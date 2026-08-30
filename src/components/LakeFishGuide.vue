@@ -5,154 +5,59 @@ const store = useFishingStore();
 <template>
   <Teleport to="body"
     ><Transition name="guide-dialog"
-      ><div v-if="store.lakeGuideOpen" class="guide-backdrop" @click.self="store.closeLakeGuide">
-        <section class="guide-card" role="dialog" aria-modal="true">
-          <header>
+      ><div
+        v-if="store.lakeGuideOpen"
+        class="fixed z-[31] inset-0 grid place-items-center p-5 bg-[rgba(4,17,11,0.72)] backdrop-blur-[7px]"
+        @click.self="store.closeLakeGuide"
+      >
+        <section
+          class="w-[min(500px,100%)] overflow-hidden border border-[rgba(255,226,149,0.68)] rounded-[20px] bg-[linear-gradient(145deg,#173d2b,#0e281b)] shadow-[0_24px_70px_rgba(0,0,0,0.48)] text-[#f4f0df]"
+          role="dialog"
+          aria-modal="true"
+        >
+          <header class="flex justify-between px-5 pt-[19px] pb-3 border-b border-[rgba(223,241,207,0.14)]">
             <div>
-              <p>Sổ tay bãi câu</p>
-              <h2>Cá trong hồ</h2>
+              <p class="m-0 text-[#e8bd62] text-[10px] font-black tracking-[0.16em] uppercase">Sổ tay bãi câu</p>
+              <h2 class="m-0 mt-1.5 text-xl">Cá trong hồ</h2>
             </div>
-            <button type="button" @click="store.closeLakeGuide">×</button>
+            <button
+              type="button"
+              class="w-[29px] h-[29px] border-0 rounded-full bg-[rgba(235,243,219,0.13)] text-white cursor-pointer text-[22px] leading-none"
+              @click="store.closeLakeGuide"
+            >
+              ×
+            </button>
           </header>
-          <div class="gear">
-            Mồi: <b>{{ store.currentBait }}</b> · Cần {{ store.equipment.rodMaxWeight }} kg · Dây
+          <div class="m-[13px] p-2.5 rounded-[10px] bg-[rgba(7,28,18,0.36)] text-[#b7cfb9] text-[11px]">
+            Mồi: <b class="text-[#f3da94]">{{ store.currentBait }}</b> · Cần {{ store.equipment.rodMaxWeight }} kg · Dây
             {{ store.equipment.lineMaxWeight }} kg · Mòn máy {{ store.equipment.reelWearPercent }}%
           </div>
-          <ul>
-            <li v-for="entry in store.fishCatchChances" :key="entry.fish.id">
-              <img :src="entry.fish.image" :alt="entry.fish.name" />
-              <div>
-                <strong>{{ entry.fish.name }}</strong
-                ><small
+          <ul class="grid gap-2 m-0 py-0 px-[13px] list-none">
+            <li
+              v-for="entry in store.fishCatchChances"
+              :key="entry.fish.id"
+              class="flex items-center gap-2.5 p-2 border border-[rgba(223,241,207,0.15)] rounded-xl bg-[rgba(7,28,18,0.35)]"
+            >
+              <img :src="entry.fish.image" :alt="entry.fish.name" class="w-[68px] h-11 rounded-[7px] object-cover" />
+              <div class="grid gap-[3px]">
+                <strong class="text-[13px]">{{ entry.fish.name }}</strong
+                ><small class="text-[#b7cfb9] text-[10px]"
                   >{{ entry.fish.weight }} kg · Ưa {{ entry.fish.favoriteBait }} · Kháng cự
                   {{ Math.round(entry.fish.resistance * 100) }}%</small
                 >
               </div>
-              <div class="rates">
-                <b>{{ entry.catch }}%</b><small>Tỉ lệ bắt</small><span>Cắn câu {{ entry.bite }}%</span>
+              <div class="ml-auto text-right">
+                <b class="text-[#e8bd62] text-lg">{{ entry.catch }}%</b><small class="text-[#b7cfb9] text-[10px]">Tỉ lệ bắt</small><span class="text-[#8fc87b] text-[9px]">Cắn câu {{ entry.bite }}%</span>
               </div>
             </li>
           </ul>
-          <p class="hint">Tỉ lệ bắt đã tính theo tải cần/dây, độ mòn máy và kỹ năng hiện tại.</p>
+          <p class="m-0 pt-[13px] px-5 pb-[18px] text-center text-[#b7cfb9] text-[10px]">Tỉ lệ bắt đã tính theo tải cần/dây, độ mòn máy và kỹ năng hiện tại.</p>
         </section>
       </div></Transition
     ></Teleport
   >
 </template>
 <style scoped>
-.guide-backdrop {
-  position: fixed;
-  z-index: 31;
-  inset: 0;
-  display: grid;
-  place-items: center;
-  padding: 20px;
-  background: rgba(4, 17, 11, 0.72);
-  backdrop-filter: blur(7px);
-}
-.guide-card {
-  width: min(500px, 100%);
-  overflow: hidden;
-  border: 1px solid rgba(255, 226, 149, 0.68);
-  border-radius: 20px;
-  background: linear-gradient(145deg, #173d2b, #0e281b);
-  box-shadow: 0 24px 70px rgba(0, 0, 0, 0.48);
-  color: #f4f0df;
-}
-header {
-  display: flex;
-  justify-content: space-between;
-  padding: 19px 20px 12px;
-  border-bottom: 1px solid rgba(223, 241, 207, 0.14);
-}
-header p,
-h2,
-.hint {
-  margin: 0;
-}
-header p {
-  color: #e8bd62;
-  font-size: 10px;
-  font-weight: 900;
-  letter-spacing: 0.16em;
-  text-transform: uppercase;
-}
-h2 {
-  margin-top: 5px;
-  font-size: 20px;
-}
-header button {
-  width: 29px;
-  height: 29px;
-  border: 0;
-  border-radius: 50%;
-  background: rgba(235, 243, 219, 0.13);
-  color: #fff;
-  cursor: pointer;
-  font-size: 22px;
-  line-height: 1;
-}
-.gear {
-  margin: 13px;
-  padding: 10px;
-  border-radius: 10px;
-  background: rgba(7, 28, 18, 0.36);
-  color: #b7cfb9;
-  font-size: 11px;
-}
-.gear b {
-  color: #f3da94;
-}
-ul {
-  display: grid;
-  gap: 8px;
-  margin: 0;
-  padding: 0 13px;
-  list-style: none;
-}
-li {
-  display: flex;
-  align-items: center;
-  gap: 10px;
-  padding: 8px;
-  border: 1px solid rgba(223, 241, 207, 0.15);
-  border-radius: 12px;
-  background: rgba(7, 28, 18, 0.35);
-}
-li img {
-  width: 68px;
-  height: 44px;
-  border-radius: 7px;
-  object-fit: cover;
-}
-li div {
-  display: grid;
-  gap: 3px;
-}
-li strong {
-  font-size: 13px;
-}
-li small,
-.hint {
-  color: #b7cfb9;
-  font-size: 10px;
-}
-.rates {
-  margin-left: auto;
-  text-align: right;
-}
-.rates b {
-  color: #e8bd62;
-  font-size: 18px;
-}
-.rates span {
-  color: #8fc87b;
-  font-size: 9px;
-}
-.hint {
-  padding: 13px 20px 18px;
-  text-align: center;
-}
 .guide-dialog-enter-active,
 .guide-dialog-leave-active {
   transition: opacity 0.18s ease;

@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { computed, ref } from "vue";
+import { computed, onBeforeUnmount, onMounted, ref } from "vue";
 import { isPointInWater } from "../data/fishingMap";
 import { useFishingStore } from "../stores/fishing";
 
@@ -11,6 +11,35 @@ const linePath = computed(() => {
   const { x, y } = store.baitPosition;
   return `M 82 17 Q 75 45 ${x} ${y}`;
 });
+
+// 4 giai đoạn trong ngày: rạng đông, ban ngày, hoàng hôn, ban đêm
+const DAY_PHASES = [
+  { key: "dawn", label: "Sáng", from: 3, to: 9, icon: "/time/sunrise.png" },
+  { key: "day", label: "Trưa", from: 9, to: 17, icon: "/time/noon.png" },
+  { key: "dusk", label: "Hoàng hôn", from: 17, to: 19, icon: "/time/dusk.png" },
+  { key: "night", label: "Ban đêm", from: 19, to: 3, icon: "/time/night.png" },
+] as const;
+
+const now = ref(new Date());
+let clockTimer: number | undefined;
+
+onMounted(() => {
+  clockTimer = window.setInterval(() => (now.value = new Date()), 1000);
+});
+onBeforeUnmount(() => {
+  if (clockTimer) window.clearInterval(clockTimer);
+});
+
+const currentPhase = computed(() => {
+  const hour = now.value.getHours();
+  return (
+    DAY_PHASES.find((phase) => (phase.from < phase.to ? hour >= phase.from && hour < phase.to : hour >= phase.from || hour < phase.to)) ??
+    DAY_PHASES[3]
+  );
+});
+const timeLabel = computed(() =>
+  now.value.toLocaleTimeString("vi-VN", { hour: "2-digit", minute: "2-digit", second: "2-digit" }),
+);
 
 function castAt(event: MouseEvent) {
   const scene = event.currentTarget as HTMLElement;
@@ -31,12 +60,14 @@ function castAt(event: MouseEvent) {
 
 <template>
   <section class="fishing-scene" @click="castAt">
-    <img src="/pond.jpg" alt="Ao câu trong rừng" class="pond-image" />
+    <img src="/pond.jpg" alt="Ao câu trong rừng" class="pond-image" draggable="false"/>
     <div class="scene-shade"></div>
     <div class="scene-top">
       <div class="location">
-        <span class="location-icon">⌖</span>
-        <div><strong>Hồ Rừng Sương</strong><small>Điểm câu yêu thích</small></div>
+        <div class="w-10 h-10 overflow-hidden">
+          <img :src="currentPhase.icon" :alt="currentPhase.label" class="location-icon" />
+        </div>
+        <div><strong>{{ timeLabel }}</strong><small>{{ currentPhase.label }}</small></div>
       </div>
       <div class="scene-actions">
         <button type="button" class="guide-button" @click.stop="store.openLakeGuide">Cá trong hồ</button>
@@ -69,7 +100,7 @@ function castAt(event: MouseEvent) {
       <span></span>
     </div>
     <div class="rod-holder" :class="castClass" aria-hidden="true">
-      <img src="/fishing-rob.jpg" alt="" class="fishing-rod" />
+      <img src="/fishing-rob.png" alt="" class="fishing-rod" />
     </div>
     <div class="bite-alert" :class="{ visible: store.castPhase === 'bite' }">! CÁ CẮN CÂU !</div>
     <div
@@ -87,7 +118,6 @@ function castAt(event: MouseEvent) {
   min-height: 0;
   overflow: hidden;
   background: #294430;
-  cursor: crosshair;
 }
 .pond-image {
   position: absolute;
@@ -96,6 +126,7 @@ function castAt(event: MouseEvent) {
   height: 100%;
   object-fit: cover;
   object-position: center 62%;
+  cursor: crosshair;
 }
 .scene-shade {
   position: absolute;
@@ -132,9 +163,10 @@ function castAt(event: MouseEvent) {
 .location-icon {
   display: grid;
   place-items: center;
-  width: 31px;
-  height: 31px;
   border-radius: 9px;
+  transform: scale(2);
+  transform-origin: top;
+  object-fit: cover;
   background: #eebd55;
   color: #244635;
   font-size: 21px;
@@ -303,7 +335,7 @@ function castAt(event: MouseEvent) {
   right: -8px;
   bottom: -20%;
   width: 190px;
-  height: min(95vh, 740px);
+  height: min(80vh, 740px);
   pointer-events: none;
   transform-origin: 64% 91%;
   transition: transform 0.28s ease-out;

@@ -143,35 +143,35 @@ function stopDragging(event: PointerEvent) {
 </script>
 
 <template>
-  <div class="map-page h-screen p-3 relative">
-    <aside class="map-sidebar">
-      <div class="sidebar-header">
-        <h2>Bản đồ</h2>
-        <span class="anchor-count">{{ anchors.length }}</span>
+  <div class="map-page h-screen p-3 relative flex gap-3">
+    <aside class="map-sidebar w-60 flex-none p-4 border-2 border-[#263238] rounded-xl bg-white text-[#263238] shadow-[0_8px_24px_rgba(38,50,56,0.12)]">
+      <div class="flex items-center justify-between">
+        <h2 class="m-0 text-lg">Bản đồ</h2>
+        <span class="grid place-items-center w-6 h-6 rounded-full bg-[#d84315] text-white text-xs font-bold">{{ anchors.length }}</span>
       </div>
 
-      <label class="anchor-toggle">
+      <label class="anchor-toggle relative flex items-center justify-between mt-5 py-3 border-t border-b border-[#d5ddda] cursor-pointer">
         <span>
-          <strong>Tạo điểm neo</strong>
-          <small>{{ isAnchorMode ? "Đang bật" : "Đang tắt" }}</small>
+          <strong class="block">Tạo điểm neo</strong>
+          <small class="block mt-[3px] text-[#607176] text-xs">{{ isAnchorMode ? "Đang bật" : "Đang tắt" }}</small>
         </span>
-        <input v-model="isAnchorMode" type="checkbox" />
+        <input v-model="isAnchorMode" type="checkbox" class="absolute opacity-0" />
         <span class="toggle-track" aria-hidden="true"></span>
       </label>
 
-      <div class="anchor-list">
-        <div class="list-header">
+      <div class="mt-5">
+        <div class="flex items-center justify-between text-[13px] font-bold">
           <span>Điểm đã neo</span>
-          <button v-if="anchors.length" type="button" class="clear-button" @click="clearAnchors">Hủy tất cả</button>
+          <button v-if="anchors.length" type="button" class="border-0 bg-transparent text-[#d84315] cursor-pointer text-xs" @click="clearAnchors">Hủy tất cả</button>
         </div>
-        <p v-if="!anchors.length" class="empty-list">Chưa có điểm neo</p>
-        <ul v-else>
-          <li v-for="(anchor, index) in anchors" :key="anchor.id">
-            <span class="anchor-index">{{ index + 1 }}</span>
-            <span class="anchor-name">{{ anchor.title }}</span>
+        <p v-if="!anchors.length" class="mt-[3px] mb-0 text-[#607176] text-xs">Chưa có điểm neo</p>
+        <ul v-else class="grid gap-2 p-0 mt-3 mb-0 list-none">
+          <li v-for="(anchor, index) in anchors" :key="anchor.id" class="flex items-center gap-2 min-w-0">
+            <span class="grid place-items-center w-6 h-6 rounded-full bg-[#d84315] text-white text-xs font-bold">{{ index + 1 }}</span>
+            <span class="flex-1 overflow-hidden text-ellipsis whitespace-nowrap text-xs">{{ anchor.title }}</span>
             <button
               type="button"
-              class="remove-button"
+              class="border-0 bg-transparent text-[#d84315] cursor-pointer px-[5px] py-0.5 text-lg leading-none"
               :aria-label="`Hủy điểm neo ${anchor.title}`"
               @click="removeAnchor(anchor.id)"
             >
@@ -184,8 +184,8 @@ function stopDragging(event: PointerEvent) {
 
     <div
       ref="mapFrame"
-      class="map-frame"
-      :class="{ dragging: isDragging, 'anchor-mode': isAnchorMode }"
+      class="map-frame flex-1 min-w-0 h-full overflow-hidden border-2 border-[#263238] rounded-xl bg-[#eef3f1] shadow-[0_8px_24px_rgba(38,50,56,0.18)] touch-none"
+      :class="isDragging ? 'cursor-grabbing' : isAnchorMode ? 'cursor-crosshair' : 'cursor-grab'"
       @wheel="handleWheel"
       @pointerdown="handlePointerDown"
       @pointermove="handlePointerMove"
@@ -193,8 +193,12 @@ function stopDragging(event: PointerEvent) {
       @pointercancel="stopDragging"
       @click="handleMapClick"
     >
-      <div class="map-content" :style="{ transform: `translate(${pan.x}px, ${pan.y}px) scale(${zoom})` }">
-        <WorldMap @mousemove="handleMouseMove" />
+      <div
+        class="w-full h-full relative grid place-items-center origin-center transition-transform duration-[120ms] ease-out"
+        :class="{ '!transition-none': isDragging }"
+        :style="{ transform: `translate(${pan.x}px, ${pan.y}px) scale(${zoom})` }"
+      >
+        <WorldMap class="w-full h-full" @mousemove="handleMouseMove" />
         <div
           v-for="(anchor, index) in anchors"
           :key="index"
@@ -213,82 +217,6 @@ function stopDragging(event: PointerEvent) {
 </template>
 
 <style lang="css">
-.map-frame {
-  flex: 1;
-  min-width: 0;
-  height: 100%;
-  overflow: hidden;
-  border: 2px solid #263238;
-  border-radius: 12px;
-  background: #eef3f1;
-  box-shadow: 0 8px 24px rgba(38, 50, 56, 0.18);
-  cursor: grab;
-  touch-action: none;
-}
-
-.map-page {
-  display: flex;
-  gap: 12px;
-}
-
-.map-sidebar {
-  width: 240px;
-  flex: 0 0 240px;
-  padding: 16px;
-  border: 2px solid #263238;
-  border-radius: 12px;
-  background: #ffffff;
-  color: #263238;
-  box-shadow: 0 8px 24px rgba(38, 50, 56, 0.12);
-}
-
-.sidebar-header,
-.list-header,
-.anchor-toggle {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-}
-
-.sidebar-header h2 {
-  margin: 0;
-  font-size: 18px;
-}
-
-.anchor-count,
-.anchor-index {
-  display: grid;
-  place-items: center;
-  width: 24px;
-  height: 24px;
-  border-radius: 50%;
-  background: #d84315;
-  color: #ffffff;
-  font-size: 12px;
-  font-weight: 700;
-}
-
-.anchor-toggle {
-  position: relative;
-  margin-top: 20px;
-  padding: 12px 0;
-  border-top: 1px solid #d5ddda;
-  border-bottom: 1px solid #d5ddda;
-  cursor: pointer;
-}
-
-.anchor-toggle strong,
-.anchor-toggle small {
-  display: block;
-}
-
-.anchor-toggle small,
-.empty-list {
-  margin-top: 3px;
-  color: #607176;
-  font-size: 12px;
-}
-
 .anchor-toggle input {
   position: absolute;
   opacity: 0;
@@ -319,84 +247,6 @@ function stopDragging(event: PointerEvent) {
 
 .anchor-toggle input:checked + .toggle-track::after {
   transform: translateX(16px);
-}
-
-.anchor-list {
-  margin-top: 20px;
-}
-
-.list-header {
-  font-size: 13px;
-  font-weight: 700;
-}
-
-.clear-button,
-.remove-button {
-  border: 0;
-  background: transparent;
-  color: #d84315;
-  cursor: pointer;
-  font-size: 12px;
-}
-
-.anchor-list ul {
-  display: grid;
-  gap: 8px;
-  padding: 0;
-  margin: 12px 0 0;
-  list-style: none;
-}
-
-.anchor-list li {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  min-width: 0;
-}
-
-.anchor-name {
-  flex: 1;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  white-space: nowrap;
-  font-size: 12px;
-}
-
-.remove-button {
-  padding: 2px 5px;
-  font-size: 18px;
-  line-height: 1;
-}
-
-.empty-list {
-  margin-bottom: 0;
-}
-
-.map-frame.anchor-mode {
-  cursor: crosshair;
-}
-
-.map-frame.dragging {
-  cursor: grabbing;
-}
-
-.map-frame.dragging .map-content {
-  transition: none;
-}
-
-.map-content {
-  width: 100%;
-  height: 100%;
-  position: relative;
-  display: grid;
-  place-items: center;
-  transform-origin: center;
-  transition: transform 120ms ease-out;
-}
-
-.map-content svg {
-  width: 100%;
-  height: 100%;
 }
 
 .map-anchor {
@@ -462,3 +312,4 @@ path:hover {
   }
 }
 </style>
+

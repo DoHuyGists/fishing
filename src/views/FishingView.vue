@@ -38,12 +38,15 @@ onBeforeUnmount(() => {
 </script>
 
 <template>
-  <main class="fishing-page">
-    <div class="content-grid">
+  <main class="w-full h-screen overflow-hidden touch-none overscroll-none bg-[#193224] text-[#e9f4e8] font-[Inter,ui-sans-serif,system-ui,sans-serif]">
+    <div class="grid grid-rows-[minmax(0,1fr)_auto] w-full h-full">
       <FishingScene />
       <section class="control-deck">
         <div class="side-panel">
-          <div class="panel-heading"><span>Trang bị</span><small>Chạm để đổi dụng cụ</small></div>
+          <div class="flex justify-between items-baseline mx-[3px] mb-2">
+            <span class="text-[#f1e6b7] text-[11px] font-black tracking-[0.08em] uppercase">Trang bị</span>
+            <small class="text-[#b8cab5] text-[9px]">Chạm để đổi dụng cụ</small>
+          </div>
           <EquipmentMenu />
         </div>
         <PowerMeter />
@@ -57,22 +60,6 @@ onBeforeUnmount(() => {
 </template>
 
 <style scoped>
-.fishing-page {
-  width: 100%;
-  height: 100vh;
-  overflow: hidden;
-  touch-action: none;
-  overscroll-behavior: none;
-  background: #193224;
-  color: #e9f4e8;
-  font-family: Inter, ui-sans-serif, system-ui, sans-serif;
-}
-.content-grid {
-  display: grid;
-  grid-template-rows: minmax(0, 1fr) auto;
-  width: 100%;
-  height: 100%;
-}
 .control-deck {
   z-index: 5;
   display: grid;
@@ -87,23 +74,6 @@ onBeforeUnmount(() => {
   border: 1px solid rgba(225, 246, 214, 0.23);
   border-radius: 16px;
   background: linear-gradient(135deg, rgba(16, 42, 27, 0.89), rgba(27, 61, 41, 0.82));
-}
-.panel-heading {
-  display: flex;
-  justify-content: space-between;
-  align-items: baseline;
-  margin: 0 3px 8px;
-}
-.panel-heading span {
-  color: #f1e6b7;
-  font-size: 11px;
-  font-weight: 900;
-  letter-spacing: 0.08em;
-  text-transform: uppercase;
-}
-.panel-heading small {
-  color: #b8cab5;
-  font-size: 9px;
 }
 .control-deck :deep(.tool) {
   border-color: rgba(237, 248, 221, 0.14);

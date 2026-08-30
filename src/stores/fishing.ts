@@ -1,6 +1,7 @@
 import { defineStore } from "pinia";
 import { biteProbability, catchProbability, lakeFish, type Equipment, type Fish } from "../data/fishingLogic";
-export type FishingTool = "rod" | "bait" | "lure" | "net";
+import { equipmentVariants } from "../data/equipmentCatalog";
+export type FishingTool = "rod" | "line" | "reel" | "hook" | "bait";
 export type CastPhase = "idle" | "casting" | "waiting" | "bite" | "fighting" | "caught" | "lost";
 export type CaughtFish = {
   id: number;
@@ -38,7 +39,14 @@ export const useFishingStore = defineStore("fishing", {
     bagOpen: false,
     lakeGuideOpen: false,
     activeFish: null as Fish | null,
-    equipment: { rodMaxWeight: 4.5, lineMaxWeight: 4, reelWearPercent: 8 } as Equipment,
+    equipment: { rodMaxWeight: 4.5, lineMaxWeight: 4, reelWearPercent: 8, reelDurability: 1, hookStrength: 1 } as Equipment,
+    equipmentLoadout: {
+      rod: "rod-bamboo",
+      line: "line-nylon",
+      reel: "reel-basic",
+      hook: "hook-standard",
+      bait: "bait-worm",
+    } as Record<FishingTool, string>,
     playerSkillMultiplier: 1.1,
     playersOpen: false,
     selectedPlayer: null as FishingPlayer | null,
@@ -79,18 +87,31 @@ export const useFishingStore = defineStore("fishing", {
   }),
   getters: {
     canPull: (s) => s.castPhase === "bite" || s.castPhase === "fighting",
-    currentBait: (s) => (s.selectedTool === "lure" ? "Cá nhỏ" : "Giun đất"),
+    currentBait: (s) => {
+      const variant = equipmentVariants.bait.find((v) => v.id === s.equipmentLoadout.bait);
+      return variant?.baitName ?? "Giun đất";
+    },
     tensionState: (s) => (s.tension >= MAX_TENSION - 10 ? "danger" : s.tension >= SAFE_TENSION ? "safe" : "low"),
-    fishCatchChances: (s) =>
-      lakeFish.map((fish) => ({
+    fishCatchChances(state): { fish: Fish; bite: number; catch: number }[] {
+      return lakeFish.map((fish) => ({
         fish,
-        bite: Math.round(biteProbability(fish, s.selectedTool === "lure" ? "Cá nhỏ" : "Giun đất") * 100),
-        catch: Math.round(catchProbability(fish, s.equipment, s.playerSkillMultiplier) * 100),
-      })),
+        bite: Math.round(biteProbability(fish, this.currentBait) * 100),
+        catch: Math.round(catchProbability(fish, state.equipment, state.playerSkillMultiplier) * 100),
+      }));
+    },
   },
   actions: {
     selectTool(tool: FishingTool) {
       this.selectedTool = tool;
+    },
+    selectVariant(category: FishingTool, variantId: string) {
+      this.equipmentLoadout[category] = variantId;
+      const variant = equipmentVariants[category].find((v) => v.id === variantId);
+      if (!variant) return;
+      if (variant.rodMaxWeight !== undefined) this.equipment.rodMaxWeight = variant.rodMaxWeight;
+      if (variant.lineMaxWeight !== undefined) this.equipment.lineMaxWeight = variant.lineMaxWeight;
+      if (variant.reelDurability !== undefined) this.equipment.reelDurability = variant.reelDurability;
+      if (variant.hookStrength !== undefined) this.equipment.hookStrength = variant.hookStrength;
     },
     castTo(x: number, y: number) {
       if (!(["idle", "waiting", "lost"] as CastPhase[]).includes(this.castPhase)) return;
@@ -119,8 +140,7 @@ export const useFishingStore = defineStore("fishing", {
         this.castPhase = "bite";
         this.castMessage = `${fish.name} đang cắn câu! Chuẩn bị kéo!`;
         window.setTimeout(() => {
-          if (attempt === this.castAttempt && this.castPhase === "bite")
-            this.loseFish("Cá đã nhả mồi — bạn phản ứng quá chậm!");
+          if (attempt === this.castAttempt && this.castPhase === "bite") this.loseFish("Cá đã nhả mồi — bạn phản ứng quá chậm!");
         }, 3000);
       }, biteDelay);
     },
@@ -168,7 +188,7 @@ export const useFishingStore = defineStore("fishing", {
       this.isPulling = false;
       if (!fish) return this.loseFish("Cá đã thoát khỏi lưỡi câu!");
       const chance = catchProbability(fish, this.equipment, this.playerSkillMultiplier);
-      this.equipment.reelWearPercent = Math.min(95, this.equipment.reelWearPercent + 1);
+      this.equipment.reelWearPercent = Math.min(95, this.equipment.reelWearPercent + this.equipment.reelDurability);
       if (Math.random() >= chance) return this.loseFish("Cá quá nặng, đứt dây câu!");
       this.castPhase = "caught";
       this.castMessage = "Bạn đã câu được cá!";

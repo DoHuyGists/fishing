@@ -15,6 +15,8 @@ export interface Equipment {
   rodMaxWeight: number;
   lineMaxWeight: number;
   reelWearPercent: number;
+  reelDurability: number; // hệ số nhân độ hao mòn cuộn dây mỗi lần bắt cá, càng thấp càng bền
+  hookStrength: number; // hệ số nhân tỉ lệ móc/giữ cá của móc câu
 }
 export const lakeFish: Fish[] = [
   {
@@ -57,20 +59,10 @@ export const lakeFish: Fish[] = [
     biteDelayRange: [3000, 6000],
   },
 ];
-export const biteProbability = (fish: Fish, bait: string) =>
-  Math.min(1, fish.baseBiteRate * (bait === fish.favoriteBait ? 1.5 : 0.8));
-export const catchProbability = (fish: Fish, equip: Equipment, skill = 1) =>
-  Math.max(
-    0.05,
-    Math.min(
-      0.95,
-      (Math.min(equip.rodMaxWeight, equip.lineMaxWeight) / fish.weight) * (1 - equip.reelWearPercent / 100) * skill,
-    ),
-  );
+export const biteProbability = (fish: Fish, bait: string) => Math.min(1, fish.baseBiteRate * (bait === fish.favoriteBait ? 1.5 : 0.8));
+export const catchProbability = (fish: Fish, equip: Equipment, skill = 1) => Math.max(0.05, Math.min(0.95, (Math.min(equip.rodMaxWeight, equip.lineMaxWeight) / fish.weight) * (1 - equip.reelWearPercent / 100) * equip.hookStrength * skill));
 export function calculateFishingOutcome(fish: Fish, bait: string, equip: Equipment, skill = 1) {
   if (Math.random() >= biteProbability(fish, bait)) return { status: "NO_BITE" as const, message: "Cá không cắn mồi!" };
   const chance = catchProbability(fish, equip, skill);
-  return Math.random() < chance
-    ? { status: "SUCCESS" as const, catchProbability: Math.round(chance * 100) }
-    : { status: "LINE_BROKEN" as const, message: "Cá quá nặng, đứt dây câu!" };
+  return Math.random() < chance ? { status: "SUCCESS" as const, catchProbability: Math.round(chance * 100) } : { status: "LINE_BROKEN" as const, message: "Cá quá nặng, đứt dây câu!" };
 }

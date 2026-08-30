@@ -33,161 +33,36 @@ onBeforeUnmount(() => {
 </script>
 
 <template>
-  <section class="power-meter" :class="`tension-${store.tensionState}`">
-    <div class="power-title">
-      <span class="bolt">↯</span>
-      <div>
-        <strong>Lực kéo</strong><small>{{ store.canPull ? "Giữ để tăng, buông để giảm" : "Chờ cá cắn câu" }}</small>
+  <section class="power-meter p-3 px-3.5 rounded-[15px] border border-[#e3e0d8] bg-[#fffefa]">
+    <div class="power-title flex items-center gap-2 text-[#385645]">
+      <span class="grid place-items-center w-[27px] h-[27px] rounded-lg bg-[#f8e6b8] text-[#be7b1d] text-[22px] font-black">↯</span>
+      <div class="flex-1">
+        <strong class="block text-[11px]">Lực kéo</strong><small class="block mt-0.5 text-[#879188] text-[9px]">{{ store.canPull ? "Giữ để tăng, buông để giảm" : "Chờ cá cắn câu" }}</small>
       </div>
-      <b>{{ Math.round(store.tension) }}%</b>
+      <b class="text-[13px]" :class="store.tensionState === 'danger' ? 'text-[#e8593f]' : 'text-[#e29a31]'">{{ Math.round(store.tension) }}%</b>
     </div>
-    <div class="power-track">
-      <span class="safe-zone"></span>
-      <div class="power-fill" :style="{ width: `${store.tension}%` }"><i></i></div>
+    <div class="power-track relative h-2 my-2.5 overflow-hidden rounded-full bg-[#e6e9df]">
+      <span class="absolute z-[1] top-0 bottom-0 left-[28%] w-[54%] bg-[rgba(118,175,83,0.26)]"></span>
+      <div class="relative z-[2] h-full rounded-[inherit] bg-[linear-gradient(90deg,#8dbb64,#f1bd4e_70%,#e66f44)] transition-[width] duration-[0.06s] ease-linear" :style="{ width: `${store.tension}%` }">
+        <i class="absolute right-0 -top-0.5 w-1 h-3 rounded-[3px] bg-white not-italic"></i>
+      </div>
     </div>
-    <div class="progress-label">
-      <span>Tiến độ kéo cá</span><b>{{ Math.round(store.catchProgress) }}%</b>
+    <div class="flex justify-between text-[#617363] text-[9px] font-bold">
+      <span>Tiến độ kéo cá</span><b class="text-[#e29a31] text-[13px]">{{ Math.round(store.catchProgress) }}%</b>
     </div>
-    <div class="catch-track"><i :style="{ width: `${store.catchProgress}%` }"></i></div>
+    <div class="relative h-[5px] my-[5px] mb-2.5 overflow-hidden rounded-full bg-[#e6e9df]">
+      <i class="block h-full rounded-[inherit] bg-[#75b865] transition-[width] duration-100 ease-linear not-italic" :style="{ width: `${store.catchProgress}%` }"></i>
+    </div>
     <button
       type="button"
-      class="cast-button"
+      class="cast-button w-full p-2.5 rounded-[10px] border-0 bg-[#3f7652] shadow-[0_4px_0_#2d593c] text-white cursor-pointer text-[11px] font-extrabold tracking-[0.01em] touch-none enabled:active:translate-y-[3px] enabled:active:shadow-[0_1px_0_#2d593c] disabled:cursor-not-allowed disabled:opacity-45"
       :disabled="!store.canPull"
       @pointerdown.prevent="beginPull"
       @pointerup="releasePull"
       @pointerleave="releasePull"
       @pointercancel="releasePull"
     >
-      <span>⌁</span>{{ store.isPulling ? "Đang kéo cần..." : "Nhấn giữ để kéo" }}
+      <span class="mr-[7px] text-[#ffe18a] text-base">⌁</span>{{ store.isPulling ? "Đang kéo cần..." : "Nhấn giữ để kéo" }}
     </button>
   </section>
 </template>
-
-<style scoped>
-.power-meter {
-  padding: 12px 14px;
-  border: 1px solid #e3e0d8;
-  border-radius: 15px;
-  background: #fffefa;
-}
-.power-title {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  color: #385645;
-}
-.bolt {
-  display: grid;
-  place-items: center;
-  width: 27px;
-  height: 27px;
-  border-radius: 8px;
-  background: #f8e6b8;
-  color: #be7b1d;
-  font-size: 22px;
-  font-weight: 900;
-}
-.power-title div {
-  flex: 1;
-}
-.power-title strong,
-.power-title small {
-  display: block;
-}
-.power-title strong {
-  font-size: 11px;
-}
-.power-title small {
-  margin-top: 2px;
-  color: #879188;
-  font-size: 9px;
-}
-.power-title b,
-.progress-label b {
-  color: #e29a31;
-  font-size: 13px;
-}
-.power-track,
-.catch-track {
-  position: relative;
-  height: 8px;
-  margin: 10px 0;
-  overflow: hidden;
-  border-radius: 99px;
-  background: #e6e9df;
-}
-.safe-zone {
-  position: absolute;
-  z-index: 1;
-  top: 0;
-  bottom: 0;
-  left: 28%;
-  width: 54%;
-  background: rgba(118, 175, 83, 0.26);
-}
-.power-fill {
-  position: relative;
-  z-index: 2;
-  height: 100%;
-  border-radius: inherit;
-  background: linear-gradient(90deg, #8dbb64, #f1bd4e 70%, #e66f44);
-  transition: width 0.06s linear;
-}
-.power-fill i {
-  position: absolute;
-  right: 0;
-  top: -2px;
-  width: 4px;
-  height: 12px;
-  border-radius: 3px;
-  background: white;
-}
-.tension-danger .power-title b {
-  color: #e8593f;
-}
-.progress-label {
-  display: flex;
-  justify-content: space-between;
-  color: #617363;
-  font-size: 9px;
-  font-weight: 700;
-}
-.catch-track {
-  height: 5px;
-  margin: 5px 0 10px;
-}
-.catch-track i {
-  display: block;
-  height: 100%;
-  border-radius: inherit;
-  background: #75b865;
-  transition: width 0.1s linear;
-}
-.cast-button {
-  width: 100%;
-  padding: 10px;
-  border: 0;
-  border-radius: 10px;
-  background: #3f7652;
-  box-shadow: 0 4px 0 #2d593c;
-  color: white;
-  cursor: pointer;
-  font-size: 11px;
-  font-weight: 800;
-  letter-spacing: 0.01em;
-  touch-action: none;
-}
-.cast-button:active:not(:disabled) {
-  transform: translateY(3px);
-  box-shadow: 0 1px 0 #2d593c;
-}
-.cast-button:disabled {
-  cursor: not-allowed;
-  opacity: 0.45;
-}
-.cast-button span {
-  margin-right: 7px;
-  color: #ffe18a;
-  font-size: 16px;
-}
-</style>
