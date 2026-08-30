@@ -4,12 +4,15 @@ export type MapPoint = { x: number; y: number };
 // mà không cần thay đổi cơ chế câu cá.
 export const waterBoundary: MapPoint[] = [
   { x: 0, y: 51 },
-  { x: 15, y: 40 },
-  { x: 32, y: 54 },
-  { x: 50, y: 57 },
-  { x: 66, y: 60 },
-  { x: 82, y: 65 },
-  { x: 100, y: 72 },
+  { x: 5, y: 50 },
+  { x: 15, y: 46 },
+  { x: 32, y: 46 },
+  { x: 50, y: 50 },
+  { x: 60, y: 56 },
+  { x: 65, y: 61 },
+  { x: 75, y: 66 },
+  { x: 82, y: 69 },
+  { x: 100, y: 77},
   { x: 100, y: 100 },
   { x: 0, y: 100 },
 ];

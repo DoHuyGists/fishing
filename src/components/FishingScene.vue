@@ -1,15 +1,31 @@
 <script setup lang="ts">
 import { computed, onBeforeUnmount, onMounted, ref } from "vue";
-import { isPointInWater } from "../data/fishingMap";
+import { isPointInWater, waterBoundary } from "../data/fishingMap";
 import { useFishingStore } from "../stores/fishing";
 
 const store = useFishingStore();
+const sceneElement = ref<HTMLElement | null>(null);
+const rodLineAnchor = ref<HTMLElement | null>(null);
+const fishingRod = ref({
+  x: 0,
+  y: 0,
+});
+const rodLineOffset = {
+  x: 0,
+  y: 0,
+};
 const ripple = ref(false);
 const invalidTap = ref(false);
 const castClass = computed(() => `phase-${store.castPhase}`);
+const waterBoundaryPoints = waterBoundary.map(({ x, y }) => `${x},${y}`).join(" ");
 const linePath = computed(() => {
   const { x, y } = store.baitPosition;
-  return `M 82 17 Q 75 45 ${x} ${y}`;
+  const { x: rodX, y: rodY } = fishingRod.value;
+  const distance = Math.hypot(x - rodX, y - rodY);
+  const sag = Math.min(18, Math.max(8, distance * 0.18));
+  const controlX = (rodX + x) / 2;
+  const controlY = (rodY + y) / 2 + sag;
+  return `M ${rodX} ${rodY} Q ${controlX} ${controlY} ${x} ${y}`;
 });
 
 // 4 giai đoạn trong ngày: rạng đông, ban ngày, hoàng hôn, ban đêm
@@ -22,12 +38,33 @@ const DAY_PHASES = [
 
 const now = ref(new Date());
 let clockTimer: number | undefined;
+let rodPositionFrame: number | undefined;
+
+function updateRodPosition() {
+  if (!sceneElement.value || !rodLineAnchor.value) return;
+
+  const sceneBounds = sceneElement.value.getBoundingClientRect();
+  const anchorBounds = rodLineAnchor.value.getBoundingClientRect();
+  fishingRod.value = {
+    x: ((anchorBounds.left + anchorBounds.width / 2 - sceneBounds.left) / sceneBounds.width) * 100 + rodLineOffset.x,
+    y: ((anchorBounds.top + anchorBounds.height / 2 - sceneBounds.top) / sceneBounds.height) * 100 + rodLineOffset.y,
+  };
+}
+
+function trackRodPosition() {
+  updateRodPosition();
+  rodPositionFrame = window.requestAnimationFrame(trackRodPosition);
+}
 
 onMounted(() => {
   clockTimer = window.setInterval(() => (now.value = new Date()), 1000);
+  trackRodPosition();
+  window.addEventListener("resize", updateRodPosition);
 });
 onBeforeUnmount(() => {
   if (clockTimer) window.clearInterval(clockTimer);
+  if (rodPositionFrame) window.cancelAnimationFrame(rodPositionFrame);
+  window.removeEventListener("resize", updateRodPosition);
 });
 
 const currentPhase = computed(() => {
@@ -54,12 +91,12 @@ function castAt(event: MouseEvent) {
   }
   store.castTo(x, y);
   ripple.value = true;
-  window.setTimeout(() => (ripple.value = false), 1200);
+  window.setTimeout(() => (ripple.value = false), 900);
 }
 </script>
 
 <template>
-  <section class="fishing-scene" @click="castAt">
+  <section ref="sceneElement" class="fishing-scene" @click="castAt">
     <img src="/pond.jpg" alt="Ao câu trong rừng" class="pond-image" draggable="false"/>
     <div class="scene-shade"></div>
     <div class="scene-top">
@@ -83,13 +120,16 @@ function castAt(event: MouseEvent) {
 
     <!-- <div class="scene-instruction">Chạm mặt hồ để vung cần đến điểm đó</div> -->
     <div class="water-glow"></div>
+    <svg class="water-boundary-debug" viewBox="0 0 100 100" preserveAspectRatio="none" aria-hidden="true">
+      <polygon :points="waterBoundaryPoints" />
+    </svg>
     <div v-if="invalidTap" class="invalid-tap">Chọn phần mặt nước</div>
     <div
       v-if="ripple"
       class="ripple"
       :style="{ left: `${store.baitPosition.x}%`, top: `${store.baitPosition.y}%` }"
     ></div>
-    <svg class="casting-line" :class="castClass" viewBox="0 0 100 100" preserveAspectRatio="none" aria-hidden="true">
+    <svg class="casting-line" :class="castClass" viewBox="0 0 100 100" preserveAspectRatio="none" pathLength="100" aria-hidden="true">
       <path :d="linePath" />
     </svg>
     <div
@@ -101,6 +141,7 @@ function castAt(event: MouseEvent) {
     </div>
     <div class="rod-holder" :class="castClass" aria-hidden="true">
       <img src="/fishing-rob.png" alt="" class="fishing-rod" />
+      <span ref="rodLineAnchor" class="rod-line-anchor"></span>
     </div>
     <div class="bite-alert" :class="{ visible: store.castPhase === 'bite' }">! CÁ CẮN CÂU !</div>
     <div
@@ -258,6 +299,22 @@ function castAt(event: MouseEvent) {
   background: radial-gradient(ellipse, rgba(225, 242, 187, 0.28), transparent 68%);
   pointer-events: none;
 }
+.water-boundary-debug {
+  position: absolute;
+  z-index: 2;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  overflow: visible;
+  pointer-events: none;
+}
+.water-boundary-debug polygon {
+  fill: rgba(74, 198, 219, 0.18);
+  stroke: rgba(229, 255, 255, 0.9);
+  stroke-width: 0.6;
+  stroke-dasharray: 1 6;
+  vector-effect: non-scaling-stroke;
+}
 .invalid-tap {
   position: absolute;
   z-index: 5;
@@ -285,7 +342,7 @@ function castAt(event: MouseEvent) {
 .casting-line path {
   fill: none;
   stroke: rgba(241, 242, 223, 0.9);
-  stroke-width: 0.18;
+  stroke-width: 0.3;
   vector-effect: non-scaling-stroke;
   filter: drop-shadow(0 1px 1px rgba(0, 0, 0, 0.35));
 }
@@ -295,8 +352,8 @@ function castAt(event: MouseEvent) {
   opacity: 0;
 }
 .casting-line.phase-casting path {
-  stroke-dasharray: 130;
-  stroke-dashoffset: 130;
+  stroke-dasharray: 100;
+  stroke-dashoffset: 100;
   animation: cast-line 0.38s 0.17s ease-out forwards;
 }
 .bait-float {
@@ -348,6 +405,14 @@ function castAt(event: MouseEvent) {
   mix-blend-mode: multiply;
   filter: drop-shadow(-5px 7px 5px rgba(0, 0, 0, 0.25));
 }
+.rod-line-anchor {
+  position: absolute;
+  top: 2.2%;
+  left: 47%;
+  width: 1px;
+  height: 1px;
+  pointer-events: none;
+}
 .rod-holder.phase-idle,
 .rod-holder.phase-waiting,
 .rod-holder.phase-bite,
@@ -369,7 +434,7 @@ function castAt(event: MouseEvent) {
   border: 2px solid rgba(255, 255, 255, 0.87);
   border-radius: 50%;
   transform: translate(-50%, -50%);
-  animation: ripple 1.2s ease-out forwards;
+  animation: ripple 1s linear forwards;
 }
 .ripple::after {
   content: "";
@@ -487,7 +552,7 @@ function castAt(event: MouseEvent) {
 }
 @keyframes ripple {
   to {
-    width: 180px;
+    width: 100px;
     opacity: 0;
   }
 }

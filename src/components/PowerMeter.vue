@@ -53,16 +53,26 @@ onBeforeUnmount(() => {
     <div class="relative h-[5px] my-[5px] mb-2.5 overflow-hidden rounded-full bg-[#e6e9df]">
       <i class="block h-full rounded-[inherit] bg-[#75b865] transition-[width] duration-100 ease-linear not-italic" :style="{ width: `${store.catchProgress}%` }"></i>
     </div>
-    <button
-      type="button"
-      class="cast-button w-full p-2.5 rounded-[10px] border-0 bg-[#3f7652] shadow-[0_4px_0_#2d593c] text-white cursor-pointer text-[11px] font-extrabold tracking-[0.01em] touch-none enabled:active:translate-y-[3px] enabled:active:shadow-[0_1px_0_#2d593c] disabled:cursor-not-allowed disabled:opacity-45"
-      :disabled="!store.canPull"
-      @pointerdown.prevent="beginPull"
-      @pointerup="releasePull"
-      @pointerleave="releasePull"
-      @pointercancel="releasePull"
-    >
-      <span class="mr-[7px] text-[#ffe18a] text-base">⌁</span>{{ store.isPulling ? "Đang kéo cần..." : "Nhấn giữ để kéo" }}
-    </button>
+    <div class="mt-3 flex gap-2">
+      <button
+        type="button"
+        class="reel-button flex-1 rounded-[10px] border border-[#d8c69b] bg-[#fff4db] px-2.5 py-2 text-[11px] font-extrabold text-[#6f5521] shadow-[0_3px_0_#e1b770] transition-all touch-none enabled:active:translate-y-[2px] enabled:active:shadow-[0_1px_0_#e1b770] disabled:cursor-not-allowed disabled:opacity-45"
+        :disabled="!store.canReelIn"
+        @click="store.reelInBait"
+      >
+        <span class="mr-[6px] text-base">↶</span>Thu mồi
+      </button>
+      <button
+        type="button"
+        class="cast-button flex-1 rounded-[10px] border-0 bg-[#3f7652] shadow-[0_4px_0_#2d593c] text-white cursor-pointer px-2.5 py-2 text-[11px] font-extrabold tracking-[0.01em] touch-none enabled:active:translate-y-[3px] enabled:active:shadow-[0_1px_0_#2d593c] disabled:cursor-not-allowed disabled:opacity-45"
+        :disabled="!store.canPull"
+        @pointerdown.prevent="beginPull"
+        @pointerup="releasePull"
+        @pointerleave="releasePull"
+        @pointercancel="releasePull"
+      >
+        <span class="mr-[7px] text-[#ffe18a] text-base">⌁</span>{{ store.isPulling ? "Đang kéo cần..." : "Nhấn giữ để kéo" }}
+      </button>
+    </div>
   </section>
 </template>

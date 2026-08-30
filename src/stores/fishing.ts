@@ -1,4 +1,4 @@
-import { defineStore } from "pinia";
+﻿import { defineStore } from "pinia";
 import { biteProbability, catchProbability, lakeFish, type Equipment, type Fish } from "../data/fishingLogic";
 import { equipmentVariants } from "../data/equipmentCatalog";
 export type FishingTool = "rod" | "line" | "reel" | "hook" | "bait";
@@ -29,7 +29,7 @@ export const useFishingStore = defineStore("fishing", {
     selectedTool: "rod" as FishingTool,
     castPhase: "idle" as CastPhase,
     baitPosition: { x: 56, y: 60 },
-    castMessage: "Sẵn sàng thả câu",
+    castMessage: "Sáºµn sÃ ng tháº£ cÃ¢u",
     isCasting: false,
     isPulling: false,
     tension: 0,
@@ -55,30 +55,30 @@ export const useFishingStore = defineStore("fishing", {
         id: 1,
         name: "Minh An",
         level: 18,
-        title: "Thợ câu hồ",
+        title: "Thá»£ cÃ¢u há»“",
         caughtCount: 42,
-        bestCatch: "Cá chép 6.2 kg",
+        bestCatch: "CÃ¡ chÃ©p 6.2 kg",
         avatar: "MA",
         color: "#d99157",
       },
       {
         id: 2,
-        name: "Bảo Ngọc",
+        name: "Báº£o Ngá»c",
         level: 27,
-        title: "Người săn cá hiếm",
+        title: "NgÆ°á»i sÄƒn cÃ¡ hiáº¿m",
         caughtCount: 108,
-        bestCatch: "Cá hồi vân 8.1 kg",
+        bestCatch: "CÃ¡ há»“i vÃ¢n 8.1 kg",
         avatar: "BN",
         color: "#a783cf",
       },
       {
         id: 3,
-        name: "Hải Đăng",
+        name: "Háº£i ÄÄƒng",
         level: 11,
-        title: "Tân thủ",
+        title: "TÃ¢n thá»§",
         caughtCount: 16,
-        bestCatch: "Cá rô 1.4 kg",
-        avatar: "HĐ",
+        bestCatch: "CÃ¡ rÃ´ 1.4 kg",
+        avatar: "HÄ",
         color: "#59a9a0",
       },
     ] as FishingPlayer[],
@@ -87,9 +87,11 @@ export const useFishingStore = defineStore("fishing", {
   }),
   getters: {
     canPull: (s) => s.castPhase === "bite" || s.castPhase === "fighting",
+    canCast: (s) => s.castPhase === "idle" || s.castPhase === "lost",
+    canReelIn: (s) => ["casting", "waiting", "bite", "fighting", "caught"].includes(s.castPhase),
     currentBait: (s) => {
       const variant = equipmentVariants.bait.find((v) => v.id === s.equipmentLoadout.bait);
-      return variant?.baitName ?? "Giun đất";
+      return variant?.baitName ?? "Giun Ä‘áº¥t";
     },
     tensionState: (s) => (s.tension >= MAX_TENSION - 10 ? "danger" : s.tension >= SAFE_TENSION ? "safe" : "low"),
     fishCatchChances(state): { fish: Fish; bite: number; catch: number }[] {
@@ -114,7 +116,10 @@ export const useFishingStore = defineStore("fishing", {
       if (variant.hookStrength !== undefined) this.equipment.hookStrength = variant.hookStrength;
     },
     castTo(x: number, y: number) {
-      if (!(["idle", "waiting", "lost"] as CastPhase[]).includes(this.castPhase)) return;
+      if (!this.canCast) {
+        this.rejectCast("Hãy thu mồi trước khi quăng mồi lại");
+        return;
+      }
       const attempt = ++this.castAttempt;
       this.baitPosition = { x, y };
       this.isPulling = false;
@@ -147,9 +152,21 @@ export const useFishingStore = defineStore("fishing", {
     startPull() {
       if (this.castPhase === "bite") {
         this.castPhase = "fighting";
-        this.castMessage = "Giữ và buông nút kéo để canh lực";
+        this.castMessage = "Giá»¯ vÃ  buÃ´ng nÃºt kÃ©o Ä‘á»ƒ canh lá»±c";
       }
       if (this.castPhase === "fighting") this.isPulling = true;
+    },
+    reelInBait() {
+      if (!this.canReelIn) return;
+      this.castAttempt += 1;
+      this.isPulling = false;
+      this.tension = 0;
+      this.catchProgress = 0;
+      this.fightElapsed = 0;
+      this.activeFish = null;
+      this.isCasting = false;
+      this.castPhase = "idle";
+      this.castMessage = "Sáºµn sÃ ng tháº£ cÃ¢u";
     },
     stopPull() {
       this.isPulling = false;
@@ -168,7 +185,7 @@ export const useFishingStore = defineStore("fishing", {
         if (this.catchProgress >= 100) this.catchFish();
       }
     },
-    loseFish(message = "Dây quá căng — cá đã thoát!") {
+    loseFish(message = "DÃ¢y quÃ¡ cÄƒng â€” cÃ¡ Ä‘Ã£ thoÃ¡t!") {
       this.isPulling = false;
       this.castPhase = "lost";
       this.castMessage = message;
@@ -179,19 +196,19 @@ export const useFishingStore = defineStore("fishing", {
           this.catchProgress = 0;
           this.fightElapsed = 0;
           this.activeFish = null;
-          this.castMessage = "Chạm mặt hồ để câu lại";
+          this.castMessage = "Cháº¡m máº·t há»“ Ä‘á»ƒ cÃ¢u láº¡i";
         }
       }, 1500);
     },
     catchFish() {
       const fish = this.activeFish;
       this.isPulling = false;
-      if (!fish) return this.loseFish("Cá đã thoát khỏi lưỡi câu!");
+      if (!fish) return this.loseFish("CÃ¡ Ä‘Ã£ thoÃ¡t khá»i lÆ°á»¡i cÃ¢u!");
       const chance = catchProbability(fish, this.equipment, this.playerSkillMultiplier);
       this.equipment.reelWearPercent = Math.min(95, this.equipment.reelWearPercent + this.equipment.reelDurability);
-      if (Math.random() >= chance) return this.loseFish("Cá quá nặng, đứt dây câu!");
+      if (Math.random() >= chance) return this.loseFish("CÃ¡ quÃ¡ náº·ng, Ä‘á»©t dÃ¢y cÃ¢u!");
       this.castPhase = "caught";
-      this.castMessage = "Bạn đã câu được cá!";
+      this.castMessage = "Báº¡n Ä‘Ã£ cÃ¢u Ä‘Æ°á»£c cÃ¡!";
       this.inventory.unshift({
         id: Date.now(),
         name: fish.name,
@@ -210,7 +227,7 @@ export const useFishingStore = defineStore("fishing", {
       this.catchProgress = 0;
       this.fightElapsed = 0;
       this.activeFish = null;
-      this.castMessage = "Chạm mặt hồ để câu tiếp";
+      this.castMessage = "Cháº¡m máº·t há»“ Ä‘á»ƒ cÃ¢u tiáº¿p";
     },
     openBag() {
       this.bagOpen = true;
@@ -235,8 +252,8 @@ export const useFishingStore = defineStore("fishing", {
     selectPlayer(player: FishingPlayer) {
       this.selectedPlayer = player;
     },
-    rejectCast() {
-      this.castMessage = "Chỉ có thể quăng mồi xuống mặt nước";
+    rejectCast(message = "Chá»‰ cÃ³ thá»ƒ quÄƒng má»“i xuá»‘ng máº·t nÆ°á»›c") {
+      this.castMessage = message;
     },
   },
 });
