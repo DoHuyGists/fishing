@@ -16,7 +16,7 @@ const router = createRouter({
       component: () => import("../views/LoginView.vue"),
     },
     {
-      path: "/fishing/:areaId",
+      path: "/fishing/:countryId/:areaId",
       name: "fishing",
       component: () => import("../views/FishingView.vue"),
       meta: { requiresAuth: true },

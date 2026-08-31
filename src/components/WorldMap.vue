@@ -1,7 +1,9 @@
 <script setup lang="ts">
-import WorldMap from "../assets/world.svg";
-import { ref } from "vue";
-import { mapData } from "../data/map";
+import { computed, onMounted, watch, ref } from "vue";
+import { useFishingAreaStore } from "../stores/fishingArea";
+import World from "./World.vue";
+
+const MAP_VIEW_STORAGE_KEY = "worldMapView";
 
 const hoveredTitle = ref("");
 const tooltipPos = ref({ x: 0, y: 0 });
@@ -13,17 +15,45 @@ const isAnchorMode = ref(false);
 const mapFrame = ref<HTMLElement | null>(null);
 const dragStart = ref({ x: 0, y: 0 });
 const panStart = ref({ x: 0, y: 0 });
-const anchors = ref<Array<{ id: number; x: number; y: number; title: string; areaId: string }>>([
-  {
-    id: 999,
-    x: 63.23196561219262,
-    y: 76.44802802905701,
-    title: "Vietnam",
-    areaId: "de"
-  },
-]);
-const targetMapData = ref();
-let nextAnchorId = 1;
+const fishingAreaStore = useFishingAreaStore();
+const anchors = computed(() => fishingAreaStore.areas);
+
+function loadMapView() {
+  try {
+    const raw = localStorage.getItem(MAP_VIEW_STORAGE_KEY);
+    if (!raw) return;
+    const saved = JSON.parse(raw);
+    if (typeof saved?.zoom === "number") {
+      zoom.value = saved.zoom;
+    }
+    if (saved?.pan && typeof saved.pan.x === "number" && typeof saved.pan.y === "number") {
+      pan.value = { x: saved.pan.x, y: saved.pan.y };
+    }
+  } catch {
+    // ignore corrupted storage
+  }
+}
+
+function saveMapView() {
+  localStorage.setItem(MAP_VIEW_STORAGE_KEY, JSON.stringify({ zoom: zoom.value, pan: pan.value }));
+}
+
+function zoomToArea(anchor: any) {
+  localStorage.setItem(MAP_VIEW_STORAGE_KEY, JSON.stringify(anchor.location));
+  loadMapView();
+}
+
+function resetZoom() {
+  zoom.value = MIN_ZOOM;
+  pan.value = { x: 0, y: 0 };
+}
+
+watch([zoom, pan], saveMapView, { deep: true });
+
+onMounted(() => {
+  fishingAreaStore.fetchArea();
+  loadMapView();
+});
 
 const MIN_ZOOM = 1;
 const MAX_ZOOM = 10;
@@ -40,49 +70,13 @@ function handleMouseMove(event: any) {
   }
 }
 
-function viewInformation(targetId: string) {
-  // @ts-ignore
-  targetMapData.value = mapData[targetId];
-}
+// function removeAnchor(anchorId: number) {
+//   anchors.value = anchors.value.filter((anchor) => anchor.id !== anchorId);
+// }
 
-function handleMapClick(event: MouseEvent) {
-  const target = event.target as Element;
-  const pointTarget = document.elementFromPoint(event.clientX, event.clientY);
-  const titledTarget = target.closest("[title]") ?? pointTarget?.closest("[title]");
-  if (!titledTarget) return;
-  const title = titledTarget.getAttribute("title");
-  const id = titledTarget.getAttribute("id");
-  const svg = titledTarget.closest("svg");
-
-  if (!title || !svg || !id) {
-    return;
-  }
-
-  viewInformation(id);
-
-  if (didDrag.value || !isAnchorMode.value) {
-    didDrag.value = false;
-    return;
-  }
-
-  const svgRect = svg.getBoundingClientRect();
-  anchors.value.push({
-    id: nextAnchorId++,
-    x: ((event.clientX - svgRect.left) / svgRect.width) * 100,
-    y: ((event.clientY - svgRect.top) / svgRect.height) * 100,
-    title,
-    areaId: "de"
-  });
-  console.log(anchors.value);
-}
-
-function removeAnchor(anchorId: number) {
-  anchors.value = anchors.value.filter((anchor) => anchor.id !== anchorId);
-}
-
-function clearAnchors() {
-  anchors.value = [];
-}
+// function clearAnchors() {
+//   anchors.value = [];
+// }
 
 function handleWheel(event: WheelEvent) {
   if (!event.ctrlKey) {
@@ -127,6 +121,11 @@ function clampPan() {
 }
 
 function handlePointerDown(event: PointerEvent) {
+  const target = event.target as Element | null;
+  if (target?.closest("path[title]") || target?.closest(".anchors") || target?.closest(".anchors-hit")) {
+    return;
+  }
+
   if (zoom.value === MIN_ZOOM || event.button !== 0 || !mapFrame.value) {
     return;
   }
@@ -170,33 +169,34 @@ function stopDragging(event: PointerEvent) {
     >
       <div class="flex items-center justify-between">
         <h2 class="m-0 text-lg">Bản đồ</h2>
-        <span class="grid place-items-center w-6 h-6 rounded-full bg-[#d84315] text-white text-xs font-bold">{{
-          anchors.length
-        }}</span>
       </div>
 
-      <label
+      <button
+        type="button"
+        class="mt-4 w-full py-2 px-3 rounded-lg border border-[#263238] bg-transparent text-[#263238] text-xs font-bold cursor-pointer hover:bg-[#eef3f1]"
+        @click="resetZoom"
+      >
+        Reset zoom
+      </button>
+
+      <!-- <label
         class="anchor-toggle relative flex items-center justify-between mt-5 py-3 border-t border-b border-[#d5ddda] cursor-pointer"
       >
-        <span>
-          <strong class="block">Tạo điểm neo</strong>
-          <small class="block mt-[3px] text-[#607176] text-xs">{{ isAnchorMode ? "Đang bật" : "Đang tắt" }}</small>
-        </span>
         <input v-model="isAnchorMode" type="checkbox" class="absolute opacity-0" />
         <span class="toggle-track" aria-hidden="true"></span>
-      </label>
+      </label> -->
 
       <div class="mt-5">
         <div class="flex items-center justify-between text-[13px] font-bold">
           <span>Điểm đã neo</span>
-          <button
+          <!-- <button
             v-if="anchors.length"
             type="button"
             class="border-0 bg-transparent text-[#d84315] cursor-pointer text-xs"
             @click="clearAnchors"
           >
             Hủy tất cả
-          </button>
+          </button> -->
         </div>
         <p v-if="!anchors.length" class="mt-[3px] mb-0 text-[#607176] text-xs">Chưa có điểm neo</p>
         <ul v-else class="grid gap-2 p-0 mt-3 mb-0 list-none">
@@ -205,16 +205,16 @@ function stopDragging(event: PointerEvent) {
               index + 1
             }}</span>
             <span class="flex-1 overflow-hidden text-ellipsis whitespace-nowrap text-xs">
-              <router-link :to="{name: 'fishing', params: {areaId: anchor.areaId}}">{{ anchor.title }}</router-link>
+              <button @click="zoomToArea(anchor)" type="button" class="cursor-pointer">{{ anchor.title }}</button>
             </span>
-            <button
+            <!-- <button
               type="button"
               class="border-0 bg-transparent text-[#d84315] cursor-pointer px-[5px] py-0.5 text-lg leading-none"
               :aria-label="`Hủy điểm neo ${anchor.title}`"
               @click="removeAnchor(anchor.id)"
             >
               ×
-            </button>
+            </button> -->
           </li>
         </ul>
       </div>
@@ -224,35 +224,25 @@ function stopDragging(event: PointerEvent) {
       ref="mapFrame"
       class="map-frame flex-1 min-w-0 h-full overflow-hidden border-2 border-[#263238] rounded-xl bg-[#eef3f1] shadow-[0_8px_24px_rgba(38,50,56,0.18)] touch-none"
       :class="isDragging ? 'cursor-grabbing' : isAnchorMode ? 'cursor-crosshair' : 'cursor-grab'"
-      @wheel="handleWheel"
+      @wheel.stop="handleWheel"
       @pointerdown="handlePointerDown"
       @pointermove="handlePointerMove"
       @pointerup="stopDragging"
       @pointercancel="stopDragging"
-      @click="handleMapClick"
     >
       <div
         class="w-full h-full relative grid place-items-center origin-center transition-transform duration-[120ms] ease-out"
         :class="{ '!transition-none': isDragging }"
         :style="{ transform: `translate(${pan.x}px, ${pan.y}px) scale(${zoom})` }"
       >
-        <WorldMap class="w-full h-full" @mousemove="handleMouseMove" />
-        <div
-          v-for="(anchor, index) in anchors"
-          :key="index"
-          class="map-anchor"
-          :style="{ left: `${anchor.x}%`, top: `${anchor.y}%`, transform: `translate(-50%, -50%) scale(${1 / zoom})` }"
-          :title="anchor.title"
-        >
-          <span>{{ anchor.title }}</span>
-        </div>
+        <World class="w-full h-full" @mousemove="handleMouseMove" :anchors="anchors" :zoom="zoom" />
       </div>
     </div>
     <div v-if="hoveredTitle" class="tooltip" :style="{ top: tooltipPos.y + 'px', left: tooltipPos.x + 'px' }">
       {{ hoveredTitle }}
     </div>
 
-    <aside
+    <!-- <aside
       class="flex flex-col map-sidebar w-100 flex-none p-4 border-2 border-[#263238] rounded-xl bg-white text-[#263238] shadow-[0_8px_24px_rgba(38,50,56,0.12)]"
     >
       <template v-if="targetMapData !== undefined">
@@ -265,7 +255,7 @@ function stopDragging(event: PointerEvent) {
           <div v-else>Chưa có thông tin</div>
         </div>
       </template>
-    </aside>
+    </aside> -->
   </div>
 </template>
 
