@@ -16,9 +16,7 @@ const selected = computed(() => props.options.find((o) => o.id === props.modelVa
 const filteredOptions = computed(() => {
   const term = search.value.trim().toLowerCase();
   if (!term) return props.options;
-  return props.options.filter(
-    (o) => o.name.toLowerCase().includes(term) || o.detail.toLowerCase().includes(term),
-  );
+  return props.options.filter((o) => o.name.toLowerCase().includes(term) || o.detail.toLowerCase().includes(term));
 });
 
 function isImageIcon(icon: string) {
@@ -60,14 +58,18 @@ watch(open, (value) => {
         <template v-else>{{ selected?.icon ?? "❔" }}</template>
       </span>
       <span class="flex-1 min-w-0 flex flex-col leading-tight">
-        <strong class="text-[11px] font-bold whitespace-nowrap overflow-hidden text-ellipsis">{{ selected?.name ?? "Chọn trang bị" }}</strong>
-        <small class="text-[10px] text-[#6c7d6e] whitespace-nowrap overflow-hidden text-ellipsis">{{ selected?.detail }}</small>
+        <strong class="text-[11px] font-bold whitespace-nowrap overflow-hidden text-ellipsis">{{
+          selected?.name ?? "Chọn trang bị"
+        }}</strong>
+        <small class="text-[10px] text-[#6c7d6e] whitespace-nowrap overflow-hidden text-ellipsis">{{
+          selected?.detail
+        }}</small>
       </span>
       <span class="flex-none text-[10px] text-[#6c7d6e]">▾</span>
     </button>
     <div
       v-if="open"
-      class="absolute z-20 bottom-[calc(100%+4px)] left-0 right-0 flex flex-col gap-1.5 p-2 rounded-[10px] border border-[#d9d2c2] bg-[#fffefa] shadow-[0_12px_30px_rgba(0,0,0,0.16)]"
+      class="absolute w-fit z-20 bottom-[calc(100%+4px)] left-0 right-0 flex flex-col gap-1.5 p-2 rounded-[10px] border border-[#d9d2c2] bg-[#fffefa] shadow-[0_12px_30px_rgba(0,0,0,0.16)]"
       @click.stop
     >
       <input
@@ -78,7 +80,9 @@ watch(open, (value) => {
         autofocus
       />
       <ul class="max-h-[200px] overflow-y-auto flex flex-col gap-0.5 m-0 p-0">
-        <li v-if="!filteredOptions.length" class="p-2 text-[11px] text-[#6c7d6e] text-center">Không tìm thấy kết quả</li>
+        <li v-if="!filteredOptions.length" class="p-2 text-[11px] text-center">
+          Không tìm thấy kết quả
+        </li>
         <li
           v-for="variant in filteredOptions"
           :key="variant.id"
@@ -87,12 +91,21 @@ watch(open, (value) => {
           @click="pick(variant)"
         >
           <span class="flex-none grid place-items-center w-5 h-5 text-sm">
-            <img v-if="isImageIcon(variant.icon)" :src="variant.icon" :alt="variant.name" class="w-full h-full object-cover rounded-[5px]" />
+            <img
+              v-if="isImageIcon(variant.icon)"
+              :src="variant.icon"
+              :alt="variant.name"
+              class="w-full h-full object-cover rounded-[5px]"
+            />
             <template v-else>{{ variant.icon }}</template>
           </span>
-          <span class="flex-1 min-w-0 flex flex-col leading-tight">
-            <strong class="text-[11px] font-bold whitespace-nowrap overflow-hidden text-ellipsis">{{ variant.name }}</strong>
-            <small class="text-[10px] text-[#6c7d6e] whitespace-nowrap overflow-hidden text-ellipsis">{{ variant.detail }}</small>
+          <span class="flex-1 min-w-0 flex flex-col leading-tight text-black">
+            <strong class="text-[11px] font-bold whitespace-nowrap">{{
+              variant.name
+            }}</strong>
+            <small class="text-[10px] whitespace-nowrap">{{
+              variant.detail
+            }}</small>
           </span>
         </li>
       </ul>

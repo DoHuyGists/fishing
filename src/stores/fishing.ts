@@ -1,6 +1,6 @@
 ﻿import { defineStore } from "pinia";
 import { biteProbability, catchProbability, lakeFish, type Equipment, type Fish } from "../data/fishingLogic";
-import { equipmentVariants } from "../data/equipmentCatalog";
+import { useEquipmentStore } from "./equipment";
 export type FishingTool = "rod" | "line" | "reel" | "hook" | "bait";
 export type CastPhase = "idle" | "casting" | "waiting" | "bite" | "fighting" | "caught" | "lost";
 export type CaughtFish = {
@@ -29,7 +29,7 @@ export const useFishingStore = defineStore("fishing", {
     selectedTool: "rod" as FishingTool,
     castPhase: "idle" as CastPhase,
     baitPosition: { x: 56, y: 60 },
-    castMessage: "Sáºµn sÃ ng tháº£ cÃ¢u",
+    castMessage: "Sẵn sàng thả câu",
     isCasting: false,
     isPulling: false,
     tension: 0,
@@ -39,7 +39,13 @@ export const useFishingStore = defineStore("fishing", {
     bagOpen: false,
     lakeGuideOpen: false,
     activeFish: null as Fish | null,
-    equipment: { rodMaxWeight: 4.5, lineMaxWeight: 4, reelWearPercent: 8, reelDurability: 1, hookStrength: 1 } as Equipment,
+    equipment: {
+      rodMaxWeight: 4.5,
+      lineMaxWeight: 4,
+      reelWearPercent: 8,
+      reelDurability: 1,
+      hookStrength: 1,
+    } as Equipment,
     equipmentLoadout: {
       rod: "rod-bamboo",
       line: "line-nylon",
@@ -55,30 +61,30 @@ export const useFishingStore = defineStore("fishing", {
         id: 1,
         name: "Minh An",
         level: 18,
-        title: "Thá»£ cÃ¢u há»“",
+        title: "Thợ câu hồ",
         caughtCount: 42,
-        bestCatch: "CÃ¡ chÃ©p 6.2 kg",
+        bestCatch: "Cá chép 6.2 kg",
         avatar: "MA",
         color: "#d99157",
       },
       {
         id: 2,
-        name: "Báº£o Ngá»c",
+        name: "Bảo Ngọc",
         level: 27,
-        title: "NgÆ°á»i sÄƒn cÃ¡ hiáº¿m",
+        title: "Người săn cá hiếm",
         caughtCount: 108,
-        bestCatch: "CÃ¡ há»“i vÃ¢n 8.1 kg",
+        bestCatch: "Cá hồi vân 8.1 kg",
         avatar: "BN",
         color: "#a783cf",
       },
       {
         id: 3,
-        name: "Háº£i ÄÄƒng",
+        name: "Hải Đăng",
         level: 11,
-        title: "TÃ¢n thá»§",
+        title: "Tân thủ",
         caughtCount: 16,
-        bestCatch: "CÃ¡ rÃ´ 1.4 kg",
-        avatar: "HÄ",
+        bestCatch: "Cá rô 1.4 kg",
+        avatar: "HĐ",
         color: "#59a9a0",
       },
     ] as FishingPlayer[],
@@ -90,8 +96,8 @@ export const useFishingStore = defineStore("fishing", {
     canCast: (s) => s.castPhase === "idle" || s.castPhase === "lost",
     canReelIn: (s) => ["casting", "waiting", "bite", "fighting", "caught"].includes(s.castPhase),
     currentBait: (s) => {
-      const variant = equipmentVariants.bait.find((v) => v.id === s.equipmentLoadout.bait);
-      return variant?.baitName ?? "Giun Ä‘áº¥t";
+      const variant = useEquipmentStore().variants.bait.find((v) => v.id === s.equipmentLoadout.bait);
+      return variant?.baitName ?? "Giun đất";
     },
     tensionState: (s) => (s.tension >= MAX_TENSION - 10 ? "danger" : s.tension >= SAFE_TENSION ? "safe" : "low"),
     fishCatchChances(state): { fish: Fish; bite: number; catch: number }[] {
@@ -108,7 +114,7 @@ export const useFishingStore = defineStore("fishing", {
     },
     selectVariant(category: FishingTool, variantId: string) {
       this.equipmentLoadout[category] = variantId;
-      const variant = equipmentVariants[category].find((v) => v.id === variantId);
+      const variant = useEquipmentStore().variants[category].find((v) => v.id === variantId);
       if (!variant) return;
       if (variant.rodMaxWeight !== undefined) this.equipment.rodMaxWeight = variant.rodMaxWeight;
       if (variant.lineMaxWeight !== undefined) this.equipment.lineMaxWeight = variant.lineMaxWeight;
@@ -145,14 +151,15 @@ export const useFishingStore = defineStore("fishing", {
         this.castPhase = "bite";
         this.castMessage = `${fish.name} đang cắn câu! Chuẩn bị kéo!`;
         window.setTimeout(() => {
-          if (attempt === this.castAttempt && this.castPhase === "bite") this.loseFish("Cá đã nhả mồi — bạn phản ứng quá chậm!");
+          if (attempt === this.castAttempt && this.castPhase === "bite")
+            this.loseFish("Cá đã nhả mồi — bạn phản ứng quá chậm!");
         }, 3000);
       }, biteDelay);
     },
     startPull() {
       if (this.castPhase === "bite") {
         this.castPhase = "fighting";
-        this.castMessage = "Giá»¯ vÃ  buÃ´ng nÃºt kÃ©o Ä‘á»ƒ canh lá»±c";
+        this.castMessage = "Giữ và buông nút kéo để cân lực";
       }
       if (this.castPhase === "fighting") this.isPulling = true;
     },
@@ -166,7 +173,7 @@ export const useFishingStore = defineStore("fishing", {
       this.activeFish = null;
       this.isCasting = false;
       this.castPhase = "idle";
-      this.castMessage = "Sáºµn sÃ ng tháº£ cÃ¢u";
+      this.castMessage = "Sẵn sàng thả câu";
     },
     stopPull() {
       this.isPulling = false;
@@ -185,7 +192,7 @@ export const useFishingStore = defineStore("fishing", {
         if (this.catchProgress >= 100) this.catchFish();
       }
     },
-    loseFish(message = "DÃ¢y quÃ¡ cÄƒng â€” cÃ¡ Ä‘Ã£ thoÃ¡t!") {
+    loseFish(message = "Dây quá căng — cá đã thoát!") {
       this.isPulling = false;
       this.castPhase = "lost";
       this.castMessage = message;
@@ -196,19 +203,19 @@ export const useFishingStore = defineStore("fishing", {
           this.catchProgress = 0;
           this.fightElapsed = 0;
           this.activeFish = null;
-          this.castMessage = "Cháº¡m máº·t há»“ Ä‘á»ƒ cÃ¢u láº¡i";
+          this.castMessage = "Chạm mặt hồ để câu lại";
         }
       }, 1500);
     },
     catchFish() {
       const fish = this.activeFish;
       this.isPulling = false;
-      if (!fish) return this.loseFish("CÃ¡ Ä‘Ã£ thoÃ¡t khá»i lÆ°á»¡i cÃ¢u!");
+      if (!fish) return this.loseFish("Cá đã thoát khỏi lưới câu!");
       const chance = catchProbability(fish, this.equipment, this.playerSkillMultiplier);
       this.equipment.reelWearPercent = Math.min(95, this.equipment.reelWearPercent + this.equipment.reelDurability);
-      if (Math.random() >= chance) return this.loseFish("CÃ¡ quÃ¡ náº·ng, Ä‘á»©t dÃ¢y cÃ¢u!");
+      if (Math.random() >= chance) return this.loseFish("Cá quá nặng, đứt dây câu!");
       this.castPhase = "caught";
-      this.castMessage = "Báº¡n Ä‘Ã£ cÃ¢u Ä‘Æ°á»£c cÃ¡!";
+      this.castMessage = "Bạn đã câu được cá!";
       this.inventory.unshift({
         id: Date.now(),
         name: fish.name,
@@ -227,7 +234,7 @@ export const useFishingStore = defineStore("fishing", {
       this.catchProgress = 0;
       this.fightElapsed = 0;
       this.activeFish = null;
-      this.castMessage = "Cháº¡m máº·t há»“ Ä‘á»ƒ cÃ¢u tiáº¿p";
+      this.castMessage = "Chạm mặt hồ để câu tiếp";
     },
     openBag() {
       this.bagOpen = true;
@@ -252,7 +259,7 @@ export const useFishingStore = defineStore("fishing", {
     selectPlayer(player: FishingPlayer) {
       this.selectedPlayer = player;
     },
-    rejectCast(message = "Chá»‰ cÃ³ thá»ƒ quÄƒng má»“i xuá»‘ng máº·t nÆ°á»›c") {
+    rejectCast(message = "Chỉ có thể quăng mồi xuống mặt nước") {
       this.castMessage = message;
     },
   },

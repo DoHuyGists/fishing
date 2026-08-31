@@ -1,5 +1,6 @@
 <script setup lang="ts">
-import { onBeforeUnmount, onMounted } from "vue";
+import { storeToRefs } from "pinia";
+import { onBeforeUnmount, onMounted, watch } from "vue";
 import EquipmentMenu from "../components/EquipmentMenu.vue";
 import CatchDialog from "../components/CatchDialog.vue";
 import FishingBag from "../components/FishingBag.vue";
@@ -7,6 +8,20 @@ import FishingPlayers from "../components/FishingPlayers.vue";
 import FishingScene from "../components/FishingScene.vue";
 import LakeFishGuide from "../components/LakeFishGuide.vue";
 import PowerMeter from "../components/PowerMeter.vue";
+import { useAuthStore } from "../stores/auth";
+import { useEquipmentStore } from "../stores/equipment";
+
+const authStore = useAuthStore();
+const equipmentStore = useEquipmentStore();
+const { user } = storeToRefs(authStore);
+
+watch(
+  user,
+  (current) => {
+    if (current) equipmentStore.fetchEquipment(current.id);
+  },
+  { immediate: true },
+);
 
 function preventZoomShortcut(event: KeyboardEvent) {
   if ((event.ctrlKey || event.metaKey) && ["+", "=", "-", "0"].includes(event.key)) event.preventDefault();
@@ -38,14 +53,16 @@ onBeforeUnmount(() => {
 </script>
 
 <template>
-  <main class="w-full h-screen overflow-hidden touch-none overscroll-none bg-[#193224] text-[#e9f4e8] font-[Inter,ui-sans-serif,system-ui,sans-serif]">
+  <main
+    class="w-full h-screen overflow-hidden touch-none overscroll-none bg-[#193224] text-[#e9f4e8] font-[Inter,ui-sans-serif,system-ui,sans-serif]"
+  >
     <div class="grid grid-rows-[minmax(0,1fr)_auto] w-full h-full">
       <FishingScene />
       <section class="control-deck">
         <div class="side-panel">
           <div class="flex justify-between items-baseline mx-[3px] mb-2">
             <span class="text-[#f1e6b7] text-[11px] font-black tracking-[0.08em] uppercase">Trang bị</span>
-            <small class="text-[#b8cab5] text-[9px]">Chạm để đổi dụng cụ</small>
+            <!-- <small class="text-[#b8cab5] text-[9px]">Chạm để đổi dụng cụ</small> -->
           </div>
           <EquipmentMenu />
         </div>

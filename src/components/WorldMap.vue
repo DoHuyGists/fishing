@@ -13,7 +13,15 @@ const isAnchorMode = ref(false);
 const mapFrame = ref<HTMLElement | null>(null);
 const dragStart = ref({ x: 0, y: 0 });
 const panStart = ref({ x: 0, y: 0 });
-const anchors = ref<Array<{ id: number; x: number; y: number; title: string }>>([]);
+const anchors = ref<Array<{ id: number; x: number; y: number; title: string; areaId: string }>>([
+  {
+    id: 999,
+    x: 63.23196561219262,
+    y: 76.44802802905701,
+    title: "Vietnam",
+    areaId: "de"
+  },
+]);
 const targetMapData = ref();
 let nextAnchorId = 1;
 
@@ -63,7 +71,9 @@ function handleMapClick(event: MouseEvent) {
     x: ((event.clientX - svgRect.left) / svgRect.width) * 100,
     y: ((event.clientY - svgRect.top) / svgRect.height) * 100,
     title,
+    areaId: "de"
   });
+  console.log(anchors.value);
 }
 
 function removeAnchor(anchorId: number) {
@@ -194,7 +204,9 @@ function stopDragging(event: PointerEvent) {
             <span class="grid place-items-center w-6 h-6 rounded-full bg-[#d84315] text-white text-xs font-bold">{{
               index + 1
             }}</span>
-            <span class="flex-1 overflow-hidden text-ellipsis whitespace-nowrap text-xs">{{ anchor.title }}</span>
+            <span class="flex-1 overflow-hidden text-ellipsis whitespace-nowrap text-xs">
+              <router-link :to="{name: 'fishing', params: {areaId: anchor.areaId}}">{{ anchor.title }}</router-link>
+            </span>
             <button
               type="button"
               class="border-0 bg-transparent text-[#d84315] cursor-pointer px-[5px] py-0.5 text-lg leading-none"
@@ -229,7 +241,7 @@ function stopDragging(event: PointerEvent) {
           v-for="(anchor, index) in anchors"
           :key="index"
           class="map-anchor"
-          :style="{ left: `${anchor.x}%`, top: `${anchor.y}%` }"
+          :style="{ left: `${anchor.x}%`, top: `${anchor.y}%`, transform: `translate(-50%, -50%) scale(${1 / zoom})` }"
           :title="anchor.title"
         >
           <span>{{ anchor.title }}</span>
@@ -240,20 +252,20 @@ function stopDragging(event: PointerEvent) {
       {{ hoveredTitle }}
     </div>
 
-    <template v-if="targetMapData !== undefined">
-      <aside
-        class="flex flex-col map-sidebar w-100 flex-none p-4 border-2 border-[#263238] rounded-xl bg-white text-[#263238] shadow-[0_8px_24px_rgba(38,50,56,0.12)]"
-      >
+    <aside
+      class="flex flex-col map-sidebar w-100 flex-none p-4 border-2 border-[#263238] rounded-xl bg-white text-[#263238] shadow-[0_8px_24px_rgba(38,50,56,0.12)]"
+    >
+      <template v-if="targetMapData !== undefined">
         <div class="">
-          <h2 class="m-0 text-lg">Thông tin </h2>
+          <h2 class="m-0 text-lg">Thông tin</h2>
           <h6 class="m-0 text-gray-500 underline">{{ targetMapData.name }}</h6>
         </div>
         <div class="overflow-y-scroll [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
           <div v-if="targetMapData.information.length !== 0">{{ targetMapData.information }}</div>
           <div v-else>Chưa có thông tin</div>
         </div>
-      </aside>
-    </template>
+      </template>
+    </aside>
   </div>
 </template>
 
@@ -298,7 +310,6 @@ function stopDragging(event: PointerEvent) {
   border-radius: 50%;
   background: #d84315;
   box-shadow: 0 1px 5px rgba(38, 50, 56, 0.55);
-  transform: translate(-50%, -50%);
   pointer-events: none;
   z-index: 1;
 }

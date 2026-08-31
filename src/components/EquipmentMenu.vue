@@ -1,9 +1,11 @@
 <script setup lang="ts">
-import { equipmentCategories, equipmentVariants } from "../data/equipmentCatalog";
+import { equipmentCategories } from "../data/equipmentCatalog";
+import { useEquipmentStore } from "../stores/equipment";
 import { useFishingStore, type FishingTool } from "../stores/fishing";
 import SearchableDropdown from "./SearchableDropdown.vue";
 
 const store = useFishingStore();
+const equipmentStore = useEquipmentStore();
 
 function onVariantChange(category: FishingTool, variantId: string) {
   store.selectVariant(category, variantId);
@@ -20,9 +22,11 @@ function onVariantChange(category: FishingTool, variantId: string) {
       @click="store.selectTool(category.id)"
     >
       <span class="flex-none text-[15px]">{{ category.icon }}</span>
-      <span class="flex-none w-[62px] max-[620px]:w-[50px] text-[#345344] text-[11px] font-bold whitespace-nowrap">{{ category.name }}</span>
+      <span class="flex-none max-[620px]:w-[50px] text-[#345344] text-[11px] font-bold whitespace-nowrap">{{
+        category.name
+      }}</span>
       <SearchableDropdown
-        :options="equipmentVariants[category.id]"
+        :options="equipmentStore.variants[category.id]"
         :model-value="store.equipmentLoadout[category.id]"
         @update:model-value="(id) => onVariantChange(category.id, id)"
       />
