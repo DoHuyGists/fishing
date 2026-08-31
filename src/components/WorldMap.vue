@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import WorldMap from "../assets/world.svg";
 import { ref } from "vue";
+import { mapData } from "../data/map";
 
 const hoveredTitle = ref("");
 const tooltipPos = ref({ x: 0, y: 0 });
@@ -13,6 +14,7 @@ const mapFrame = ref<HTMLElement | null>(null);
 const dragStart = ref({ x: 0, y: 0 });
 const panStart = ref({ x: 0, y: 0 });
 const anchors = ref<Array<{ id: number; x: number; y: number; title: string }>>([]);
+const targetMapData = ref();
 let nextAnchorId = 1;
 
 const MIN_ZOOM = 1;
@@ -30,19 +32,28 @@ function handleMouseMove(event: any) {
   }
 }
 
-function handleMapClick(event: MouseEvent) {
-  if (didDrag.value || !isAnchorMode.value) {
-    didDrag.value = false;
-    return;
-  }
+function viewInformation(targetId: string) {
+  // @ts-ignore
+  targetMapData.value = mapData[targetId];
+}
 
+function handleMapClick(event: MouseEvent) {
   const target = event.target as Element;
   const pointTarget = document.elementFromPoint(event.clientX, event.clientY);
   const titledTarget = target.closest("[title]") ?? pointTarget?.closest("[title]");
-  const title = titledTarget?.getAttribute("title");
-  const svg = titledTarget?.closest("svg");
+  if (!titledTarget) return;
+  const title = titledTarget.getAttribute("title");
+  const id = titledTarget.getAttribute("id");
+  const svg = titledTarget.closest("svg");
 
-  if (!title || !svg) {
+  if (!title || !svg || !id) {
+    return;
+  }
+
+  viewInformation(id);
+
+  if (didDrag.value || !isAnchorMode.value) {
+    didDrag.value = false;
     return;
   }
 
@@ -144,13 +155,19 @@ function stopDragging(event: PointerEvent) {
 
 <template>
   <div class="map-page h-screen p-3 relative flex gap-3">
-    <aside class="map-sidebar w-60 flex-none p-4 border-2 border-[#263238] rounded-xl bg-white text-[#263238] shadow-[0_8px_24px_rgba(38,50,56,0.12)]">
+    <aside
+      class="map-sidebar w-60 flex-none p-4 border-2 border-[#263238] rounded-xl bg-white text-[#263238] shadow-[0_8px_24px_rgba(38,50,56,0.12)]"
+    >
       <div class="flex items-center justify-between">
         <h2 class="m-0 text-lg">Bản đồ</h2>
-        <span class="grid place-items-center w-6 h-6 rounded-full bg-[#d84315] text-white text-xs font-bold">{{ anchors.length }}</span>
+        <span class="grid place-items-center w-6 h-6 rounded-full bg-[#d84315] text-white text-xs font-bold">{{
+          anchors.length
+        }}</span>
       </div>
 
-      <label class="anchor-toggle relative flex items-center justify-between mt-5 py-3 border-t border-b border-[#d5ddda] cursor-pointer">
+      <label
+        class="anchor-toggle relative flex items-center justify-between mt-5 py-3 border-t border-b border-[#d5ddda] cursor-pointer"
+      >
         <span>
           <strong class="block">Tạo điểm neo</strong>
           <small class="block mt-[3px] text-[#607176] text-xs">{{ isAnchorMode ? "Đang bật" : "Đang tắt" }}</small>
@@ -162,12 +179,21 @@ function stopDragging(event: PointerEvent) {
       <div class="mt-5">
         <div class="flex items-center justify-between text-[13px] font-bold">
           <span>Điểm đã neo</span>
-          <button v-if="anchors.length" type="button" class="border-0 bg-transparent text-[#d84315] cursor-pointer text-xs" @click="clearAnchors">Hủy tất cả</button>
+          <button
+            v-if="anchors.length"
+            type="button"
+            class="border-0 bg-transparent text-[#d84315] cursor-pointer text-xs"
+            @click="clearAnchors"
+          >
+            Hủy tất cả
+          </button>
         </div>
         <p v-if="!anchors.length" class="mt-[3px] mb-0 text-[#607176] text-xs">Chưa có điểm neo</p>
         <ul v-else class="grid gap-2 p-0 mt-3 mb-0 list-none">
           <li v-for="(anchor, index) in anchors" :key="anchor.id" class="flex items-center gap-2 min-w-0">
-            <span class="grid place-items-center w-6 h-6 rounded-full bg-[#d84315] text-white text-xs font-bold">{{ index + 1 }}</span>
+            <span class="grid place-items-center w-6 h-6 rounded-full bg-[#d84315] text-white text-xs font-bold">{{
+              index + 1
+            }}</span>
             <span class="flex-1 overflow-hidden text-ellipsis whitespace-nowrap text-xs">{{ anchor.title }}</span>
             <button
               type="button"
@@ -213,6 +239,21 @@ function stopDragging(event: PointerEvent) {
     <div v-if="hoveredTitle" class="tooltip" :style="{ top: tooltipPos.y + 'px', left: tooltipPos.x + 'px' }">
       {{ hoveredTitle }}
     </div>
+
+    <template v-if="targetMapData !== undefined">
+      <aside
+        class="flex flex-col map-sidebar w-100 flex-none p-4 border-2 border-[#263238] rounded-xl bg-white text-[#263238] shadow-[0_8px_24px_rgba(38,50,56,0.12)]"
+      >
+        <div class="">
+          <h2 class="m-0 text-lg">Thông tin </h2>
+          <h6 class="m-0 text-gray-500 underline">{{ targetMapData.name }}</h6>
+        </div>
+        <div class="overflow-y-scroll [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
+          <div v-if="targetMapData.information.length !== 0">{{ targetMapData.information }}</div>
+          <div v-else>Chưa có thông tin</div>
+        </div>
+      </aside>
+    </template>
   </div>
 </template>
 
@@ -276,7 +317,7 @@ function stopDragging(event: PointerEvent) {
 }
 
 path {
-  fill: #800080ad;
+  fill: #153221;
   stroke: white;
   stroke-width: 0.02rem !important;
 }
@@ -312,4 +353,3 @@ path:hover {
   }
 }
 </style>
-

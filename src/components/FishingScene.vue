@@ -70,10 +70,27 @@ onBeforeUnmount(() => {
 const currentPhase = computed(() => {
   const hour = now.value.getHours();
   return (
-    DAY_PHASES.find((phase) => (phase.from < phase.to ? hour >= phase.from && hour < phase.to : hour >= phase.from || hour < phase.to)) ??
-    DAY_PHASES[3]
+    DAY_PHASES.find((phase) =>
+      phase.from < phase.to ? hour >= phase.from && hour < phase.to : hour >= phase.from || hour < phase.to,
+    ) ?? DAY_PHASES[3]
   );
 });
+
+const currentScenePhace = computed(() => {
+  switch (currentPhase.value.key) {
+    case "dawn":
+      return "/area/ponds/pond.sunrise.png";
+    case "day":
+      return "/area/ponds/pond.noon.jpg";
+    case "dusk":
+      return "/area/ponds/pond.dusk.png";
+    case "night":
+      return "/area/ponds/pond.night.png";
+    default:
+      break;
+  }
+});
+
 const timeLabel = computed(() =>
   now.value.toLocaleTimeString("vi-VN", { hour: "2-digit", minute: "2-digit", second: "2-digit" }),
 );
@@ -97,14 +114,17 @@ function castAt(event: MouseEvent) {
 
 <template>
   <section ref="sceneElement" class="fishing-scene" @click="castAt">
-    <img src="/pond.jpg" alt="Ao câu trong rừng" class="pond-image" draggable="false"/>
+    <img :src="currentScenePhace" alt="Ao câu trong rừng" class="pond-image" draggable="false" />
     <div class="scene-shade"></div>
     <div class="scene-top">
       <div class="location">
         <div class="w-10 h-10 overflow-hidden">
           <img :src="currentPhase.icon" :alt="currentPhase.label" class="location-icon" />
         </div>
-        <div><strong>{{ timeLabel }}</strong><small>{{ currentPhase.label }}</small></div>
+        <div>
+          <strong>{{ timeLabel }}</strong
+          ><small>{{ currentPhase.label }}</small>
+        </div>
       </div>
       <div class="scene-actions">
         <button type="button" class="guide-button" @click.stop="store.openLakeGuide">Cá trong hồ</button>
@@ -129,7 +149,14 @@ function castAt(event: MouseEvent) {
       class="ripple"
       :style="{ left: `${store.baitPosition.x}%`, top: `${store.baitPosition.y}%` }"
     ></div>
-    <svg class="casting-line" :class="castClass" viewBox="0 0 100 100" preserveAspectRatio="none" pathLength="100" aria-hidden="true">
+    <svg
+      class="casting-line"
+      :class="castClass"
+      viewBox="0 0 100 100"
+      preserveAspectRatio="none"
+      pathLength="100"
+      aria-hidden="true"
+    >
       <path :d="linePath" />
     </svg>
     <div
@@ -261,8 +288,29 @@ function castAt(event: MouseEvent) {
   font-weight: 800;
   backdrop-filter: blur(10px);
 }
-.players-button { padding: 10px 12px; border: 1px solid rgba(255, 255, 255, .2); border-radius: 12px; background: rgba(17, 38, 27, .72); box-shadow: 0 6px 18px rgba(9, 20, 14, .16); color: white; cursor: pointer; font-size: 11px; font-weight: 800; backdrop-filter: blur(10px); }
-.players-button b { display: inline-grid; place-items: center; min-width: 17px; height: 17px; margin-left: 4px; border-radius: 50%; background: #78c6b1; color: #173c31; font-size: 10px; }
+.players-button {
+  padding: 10px 12px;
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  border-radius: 12px;
+  background: rgba(17, 38, 27, 0.72);
+  box-shadow: 0 6px 18px rgba(9, 20, 14, 0.16);
+  color: white;
+  cursor: pointer;
+  font-size: 11px;
+  font-weight: 800;
+  backdrop-filter: blur(10px);
+}
+.players-button b {
+  display: inline-grid;
+  place-items: center;
+  min-width: 17px;
+  height: 17px;
+  margin-left: 4px;
+  border-radius: 50%;
+  background: #78c6b1;
+  color: #173c31;
+  font-size: 10px;
+}
 .bag-button b {
   display: inline-grid;
   place-items: center;
@@ -309,8 +357,9 @@ function castAt(event: MouseEvent) {
   pointer-events: none;
 }
 .water-boundary-debug polygon {
-  fill: rgba(74, 198, 219, 0.18);
-  stroke: rgba(229, 255, 255, 0.9);
+  fill: none;
+  /* fill: rgba(74, 198, 219, 0.18);
+  stroke: rgba(229, 255, 255, 0.9); */
   stroke-width: 0.6;
   stroke-dasharray: 1 6;
   vector-effect: non-scaling-stroke;
@@ -596,8 +645,13 @@ function castAt(event: MouseEvent) {
     top: 13px;
     left: 13px;
   }
-  .players-button { font-size: 0; padding: 9px; }
-  .players-button b { margin: 0; }
+  .players-button {
+    font-size: 0;
+    padding: 9px;
+  }
+  .players-button b {
+    margin: 0;
+  }
   .scene-instruction {
     font-size: 9px;
   }

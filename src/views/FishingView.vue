@@ -108,7 +108,7 @@ onBeforeUnmount(() => {
   color: #b8cab5;
 }
 .control-deck :deep(.power-track) {
-  background: rgba(218, 239, 201, 0.18);
+  background: #daefc92e;
 }
 .control-deck :deep(.cast-button) {
   background: #d49c42;
