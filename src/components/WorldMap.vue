@@ -188,7 +188,7 @@ function stopDragging(event: PointerEvent) {
 
       <div class="mt-5">
         <div class="flex items-center justify-between text-[13px] font-bold">
-          <span>Điểm đã neo</span>
+          <span>Danh sách bãi câu</span>
           <!-- <button
             v-if="anchors.length"
             type="button"
@@ -320,7 +320,7 @@ function stopDragging(event: PointerEvent) {
 path {
   fill: #153221;
   stroke: white;
-  stroke-width: 0.02rem !important;
+  stroke-width: 0.01rem !important;
 }
 
 path:hover {

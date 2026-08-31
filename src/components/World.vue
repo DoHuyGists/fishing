@@ -66,6 +66,7 @@ function closeAreaWindow() {
 .anchor-dialog-wrapper {
   overflow: visible;
   pointer-events: auto;
+  user-select: none;
 }
 
 .anchor-dialog-wrapper > div {
@@ -98,7 +99,7 @@ function closeAreaWindow() {
   width: 100%;
   padding: 6px 10px;
   border-radius: 8px;
-  background: #d84315;
+  background: #22c55e;
   color: #fff;
   font-weight: 700;
   text-decoration: none;
@@ -1393,14 +1394,14 @@ function closeAreaWindow() {
         <circle
           @click.stop="openAreaWindow(anchor)"
           r="1"
-          fill="red"
+          :fill="selectedAnchor && selectedAnchor.id === anchor.id ? '#22c55e' : 'red'"
           stroke="#ffffff"
           stroke-width=".5"
           class="anchors"
         />
 
         <g v-if="selectedAnchor && selectedAnchor.id === anchor.id" transform="translate(0 -18)">
-          <foreignObject x="-75" y="-78" width="150" height="90" class="anchor-dialog-wrapper">
+          <foreignObject x="-75" y="-70" width="150" height="90" class="anchor-dialog-wrapper">
             <div
               xmlns="http://www.w3.org/1999/xhtml"
               class="anchor-dialog"
