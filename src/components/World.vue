@@ -1384,6 +1384,10 @@ function closeAreaWindow() {
       title="Zimbabwe"
       id="ZW"
     />
+    <!-- <g :transform="`translate(${771} ${436})`">
+      <circle r="1" fill="red" stroke-width=".5"></circle>
+    </g> -->
+
     <template v-for="anchor in props.anchors" :key="anchor.id">
       <g :transform="`translate(${anchor.x} ${anchor.y})`">
         <circle r="1" fill="red" stroke-width=".5" opacity="0" class="anchor-pulse">

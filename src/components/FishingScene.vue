@@ -86,13 +86,13 @@ const currentScenePhace = computed(() => {
   if(fishingAreaStore.currentArea){
     switch (currentPhase.value.key) {
       case "dawn":
-        return `${fishingAreaStore.currentArea.scenePath}/pond.sunrise.png`;
+        return `${fishingAreaStore.currentArea.scenePath}/dawn.png`;
       case "day":
-        return `${fishingAreaStore.currentArea.scenePath}/pond.noon.jpg`;
+        return `${fishingAreaStore.currentArea.scenePath}/day.png`;
       case "dusk":
-        return `${fishingAreaStore.currentArea.scenePath}/pond.dusk.png`;
+        return `${fishingAreaStore.currentArea.scenePath}/dusk.png`;
       case "night":
-        return `${fishingAreaStore.currentArea.scenePath}/pond.night.png`;
+        return `${fishingAreaStore.currentArea.scenePath}/night.png`;
       default:
         break;
     }

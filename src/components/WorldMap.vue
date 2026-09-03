@@ -304,6 +304,12 @@ function stopDragging(event: PointerEvent) {
   z-index: 1;
 }
 
+.map-frame {
+  flex: 0 0 500px;
+  width: 500px;
+  height: 500px;
+}
+
 .map-anchor span {
   position: absolute;
   top: 15px;
@@ -350,7 +356,7 @@ path:hover {
   }
 
   .map-frame {
-    min-height: 70vh;
+    min-height: 50vh;
   }
 }
 </style>
