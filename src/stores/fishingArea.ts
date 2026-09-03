@@ -6,6 +6,7 @@ const fishingAreaRepository = supabaseFishingAreaRepository;
 export const useFishingAreaStore = defineStore("fishing_areas", {
   state: () => ({
     areas: [] as any[],
+    currentArea: {} as any,
     loading: false,
     loaded: false,
     error: "",
@@ -24,6 +25,21 @@ export const useFishingAreaStore = defineStore("fishing_areas", {
         this.loading = false;
       }
     },
+
+    async fetchCurrentArea(areaId: string){
+      if (this.loading) return;
+      this.loading = true;
+      this.error = "";
+      try {
+        this.currentArea = await fishingAreaRepository.fetchOneAreas(areaId);
+        this.loaded = true;
+      } catch (err) {
+        this.error = err instanceof Error ? err.message : "Không thể tải trang bị từ máy chủ";
+      } finally {
+        this.loading = false;
+      }
+    },
+
     reset() {
       this.areas = [];
       this.loaded = false;

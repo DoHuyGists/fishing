@@ -1,8 +1,14 @@
 <script setup lang="ts">
-import { computed, onBeforeUnmount, onMounted, ref } from "vue";
+import { computed, onBeforeUnmount, onMounted, ref, watch } from "vue";
 import { isPointInWater, waterBoundary } from "../data/fishingMap";
 import { useFishingStore } from "../stores/fishing";
+import { useRoute } from "vue-router";
+import { useFishingAreaStore } from "../stores/fishingArea";
 
+const route = useRoute();
+const fishingAreaStore = useFishingAreaStore();
+const countryId = route.params.countryId;
+const areaId = route.params.areaId;
 const store = useFishingStore();
 const sceneElement = ref<HTMLElement | null>(null);
 const rodLineAnchor = ref<HTMLElement | null>(null);
@@ -77,19 +83,29 @@ const currentPhase = computed(() => {
 });
 
 const currentScenePhace = computed(() => {
-  switch (currentPhase.value.key) {
-    case "dawn":
-      return "/area/ponds/pond.sunrise.png";
-    case "day":
-      return "/area/ponds/pond.noon.jpg";
-    case "dusk":
-      return "/area/ponds/pond.dusk.png";
-    case "night":
-      return "/area/ponds/pond.night.png";
-    default:
-      break;
+  if(fishingAreaStore.currentArea){
+    switch (currentPhase.value.key) {
+      case "dawn":
+        return `${fishingAreaStore.currentArea.scenePath}/pond.sunrise.png`;
+      case "day":
+        return `${fishingAreaStore.currentArea.scenePath}/pond.noon.jpg`;
+      case "dusk":
+        return `${fishingAreaStore.currentArea.scenePath}/pond.dusk.png`;
+      case "night":
+        return `${fishingAreaStore.currentArea.scenePath}/pond.night.png`;
+      default:
+        break;
+    }
+  }else{
+    return ""
   }
 });
+
+onMounted(()=>{
+  if(areaId){
+    fishingAreaStore.fetchCurrentArea(areaId as string)
+  }
+})
 
 const timeLabel = computed(() =>
   now.value.toLocaleTimeString("vi-VN", { hour: "2-digit", minute: "2-digit", second: "2-digit" }),

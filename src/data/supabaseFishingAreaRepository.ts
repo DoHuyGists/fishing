@@ -1,8 +1,10 @@
 import supabase from "../database/connection";
 
-class SupabaseFishingAreaRepository  {
-   async fetchAreas(): Promise<any[]> {
-    const { data, error } = await supabase.from("fishing_areas").select("id, country_id, x, y, title, location");
+class SupabaseFishingAreaRepository {
+  async fetchAreas(): Promise<any[]> {
+    const { data, error } = await supabase
+      .from("fishing_areas")
+      .select("id, country_id, x, y, title, location, scene_path");
 
     if (error) throw new Error(error.message);
 
@@ -14,8 +16,30 @@ class SupabaseFishingAreaRepository  {
       y: x.y,
       title: x.title,
       countryId: x.country_id,
-      location: x.location
+      location: x.location,
+      scenePath: x.scene_path,
     }));
+  }
+  async fetchOneAreas(areaId: string): Promise<any> {
+    const { data, error } = await supabase
+      .from("fishing_areas")
+      .select("id, country_id, x, y, title, location, scene_path")
+      .eq("id", areaId)
+      .maybeSingle();
+
+    if (error) throw new Error(error.message);
+
+    if (!data) return null;
+
+    return {
+      id: data.id,
+      x: data.x,
+      y: data.y,
+      title: data.title,
+      countryId: data.country_id,
+      location: data.location,
+      scenePath: data.scene_path,
+    };
   }
 }
 
