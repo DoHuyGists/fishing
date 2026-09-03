@@ -11,7 +11,7 @@ const POPUP_CLOSE_ZOOM = 1.25;
 
 const popupScale = computed(() => {
   const zoom = Number(props.zoom ?? 1);
-  return Number(Math.max(1 / zoom, 0.5).toFixed(3));
+  return Number(Math.max(1 / zoom, 0.2).toFixed(3));
 });
 
 watch(
@@ -1404,7 +1404,7 @@ function closeAreaWindow() {
           class="anchors"
         />
 
-        <g v-if="selectedAnchor && selectedAnchor.id === anchor.id" transform="translate(0 -18)">
+        <g v-if="selectedAnchor && selectedAnchor.id === anchor.id" transform="translate(0 0)">
           <foreignObject x="-75" y="-70" width="150" height="90" class="anchor-dialog-wrapper">
             <div
               xmlns="http://www.w3.org/1999/xhtml"
@@ -1430,7 +1430,7 @@ function closeAreaWindow() {
                 @pointerdown.stop
                 @click.stop
               >
-                Đi đến hồ
+                Đi đến bãi câu
               </router-link>
             </div>
           </foreignObject>
