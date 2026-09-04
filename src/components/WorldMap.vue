@@ -2,6 +2,7 @@
 import { computed, onMounted, watch, ref } from "vue";
 import { useFishingAreaStore } from "../stores/fishingArea";
 import World from "./World.vue";
+import { useWorldStore } from "../stores/world.ts";
 
 const MAP_VIEW_STORAGE_KEY = "worldMapView";
 
@@ -17,6 +18,7 @@ const dragStart = ref({ x: 0, y: 0 });
 const panStart = ref({ x: 0, y: 0 });
 const fishingAreaStore = useFishingAreaStore();
 const anchors = computed(() => fishingAreaStore.areas);
+const worldStore = useWorldStore()
 
 function loadMapView() {
   try {
@@ -40,12 +42,18 @@ function saveMapView() {
 
 function zoomToArea(anchor: any) {
   localStorage.setItem(MAP_VIEW_STORAGE_KEY, JSON.stringify(anchor.location));
+}
+
+function handleSelectArea(anchor: any) {
+  zoomToArea(anchor);
   loadMapView();
+  setTimeout(()=>{worldStore.selectArea(anchor);},0)
 }
 
 function resetZoom() {
   zoom.value = MIN_ZOOM;
   pan.value = { x: 0, y: 0 };
+  worldStore.selectArea({})
 }
 
 watch([zoom, pan], saveMapView, { deep: true });
@@ -56,8 +64,8 @@ onMounted(() => {
 });
 
 const MIN_ZOOM = 1;
-const MAX_ZOOM = 10;
-const ZOOM_STEP = 0.1;
+const MAX_ZOOM = 40;
+const ZOOM_STEP = 1;
 
 function handleMouseMove(event: any) {
   const targetTitle = event.target.getAttribute("title");
@@ -205,7 +213,7 @@ function stopDragging(event: PointerEvent) {
               index + 1
             }}</span>
             <span class="flex-1 overflow-hidden text-ellipsis whitespace-nowrap text-xs">
-              <button @click="zoomToArea(anchor)" type="button" class="cursor-pointer">{{ anchor.title }}</button>
+              <button @click="handleSelectArea(anchor)" type="button" class="cursor-pointer">{{ anchor.title }}</button>
             </span>
             <!-- <button
               type="button"

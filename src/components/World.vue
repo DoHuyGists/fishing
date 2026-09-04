@@ -1,29 +1,38 @@
 <script lang="ts" setup>
 import { computed, ref, watch } from "vue";
+import { useWorldStore } from "../stores/world";
 
 const props = defineProps<{
   anchors: any[];
   zoom?: number;
 }>();
 
+const worldStore = useWorldStore();
 const selectedAnchor = ref<any | null>(null);
 const POPUP_CLOSE_ZOOM = 1.25;
 
+watch(
+  () => worldStore.selectedArea,
+  (newSelectedArea) => {
+    openAreaWindow(newSelectedArea);
+  },
+);
+
 const popupScale = computed(() => {
   const zoom = Number(props.zoom ?? 1);
-  return Number(Math.max(1 / zoom, 0.2).toFixed(3));
+  return Number(Math.max(1 / zoom, 0.1).toFixed(3));
 });
 
-watch(
-  () => props.zoom,
-  (nextZoom) => {
-    const zoom = Number(nextZoom ?? 1);
-    if (selectedAnchor.value && zoom > POPUP_CLOSE_ZOOM) {
-      selectedAnchor.value = null;
-    }
-  },
-  { immediate: true },
-);
+// watch(
+//   () => props.zoom,
+//   (nextZoom) => {
+//     const zoom = Number(nextZoom ?? 1);
+//     if (selectedAnchor.value && zoom > POPUP_CLOSE_ZOOM) {
+//       selectedAnchor.value = null;
+//     }
+//   },
+//   { immediate: true },
+// );
 
 function openAreaWindow(anchor: any) {
   selectedAnchor.value = anchor;
@@ -51,9 +60,8 @@ function closeAreaWindow() {
   gap: 6px;
   width: 150px;
   padding: 8px 10px 10px;
-  border: 1px solid rgba(38, 50, 56, 0.12);
   border-radius: 10px;
-  background: rgba(255, 255, 255, 0.96);
+  background: white;
   box-shadow: 0 8px 18px rgba(38, 50, 56, 0.18);
   color: #263238;
   font-size: 12px;
@@ -103,6 +111,17 @@ function closeAreaWindow() {
   color: #fff;
   font-weight: 700;
   text-decoration: none;
+}
+.triangle {
+  position: absolute;
+  top: calc(100% - 1px);
+  left: 50%;
+  transform: translateX(-50%);
+  width: 0;
+  height: 0;
+  border-left: 8px solid transparent;
+  border-right: 8px solid transparent;
+  border-top: 10px solid white;
 }
 </style>
 <template>
@@ -1394,7 +1413,6 @@ function closeAreaWindow() {
           <animate attributeName="r" values="1;5" dur="1.5s" repeatCount="indefinite" />
           <animate attributeName="opacity" values="0.8;0" dur="1.5s" repeatCount="indefinite" />
         </circle>
-        <circle @click.stop="openAreaWindow(anchor)" r="6" fill="transparent" stroke="transparent" class="anchors" />
         <circle
           @click.stop="openAreaWindow(anchor)"
           r="1"
@@ -1405,33 +1423,42 @@ function closeAreaWindow() {
         />
 
         <g v-if="selectedAnchor && selectedAnchor.id === anchor.id" transform="translate(0 0)">
-          <foreignObject x="-75" y="-70" width="150" height="90" class="anchor-dialog-wrapper">
+          <foreignObject x="-75" y="-70" class="anchor-dialog-wrapper">
             <div
               xmlns="http://www.w3.org/1999/xhtml"
               class="anchor-dialog"
               @pointerdown.stop
               @click.stop
               :style="{
-                transform: `scale(${popupScale})`,
+                transform: `scale(${0.1}) translateY(${(1 - popupScale) * 90}px)`,
                 transformOrigin: 'center bottom',
                 opacity: popupScale > 0 ? 1 : 0,
               }"
             >
               <div class="anchor-dialog-header">
                 <span>{{ anchor.title }}</span>
+
                 <button type="button" class="anchor-dialog-close" @pointerdown.stop @click.stop="closeAreaWindow">
                   ×
                 </button>
               </div>
 
               <router-link
-                :to="{ name: 'fishing', params: { countryId: anchor.countryId, areaId: anchor.id } }"
+                :to="{
+                  name: 'fishing',
+                  params: {
+                    countryId: anchor.countryId,
+                    areaId: anchor.id,
+                  },
+                }"
                 class="anchor-dialog-link"
                 @pointerdown.stop
                 @click.stop
               >
                 Đi đến bãi câu
               </router-link>
+
+              <div class="triangle"></div>
             </div>
           </foreignObject>
         </g>

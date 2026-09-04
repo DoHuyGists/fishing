@@ -4,7 +4,8 @@ class SupabaseFishingAreaRepository {
   async fetchAreas(): Promise<any[]> {
     const { data, error } = await supabase
       .from("fishing_areas")
-      .select("id, country_id, x, y, title, location, scene_path");
+      .select("id, country_id, x, y, title, location, scene_path")
+      .order('y', {ascending: true});
 
     if (error) throw new Error(error.message);
 
