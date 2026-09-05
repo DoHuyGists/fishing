@@ -24,7 +24,7 @@ class SupabaseFishingAreaRepository {
   async fetchOneAreas(areaId: string): Promise<any> {
     const { data, error } = await supabase
       .from("fishing_areas")
-      .select("id, country_id, x, y, title, location, scene_path")
+      .select("id, country_id, x, y, title, location, scene_path, fishing_boundary")
       .eq("id", areaId)
       .maybeSingle();
 
@@ -40,6 +40,7 @@ class SupabaseFishingAreaRepository {
       countryId: data.country_id,
       location: data.location,
       scenePath: data.scene_path,
+      fishingBoundary: data.fishing_boundary,
     };
   }
 }

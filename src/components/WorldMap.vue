@@ -130,7 +130,7 @@ function clampPan() {
 
 function handlePointerDown(event: PointerEvent) {
   const target = event.target as Element | null;
-  if (target?.closest("path[title]") || target?.closest(".anchors") || target?.closest(".anchors-hit")) {
+  if (target?.closest(".anchors")) {
     return;
   }
 

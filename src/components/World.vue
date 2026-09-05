@@ -1415,10 +1415,10 @@ function closeAreaWindow() {
         </circle>
         <circle
           @click.stop="openAreaWindow(anchor)"
-          r="1"
+          r=".7"
           :fill="selectedAnchor && selectedAnchor.id === anchor.id ? '#22c55e' : 'red'"
           stroke="#ffffff"
-          stroke-width=".5"
+          stroke-width=".3"
           class="anchors"
         />
 
