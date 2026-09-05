@@ -75,6 +75,7 @@ onMounted(() => {
   clockTimer = window.setInterval(() => (now.value = new Date()), 1000);
   trackRodPosition();
   window.addEventListener("resize", updateRodPosition);
+  store.fetchFishInCurrentArea(areaId as string)
 });
 onBeforeUnmount(() => {
   if (clockTimer) window.clearInterval(clockTimer);

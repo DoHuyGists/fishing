@@ -26,7 +26,7 @@ export const useFishingAreaStore = defineStore("fishing_areas", {
       }
     },
 
-    async fetchCurrentArea(areaId: string){
+    async fetchCurrentArea(areaId: string) {
       if (this.loading) return;
       this.loading = true;
       this.error = "";

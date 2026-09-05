@@ -5,6 +5,7 @@ class SupabaseFishingAreaRepository {
     const { data, error } = await supabase
       .from("fishing_areas")
       .select("id, country_id, x, y, title, location, scene_path")
+      .eq("is_available", true)
       .order('y', {ascending: true});
 
     if (error) throw new Error(error.message);

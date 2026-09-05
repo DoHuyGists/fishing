@@ -1,6 +1,7 @@
 ﻿import { defineStore } from "pinia";
-import { biteProbability, catchProbability, lakeFish, type Equipment, type Fish } from "../data/fishingLogic";
+import { biteProbability, catchProbability, type Equipment, type Fish } from "../data/fishingLogic";
 import { useEquipmentStore } from "./equipment";
+import { supabaseFishRepository } from "../data/supabaseFishRepository";
 export type FishingTool = "rod" | "line" | "reel" | "hook" | "bait";
 export type CastPhase = "idle" | "casting" | "waiting" | "bite" | "fighting" | "caught" | "lost";
 export type CaughtFish = {
@@ -90,6 +91,7 @@ export const useFishingStore = defineStore("fishing", {
     ] as FishingPlayer[],
     inventory: [] as CaughtFish[],
     castAttempt: 0,
+    lakeFish: [] as any[]
   }),
   getters: {
     canPull: (s) => s.castPhase === "bite" || s.castPhase === "fighting",
@@ -101,7 +103,7 @@ export const useFishingStore = defineStore("fishing", {
     },
     tensionState: (s) => (s.tension >= MAX_TENSION - 10 ? "danger" : s.tension >= SAFE_TENSION ? "safe" : "low"),
     fishCatchChances(state): { fish: Fish; bite: number; catch: number }[] {
-      return lakeFish.map((fish) => ({
+      return this.lakeFish.map((fish) => ({
         fish,
         bite: Math.round(biteProbability(fish, this.currentBait) * 100),
         catch: Math.round(catchProbability(fish, state.equipment, state.playerSkillMultiplier) * 100),
@@ -109,6 +111,16 @@ export const useFishingStore = defineStore("fishing", {
     },
   },
   actions: {
+    async fetchFishInCurrentArea(areaId: string) {
+      if (!areaId) return;
+      try {
+        this.lakeFish = await supabaseFishRepository.fetchFishesByArea(areaId);
+      } catch (err) {
+        
+      } finally {
+        
+      }
+    },
     selectTool(tool: FishingTool) {
       this.selectedTool = tool;
     },
@@ -136,7 +148,7 @@ export const useFishingStore = defineStore("fishing", {
       this.isCasting = true;
       this.castPhase = "casting";
       this.castMessage = "Đang vung cần đến điểm đã chọn...";
-      const fish = lakeFish[Math.floor(Math.random() * lakeFish.length)];
+      const fish = this.lakeFish[Math.floor(Math.random() * this.lakeFish.length)];
       const [minBiteDelay, maxBiteDelay] = fish.biteDelayRange;
       const biteDelay = minBiteDelay + Math.random() * (maxBiteDelay - minBiteDelay);
       window.setTimeout(() => {
