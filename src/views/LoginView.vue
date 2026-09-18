@@ -17,9 +17,7 @@ async function submit() {
 <template>
   <main class="login-page">
     <section class="login-panel" aria-labelledby="login-title">
-      <div class="brand-mark" aria-hidden="true">C</div>
-      <p class="eyebrow">Nhật ký mặt hồ</p>
-      <h1 id="login-title">Vào hồ câu</h1>
+      <h1 id="login-title">Đăng nhập</h1>
       <p class="intro">Đăng nhập để tiếp tục hành trình của bạn.</p>
 
       <form class="login-form" @submit.prevent="submit">

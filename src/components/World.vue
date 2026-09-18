@@ -9,7 +9,6 @@ const props = defineProps<{
 
 const worldStore = useWorldStore();
 const selectedAnchor = ref<any | null>(null);
-const POPUP_CLOSE_ZOOM = 1.25;
 
 watch(
   () => worldStore.selectedArea,

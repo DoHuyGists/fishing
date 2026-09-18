@@ -1,6 +1,8 @@
-﻿import { defineStore } from "pinia";
+import { defineStore } from "pinia";
 import { biteProbability, catchProbability, type Equipment, type Fish } from "../data/fishingLogic";
 import { useEquipmentStore } from "./equipment";
+import { useAuthStore } from "./auth";
+import { useFishingAreaStore } from "./fishingArea";
 import { supabaseFishRepository } from "../data/supabaseFishRepository";
 export type FishingTool = "rod" | "line" | "reel" | "hook" | "bait";
 export type CastPhase = "idle" | "casting" | "waiting" | "bite" | "fighting" | "caught" | "lost";
@@ -91,7 +93,8 @@ export const useFishingStore = defineStore("fishing", {
     ] as FishingPlayer[],
     inventory: [] as CaughtFish[],
     castAttempt: 0,
-    lakeFish: [] as any[]
+    lakeFish: [] as Fish[],
+    currentAreaId: null as string | null,
   }),
   getters: {
     canPull: (s) => s.castPhase === "bite" || s.castPhase === "fighting",
@@ -113,6 +116,7 @@ export const useFishingStore = defineStore("fishing", {
   actions: {
     async fetchFishInCurrentArea(areaId: string) {
       if (!areaId) return;
+      this.currentAreaId = areaId;
       try {
         this.lakeFish = await supabaseFishRepository.fetchFishesByArea(areaId);
       } catch (err) {
@@ -219,7 +223,7 @@ export const useFishingStore = defineStore("fishing", {
         }
       }, 1500);
     },
-    catchFish() {
+    async catchFish() {
       const fish = this.activeFish;
       this.isPulling = false;
       if (!fish) return this.loseFish("Cá đã thoát khỏi lưới câu!");
@@ -238,6 +242,17 @@ export const useFishingStore = defineStore("fishing", {
         chance: Math.round(chance * 100),
       });
       this.catchDialogOpen = true;
+
+      const authStore = useAuthStore();
+      const userId = authStore.user?.id;
+      const areaId = this.currentAreaId || useFishingAreaStore().currentArea?.id;
+      if (userId && areaId) {
+        try {
+          await supabaseFishRepository.saveCaughtFish(userId, areaId, fish);
+        } catch (err) {
+          console.error("Lưu thông tin cá đã câu thất bại:", err);
+        }
+      }
     },
     closeCatchDialog() {
       this.catchDialogOpen = false;

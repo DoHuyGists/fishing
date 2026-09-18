@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { computed, onBeforeUnmount, onMounted, ref, watch } from "vue";
+import { computed, onBeforeUnmount, onMounted, ref } from "vue";
 import { isPointInWater } from "../data/fishingMap";
 import { useFishingStore } from "../stores/fishing";
 import { useRoute } from "vue-router";
@@ -17,7 +17,6 @@ const waterBoundaryPoints = computed(() => waterBoundary.value.map(({ x, y }) =>
 
 const route = useRoute();
 const fishingAreaStore = useFishingAreaStore();
-const countryId = route.params.countryId;
 const areaId = route.params.areaId;
 const store = useFishingStore();
 const sceneElement = ref<HTMLElement | null>(null);
