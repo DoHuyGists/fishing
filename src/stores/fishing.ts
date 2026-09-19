@@ -7,13 +7,14 @@ import { supabaseFishRepository } from "../data/supabaseFishRepository";
 export type FishingTool = "rod" | "line" | "reel" | "hook" | "bait";
 export type CastPhase = "idle" | "casting" | "waiting" | "bite" | "fighting" | "caught" | "lost";
 export type CaughtFish = {
-  id: number;
+  id: string | number;
   name: string;
   weight: string;
   length: string;
   rarity: string;
   image: string;
-  chance: number;
+  chance?: number;
+  createdAt?: string;
 };
 export type FishingPlayer = {
   id: number;
@@ -119,10 +120,45 @@ export const useFishingStore = defineStore("fishing", {
       this.currentAreaId = areaId;
       try {
         this.lakeFish = await supabaseFishRepository.fetchFishesByArea(areaId);
+        await this.fetchCaughtFishes(undefined, areaId);
       } catch (err) {
         
       } finally {
         
+      }
+    },
+    async fetchCaughtFishes(userId?: string, areaId?: string) {
+      const authStore = useAuthStore();
+      const targetUserId = userId || authStore.user?.id;
+      const targetAreaId = areaId || this.currentAreaId || useFishingAreaStore().currentArea?.id;
+
+      if (!targetUserId || !targetAreaId) return;
+
+      try {
+        const rows = await supabaseFishRepository.fetchCaughtFishes(targetUserId, targetAreaId);
+        this.inventory = rows.map((row) => {
+          const fish = row.fish;
+          return {
+            id: row.id,
+            name: fish.name,
+            weight: typeof fish.weight === "number" ? `${fish.weight} kg` : fish.weight,
+            length: fish.length,
+            rarity: fish.rarity,
+            image: fish.image,
+            createdAt: row.created_at,
+          };
+        });
+      } catch (err) {
+        console.error("Lỗi khi tải danh sách cá trong túi:", err);
+      }
+    },
+    async releaseFish(caughtId: string | number) {
+      try {
+        await supabaseFishRepository.deleteCaughtFish(String(caughtId));
+        this.inventory = this.inventory.filter((item) => item.id !== caughtId);
+      } catch (err) {
+        console.error("Lỗi khi thả cá khỏi túi:", err);
+        throw err;
       }
     },
     selectTool(tool: FishingTool) {
@@ -249,6 +285,7 @@ export const useFishingStore = defineStore("fishing", {
       if (userId && areaId) {
         try {
           await supabaseFishRepository.saveCaughtFish(userId, areaId, fish);
+          await this.fetchCaughtFishes(userId, areaId);
         } catch (err) {
           console.error("Lưu thông tin cá đã câu thất bại:", err);
         }
@@ -263,8 +300,9 @@ export const useFishingStore = defineStore("fishing", {
       this.activeFish = null;
       this.castMessage = "Chạm mặt hồ để câu tiếp";
     },
-    openBag() {
+    async openBag() {
       this.bagOpen = true;
+      await this.fetchCaughtFishes();
     },
     closeBag() {
       this.bagOpen = false;

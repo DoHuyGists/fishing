@@ -1,7 +1,8 @@
 <script setup lang="ts">
-import { computed, onBeforeUnmount, onMounted, ref } from "vue";
+import { computed, onBeforeUnmount, onMounted, ref, watch } from "vue";
 import { isPointInWater } from "../data/fishingMap";
 import { useFishingStore } from "../stores/fishing";
+import { useAuthStore } from "../stores/auth";
 import { useRoute } from "vue-router";
 import { useFishingAreaStore } from "../stores/fishingArea";
 
@@ -16,9 +17,20 @@ const waterBoundaryPoints = computed(() => waterBoundary.value.map(({ x, y }) =>
 //
 
 const route = useRoute();
+const authStore = useAuthStore();
 const fishingAreaStore = useFishingAreaStore();
 const areaId = route.params.areaId;
 const store = useFishingStore();
+
+watch(
+  () => [authStore.user?.id, areaId],
+  ([userId, currentAreaId]) => {
+    if (userId && currentAreaId) {
+      store.fetchCaughtFishes(userId as string, currentAreaId as string);
+    }
+  },
+  { immediate: true }
+);
 const sceneElement = ref<HTMLElement | null>(null);
 const rodLineAnchor = ref<HTMLElement | null>(null);
 const fishingRod = ref({
