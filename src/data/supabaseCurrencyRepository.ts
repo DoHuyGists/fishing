@@ -44,6 +44,24 @@ class SupabaseCurrencyRepository {
 
     return data?.cash ?? 0;
   }
+
+  async updateCurrency(userId: string, newCash: number): Promise<void> {
+    const { error } = await supabase
+      .from("currency")
+      .update({ cash: newCash })
+      .eq("user_id", userId);
+
+    if (error) {
+      throw new Error(error.message);
+    }
+  }
+
+  async addCash(userId: string, amount: number): Promise<number> {
+    const current = await this.fetchCurrencyByUserId(userId);
+    const updated = Math.max(0, current + amount);
+    await this.updateCurrency(userId, updated);
+    return updated;
+  }
 }
 
 export const supabaseCurrencyRepository = new SupabaseCurrencyRepository();
