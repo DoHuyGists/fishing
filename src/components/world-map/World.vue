@@ -1,6 +1,6 @@
 <script lang="ts" setup>
 import { computed, ref, watch } from "vue";
-import { useWorldStore } from "../stores/world";
+import { useWorldStore } from "../../stores/world";
 
 const props = defineProps<{
   anchors: any[];
