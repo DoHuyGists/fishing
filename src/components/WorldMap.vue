@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { computed, onMounted, watch, ref } from "vue";
+import { onMounted, watch, ref } from "vue";
 import { useFishingAreaStore } from "../stores/fishingArea";
 import { useCurrencyStore } from "../stores/currency";
 import { useAuthStore } from "../stores/auth";
@@ -8,6 +8,8 @@ import MarketWindow from "./market/MarketWindow.vue";
 import { useMarketStore } from "../stores/market.ts";
 import { useCaughtStore } from "../stores/caught.ts";
 import CaughtList from "./caught/CaughtList.vue";
+import CatchDiaryModal from "./diary/CatchDiaryModal.vue";
+import { useDiaryStore } from "../stores/diary.ts";
 
 
 const isProfileOpen = ref(false);
@@ -15,14 +17,23 @@ const marketStore = useMarketStore()
 const fishingAreaStore = useFishingAreaStore();
 const currencyStore = useCurrencyStore();
 const authStore = useAuthStore();
-const caughtStore = useCaughtStore()
+const caughtStore = useCaughtStore();
+const diaryStore = useDiaryStore();
 
 // Quản lý Chợ Cá (Market)
 const isMarketOpen = ref(false);
 
+// Quản lý Nhật ký câu (Diary)
+const isDiaryOpen = ref(false);
+
 function openMarketModal() {
   isMarketOpen.value = true;
   marketStore.loadMarketListings();
+}
+
+function openDiaryModal() {
+  isDiaryOpen.value = true;
+  diaryStore.loadDiary(authStore.user?.id);
 }
 
 
@@ -87,6 +98,14 @@ onMounted(() => {
           <span class="text-sm">🏪</span>
           <span>Chợ cá</span>
         </button>
+
+        <!-- Nhật ký -->
+        <button type="button"
+          class="flex items-center gap-1.5 px-3 py-1.5 bg-[#153221] hover:bg-[#1a3e29] border-[1px] border-gray-300 text-white rounded-xl shadow-sm font-bold text-xs cursor-pointer transition-colors"
+          @click="openDiaryModal">
+          <span class="text-sm">📖</span>
+          <span>Nhật ký</span>
+        </button>
       </div>
     </div>
 
@@ -98,6 +117,9 @@ onMounted(() => {
         &times;
       </button>
    </MarketWindow>
+
+    <!-- Nhật ký Modal Dialog -->
+    <CatchDiaryModal v-if="isDiaryOpen" @close="isDiaryOpen = false" />
 
     
     
