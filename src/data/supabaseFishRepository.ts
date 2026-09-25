@@ -13,7 +13,7 @@ export type CaughtRow = {
 class SupabaseFishRepository {
   async fetchFishesByArea(areaId: string): Promise<Fish[]> {
     const { data, error } = await supabase
-      .from("fishes_in_area")
+      .from("species_in_area")
       .select("id, area_id, fishes")
       .eq("area_id", areaId)
       .maybeSingle();

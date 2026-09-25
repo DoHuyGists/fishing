@@ -133,12 +133,16 @@ onMounted(() => {
           <World class="w-full h-full" @mousemove="handleMouseMove" :anchors="anchors" :zoom="worldStore.zoom" />
         </div>
       </div>
-      <div>
+      <div class="space-y-2 mt-4">
         <button type="button"
-          class="mt-4 py-2 px-3 rounded-lg border border-gray-300 bg-transparent text-[#263238] text-xs font-bold cursor-pointer hover:bg-[#eef3f1] transition-colors"
+          class="py-2 px-3 rounded-lg border border-gray-300 bg-transparent text-[#263238] text-xs font-bold cursor-pointer hover:bg-[#eef3f1] transition-colors"
           @click="worldStore.resetZoom">
           Reset zoom
         </button>
+        <div class="py-2 px-3 rounded-lg border border-gray-300">
+          <div>1. Nhấn giữ Ctrl + cuộn chuột để zoom bản đồ</div>
+          <div>2. Nhấn giữ chuột trái + di chuyển chuột để di chuyển bản đồ</div>
+        </div>
       </div>
     </div>
   </div>
