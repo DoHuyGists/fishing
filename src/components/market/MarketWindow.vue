@@ -120,7 +120,7 @@ function getRarityBadgeClass(rarity: string) {
      <div 
       class="fixed inset-0 z-50 flex items-center justify-center bg-black/60 p-4 backdrop-blur-xs">
       <div
-        class="w-full max-w-4xl max-h-[85vh] bg-white border-[1px] border-gray-300 rounded-2xl shadow-[0_20px_50px_rgba(0,0,0,0.3)] flex flex-col overflow-hidden relative">
+        class="w-full h-full bg-white border-[1px] border-gray-300 rounded-2xl shadow-[0_20px_50px_rgba(0,0,0,0.3)] flex flex-col overflow-hidden relative">
 
         <!-- Header -->
         <div
@@ -238,7 +238,7 @@ function getRarityBadgeClass(rarity: string) {
               <p class="m-0 font-medium">{{ marketSearch || marketRarity !== 'ALL' ? 'Không tìm thấy con cá nào phù hợp với bộ lọc' : 'Hiện chưa có cá nào được đăng bán trên thị trường.' }}</p>
             </div>
 
-            <div v-else class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4">
+            <div v-else class="grid grid-cols-1 sm:grid-cols-3 md:grid-cols-5 gap-4">
               <div v-for="item in filteredMarketListings" :key="item.id"
                 class="bg-white border border-gray-200 hover:border-emerald-500/50 rounded-xl p-3 shadow-2xs hover:shadow-md transition-all flex flex-col justify-between relative group">
 
@@ -308,7 +308,7 @@ function getRarityBadgeClass(rarity: string) {
                 để rao bán cá.</p>
             </div>
 
-            <div v-else class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4">
+            <div v-else class="grid grid-cols-1 sm:grid-cols-3 md:grid-cols-5 gap-4">
               <div v-for="item in myMarketListings" :key="item.id"
                 class="bg-white border border-gray-200 rounded-xl p-3 shadow-2xs flex flex-col justify-between">
 

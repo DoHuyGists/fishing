@@ -54,7 +54,7 @@ onBeforeUnmount(() => {
 
 <template>
   <main
-    class="w-full h-screen overflow-hidden touch-none overscroll-none bg-[#193224] text-[#e9f4e8] font-[Inter,ui-sans-serif,system-ui,sans-serif]"
+    class="w-full h-screen overflow-hidden touch-none overscroll-none bg-[#193224] text-[#e9f4e8]"
   >
     <div class="grid grid-rows-[minmax(0,1fr)_auto] w-full h-full">
       <FishingScene />
