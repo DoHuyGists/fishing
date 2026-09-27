@@ -4,6 +4,8 @@ import { useEquipmentStore } from "./equipment";
 import { useAuthStore } from "./auth";
 import { useFishingAreaStore } from "./fishingArea";
 import { supabaseFishRepository } from "../data/supabaseFishRepository";
+import { supabaseUserInAreaRepository } from "../data/supabaseUserInAreaRepository";
+import supabase from "../database/connection";
 export type FishingTool = "rod" | "line" | "reel" | "hook" | "bait";
 export type CastPhase = "idle" | "casting" | "waiting" | "bite" | "fighting" | "caught" | "lost";
 export type CaughtFish = {
@@ -17,7 +19,8 @@ export type CaughtFish = {
   createdAt?: string;
 };
 export type FishingPlayer = {
-  id: number;
+  id: string | number;
+  userId?: string;
   name: string;
   level: number;
   title: string;
@@ -25,6 +28,7 @@ export type FishingPlayer = {
   bestCatch: string;
   avatar: string;
   color: string;
+  isCurrentUser?: boolean;
 };
 const MAX_TENSION = 82,
   SAFE_TENSION = 28;
@@ -60,38 +64,8 @@ export const useFishingStore = defineStore("fishing", {
     playerSkillMultiplier: 1.1,
     playersOpen: false,
     selectedPlayer: null as FishingPlayer | null,
-    nearbyPlayers: [
-      {
-        id: 1,
-        name: "Minh An",
-        level: 18,
-        title: "Thợ câu hồ",
-        caughtCount: 42,
-        bestCatch: "Cá chép 6.2 kg",
-        avatar: "MA",
-        color: "#d99157",
-      },
-      {
-        id: 2,
-        name: "Bảo Ngọc",
-        level: 27,
-        title: "Người săn cá hiếm",
-        caughtCount: 108,
-        bestCatch: "Cá hồi vân 8.1 kg",
-        avatar: "BN",
-        color: "#a783cf",
-      },
-      {
-        id: 3,
-        name: "Hải Đăng",
-        level: 11,
-        title: "Tân thủ",
-        caughtCount: 16,
-        bestCatch: "Cá rô 1.4 kg",
-        avatar: "HĐ",
-        color: "#59a9a0",
-      },
-    ] as FishingPlayer[],
+    nearbyPlayers: [] as FishingPlayer[],
+    isLoadingPlayers: false,
     inventory: [] as CaughtFish[],
     castAttempt: 0,
     lakeFish: [] as Fish[],
@@ -120,11 +94,112 @@ export const useFishingStore = defineStore("fishing", {
       this.currentAreaId = areaId;
       try {
         this.lakeFish = await supabaseFishRepository.fetchFishesByArea(areaId);
-        await this.fetchCaughtFishes(undefined, areaId);
+        await Promise.all([
+          this.fetchCaughtFishes(undefined, areaId),
+          this.fetchPlayersInArea(areaId),
+        ]);
       } catch (err) {
-        
+        console.error("Lỗi khi tải dữ liệu bãi câu:", err);
+      }
+    },
+    async fetchPlayersInArea(areaId?: string) {
+      const targetAreaId = areaId || this.currentAreaId || useFishingAreaStore().currentArea?.id;
+      if (!targetAreaId) return;
+
+      this.isLoadingPlayers = true;
+      try {
+        const rows = await supabaseUserInAreaRepository.fetchUsersInArea(targetAreaId);
+        if (!rows.length) {
+          this.nearbyPlayers = [];
+          return;
+        }
+
+        const authStore = useAuthStore();
+        const currentUserId = authStore.user?.id;
+        const userIds = rows.map((r) => r.user_id);
+
+        const { data: catches } = await supabase
+          .from("caught")
+          .select("user_id, fish")
+          .in("user_id", userIds);
+
+        const playerStats = new Map<string, { count: number; bestWeight: number; bestFishName: string }>();
+        userIds.forEach((uid) => {
+          playerStats.set(uid, { count: 0, bestWeight: 0, bestFishName: "" });
+        });
+
+        if (catches) {
+          catches.forEach((c: any) => {
+            const stat = playerStats.get(c.user_id);
+            if (!stat) return;
+            stat.count++;
+            const weightVal = typeof c.fish?.weight === "number" ? c.fish.weight : parseFloat(c.fish?.weight || "0");
+            if (weightVal > stat.bestWeight) {
+              stat.bestWeight = weightVal;
+              stat.bestFishName = c.fish?.name || "";
+            }
+          });
+        }
+
+        const colors = [
+          "#d99157",
+          "#a783cf",
+          "#59a9a0",
+          "#3b82f6",
+          "#ef4444",
+          "#f59e0b",
+          "#10b981",
+          "#8b5cf6",
+          "#ec4899",
+          "#14b8a6",
+        ];
+
+        this.nearbyPlayers = rows.map((row) => {
+          const isCurrent = row.user_id === currentUserId;
+          const stat = playerStats.get(row.user_id) || { count: 0, bestWeight: 0, bestFishName: "" };
+          const level = Math.max(1, Math.floor(stat.count / 3) + 1);
+
+          let title = "Tân thủ";
+          if (level >= 30) title = "Huyền thoại mặt nước";
+          else if (level >= 20) title = "Người săn cá hiếm";
+          else if (level >= 10) title = "Thợ câu lão luyện";
+          else if (level >= 5) title = "Thợ câu hồ";
+
+          let name = "";
+          let avatar = "";
+
+          if (isCurrent) {
+            const rawName = authStore.user?.user_metadata?.full_name || authStore.user?.email?.split("@")[0] || "Tôi";
+            name = `${rawName} (Bạn)`;
+            avatar = rawName.slice(0, 2).toUpperCase();
+          } else {
+            const shortId = row.user_id.slice(0, 5);
+            name = `Cần thủ #${shortId}`;
+            avatar = shortId.slice(0, 2).toUpperCase();
+          }
+
+          const charCodeSum = row.user_id.split("").reduce((sum, ch) => sum + ch.charCodeAt(0), 0);
+          const color = colors[charCodeSum % colors.length];
+
+          const bestCatch = stat.bestWeight > 0 ? `${stat.bestFishName} ${stat.bestWeight} kg` : "Chưa có";
+
+          return {
+            id: row.id,
+            userId: row.user_id,
+            name,
+            level,
+            title,
+            caughtCount: stat.count,
+            bestCatch,
+            avatar,
+            color,
+            isCurrentUser: isCurrent,
+          };
+        });
+      } catch (err) {
+        console.error("Lỗi khi tải danh sách người chơi trong khu vực:", err);
       } finally {
-        
+        this.isLoadingPlayers = false;
       }
     },
     async fetchCaughtFishes(userId?: string, areaId?: string) {
@@ -313,9 +388,12 @@ export const useFishingStore = defineStore("fishing", {
     closeLakeGuide() {
       this.lakeGuideOpen = false;
     },
-    openPlayers() {
+    async openPlayers() {
       this.playersOpen = true;
       this.selectedPlayer = null;
+      if (this.currentAreaId) {
+        await this.fetchPlayersInArea(this.currentAreaId);
+      }
     },
     closePlayers() {
       this.playersOpen = false;

@@ -16,7 +16,7 @@ const store = useFishingStore();
           <header class="flex justify-between px-5 pt-[19px] pb-3 border-b border-[rgba(223,241,207,0.14)]">
             <div>
               <p class="m-0 text-[#e8bd62] text-[10px] font-black tracking-[0.16em] uppercase">Cùng bãi câu</p>
-              <h2 id="players-title" class="mt-1.5 mb-0 text-xl">Người chơi đang câu</h2>
+              <h2 id="players-title" class="mt-1.5 mb-0 text-xl">Người chơi đang câu ({{ store.nearbyPlayers.length }})</h2>
             </div>
             <button type="button"
               class="w-[29px] h-[29px] border-0 rounded-full bg-[rgba(235,243,219,0.13)] text-white cursor-pointer text-[22px] leading-none"
@@ -25,16 +25,28 @@ const store = useFishingStore();
             </button>
           </header>
           <p class="px-5 pt-3 pb-1.5 text-[#b7cfb9] text-xs">Chạm vào người chơi để xem thông tin.</p>
-          <ul v-if="!store.selectedPlayer" class="grid gap-2 m-0 p-3 list-none">
+          <div v-if="store.isLoadingPlayers" class="py-8 text-center text-[#b7cfb9] text-xs">
+            Đang cập nhật danh sách người câu...
+          </div>
+          <div v-else-if="!store.selectedPlayer && !store.nearbyPlayers.length" class="py-8 px-4 text-center text-[#b7cfb9] text-xs">
+            <span class="text-2xl mb-1 block">🎣</span>
+            <p class="m-0">Hiện chưa có người chơi nào trong khu vực này.</p>
+          </div>
+          <ul v-else-if="!store.selectedPlayer" class="grid gap-2 m-0 p-3 list-none">
             <li v-for="player in store.nearbyPlayers" :key="player.id">
               <button type="button"
-                class="flex items-center w-full gap-[11px] p-2.5 border border-[rgba(223,241,207,0.15)] rounded-xl bg-[rgba(7,28,18,0.35)] text-inherit cursor-pointer text-left hover:border-[#d8b866] hover:bg-[rgba(55,91,57,0.5)]"
+                class="flex items-center w-full gap-[11px] p-2.5 border rounded-xl bg-[rgba(7,28,18,0.35)] text-inherit cursor-pointer text-left hover:border-[#d8b866] hover:bg-[rgba(55,91,57,0.5)] transition-colors"
+                :class="player.isCurrentUser ? 'border-[#22c55e]/60 bg-[rgba(34,197,94,0.08)]' : 'border-[rgba(223,241,207,0.15)]'"
                 @click="store.selectPlayer(player)">
                 <span
                   class="grid flex-none place-items-center w-[39px] h-[39px] border-1 border-[rgba(255,255,255,0.35)] rounded-full text-white text-[11px] font-black"
                   :style="{ background: player.color }">{{ player.avatar }}</span>
-                <span class="grid gap-[3px]"><strong class="text-sm">{{ player.name }}</strong><small
-                    class="text-[#b7cfb9] text-[10px]">Cấp {{ player.level }} · {{ player.title }}</small></span>
+                <span class="grid gap-[3px]">
+                  <strong class="text-sm flex items-center gap-1.5">
+                    {{ player.name }}
+                  </strong>
+                  <small class="text-[#b7cfb9] text-[10px]">Cấp {{ player.level }} · {{ player.title }}</small>
+                </span>
                 <span class="ml-auto text-[#e8bd62] text-[11px] font-extrabold">Xem ›</span>
               </button>
             </li>

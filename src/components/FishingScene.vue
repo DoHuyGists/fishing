@@ -3,8 +3,11 @@ import { computed, onBeforeUnmount, onMounted, ref, watch } from "vue";
 import { isPointInWater } from "../data/fishingMap";
 import { useFishingStore } from "../stores/fishing";
 import { useAuthStore } from "../stores/auth";
-import { useRoute } from "vue-router";
+import { onBeforeRouteLeave, useRoute, useRouter } from "vue-router";
 import { useFishingAreaStore } from "../stores/fishingArea";
+import { supabaseUserInAreaRepository } from "../data/supabaseUserInAreaRepository";
+
+const environment = import.meta.env.VITE_ENVIRONTMENT;
 
 //
 const isDevMode = ref(false);
@@ -17,16 +20,50 @@ const waterBoundaryPoints = computed(() => waterBoundary.value.map(({ x, y }) =>
 //
 
 const route = useRoute();
+const router = useRouter();
 const authStore = useAuthStore();
 const fishingAreaStore = useFishingAreaStore();
 const areaId = route.params.areaId;
 const store = useFishingStore();
+const isLeaving = ref(false);
+let realtimeSubscription: ReturnType<typeof supabaseUserInAreaRepository.subscribeToAreaUsers> | null = null;
+
+async function handleBackToMap() {
+  if (isLeaving.value) return;
+  isLeaving.value = true;
+  try {
+    if (authStore.user?.id) {
+      await supabaseUserInAreaRepository.setUserArea(authStore.user.id, null);
+    }
+  } catch (err) {
+    console.error("Lỗi khi cập nhật trạng thái rời bãi câu:", err);
+  } finally {
+    isLeaving.value = false;
+    router.push({ name: "home" });
+  }
+}
+
+onBeforeRouteLeave(async (to, _from, next) => {
+  if (to.name !== "fishing" && authStore.user?.id) {
+    try {
+      await supabaseUserInAreaRepository.setUserArea(authStore.user.id, null);
+    } catch (err) {
+      console.error("Lỗi khi cập nhật trạng thái rời bãi câu:", err);
+    }
+  }
+  next();
+});
 
 watch(
   () => [authStore.user?.id, areaId],
-  ([userId, currentAreaId]) => {
+  async ([userId, currentAreaId]) => {
     if (userId && currentAreaId) {
       store.fetchCaughtFishes(userId as string, currentAreaId as string);
+      try {
+        await supabaseUserInAreaRepository.setUserArea(userId as string, currentAreaId as string);
+      } catch (err) {
+        console.error("Lỗi khi cập nhật vị trí bãi câu:", err);
+      }
     }
   },
   { immediate: true }
@@ -86,12 +123,21 @@ onMounted(() => {
   clockTimer = window.setInterval(() => (now.value = new Date()), 1000);
   trackRodPosition();
   window.addEventListener("resize", updateRodPosition);
-  store.fetchFishInCurrentArea(areaId as string)
+  if (areaId) {
+    store.fetchFishInCurrentArea(areaId as string);
+    store.fetchPlayersInArea(areaId as string);
+    realtimeSubscription = supabaseUserInAreaRepository.subscribeToAreaUsers(() => {
+      store.fetchPlayersInArea(areaId as string);
+    });
+  }
 });
 onBeforeUnmount(() => {
   if (clockTimer) window.clearInterval(clockTimer);
   if (rodPositionFrame) window.cancelAnimationFrame(rodPositionFrame);
   window.removeEventListener("resize", updateRodPosition);
+  if (realtimeSubscription) {
+    supabaseUserInAreaRepository.unsubscribe(realtimeSubscription);
+  }
 });
 
 const currentPhase = computed(() => {
@@ -168,7 +214,7 @@ function handleClickOnScene(event: MouseEvent) {
 </script>
 
 <template>
-  <section class="fishing-scene">
+  <section class="fishing-scene" @contextmenu.prevent="">
     <img
       :src="currentScenePhace"
       alt="Ao câu trong rừng"
@@ -179,13 +225,26 @@ function handleClickOnScene(event: MouseEvent) {
     />
     <div class="scene-shade"></div>
     <div class="scene-top">
-      <div class="location">
-        <div class="w-10 h-10 overflow-hidden">
-          <img :src="currentPhase.icon" :alt="currentPhase.label" class="location-icon" />
+      <div class="flex flex-col gap-2">
+        <div class="location">
+          <div class="w-10 h-10 overflow-hidden">
+            <img :src="currentPhase.icon" :alt="currentPhase.label" class="location-icon" />
+          </div>
+          <div>
+            <strong>{{ timeLabel }}</strong>
+            <small>{{ currentPhase.label }}</small>
+            <small>26°C <i></i> Gió nhẹ</small>
+          </div>    
         </div>
-        <div>
-          <strong>{{ timeLabel }}</strong
-          ><small>{{ currentPhase.label }}</small>
+        <div class="backdrop-blur-2xl h-fit w-fit rounded p-1">
+          <button
+            type="button"
+            class="text-sm text-red-500 bg-transparent border-0 cursor-pointer font-medium p-0 hover:underline disabled:opacity-50"
+            :disabled="isLeaving"
+            @click="handleBackToMap"
+          >
+            {{ isLeaving ? "Đang quay lại..." : "Quay lại bản đồ" }}
+          </button>
         </div>
       </div>
       <div class="scene-actions">
@@ -196,8 +255,7 @@ function handleClickOnScene(event: MouseEvent) {
         <button type="button" class="bag-button" @click.stop="store.openBag">
           Túi cá <b>{{ store.inventory.length }}</b>
         </button>
-        <div class="weather"><span>☀</span> 26°C <i></i> Gió nhẹ</div>
-        <label class="select-none cursor-pointer">Dev mode <input v-model="isDevMode" type="checkbox" /> </label>
+        <label v-if="environment == 'Development'" class="select-none cursor-pointer">Dev mode <input v-model="isDevMode" type="checkbox" /> </label>
       </div>
     </div>
 

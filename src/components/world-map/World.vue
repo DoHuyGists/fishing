@@ -1,14 +1,20 @@
 <script lang="ts" setup>
 import { computed, ref, watch } from "vue";
+import { useRouter } from "vue-router";
 import { useWorldStore } from "../../stores/world";
+import { useAuthStore } from "../../stores/auth";
+import { supabaseUserInAreaRepository } from "../../data/supabaseUserInAreaRepository";
 
 const props = defineProps<{
   anchors: any[];
   zoom?: number;
 }>();
 
+const router = useRouter();
+const authStore = useAuthStore();
 const worldStore = useWorldStore();
 const selectedAnchor = ref<any | null>(null);
+const isEntering = ref(false);
 
 watch(
   () => worldStore.selectedArea,
@@ -39,6 +45,27 @@ function openAreaWindow(anchor: any) {
 
 function closeAreaWindow() {
   selectedAnchor.value = null;
+}
+
+async function goToFishingArea(anchor: any) {
+  if (isEntering.value) return;
+  isEntering.value = true;
+  try {
+    if (authStore.user?.id) {
+      await supabaseUserInAreaRepository.setUserArea(authStore.user.id, anchor.id);
+    }
+  } catch (err) {
+    console.error("Lỗi cập nhật user_in_area khi đi đến bãi câu:", err);
+  } finally {
+    isEntering.value = false;
+    router.push({
+      name: "fishing",
+      params: {
+        countryId: anchor.countryId,
+        areaId: anchor.id,
+      },
+    });
+  }
 }
 </script>
 <style lang="css">
@@ -106,10 +133,20 @@ function closeAreaWindow() {
   width: 100%;
   padding: 6px 10px;
   border-radius: 8px;
+  border: none;
   background: #22c55e;
   color: #fff;
   font-weight: 700;
   text-decoration: none;
+  cursor: pointer;
+  transition: opacity 0.15s ease, background 0.15s ease;
+}
+.anchor-dialog-link:hover:not(:disabled) {
+  background: #16a34a;
+}
+.anchor-dialog-link:disabled {
+  opacity: 0.7;
+  cursor: wait;
 }
 .triangle {
   position: absolute;
@@ -1442,20 +1479,15 @@ function closeAreaWindow() {
                 </button>
               </div>
 
-              <router-link
-                :to="{
-                  name: 'fishing',
-                  params: {
-                    countryId: anchor.countryId,
-                    areaId: anchor.id,
-                  },
-                }"
+              <button
+                type="button"
                 class="anchor-dialog-link"
+                :disabled="isEntering"
                 @pointerdown.stop
-                @click.stop
+                @click.stop="goToFishingArea(anchor)"
               >
-                Đi đến bãi câu
-              </router-link>
+                {{ isEntering ? "Đang vào..." : "Đi đến bãi câu" }}
+              </button>
 
               <div class="triangle"></div>
             </div>
