@@ -18,12 +18,12 @@ async function submit() {
   <main class="login-page">
     <section class="login-panel" aria-labelledby="login-title">
       <h1 id="login-title">Đăng nhập</h1>
-      <p class="intro">Đăng nhập để tiếp tục hành trình của bạn.</p>
+      <!-- <p class="intro">Đăng nhập để tiếp tục hành trình của bạn.</p> -->
 
-      <form class="login-form" @submit.prevent="submit">
+      <form class="login-form mt-3" @submit.prevent="submit">
         <label>
           <span>Email</span>
-          <input v-model.trim="form.email" type="email" autocomplete="email" required placeholder="ban@example.com" />
+          <input v-model.trim="form.email" type="email" autocomplete="email" required placeholder="...@gmail.com" />
         </label>
         <label>
           <span>Mật khẩu</span>

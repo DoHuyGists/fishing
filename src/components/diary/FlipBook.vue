@@ -28,7 +28,7 @@ const flipDirection = ref<"next" | "prev">("next");
 const sheetFlippedState = ref<boolean[]>([]);
 
 // Number of species displayed per page (2 columns x 3 rows)
-const ITEMS_PER_PAGE = 18;
+const ITEMS_PER_PAGE = 5;
 
 // Calculate total sheets: each sheet has 2 pages (Front & Back), 6 species per page = 12 species per sheet
 const totalSheets = computed(() => {
@@ -156,9 +156,9 @@ function getSheetZIndex(sheetIndex: number): number {
               <!-- Country Overview Card -->
               <div class="bg-amber-900/10 p-4 rounded-sm border border-amber-900/20 mb-4">
                 <h4 class="m-0 font-serif font-bold text-sm text-amber-950 mb-2">
-                  📖 Tổng Quan
+                  Tổng Quan
                 </h4>
-                <p class="m-0 text-xs text-amber-900/80 leading-relaxed italic">
+                <p class="m-0 text-amber-900/80 leading-relaxed italic text-lg">
                   {{ country.information || `Vùng biển và hồ nước tại khu vực ${country.name} là nơi cư trú của nhiều
                   loài sinh vật độc đáo.` }}
                 </p>
@@ -245,12 +245,12 @@ function getSheetZIndex(sheetIndex: number): number {
             <div
               class="sheet-face sheet-front absolute inset-0 bg-gradient-to-bl from-[#faf4e6] via-[#f5e9d3] to-[#ebdcc3] p-3 md:p-5 flex flex-col justify-between shadow-xl border-l border-amber-900/20">
 
-              <div>
+              <div class="flex flex-col h-full">
                 <!-- Header -->
                 <div class="flex items-center justify-between border-b-1 border-amber-900/30 mb-3"></div>
 
                 <!-- 6 Species Cards Grid (2 Columns) -->
-                <div class="grid grid-cols-2 gap-2">
+                <div class="grid grid-cols-1 grid-rows-5 gap-2 h-full">
                   <div v-for="entry in getSpeciesForPage(sheetIdx * 2 + 1)" :key="entry.species.id"
                     class="flex gap-2 p-1.5 rounded-lg border transition-all duration-200 relative overflow-hidden text-amber-950"
                     :class="[
@@ -260,8 +260,8 @@ function getSheetZIndex(sheetIndex: number): number {
                     ]">
                     <!-- Fish Image -->
                     <div
-                      class="relative w-10 h-10 shrink-0 rounded-md overflow-hidden border border-amber-900/30 bg-amber-900/20 flex items-center justify-center">
-                      <img v-if="entry.species.image" :src="entry.species.image" :alt="entry.species.name"
+                      class="relative w-1/5 shrink-0 rounded-md overflow-hidden p-1 border-amber-900/30 bg-amber-900/20 flex items-center justify-center">
+                      <img v-if="entry.species.image" :src="entry.species.image" :alt="entry.isCaught ? entry.species.name : '_???'"
                         class="w-full h-full object-cover"
                         :class="{ 'brightness-0 opacity-40 blur-[1px]': !entry.isCaught }" />
                       <span v-else class="text-base select-none">{{ entry.isCaught ? '🐟' : '❓' }}</span>
@@ -274,7 +274,7 @@ function getSheetZIndex(sheetIndex: number): number {
                     <div class="flex-1 flex flex-col justify-between text-[10px] min-w-0">
                       <div>
                         <div class="flex items-center justify-between gap-1">
-                          <h4 class="m-0 font-serif font-bold text-[11px] text-amber-950 truncate">
+                          <h4 class="m-0 font-serif font-bold text-lg text-amber-950 truncate">
                             {{ entry.isCaught ? entry.species.name : '???' }}
                           </h4>
                           <span class="px-1 py-0.2 rounded text-[8px] font-bold uppercase shrink-0 border" :class="[
@@ -285,7 +285,7 @@ function getSheetZIndex(sheetIndex: number): number {
                             {{ entry.isCaught ? (entry.species.status || 'Đã câu') : 'Chưa bắt' }}
                           </span>
                         </div>
-                        <p class="m-0 text-[9px] text-amber-900/80 line-clamp-1 leading-tight italic mt-0.5">
+                        <p class="m-0 text-md text-amber-900/80 line-clamp-1 leading-tight italic mt-0.5">
                           {{ entry.isCaught
                             ? (entry.species.information || 'Chưa có thông tin sinh thái.')
                             : 'Chưa khám phá.'
@@ -294,7 +294,7 @@ function getSheetZIndex(sheetIndex: number): number {
                       </div>
                       <div class="text-[8px] text-emerald-800 font-semibold mt-0.5">
                         <span v-if="entry.isCaught">✓ {{ formatDate(entry.caughtAt) }}</span>
-                        <span v-else class="text-amber-800/60 font-medium">🔒 Trống</span>
+                        <span v-else class="text-amber-800/60 font-medium"></span>
                       </div>
                     </div>
                   </div>
@@ -323,12 +323,12 @@ function getSheetZIndex(sheetIndex: number): number {
             <div
               class="sheet-face sheet-back absolute inset-0 bg-gradient-to-br from-[#faf4e6] via-[#f5e9d3] to-[#ebdcc3] p-3 md:p-5 flex flex-col justify-between shadow-xl border-r border-amber-900/20">
 
-              <div>
+              <div class="flex flex-col h-full">
                 <!-- Header -->
                 <div class="flex items-center justify-between border-b-1 border-amber-900/30 mb-3"></div>
 
                 <!-- 6 Species Cards Grid (2 Columns) -->
-                <div class="grid grid-cols-2 gap-2">
+                <div class="grid grid-cols-1 grid-rows-5 gap-2 h-full">
                   <div v-for="entry in getSpeciesForPage(sheetIdx * 2 + 2)" :key="entry.species.id"
                     class="flex gap-2 p-1.5 rounded-lg border transition-all duration-200 relative overflow-hidden text-amber-950"
                     :class="[
@@ -338,7 +338,7 @@ function getSheetZIndex(sheetIndex: number): number {
                     ]">
                     <!-- Fish Image -->
                     <div
-                      class="relative w-10 h-10 shrink-0 rounded-md overflow-hidden border border-amber-900/30 bg-amber-900/20 flex items-center justify-center">
+                      class="relative w-1/5 shrink-0 rounded-md overflow-hidden p-1 bg-amber-900/20 flex items-center justify-center">
                       <img v-if="entry.species.image" :src="entry.species.image" :alt="entry.species.name"
                         class="w-full h-full object-cover"
                         :class="{ 'brightness-0 opacity-40 blur-[1px]': !entry.isCaught }" />
@@ -372,7 +372,7 @@ function getSheetZIndex(sheetIndex: number): number {
                       </div>
                       <div class="text-[8px] text-emerald-800 font-semibold mt-0.5">
                         <span v-if="entry.isCaught">✓ {{ formatDate(entry.caughtAt) }}</span>
-                        <span v-else class="text-amber-800/60 font-medium">🔒 Trống</span>
+                        <span v-else class="text-amber-800/60 font-medium"></span>
                       </div>
                     </div>
                   </div>
@@ -406,24 +406,28 @@ function getSheetZIndex(sheetIndex: number): number {
     </div>
 
     <!-- Navigation Control Buttons -->
-    <div class="mt-2 flex items-center justify-between px-4 shrink-0">
-      <button type="button"
-        class="flex items-center gap-1.5 px-4 py-2 rounded-sm bg-amber-800 hover:bg-amber-700 disabled:opacity-40 text-amber-100 font-bold text-xs transition-all shadow-md cursor-pointer border border-amber-500/40 active:scale-95 disabled:cursor-not-allowed"
-        :disabled="currentSheetIndex === 0 || isFlipping" @click="flipPrev">
-        <span>◀</span>
-        <span>Trang trước</span>
-      </button>
-
-      <div class="text-xs font-serif font-bold text-amber-200">
-        Tờ {{ currentSheetIndex }} / {{ totalSheets }} (Tổng {{ entries.length }} loài)
-      </div>
-
-      <button type="button"
-        class="flex items-center gap-1.5 px-4 py-2 rounded-sm bg-amber-800 hover:bg-amber-700 disabled:opacity-40 text-amber-100 font-bold text-xs transition-all shadow-md cursor-pointer border border-amber-500/40 active:scale-95 disabled:cursor-not-allowed"
-        :disabled="currentSheetIndex >= totalSheets || isFlipping" @click="flipNext">
-        <span>Trang kế tiếp</span>
-        <span>▶</span>
-      </button>
+    <div class="mt-2 flex items-center justify-center gap-2 px-4 shrink-0">
+        <button type="button"
+          class="flex items-center gap-1.5 px-4 py-2 rounded-sm bg-amber-800 hover:bg-amber-700 disabled:opacity-40 text-amber-100 font-bold text-xs transition-all shadow-md cursor-pointer border border-amber-500/40 active:scale-95 disabled:cursor-not-allowed"
+          :disabled="isFlipping" @click="flipPrev"
+          :class="currentSheetIndex === 0 ? 'invisible' : 'visible'"
+          >
+          <span>◀</span>
+          <span>Trang trước</span>
+        </button>
+  
+        <div class="text-xs font-serif font-bold text-amber-200">
+           {{ currentSheetIndex }} / {{ totalSheets }}
+        </div>
+  
+        <button type="button"
+          class="flex items-center gap-1.5 px-4 py-2 rounded-sm bg-amber-800 hover:bg-amber-700 disabled:opacity-40 text-amber-100 font-bold text-xs transition-all shadow-md cursor-pointer border border-amber-500/40 active:scale-95 disabled:cursor-not-allowed"
+          :disabled="isFlipping" @click="flipNext"
+          :class="currentSheetIndex >= totalSheets ? 'invisible' : 'visible'"
+          >
+          <span>Trang kế tiếp</span>
+          <span>▶</span>
+        </button>
     </div>
 
   </div>

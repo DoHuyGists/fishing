@@ -161,16 +161,9 @@ function returnToBookshelf() {
 
       <!-- TOP BAR HEADER -->
       <div class="flex flex-wrap items-center justify-between gap-3 border-b-2 border-amber-900/50 pb-3 mb-4 shrink-0">
-        <div class="flex items-center gap-3">
-          <button v-if="viewMode === 'openbook'" type="button"
-            class="flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-amber-800/80 hover:bg-amber-700 text-amber-100 font-bold text-xs border border-amber-500/50 transition-all cursor-pointer shadow"
-            @click="returnToBookshelf">
-            <span>⬅</span>
-            <span>Quay lại giá sách</span>
-          </button>
-
+        <div class="flex justify-between items-center gap-3 w-full">
           <div class="flex items-center gap-2">
-            <span class="text-2xl md:text-3xl">📚</span>
+            <!-- <span class="text-2xl md:text-3xl">📚</span> -->
             <div>
               <h2 class="m-0 text-lg md:text-2xl font-serif font-bold text-amber-200 tracking-wide">
                 {{ viewMode === 'bookshelf' ? 'Nhật ký đánh bắt' : `Nhật ký đánh bắt: ${selectedCountry?.name}` }}
@@ -180,12 +173,18 @@ function returnToBookshelf() {
               </p> -->
             </div>
           </div>
+          <button v-if="viewMode === 'openbook'" type="button"
+            class="flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-amber-800/80 hover:bg-amber-700 text-amber-100 font-bold text-xs border border-amber-500/50 transition-all cursor-pointer shadow"
+            @click="returnToBookshelf">
+            <span>⬅</span>
+            <span>Quay lại giá sách</span>
+          </button>
         </div>
 
         <!-- Search Bar on Bookshelf mode -->
         <div v-if="viewMode === 'bookshelf'" class="flex items-center gap-2">
           <div class="relative w-48 md:w-64">
-            <input v-model="searchQuery" type="text" placeholder="🔍 Tìm quốc gia (VN, Japan...)"
+            <input v-model="searchQuery" type="text" placeholder="🔍 Tìm quốc gia"
               class="w-full bg-[#2a1b12] border border-amber-700/60 rounded-xl px-3 py-1.5 text-xs text-amber-100 placeholder-amber-400/50 focus:outline-none focus:border-amber-400 shadow-inner" />
             <button v-if="searchQuery" type="button"
               class="absolute right-2 top-1/2 -translate-y-1/2 text-amber-400 hover:text-amber-200 text-xs font-bold"
@@ -202,7 +201,7 @@ function returnToBookshelf() {
         <div class="flex-1 overflow-y-auto">
           <div class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-6 py-2">
             <div v-for="country in paginatedCountries" :key="country.code"
-              class="group relative flex flex-col items-center justify-between p-3 rounded-2xl bg-gradient-to-b from-[#3a2213]/60 to-[#1c1008]/80 border border-amber-900/40 hover:border-amber-400/80 shadow-lg hover:shadow-amber-950/90 transition-all duration-300 cursor-pointer transform hover:-translate-y-2"
+              class="group relative select-none flex flex-col items-center justify-between p-3 rounded-2xl bg-gradient-to-b from-[#3a2213]/60 to-[#1c1008]/80 border border-amber-900/40 hover:border-amber-400/80 shadow-lg hover:shadow-amber-950/90 transition-all duration-300 cursor-pointer transform hover:-translate-y-2"
               @click="openCountryBook(country)">
               <!-- 3D Dynamic Book Component Container -->
               <div class="w-[140px] h-[190px] flex items-center justify-center overflow-hidden my-1">

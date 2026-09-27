@@ -131,8 +131,8 @@ function getRarityBadgeClass(rarity: string) {
               🏪
             </div>
             <div>
-              <h2 class="m-0 text-lg font-extrabold tracking-wide">Chợ Cá - Sàn Giao Dịch</h2>
-              <p class="m-0 text-xs text-emerald-200">Mua bán, giao dịch cá quý hiếm giữa các cần thủ</p>
+              <h2 class="m-0 text-lg font-extrabold tracking-wide">Chợ Cá</h2>
+              <!-- <p class="m-0 text-xs text-emerald-200">Mua bán, giao dịch cá quý hiếm giữa các cần thủ</p> -->
             </div>
           </div>
 
