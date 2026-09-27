@@ -8,6 +8,7 @@ export interface Species {
   status: string | null;
   name: string;
   image: string | null;
+  "3d": string | null;
 }
 
 export interface CaughtDiary {
@@ -24,7 +25,7 @@ class SupabaseDiaryRepository {
   async fetchSpecies(): Promise<Species[]> {
     const { data, error } = await supabase
       .from("species")
-      .select("id, created_at, information, location, status, name, image")
+      .select("id, created_at, information, location, status, name, image, 3d")
       .order("location", { ascending: true })
       .order("name", { ascending: true });
 
@@ -42,7 +43,7 @@ class SupabaseDiaryRepository {
   async fetchSpeciesByLocation(locationCode: string, locationName?: string): Promise<Species[]> {
     let query = supabase
       .from("species")
-      .select("id, created_at, information, location, status, name, image");
+      .select("id, created_at, information, location, status, name, image, 3d");
 
     if (locationName) {
       query = query.or(`location.eq.${locationCode},location.eq.${locationName},location.ilike.%${locationCode}%,location.ilike.%${locationName}%`);

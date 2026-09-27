@@ -13,6 +13,24 @@ const props = defineProps<{
 
 const emit = defineEmits(["back"]);
 
+// 3D Model Viewer
+const modelViewerOpen = ref(false);
+const modelViewerSrc = ref("");
+const modelViewerName = ref("");
+
+function open3DViewer(entry: DiaryFishEntry) {
+  if (!entry.isCaught || !entry.species["3d"]) return;
+  modelViewerSrc.value = entry.species["3d"];
+  modelViewerName.value = entry.species.name;
+  modelViewerOpen.value = true;
+}
+
+function close3DViewer() {
+  modelViewerOpen.value = false;
+  modelViewerSrc.value = "";
+  modelViewerName.value = "";
+}
+
 // Animation duration in ms
 const FLIP_DURATION = 650;
 
@@ -260,13 +278,18 @@ function getSheetZIndex(sheetIndex: number): number {
                     ]">
                     <!-- Fish Image -->
                     <div
-                      class="relative w-1/5 shrink-0 rounded-md overflow-hidden p-1 border-amber-900/30 bg-amber-900/20 flex items-center justify-center">
+                      class="relative w-1/5 shrink-0 rounded-md overflow-hidden p-1 border-amber-900/30 bg-amber-900/20 flex items-center justify-center"
+                      :class="{ 'cursor-pointer hover:ring-2 hover:ring-emerald-500/60 transition-shadow': entry.isCaught && entry.species['3d'] }"
+                      @click="open3DViewer(entry)">
                       <img v-if="entry.species.image" :src="entry.species.image" :alt="entry.isCaught ? entry.species.name : '_???'"
                         class="w-full h-full object-cover"
                         :class="{ 'brightness-0 opacity-40 blur-[1px]': !entry.isCaught }" />
                       <span v-else class="text-base select-none">{{ entry.isCaught ? '🐟' : '❓' }}</span>
                       <div v-if="!entry.isCaught" class="absolute inset-0 flex items-center justify-center bg-black/30">
                         <span class="text-[10px]">🔒</span>
+                      </div>
+                      <div v-if="entry.isCaught && entry.species['3d']" class="absolute bottom-0.5 right-0.5 bg-emerald-600/90 text-white text-[7px] font-bold px-1 py-px rounded leading-tight">
+                        3D
                       </div>
                     </div>
 
@@ -338,13 +361,18 @@ function getSheetZIndex(sheetIndex: number): number {
                     ]">
                     <!-- Fish Image -->
                     <div
-                      class="relative w-1/5 shrink-0 rounded-md overflow-hidden p-1 bg-amber-900/20 flex items-center justify-center">
+                      class="relative w-1/5 shrink-0 rounded-md overflow-hidden p-1 bg-amber-900/20 flex items-center justify-center"
+                      :class="{ 'cursor-pointer hover:ring-2 hover:ring-emerald-500/60 transition-shadow': entry.isCaught && entry.species['3d'] }"
+                      @click="open3DViewer(entry)">
                       <img v-if="entry.species.image" :src="entry.species.image" :alt="entry.species.name"
                         class="w-full h-full object-cover"
                         :class="{ 'brightness-0 opacity-40 blur-[1px]': !entry.isCaught }" />
                       <span v-else class="text-base select-none">{{ entry.isCaught ? '🐟' : '❓' }}</span>
                       <div v-if="!entry.isCaught" class="absolute inset-0 flex items-center justify-center bg-black/30">
                         <span class="text-[10px]">🔒</span>
+                      </div>
+                      <div v-if="entry.isCaught && entry.species['3d']" class="absolute bottom-0.5 right-0.5 bg-emerald-600/90 text-white text-[7px] font-bold px-1 py-px rounded leading-tight">
+                        3D
                       </div>
                     </div>
 
@@ -431,6 +459,47 @@ function getSheetZIndex(sheetIndex: number): number {
     </div>
 
   </div>
+
+  <!-- 3D Model Viewer Modal -->
+  <Teleport to="body">
+    <Transition name="model-viewer-dialog">
+      <div v-if="modelViewerOpen"
+        class="fixed inset-0 z-[100] grid place-items-center p-4 bg-black/80 backdrop-blur-md"
+        @click.self="close3DViewer">
+        <div class="relative w-full max-w-2xl aspect-square bg-gradient-to-br from-[#1a2e1a] to-[#0d1f0d] rounded-2xl overflow-hidden shadow-[0_30px_80px_rgba(0,0,0,0.7)] border border-emerald-800/40">
+          <!-- Header -->
+          <div class="absolute top-0 inset-x-0 z-10 flex items-center justify-between px-5 py-3 bg-gradient-to-b from-black/60 to-transparent">
+            <div>
+              <p class="m-0 text-emerald-400 text-[10px] font-black tracking-[0.16em] uppercase">Mô hình 3D</p>
+              <h3 class="m-0 text-white text-lg font-bold">{{ modelViewerName }}</h3>
+            </div>
+            <button type="button"
+              class="w-8 h-8 border-0 rounded-full bg-white/15 hover:bg-white/25 text-white cursor-pointer text-xl leading-none transition-colors"
+              @click="close3DViewer">
+              ×
+            </button>
+          </div>
+
+          <!-- Model Viewer -->
+          <model-viewer
+            :src="modelViewerSrc"
+            :alt="modelViewerName"
+            auto-rotate
+            camera-controls
+            touch-action="pan-y"
+            shadow-intensity="1"
+            environment-image="neutral"
+            style="width: 100%; height: 100%; --poster-color: transparent;"
+          ></model-viewer>
+
+          <!-- Footer hint -->
+          <div class="absolute bottom-0 inset-x-0 z-10 px-5 py-2 bg-gradient-to-t from-black/50 to-transparent text-center">
+            <p class="m-0 text-white/60 text-[10px]">Kéo để xoay · Cuộn để phóng to</p>
+          </div>
+        </div>
+      </div>
+    </Transition>
+  </Teleport>
 </template>
 
 <style scoped>
@@ -463,5 +532,15 @@ function getSheetZIndex(sheetIndex: number): number {
 
 .sheet-back {
   transform: rotateY(180deg);
+}
+
+.model-viewer-dialog-enter-active,
+.model-viewer-dialog-leave-active {
+  transition: opacity 0.25s ease;
+}
+
+.model-viewer-dialog-enter-from,
+.model-viewer-dialog-leave-to {
+  opacity: 0;
 }
 </style>
