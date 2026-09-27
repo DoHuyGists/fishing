@@ -4,7 +4,7 @@ import { supabaseCurrencyRepository } from "./supabaseCurrencyRepository";
 export interface MarketListing {
   id: number;
   created_at: string;
-  item_id: string;
+  caught_id: string;
   user_id: string;
   price: number;
   status: string;
@@ -20,29 +20,22 @@ export interface MarketListing {
 class SupabaseMarketRepository {
   async fetchActiveListings(): Promise<MarketListing[]> {
     try {
-      const { data, error } = await supabase
-        .from("market")
-        .select("id, created_at, item_id, user_id, price, status, caught:item_id (id, user_id, area_id, fish, created_at)")
-        .eq("status", "normal")
-        .order("created_at", { ascending: false });
+      const { data, error } = await supabase.from("species_market").select("id, created_at, caught_id, user_id, price, status, caught:caught_id (id, user_id, area_id, fish, created_at)").eq("status", "normal").order("created_at", { ascending: false });
 
       if (error) {
         return this.fetchActiveListingsFallback();
       }
 
       const list = (data as any[]) ?? [];
-      const missingItemIds = list.filter((m) => !m.caught).map((m) => m.item_id);
+      const missingItemIds = list.filter((m) => !m.caught).map((m) => m.caught_id);
 
       if (missingItemIds.length > 0) {
-        const { data: caughtData } = await supabase
-          .from("caught")
-          .select("id, user_id, area_id, fish, created_at")
-          .in("id", missingItemIds);
+        const { data: caughtData } = await supabase.from("caught").select("id, user_id, area_id, fish, created_at").in("id", missingItemIds);
 
         const caughtMap = new Map((caughtData ?? []).map((c: any) => [c.id, c]));
         return list.map((m) => ({
           ...m,
-          caught: m.caught ?? caughtMap.get(m.item_id),
+          caught: m.caught ?? caughtMap.get(m.caught_id),
         }));
       }
 
@@ -53,39 +46,26 @@ class SupabaseMarketRepository {
   }
 
   private async fetchActiveListingsFallback(): Promise<MarketListing[]> {
-    const { data: rawData, error: rawError } = await supabase
-      .from("market")
-      .select("*")
-      .eq("status", "normal")
-      .order("created_at", { ascending: false });
+    const { data: rawData, error: rawError } = await supabase.from("species_market").select("*").eq("status", "normal").order("created_at", { ascending: false });
 
     if (rawError || !rawData || rawData.length === 0) return [];
 
-    const itemIds = rawData.map((m) => m.item_id);
-    const { data: caughtData } = await supabase
-      .from("caught")
-      .select("id, user_id, area_id, fish, created_at")
-      .in("id", itemIds);
+    const itemIds = rawData.map((m) => m.caught_id);
+    const { data: caughtData } = await supabase.from("caught").select("id, user_id, area_id, fish, created_at").in("id", itemIds);
 
     const caughtMap = new Map((caughtData ?? []).map((c: any) => [c.id, c]));
     return rawData.map((m) => ({
       ...m,
-      caught: caughtMap.get(m.item_id),
+      caught: caughtMap.get(m.caught_id),
     }));
   }
 
   async cancelListing(marketId: number, caughtId: string): Promise<void> {
-    const { error: marketError } = await supabase
-      .from("market")
-      .update({ status: "cancelled" })
-      .eq("id", marketId);
+    const { error: marketError } = await supabase.from("species_market").update({ status: "cancelled" }).eq("id", marketId);
 
     if (marketError) throw new Error(marketError.message);
 
-    const { error: caughtError } = await supabase
-      .from("caught")
-      .update({ status: "normal" })
-      .eq("id", caughtId);
+    const { error: caughtError } = await supabase.from("caught").update({ status: "normal" }).eq("id", caughtId);
 
     if (caughtError) throw new Error(caughtError.message);
   }
@@ -110,18 +90,12 @@ class SupabaseMarketRepository {
     }
 
     // Đánh dấu đã bán trong bảng market
-    const { error: marketError } = await supabase
-      .from("market")
-      .update({ status: "sold" })
-      .eq("id", marketItem.id);
+    const { error: marketError } = await supabase.from("species_market").update({ status: "sold" }).eq("id", marketItem.id);
 
     if (marketError) throw new Error(marketError.message);
 
     // Chuyển quyền sở hữu cá sang cho người mua & chuyển status về 'normal'
-    const { error: caughtError } = await supabase
-      .from("caught")
-      .update({ user_id: buyerId, status: "normal" })
-      .eq("id", marketItem.item_id);
+    const { error: caughtError } = await supabase.from("caught").update({ user_id: buyerId, status: "normal" }).eq("id", marketItem.caught_id);
 
     if (caughtError) throw new Error(caughtError.message);
   }

@@ -23,11 +23,7 @@ class SupabaseDiaryRepository {
    * Fetch all fish species from the `species` table.
    */
   async fetchSpecies(): Promise<Species[]> {
-    const { data, error } = await supabase
-      .from("species")
-      .select("id, created_at, information, location, status, name, image, 3d")
-      .order("location", { ascending: true })
-      .order("name", { ascending: true });
+    const { data, error } = await supabase.from("species").select("id, created_at, information, location, status, name, image, 3d").order("location", { ascending: true }).order("name", { ascending: true });
 
     if (error) {
       console.error("Error fetching species:", error);
@@ -41,9 +37,7 @@ class SupabaseDiaryRepository {
    * Fetch species filtered by location (matches country code or country name).
    */
   async fetchSpeciesByLocation(locationCode: string, locationName?: string): Promise<Species[]> {
-    let query = supabase
-      .from("species")
-      .select("id, created_at, information, location, status, name, image, 3d");
+    let query = supabase.from("species").select("id, created_at, information, location, status, name, image, 3d");
 
     if (locationName) {
       query = query.or(`location.eq.${locationCode},location.eq.${locationName},location.ilike.%${locationCode}%,location.ilike.%${locationName}%`);
@@ -68,10 +62,7 @@ class SupabaseDiaryRepository {
   async fetchCaughtDiary(userId: string): Promise<CaughtDiary[]> {
     if (!userId) return [];
 
-    const { data, error } = await supabase
-      .from("caught_diary")
-      .select("id, created_at, user_id, species_id")
-      .eq("user_id", userId);
+    const { data, error } = await supabase.from("caught_diary").select("id, created_at, user_id, species_id").eq("user_id", userId);
 
     if (error) {
       console.error("Error fetching caught_diary:", error);

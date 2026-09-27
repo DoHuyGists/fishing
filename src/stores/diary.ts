@@ -1,9 +1,5 @@
 import { defineStore } from "pinia";
-import {
-  supabaseDiaryRepository,
-  type Species,
-  type CaughtDiary,
-} from "../data/supabaseDiaryRepository";
+import { supabaseDiaryRepository, type Species, type CaughtDiary } from "../data/supabaseDiaryRepository";
 
 export interface DiaryFishEntry {
   species: Species;
@@ -52,14 +48,11 @@ export const useDiaryStore = defineStore("diary", {
 
       // Filter from allSpecies or locationSpecies
       const targetSpecies = state.allSpecies.length > 0 ? state.allSpecies : state.locationSpecies;
-      
+
       const filtered = targetSpecies.filter((item) => {
         if (!item.location) return false;
         const loc = item.location.trim().toLowerCase();
-        return (
-          (code && (loc === code || loc.includes(code))) ||
-          (name && (loc === name || loc.includes(name) || name.includes(loc)))
-        );
+        return (code && (loc === code || loc.includes(code))) || (name && (loc === name || loc.includes(name) || name.includes(loc)));
       });
 
       return filtered.map((species) => ({
@@ -79,10 +72,7 @@ export const useDiaryStore = defineStore("diary", {
       this.isLoading = true;
       this.error = null;
       try {
-        const [speciesData, caughtData] = await Promise.all([
-          supabaseDiaryRepository.fetchSpecies(),
-          userId ? supabaseDiaryRepository.fetchCaughtDiary(userId) : Promise.resolve([]),
-        ]);
+        const [speciesData, caughtData] = await Promise.all([supabaseDiaryRepository.fetchSpecies(), userId ? supabaseDiaryRepository.fetchCaughtDiary(userId) : Promise.resolve([])]);
 
         this.allSpecies = speciesData;
         this.caughtDiary = caughtData;
@@ -119,6 +109,6 @@ export const useDiaryStore = defineStore("diary", {
       this.selectedLocationCode = null;
       this.selectedLocationName = null;
       this.locationSpecies = [];
-    }
+    },
   },
 });

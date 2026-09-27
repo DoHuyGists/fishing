@@ -17,6 +17,7 @@ const buyError = ref("");
 const isCancellingListing = ref(false);
 const marketStore = useMarketStore()
 const caughtStore = useCaughtStore()
+const emit = defineEmits(['close'])
 
 const filteredMarketListings = computed(() => {
   let result = marketStore.marketListings.filter((item) => {
@@ -144,7 +145,12 @@ function getRarityBadgeClass(rarity: string) {
               <span>{{ currencyStore.formattedCash }} đ</span>
             </div>
 
-            <slot></slot>
+            <button type="button"
+              class="w-8 h-8 rounded-full border border-emerald-600/50 bg-emerald-900/50 text-white hover:bg-emerald-800 font-bold text-lg flex items-center justify-center cursor-pointer transition-colors"
+              @click="emit('close')"
+              >
+              &times;
+            </button>
           </div>
         </div>
 

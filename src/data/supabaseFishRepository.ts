@@ -12,11 +12,7 @@ export type CaughtRow = {
 
 class SupabaseFishRepository {
   async fetchFishesByArea(areaId: string): Promise<Fish[]> {
-    const { data, error } = await supabase
-      .from("species_in_area")
-      .select("id, area_id, fishes")
-      .eq("area_id", areaId)
-      .maybeSingle();
+    const { data, error } = await supabase.from("species_in_area").select("id, area_id, fishes").eq("area_id", areaId).maybeSingle();
 
     if (error) throw new Error(error.message);
 
@@ -36,12 +32,7 @@ class SupabaseFishRepository {
   }
 
   async fetchCaughtFishes(userId: string, areaId: string): Promise<CaughtRow[]> {
-    const { data, error } = await supabase
-      .from("caught")
-      .select("id, created_at, user_id, area_id, fish, status")
-      .eq("user_id", userId)
-      .eq("area_id", areaId)
-      .order("created_at", { ascending: false });
+    const { data, error } = await supabase.from("caught").select("id, created_at, user_id, area_id, fish, status").eq("user_id", userId).eq("area_id", areaId).order("created_at", { ascending: false });
 
     if (error) throw new Error(error.message);
 
@@ -49,11 +40,7 @@ class SupabaseFishRepository {
   }
 
   async fetchAllCaughtFishes(userId: string): Promise<CaughtRow[]> {
-    const { data, error } = await supabase
-      .from("caught")
-      .select("id, created_at, user_id, area_id, fish, status")
-      .eq("user_id", userId)
-      .order("created_at", { ascending: false });
+    const { data, error } = await supabase.from("caught").select("id, created_at, user_id, area_id, fish, status").eq("user_id", userId).order("created_at", { ascending: false });
 
     if (error) throw new Error(error.message);
 
@@ -67,8 +54,8 @@ class SupabaseFishRepository {
   }
 
   async listFishOnMarket(caughtId: string, userId: string, price: number): Promise<void> {
-    const { error: marketError } = await supabase.from("market").insert({
-      item_id: caughtId,
+    const { error: marketError } = await supabase.from("species_market").insert({
+      caught_id: caughtId,
       user_id: userId,
       price: price,
       status: "normal",
@@ -76,22 +63,14 @@ class SupabaseFishRepository {
 
     if (marketError) throw new Error(marketError.message);
 
-    const { data: updatedRows, error: caughtError } = await supabase
-      .from("caught")
-      .update({ status: "on-market" })
-      .eq("id", caughtId)
-      .select();
+    const { data: updatedRows, error: caughtError } = await supabase.from("caught").update({ status: "on-market" }).eq("id", caughtId).select();
 
     if (caughtError) throw new Error(caughtError.message);
 
     if (!updatedRows || updatedRows.length === 0) {
-      throw new Error(
-        "Không thể cập nhật trạng thái cá (0 dòng bị ảnh hưởng). Vui lòng kiểm tra lại RLS (Row Level Security) Policy cho thao tác UPDATE trên bảng 'caught'."
-      );
+      throw new Error("Không thể cập nhật trạng thái cá (0 dòng bị ảnh hưởng). Vui lòng kiểm tra lại RLS (Row Level Security) Policy cho thao tác UPDATE trên bảng 'caught'.");
     }
   }
 }
 
 export const supabaseFishRepository = new SupabaseFishRepository();
-
-

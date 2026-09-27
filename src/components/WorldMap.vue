@@ -11,6 +11,7 @@ import CaughtList from "./caught/CaughtList.vue";
 import CatchDiaryModal from "./diary/CatchDiaryModal.vue";
 import { useDiaryStore } from "../stores/diary.ts";
 import AccountInfoModal from "./account/AccountInfoModal.vue";
+import SpinWheelModal from "./spin-wheel/SpinWheelModal.vue";
 
 
 const isProfileOpen = ref(false);
@@ -26,6 +27,8 @@ const isMarketOpen = ref(false);
 
 // Quản lý Nhật ký câu (Diary)
 const isDiaryOpen = ref(false);
+const isSpinWheelOpen = ref(false);
+const isInventoryOpen = ref(false);
 
 function openMarketModal() {
   isMarketOpen.value = true;
@@ -35,6 +38,14 @@ function openMarketModal() {
 function openDiaryModal() {
   isDiaryOpen.value = true;
   diaryStore.loadDiary(authStore.user?.id);
+}
+
+function openSpinWheelModal() {
+  isSpinWheelOpen.value = true;
+}
+
+function openInventoryModal() {
+  isInventoryOpen.value = true;
 }
 
 
@@ -107,23 +118,36 @@ onMounted(() => {
           <span class="text-sm">📖</span>
           <span>Nhật ký</span>
         </button>
+
+        <!-- Gacha -->
+        <button type="button"
+          class="flex items-center gap-1.5 px-3 py-1.5 bg-[#153221] hover:bg-[#1a3e29] border-[1px] border-gray-300 text-white rounded-xl shadow-sm font-bold text-xs cursor-pointer transition-colors"
+          @click="openSpinWheelModal">
+          <span class="text-sm">?</span>
+          <span>Gacha</span>
+        </button>
+
+        <!-- Túi đồ -->
+        <button type="button"
+          class="flex items-center gap-1.5 px-3 py-1.5 bg-[#153221] hover:bg-[#1a3e29] border-[1px] border-gray-300 text-white rounded-xl shadow-sm font-bold text-xs cursor-pointer transition-colors"
+          @click="openInventoryModal">
+          <span class="text-sm"></span>
+          <span>Túi đồ</span>
+        </button>
       </div>
     </div>
 
     <!-- Market Modal Dialog -->
-   <MarketWindow v-if="isMarketOpen">
-    <button type="button"
-        class="w-8 h-8 rounded-full border border-emerald-600/50 bg-emerald-900/50 text-white hover:bg-emerald-800 font-bold text-lg flex items-center justify-center cursor-pointer transition-colors"
-        @click="isMarketOpen = false">
-        &times;
-      </button>
-   </MarketWindow>
+   <MarketWindow v-if="isMarketOpen" @close="isMarketOpen = false"/>
 
     <!-- Nhật ký Modal Dialog -->
     <CatchDiaryModal v-if="isDiaryOpen" @close="isDiaryOpen = false" />
 
     <!-- Dialog xem thông tin cá nhân -->
     <AccountInfoModal v-if="isProfileOpen" @close="isProfileOpen = false"/>
+
+    <!-- Gacha -->
+    <SpinWheelModal v-if="isSpinWheelOpen" @close="isSpinWheelOpen = false" />
   </div>
 </template>
 
