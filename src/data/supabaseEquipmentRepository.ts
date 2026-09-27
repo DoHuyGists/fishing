@@ -16,7 +16,7 @@ type EquipmentRow = Record<(typeof COLUMN_BY_TOOL)[FishingTool], EquipmentVarian
 class SupabaseEquipmentRepository implements EquipmentRepository {
   async fetchEquipment(userId: string): Promise<Record<FishingTool, EquipmentVariant[]>> {
     const { data, error } = await supabase
-      .from("equipments")
+      .from("user_equipments")
       .select("robs, lines, reels, hooks, bait")
       .eq("user_id", userId)
       .maybeSingle<EquipmentRow>();
@@ -36,7 +36,7 @@ class SupabaseEquipmentRepository implements EquipmentRepository {
 
   private async seedDefaultRow(userId: string): Promise<Record<FishingTool, EquipmentVariant[]>> {
     const seed = defaultEquipmentVariants;
-    const { error } = await supabase.from("equipments").insert({
+    const { error } = await supabase.from("user_equipments").insert({
       user_id: userId,
       robs: seed.rod,
       lines: seed.line,
