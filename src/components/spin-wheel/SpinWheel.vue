@@ -213,7 +213,7 @@ onBeforeUnmount(() => {
               class="h-10 w-10 object-contain drop-shadow-md"
             />
             <span class="max-w-[64px] truncate text-center text-[11px] font-semibold text-white drop-shadow">
-              {{ reward.value }}
+              {{ reward.label }}
             </span>
           </div>
         </div>

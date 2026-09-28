@@ -1,7 +1,7 @@
 import supabase from "../database/connection";
 
 export interface CurrencyRow {
-  id: number;
+  id: string;
   created_at: string;
   user_id: string;
   cash: number;

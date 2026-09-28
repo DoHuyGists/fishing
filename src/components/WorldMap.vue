@@ -12,6 +12,7 @@ import CatchDiaryModal from "./diary/CatchDiaryModal.vue";
 import { useDiaryStore } from "../stores/diary.ts";
 import AccountInfoModal from "./account/AccountInfoModal.vue";
 import SpinWheelModal from "./spin-wheel/SpinWheelModal.vue";
+import InventoryModal from "./inventory/InventoryModal.vue";
 
 
 const isProfileOpen = ref(false);
@@ -93,7 +94,7 @@ onMounted(() => {
     <InteractWorldWrapper />
 
     <!-- Sidebar phải: Danh sách cá đã câu được -->
-    <CaughtList/>
+    <CaughtList />
 
     <div>
       <div class="flex items-center gap-2">
@@ -138,16 +139,19 @@ onMounted(() => {
     </div>
 
     <!-- Market Modal Dialog -->
-   <MarketWindow v-if="isMarketOpen" @close="isMarketOpen = false"/>
+    <MarketWindow v-if="isMarketOpen" @close="isMarketOpen = false" />
 
     <!-- Nhật ký Modal Dialog -->
     <CatchDiaryModal v-if="isDiaryOpen" @close="isDiaryOpen = false" />
 
     <!-- Dialog xem thông tin cá nhân -->
-    <AccountInfoModal v-if="isProfileOpen" @close="isProfileOpen = false"/>
+    <AccountInfoModal v-if="isProfileOpen" @close="isProfileOpen = false" />
 
     <!-- Gacha -->
     <SpinWheelModal v-if="isSpinWheelOpen" @close="isSpinWheelOpen = false" />
+
+    <!-- Inventory -->
+    <InventoryModal v-if="isInventoryOpen" @close="isInventoryOpen = false" />
   </div>
 </template>
 
@@ -159,6 +163,7 @@ onMounted(() => {
     flex-direction: column;
     overflow: auto;
   }
+
   .map-sidebar,
   .caught-sidebar {
     width: 100%;

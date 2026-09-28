@@ -1,11 +1,32 @@
 import { defineStore } from "pinia";
 import { defaultEquipmentVariants, type EquipmentVariant } from "../data/equipmentCatalog";
-import type { EquipmentRepository } from "../data/equipmentRepository";
+
 import { supabaseEquipmentRepository } from "../data/supabaseEquipmentRepository";
 import type { FishingTool } from "./fishing";
 
-// Swap this to change the data source without touching stores/components.
-const equipmentRepository: EquipmentRepository = supabaseEquipmentRepository;
+export type Category = "rod" | "line" | "reel" | "hook" | "bait";
+
+export interface ItemData {
+  category: Category;
+  name?: string;
+  image?: string;
+  [key: string]: unknown;
+}
+
+interface EquipItem extends ItemData {
+  id: string;
+}
+
+export interface EquipmentSet {
+  id: string;
+  createdAt: string;
+  userId: string;
+  rod: EquipItem[];
+  line: EquipItem[];
+  reel: EquipItem[];
+  hook: EquipItem[];
+  bait: EquipItem[];
+}
 
 export const useEquipmentStore = defineStore("equipment", {
   state: () => ({
@@ -21,7 +42,7 @@ export const useEquipmentStore = defineStore("equipment", {
       this.loading = true;
       this.error = "";
       try {
-        this.variants = await equipmentRepository.fetchEquipment(userId);
+        this.variants = await supabaseEquipmentRepository.fetchEquipment(userId);
         this.userId = userId;
         this.loaded = true;
       } catch (err) {
@@ -36,5 +57,21 @@ export const useEquipmentStore = defineStore("equipment", {
       this.loaded = false;
       this.error = "";
     },
+    normalize(row: any): EquipmentSet {
+      return {
+        ...row,
+        rod: row.rod ?? [],
+        line: row.line ?? [],
+        reel: row.reel ?? [],
+        hook: row.hook ?? [],
+        bait: row.bait ?? [],
+      }
+    },
+    async buySet(userId: string) {
+      return supabaseEquipmentRepository.CreateNewSet(userId);
+    },
+    async saveSet(userId: string, set: EquipmentSet) {
+      return supabaseEquipmentRepository.UpdateSet(userId, set);
+    }
   },
 });
