@@ -26,6 +26,7 @@ export interface EquipmentSet {
   reel: EquipItem[];
   hook: EquipItem[];
   bait: EquipItem[];
+  isUsed: boolean;
 }
 
 export const useEquipmentStore = defineStore("equipment", {
@@ -66,6 +67,9 @@ export const useEquipmentStore = defineStore("equipment", {
         hook: row.hook ?? [],
         bait: row.bait ?? [],
       }
+    },
+    async chooseSet(userId: string, setId: string){
+      supabaseEquipmentRepository.updateCurrentUsedSet(userId, setId);
     },
     async buySet(userId: string) {
       return supabaseEquipmentRepository.CreateNewSet(userId);

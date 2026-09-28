@@ -19,7 +19,7 @@ class SupabaseEquipmentRepository{
       .from("user_equipments")
       .select("rod, line, reel, hook, bait")
       .eq("user_id", userId)
-      .eq("isUsed", true)
+      .eq("is_used", true)
       .maybeSingle<EquipmentRow>();
 
     if (error) throw new Error(error.message);
@@ -51,6 +51,7 @@ class SupabaseEquipmentRepository{
       reel: x.reel ?? [],
       hook: x.hook ?? [],
       bait: x.bait ?? [],
+      isUsed: x.is_used,
     })) as EquipmentSet[]
   }
 
@@ -81,6 +82,15 @@ class SupabaseEquipmentRepository{
     });
     if (error) throw new Error(error.message);
     return seed;
+  }
+
+  async updateCurrentUsedSet(userId: string, setId: string){
+    const { error } = await supabase.rpc('switch_equipment', {
+      p_id: setId,
+      p_user_id: userId
+    });
+
+    if (error) throw new Error(error.message);
   }
 }
 

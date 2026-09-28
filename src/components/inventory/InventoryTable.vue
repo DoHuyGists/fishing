@@ -213,6 +213,13 @@ async function buySet() {
     toast('ok', 'Đã thêm set mới.')
 }
 
+function handleUpdateSetUsed(event: Event, setId: string) {
+  if((event.target as HTMLInputElement).value == "on"){
+    equipmentStore.chooseSet(userId.value!, setId);
+    toast('ok', 'Cập nhật thành công.')
+  }
+}
+
 const fmtPrice = (n: number) => n.toLocaleString("vi-VN");
 </script>
 
@@ -432,10 +439,16 @@ const fmtPrice = (n: number) => n.toLocaleString("vi-VN");
             class="rounded-md border border-slate-200 bg-white p-3"
           >
             <div class="mb-3 flex items-center justify-between">
-              <h3 class="text-sm font-semibold">
+              <div class="text-sm font-semibold">
                 Set {{ index + 1 }}
                 <span v-if="isDirty(set)" class="ml-2 text-xs font-normal text-amber-600">Chưa lưu</span>
-              </h3>
+              </div>
+            <div class="select-none flex gap-2">
+              <input type="radio" name="equipment-set" :checked="set.isUsed" @change="handleUpdateSetUsed($event, set.id)" class="cursor-pointer">
+              <label for="" class="text-sm">
+                Sử dụng
+              </label>
+            </div>
               <button
                 type="button"
                 :disabled="!isDirty(set) || savingId === set.id"
