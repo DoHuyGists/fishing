@@ -11,7 +11,7 @@ onMounted(() => {
 </script>
 <template>
   <aside
-    class="map-sidebar w-60 flex-none h-full p-4 border-[1px] border-gray-300 rounded-xl bg-white text-[#263238] flex flex-col overflow-hidden">
+    class="map-sidebar w-60 flex-none h-full p-4 border border-gray-300 rounded-xl bg-white text-[#263238] flex flex-col overflow-hidden">
     <div class="flex items-center justify-between">
       <h2 class="m-0 text-lg font-bold">Bản đồ</h2>
     </div>

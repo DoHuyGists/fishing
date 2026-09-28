@@ -56,7 +56,7 @@ const isDirty = (s: EquipmentSet) => snapshotOf(s) !== savedSnapshot.value[s.id]
 
 async function load() {
   loading.value = true;
-  userId.value = authStore.user?.id ?? null;
+  userId.value = authStore.userId ?? null;
   if (!userId.value) {
     loading.value = false;
     return toast("error", "Bạn cần đăng nhập để xem kho đồ.");

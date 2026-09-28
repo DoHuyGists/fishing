@@ -23,11 +23,11 @@ const shelfPage = ref(0);
 const SHELF_PAGE_SIZE = 12; // 12 quyển sách trên 1 trang giá sách
 
 onMounted(() => {
-  diaryStore.initDiary(authStore.user?.id);
+  diaryStore.initDiary(authStore.userId);
 });
 
 watch(
-  () => authStore.user?.id,
+  () => authStore.userId,
   (userId) => {
     if (userId) {
       diaryStore.initDiary(userId);
@@ -134,7 +134,7 @@ const countryStats = computed(() => {
 // Open a country book
 async function openCountryBook(country: { code: string; name: string; information: string }) {
   selectedCountry.value = country;
-  await diaryStore.selectLocation(authStore.user?.id, country.code, country.name);
+  await diaryStore.selectLocation(authStore.userId, country.code, country.name);
   viewMode.value = "openbook";
 }
 

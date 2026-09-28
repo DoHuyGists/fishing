@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { computed, onBeforeUnmount, onMounted, ref, watch } from "vue";
+import { computed, onBeforeMount, onBeforeUnmount, onMounted, ref, watch } from "vue";
 import { isPointInWater } from "../data/fishingMap";
 import { useFishingStore } from "../stores/fishing";
 import { useAuthStore } from "../stores/auth";
@@ -23,8 +23,7 @@ const route = useRoute();
 const router = useRouter();
 const authStore = useAuthStore();
 const fishingAreaStore = useFishingAreaStore();
-const areaId = route.params.areaId;
-const store = useFishingStore();
+const fishingStore = useFishingStore();
 const isLeaving = ref(false);
 let realtimeSubscription: ReturnType<typeof supabaseUserInAreaRepository.subscribeToAreaUsers> | null = null;
 
@@ -32,9 +31,7 @@ async function handleBackToMap() {
   if (isLeaving.value) return;
   isLeaving.value = true;
   try {
-    if (authStore.user?.id) {
-      await supabaseUserInAreaRepository.setUserArea(authStore.user.id, null);
-    }
+    await supabaseUserInAreaRepository.setUserArea(authStore.userId, null);
   } catch (err) {
     console.error("Lỗi khi cập nhật trạng thái rời bãi câu:", err);
   } finally {
@@ -43,31 +40,37 @@ async function handleBackToMap() {
   }
 }
 
-onBeforeRouteLeave(async (to, _from, next) => {
-  if (to.name !== "fishing" && authStore.user?.id) {
+onBeforeRouteLeave(async (to) => {
+  if (to.name !== "fishing") {
     try {
-      await supabaseUserInAreaRepository.setUserArea(authStore.user.id, null);
+      await supabaseUserInAreaRepository.setUserArea(authStore.userId, null);
     } catch (err) {
       console.error("Lỗi khi cập nhật trạng thái rời bãi câu:", err);
     }
   }
-  next();
+  return true;
 });
 
-watch(
-  () => [authStore.user?.id, areaId],
-  async ([userId, currentAreaId]) => {
-    if (userId && currentAreaId) {
-      store.fetchCaughtFishes(userId as string, currentAreaId as string);
-      try {
-        await supabaseUserInAreaRepository.setUserArea(userId as string, currentAreaId as string);
-      } catch (err) {
-        console.error("Lỗi khi cập nhật vị trí bãi câu:", err);
-      }
-    }
-  },
-  { immediate: true }
-);
+onBeforeMount(async()=>{
+  await fishingStore.updateCurrentAreaId(authStore.userId);
+})
+
+watch(()=> fishingStore.currentAreaId, (areaId)=>{
+  if(areaId){
+    fishingStore.fetchFishInCurrentArea(areaId as string);
+    fishingStore.fetchPlayersInArea(areaId as string);
+    fishingAreaStore.fetchCurrentArea(areaId as string);
+    fishingStore.fetchCaughtFishes(authStore.userId, areaId);
+    realtimeSubscription = supabaseUserInAreaRepository.subscribeToAreaUsers(async () => {
+      await fishingStore.updateCurrentAreaId(authStore.userId);
+      fishingStore.fetchPlayersInArea(areaId as string);
+    });
+  }else{
+    router.replace({name: "home"})
+  }
+})
+
+
 const sceneElement = ref<HTMLElement | null>(null);
 const rodLineAnchor = ref<HTMLElement | null>(null);
 const fishingRod = ref({
@@ -80,9 +83,9 @@ const rodLineOffset = {
 };
 const ripple = ref(false);
 const invalidTap = ref(false);
-const castClass = computed(() => `phase-${store.castPhase}`);
+const castClass = computed(() => `phase-${fishingStore.castPhase}`);
 const linePath = computed(() => {
-  const { x, y } = store.baitPosition;
+  const { x, y } = fishingStore.baitPosition;
   const { x: rodX, y: rodY } = fishingRod.value;
   const distance = Math.hypot(x - rodX, y - rodY);
   const sag = Math.min(18, Math.max(8, distance * 0.18));
@@ -123,13 +126,6 @@ onMounted(() => {
   clockTimer = window.setInterval(() => (now.value = new Date()), 1000);
   trackRodPosition();
   window.addEventListener("resize", updateRodPosition);
-  if (areaId) {
-    store.fetchFishInCurrentArea(areaId as string);
-    store.fetchPlayersInArea(areaId as string);
-    realtimeSubscription = supabaseUserInAreaRepository.subscribeToAreaUsers(() => {
-      store.fetchPlayersInArea(areaId as string);
-    });
-  }
 });
 onBeforeUnmount(() => {
   if (clockTimer) window.clearInterval(clockTimer);
@@ -168,12 +164,6 @@ const currentScenePhace = computed(() => {
   }
 });
 
-onMounted(() => {
-  if (areaId) {
-    fishingAreaStore.fetchCurrentArea(areaId as string);
-  }
-});
-
 const timeLabel = computed(() =>
   now.value.toLocaleTimeString("vi-VN", { hour: "2-digit", minute: "2-digit", second: "2-digit" }),
 );
@@ -195,11 +185,11 @@ function castAt(event: MouseEvent) {
   const y = ((event.clientY - bounds.top) / bounds.height) * 100;
   if (!isPointInWater({ x, y }, fishingAreaStore.currentArea.fishingBoundary)) {
     invalidTap.value = true;
-    store.rejectCast();
+    fishingStore.rejectCast();
     window.setTimeout(() => (invalidTap.value = false), 520);
     return;
   }
-  store.castTo(x, y);
+  fishingStore.castTo(x, y);
   ripple.value = true;
   window.setTimeout(() => (ripple.value = false), 900);
 }
@@ -224,7 +214,7 @@ function handleClickOnScene(event: MouseEvent) {
       @click="handleClickOnScene"
     />
     <div class="scene-shade"></div>
-    <div class="scene-top">
+    <div class="scene-top flex justify-between items-start">
       <div class="flex flex-col gap-2">
         <div class="location">
           <div class="w-10 h-10 overflow-hidden">
@@ -248,12 +238,12 @@ function handleClickOnScene(event: MouseEvent) {
         </div>
       </div>
       <div class="scene-actions">
-        <button type="button" class="guide-button" @click.stop="store.openLakeGuide">Cá trong hồ</button>
-        <button type="button" class="players-button" @click.stop="store.openPlayers">
-          Người câu <b>{{ store.nearbyPlayers.length }}</b>
+        <button type="button" class="guide-button" @click.stop="fishingStore.openLakeGuide">Cá trong hồ</button>
+        <button type="button" class="players-button" @click.stop="fishingStore.openPlayers">
+          Người câu <b>{{ fishingStore.nearbyPlayers.length }}</b>
         </button>
-        <button type="button" class="bag-button" @click.stop="store.openBag">
-          Túi cá <b>{{ store.inventory.length }}</b>
+        <button type="button" class="bag-button" @click.stop="fishingStore.openBag">
+          Túi cá <b>{{ fishingStore.inventory.length }}</b>
         </button>
         <label v-if="environment == 'Development'" class="select-none cursor-pointer">Dev mode <input v-model="isDevMode" type="checkbox" /> </label>
       </div>
@@ -268,7 +258,7 @@ function handleClickOnScene(event: MouseEvent) {
     <div
       v-if="ripple"
       class="ripple"
-      :style="{ left: `${store.baitPosition.x}%`, top: `${store.baitPosition.y}%` }"
+      :style="{ left: `${fishingStore.baitPosition.x}%`, top: `${fishingStore.baitPosition.y}%` }"
     ></div>
     <svg
       class="casting-line"
@@ -283,7 +273,7 @@ function handleClickOnScene(event: MouseEvent) {
     <div
       class="bait-float"
       :class="castClass"
-      :style="{ left: `${store.baitPosition.x}%`, top: `${store.baitPosition.y}%` }"
+      :style="{ left: `${fishingStore.baitPosition.x}%`, top: `${fishingStore.baitPosition.y}%` }"
     >
       <span></span>
     </div>
@@ -291,12 +281,12 @@ function handleClickOnScene(event: MouseEvent) {
       <img src="/fishing-rob.png" alt="" class="fishing-rod" />
       <span ref="rodLineAnchor" class="rod-line-anchor"></span>
     </div>
-    <div class="bite-alert" :class="{ visible: store.castPhase === 'bite' }">! CÁ CẮN CÂU !</div>
+    <div class="bite-alert" :class="{ visible: fishingStore.castPhase === 'bite' }">! CÁ CẮN CÂU !</div>
     <div
       class="scene-status"
-      :class="{ active: store.isCasting || store.castPhase === 'bite' || store.castPhase === 'fighting' }"
+      :class="{ active: fishingStore.isCasting || fishingStore.castPhase === 'bite' || fishingStore.castPhase === 'fighting' }"
     >
-      <span class="status-dot"></span>{{ store.castMessage }}
+      <span class="status-dot"></span>{{ fishingStore.castMessage }}
     </div>
   </section>
 </template>
@@ -329,9 +319,6 @@ function handleClickOnScene(event: MouseEvent) {
   top: 20px;
   left: 21px;
   right: 21px;
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
   color: white;
 }
 .location,

@@ -55,7 +55,7 @@ async function handleSell() {
     return;
   }
 
-  const userId = authStore.user?.id;
+  const userId = authStore.userId;
   if (!userId) {
     sellError.value = "Bạn chưa đăng nhập";
     return;
@@ -127,7 +127,7 @@ async function handleRelease() {
 </script>
 <template>
 <aside
-      class="caught-sidebar w-84 flex-none h-full p-4 border-[1px] border-gray-300 rounded-xl bg-white text-[#263238] flex flex-col overflow-hidden">
+      class="caught-sidebar w-84 flex-none h-full p-4 border border-gray-300 rounded-xl bg-white text-[#263238] flex flex-col overflow-hidden">
       <!-- Header tiêu đề -->
       <div class="flex items-center justify-between border-b border-gray-300 pb-3 mb-3">
         <div class="flex items-center gap-2">
@@ -226,7 +226,7 @@ async function handleRelease() {
       class="fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-4 backdrop-blur-xs"
       @click.self="cancelRelease">
       <div
-        class="w-full max-w-sm bg-white border-[1px] border-gray-300 rounded-xl p-5 shadow-[0_12px_32px_rgba(38,50,56,0.3)] text-center relative">
+        class="w-full max-w-sm bg-white border border-gray-300 rounded-xl p-5 shadow-[0_12px_32px_rgba(38,50,56,0.3)] text-center relative">
         <h3 class="m-0 text-base font-bold text-[#263238]">Xác nhận thả cá</h3>
         <p class="my-4 text-xs text-gray-600 leading-relaxed">
           Bạn có chắc chắn muốn thả con <strong class="text-[#153221]">{{ fishToRelease.fish?.name }}</strong> ({{
@@ -254,7 +254,7 @@ async function handleRelease() {
     <div v-if="fishToSell" class="fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-4 backdrop-blur-xs"
       @click.self="cancelSell">
       <div
-        class="w-full max-w-sm bg-white border-[1px] border-gray-300 rounded-xl p-5 shadow-[0_12px_32px_rgba(38,50,56,0.3)] text-center relative">
+        class="w-full max-w-sm bg-white border border-gray-300 rounded-xl p-5 shadow-[0_12px_32px_rgba(38,50,56,0.3)] text-center relative">
         <h3 class="m-0 text-base font-bold text-[#263238]">Đăng bán cá</h3>
         <p class="my-3 text-xs text-gray-600 leading-relaxed">
           Đăng bán con <strong class="text-[#153221]">{{ fishToSell.fish?.name }}</strong> ({{

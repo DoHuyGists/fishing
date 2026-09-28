@@ -89,15 +89,15 @@ export const useFishingStore = defineStore("fishing", {
     },
   },
   actions: {
+    async updateCurrentAreaId(userId: string) {
+      this.currentAreaId = await supabaseUserInAreaRepository.getCurrentUserArea(userId);
+    },
     async fetchFishInCurrentArea(areaId: string) {
       if (!areaId) return;
       this.currentAreaId = areaId;
       try {
         this.lakeFish = await supabaseFishRepository.fetchFishesByArea(areaId);
-        await Promise.all([
-          this.fetchCaughtFishes(undefined, areaId),
-          this.fetchPlayersInArea(areaId),
-        ]);
+        await Promise.all([this.fetchCaughtFishes(undefined, areaId), this.fetchPlayersInArea(areaId)]);
       } catch (err) {
         console.error("Lỗi khi tải dữ liệu bãi câu:", err);
       }
@@ -115,13 +115,10 @@ export const useFishingStore = defineStore("fishing", {
         }
 
         const authStore = useAuthStore();
-        const currentUserId = authStore.user?.id;
+        const currentUserId = authStore.userId;
         const userIds = rows.map((r) => r.user_id);
 
-        const { data: catches } = await supabase
-          .from("caught")
-          .select("user_id, fish")
-          .in("user_id", userIds);
+        const { data: catches } = await supabase.from("caught").select("user_id, fish").in("user_id", userIds);
 
         const playerStats = new Map<string, { count: number; bestWeight: number; bestFishName: string }>();
         userIds.forEach((uid) => {
@@ -141,18 +138,7 @@ export const useFishingStore = defineStore("fishing", {
           });
         }
 
-        const colors = [
-          "#d99157",
-          "#a783cf",
-          "#59a9a0",
-          "#3b82f6",
-          "#ef4444",
-          "#f59e0b",
-          "#10b981",
-          "#8b5cf6",
-          "#ec4899",
-          "#14b8a6",
-        ];
+        const colors = ["#d99157", "#a783cf", "#59a9a0", "#3b82f6", "#ef4444", "#f59e0b", "#10b981", "#8b5cf6", "#ec4899", "#14b8a6"];
 
         this.nearbyPlayers = rows.map((row) => {
           const isCurrent = row.user_id === currentUserId;
@@ -204,7 +190,7 @@ export const useFishingStore = defineStore("fishing", {
     },
     async fetchCaughtFishes(userId?: string, areaId?: string) {
       const authStore = useAuthStore();
-      const targetUserId = userId || authStore.user?.id;
+      const targetUserId = userId || authStore.userId;
       const targetAreaId = areaId || this.currentAreaId || useFishingAreaStore().currentArea?.id;
 
       if (!targetUserId || !targetAreaId) return;
@@ -278,8 +264,7 @@ export const useFishingStore = defineStore("fishing", {
         this.castPhase = "bite";
         this.castMessage = `${fish.name} đang cắn câu! Chuẩn bị kéo!`;
         window.setTimeout(() => {
-          if (attempt === this.castAttempt && this.castPhase === "bite")
-            this.loseFish("Cá đã nhả mồi — bạn phản ứng quá chậm!");
+          if (attempt === this.castAttempt && this.castPhase === "bite") this.loseFish("Cá đã nhả mồi — bạn phản ứng quá chậm!");
         }, 3000);
       }, biteDelay);
     },
@@ -355,7 +340,7 @@ export const useFishingStore = defineStore("fishing", {
       this.catchDialogOpen = true;
 
       const authStore = useAuthStore();
-      const userId = authStore.user?.id;
+      const userId = authStore.userId;
       const areaId = this.currentAreaId || useFishingAreaStore().currentArea?.id;
       if (userId && areaId) {
         try {

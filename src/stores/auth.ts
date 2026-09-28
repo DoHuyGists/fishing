@@ -17,6 +17,14 @@ export const useAuthStore = defineStore("auth", {
   }),
   getters: {
     isAuthenticated: (state) => Boolean(state.session),
+    userId: (state) => {
+      if(state.user?.id){
+        return state.user.id;
+      }else{
+        throw new Error("Missing user id");
+        
+      }
+    }
   },
   actions: {
     async initialize() {

@@ -1,15 +1,18 @@
 <script lang="ts" setup>
-import { computed, ref, watch } from "vue";
+import { computed, onBeforeMount, onBeforeUnmount, ref, watch } from "vue";
 import { useRouter } from "vue-router";
 import { useWorldStore } from "../../stores/world";
 import { useAuthStore } from "../../stores/auth";
 import { supabaseUserInAreaRepository } from "../../data/supabaseUserInAreaRepository";
+import { useFishingStore } from "../../stores/fishing";
 
 const props = defineProps<{
   anchors: any[];
   zoom?: number;
 }>();
 
+let realtimeSubscription: ReturnType<typeof supabaseUserInAreaRepository.subscribeToAreaUsers> | null = null;
+const fishingStore = useFishingStore();
 const router = useRouter();
 const authStore = useAuthStore();
 const worldStore = useWorldStore();
@@ -51,22 +54,42 @@ async function goToFishingArea(anchor: any) {
   if (isEntering.value) return;
   isEntering.value = true;
   try {
-    if (authStore.user?.id) {
-      await supabaseUserInAreaRepository.setUserArea(authStore.user.id, anchor.id);
+    if (authStore.userId) {
+      await supabaseUserInAreaRepository.setUserArea(authStore.userId, anchor.id);
     }
   } catch (err) {
     console.error("Lỗi cập nhật user_in_area khi đi đến bãi câu:", err);
   } finally {
     isEntering.value = false;
-    router.push({
-      name: "fishing",
-      params: {
-        countryId: anchor.countryId,
-        areaId: anchor.id,
-      },
-    });
+    router.push({name: "fishing"});
   }
 }
+function getUserId() {
+  const userId = authStore.userId;
+  if(userId){
+    return userId;
+  }else{
+    throw new Error()
+  }
+}
+
+
+onBeforeMount(()=>{
+  realtimeSubscription = supabaseUserInAreaRepository.subscribeToAreaUsers(async () => {
+      const currentAreaId = await supabaseUserInAreaRepository.getCurrentUserArea(getUserId());
+      if(currentAreaId){
+        router.replace({name: "fishing"})
+      }
+    });
+})
+
+onBeforeUnmount(() => {
+  if (realtimeSubscription) {
+    supabaseUserInAreaRepository.unsubscribe(realtimeSubscription);
+  }
+});
+
+
 </script>
 <style lang="css">
 .anchors {

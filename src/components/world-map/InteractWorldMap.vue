@@ -122,7 +122,7 @@ onMounted(() => {
     <FishingAnchor />
     <div class="flex flex-col">
       <div ref="mapFrame"
-        class="map-frame flex-1 min-w-0 h-full overflow-hidden border-[1px] mb-0 border-gray-300 rounded-xl bg-[#eef3f1] touch-none relative"
+        class="map-frame flex-1 min-w-0 h-full overflow-hidden border mb-0 border-gray-300 rounded-xl bg-[#eef3f1] touch-none relative"
         :class="isDragging ? 'cursor-grabbing' : isAnchorMode ? 'cursor-crosshair' : 'cursor-grab'"
         @wheel.stop="handleWheel" @pointerdown="handlePointerDown" @pointermove="handlePointerMove"
         @pointerup="stopDragging" @pointercancel="stopDragging">
@@ -142,6 +142,7 @@ onMounted(() => {
         <div class="py-2 px-3 rounded-lg border border-gray-300">
           <div>1. Nhấn giữ Ctrl + cuộn chuột để zoom bản đồ</div>
           <div>2. Nhấn giữ chuột trái + di chuyển chuột để di chuyển bản đồ</div>
+          <div>3. Nhấn vào chấm đỏ để đi câu</div>
         </div>
       </div>
     </div>

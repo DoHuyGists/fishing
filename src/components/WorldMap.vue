@@ -38,7 +38,7 @@ function openMarketModal() {
 
 function openDiaryModal() {
   isDiaryOpen.value = true;
-  diaryStore.loadDiary(authStore.user?.id);
+  diaryStore.loadDiary(authStore.userId);
 }
 
 function openSpinWheelModal() {
@@ -50,9 +50,8 @@ function openInventoryModal() {
 }
 
 
-
 watch(
-  () => authStore.user?.id,
+  () => authStore.userId,
   (userId) => {
     if (userId) {
       currencyStore.fetchCurrency(userId);
@@ -78,8 +77,8 @@ watch(
 );
 
 onMounted(() => {
-  if (authStore.user?.id) {
-    currencyStore.fetchCurrency(authStore.user.id);
+  if (authStore.userId) {
+    currencyStore.fetchCurrency(authStore.userId);
     caughtStore.loadCaughtFishes();
   }
 });
@@ -97,16 +96,16 @@ onMounted(() => {
     <CaughtList />
 
     <div>
-      <div class="flex items-center gap-2">
+      <div class="flex items-center flex-wrap gap-2">
         <button type="button"
-          class="flex items-center gap-1.5 px-3 py-1.5 bg-[#153221] hover:bg-[#1a3e29] border-[1px] border-gray-300 text-white rounded-xl shadow-sm font-bold text-xs cursor-pointer transition-colors"
+          class="flex items-center gap-1.5 px-3 py-1.5 bg-[#153221] hover:bg-[#1a3e29] border border-gray-300 text-white rounded-xl shadow-sm font-bold text-xs cursor-pointer transition-colors"
           @click="isProfileOpen = true">
           <span class="text-sm">⚙️</span>
           <span>Tài khoản</span>
         </button>
 
         <button type="button"
-          class="flex items-center gap-1.5 px-3 py-1.5 bg-[#153221] hover:bg-[#1a3e29] border-[1px] border-gray-300 text-white rounded-xl shadow-sm font-bold text-xs cursor-pointer transition-colors"
+          class="flex items-center gap-1.5 px-3 py-1.5 bg-[#153221] hover:bg-[#1a3e29] border border-gray-300 text-white rounded-xl shadow-sm font-bold text-xs cursor-pointer transition-colors"
           @click="openMarketModal">
           <span class="text-sm">🏪</span>
           <span>Chợ cá</span>
@@ -114,7 +113,7 @@ onMounted(() => {
 
         <!-- Nhật ký -->
         <button type="button"
-          class="flex items-center gap-1.5 px-3 py-1.5 bg-[#153221] hover:bg-[#1a3e29] border-[1px] border-gray-300 text-white rounded-xl shadow-sm font-bold text-xs cursor-pointer transition-colors"
+          class="flex items-center gap-1.5 px-3 py-1.5 bg-[#153221] hover:bg-[#1a3e29] border border-gray-300 text-white rounded-xl shadow-sm font-bold text-xs cursor-pointer transition-colors"
           @click="openDiaryModal">
           <span class="text-sm">📖</span>
           <span>Nhật ký</span>
@@ -122,17 +121,17 @@ onMounted(() => {
 
         <!-- Gacha -->
         <button type="button"
-          class="flex items-center gap-1.5 px-3 py-1.5 bg-[#153221] hover:bg-[#1a3e29] border-[1px] border-gray-300 text-white rounded-xl shadow-sm font-bold text-xs cursor-pointer transition-colors"
+          class="flex items-center gap-1.5 px-3 py-1.5 bg-[#153221] hover:bg-[#1a3e29] border border-gray-300 text-white rounded-xl shadow-sm font-bold text-xs cursor-pointer transition-colors"
           @click="openSpinWheelModal">
-          <span class="text-sm">?</span>
+          <span class="text-sm">🎁</span>
           <span>Gacha</span>
         </button>
 
         <!-- Túi đồ -->
         <button type="button"
-          class="flex items-center gap-1.5 px-3 py-1.5 bg-[#153221] hover:bg-[#1a3e29] border-[1px] border-gray-300 text-white rounded-xl shadow-sm font-bold text-xs cursor-pointer transition-colors"
+          class="flex items-center gap-1.5 px-3 py-1.5 bg-[#153221] hover:bg-[#1a3e29] border border-gray-300 text-white rounded-xl shadow-sm font-bold text-xs cursor-pointer transition-colors"
           @click="openInventoryModal">
-          <span class="text-sm"></span>
+          <span class="text-sm">📦</span>
           <span>Túi đồ</span>
         </button>
       </div>

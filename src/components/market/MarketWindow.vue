@@ -39,7 +39,7 @@ const filteredMarketListings = computed(() => {
 });
 
 const myMarketListings = computed(() => {
-  const currentUserId = authStore.user?.id;
+  const currentUserId = authStore.userId;
   if (!currentUserId) return [];
   return marketStore.marketListings.filter((item) => item.user_id === currentUserId);
 });
@@ -56,7 +56,7 @@ function cancelBuy() {
 
 async function handleBuyFish() {
   if (!itemToBuy.value) return;
-  const buyerId = authStore.user?.id;
+  const buyerId = authStore.userId;
   if (!buyerId) {
     buyError.value = "Bạn chưa đăng nhập";
     return;
@@ -121,7 +121,7 @@ function getRarityBadgeClass(rarity: string) {
      <div 
       class="fixed inset-0 z-50 flex items-center justify-center bg-black/60 p-4 backdrop-blur-xs">
       <div
-        class="w-full h-full bg-white border-[1px] border-gray-300 rounded-2xl shadow-[0_20px_50px_rgba(0,0,0,0.3)] flex flex-col overflow-hidden relative">
+        class="w-full h-full bg-white border border-gray-300 rounded-2xl shadow-[0_20px_50px_rgba(0,0,0,0.3)] flex flex-col overflow-hidden relative">
 
         <!-- Header -->
         <div
@@ -235,7 +235,7 @@ function getRarityBadgeClass(rarity: string) {
           <div v-if="activeMarketTab === 'all'">
             <div v-if="marketStore.isLoadingMarket"
               class="py-16 text-center text-gray-500 text-xs flex flex-col items-center gap-2">
-              <div class="w-8 h-8 border-[1px] border-emerald-600 border-t-transparent rounded-full animate-spin"></div>
+              <div class="w-8 h-8 border border-emerald-600 border-t-transparent rounded-full animate-spin"></div>
               <span>Đang tải các cá đang giao dịch...</span>
             </div>
 
@@ -261,7 +261,7 @@ function getRarityBadgeClass(rarity: string) {
                     </span>
 
                     <!-- Badge nếu là cá của bản thân -->
-                    <span v-if="item.user_id === authStore.user?.id"
+                    <span v-if="item.user_id === authStore.userId"
                       class="absolute top-2 left-2 px-2 py-0.5 bg-amber-500 text-white font-extrabold text-[9px] rounded shadow-xs">
                       Cá của bạn
                     </span>
@@ -290,7 +290,7 @@ function getRarityBadgeClass(rarity: string) {
                       đ</span>
                   </div>
 
-                  <button v-if="item.user_id === authStore.user?.id" type="button" disabled
+                  <button v-if="item.user_id === authStore.userId" type="button" disabled
                     class="px-3 py-1.5 bg-gray-100 text-gray-400 font-bold text-xs rounded-lg cursor-not-allowed">
                     Đã đăng
                   </button>
@@ -369,7 +369,7 @@ function getRarityBadgeClass(rarity: string) {
     <div v-if="itemToBuy" class="fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-4 backdrop-blur-xs"
       @click.self="cancelBuy">
       <div
-        class="w-full max-w-sm bg-white border-[1px] border-gray-300 rounded-xl p-5 shadow-[0_12px_32px_rgba(38,50,56,0.3)] text-center relative">
+        class="w-full max-w-sm bg-white border border-gray-300 rounded-xl p-5 shadow-[0_12px_32px_rgba(38,50,56,0.3)] text-center relative">
         <h3 class="m-0 text-base font-bold text-[#263238]">Xác nhận mua cá</h3>
 
         <div class="my-4 p-3 bg-emerald-50 border border-emerald-200 rounded-xl flex items-center gap-3 text-left">

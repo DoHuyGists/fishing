@@ -9,7 +9,7 @@ const currencyStore = useCurrencyStore();
 <template>
     <div class="fixed inset-0 z-50 flex items-center justify-center bg-black/40 p-4">
       <div
-        class="w-full max-w-md bg-white border-[1px] border-gray-300 rounded-xl p-5 shadow-[0_12px_32px_rgba(38,50,56,0.25)] relative">
+        class="w-full max-w-md bg-white border border-gray-300 rounded-xl p-5 shadow-[0_12px_32px_rgba(38,50,56,0.25)] relative">
         <div class="flex items-center justify-between border-b border-gray-300 pb-3 mb-4">
           <h3 class="m-0 text-base font-bold text-[#263238]">Thông tin tài khoản</h3>
           <button type="button"
@@ -26,7 +26,7 @@ const currencyStore = useCurrencyStore();
           </div>
           <div class="flex justify-between items-center py-1.5 border-b border-gray-100">
             <span class="text-gray-500 font-medium">User ID</span>
-            <span class="font-mono text-[11px] bg-gray-100 px-2 py-0.5 rounded">{{ authStore.user?.id || "N/A" }}</span>
+            <span class="font-mono text-[11px] bg-gray-100 px-2 py-0.5 rounded">{{ authStore.userId || "N/A" }}</span>
           </div>
           <div class="flex justify-between items-center py-1.5 border-b border-gray-100">
             <span class="text-gray-500 font-medium">Số tiền hiện tại</span>

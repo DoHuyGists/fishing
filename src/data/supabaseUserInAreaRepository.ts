@@ -103,6 +103,20 @@ class SupabaseUserInAreaRepository {
   async unsubscribe(channel: RealtimeChannel): Promise<void> {
     await supabase.removeChannel(channel);
   }
+
+  async getCurrentUserArea(userId: string){
+    const { data, error } = await supabase
+      .from("user_in_area")
+      .select("area_id")
+      .eq("user_id", userId)
+      .maybeSingle();
+
+      if(error){
+        throw new Error(error.message);
+      }
+
+      return data?.area_id;
+  }
 }
 
 export const supabaseUserInAreaRepository = new SupabaseUserInAreaRepository();
