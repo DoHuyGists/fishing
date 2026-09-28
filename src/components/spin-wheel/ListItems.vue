@@ -1,16 +1,21 @@
 <template>
     <div class="flex flex-col">
-        <template v-for="item in items">
+        <template v-for="item in spinWheelStore.rewardList">
             <div class="flex gap-2">
-                <input type="checkbox" name="" id="">
-                <div>{{ item.category }}</div>
+                <input type="checkbox" v-model="spinWheelStore.selectedReward" :value="item">
+                <div>{{ item.label }}</div>
             </div>
         </template>
     </div>
 </template>
 <script lang="ts" setup>
-import { items } from '../../data/items';
+import { onMounted } from 'vue';
+import { useSpinWheelStore } from '../../stores/spinWheel';
 
+const spinWheelStore = useSpinWheelStore()
 
+onMounted(async()=>{
+    await spinWheelStore.setReward();
+})
 
 </script>

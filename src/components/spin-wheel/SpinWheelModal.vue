@@ -4,7 +4,7 @@
           <div class="flex gap-10">
             <ListItems/>
             <SpinWheel
-            :rewards="rewards"
+            :rewards="spinWheelStore.selectedReward"
             @spin-end="onWin"
             :size="500"
           />
@@ -28,33 +28,9 @@ import type { Reward } from './SpinWheel.vue'
 
 const emit = defineEmits(["close"]);
 const spinWheelStore = useSpinWheelStore();
-const cost = ref(10)
-
-const rewards: Reward[] = [
-  {
-    id: 1,
-    value: 'rod',
-    label: 'Cần câu',
-    image: '',
-    color: '#FF6B6B',
-  },
-  {
-    id: 2,
-    value: 'hook',
-    label: 'Móc câu',
-    image: '',
-  },
-  {
-    id: 3,
-    value: 'bait',
-    label: 'Mồi câu',
-    image: '',
-  }
-]
+const cost = ref(10);
 
 async function onWin(reward: Reward) {
-  const item = await spinWheelStore.submitReward(reward, cost.value);
-  console.log(item);
-  
+  await spinWheelStore.submitReward(reward, cost.value);
 }
 </script>
