@@ -1,7 +1,8 @@
 <script lang="ts" setup>
-import { computed } from 'vue';
+import { computed, onBeforeMount } from 'vue';
 import { useSingleSession } from '../composables/use-single-session';
 import { useAuthStore } from '../stores/auth';
+import { useTimezoneCheck } from '../composables/use-timezone-check';
 
 const authStore = useAuthStore();
 const userId = computed(() => authStore.userId);
@@ -12,6 +13,11 @@ const {
   closeCurrentTab,
   logoutAccount,
 } = useSingleSession(userId);
+
+onBeforeMount(async ()=>{
+  await useTimezoneCheck()
+})
+
 </script>
 
 <template>
