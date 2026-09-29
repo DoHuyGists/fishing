@@ -13,6 +13,7 @@ import { useDiaryStore } from "../stores/diary.ts";
 import AccountInfoModal from "./account/AccountInfoModal.vue";
 import SpinWheelModal from "./spin-wheel/SpinWheelModal.vue";
 import InventoryModal from "./inventory/InventoryModal.vue";
+import Feedbackmodal from "./feedback/Feedbackmodal.vue";
 
 
 const isProfileOpen = ref(false);
@@ -30,6 +31,7 @@ const isMarketOpen = ref(false);
 const isDiaryOpen = ref(false);
 const isSpinWheelOpen = ref(false);
 const isInventoryOpen = ref(false);
+const isFeedbackFormOpen = ref(false);
 
 function openMarketModal() {
   isMarketOpen.value = true;
@@ -47,6 +49,10 @@ function openSpinWheelModal() {
 
 function openInventoryModal() {
   isInventoryOpen.value = true;
+}
+
+function openFeedbackForm() {
+  isFeedbackFormOpen.value = true;
 }
 
 
@@ -134,6 +140,14 @@ onMounted(() => {
           <span class="text-sm">📦</span>
           <span>Túi đồ</span>
         </button>
+
+        <!-- Feedback -->
+        <button type="button"
+          class="flex items-center gap-1.5 px-3 py-1.5 bg-[#153221] hover:bg-[#1a3e29] border border-gray-300 text-white rounded-xl shadow-sm font-bold text-xs cursor-pointer transition-colors"
+          @click="openFeedbackForm">
+          <span class="text-sm">📄</span>
+          <span>Phản hồi</span>
+        </button>
       </div>
     </div>
 
@@ -151,6 +165,9 @@ onMounted(() => {
 
     <!-- Inventory -->
     <InventoryModal v-if="isInventoryOpen" @close="isInventoryOpen = false" />
+
+    <!-- Feedback -->
+     <Feedbackmodal v-if="isFeedbackFormOpen" @close="isFeedbackFormOpen = false"/>
   </div>
 </template>
 
