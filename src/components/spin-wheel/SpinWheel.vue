@@ -38,6 +38,8 @@ interface Props {
   size?: number
   /** Số vòng quay thêm cho hiệu ứng trước khi dừng */
   extraSpins?: number
+  /** Chặn quay khi chưa đủ điều kiện (vd: chưa đủ số phần thưởng tối thiểu) */
+  disabled?: boolean
 }
 
 const props = withDefaults(defineProps<Props>(), {
@@ -46,6 +48,7 @@ const props = withDefaults(defineProps<Props>(), {
   spinDuration: 4200,
   size: 320,
   extraSpins: 6,
+  disabled: false,
 })
 
 const emit = defineEmits<{
@@ -133,7 +136,7 @@ async function getRandomIndex(): Promise<number> {
 }
 
 async function spin() {
-  if (spinning.value || props.rewards.length === 0) return
+  if (spinning.value || props.disabled || props.rewards.length === 0) return
   errorMsg.value = ''
   spinning.value = true
   emit('spin-start')
@@ -223,7 +226,7 @@ onBeforeUnmount(() => {
       <button
         type="button"
         class="absolute cursor-pointer inset-0 m-auto flex h-16 w-16 items-center justify-center rounded-full border-4 border-white bg-slate-900 text-xs font-bold tracking-wide text-white shadow-lg transition-transform active:scale-95 disabled:cursor-not-allowed disabled:opacity-60"
-        :disabled="spinning || rewards.length === 0"
+        :disabled="spinning || disabled || rewards.length === 0"
         @click="spin"
       >
         {{ spinning ? '...' : 'QUAY' }}

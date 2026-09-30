@@ -15,11 +15,12 @@
             <SpinWheel
             :rewards="eligibleRewards"
             :fetch-reward-index="fetchRewardIndex"
+            :disabled="!canSpin"
             @spin-end="onWin"
             :size="wheelSize"
           />
             <p class="text-center text-sm text-emerald-100/80">
-              {{ eligibleRewards.length ? `${eligibleRewards.length} phần thưởng trong vòng quay` : 'Chọn phần thưởng để bắt đầu' }}
+              {{ canSpin ? `${eligibleRewards.length} phần thưởng trong vòng quay` : `Chọn thêm ${4 - eligibleRewards.length} phần thưởng nữa để quay` }}
             </p>
         </div>
         </div>
@@ -37,6 +38,7 @@ const emit = defineEmits(["close"]);
 const spinWheelStore = useSpinWheelStore();
 const viewportWidth = ref(window.innerWidth);
 const eligibleRewards = computed(() => spinWheelStore.selectedReward);
+const canSpin = computed(() => eligibleRewards.value.length >= 4);
 const wheelSize = computed(() => viewportWidth.value < 640 ? 260 : viewportWidth.value < 1024 ? 340 : 420);
 
 function updateViewportWidth() {
