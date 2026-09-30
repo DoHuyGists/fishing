@@ -10,33 +10,33 @@ export type CaughtRow = {
   status?: string;
 };
 
+export type FishingInventoryRow = {
+  id: string;
+  created_at: string | null;
+  weight: number;
+  species: {
+    name: string;
+    image: string | null;
+    rarity: string | null;
+    "3d": string | null;
+  } | null;
+};
+
 class SupabaseFishRepository {
-  async fetchFishesByArea(areaId: string): Promise<Fish[]> {
-    const { data, error } = await supabase.from("species_in_area").select("id, area_id, fishes").eq("area_id", areaId).maybeSingle();
-
-    if (error) throw new Error(error.message);
-
-    if (!data) return [];
-
-    return data.fishes ?? [];
-  }
-
-  async saveCaughtFish(userId: string, areaId: string, fish: Fish): Promise<void> {
-    const { error } = await supabase.from("caught").insert({
-      user_id: userId,
-      area_id: areaId,
-      fish: fish,
-    });
-
-    if (error) throw new Error(error.message);
-  }
-
   async fetchCaughtFishes(userId: string, areaId: string): Promise<CaughtRow[]> {
     const { data, error } = await supabase.from("caught").select("id, created_at, user_id, area_id, fish, status").eq("user_id", userId).eq("area_id", areaId).order("created_at", { ascending: false });
 
     if (error) throw new Error(error.message);
 
     return (data ?? []).filter((row) => row.status !== "on-market");
+  }
+
+  async fetchFishingInventory(userId: string): Promise<FishingInventoryRow[]> {
+    const { data, error } = await supabase.from("caught").select('id, created_at, weight, species(name, image, rarity, "3d")').eq("user_id", userId).order("created_at", { ascending: false });
+
+    if (error) throw new Error(error.message);
+
+    return (data ?? []) as unknown as FishingInventoryRow[];
   }
 
   async fetchAllCaughtFishes(userId: string): Promise<CaughtRow[]> {

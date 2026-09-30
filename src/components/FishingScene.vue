@@ -57,10 +57,8 @@ onBeforeMount(async()=>{
 
 watch(()=> fishingStore.currentAreaId, (areaId)=>{
   if(areaId){
-    fishingStore.fetchFishInCurrentArea(areaId as string);
-    fishingStore.fetchPlayersInArea(areaId as string);
+    fishingStore.initializeFishingArea(areaId as string);
     fishingAreaStore.fetchCurrentArea(areaId as string);
-    fishingStore.fetchCaughtFishes(authStore.userId, areaId);
     realtimeSubscription = supabaseUserInAreaRepository.subscribeToAreaUsers(async () => {
       await fishingStore.updateCurrentAreaId(authStore.userId);
       fishingStore.fetchPlayersInArea(areaId as string);
@@ -284,7 +282,7 @@ function handleClickOnScene(event: MouseEvent) {
     <div class="bite-alert" :class="{ visible: fishingStore.castPhase === 'bite' }">! CÁ CẮN CÂU !</div>
     <div
       class="scene-status"
-      :class="{ active: fishingStore.isCasting || fishingStore.castPhase === 'bite' || fishingStore.castPhase === 'fighting' }"
+      :class="{ active: fishingStore.castPhase !== 'idle' }"
     >
       <span class="status-dot"></span>{{ fishingStore.castMessage }}
     </div>

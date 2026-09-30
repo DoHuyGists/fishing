@@ -28,30 +28,9 @@ const store = useFishingStore();
               ×
             </button>
           </header>
-          <div class="m-[13px] p-2.5 rounded-[10px] bg-[rgba(7,28,18,0.36)] text-[#b7cfb9] text-[11px]">
-            Mồi: <b class="text-[#f3da94]">{{ store.currentBait }}</b> · Cần {{ store.equipment.rodMaxWeight }} kg · Dây
-            {{ store.equipment.lineMaxWeight }} kg · Mòn máy {{ store.equipment.reelWearPercent }}%
-          </div>
-          <ul class="grid gap-2 m-0 py-0 px-[13px] list-none">
-            <li
-              v-for="entry in store.fishCatchChances"
-              :key="entry.fish.id"
-              class="flex items-center gap-2.5 p-2 border border-[rgba(223,241,207,0.15)] rounded-xl bg-[rgba(7,28,18,0.35)]"
-            >
-              <img :src="entry.fish.image" :alt="entry.fish.name" class="w-[68px] h-11 rounded-[7px] object-cover" />
-              <div class="grid gap-[3px]">
-                <strong class="text-[13px]">{{ entry.fish.name }}</strong
-                ><small class="text-[#b7cfb9] text-[10px]"
-                  >{{ entry.fish.weight }} kg · Ưa {{ entry.fish.favoriteBait }} · Kháng cự
-                  {{ Math.round(entry.fish.resistance * 100) }}%</small
-                >
-              </div>
-              <div class="ml-auto text-right">
-                <b class="text-[#e8bd62] text-lg">{{ entry.catch }}%</b><small class="text-[#b7cfb9] text-[10px]">Tỉ lệ bắt</small><span class="text-[#8fc87b] text-[9px]">Cắn câu {{ entry.bite }}%</span>
-              </div>
-            </li>
-          </ul>
-          <p class="m-0 pt-[13px] px-5 pb-[18px] text-center text-[#b7cfb9] text-[10px]">Tỉ lệ bắt đã tính theo tải cần/dây, độ mòn máy và kỹ năng hiện tại.</p>
+          <p class="m-0 px-5 py-8 text-center text-[#b7cfb9] text-[12px]">
+            Thông tin loài cá sẽ chỉ xuất hiện sau khi hoàn thành thử thách.
+          </p>
         </section>
       </div></Transition
     ></Teleport

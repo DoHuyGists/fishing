@@ -26,8 +26,16 @@ const caught = computed(() => store.inventory[0]);
           <div class="px-5 pt-3.5 pb-3">
             <span class="inline-block px-2 py-1 rounded-full bg-[#dcae52] text-[#254130] text-[9px] font-black tracking-[0.1em]">{{ caught.rarity }}</span>
             <h2 id="catch-title" class="mt-2 mb-[3px] text-2xl">{{ caught.name }}</h2>
-            <p class="m-0 text-[#b7cfb9] text-[13px]">{{ caught.weight }} · {{ caught.length }}</p>
-            <small class="block mt-1.5 text-[#e8bd62] text-[11px] font-bold">Tỉ lệ bắt lúc kéo: {{ caught.chance }}%</small>
+            <p class="m-0 text-[#b7cfb9] text-[13px]">{{ caught.weight }}<span v-if="caught.length"> · {{ caught.length }}</span></p>
+            <a
+              v-if="caught.model3d"
+              :href="caught.model3d"
+              target="_blank"
+              rel="noopener noreferrer"
+              class="inline-block mt-2 text-[#e8bd62] text-[11px] font-bold"
+            >
+              Xem mô hình 3D
+            </a>
           </div>
           <button
             type="button"

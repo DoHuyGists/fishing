@@ -1,21 +1,25 @@
 import { defineStore } from "pinia";
-import { biteProbability, catchProbability, type Equipment, type Fish } from "../data/fishingLogic";
-import { useEquipmentStore } from "./equipment";
 import { useAuthStore } from "./auth";
 import { useFishingAreaStore } from "./fishingArea";
 import { supabaseFishRepository } from "../data/supabaseFishRepository";
 import { supabaseUserInAreaRepository } from "../data/supabaseUserInAreaRepository";
 import supabase from "../database/connection";
 export type FishingTool = "rod" | "line" | "reel" | "hook" | "bait";
-export type CastPhase = "idle" | "casting" | "waiting" | "bite" | "fighting" | "caught" | "lost";
+export type CastPhase = "idle" | "casting" | "waiting" | "bite" | "submitting" | "caught" | "lost";
+export type FishingChallenge = {
+  target_zone_start: number;
+  target_zone_width: number;
+  bar_speed: number;
+  max_duration_ms: number;
+};
 export type CaughtFish = {
   id: string | number;
   name: string;
   weight: string;
-  length: string;
+  length?: string;
   rarity: string;
   image: string;
-  chance?: number;
+  model3d?: string;
   createdAt?: string;
 };
 export type FishingPlayer = {
@@ -30,8 +34,55 @@ export type FishingPlayer = {
   color: string;
   isCurrentUser?: boolean;
 };
-const MAX_TENSION = 82,
-  SAFE_TENSION = 28;
+
+type CastRodResponse = {
+  session_id: string;
+  wait_time_ms: number;
+  challenge: FishingChallenge;
+};
+
+type SubmitChallengeResponse = {
+  success: boolean;
+  message?: string;
+  caught?: {
+    id: string;
+    name: string;
+    rarity: string;
+    weight: number;
+    image: string | null;
+    model_3d: string | null;
+  };
+};
+
+const RPC_TIMEOUT_MS = 15_000;
+
+function withTimeout<T>(request: PromiseLike<T>, timeoutMs: number): Promise<T> {
+  let timeoutId: ReturnType<typeof setTimeout> | undefined;
+  const timeout = new Promise<T>((_, reject) => {
+    timeoutId = window.setTimeout(() => reject(new Error("Request timed out")), timeoutMs);
+  });
+
+  return Promise.race([Promise.resolve(request), timeout]).finally(() => {
+    if (timeoutId !== undefined) window.clearTimeout(timeoutId);
+  });
+}
+
+function isFishingChallenge(value: unknown): value is FishingChallenge {
+  if (!value || typeof value !== "object") return false;
+  const challenge = value as FishingChallenge;
+  return (
+    Number.isFinite(challenge.target_zone_start) &&
+    Number.isFinite(challenge.target_zone_width) &&
+    Number.isFinite(challenge.bar_speed) &&
+    Number.isFinite(challenge.max_duration_ms) &&
+    challenge.target_zone_start >= 0 &&
+    challenge.target_zone_width > 0 &&
+    challenge.target_zone_start + challenge.target_zone_width <= 1 &&
+    challenge.bar_speed > 0 &&
+    challenge.max_duration_ms > 0
+  );
+}
+
 export const useFishingStore = defineStore("fishing", {
   state: () => ({
     selectedTool: "rod" as FishingTool,
@@ -39,21 +90,9 @@ export const useFishingStore = defineStore("fishing", {
     baitPosition: { x: 56, y: 60 },
     castMessage: "Sẵn sàng thả câu",
     isCasting: false,
-    isPulling: false,
-    tension: 0,
-    catchProgress: 0,
-    fightElapsed: 0,
     catchDialogOpen: false,
     bagOpen: false,
     lakeGuideOpen: false,
-    activeFish: null as Fish | null,
-    equipment: {
-      rodMaxWeight: 4.5,
-      lineMaxWeight: 4,
-      reelWearPercent: 8,
-      reelDurability: 1,
-      hookStrength: 1,
-    } as Equipment,
     equipmentLoadout: {
       rod: "rod-bamboo",
       line: "line-nylon",
@@ -61,46 +100,29 @@ export const useFishingStore = defineStore("fishing", {
       hook: "hook-standard",
       bait: "bait-worm",
     } as Record<FishingTool, string>,
-    playerSkillMultiplier: 1.1,
+    sessionId: null as string | null,
+    challenge: null as FishingChallenge | null,
+    castRequestId: 0,
     playersOpen: false,
     selectedPlayer: null as FishingPlayer | null,
     nearbyPlayers: [] as FishingPlayer[],
     isLoadingPlayers: false,
     inventory: [] as CaughtFish[],
-    castAttempt: 0,
-    lakeFish: [] as Fish[],
     currentAreaId: null as string | null,
   }),
   getters: {
-    canPull: (s) => s.castPhase === "bite" || s.castPhase === "fighting",
+    canPull: (s) => s.castPhase === "bite",
     canCast: (s) => s.castPhase === "idle" || s.castPhase === "lost",
-    canReelIn: (s) => ["casting", "waiting", "bite", "fighting", "caught"].includes(s.castPhase),
-    currentBait: (s) => {
-      const variant = useEquipmentStore().variants.bait.find((v) => v.id === s.equipmentLoadout.bait);
-      return variant?.baitName ?? "Giun đất";
-    },
-    tensionState: (s) => (s.tension >= MAX_TENSION - 10 ? "danger" : s.tension >= SAFE_TENSION ? "safe" : "low"),
-    fishCatchChances(state): { fish: Fish; bite: number; catch: number }[] {
-      return this.lakeFish.map((fish) => ({
-        fish,
-        bite: Math.round(biteProbability(fish, this.currentBait) * 100),
-        catch: Math.round(catchProbability(fish, state.equipment, state.playerSkillMultiplier) * 100),
-      }));
-    },
+    canReelIn: (s) => ["casting", "waiting", "bite"].includes(s.castPhase),
   },
   actions: {
     async updateCurrentAreaId(userId: string) {
       this.currentAreaId = await supabaseUserInAreaRepository.getCurrentUserArea(userId);
     },
-    async fetchFishInCurrentArea(areaId: string) {
+    async initializeFishingArea(areaId: string) {
       if (!areaId) return;
       this.currentAreaId = areaId;
-      try {
-        this.lakeFish = await supabaseFishRepository.fetchFishesByArea(areaId);
-        await Promise.all([this.fetchCaughtFishes(undefined, areaId), this.fetchPlayersInArea(areaId)]);
-      } catch (err) {
-        console.error("Lỗi khi tải dữ liệu bãi câu:", err);
-      }
+      await Promise.all([this.fetchCaughtFishes(), this.fetchPlayersInArea(areaId)]);
     },
     async fetchPlayersInArea(areaId?: string) {
       const targetAreaId = areaId || this.currentAreaId || useFishingAreaStore().currentArea?.id;
@@ -118,7 +140,8 @@ export const useFishingStore = defineStore("fishing", {
         const currentUserId = authStore.userId;
         const userIds = rows.map((r) => r.user_id);
 
-        const { data: catches } = await supabase.from("caught").select("user_id, fish").in("user_id", userIds);
+        const { data: catches, error: catchesError } = await supabase.from("caught").select("user_id, weight, species(name)").in("user_id", userIds);
+        if (catchesError) throw catchesError;
 
         const playerStats = new Map<string, { count: number; bestWeight: number; bestFishName: string }>();
         userIds.forEach((uid) => {
@@ -130,10 +153,11 @@ export const useFishingStore = defineStore("fishing", {
             const stat = playerStats.get(c.user_id);
             if (!stat) return;
             stat.count++;
-            const weightVal = typeof c.fish?.weight === "number" ? c.fish.weight : parseFloat(c.fish?.weight || "0");
+            const weightVal = typeof c.weight === "number" ? c.weight : parseFloat(c.weight || "0");
             if (weightVal > stat.bestWeight) {
               stat.bestWeight = weightVal;
-              stat.bestFishName = c.fish?.name || "";
+              const species = Array.isArray(c.species) ? c.species[0] : c.species;
+              stat.bestFishName = species?.name || "";
             }
           });
         }
@@ -188,25 +212,23 @@ export const useFishingStore = defineStore("fishing", {
         this.isLoadingPlayers = false;
       }
     },
-    async fetchCaughtFishes(userId?: string, areaId?: string) {
+    async fetchCaughtFishes(userId?: string) {
       const authStore = useAuthStore();
       const targetUserId = userId || authStore.userId;
-      const targetAreaId = areaId || this.currentAreaId || useFishingAreaStore().currentArea?.id;
-
-      if (!targetUserId || !targetAreaId) return;
+      if (!targetUserId) return;
 
       try {
-        const rows = await supabaseFishRepository.fetchCaughtFishes(targetUserId, targetAreaId);
+        const rows = await supabaseFishRepository.fetchFishingInventory(targetUserId);
         this.inventory = rows.map((row) => {
-          const fish = row.fish;
+          const species = Array.isArray(row.species) ? row.species[0] : row.species;
           return {
             id: row.id,
-            name: fish.name,
-            weight: typeof fish.weight === "number" ? `${fish.weight} kg` : fish.weight,
-            length: fish.length,
-            rarity: fish.rarity,
-            image: fish.image,
-            createdAt: row.created_at,
+            name: species?.name ?? "Cá",
+            weight: `${row.weight} kg`,
+            rarity: species?.rarity ?? "Chưa rõ",
+            image: species?.image ?? "/fish/VN/fish.jpg",
+            model3d: species?.["3d"] ?? undefined,
+            createdAt: row.created_at ?? undefined,
           };
         });
       } catch (err) {
@@ -227,137 +249,119 @@ export const useFishingStore = defineStore("fishing", {
     },
     selectVariant(category: FishingTool, variantId: string) {
       this.equipmentLoadout[category] = variantId;
-      const variant = useEquipmentStore().variants[category].find((v) => v.id === variantId);
-      if (!variant) return;
-      if (variant.rodMaxWeight !== undefined) this.equipment.rodMaxWeight = variant.rodMaxWeight;
-      if (variant.lineMaxWeight !== undefined) this.equipment.lineMaxWeight = variant.lineMaxWeight;
-      if (variant.reelDurability !== undefined) this.equipment.reelDurability = variant.reelDurability;
-      if (variant.hookStrength !== undefined) this.equipment.hookStrength = variant.hookStrength;
     },
-    castTo(x: number, y: number) {
+    async castTo(x: number, y: number) {
       if (!this.canCast) {
         this.rejectCast("Hãy thu mồi trước khi quăng mồi lại");
         return;
       }
-      const attempt = ++this.castAttempt;
+      const areaId = this.currentAreaId || useFishingAreaStore().currentArea?.id;
+      if (!areaId) {
+        this.rejectCast("Không tìm thấy bãi câu. Hãy thử vào lại khu vực.");
+        return;
+      }
+
+      const requestId = ++this.castRequestId;
       this.baitPosition = { x, y };
-      this.isPulling = false;
-      this.tension = 0;
-      this.catchProgress = 0;
-      this.fightElapsed = 0;
-      this.activeFish = null;
+      this.catchDialogOpen = false;
+      this.challenge = null;
+      this.sessionId = null;
       this.isCasting = true;
       this.castPhase = "casting";
-      this.castMessage = "Đang vung cần đến điểm đã chọn...";
-      const fish = this.lakeFish[Math.floor(Math.random() * this.lakeFish.length)];
-      const [minBiteDelay, maxBiteDelay] = fish.biteDelayRange;
-      const biteDelay = minBiteDelay + Math.random() * (maxBiteDelay - minBiteDelay);
-      window.setTimeout(() => {
-        if (attempt !== this.castAttempt) return;
-        this.castPhase = "waiting";
+      this.castMessage = "Đang kết nối với bãi câu...";
+
+      try {
+        const { data, error } = await withTimeout(supabase.rpc("cast_rod", { p_area_id: areaId }), RPC_TIMEOUT_MS);
+        if (requestId !== this.castRequestId) return;
+        if (error) throw error;
+
+        const response = data as unknown as CastRodResponse;
+        if (!response || typeof response.session_id !== "string" || !Number.isFinite(response.wait_time_ms) || response.wait_time_ms < 0 || !isFishingChallenge(response.challenge)) {
+          throw new Error("Invalid cast response");
+        }
+
+        this.sessionId = response.session_id;
+        this.challenge = response.challenge;
         this.isCasting = false;
-        this.castMessage = "Đang chờ cá cắn câu...";
-      }, 900);
-      window.setTimeout(() => {
-        if (attempt !== this.castAttempt || this.castPhase !== "waiting") return;
-        this.activeFish = fish;
-        this.castPhase = "bite";
-        this.castMessage = `${fish.name} đang cắn câu! Chuẩn bị kéo!`;
+        this.castPhase = "waiting";
+        this.castMessage = "Mồi đã chạm nước. Đang chờ tín hiệu...";
         window.setTimeout(() => {
-          if (attempt === this.castAttempt && this.castPhase === "bite") this.loseFish("Cá đã nhả mồi — bạn phản ứng quá chậm!");
-        }, 3000);
-      }, biteDelay);
-    },
-    startPull() {
-      if (this.castPhase === "bite") {
-        this.castPhase = "fighting";
-        this.castMessage = "Giữ và buông nút kéo để cân lực";
+          if (requestId !== this.castRequestId || !this.sessionId) return;
+          this.castPhase = "bite";
+          this.castMessage = "Tín hiệu! Bấm đúng lúc để móc cá.";
+        }, response.wait_time_ms);
+      } catch {
+        if (requestId !== this.castRequestId) return;
+        this.sessionId = null;
+        this.challenge = null;
+        this.isCasting = false;
+        this.castPhase = "lost";
+        this.castMessage = "Không thể kết nối. Hãy thử thả cần lại.";
       }
-      if (this.castPhase === "fighting") this.isPulling = true;
     },
     reelInBait() {
       if (!this.canReelIn) return;
-      this.castAttempt += 1;
-      this.isPulling = false;
-      this.tension = 0;
-      this.catchProgress = 0;
-      this.fightElapsed = 0;
-      this.activeFish = null;
+      this.castRequestId += 1;
+      this.sessionId = null;
+      this.challenge = null;
       this.isCasting = false;
       this.castPhase = "idle";
       this.castMessage = "Sẵn sàng thả câu";
     },
-    stopPull() {
-      this.isPulling = false;
-    },
-    updateFight(deltaMs: number) {
-      if (this.castPhase !== "fighting") return;
-      this.fightElapsed += deltaMs;
-      this.tension = Math.max(0, Math.min(100, this.tension + (this.isPulling ? 0.055 : -0.028) * deltaMs));
-      if (this.tension > MAX_TENSION) return this.loseFish();
-      if (this.isPulling && this.tension >= SAFE_TENSION) {
-        const resistance = this.activeFish?.resistance ?? 0;
-        const resistanceRate = this.activeFish?.resistanceRate ?? 0;
-        const isFishResisting = Math.floor(this.fightElapsed / 450) % 2 === 1;
-        const progressChange = isFishResisting ? -resistance * resistanceRate * deltaMs : deltaMs * 0.5; // < 0.5 make fishing progress harder
-        this.catchProgress = Math.max(0, Math.min(100, this.catchProgress + progressChange));
-        if (this.catchProgress >= 100) this.catchFish();
-      }
-    },
-    loseFish(message = "Dây quá căng — cá đã thoát!") {
-      this.isPulling = false;
-      this.castPhase = "lost";
-      this.castMessage = message;
-      window.setTimeout(() => {
-        if (this.castPhase === "lost") {
-          this.castPhase = "idle";
-          this.tension = 0;
-          this.catchProgress = 0;
-          this.fightElapsed = 0;
-          this.activeFish = null;
-          this.castMessage = "Chạm mặt hồ để câu lại";
-        }
-      }, 1500);
-    },
-    async catchFish() {
-      const fish = this.activeFish;
-      this.isPulling = false;
-      if (!fish) return this.loseFish("Cá đã thoát khỏi lưới câu!");
-      const chance = catchProbability(fish, this.equipment, this.playerSkillMultiplier);
-      this.equipment.reelWearPercent = Math.min(95, this.equipment.reelWearPercent + this.equipment.reelDurability);
-      if (Math.random() >= chance) return this.loseFish("Cá quá nặng, đứt dây câu!");
-      this.castPhase = "caught";
-      this.castMessage = "Bạn đã câu được cá!";
-      this.inventory.unshift({
-        id: Date.now(),
-        name: fish.name,
-        weight: `${fish.weight} kg`,
-        length: fish.length,
-        rarity: fish.rarity,
-        image: fish.image,
-        chance: Math.round(chance * 100),
-      });
-      this.catchDialogOpen = true;
+    async submitChallenge(isSuccess: boolean, timeSpentMs: number) {
+      if (!this.sessionId || !this.challenge || this.castPhase !== "bite") return;
 
-      const authStore = useAuthStore();
-      const userId = authStore.userId;
-      const areaId = this.currentAreaId || useFishingAreaStore().currentArea?.id;
-      if (userId && areaId) {
-        try {
-          await supabaseFishRepository.saveCaughtFish(userId, areaId, fish);
-          await this.fetchCaughtFishes(userId, areaId);
-        } catch (err) {
-          console.error("Lưu thông tin cá đã câu thất bại:", err);
+      const sessionId = this.sessionId;
+      const requestId = this.castRequestId;
+      this.castPhase = "submitting";
+      this.castMessage = "Đang xác nhận kết quả...";
+
+      try {
+        const { data, error } = await withTimeout(
+          supabase.rpc("submit_challenge", {
+            p_session_id: sessionId,
+            p_success: isSuccess,
+            p_time_spent_ms: Math.max(0, Math.round(timeSpentMs)),
+          }),
+          RPC_TIMEOUT_MS,
+        );
+        if (requestId !== this.castRequestId) return;
+        if (error) throw error;
+
+        const response = data as unknown as SubmitChallengeResponse;
+        if (response?.success && response.caught) {
+          const caught: CaughtFish = {
+            id: response.caught.id,
+            name: response.caught.name,
+            rarity: response.caught.rarity,
+            weight: `${response.caught.weight} kg`,
+            image: response.caught.image ?? "/fish/VN/fish.jpg",
+            model3d: response.caught.model_3d ?? undefined,
+          };
+          this.inventory.unshift(caught);
+          this.catchDialogOpen = true;
+          this.castPhase = "caught";
+          this.castMessage = "Bạn đã câu được cá!";
+        } else {
+          this.castPhase = "lost";
+          this.castMessage = response?.message || "Cá đã thoát. Hãy thử lại!";
         }
+        this.sessionId = null;
+        this.challenge = null;
+      } catch {
+        if (requestId !== this.castRequestId) return;
+        this.sessionId = null;
+        this.challenge = null;
+        this.castPhase = "lost";
+        this.castMessage = "Không thể xác nhận kết quả. Hãy thử lại.";
       }
     },
     closeCatchDialog() {
       this.catchDialogOpen = false;
+      this.castRequestId += 1;
+      this.sessionId = null;
+      this.challenge = null;
       this.castPhase = "idle";
-      this.tension = 0;
-      this.catchProgress = 0;
-      this.fightElapsed = 0;
-      this.activeFish = null;
       this.castMessage = "Chạm mặt hồ để câu tiếp";
     },
     async openBag() {

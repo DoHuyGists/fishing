@@ -69,7 +69,7 @@ async function handleRelease() {
                 <div class="grid gap-0.5 min-w-0">
                   <span class="text-[#e8bd62] text-[9px] font-black tracking-[0.09em] uppercase">{{ fish.rarity }}</span>
                   <strong class="text-sm truncate">{{ fish.name }}</strong>
-                  <small class="text-[#b7cfb9] text-[11px]">{{ fish.weight }} · {{ fish.length }}</small>
+                  <small class="text-[#b7cfb9] text-[11px]">{{ fish.weight }}<span v-if="fish.length"> · {{ fish.length }}</span></small>
                 </div>
               </div>
               <button

@@ -1,35 +1,69 @@
 <script setup lang="ts">
-import { onBeforeUnmount, ref } from "vue";
+import { computed, onBeforeUnmount, ref, watch } from "vue";
 import { useFishingStore } from "../stores/fishing";
 
 const store = useFishingStore();
-const frameId = ref<number>();
-let previousFrame = 0;
+const challenge = computed(() => store.challenge);
+const markerPosition = ref(0);
+const timeRemaining = ref(0);
+let startedAt = 0;
+let frameId: number | undefined;
+
+function positionAt(elapsedMs: number, speed: number) {
+  const position = ((elapsedMs / 1000) * speed) % 2;
+  return position <= 1 ? position : 2 - position;
+}
+
+function stopAnimation() {
+  if (frameId !== undefined) cancelAnimationFrame(frameId);
+  frameId = undefined;
+}
 
 function tick(timestamp: number) {
-  store.updateFight(Math.min(timestamp - previousFrame, 50));
-  previousFrame = timestamp;
-  if (store.canPull) {
-    frameId.value = requestAnimationFrame(tick);
-  } else {
-    frameId.value = undefined;
+  const currentChallenge = challenge.value;
+  if (!currentChallenge || !store.canPull) {
+    stopAnimation();
+    return;
   }
+
+  const elapsed = timestamp - startedAt;
+  if (elapsed >= currentChallenge.max_duration_ms) {
+    timeRemaining.value = 0;
+    stopAnimation();
+    void store.submitChallenge(false, currentChallenge.max_duration_ms);
+    return;
+  }
+
+  markerPosition.value = positionAt(elapsed, currentChallenge.bar_speed);
+  timeRemaining.value = currentChallenge.max_duration_ms - elapsed;
+  frameId = requestAnimationFrame(tick);
 }
 
-function beginPull() {
-  if (!store.canPull) return;
-  store.startPull();
-  previousFrame = performance.now();
-  if (!frameId.value) frameId.value = requestAnimationFrame(tick);
+function startAnimation() {
+  stopAnimation();
+  if (!challenge.value || !store.canPull) return;
+  startedAt = performance.now();
+  markerPosition.value = 0;
+  timeRemaining.value = challenge.value.max_duration_ms;
+  frameId = requestAnimationFrame(tick);
 }
 
-function releasePull() {
-  store.stopPull();
+function finishChallenge() {
+  const currentChallenge = challenge.value;
+  if (!currentChallenge || !store.canPull || startedAt === 0) return;
+
+  const elapsed = performance.now() - startedAt;
+  const position = positionAt(elapsed, currentChallenge.bar_speed);
+  const isSuccess =
+    elapsed < currentChallenge.max_duration_ms &&
+    position >= currentChallenge.target_zone_start &&
+    position <= currentChallenge.target_zone_start + currentChallenge.target_zone_width;
+  stopAnimation();
+  void store.submitChallenge(isSuccess, elapsed);
 }
 
-onBeforeUnmount(() => {
-  if (frameId.value) cancelAnimationFrame(frameId.value);
-});
+watch(() => store.canPull, (isActive) => (isActive ? startAnimation() : stopAnimation()));
+onBeforeUnmount(stopAnimation);
 </script>
 
 <template>
@@ -37,21 +71,30 @@ onBeforeUnmount(() => {
     <div class="power-title flex items-center gap-2 text-[#385645]">
       <span class="grid place-items-center w-[27px] h-[27px] rounded-lg bg-[#f8e6b8] text-[#be7b1d] text-[22px] font-black">↯</span>
       <div class="flex-1">
-        <strong class="block text-[11px]">Lực kéo</strong><small class="block mt-0.5 text-[#879188] text-[9px]">{{ store.canPull ? "Giữ để tăng, buông để giảm" : "Chờ cá cắn câu" }}</small>
+        <strong class="block text-[11px]">Thử thách câu cá</strong><small class="block mt-0.5 text-[#879188] text-[9px]">{{ store.canPull ? "Bấm khi vạch nằm trong vùng sáng" : store.castPhase === 'waiting' ? "Đang chờ tín hiệu..." : "Chờ thả cần" }}</small>
       </div>
-      <b class="text-[13px]" :class="store.tensionState === 'danger' ? 'text-[#e8593f]' : 'text-[#e29a31]'">{{ Math.round(store.tension) }}%</b>
+      <b class="text-[13px] text-[#e29a31]">{{ store.canPull ? `${Math.ceil(timeRemaining / 1000)}s` : "" }}</b>
     </div>
     <div class="power-track relative h-2 my-2.5 overflow-hidden rounded-full bg-[#e6e9df]">
-      <span class="absolute z-[1] top-0 bottom-0 left-[28%] w-[54%] bg-[rgba(118,175,83,0.26)]"></span>
-      <div class="relative z-[2] h-full rounded-[inherit] bg-[linear-gradient(90deg,#8dbb64,#f1bd4e_70%,#e66f44)] transition-[width] duration-[0.06s] ease-linear" :style="{ width: `${store.tension}%` }">
-        <i class="absolute right-0 -top-0.5 w-1 h-3 rounded-[3px] bg-white not-italic"></i>
-      </div>
+      <span
+        v-if="challenge && store.canPull"
+        class="absolute z-[1] top-0 bottom-0 bg-[rgba(118,175,83,0.55)]"
+        :style="{ left: `${challenge.target_zone_start * 100}%`, width: `${challenge.target_zone_width * 100}%` }"
+      ></span>
+      <i
+        v-if="store.canPull"
+        class="absolute z-[2] top-[-2px] w-1.5 h-3 rounded-[3px] bg-[#e66f44] not-italic"
+        :style="{ left: `calc(${markerPosition * 100}% - 3px)` }"
+      ></i>
     </div>
     <div class="flex justify-between text-[#617363] text-[9px] font-bold">
-      <span>Tiến độ kéo cá</span><b class="text-[#e29a31] text-[13px]">{{ Math.round(store.catchProgress) }}%</b>
+      <span>Thời gian thử thách</span><b class="text-[#e29a31] text-[13px]">{{ store.canPull ? `${Math.ceil(timeRemaining / 1000)} giây` : "--" }}</b>
     </div>
     <div class="relative h-[5px] my-[5px] mb-2.5 overflow-hidden rounded-full bg-[#e6e9df]">
-      <i class="block h-full rounded-[inherit] bg-[#75b865] transition-[width] duration-100 ease-linear not-italic" :style="{ width: `${store.catchProgress}%` }"></i>
+      <i
+        class="block h-full rounded-[inherit] bg-[#75b865] transition-[width] duration-100 ease-linear not-italic"
+        :style="{ width: challenge && store.canPull ? `${(timeRemaining / challenge.max_duration_ms) * 100}%` : '0%' }"
+      ></i>
     </div>
     <div class="mt-3 flex gap-2">
       <button
@@ -66,12 +109,9 @@ onBeforeUnmount(() => {
         type="button"
         class="cast-button flex-1 rounded-[10px] border-0 bg-[#3f7652] shadow-[0_4px_0_#2d593c] text-white cursor-pointer px-2.5 py-2 text-[11px] font-extrabold tracking-[0.01em] touch-none enabled:active:translate-y-[3px] enabled:active:shadow-[0_1px_0_#2d593c] disabled:cursor-not-allowed disabled:opacity-45"
         :disabled="!store.canPull"
-        @pointerdown.prevent="beginPull"
-        @pointerup="releasePull"
-        @pointerleave="releasePull"
-        @pointercancel="releasePull"
+        @click="finishChallenge"
       >
-        <span class="mr-[7px] text-[#ffe18a] text-base">⌁</span>{{ store.isPulling ? "Đang kéo cần..." : "Nhấn giữ để kéo" }}
+        <span class="mr-[7px] text-[#ffe18a] text-base">⌁</span>{{ store.canPull ? "Móc cá" : "Chờ tín hiệu" }}
       </button>
     </div>
   </section>
