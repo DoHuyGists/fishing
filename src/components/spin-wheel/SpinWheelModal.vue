@@ -1,10 +1,17 @@
 <template>
-    <div class="fixed inset-0 z-50 overflow-y-auto bg-black/70 p-3 sm:p-5">
-        <div class="relative mx-auto flex min-h-[calc(100dvh-1.5rem)] w-full max-w-7xl flex-col items-center justify-center gap-6 overflow-hidden rounded-2xl border border-emerald-300/20 bg-emerald-950 px-4 py-14 shadow-2xl sm:min-h-[calc(100dvh-2.5rem)] sm:px-8 sm:py-10 lg:flex-row lg:gap-8">
-          <div class="h-[42vh] min-h-70 max-h-120 w-full lg:h-[min(76vh,720px)] lg:w-[min(38vw,440px)]">
+    <div class="fixed inset-0 z-50 flex flex-col bg-emerald-950">
+        <button type="button"
+            aria-label="Đóng vòng quay"
+            class="absolute right-4 top-4 z-10 flex h-10 w-10 cursor-pointer items-center justify-center rounded-full border border-white/15 bg-white/5 text-2xl font-bold text-white transition-colors hover:bg-white/15 sm:right-6 sm:top-6"
+            @click="emit('close')">
+            &times;
+        </button>
+
+        <div class="flex h-full w-full flex-col lg:flex-row">
+          <div class="h-1/2 min-h-0 w-full border-b border-emerald-300/20 p-3 sm:p-5 lg:h-full lg:w-1/2 lg:border-b-0 lg:border-r">
             <ListItems/>
           </div>
-          <div class="flex w-full flex-col items-center gap-4 lg:w-auto">
+          <div class="flex min-h-0 w-full flex-1 flex-col items-center justify-center gap-4 overflow-y-auto p-4 sm:p-8 lg:w-1/2">
             <SpinWheel
             :rewards="eligibleRewards"
             :fetch-reward-index="fetchRewardIndex"
@@ -12,16 +19,9 @@
             :size="wheelSize"
           />
             <p class="text-center text-sm text-emerald-100/80">
-              {{ eligibleRewards.length ? `${eligibleRewards.length} phần thưởng trong vòng quay` : 'Chọn ít nhất 4 món để mở vòng quay' }}
+              {{ eligibleRewards.length ? `${eligibleRewards.length} phần thưởng trong vòng quay` : 'Chọn phần thưởng để bắt đầu' }}
             </p>
-          </div>
-
-          <button type="button"
-            aria-label="Đóng vòng quay"
-            class="absolute right-4 top-4 flex h-10 w-10 cursor-pointer items-center justify-center rounded-full border border-white/15 bg-white/5 text-2xl font-bold text-white transition-colors hover:bg-white/15 sm:right-6 sm:top-6"
-            @click="emit('close')">
-            &times;
-        </button>
+        </div>
         </div>
     </div>
 </template>
@@ -36,10 +36,8 @@ import type { Reward } from './SpinWheel.vue'
 const emit = defineEmits(["close"]);
 const spinWheelStore = useSpinWheelStore();
 const viewportWidth = ref(window.innerWidth);
-const eligibleRewards = computed(() =>
-  spinWheelStore.selectedReward.length >= 4 ? spinWheelStore.selectedReward : [],
-);
-const wheelSize = computed(() => viewportWidth.value < 640 ? 280 : viewportWidth.value < 1024 ? 360 : 460);
+const eligibleRewards = computed(() => spinWheelStore.selectedReward);
+const wheelSize = computed(() => viewportWidth.value < 640 ? 260 : viewportWidth.value < 1024 ? 340 : 420);
 
 function updateViewportWidth() {
   viewportWidth.value = window.innerWidth;

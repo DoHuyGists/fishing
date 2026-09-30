@@ -1,16 +1,16 @@
 <template>
-    <section class="flex h-full min-h-0 w-full max-w-md flex-col overflow-hidden rounded-xl border border-white/15 bg-slate-950/80 text-white shadow-2xl">
-        <header class="border-b border-white/10 px-5 py-4">
+    <section class="flex h-full min-h-0 w-full flex-col overflow-hidden rounded-xl border border-white/15 bg-slate-950/80 text-white shadow-2xl">
+        <header class="border-b border-white/10 px-4 py-3">
             <div class="flex items-start justify-between gap-3">
                 <div>
                     <p class="text-xs font-semibold uppercase tracking-[0.18em] text-emerald-300">Vòng quay may mắn</p>
-                    <h2 class="mt-1 text-xl font-bold">Chọn phần thưởng</h2>
+                    <h2 class="mt-1 text-lg font-bold">Chọn phần thưởng</h2>
                 </div>
                 <span class="shrink-0 rounded-full bg-emerald-400/15 px-3 py-1 text-sm font-semibold text-emerald-200">
                     {{ spinWheelStore.selectedReward.length }} đã chọn
                 </span>
             </div>
-            <div class="mt-4 flex items-center justify-between gap-3">
+            <div class="mt-3 flex items-center justify-between gap-3">
                 <p class="text-sm text-slate-300">Cần chọn ít nhất 4 món để quay</p>
                 <button
                     type="button"
@@ -23,7 +23,7 @@
             </div>
         </header>
 
-        <div class="grid grid-cols-[minmax(0,1fr)_auto] gap-2 border-b border-white/10 p-4">
+        <div class="grid grid-cols-[minmax(0,1fr)_auto] gap-2 border-b border-white/10 p-3">
             <label class="flex min-w-0 items-center gap-2 rounded-lg border border-white/15 bg-white/5 px-3 focus-within:border-emerald-300/70">
                 <svg class="h-4 w-4 shrink-0 text-slate-400" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
                     <circle cx="11" cy="11" r="7" />
@@ -61,24 +61,25 @@
             <div v-else-if="visibleRewards.length === 0" class="flex h-full min-h-32 items-center justify-center px-4 text-center text-sm text-slate-400">
                 Không tìm thấy phần thưởng phù hợp.
             </div>
-            <div v-else class="space-y-1">
-                <label
+            <div v-else class="grid grid-cols-3 gap-2 sm:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6">
+                <button
                     v-for="item in visibleRewards"
                     :key="item.id"
-                    class="flex cursor-pointer items-center gap-3 rounded-lg border border-transparent px-3 py-2.5 transition-colors hover:border-white/10 hover:bg-white/5"
-                    :class="isSelected(item) ? 'bg-emerald-400/10' : ''"
+                    type="button"
+                    class="group relative flex flex-col items-center gap-1 rounded-lg border px-2 py-2 text-center transition-colors"
+                    :class="isSelected(item) ? 'border-emerald-400/80 bg-emerald-400/10' : 'border-white/10 bg-white/5 hover:border-white/20 hover:bg-white/10'"
+                    @click="toggleReward(item)"
                 >
-                    <input
-                        type="checkbox"
-                        :checked="isSelected(item)"
-                        class="h-4 w-4 shrink-0 accent-emerald-400"
-                        @change="toggleReward(item)"
-                    >
-                    <img v-if="item.image" :src="item.image" :alt="''" class="h-10 w-10 shrink-0 rounded-md bg-white/5 object-contain p-1">
-                    <span v-else class="flex h-10 w-10 shrink-0 items-center justify-center rounded-md bg-white/5 text-lg text-emerald-200" aria-hidden="true">✦</span>
-                    <span class="min-w-0 flex-1 truncate text-sm font-medium">{{ item.label }}</span>
-                    <span class="max-w-24 truncate rounded bg-white/5 px-2 py-1 text-xs text-slate-300">{{ item.value }}</span>
-                </label>
+                    <span
+                        v-if="isSelected(item)"
+                        class="absolute right-1 top-1 flex h-4 w-4 items-center justify-center rounded-full bg-emerald-400 text-[10px] font-bold text-emerald-950"
+                        aria-hidden="true"
+                    >✓</span>
+                    <img v-if="item.image" :src="item.image" :alt="''" class="h-10 w-10 shrink-0 object-contain">
+                    <span v-else class="flex h-10 w-10 shrink-0 items-center justify-center text-lg text-emerald-200" aria-hidden="true">✦</span>
+                    <span class="line-clamp-2 min-h-8 w-full text-xs font-medium leading-tight">{{ item.label }}</span>
+                    <span class="max-w-full truncate rounded bg-white/10 px-1.5 py-0.5 text-[10px] text-slate-300">{{ item.value }}</span>
+                </button>
             </div>
         </div>
 
