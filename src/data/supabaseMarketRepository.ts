@@ -1,8 +1,7 @@
 import supabase from "../database/connection";
-import { supabaseCurrencyRepository } from "./supabaseCurrencyRepository";
 
 export interface MarketListing {
-  id: number;
+  id: string;
   created_at: string;
   caught_id: string;
   user_id: string;
@@ -60,7 +59,7 @@ class SupabaseMarketRepository {
     }));
   }
 
-  async cancelListing(marketId: number, caughtId: string): Promise<void> {
+  async cancelListing(marketId: string, caughtId: string): Promise<void> {
     const { error: marketError } = await supabase.from("species_market").update({ status: "cancelled" }).eq("id", marketId);
 
     if (marketError) throw new Error(marketError.message);
@@ -70,34 +69,19 @@ class SupabaseMarketRepository {
     if (caughtError) throw new Error(caughtError.message);
   }
 
-  async buyFish(buyerId: string, marketItem: MarketListing): Promise<void> {
-    if (!buyerId) throw new Error("Bạn chưa đăng nhập");
-    if (buyerId === marketItem.user_id) throw new Error("Bạn không thể mua cá do chính mình đăng bán");
-
-    const buyerCash = await supabaseCurrencyRepository.fetchCurrencyByUserId(buyerId);
-    if (buyerCash < marketItem.price) {
-      throw new Error(`Bạn không đủ tiền! Cần thêm ${(marketItem.price - buyerCash).toLocaleString("vi-VN")} đ nữa.`);
-    }
-
-    // Trừ tiền người mua
-    await supabaseCurrencyRepository.updateCurrency(buyerId, buyerCash - marketItem.price);
-
-    // Cộng tiền cho người bán
-    try {
-      await supabaseCurrencyRepository.addCash(marketItem.user_id, marketItem.price);
-    } catch (err) {
-      console.warn("Không thể cộng tiền cho người bán:", err);
-    }
-
-    // Đánh dấu đã bán trong bảng market
-    const { error: marketError } = await supabase.from("species_market").update({ status: "sold" }).eq("id", marketItem.id);
-
-    if (marketError) throw new Error(marketError.message);
-
-    // Chuyển quyền sở hữu cá sang cho người mua & chuyển status về 'normal'
-    const { error: caughtError } = await supabase.from("caught").update({ user_id: buyerId, status: "normal" }).eq("id", marketItem.caught_id);
-
-    if (caughtError) throw new Error(caughtError.message);
+  async buyFish(speciesMarketId: string): Promise<{
+    success : boolean;
+    market_id : string;
+    caught_id : string;
+    buyer_id : string;
+    seller_id : string;
+    price : number;
+  }> {
+    const { data, error } = await supabase.rpc('buy_market_item', {
+      p_market_id: speciesMarketId
+    });
+    if (error) throw new Error(error.message);
+    return data;
   }
 }
 

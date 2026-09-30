@@ -66,8 +66,9 @@ async function handleBuyFish() {
   buyError.value = "";
 
   try {
-    await supabaseMarketRepository.buyFish(buyerId, itemToBuy.value);
-    await currencyStore.fetchCurrency(buyerId);
+    const speciesMarketId = itemToBuy.value.id;
+    await supabaseMarketRepository.buyFish(speciesMarketId);
+    await currencyStore.fetchCurrency();
     await marketStore.loadMarketListings();
     await caughtStore.loadCaughtFishes();
     cancelBuy();

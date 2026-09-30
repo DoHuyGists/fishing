@@ -1,5 +1,8 @@
 import { defineStore } from "pinia";
 import { supabaseCurrencyRepository } from "../data/supabaseCurrencyRepository";
+import { useAuthStore } from "./auth";
+
+const authStore = useAuthStore();
 
 export const useCurrencyStore = defineStore("currency", {
   state: () => ({
@@ -13,8 +16,7 @@ export const useCurrencyStore = defineStore("currency", {
     },
   },
   actions: {
-    async fetchCurrency(userId: string) {
-      if (!userId) return;
+    async fetchCurrency(userId: string = authStore.userId) {
       this.loading = true;
       this.error = "";
       try {
