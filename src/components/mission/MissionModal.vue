@@ -45,12 +45,12 @@ function isFishRequired(fishId: string | undefined) {
   return !!fishId && (requiredFishCounts.value.get(fishId) ?? 0) > 0;
 }
 
-function canSelectCaught(caught: { id: string; fish: { id?: string } }) {
+function canSelectCaught(caught: { id: string; fish: { id?: string } | null }) {
   const fishId = caught.fish?.id;
   return !!fishId && (selectedFishCounts.value.get(fishId) ?? 0) < (requiredFishCounts.value.get(fishId) ?? 0);
 }
 
-function toggleCaught(caught: { id: string; fish: { id?: string } }) {
+function toggleCaught(caught: { id: string; fish: { id?: string } | null }) {
   if (selectedCaughtIds.value.includes(caught.id)) {
     selectedCaughtIds.value = selectedCaughtIds.value.filter((id) => id !== caught.id);
   } else if (canSelectCaught(caught)) {
@@ -155,8 +155,7 @@ async function claimMission() {
               <span class="min-w-0 flex-1">
                 <span class="block truncate text-sm font-bold">{{ caught.fish?.name || "Cá không tên" }}</span>
                 <span class="block text-xs text-emerald-900/60"
-                  >{{ caught.fish?.rarity || "Không rõ độ hiếm" }} ·
-                  {{ caught.fish?.length || "Chưa rõ kích thước" }}</span
+                  >{{ caught.fish?.rarity || "Không rõ độ hiếm" }} · {{ caught.weight }} kg</span
                 >
               </span>
               <span v-if="selectedCaughtIds.includes(caught.id)" class="text-xs font-bold text-emerald-800"

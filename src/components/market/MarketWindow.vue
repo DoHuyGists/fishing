@@ -84,7 +84,7 @@ async function handleCancelListing(item: MarketListing) {
   if (!item.caught?.id) return;
   isCancellingListing.value = true;
   try {
-    await supabaseMarketRepository.cancelListing(item.id, item.caught.id);
+    await supabaseMarketRepository.cancelListing(item.id);
     await marketStore.loadMarketListings();
     await caughtStore.loadCaughtFishes();
   } catch (err) {
@@ -104,7 +104,7 @@ function formatDate(dateStr: string) {
     minute: "2-digit",
   });
 }
-function getRarityBadgeClass(rarity: string) {
+function getRarityBadgeClass(rarity: string | null | undefined) {
   switch (rarity?.toUpperCase()) {
     case "HUYỀN THOẠI":
       return "bg-amber-100 text-amber-800 border-amber-300";
@@ -274,8 +274,6 @@ function getRarityBadgeClass(rarity: string) {
                     <div class="flex items-center gap-2 text-[11px] text-gray-500 font-medium">
                       <span>⚖️ {{ typeof item.caught?.fish?.weight === 'number' ? item.caught.fish.weight + ' kg' :
                         item.caught?.fish?.weight }}</span>
-                      <span>•</span>
-                      <span>📏 {{ item.caught?.fish?.length }}</span>
                     </div>
                     <div class="text-[10px] text-gray-400 mt-0.5">
                       📅 Đăng bán: {{ formatDate(item.created_at) }}
@@ -336,8 +334,6 @@ function getRarityBadgeClass(rarity: string) {
                     <div class="flex items-center gap-2 text-[11px] text-gray-500 font-medium">
                       <span>⚖️ {{ typeof item.caught?.fish?.weight === 'number' ? item.caught.fish.weight + ' kg' :
                         item.caught?.fish?.weight }}</span>
-                      <span>•</span>
-                      <span>📏 {{ item.caught?.fish?.length }}</span>
                     </div>
                     <div class="text-[10px] text-gray-400">
                       📅 Ngày đăng: {{ formatDate(item.created_at) }}

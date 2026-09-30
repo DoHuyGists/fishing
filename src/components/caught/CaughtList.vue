@@ -78,7 +78,7 @@ async function handleSell() {
 }
 
 
-function getRarityBadgeClass(rarity: string) {
+function getRarityBadgeClass(rarity: string | null | undefined) {
   switch (rarity?.toUpperCase()) {
     case "HUYỀN THOẠI":
       return "bg-amber-100 text-amber-800 border-amber-300";
@@ -91,7 +91,7 @@ function getRarityBadgeClass(rarity: string) {
   }
 }
 
-function formatDate(dateStr: string) {
+function formatDate(dateStr: string | null) {
   if (!dateStr) return "";
   const d = new Date(dateStr);
   return d.toLocaleDateString("vi-VN", {
@@ -197,11 +197,8 @@ async function handleRelease() {
             </div>
             <div class="flex items-center gap-2 text-[11px] text-gray-600">
               <span>{{ typeof item.fish?.weight === 'number' ? item.fish.weight + ' kg' : item.fish?.weight }}</span>
-              <span>•</span>
-              <span>{{ item.fish?.length }}</span>
             </div>
             <div class="flex items-center justify-between text-[10px] text-gray-400">
-              <span class="truncate text-emerald-800 font-medium">📍 {{ item.areaName }}</span>
               <span class="flex-shrink-0 ml-1">{{ formatDate(item.created_at) }}</span>
             </div>
           </div>
@@ -233,7 +230,7 @@ async function handleRelease() {
             typeof fishToRelease.fish?.weight === 'number'
               ? fishToRelease.fish.weight + ' kg'
               : fishToRelease.fish?.weight
-          }}) câu tại <strong>{{ fishToRelease.areaName }}</strong> về lại tự nhiên không?
+              }}) về lại tự nhiên không?
         </p>
         <div class="flex justify-center gap-3 mt-5">
           <button type="button"

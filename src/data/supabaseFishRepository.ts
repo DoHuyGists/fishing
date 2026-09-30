@@ -1,13 +1,20 @@
 import supabase from "../database/connection";
-import type { Fish } from "./fishingLogic";
+
+export type CaughtFishDetails = {
+  id: string;
+  name: string;
+  weight: number;
+  image: string | null;
+  rarity: string | null;
+};
 
 export type CaughtRow = {
   id: string;
-  created_at: string;
+  created_at: string | null;
   user_id: string;
-  area_id: string;
-  fish: Fish;
-  status?: string;
+  species_id: string;
+  weight: number;
+  fish: CaughtFishDetails | null;
 };
 
 export type FishingInventoryRow = {
@@ -23,16 +30,15 @@ export type FishingInventoryRow = {
 };
 
 class SupabaseFishRepository {
-  async fetchCaughtFishes(userId: string, areaId: string): Promise<CaughtRow[]> {
-    const { data, error } = await supabase.from("caught").select("id, created_at, user_id, area_id, fish, status").eq("user_id", userId).eq("area_id", areaId).order("created_at", { ascending: false });
-
-    if (error) throw new Error(error.message);
-
-    return (data ?? []).filter((row) => row.status !== "on-market");
+  async fetchCaughtFishes(userId: string): Promise<CaughtRow[]> {
+    return this.fetchAllCaughtFishes(userId);
   }
 
   async fetchFishingInventory(userId: string): Promise<FishingInventoryRow[]> {
-    const { data, error } = await supabase.from("caught").select('id, created_at, weight, species(name, image, rarity, "3d")').eq("user_id", userId).order("created_at", { ascending: false });
+    const listedCaughtIds = await this.fetchListedCaughtIds(userId);
+    let query = supabase.from("caught").select('id, created_at, weight, species(name, image, rarity, "3d")').eq("user_id", userId).order("created_at", { ascending: false });
+    if (listedCaughtIds.length) query = query.not("id", "in", `(${listedCaughtIds.join(",")})`);
+    const { data, error } = await query;
 
     if (error) throw new Error(error.message);
 
@@ -40,11 +46,40 @@ class SupabaseFishRepository {
   }
 
   async fetchAllCaughtFishes(userId: string): Promise<CaughtRow[]> {
-    const { data, error } = await supabase.from("caught").select("id, created_at, user_id, area_id, fish, status").eq("user_id", userId).order("created_at", { ascending: false });
+    const listedCaughtIds = await this.fetchListedCaughtIds(userId);
+    let query = supabase.from("caught").select("id, created_at, user_id, species_id, weight, species(name, image, rarity)").eq("user_id", userId).order("created_at", { ascending: false });
+    if (listedCaughtIds.length) query = query.not("id", "in", `(${listedCaughtIds.join(",")})`);
+    const { data, error } = await query;
 
     if (error) throw new Error(error.message);
 
-    return (data ?? []).filter((row) => row.status !== "on-market");
+    return (data ?? []).map((row) => {
+      const species = Array.isArray(row.species) ? row.species[0] : row.species;
+      return {
+        id: row.id,
+        created_at: row.created_at,
+        user_id: row.user_id,
+        species_id: row.species_id,
+        weight: Number(row.weight),
+        fish: species
+          ? {
+              id: row.species_id,
+              name: species.name,
+              weight: Number(row.weight),
+              image: species.image,
+              rarity: species.rarity,
+            }
+          : null,
+      };
+    });
+  }
+
+  private async fetchListedCaughtIds(userId: string): Promise<string[]> {
+    const { data, error } = await supabase.from("species_market").select("caught_id").eq("user_id", userId).eq("status", "normal");
+
+    if (error) throw new Error(error.message);
+
+    return (data ?? []).map((listing) => listing.caught_id);
   }
 
   async deleteCaughtFish(caughtId: string): Promise<void> {
@@ -62,14 +97,6 @@ class SupabaseFishRepository {
     });
 
     if (marketError) throw new Error(marketError.message);
-
-    const { data: updatedRows, error: caughtError } = await supabase.from("caught").update({ status: "on-market" }).eq("id", caughtId).select();
-
-    if (caughtError) throw new Error(caughtError.message);
-
-    if (!updatedRows || updatedRows.length === 0) {
-      throw new Error("Không thể cập nhật trạng thái cá (0 dòng bị ảnh hưởng). Vui lòng kiểm tra lại RLS (Row Level Security) Policy cho thao tác UPDATE trên bảng 'caught'.");
-    }
   }
 }
 

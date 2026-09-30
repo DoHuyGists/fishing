@@ -43,7 +43,7 @@ class SupabaseMissionRepository {
   }
 
   async claimMission(missionId: string, caughtIds: string[]): Promise<void> {
-    const { error } = await supabase.rpc("claim_hour_mission", {
+    const { error } = await supabase.rpc("complete_hour_mission", {
       p_mission_id: missionId,
       p_caught_ids: caughtIds,
     });

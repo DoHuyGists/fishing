@@ -1,6 +1,5 @@
 <script setup lang="ts">
 import { onMounted, watch, ref } from "vue";
-import { useFishingAreaStore } from "../stores/fishingArea";
 import { useCurrencyStore } from "../stores/currency";
 import { useAuthStore } from "../stores/auth";
 import InteractWorldWrapper from "./world-map/InteractWorldMap.vue";
@@ -19,7 +18,6 @@ import MissionModal from "./mission/MissionModal.vue";
 
 const isProfileOpen = ref(false);
 const marketStore = useMarketStore()
-const fishingAreaStore = useFishingAreaStore();
 const currencyStore = useCurrencyStore();
 const authStore = useAuthStore();
 const caughtStore = useCaughtStore();
@@ -71,21 +69,6 @@ watch(
     }
   },
   { immediate: true }
-);
-
-watch(
-  () => fishingAreaStore.areas,
-  () => {
-    if (caughtStore.caughtFishes.length && fishingAreaStore.areas.length) {
-      caughtStore.caughtFishes = caughtStore.caughtFishes.map((row) => {
-        const area = fishingAreaStore.areas.find((a) => a.id === row.area_id);
-        return {
-          ...row,
-          areaName: area?.title ?? row.areaName ?? "Bãi câu",
-        };
-      });
-    }
-  }
 );
 
 onMounted(() => {
