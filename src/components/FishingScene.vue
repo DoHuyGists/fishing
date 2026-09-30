@@ -3,7 +3,7 @@ import { computed, onBeforeMount, onBeforeUnmount, onMounted, ref, watch } from 
 import { isPointInWater } from "../data/fishingMap";
 import { useFishingStore } from "../stores/fishing";
 import { useAuthStore } from "../stores/auth";
-import { onBeforeRouteLeave, useRoute, useRouter } from "vue-router";
+import { onBeforeRouteLeave, useRouter } from "vue-router";
 import { useFishingAreaStore } from "../stores/fishingArea";
 import { supabaseUserInAreaRepository } from "../data/supabaseUserInAreaRepository";
 
@@ -19,7 +19,6 @@ const waterBoundary = ref<any[]>([
 const waterBoundaryPoints = computed(() => waterBoundary.value.map(({ x, y }) => `${x},${y}`).join(" "));
 //
 
-const route = useRoute();
 const router = useRouter();
 const authStore = useAuthStore();
 const fishingAreaStore = useFishingAreaStore();

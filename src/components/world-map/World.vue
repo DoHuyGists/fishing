@@ -4,7 +4,6 @@ import { useRouter } from "vue-router";
 import { useWorldStore } from "../../stores/world";
 import { useAuthStore } from "../../stores/auth";
 import { supabaseUserInAreaRepository } from "../../data/supabaseUserInAreaRepository";
-import { useFishingStore } from "../../stores/fishing";
 
 const props = defineProps<{
   anchors: any[];
@@ -12,7 +11,6 @@ const props = defineProps<{
 }>();
 
 let realtimeSubscription: ReturnType<typeof supabaseUserInAreaRepository.subscribeToAreaUsers> | null = null;
-const fishingStore = useFishingStore();
 const router = useRouter();
 const authStore = useAuthStore();
 const worldStore = useWorldStore();

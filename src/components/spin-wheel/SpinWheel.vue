@@ -69,7 +69,6 @@ const showResult = ref(false)
 const resultReward = ref<Reward | null>(null)
 const errorMsg = ref('')
 const pendingReward = ref<Reward | null>(null)
-const wheelEl = ref<HTMLElement | null>(null)
 
 const segmentAngle = computed(() => 360 / Math.max(props.rewards.length, 1))
 
@@ -196,7 +195,6 @@ onBeforeUnmount(() => {
 
       <!-- Bánh xe -->
       <div
-        ref="wheelEl"
         class="absolute inset-0 overflow-hidden rounded-full border-[6px] border-white shadow-[0_10px_30px_rgba(0,0,0,0.25)]"
         :style="wheelStyle"
         @transitionend="onTransitionEnd"

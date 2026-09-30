@@ -116,19 +116,12 @@ const currentBookEntries = computed<DiaryFishEntry[]>(() => {
         location: selectedCountry.value.code,
         status: "Chưa khám phá",
         image: null,
+        "3d": null,
       },
       isCaught: false,
     });
   }
   return mockSpeciesList;
-});
-
-// Stats for selected country book
-const countryStats = computed(() => {
-  const entries = currentBookEntries.value;
-  const total = entries.length;
-  const caught = entries.filter((e) => e.isCaught).length;
-  return { total, caught };
 });
 
 // Open a country book

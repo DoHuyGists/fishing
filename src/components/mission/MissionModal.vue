@@ -9,6 +9,7 @@ const caughtStore = useCaughtStore();
 const selectedMissionId = ref("");
 const selectedCaughtIds = ref<string[]>([]);
 const isLoading = ref(true);
+const isRefreshing = ref(false);
 const isClaiming = ref(false);
 const statusMessage = ref("");
 const statusIsError = ref(false);
@@ -64,16 +65,34 @@ function selectMission(missionId: string) {
   statusMessage.value = "";
 }
 
-onMounted(async () => {
+async function loadMissionData(initialLoad = false) {
+  if (initialLoad) {
+    isLoading.value = true;
+  } else {
+    isRefreshing.value = true;
+  }
   try {
     await Promise.all([missionStore.SetMission(), caughtStore.loadCaughtFishes()]);
-    selectedMissionId.value = missionStore.missions[0]?.id ?? "";
+    if (!missionStore.missions.some((mission) => mission.id === selectedMissionId.value)) {
+      selectedMissionId.value = missionStore.missions[0]?.id ?? "";
+    }
+    selectedCaughtIds.value = [];
+    statusIsError.value = false;
+    statusMessage.value = initialLoad ? "" : "Đã làm mới dữ liệu.";
   } catch (error) {
     statusIsError.value = true;
     statusMessage.value = error instanceof Error ? error.message : "Không thể tải dữ liệu nhiệm vụ.";
   } finally {
-    isLoading.value = false;
+    if (initialLoad) {
+      isLoading.value = false;
+    } else {
+      isRefreshing.value = false;
+    }
   }
+}
+
+onMounted(() => {
+  void loadMissionData(true);
 });
 
 async function claimMission() {
@@ -95,9 +114,9 @@ async function claimMission() {
 }
 </script>
 <template>
-  <div class="fixed inset-0 z-50 bg-black/65 p-3 sm:p-6 grid place-items-center" @click.self="emit('close')">
+  <div class="fixed inset-0 z-50 bg-black/65" @click.self="emit('close')">
     <section
-      class="relative w-full max-w-6xl h-[min(780px,94vh)] overflow-hidden rounded-xl border border-emerald-900/20 bg-[#f4f5e9] text-[#20372a] shadow-2xl flex flex-col"
+      class="relative w-screen h-dvh max-w-none overflow-hidden border-0 bg-[#f4f5e9] text-[#20372a] shadow-2xl flex flex-col"
       role="dialog"
       aria-modal="true"
       aria-labelledby="mission-title"
@@ -109,20 +128,30 @@ async function claimMission() {
           <p class="m-0 text-[10px] font-extrabold tracking-[0.14em] uppercase text-emerald-800">Bảng nhiệm vụ</p>
           <h2 id="mission-title" class="m-0 mt-1 text-xl sm:text-2xl font-bold">Nhiệm vụ theo giờ</h2>
         </div>
-        <button
-          type="button"
-          class="w-9 h-9 rounded-full border border-emerald-900/15 bg-white/70 text-emerald-950 hover:bg-white text-2xl leading-none cursor-pointer"
-          aria-label="Đóng nhiệm vụ"
-          @click="emit('close')"
-        >
-          &times;
-        </button>
+        <div class="flex items-center gap-2">
+          <button
+            type="button"
+            class="px-3 py-2 rounded-md border border-emerald-900/15 bg-white/70 text-sm font-bold text-emerald-950 hover:bg-white disabled:opacity-50 disabled:cursor-not-allowed"
+            :disabled="isRefreshing || isClaiming || isLoading"
+            @click="loadMissionData()"
+          >
+            <span aria-hidden="true" class="mr-1">↻</span>{{ isRefreshing ? "Đang tải..." : "Làm mới" }}
+          </button>
+          <button
+            type="button"
+            class="w-9 h-9 rounded-full border border-emerald-900/15 bg-white/70 text-emerald-950 hover:bg-white text-2xl leading-none cursor-pointer"
+            aria-label="Đóng nhiệm vụ"
+            @click="emit('close')"
+          >
+            &times;
+          </button>
+        </div>
       </header>
 
       <div v-if="isLoading" class="flex-1 grid place-items-center text-sm text-emerald-900/70">
         Đang tải cá và nhiệm vụ...
       </div>
-      <div v-else class="grid grid-rows-[minmax(0,1fr)_minmax(0,1fr)] md:grid-rows-1 md:grid-cols-2 min-h-0 flex-1">
+      <div v-else class="grid grid-rows-[minmax(0,1fr)_minmax(0,1fr)] md:grid-rows-1 md:grid-cols-[minmax(0,1fr)_minmax(0,1fr)] min-h-0 flex-1">
         <section class="min-h-0 flex flex-col border-b md:border-b-0 md:border-r border-emerald-950/10">
           <div class="px-5 py-3 sm:px-6 border-b border-emerald-950/10 flex items-center justify-between">
             <h3 class="m-0 text-sm font-bold">Cá đã câu</h3>
@@ -210,7 +239,7 @@ async function claimMission() {
                     <span class="block text-xs text-emerald-900/60">{{ fish.rarity }} · {{ fish.length }}</span>
                   </span>
                   <span
-                    class="text-xs font-bold"
+                    class="text-xs font-bold pr-2"
                     :class="(selectedFishCounts.get(fish.id) ?? 0) > 0 ? 'text-emerald-700' : 'text-emerald-950/45'"
                   >
                     {{ Math.min(selectedFishCounts.get(fish.id) ?? 0, requiredFishCounts.get(fish.id) ?? 0) }}/{{

@@ -2,27 +2,37 @@ import { createRouter, createWebHistory } from "vue-router";
 import supabase from "../database/connection";
 import { supabaseUserInAreaRepository } from "../data/supabaseUserInAreaRepository.ts";
 import ProtectedLayout from "../layouts/ProtectedLayout.vue";
+import Admin from "../components/admin/Admin.vue";
 
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
   routes: [
     {
       path: "/",
-      component: ProtectedLayout,
       children: [
         {
           path: "",
-          name: "home",
-          component: () => import("../views/HomeView.vue"),
-          meta: { requiresAuth: true },
+          component: ProtectedLayout,
+          children: [
+            {
+              path: "",
+              name: "home",
+              component: () => import("../views/HomeView.vue"),
+              meta: { requiresAuth: true },
+            },
+            {
+              path: "/fishing",
+              name: "fishing",
+              component: () => import("../views/FishingView.vue"),
+              meta: { requiresAuth: true },
+            },
+          ],
         },
         {
-          path: "/fishing",
-          name: "fishing",
-          component: () => import("../views/FishingView.vue"),
-          meta: { requiresAuth: true },
-        },
-      ]
+          path: "admin",
+          component: Admin
+        }
+      ],
     },
     {
       path: "/login",
