@@ -21,10 +21,8 @@ export const useSpinWheelStore = defineStore("SpinWheel", {
         image: x.image,
       }));
     },
-    async submitReward(reward: Reward, cost: number) {
-      if (authStore.userId) {
-        return await supabaseUserInventoryRepository.buyItemWithRandomIndex(authStore.userId, reward, cost);
-      }
+    async claimRandomItem(itemIds: string[]): Promise<string> {
+      return await supabaseUserInventoryRepository.claimRandomItem(itemIds);
     },
   },
 });
