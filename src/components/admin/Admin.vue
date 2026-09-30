@@ -1,10 +1,12 @@
 <script lang="ts" setup>
 import { ref } from 'vue';
 import FishingAreaManagement from './FishingAreaManagement.vue';
+import ItemManagement from './ItemManagement.vue';
 import SpeciesManagement from './SpeciesManagement.vue';
 import SpeciesInAreaManagement from './SpeciesInAreaManagement.vue';
 
 const showFishingAreaManagement = ref(false);
+const showItemManagement = ref(false);
 const showSpeciesManagement = ref(false);
 const showSpeciesInAreaManagement = ref(false);
 </script>
@@ -21,6 +23,11 @@ const showSpeciesInAreaManagement = ref(false);
       </button>
       <button type="button"
         class="px-4 py-2 rounded-lg bg-[#153221] text-white text-sm font-bold hover:bg-emerald-800 transition-colors cursor-pointer"
+        @click="showItemManagement = true">
+        🎒 Quản lý vật phẩm
+      </button>
+      <button type="button"
+        class="px-4 py-2 rounded-lg bg-[#153221] text-white text-sm font-bold hover:bg-emerald-800 transition-colors cursor-pointer"
         @click="showSpeciesManagement = true">
         🐟 Quản lý loài cá
       </button>
@@ -32,6 +39,7 @@ const showSpeciesInAreaManagement = ref(false);
     </div>
 
     <FishingAreaManagement v-if="showFishingAreaManagement" @close="showFishingAreaManagement = false" />
+    <ItemManagement v-if="showItemManagement" @close="showItemManagement = false" />
     <SpeciesManagement v-if="showSpeciesManagement" @close="showSpeciesManagement = false" />
     <SpeciesInAreaManagement v-if="showSpeciesInAreaManagement" @close="showSpeciesInAreaManagement = false" />
   </div>

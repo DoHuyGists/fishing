@@ -285,7 +285,7 @@ onMounted(loadAll);
     </div>
 
     <main class="relative flex min-h-0 flex-1">
-      <section class="min-w-0 flex-1 overflow-auto p-4 md:p-6">
+      <section class="flex min-h-0 min-w-0 flex-1 flex-col overflow-hidden p-4 md:p-6">
         <div v-if="loadError" class="mb-4 flex items-center justify-between gap-3 rounded-lg border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-700">
           <span>{{ loadError }}</span>
           <button type="button" class="font-bold underline" @click="loadAll">Thử lại</button>
@@ -294,7 +294,7 @@ onMounted(loadAll);
         <div v-else-if="!filteredRows.length" class="grid min-h-64 place-items-center text-center text-sm text-gray-500">
           <div><span class="mb-2 block text-3xl">🎯</span>{{ rows.length ? 'Không tìm thấy cấu hình phù hợp.' : 'Chưa có cấu hình nào.' }}</div>
         </div>
-        <div v-else-if="viewMode === 'grouped'" class="flex flex-col gap-4">
+        <div v-else-if="viewMode === 'grouped'" class="flex min-h-0 flex-1 flex-col gap-4 overflow-auto">
           <div v-for="group in groupedByArea" :key="group.areaId" class="overflow-hidden rounded-lg border border-gray-200 bg-white shadow-sm">
             <button type="button" class="flex w-full items-center justify-between gap-3 bg-emerald-50/60 px-4 py-3 text-left hover:bg-emerald-50" @click="toggleAreaCollapsed(group.areaId)">
               <div class="flex min-w-0 items-center gap-2">
@@ -322,8 +322,8 @@ onMounted(loadAll);
             </div>
           </div>
         </div>
-        <div v-else class="rounded-lg border border-gray-200 bg-white shadow-sm">
-          <table class="w-full min-w-225 border-collapse text-left text-sm">
+        <div v-else class="min-h-0 flex-1 overflow-auto rounded-lg border border-gray-200 bg-white shadow-sm">
+          <table class="w-full min-w-225 border-separate border-spacing-0 text-left text-sm">
             <thead class="text-[11px] uppercase text-gray-600">
               <tr>
                 <th class="sticky top-0 z-10 bg-gray-100 px-4 py-3">Bãi câu</th>
