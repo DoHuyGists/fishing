@@ -1,7 +1,6 @@
 import supabase from "../database/connection";
 import type { RealtimeChannel } from "@supabase/supabase-js";
 
-
 export type UserInAreaRow = {
   id: string;
   created_at: string;
@@ -11,51 +10,21 @@ export type UserInAreaRow = {
 };
 
 class SupabaseUserInAreaRepository {
-  /**
-   * Cập nhật vị trí bãi câu hiện tại của user vào bảng user_in_area.
-   * Nếu user chưa có thì thêm mới, nếu đã có thì cập nhật lại area_id và updated_at.
-   */
-  async setUserArea(userId: string, areaId: string | null): Promise<void> {
-    if (!userId) return;
+  async setUserEnterArea(areaId: string): Promise<void> {
+    const { error } = await supabase.rpc("user_enter_area", {
+      p_area_id: areaId,
+    });
 
-    const { data: existing, error: selectError } = await supabase
-      .from("user_in_area")
-      .select("id")
-      .eq("user_id", userId)
-      .maybeSingle();
-
-    if (selectError) {
-      console.warn("Lỗi khi kiểm tra user_in_area:", selectError.message);
+    if (error) {
+      console.error(error);
     }
+  }
 
-    const now = new Date().toISOString();
+  async setUserLeaveArea() {
+    const { error } = await supabase.rpc('user_leave_area');
 
-    if (existing) {
-      const { error: updateError } = await supabase
-        .from("user_in_area")
-        .update({
-          area_id: areaId,
-          updated_at: now,
-        })
-        .eq("user_id", userId);
-
-      if (updateError) {
-        console.error("Lỗi khi cập nhật user_in_area:", updateError.message);
-        throw new Error(updateError.message);
-      }
-    } else {
-      const { error: insertError } = await supabase
-        .from("user_in_area")
-        .insert({
-          user_id: userId,
-          area_id: areaId,
-          updated_at: now,
-        });
-
-      if (insertError) {
-        console.error("Lỗi khi thêm mới user_in_area:", insertError.message);
-        throw new Error(insertError.message);
-      }
+    if (error) {
+      console.error(error);
     }
   }
 
@@ -65,10 +34,7 @@ class SupabaseUserInAreaRepository {
   async fetchUsersInArea(areaId: string): Promise<UserInAreaRow[]> {
     if (!areaId) return [];
 
-    const { data, error } = await supabase
-      .from("user_in_area")
-      .select("id, created_at, area_id, user_id, updated_at")
-      .eq("area_id", areaId);
+    const { data, error } = await supabase.from("user_in_area").select("id, created_at, area_id, user_id, updated_at").eq("area_id", areaId);
 
     if (error) {
       console.error("Lỗi khi lấy danh sách user_in_area:", error.message);
@@ -93,7 +59,7 @@ class SupabaseUserInAreaRepository {
         },
         () => {
           onChange();
-        }
+        },
       )
       .subscribe();
   }
@@ -105,18 +71,14 @@ class SupabaseUserInAreaRepository {
     await supabase.removeChannel(channel);
   }
 
-  async getCurrentUserArea(userId: string){
-    const { data, error } = await supabase
-      .from("user_in_area")
-      .select("area_id")
-      .eq("user_id", userId)
-      .maybeSingle();
+  async getCurrentUserArea(userId: string) {
+    const { data, error } = await supabase.from("user_in_area").select("area_id").eq("user_id", userId).maybeSingle();
 
-      if(error){
-        throw new Error(error.message);
-      }
+    if (error) {
+      throw new Error(error.message);
+    }
 
-      return data?.area_id;
+    return data?.area_id;
   }
 }
 

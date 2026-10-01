@@ -122,7 +122,7 @@ export const useFishingStore = defineStore("fishing", {
     async initializeFishingArea(areaId: string) {
       if (!areaId) return;
       this.currentAreaId = areaId;
-      await Promise.all([this.fetchCaughtFishes(), this.fetchPlayersInArea(areaId)]);
+      await Promise.all([this.fetchCaughtFishes(areaId), this.fetchPlayersInArea(areaId)]);
     },
     async fetchPlayersInArea(areaId?: string) {
       const targetAreaId = areaId || this.currentAreaId || useFishingAreaStore().currentArea?.id;
@@ -212,13 +212,9 @@ export const useFishingStore = defineStore("fishing", {
         this.isLoadingPlayers = false;
       }
     },
-    async fetchCaughtFishes(userId?: string) {
-      const authStore = useAuthStore();
-      const targetUserId = userId || authStore.userId;
-      if (!targetUserId) return;
-
+    async fetchCaughtFishes(areaId: string) {
       try {
-        const rows = await supabaseFishRepository.fetchFishingInventory(targetUserId);
+        const rows = await supabaseFishRepository.fetchFishingInventory(areaId);
         this.inventory = rows.map((row) => {
           const species = Array.isArray(row.species) ? row.species[0] : row.species;
           return {
@@ -366,7 +362,7 @@ export const useFishingStore = defineStore("fishing", {
     },
     async openBag() {
       this.bagOpen = true;
-      await this.fetchCaughtFishes();
+      if(this.currentAreaId) await this.fetchCaughtFishes(this.currentAreaId);
     },
     closeBag() {
       this.bagOpen = false;

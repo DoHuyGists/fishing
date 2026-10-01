@@ -52,7 +52,7 @@ async function goToFishingArea(anchor: any) {
   isEntering.value = true;
   try {
     if (authStore.userId) {
-      await supabaseUserInAreaRepository.setUserArea(authStore.userId, anchor.id);
+      await supabaseUserInAreaRepository.setUserEnterArea(anchor.id);
     }
   } catch (err) {
     console.error("Lỗi cập nhật user_in_area khi đi đến bãi câu:", err);

@@ -34,12 +34,10 @@ class SupabaseFishRepository {
     return this.fetchAllCaughtFishes(userId);
   }
 
-  async fetchFishingInventory(userId: string): Promise<FishingInventoryRow[]> {
-    const listedCaughtIds = await this.fetchListedCaughtIds(userId);
-    let query = supabase.from("caught").select('id, created_at, weight, species(name, image, rarity, "3d")').eq("user_id", userId).order("created_at", { ascending: false });
-    if (listedCaughtIds.length) query = query.not("id", "in", `(${listedCaughtIds.join(",")})`);
-    const { data, error } = await query;
-
+  async fetchFishingInventory(areaId: string): Promise<FishingInventoryRow[]> {
+    const { data, error } = await supabase.rpc('get_caught_in_area ', {
+      p_area_id: areaId
+    });
     if (error) throw new Error(error.message);
 
     return (data ?? []) as unknown as FishingInventoryRow[];

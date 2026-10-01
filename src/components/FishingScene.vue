@@ -26,25 +26,22 @@ const fishingStore = useFishingStore();
 const isLeaving = ref(false);
 let realtimeSubscription: ReturnType<typeof supabaseUserInAreaRepository.subscribeToAreaUsers> | null = null;
 
-async function handleBackToMap() {
-  if (isLeaving.value) return;
-  isLeaving.value = true;
-  try {
-    await supabaseUserInAreaRepository.setUserArea(authStore.userId, null);
-  } catch (err) {
-    console.error("Lỗi khi cập nhật trạng thái rời bãi câu:", err);
-  } finally {
-    isLeaving.value = false;
-    router.push({ name: "home" });
-  }
+// 1. Hàm trên UI chỉ làm nhiệm vụ chuyển hướng
+function handleBackToMap() {
+  router.push({ name: "home" });
 }
 
+// 2. Quản lý toàn bộ việc rời bãi câu ở Router Guard
 onBeforeRouteLeave(async (to) => {
-  if (to.name !== "fishing") {
+  // Nếu chuyển sang trang khác "fishing" và chưa xử lý rời bãi
+  if (to.name !== "fishing" && !isLeaving.value) {
+    isLeaving.value = true;
     try {
-      await supabaseUserInAreaRepository.setUserArea(authStore.userId, null);
+      await supabaseUserInAreaRepository.setUserLeaveArea();
     } catch (err) {
       console.error("Lỗi khi cập nhật trạng thái rời bãi câu:", err);
+    } finally {
+      isLeaving.value = false;
     }
   }
   return true;
