@@ -10,7 +10,7 @@ export interface ActiveSession {
   updated_at?: string;
 }
 
-export function useSingleSession(userId: Ref<string | null | undefined>) {
+export function useSingleSession(userId: string) {
   // Trạng thái bật/tắt dialog cảnh báo
   const showConflictModal = ref<boolean>(false);
   const modalMessage = ref<string>('');
@@ -128,7 +128,7 @@ export function useSingleSession(userId: Ref<string | null | undefined>) {
 
   // Theo dõi userId (nhận từ computed/ref)
   watch(
-    userId,
+    () => userId,
     (newUid) => {
       if (newUid) {
         initTabCheck();

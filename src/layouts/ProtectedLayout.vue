@@ -1,22 +1,31 @@
 <script lang="ts" setup>
-import { computed, onBeforeMount } from 'vue';
+import { onBeforeMount, onBeforeUnmount } from 'vue';
 import { useSingleSession } from '../composables/use-single-session';
 import { useAuthStore } from '../stores/auth';
 import { useTimezoneCheck } from '../composables/use-timezone-check';
+import { useAreaUserSocket } from '../composables/use-area-check';
+import { useRouter } from 'vue-router';
 
+const router = useRouter();
 const authStore = useAuthStore();
-const userId = computed(() => authStore.userId);
+const areaUserSocket = useAreaUserSocket(authStore.userId, router)
 
 const {
   showConflictModal,
   modalMessage,
   closeCurrentTab,
   logoutAccount,
-} = useSingleSession(userId);
+} = useSingleSession(authStore.userId);
 
 onBeforeMount(async ()=>{
   await useTimezoneCheck()
+  areaUserSocket.subcribe()
 })
+
+
+onBeforeUnmount(() => {
+  areaUserSocket.unSubscribe()
+});
 
 </script>
 

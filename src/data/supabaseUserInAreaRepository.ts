@@ -1,6 +1,7 @@
 import supabase from "../database/connection";
 import type { RealtimeChannel } from "@supabase/supabase-js";
 
+
 export type UserInAreaRow = {
   id: string;
   created_at: string;

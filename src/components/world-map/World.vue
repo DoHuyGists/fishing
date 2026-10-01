@@ -10,7 +10,6 @@ const props = defineProps<{
   zoom?: number;
 }>();
 
-let realtimeSubscription: ReturnType<typeof supabaseUserInAreaRepository.subscribeToAreaUsers> | null = null;
 const router = useRouter();
 const authStore = useAuthStore();
 const worldStore = useWorldStore();
@@ -62,30 +61,6 @@ async function goToFishingArea(anchor: any) {
     router.push({name: "fishing"});
   }
 }
-function getUserId() {
-  const userId = authStore.userId;
-  if(userId){
-    return userId;
-  }else{
-    throw new Error()
-  }
-}
-
-
-onBeforeMount(()=>{
-  realtimeSubscription = supabaseUserInAreaRepository.subscribeToAreaUsers(async () => {
-      const currentAreaId = await supabaseUserInAreaRepository.getCurrentUserArea(getUserId());
-      if(currentAreaId){
-        router.replace({name: "fishing"})
-      }
-    });
-})
-
-onBeforeUnmount(() => {
-  if (realtimeSubscription) {
-    supabaseUserInAreaRepository.unsubscribe(realtimeSubscription);
-  }
-});
 
 
 </script>
