@@ -7,7 +7,7 @@ export interface EventRow {
   name: string;
   description: string | null;
   image: string | null;
-  icon: string | null;
+  thumbnail: string | null;
   is_disabled: boolean;
 }
 

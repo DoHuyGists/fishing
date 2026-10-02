@@ -9,7 +9,9 @@ export interface EventScheduleRow {
   isDisabled: boolean;
   viewCount: number;
   eventName: string | null;
-  eventIcon: string | null;
+  eventThumbnail: string | null;
+  eventImage: string | null;
+  eventDescription: string | null;
 }
 
 export interface EventSchedulePayload {
@@ -20,7 +22,7 @@ export interface EventSchedulePayload {
   viewCount: number;
 }
 
-const SELECT_QUERY = "*, event:event(id, name, icon)";
+const SELECT_QUERY = "*, event:event(id, name, thumbnail, image, description)";
 
 function mapRow(row: any): EventScheduleRow {
   return {
@@ -32,7 +34,9 @@ function mapRow(row: any): EventScheduleRow {
     isDisabled: row.is_disabled,
     viewCount: row.view_count,
     eventName: row.event?.name ?? null,
-    eventIcon: row.event?.icon ?? null,
+    eventThumbnail: row.event?.thumbnail ?? null,
+    eventImage: row.event?.image ?? null,
+    eventDescription: row.event?.description ?? null,
   };
 }
 
@@ -79,6 +83,14 @@ class SupabaseEventScheduleRepository {
 
   async delete(id: string): Promise<void> {
     const { error } = await supabase.from("event_schedule").delete().eq("id", id);
+    if (error) throw new Error(error.message);
+  }
+
+  async incrementViewCount(id: string, currentCount: number): Promise<void> {
+    const { error } = await supabase
+      .from("event_schedule")
+      .update({ view_count: currentCount + 1 })
+      .eq("id", id);
     if (error) throw new Error(error.message);
   }
 }

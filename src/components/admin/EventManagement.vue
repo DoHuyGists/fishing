@@ -20,7 +20,7 @@ const emptyForm = () => ({
   name: "",
   description: "",
   image: "",
-  icon: "",
+  thumbnail: "",
   isDisabled: true,
 });
 
@@ -63,7 +63,7 @@ function openEditForm(item: EventRow) {
     name: item.name,
     description: item.description ?? "",
     image: item.image ?? "",
-    icon: item.icon ?? "",
+    thumbnail: item.thumbnail ?? "",
     isDisabled: item.is_disabled,
   });
   formError.value = "";
@@ -86,7 +86,7 @@ function buildPayload(): EventPayload | null {
     name,
     description: form.description.trim() || null,
     image: form.image.trim() || null,
-    icon: form.icon.trim() || null,
+    thumbnail: form.thumbnail.trim() || null,
     is_disabled: form.isDisabled,
   };
 }
@@ -252,14 +252,14 @@ onMounted(loadEvents);
                       v-if="item.image"
                       :src="item.image"
                       :alt="item.name"
-                      class="size-12 shrink-0 rounded-md border border-gray-200 bg-gray-50 object-cover"
+                      class="shrink-0 rounded-md border border-gray-200 bg-gray-50 object-cover"
                       loading="lazy"
                     />
                     <div
                       v-else
                       class="grid size-12 shrink-0 place-items-center rounded-md border border-gray-200 bg-gray-50 text-xl"
                     >
-                      {{ item.icon || "🎉" }}
+                      {{ item.thumbnail || "🎉" }}
                     </div>
                     <div class="min-w-0">
                       <div class="truncate font-bold text-gray-800" :title="item.name">{{ item.name }}</div>
@@ -333,8 +333,8 @@ onMounted(loadEvents);
             <div v-if="formError" class="rounded-lg border border-red-200 bg-red-50 px-3 py-2 text-sm text-red-700">
               {{ formError }}
             </div>
-            <div class="grid gap-4 sm:grid-cols-2">
-              <label class="flex flex-col gap-1.5 text-xs font-bold text-gray-600 sm:col-span-2"
+            <div class="flex flex-col gap-4 w-3xl">
+              <label class="flex flex-col gap-1.5 text-xs font-bold text-gray-600"
                 >Tên sự kiện *
                 <input
                   v-model="form.name"
@@ -344,33 +344,33 @@ onMounted(loadEvents);
                 />
               </label>
               <label class="flex flex-col gap-1.5 text-xs font-bold text-gray-600"
-                >Icon
+                >Thumbnail
                 <input
-                  v-model="form.icon"
-                  placeholder="🎉"
+                  v-model="form.thumbnail"
+                  placeholder="Đường dẫn ảnh bìa nhỏ"
                   class="rounded-md border border-gray-300 px-3 py-2 text-sm font-normal text-gray-800 focus:border-emerald-600 focus:outline-none"
                 />
               </label>
-              <label class="flex items-center gap-2 text-xs font-bold text-gray-600">
-                <input v-model="form.isDisabled" type="checkbox" class="size-4 rounded border-gray-300" />
-                Tắt sự kiện
-              </label>
-              <label class="flex flex-col gap-1.5 text-xs font-bold text-gray-600 sm:col-span-2"
-                >Đường dẫn hình ảnh
+              <label class="flex flex-col gap-1.5 text-xs font-bold text-gray-600"
+                >Banner
                 <input
                   v-model="form.image"
                   type="text"
-                  placeholder="https://... hoặc đường dẫn asset"
+                  placeholder="Đường dẫn ảnh banner"
                   class="rounded-md border border-gray-300 px-3 py-2 text-sm font-normal text-gray-800 focus:border-emerald-600 focus:outline-none"
                 />
               </label>
-              <label class="flex flex-col gap-1.5 text-xs font-bold text-gray-600 sm:col-span-2"
+              <label class="flex flex-col gap-1.5 text-xs font-bold text-gray-600"
                 >Mô tả
                 <textarea
                   v-model="form.description"
                   rows="5"
                   class="resize-y rounded-md border border-gray-300 px-3 py-2 text-sm font-normal text-gray-800 focus:border-emerald-600 focus:outline-none"
                 ></textarea>
+              </label>
+              <label class="flex items-center gap-2 text-xs font-bold text-gray-600">
+                <input v-model="form.isDisabled" type="checkbox" class="size-4 rounded border-gray-300" />
+                Tắt sự kiện
               </label>
             </div>
           </form>

@@ -6,6 +6,7 @@ import {
   type EventScheduleRow,
 } from "../../data/supabaseEventScheduleRepository";
 import { supabaseEventRepository, type EventRow } from "../../data/supabaseEventRepository";
+import EventThumbnail from "../event/EventThumbnail.vue";
 
 const emit = defineEmits(["close"]);
 
@@ -310,7 +311,7 @@ onMounted(loadAll);
               >
                 <td class="px-4 py-3">
                   <div class="flex items-center gap-2">
-                    <span class="text-lg">{{ item.eventIcon || "🎉" }}</span>
+                    <EventThumbnail :src="item.eventThumbnail" :rotate="-8" :width="80" :height="80" />
                     <span class="font-bold text-gray-800">{{ item.eventName || "—" }}</span>
                   </div>
                 </td>
