@@ -14,6 +14,7 @@ import SpinWheelModal from "./spin-wheel/SpinWheelModal.vue";
 import InventoryModal from "./inventory/InventoryModal.vue";
 import Feedbackmodal from "./feedback/Feedbackmodal.vue";
 import MissionModal from "./mission/MissionModal.vue";
+import EventModal from "./event/EventModal.vue";
 
 
 const isProfileOpen = ref(false);
@@ -32,6 +33,7 @@ const isSpinWheelOpen = ref(false);
 const isInventoryOpen = ref(false);
 const isFeedbackFormOpen = ref(false);
 const isMissionModalOpen = ref(false);
+const isEventModalOpen = ref(false)
 
 function openMarketModal() {
   isMarketOpen.value = true;
@@ -57,6 +59,10 @@ function openFeedbackForm() {
 
 function openMissionModal() {
   isMissionModalOpen.value = true;
+}
+
+function openEventModal() {
+  isEventModalOpen.value = true;
 }
 
 
@@ -145,6 +151,14 @@ onMounted(() => {
           <span class="text-sm">📄</span>
           <span>Nhiệm vụ</span>
         </button>
+
+        <!-- Event -->
+        <button type="button"
+          class="flex items-center gap-1.5 px-3 py-1.5 bg-[#153221] hover:bg-[#1a3e29] border border-gray-300 text-white rounded-xl shadow-sm font-bold text-xs cursor-pointer transition-colors"
+          @click="openEventModal">
+          <span class="text-sm">📄</span>
+          <span>Sự kiện</span>
+        </button>
       </div>
     </div>
 
@@ -168,6 +182,9 @@ onMounted(() => {
 
     <!-- Mission -->
      <MissionModal v-if="isMissionModalOpen" @close="isMissionModalOpen = false"/>
+
+     <!-- Event -->
+      <EventModal v-if="isEventModalOpen" @close="isEventModalOpen = false"/>
   </div>
 </template>
 

@@ -102,7 +102,7 @@ async function claimMission() {
   try {
     await missionStore.ClaimMission(selectedMission.value.id, selectedCaughtIds.value);
     statusIsError.value = false;
-    statusMessage.value = "Nhận nhiệm vụ thành công.";
+    statusMessage.value = "Nộp thành công.";
     selectedCaughtIds.value = [];
     await Promise.all([caughtStore.loadCaughtFishes(), missionStore.SetMission()]);
   } catch (error) {

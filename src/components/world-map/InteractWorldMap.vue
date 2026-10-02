@@ -118,7 +118,7 @@ onMounted(() => {
 });
 </script>
 <template>
-  <div class="flex gap-2">
+  <div class="flex flex-col md:flex-row gap-2">
     <FishingAnchor />
     <div class="flex flex-col">
       <div ref="mapFrame"
