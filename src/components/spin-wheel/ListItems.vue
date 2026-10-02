@@ -66,8 +66,8 @@
                     v-for="item in visibleRewards"
                     :key="item.id"
                     type="button"
-                    class="group relative flex flex-col items-center gap-1 rounded-lg border px-2 py-2 text-center transition-colors"
-                    :class="isSelected(item) ? 'border-emerald-400/80 bg-emerald-400/10' : 'border-white/10 bg-white/5 hover:border-white/20 hover:bg-white/10'"
+                    class="group cursor-pointer relative flex flex-col items-center gap-1 rounded-lg border px-2 py-2 text-center transition-colors"
+                    :class="isSelected(item) ? 'border-emerald-400/80 bg-white/40' : 'border-white/10 bg-white/60 hover:border-white/20 hover:bg-white/50'"
                     @click="toggleReward(item)"
                 >
                     <span
@@ -78,7 +78,7 @@
                     <img v-if="item.image" :src="item.image" :alt="''" class="h-10 w-10 shrink-0 object-contain">
                     <span v-else class="flex h-10 w-10 shrink-0 items-center justify-center text-lg text-emerald-200" aria-hidden="true">✦</span>
                     <span class="line-clamp-2 min-h-8 w-full text-xs font-medium leading-tight">{{ item.label }}</span>
-                    <span class="max-w-full truncate rounded bg-white/10 px-1.5 py-0.5 text-[10px] text-slate-300">{{ item.value }}</span>
+                    <!-- <span class="max-w-full truncate rounded bg-white/10 px-1.5 py-0.5 text-[10px] text-slate-300">{{ item.value }}</span> -->
                 </button>
             </div>
         </div>

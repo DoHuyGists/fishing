@@ -50,7 +50,7 @@ const frameStyle = computed(() => ({
 
 <template>
   <div
-    class="box-border shrink-0 select-none overflow-hidden border-solid border-zinc-100 bg-zinc-800 shadow-[0_10px_10px_rgba(0,0,0,0.25)]"
+    class="box-border shrink-0 select-none overflow-hidden border-solid border-zinc-100 bg-zinc-800 shadow-[0_7px_7px_rgba(0,0,0,0.35)]"
     :style="frameStyle"
   >
     <img
@@ -58,7 +58,7 @@ const frameStyle = computed(() => ({
       :src="src"
       :alt="alt"
       draggable="false"
-      class="block h-full w-full object-cover"
+      class="block h-full w-full object-cover hover:scale-125 ease-in-out duration-200"
       @error="failed = true"
     />
 

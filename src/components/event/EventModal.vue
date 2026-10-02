@@ -114,10 +114,10 @@ onMounted(loadSchedules);
               v-for="item in activeSchedules"
               :key="item.id"
               type="button"
-              class="w-full rounded-lg p-3 text-left transition-colors"
+              class="w-full cursor-pointer rounded-lg p-3 text-left transition-colors"
               :class="
                 selectedId === item.id
-                  ? ''
+                  ? 'bg-gray-50'
                   : ''
               "
               @click="selectSchedule(item)"
