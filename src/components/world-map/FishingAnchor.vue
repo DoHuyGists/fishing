@@ -21,11 +21,11 @@ onMounted(() => {
       <div class="flex items-center justify-between text-[13px] font-bold">
         <span>Danh sách bãi câu</span>
       </div>
-      <p v-if="!anchors.length" class="mt-[3px] mb-0 text-[#607176] text-xs">Chưa có điểm neo</p>
+      <p v-if="!anchors.length" class="mt-0.75 mb-0 text-[#607176] text-xs">Chưa có điểm neo</p>
       <ul v-else class="grid gap-2 p-0 mt-3 mb-0 list-none">
-        <li v-for="(anchor, index) in anchors" :key="anchor.id" class="flex items-center gap-2 min-w-0">
+        <li v-for="(anchor, _) in anchors" :key="anchor.id" class="flex items-center gap-2 min-w-0">
           <span
-            class="grid place-items-center w-5 h-5 rounded-full bg-[#d84315] text-white text-xs font-bold flex-shrink-0"
+            class="grid place-items-center w-5 h-5 rounded-full bg-[#d84315] text-white text-xs font-bold shrink-0"
           ></span>
           <span class="flex-1 overflow-hidden text-ellipsis whitespace-nowrap text-xs">
             <button

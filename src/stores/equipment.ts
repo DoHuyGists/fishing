@@ -2,7 +2,7 @@ import { defineStore } from "pinia";
 import { defaultEquipmentVariants, type EquipmentVariant } from "../data/equipmentCatalog";
 
 import { supabaseEquipmentRepository } from "../data/supabaseEquipmentRepository";
-import type { FishingTool } from "./fishing";
+import { useFishingStore, type FishingTool } from "./fishing";
 
 export type Category = "rod" | "line" | "reel" | "hook" | "bait";
 
@@ -46,6 +46,8 @@ export const useEquipmentStore = defineStore("equipment", {
         this.variants = await supabaseEquipmentRepository.fetchEquipment(userId);
         this.userId = userId;
         this.loaded = true;
+        const selected = await supabaseEquipmentRepository.fetchSelected(userId);
+        Object.assign(useFishingStore().equipmentLoadout, selected);
       } catch (err) {
         this.error = err instanceof Error ? err.message : "Không thể tải trang bị từ máy chủ";
       } finally {
@@ -66,9 +68,9 @@ export const useEquipmentStore = defineStore("equipment", {
         reel: row.reel ?? [],
         hook: row.hook ?? [],
         bait: row.bait ?? [],
-      }
+      };
     },
-    async chooseSet(userId: string, setId: string){
+    async chooseSet(userId: string, setId: string) {
       supabaseEquipmentRepository.updateCurrentUsedSet(userId, setId);
     },
     async buySet(userId: string) {
@@ -76,6 +78,6 @@ export const useEquipmentStore = defineStore("equipment", {
     },
     async saveSet(userId: string, set: EquipmentSet) {
       return supabaseEquipmentRepository.UpdateSet(userId, set);
-    }
+    },
   },
 });

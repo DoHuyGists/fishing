@@ -1,6 +1,7 @@
 import { defineStore } from "pinia";
 import { useAuthStore } from "./auth";
 import { useFishingAreaStore } from "./fishingArea";
+import { supabaseEquipmentRepository } from "../data/supabaseEquipmentRepository";
 import { supabaseFishRepository } from "../data/supabaseFishRepository";
 import { supabaseUserInAreaRepository } from "../data/supabaseUserInAreaRepository";
 import supabase from "../database/connection";
@@ -21,6 +22,9 @@ export type CaughtFish = {
   image: string;
   model3d?: string;
   createdAt?: string;
+  isShiny?: boolean;
+  variantType?: "NORMAL" | "GOLDEN" | "MUTATED";
+  starRating?: number;
 };
 export type FishingPlayer = {
   id: string | number;
@@ -51,6 +55,9 @@ type SubmitChallengeResponse = {
     weight: number;
     image: string | null;
     model_3d: string | null;
+    is_shiny: boolean;
+    variant_type: "NORMAL" | "GOLDEN" | "MUTATED";
+    star_rating: number;
   };
 };
 
@@ -243,8 +250,15 @@ export const useFishingStore = defineStore("fishing", {
     selectTool(tool: FishingTool) {
       this.selectedTool = tool;
     },
-    selectVariant(category: FishingTool, variantId: string) {
+    async selectVariant(category: FishingTool, variantId: string) {
+      const previous = this.equipmentLoadout[category];
       this.equipmentLoadout[category] = variantId;
+      try {
+        await supabaseEquipmentRepository.selectItem(variantId);
+      } catch (err) {
+        this.equipmentLoadout[category] = previous;
+        console.error("Lỗi khi chọn trang bị:", err);
+      }
     },
     async castTo(x: number, y: number) {
       if (!this.canCast) {
@@ -333,6 +347,9 @@ export const useFishingStore = defineStore("fishing", {
             weight: `${response.caught.weight} kg`,
             image: response.caught.image ?? "/fish/VN/fish.jpg",
             model3d: response.caught.model_3d ?? undefined,
+            isShiny: response.caught.is_shiny,
+            variantType: response.caught.variant_type,
+            starRating: response.caught.star_rating,
           };
           this.inventory.unshift(caught);
           this.catchDialogOpen = true;
@@ -362,7 +379,7 @@ export const useFishingStore = defineStore("fishing", {
     },
     async openBag() {
       this.bagOpen = true;
-      if(this.currentAreaId) await this.fetchCaughtFishes(this.currentAreaId);
+      if (this.currentAreaId) await this.fetchCaughtFishes(this.currentAreaId);
     },
     closeBag() {
       this.bagOpen = false;

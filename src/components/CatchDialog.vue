@@ -4,6 +4,16 @@ import { useFishingStore } from "../stores/fishing";
 
 const store = useFishingStore();
 const caught = computed(() => store.inventory[0]);
+const variantFrameClass = computed(() => {
+  switch (caught.value?.variantType) {
+    case "GOLDEN":
+      return "border-[#ffd54a] shadow-[0_24px_70px_rgba(255,190,45,0.38)]";
+    case "MUTATED":
+      return "border-[#b47cff] shadow-[0_24px_70px_rgba(150,75,255,0.38)]";
+    default:
+      return "border-[rgba(255,226,149,0.68)]";
+  }
+});
 </script>
 
 <template>
@@ -16,7 +26,8 @@ const caught = computed(() => store.inventory[0]);
         @click.self="store.closeCatchDialog"
       >
         <section
-          class="catch-card w-[min(360px,100%)] overflow-hidden border border-[rgba(255,226,149,0.68)] rounded-[22px] bg-[linear-gradient(145deg,#173d2b,#0e281b)] shadow-[0_24px_70px_rgba(0,0,0,0.48)] text-center text-[#f4f0df]"
+          class="catch-card w-[min(360px,100%)] overflow-hidden border-2 rounded-[22px] bg-[linear-gradient(145deg,#173d2b,#0e281b)] shadow-[0_24px_70px_rgba(0,0,0,0.48)] text-center text-[#f4f0df]"
+          :class="variantFrameClass"
           role="dialog"
           aria-modal="true"
           aria-labelledby="catch-title"
@@ -25,6 +36,10 @@ const caught = computed(() => store.inventory[0]);
           <img :src="caught.image" :alt="caught.name" class="block w-[calc(100%-28px)] h-[178px] mx-3.5 rounded-[14px] object-cover" />
           <div class="px-5 pt-3.5 pb-3">
             <span class="inline-block px-2 py-1 rounded-full bg-[#dcae52] text-[#254130] text-[9px] font-black tracking-[0.1em]">{{ caught.rarity }}</span>
+            <span v-if="caught.isShiny" class="inline-block ml-1 px-2 py-1 rounded-full bg-[#fff1a8] text-[#6b4b00] text-[9px] font-black tracking-widest">CÁ XỊN</span>
+            <p v-if="caught.starRating !== undefined" class="mt-2 mb-0 text-[#ffd65a] text-sm font-black" :aria-label="`${caught.starRating} sao`">
+              {{ "★".repeat(Math.max(0, Math.floor(caught.starRating))) }}<span class="ml-1 text-[11px]">{{ caught.starRating }}/5</span>
+            </p>
             <h2 id="catch-title" class="mt-2 mb-[3px] text-2xl">{{ caught.name }}</h2>
             <p class="m-0 text-[#b7cfb9] text-[13px]">{{ caught.weight }}<span v-if="caught.length"> · {{ caught.length }}</span></p>
           </div>
