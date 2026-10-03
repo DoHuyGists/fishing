@@ -59,9 +59,12 @@ class SupabaseEquipmentRepository {
     })) as EquipmentSet[];
   }
 
-  async CreateNewSet(userId: string) {
-    const { data, error } = await supabase.from("user_equipments").insert({ user_id: userId }).select().single();
-    if (error) throw new Error(error.message);
+  async CreateNewSet() {
+    const { data, error } = await supabase.rpc('buy_equipment_set');
+
+    if (error) {
+      if (error) throw new Error(error.message);
+    }
     return data;
   }
 

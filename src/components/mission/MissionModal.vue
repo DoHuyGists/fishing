@@ -28,8 +28,8 @@ const selectedFishCounts = computed(() => {
   const counts = new Map<string, number>();
   for (const caughtId of selectedCaughtIds.value) {
     const caught = caughtStore.caughtFishes.find((item) => item.id === caughtId);
-    if (caught?.fish?.id) {
-      counts.set(caught.fish.id, (counts.get(caught.fish.id) ?? 0) + 1);
+    if (caught?.species?.id) {
+      counts.set(caught.species.id, (counts.get(caught.species.id) ?? 0) + 1);
     }
   }
   return counts;
@@ -46,12 +46,12 @@ function isFishRequired(fishId: string | undefined) {
   return !!fishId && (requiredFishCounts.value.get(fishId) ?? 0) > 0;
 }
 
-function canSelectCaught(caught: { id: string; fish: { id?: string } | null }) {
-  const fishId = caught.fish?.id;
+function canSelectCaught(caught: any) {
+  const fishId = caught.species.id;
   return !!fishId && (selectedFishCounts.value.get(fishId) ?? 0) < (requiredFishCounts.value.get(fishId) ?? 0);
 }
 
-function toggleCaught(caught: { id: string; fish: { id?: string } | null }) {
+function toggleCaught(caught: any) {
   if (selectedCaughtIds.value.includes(caught.id)) {
     selectedCaughtIds.value = selectedCaughtIds.value.filter((id) => id !== caught.id);
   } else if (canSelectCaught(caught)) {
@@ -169,7 +169,7 @@ async function claimMission() {
               :class="
                 selectedCaughtIds.includes(caught.id)
                   ? 'border-emerald-700 bg-emerald-100 ring-2 ring-emerald-700/20'
-                  : isFishRequired(caught.fish?.id)
+                  : isFishRequired(caught.species.id)
                     ? 'border-amber-500 bg-amber-50 hover:bg-amber-100 cursor-pointer'
                     : 'border-emerald-950/10 bg-white/50 opacity-55'
               "
@@ -177,20 +177,20 @@ async function claimMission() {
               @click="toggleCaught(caught)"
             >
               <img
-                :src="caught.fish?.image || '/fish/VN/fish.jpg'"
-                :alt="caught.fish?.name || 'Cá'"
+                :src="caught.species?.image || '/fish/VN/fish.jpg'"
+                :alt="caught.species?.name || 'Cá'"
                 class="w-14 h-12 rounded-md object-cover bg-emerald-950/5 shrink-0"
               />
               <span class="min-w-0 flex-1">
-                <span class="block truncate text-sm font-bold">{{ caught.fish?.name || "Cá không tên" }}</span>
+                <span class="block truncate text-sm font-bold">{{ caught.species?.name || "Cá không tên" }}</span>
                 <span class="block text-xs text-emerald-900/60"
-                  >{{ caught.fish?.rarity || "Không rõ độ hiếm" }} · {{ caught.weight }} kg</span
+                  >{{ caught.species?.rarity || "Không rõ độ hiếm" }} · {{ caught.weight }} kg</span
                 >
               </span>
               <span v-if="selectedCaughtIds.includes(caught.id)" class="text-xs font-bold text-emerald-800"
                 >Đã chọn</span
               >
-              <span v-else-if="isFishRequired(caught.fish?.id)" class="text-xs font-bold text-amber-800">Phù hợp</span>
+              <span v-else-if="isFishRequired(caught.species?.id)" class="text-xs font-bold text-amber-800">Phù hợp</span>
             </button>
           </div>
         </section>

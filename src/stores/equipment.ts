@@ -73,8 +73,8 @@ export const useEquipmentStore = defineStore("equipment", {
     async chooseSet(userId: string, setId: string) {
       supabaseEquipmentRepository.updateCurrentUsedSet(userId, setId);
     },
-    async buySet(userId: string) {
-      return supabaseEquipmentRepository.CreateNewSet(userId);
+    async buySet() {
+      return supabaseEquipmentRepository.CreateNewSet();
     },
     async saveSet(userId: string, set: EquipmentSet) {
       return supabaseEquipmentRepository.UpdateSet(userId, set);

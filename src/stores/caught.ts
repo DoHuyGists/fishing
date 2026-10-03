@@ -9,15 +9,25 @@ export const useCaughtStore = defineStore("Caught", {
       id: string;
       created_at: string | null;
       user_id: string;
-      species_id: string;
       weight: number;
-      fish: {
+      is_shiny: boolean;
+      variant_type: "NORMAL" | "GOLDEN" | "MUTATED";
+      species: {
         id: string;
         name: string;
         weight: number;
         image: string | null;
         rarity: string | null;
-      } | null;
+      };
+      origin: {
+        id: string;
+        country: string;
+        name: string;
+        x: number;
+        y: number;
+        location: { x: number; y: number }[];
+        isAvailable: boolean;
+      }
     }>,
   }),
   actions: {
@@ -26,7 +36,7 @@ export const useCaughtStore = defineStore("Caught", {
       if (!userId) return;
       this.isLoadingCaught = true;
       try {
-        this.caughtFishes = await supabaseFishRepository.fetchAllCaughtFishes(userId);
+        this.caughtFishes = await supabaseFishRepository.fetchAllCaughtFishes();
       } catch (err) {
         console.error("Lỗi khi tải danh sách cá:", err);
       } finally {

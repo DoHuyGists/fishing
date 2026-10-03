@@ -1,4 +1,5 @@
 import supabase from "../database/connection";
+import type { RealtimeChannel } from "@supabase/supabase-js";
 
 export interface CurrencyRow {
   id: string;
@@ -8,59 +9,42 @@ export interface CurrencyRow {
 }
 
 class SupabaseCurrencyRepository {
-  async fetchCurrencyByUserId(userId: string): Promise<number> {
-    const { data, error } = await supabase
-      .from("currency")
-      .select("cash")
-      .eq("user_id", userId)
-      .maybeSingle<{ cash: number }>();
+  async fetchMyCurrency(): Promise<any> {
+    const { data, error } = await supabase.rpc("get_my_currency");
 
     if (error) {
       throw new Error(error.message);
     }
 
-    if (!data) {
-      return this.createDefaultCurrency(userId);
-    }
-
-    return data.cash ?? 0;
+    return data;
   }
 
-  private async createDefaultCurrency(userId: string): Promise<number> {
-    const { data, error } = await supabase
-      .from("currency")
-      .insert({ user_id: userId, cash: 0 })
-      .select("cash")
-      .single<{ cash: number }>();
-
-    if (error) {
-      const { data: retryData } = await supabase
-        .from("currency")
-        .select("cash")
-        .eq("user_id", userId)
-        .maybeSingle<{ cash: number }>();
-      return retryData?.cash ?? 0;
-    }
-
-    return data?.cash ?? 0;
+  /**
+   * Đăng ký lắng nghe thay đổi realtime trên bảng currency theo userId.
+   */
+  subscribeToCurrency(userId: string, onChange: () => void): RealtimeChannel {
+    return supabase
+      .channel(`currency_realtime_${userId}`)
+      .on(
+        "postgres_changes",
+        {
+          event: "*",
+          schema: "public",
+          table: "currency",
+          filter: `user_id=eq.${userId}`,
+        },
+        () => {
+          onChange();
+        },
+      )
+      .subscribe();
   }
 
-  async updateCurrency(userId: string, newCash: number): Promise<void> {
-    const { error } = await supabase
-      .from("currency")
-      .update({ cash: newCash })
-      .eq("user_id", userId);
-
-    if (error) {
-      throw new Error(error.message);
-    }
-  }
-
-  async addCash(userId: string, amount: number): Promise<number> {
-    const current = await this.fetchCurrencyByUserId(userId);
-    const updated = Math.max(0, current + amount);
-    await this.updateCurrency(userId, updated);
-    return updated;
+  /**
+   * Hủy đăng ký realtime channel
+   */
+  async unsubscribe(channel: RealtimeChannel): Promise<void> {
+    await supabase.removeChannel(channel);
   }
 }
 

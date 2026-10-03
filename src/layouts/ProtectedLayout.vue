@@ -1,14 +1,19 @@
 <script lang="ts" setup>
 import { onBeforeMount, onBeforeUnmount } from 'vue';
+import type { RealtimeChannel } from '@supabase/supabase-js';
 import { useSingleSession } from '../composables/use-single-session';
 import { useAuthStore } from '../stores/auth';
 import { useTimezoneCheck } from '../composables/use-timezone-check';
 import { useAreaUserSocket } from '../composables/use-area-check';
 import { useRouter } from 'vue-router';
+import { useCurrencyStore } from '../stores/currency';
+import { supabaseCurrencyRepository } from '../data/supabaseCurrencyRepository';
 
 const router = useRouter();
 const authStore = useAuthStore();
-const areaUserSocket = useAreaUserSocket(authStore.userId, router)
+const currencyStore = useCurrencyStore();
+const areaUserSocket = useAreaUserSocket(authStore.userId, router);
+let currencyChannel: RealtimeChannel | null = null;
 
 const {
   showConflictModal,
@@ -17,14 +22,27 @@ const {
   logoutAccount,
 } = useSingleSession(authStore.userId);
 
-onBeforeMount(async ()=>{
-  await useTimezoneCheck()
-  areaUserSocket.subcribe()
-})
+onBeforeMount(async () => {
+  await useTimezoneCheck();
+  areaUserSocket.subcribe();
 
+  if (authStore.userId) {
+    currencyStore.fetchCurrency(authStore.userId);
+    currencyChannel = supabaseCurrencyRepository.subscribeToCurrency(
+      authStore.userId,
+      () => {
+        currencyStore.fetchCurrency(authStore.userId);
+      }
+    );
+  }
+});
 
 onBeforeUnmount(() => {
-  areaUserSocket.unSubscribe()
+  areaUserSocket.unSubscribe();
+  if (currencyChannel) {
+    supabaseCurrencyRepository.unsubscribe(currencyChannel);
+    currencyChannel = null;
+  }
 });
 
 </script>

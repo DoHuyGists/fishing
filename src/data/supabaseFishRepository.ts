@@ -14,7 +14,18 @@ export type CaughtRow = {
   user_id: string;
   species_id: string;
   weight: number;
-  fish: CaughtFishDetails | null;
+  is_shiny: boolean;
+  variant_type: "NORMAL" | "GOLDEN" | "MUTATED";
+  species: CaughtFishDetails;
+  origin: {
+    id: string;
+    country: string;
+    name: string;
+    x: number;
+    y: number;
+    location: { x: number; y: number }[];
+    isAvailable: boolean;
+  }
 };
 
 export type FishingInventoryRow = {
@@ -32,8 +43,8 @@ export type FishingInventoryRow = {
 };
 
 class SupabaseFishRepository {
-  async fetchCaughtFishes(userId: string): Promise<CaughtRow[]> {
-    return this.fetchAllCaughtFishes(userId);
+  async fetchCaughtFishes(): Promise<CaughtRow[]> {
+    return this.fetchAllCaughtFishes();
   }
 
   async fetchFishingInventory(areaId: string): Promise<FishingInventoryRow[]> {
@@ -45,31 +56,35 @@ class SupabaseFishRepository {
     return (data ?? []) as unknown as FishingInventoryRow[];
   }
 
-  async fetchAllCaughtFishes(userId: string): Promise<CaughtRow[]> {
-    const listedCaughtIds = await this.fetchListedCaughtIds(userId);
-    let query = supabase.from("caught").select("id, created_at, user_id, species_id, weight, species(name, image, rarity)").eq("user_id", userId).order("created_at", { ascending: false });
-    if (listedCaughtIds.length) query = query.not("id", "in", `(${listedCaughtIds.join(",")})`);
-    const { data, error } = await query;
+  async fetchAllCaughtFishes(): Promise<CaughtRow[]> {
+    const { data, error } = await supabase.rpc("get_caught_in_home");
 
     if (error) throw new Error(error.message);
 
-    return (data ?? []).map((row) => {
-      const species = Array.isArray(row.species) ? row.species[0] : row.species;
+    return (data ?? []).map((row: any) => {
       return {
         id: row.id,
         created_at: row.created_at,
         user_id: row.user_id,
-        species_id: row.species_id,
         weight: Number(row.weight),
-        fish: species
-          ? {
-              id: row.species_id,
-              name: species.name,
-              weight: Number(row.weight),
-              image: species.image,
-              rarity: species.rarity,
-            }
-          : null,
+        is_shiny: row.is_shiny,
+        variant_type: row.variant_type,
+        species: {
+          id: row.species.id,
+          name: row.species.name,
+          weight: Number(row.weight),
+          image: row.species.image,
+          rarity: row.species.rarity,
+        },
+        origin: {
+          id: row.origin.id,
+          country: row.origin.country,
+          name: row.origin.name,
+          x: row.origin.x,
+          y: row.origin.y,
+          location: row.origin.location,
+          isAvailable: row.origin.is_available
+        }
       };
     });
   }
