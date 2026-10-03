@@ -224,7 +224,7 @@ function handleUpdateSetUsed(event: Event, setId: string) {
   }
 }
 
-const fmtPrice = (n: number) => n.toLocaleString("vi-VN");
+
 </script>
 
 <template>
@@ -449,11 +449,11 @@ const fmtPrice = (n: number) => n.toLocaleString("vi-VN");
           <div class="text-base font-semibold">Mua thêm set trang bị?</div>
           <div class="flex items-center gap-2 mt-2 text-sm text-slate-600">
             <span>Bạn sẽ thêm 1 set trang bị với giá:</span>
-            <Cash :amount="fmtPrice(SET_PRICE)" />
+            <Cash :amount="SET_PRICE" />
           </div>
           <div class="flex items-center gap-2 mt-2 text-sm text-slate-600">
             <span>Số dư hiện tại:</span>
-            <Cash :amount="fmtPrice(currencyStore.cash)" />
+            <Cash :amount="currencyStore.cash" />
           </div>
         </template>
         <template v-else>

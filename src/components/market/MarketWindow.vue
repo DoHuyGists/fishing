@@ -5,6 +5,8 @@ import { supabaseMarketRepository, type MarketListing } from '../../data/supabas
 import { useAuthStore } from '../../stores/auth';
 import { useMarketStore } from '../../stores/market';
 import { useCaughtStore } from '../../stores/caught';
+import Cash from '../currency/Cash.vue';
+
 const authStore = useAuthStore();
 const currencyStore = useCurrencyStore();
 const activeMarketTab = ref<"all" | "my">("all");
@@ -142,8 +144,7 @@ function getRarityBadgeClass(rarity: string | null | undefined) {
             <!-- Số tiền người dùng -->
             <div
               class="flex items-center gap-2 px-3 py-1.5 bg-emerald-950/60 border border-emerald-600/50 rounded-xl text-amber-300 font-bold text-sm">
-              <span>💰</span>
-              <span>{{ currencyStore.formattedCash }} đ</span>
+              <Cash :amount="currencyStore.formattedCash"/>
             </div>
 
             <button type="button"
@@ -371,17 +372,21 @@ function getRarityBadgeClass(rarity: string | null | undefined) {
 
         <div class="my-4 p-3 bg-emerald-50 border border-emerald-200 rounded-xl flex items-center gap-3 text-left">
           <img :src="itemToBuy.caught?.fish?.image || '/fish/VN/fish.jpg'"
-            class="w-12 h-12 rounded-lg object-cover border border-emerald-300" />
+            class="h-12 rounded-lg object-cover" />
           <div class="flex-1 min-w-0">
-            <h4 class="m-0 text-xs font-bold text-[#263238] truncate">{{ itemToBuy.caught?.fish?.name }}</h4>
-            <div class="text-[11px] text-amber-700 font-extrabold mt-0.5">{{ itemToBuy.price.toLocaleString('vi-VN') }}
-              đ</div>
+            <div class="m-0 text-xs font-bold text-[#263238] truncate">{{ itemToBuy.caught?.fish?.name }}</div>
+            <div class="m-0 text-xs font-bold text-[#263238] truncate">{{ itemToBuy.caught?.fish?.weight }} kg</div>
           </div>
         </div>
-
-        <p class="text-xs text-gray-600 leading-relaxed mb-4">
-          Số tiền hiện có của bạn: <strong class="text-amber-600">{{ currencyStore.formattedCash }} đ</strong>
-        </p>
+        
+        <div class="flex items-center gap-2 text-xs text-gray-600 leading-relaxed mb-4">
+          <span>Giá:</span>
+          <Cash :amount="itemToBuy.price" />
+        </div>
+        <div class="flex items-center gap-2 text-xs text-gray-600 leading-relaxed mb-4">
+          <span>Số dư hiện có: </span>
+          <Cash :amount="currencyStore.formattedCash" />
+        </div>
 
         <p v-if="buyError"
           class="mb-3 text-[11px] text-red-500 font-medium bg-red-50 p-2 rounded border border-red-200">{{ buyError }}
@@ -396,7 +401,7 @@ function getRarityBadgeClass(rarity: string | null | undefined) {
           <button type="button"
             class="py-1.5 px-4 rounded-lg border border-gray-300 bg-[#153221] text-white text-xs font-bold cursor-pointer hover:bg-[#1a3e29] shadow-sm disabled:opacity-50"
             :disabled="isBuying" @click="handleBuyFish">
-            {{ isBuying ? 'Đang giao dịch...' : 'Xác nhận mua' }}
+            {{ isBuying ? 'Đang giao dịch...' : 'Mua' }}
           </button>
         </div>
       </div>

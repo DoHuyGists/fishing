@@ -1,6 +1,7 @@
 <script lang="ts" setup>
 import { useAuthStore } from '../../stores/auth';
 import { useCurrencyStore } from '../../stores/currency';
+import Cash from '../currency/Cash.vue';
 
 const emit = defineEmits(["close"]);
 const authStore = useAuthStore();
@@ -29,8 +30,8 @@ const currencyStore = useCurrencyStore();
             <span class="font-mono text-[11px] bg-gray-100 px-2 py-0.5 rounded">{{ authStore.userId || "N/A" }}</span>
           </div>
           <div class="flex justify-between items-center py-1.5 border-b border-gray-100">
-            <span class="text-gray-500 font-medium">Số tiền hiện tại</span>
-            <span class="font-bold text-amber-600 text-sm">{{ currencyStore.formattedCash }} đ</span>
+            <span class="text-gray-500 font-medium">Số dư hiện tại</span>
+            <Cash :amount="currencyStore.formattedCash"/>
           </div>
         </div>
 

@@ -2,6 +2,7 @@
 import { computed, onMounted, ref } from "vue";
 import { useMissionStore } from "../../stores/mission";
 import { useCaughtStore } from "../../stores/caught";
+import Cash from "../currency/Cash.vue";
 
 const emit = defineEmits<{ close: [] }>();
 const missionStore = useMissionStore();
@@ -218,9 +219,10 @@ async function claimMission() {
             >
               <span class="flex items-center justify-between gap-3">
                 <strong class="text-sm">{{ mission.start }} - {{ mission.end }}</strong>
-                <span class="text-xs font-bold text-amber-800"
-                  >{{ Number(mission.cash).toLocaleString("vi-VN") }} xu</span
-                >
+                <div class="flex items-center gap-2">
+                  <span class="text-sm">Phần thưởng:</span>
+                  <Cash :amount="mission.cash" />
+                </div>
               </span>
               <span class="mt-1 block text-xs text-emerald-900/65">{{ mission.content.length }} cá cần nộp</span>
             </button>
