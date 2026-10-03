@@ -33,12 +33,12 @@ const variantFrameClass = computed(() => {
           aria-labelledby="catch-title"
         >
           <p class="mt-[19px] mb-2.5 text-[#e8bd62] text-[10px] font-black tracking-[0.16em] uppercase">Cú câu thành công</p>
-          <img :src="caught.image" :alt="caught.name" class="block w-[calc(100%-28px)] h-[178px] mx-3.5 rounded-[14px] object-cover" />
+          <img :src="caught.image" :alt="caught.name" class="block w-[calc(100%-28px)] h-[178px] mx-3.5 rounded-[14px] object-cover" draggable="false"/>
           <div class="px-5 pt-3.5 pb-3">
-            <span class="inline-block px-2 py-1 rounded-full bg-[#dcae52] text-[#254130] text-[9px] font-black tracking-[0.1em]">{{ caught.rarity }}</span>
+            <span class="inline-block px-2 py-1 rounded-full bg-[#dcae52] text-[#254130] text-[9px] font-black tracking-[0.1em]">{{ caught.variantType }}</span>
             <span v-if="caught.isShiny" class="inline-block ml-1 px-2 py-1 rounded-full bg-[#fff1a8] text-[#6b4b00] text-[9px] font-black tracking-widest">CÁ XỊN</span>
             <p v-if="caught.starRating !== undefined" class="mt-2 mb-0 text-[#ffd65a] text-sm font-black" :aria-label="`${caught.starRating} sao`">
-              {{ "★".repeat(Math.max(0, Math.floor(caught.starRating))) }}<span class="ml-1 text-[11px]">{{ caught.starRating }}/5</span>
+              {{ "★".repeat(Math.max(0, Math.floor(caught.starRating))) }}
             </p>
             <h2 id="catch-title" class="mt-2 mb-[3px] text-2xl">{{ caught.name }}</h2>
             <p class="m-0 text-[#b7cfb9] text-[13px]">{{ caught.weight }}<span v-if="caught.length"> · {{ caught.length }}</span></p>

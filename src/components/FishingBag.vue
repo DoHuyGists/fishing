@@ -26,6 +26,18 @@ async function handleRelease() {
     isReleasing.value = false;
   }
 }
+
+function getRewardEffect(variant: "NORMAL" | "GOLDEN" | "MUTATED") {
+  switch (variant){
+    case 'GOLDEN':
+      return 'reward-special'
+    case 'MUTATED':
+        return 'reward-legendary'
+    default:
+      return ''
+  }
+}
+
 </script>
 
 <template>
@@ -62,12 +74,12 @@ async function handleRelease() {
             <li
               v-for="fish in store.inventory"
               :key="fish.id"
-              class="flex items-center justify-between gap-3 p-2 border border-[rgba(223,241,207,0.15)] rounded-xl bg-[rgba(7,28,18,0.35)]"
+              :class="`flex items-center justify-between gap-3 p-2 border ${fish.isShiny ? getRewardEffect(fish.variantType) : ''} rounded-xl border-[rgba(223,241,207,0.15)]`"
             >
               <div class="flex items-center gap-3 min-w-0">
                 <img :src="fish.image" :alt="fish.name" class="w-[74px] h-12 rounded-lg object-cover flex-shrink-0" />
                 <div class="grid gap-0.5 min-w-0">
-                  <span class="text-[#e8bd62] text-[9px] font-black tracking-[0.09em] uppercase">{{ fish.rarity }}</span>
+                  <span class="text-[#e8bd62] text-[9px] font-black tracking-[0.09em] uppercase">{{ fish.variantType }}</span>
                   <strong class="text-sm truncate">{{ fish.name }}</strong>
                   <small class="text-[#b7cfb9] text-[11px]">{{ fish.weight }}<span v-if="fish.length"> · {{ fish.length }}</span></small>
                 </div>

@@ -18,12 +18,11 @@ export type CaughtFish = {
   name: string;
   weight: string;
   length?: string;
-  rarity: string;
   image: string;
   model3d?: string;
   createdAt?: string;
   isShiny?: boolean;
-  variantType?: "NORMAL" | "GOLDEN" | "MUTATED";
+  variantType: "NORMAL" | "GOLDEN" | "MUTATED";
   starRating?: number;
 };
 export type FishingPlayer = {
@@ -228,10 +227,11 @@ export const useFishingStore = defineStore("fishing", {
             id: row.id,
             name: species?.name ?? "Cá",
             weight: `${row.weight} kg`,
-            rarity: species?.rarity ?? "Chưa rõ",
+            variantType: row.variant_type,
             image: species?.image ?? "/fish/VN/fish.jpg",
             model3d: species?.["3d"] ?? undefined,
             createdAt: row.created_at ?? undefined,
+            isShiny: row.is_shiny
           };
         });
       } catch (err) {
@@ -343,7 +343,6 @@ export const useFishingStore = defineStore("fishing", {
           const caught: CaughtFish = {
             id: response.caught.id,
             name: response.caught.name,
-            rarity: response.caught.rarity,
             weight: `${response.caught.weight} kg`,
             image: response.caught.image ?? "/fish/VN/fish.jpg",
             model3d: response.caught.model_3d ?? undefined,

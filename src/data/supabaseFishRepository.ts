@@ -21,6 +21,8 @@ export type FishingInventoryRow = {
   id: string;
   created_at: string | null;
   weight: number;
+  variant_type: "NORMAL" | "GOLDEN" | "MUTATED";
+  is_shiny: boolean;
   species: {
     name: string;
     image: string | null;
