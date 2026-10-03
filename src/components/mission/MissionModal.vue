@@ -14,6 +14,9 @@ const isRefreshing = ref(false);
 const isClaiming = ref(false);
 const statusMessage = ref("");
 const statusIsError = ref(false);
+const claimSuccess = ref(false);
+const claimedReward = ref(0);
+let claimSuccessTimer: ReturnType<typeof setTimeout> | null = null;
 
 const selectedMission = computed(
   () => missionStore.missions.find((mission) => mission.id === selectedMissionId.value) ?? null,
@@ -96,16 +99,32 @@ onMounted(() => {
   void loadMissionData(true);
 });
 
+function showClaimSuccess(reward: number) {
+  claimedReward.value = reward;
+  claimSuccess.value = true;
+  if (claimSuccessTimer) clearTimeout(claimSuccessTimer);
+  claimSuccessTimer = setTimeout(() => {
+    claimSuccess.value = false;
+  }, 2500);
+}
+
+function closeClaimSuccess() {
+  claimSuccess.value = false;
+  if (claimSuccessTimer) clearTimeout(claimSuccessTimer);
+}
+
 async function claimMission() {
   if (!selectedMission.value || !isMissionComplete.value || isClaiming.value) return;
   isClaiming.value = true;
   statusMessage.value = "";
   try {
+    const reward = selectedMission.value.cash ?? 0;
     await missionStore.ClaimMission(selectedMission.value.id, selectedCaughtIds.value);
     statusIsError.value = false;
-    statusMessage.value = "Nộp thành công.";
+    statusMessage.value = "";
     selectedCaughtIds.value = [];
     await Promise.all([caughtStore.loadCaughtFishes(), missionStore.SetMission()]);
+    showClaimSuccess(reward);
   } catch (error) {
     statusIsError.value = true;
     statusMessage.value = error instanceof Error ? error.message : "Không thể nhận nhiệm vụ.";
@@ -276,4 +295,43 @@ async function claimMission() {
       </div>
     </section>
   </div>
+
+  <!-- Popup thông báo nộp nhiệm vụ thành công -->
+  <Transition name="claim-success">
+    <div v-if="claimSuccess"
+      class="fixed top-6 left-1/2 -translate-x-1/2 z-[100] flex items-center gap-2.5 px-5 py-3 rounded-xl bg-emerald-600 text-white shadow-[0_8px_30px_rgba(21,50,33,0.35)] border border-emerald-500 cursor-pointer"
+      @click="closeClaimSuccess">
+      <span class="text-lg">✅</span>
+      <span class="text-sm font-semibold">Nộp nhiệm vụ thành công! Nhận <strong><Cash :amount="claimedReward" /></strong></span>
+    </div>
+  </Transition>
 </template>
+
+<style scoped>
+.claim-success-enter-active {
+  animation: claim-success-in 0.4s ease-out;
+}
+.claim-success-leave-active {
+  animation: claim-success-out 0.3s ease-in forwards;
+}
+@keyframes claim-success-in {
+  0% {
+    opacity: 0;
+    transform: translateX(-50%) translateY(-20px) scale(0.95);
+  }
+  100% {
+    opacity: 1;
+    transform: translateX(-50%) translateY(0) scale(1);
+  }
+}
+@keyframes claim-success-out {
+  0% {
+    opacity: 1;
+    transform: translateX(-50%) translateY(0) scale(1);
+  }
+  100% {
+    opacity: 0;
+    transform: translateX(-50%) translateY(-20px) scale(0.95);
+  }
+}
+</style>

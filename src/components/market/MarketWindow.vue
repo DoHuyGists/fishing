@@ -16,11 +16,24 @@ const marketSort = ref<"newest" | "price-asc" | "price-desc">("newest");
 const itemToBuy = ref<MarketListing | null>(null);
 const isBuying = ref(false);
 const buyError = ref("");
+const buySuccess = ref(false);
+const boughtFishName = ref("");
+let buySuccessTimer: ReturnType<typeof setTimeout> | null = null;
 const isCancellingListing = ref(false);
 const marketStore = useMarketStore()
 const caughtStore = useCaughtStore()
+const LISTED_PRICE = 500;
 const emit = defineEmits(['close'])
-
+const balanceFee = computed(() => {
+  if(!itemToBuy.value) return 0;
+  const price = Number(itemToBuy.value.price);
+  if (price >= 1000) {
+    const balanceFactor = Math.floor(price / 1000.0) * 0.01;
+    return Math.floor(price * balanceFactor);
+  } else {
+    return 0;
+  }
+})
 const filteredMarketListings = computed(() => {
   let result = marketStore.marketListings.filter((item) => {
     const fish = item.caught?.fish;
@@ -69,11 +82,13 @@ async function handleBuyFish() {
 
   try {
     const speciesMarketId = itemToBuy.value.id;
+    const fishName = itemToBuy.value.caught?.fish?.name || 'cá';
     await supabaseMarketRepository.buyFish(speciesMarketId);
     await currencyStore.fetchCurrency();
     await marketStore.loadMarketListings();
     await caughtStore.loadCaughtFishes();
     cancelBuy();
+    showBuySuccess(fishName);
   } catch (err: any) {
     console.error("Lỗi khi mua cá:", err);
     buyError.value = err.message || "Không thể mua cá. Vui lòng thử lại.";
@@ -94,6 +109,20 @@ async function handleCancelListing(item: MarketListing) {
   } finally {
     isCancellingListing.value = false;
   }
+}
+
+function showBuySuccess(fishName: string) {
+  boughtFishName.value = fishName;
+  buySuccess.value = true;
+  if (buySuccessTimer) clearTimeout(buySuccessTimer);
+  buySuccessTimer = setTimeout(() => {
+    buySuccess.value = false;
+  }, 2500);
+}
+
+function closeBuySuccess() {
+  buySuccess.value = false;
+  if (buySuccessTimer) clearTimeout(buySuccessTimer);
 }
 
 function formatDate(dateStr: string) {
@@ -379,20 +408,34 @@ function getRarityBadgeClass(rarity: string | null | undefined) {
           </div>
         </div>
         
-        <div class="flex items-center gap-2 text-xs text-gray-600 leading-relaxed mb-4">
+        <div class="flex items-center gap-2 text-xs text-gray-600 leading-relaxed">
+          <span>Số dư hiện có: </span>
+          <Cash :amount="currencyStore.formattedCash" />
+        </div>
+        <hr class="my-2">
+        <div class="flex items-center gap-2 text-xs text-gray-600 leading-relaxed">
           <span>Giá:</span>
           <Cash :amount="itemToBuy.price" />
         </div>
-        <div class="flex items-center gap-2 text-xs text-gray-600 leading-relaxed mb-4">
-          <span>Số dư hiện có: </span>
-          <Cash :amount="currencyStore.formattedCash" />
+        <div class="flex items-center gap-2 text-xs">
+          <span>Phí niêm yết thị trường:</span>
+          <Cash :amount="LISTED_PRICE" />
+        </div>
+        <div class="flex items-center gap-2 text-xs">
+          <span>Phí cân bằng thị trường: </span>
+          <Cash :amount="balanceFee" />
+        </div>
+        <hr class="my-2">
+        <div class="flex items-center gap-2 text-xs">
+          <span>Tổng phí: </span>
+          <Cash :amount="LISTED_PRICE + balanceFee + itemToBuy.price" />
         </div>
 
         <p v-if="buyError"
           class="mb-3 text-[11px] text-red-500 font-medium bg-red-50 p-2 rounded border border-red-200">{{ buyError }}
         </p>
 
-        <div class="flex justify-center gap-3">
+        <div class="flex justify-center gap-3 mt-4">
           <button type="button"
             class="py-1.5 px-4 rounded-lg border border-gray-300 bg-transparent text-[#263238] text-xs font-bold cursor-pointer hover:bg-[#eef3f1]"
             @click="cancelBuy">
@@ -401,9 +444,48 @@ function getRarityBadgeClass(rarity: string | null | undefined) {
           <button type="button"
             class="py-1.5 px-4 rounded-lg border border-gray-300 bg-[#153221] text-white text-xs font-bold cursor-pointer hover:bg-[#1a3e29] shadow-sm disabled:opacity-50"
             :disabled="isBuying" @click="handleBuyFish">
-            {{ isBuying ? 'Đang giao dịch...' : 'Mua' }}
+            {{ isBuying ? 'Đang xử lý...' : 'Mua' }}
           </button>
         </div>
       </div>
     </div>
+
+    <!-- Popup thông báo mua cá thành công -->
+    <Transition name="buy-success">
+      <div v-if="buySuccess"
+        class="fixed top-6 left-1/2 -translate-x-1/2 z-[100] flex items-center gap-2.5 px-5 py-3 rounded-xl bg-emerald-600 text-white shadow-[0_8px_30px_rgba(21,50,33,0.35)] border border-emerald-500 cursor-pointer"
+        @click="closeBuySuccess">
+        <span class="text-lg">🎉</span>
+        <span class="text-sm font-semibold">Mua <strong>{{ boughtFishName }}</strong> thành công!</span>
+      </div>
+    </Transition>
 </template>
+
+<style scoped>
+.buy-success-enter-active {
+  animation: buy-success-in 0.4s ease-out;
+}
+.buy-success-leave-active {
+  animation: buy-success-out 0.3s ease-in forwards;
+}
+@keyframes buy-success-in {
+  0% {
+    opacity: 0;
+    transform: translateX(-50%) translateY(-20px) scale(0.95);
+  }
+  100% {
+    opacity: 1;
+    transform: translateX(-50%) translateY(0) scale(1);
+  }
+}
+@keyframes buy-success-out {
+  0% {
+    opacity: 1;
+    transform: translateX(-50%) translateY(0) scale(1);
+  }
+  100% {
+    opacity: 0;
+    transform: translateX(-50%) translateY(-20px) scale(0.95);
+  }
+}
+</style>

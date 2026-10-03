@@ -5,6 +5,8 @@ import { useAuthStore } from '../../stores/auth';
 import { supabaseFishRepository } from '../../data/supabaseFishRepository';
 import { useMarketStore } from '../../stores/market';
 import { useWorldStore } from '../../stores/world';
+import Cash from '../currency/Cash.vue';
+import { useCurrencyStore } from '../../stores/currency.ts';
 const worldStore = useWorldStore()
 const caughtStore = useCaughtStore()
 const marketStore = useMarketStore()
@@ -16,7 +18,21 @@ const fishToSell = ref<any | null>(null);
 const sellPrice = ref<number | "">("");
 const isSelling = ref(false);
 const sellError = ref("");
+const sellSuccess = ref(false);
+const soldFishName = ref("");
+let sellSuccessTimer: ReturnType<typeof setTimeout> | null = null;
+const LISTED_PRICE = 500;
 const authStore = useAuthStore();
+const currencyStore = useCurrencyStore();
+const balanceFee = computed(() => {
+  const price = Number(sellPrice.value);
+  if (price >= 1000) {
+    const balanceFactor = Math.floor(price / 1000.0) * 0.01;
+    return Math.floor(price * balanceFactor);
+  } else {
+    return 0;
+  }
+})
 
 const filteredCaughtFishes = computed(() => {
   return caughtStore.caughtFishes.filter((item) => {
@@ -67,10 +83,12 @@ async function handleSell() {
   sellError.value = "";
 
   try {
-    await supabaseFishRepository.listFishOnMarket(fishToSell.value.id, userId, priceNum);
+    const fishName = fishToSell.value.species?.name || "cá";
+    await supabaseFishRepository.listFishOnMarket(fishToSell.value.id, priceNum);
     caughtStore.caughtFishes = caughtStore.caughtFishes.filter((f) => f.id !== fishToSell.value.id);
     await marketStore.loadMarketListings();
     cancelSell();
+    showSellSuccess(fishName);
   } catch (err: any) {
     console.error("Lỗi khi đăng bán cá:", err);
     sellError.value = err.message || "Không thể đăng bán cá. Vui lòng thử lại.";
@@ -124,6 +142,20 @@ async function handleRelease() {
   } finally {
     isReleasing.value = false;
   }
+}
+
+function showSellSuccess(fishName: string) {
+  soldFishName.value = fishName;
+  sellSuccess.value = true;
+  if (sellSuccessTimer) clearTimeout(sellSuccessTimer);
+  sellSuccessTimer = setTimeout(() => {
+    sellSuccess.value = false;
+  }, 2500);
+}
+
+function closeSellSuccess() {
+  sellSuccess.value = false;
+  if (sellSuccessTimer) clearTimeout(sellSuccessTimer);
 }
 
 </script>
@@ -192,7 +224,8 @@ async function handleRelease() {
             <span class="font-bold text-xs truncate text-[#263238]">{{ item.species?.name }}</span>
           </div>
           <div class="flex items-center gap-2 text-[11px] text-gray-600">
-            <span>{{ typeof item.species?.weight === 'number' ? item.species.weight + ' kg' : item.species?.weight }}</span>
+            <span>{{ typeof item.species?.weight === 'number' ? item.species.weight + ' kg' : item.species?.weight
+              }}</span>
           </div>
           <div class="flex items-center justify-between text-[10px] text-gray-400">
             <span class="shrink-0 ml-1">{{ formatDate(item.created_at) }}</span>
@@ -203,7 +236,7 @@ async function handleRelease() {
               {{ item.species?.rarity }}
             </span>
             <span class="text-xs px-1.5 py-1">{{ item.variant_type }}</span>
-            <div @click="worldStore.handleMoveToArea(item.origin)"class="text-xs mt-1 cursor-pointer hover:underline">
+            <div @click="worldStore.handleMoveToArea(item.origin)" class="text-xs mt-1 cursor-pointer hover:underline">
               {{ item.origin.country }} - {{ item.origin.name }}
             </div>
           </div>
@@ -267,11 +300,31 @@ async function handleRelease() {
       </p>
 
       <div class="my-4 text-left">
-        <label class="block text-xs font-bold text-gray-700 mb-1">Giá bán (đ)</label>
         <input v-model.number="sellPrice" type="number" min="1" placeholder="Nhập giá bán..."
           class="w-full px-3 py-2 text-xs border border-gray-300 rounded-lg focus:outline-none focus:border-gray-300"
+          @keydown="(e: KeyboardEvent) => { if (['e', 'E', '+', '-', '.'].includes(e.key)) e.preventDefault() }"
           @keyup.enter="handleSell" />
         <p v-if="sellError" class="mt-1 text-[11px] text-red-500 font-medium">{{ sellError }}</p>
+      </div>
+      <div>
+        <div class="flex items-center gap-2 text-xs">
+          <span>Số dư hiện tại: </span>
+          <Cash :amount="currencyStore.cash" />
+        </div>
+        <hr class="my-2">
+        <div class="flex items-center gap-2 text-xs">
+          <span>Phí niêm yết thị trường:</span>
+          <Cash :amount="LISTED_PRICE" />
+        </div>
+        <div class="flex items-center gap-2 text-xs">
+          <span>Phí cân bằng thị trường: </span>
+          <Cash :amount="balanceFee" />
+        </div>
+        <hr class="my-2">
+        <div class="flex items-center gap-2 text-xs">
+          <span>Tổng phí: </span>
+          <Cash :amount="LISTED_PRICE + balanceFee" />
+        </div>
       </div>
 
       <div class="flex justify-center gap-3 mt-5">
@@ -283,9 +336,48 @@ async function handleRelease() {
         <button type="button"
           class="py-1.5 px-4 rounded-lg border border-gray-300 bg-[#153221] text-white text-xs font-bold cursor-pointer hover:bg-[#1a3e29] shadow-sm disabled:opacity-50"
           :disabled="isSelling" @click="handleSell">
-          {{ isSelling ? 'Đang bán...' : 'Xác nhận bán' }}
+          {{ isSelling ? 'Đang xử lý...' : 'Đăng bán' }}
         </button>
       </div>
     </div>
   </div>
+
+  <!-- Popup thông báo đăng bán thành công -->
+  <Transition name="sell-success">
+    <div v-if="sellSuccess"
+      class="fixed top-6 left-1/2 -translate-x-1/2 z-[100] flex items-center gap-2.5 px-5 py-3 rounded-xl bg-emerald-600 text-white shadow-[0_8px_30px_rgba(21,50,33,0.35)] border border-emerald-500"
+      @click="closeSellSuccess">
+      <span class="text-lg">✅</span>
+      <span class="text-sm font-semibold">Đã đăng bán <strong>{{ soldFishName }}</strong> lên thị trường thành công!</span>
+    </div>
+  </Transition>
 </template>
+
+<style scoped>
+.sell-success-enter-active {
+  animation: sell-success-in 0.4s ease-out;
+}
+.sell-success-leave-active {
+  animation: sell-success-out 0.3s ease-in forwards;
+}
+@keyframes sell-success-in {
+  0% {
+    opacity: 0;
+    transform: translateX(-50%) translateY(-20px) scale(0.95);
+  }
+  100% {
+    opacity: 1;
+    transform: translateX(-50%) translateY(0) scale(1);
+  }
+}
+@keyframes sell-success-out {
+  0% {
+    opacity: 1;
+    transform: translateX(-50%) translateY(0) scale(1);
+  }
+  100% {
+    opacity: 0;
+    transform: translateX(-50%) translateY(-20px) scale(0.95);
+  }
+}
+</style>

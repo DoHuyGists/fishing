@@ -103,15 +103,15 @@ class SupabaseFishRepository {
     if (error) throw new Error(error.message);
   }
 
-  async listFishOnMarket(caughtId: string, userId: string, price: number): Promise<void> {
-    const { error: marketError } = await supabase.from("species_market").insert({
-      caught_id: caughtId,
-      user_id: userId,
-      price: price,
-      status: "normal",
+  async listFishOnMarket(caughtId: string, price: number): Promise<void> {
+    const { data, error } = await supabase.rpc("list_species_on_market", {
+      p_caught_id: caughtId,
+      p_price: price,
     });
 
-    if (marketError) throw new Error(marketError.message);
+    if (error) throw new Error(error.message);
+
+    return data;
   }
 }
 

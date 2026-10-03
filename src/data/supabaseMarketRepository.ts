@@ -101,7 +101,7 @@ class SupabaseMarketRepository {
     seller_id: string;
     price: number;
   }> {
-    const { data, error } = await supabase.rpc("buy_market_item", {
+    const { data, error } = await supabase.rpc("buy_species_from_market", {
       p_market_id: speciesMarketId,
     });
     if (error) throw new Error(error.message);
