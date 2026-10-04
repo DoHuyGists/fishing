@@ -1,11 +1,11 @@
 <script lang="ts" setup>
 import { computed, ref } from "vue";
-import FishingAreaManagement from "./FishingAreaManagement.vue";
-import ItemManagement from "./ItemManagement.vue";
-import SpeciesManagement from "./SpeciesManagement.vue";
-import SpeciesInAreaManagement from "./SpeciesInAreaManagement.vue";
-import EventManagement from "./EventManagement.vue";
-import EventScheduleManagement from "./EventScheduleManagement.vue";
+import FishingAreaManagement from "../components/admin/FishingAreaManagement.vue";
+import ItemManagement from "../components/admin/ItemManagement.vue";
+import SpeciesManagement from "../components/admin/SpeciesManagement.vue";
+import SpeciesInAreaManagement from "../components/admin/SpeciesInAreaManagement.vue";
+import EventManagement from "../components/admin/EventManagement.vue";
+import EventScheduleManagement from "../components/admin/EventScheduleManagement.vue";
 
 type ModuleKey = "area" | "item" | "species" | "speciesInArea" | "event" | "schedule";
 

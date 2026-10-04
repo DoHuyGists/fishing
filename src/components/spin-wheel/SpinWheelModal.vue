@@ -1,14 +1,5 @@
 <template>
-  <div class="fixed inset-0 z-50 flex flex-col bg-emerald-950">
-    <button
-      type="button"
-      aria-label="Đóng vòng quay"
-      class="absolute right-4 top-4 z-10 flex h-10 w-10 cursor-pointer items-center justify-center rounded-full border border-white/15 bg-white/5 text-2xl font-bold text-white transition-colors hover:bg-white/15 sm:right-6 sm:top-6"
-      @click="emit('close')"
-    >
-      &times;
-    </button>
-
+  <Modal>
     <div class="flex h-full w-full flex-col lg:flex-row">
       <div
         class="h-1/2 min-h-0 w-full border-b border-emerald-300/20 p-3 sm:p-5 lg:h-full lg:w-1/2 lg:border-b-0 lg:border-r"
@@ -34,7 +25,7 @@
         </p>
       </div>
     </div>
-  </div>
+  </Modal>
 </template>
 
 <script setup lang="ts">
@@ -43,8 +34,8 @@ import { useSpinWheelStore } from "../../stores/spinWheel.ts";
 import ListItems from "./ListItems.vue";
 import SpinWheel from "./SpinWheel.vue";
 import type { Reward } from "./SpinWheel.vue";
+import Modal from "../Modal.vue";
 
-const emit = defineEmits(["close"]);
 const spinWheelStore = useSpinWheelStore();
 const viewportWidth = ref(window.innerWidth);
 const eligibleRewards = computed(() => spinWheelStore.selectedReward);

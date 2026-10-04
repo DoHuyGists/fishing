@@ -5,6 +5,7 @@ import { useAuthStore } from "../../stores/auth";
 import { mapData } from "../../data/map";
 import FlipBook from "./FlipBook.vue";
 import BookCover, { type BookVariant } from "./BookCover.vue";
+import Modal from "../Modal.vue";
 
 const emit = defineEmits(["close"]);
 
@@ -139,40 +140,13 @@ function returnToBookshelf() {
 </script>
 
 <template>
-  <div
-    class="fixed inset-0 z-50 flex items-center justify-center bg-black/80 backdrop-blur-md p-2 md:p-6 overflow-y-auto">
+  <Modal :title="viewMode === 'bookshelf' ? 'Nhật ký đánh bắt' : `Nhật ký đánh bắt: ${selectedCountry?.name}`">
     <!-- Main Window Container -->
     <div
       class="relative bg-[#1c120c] rounded-2xl p-4 md:p-6 shadow-[0_25px_70px_rgba(0,0,0,0.9)] border-1 border-[#4a2e1b] text-amber-100 flex flex-col min-h-[620px] h-full w-full">
 
-      <!-- Close Button -->
-      <button type="button"
-        class="absolute -top-3 -right-3 z-50 w-10 h-10 rounded-full bg-amber-900 border-1 border-amber-400 text-amber-100 font-bold text-xl flex items-center justify-center hover:bg-amber-800 transition-transform active:scale-95 shadow-xl cursor-pointer"
-        @click="emit('close')" title="Đóng nhật ký">
-        ✕
-      </button>
-
       <!-- TOP BAR HEADER -->
       <div class="flex flex-wrap items-center justify-between gap-3 border-b-2 border-amber-900/50 pb-3 mb-4 shrink-0">
-        <div class="flex justify-between items-center gap-3 w-full">
-          <div class="flex items-center gap-2">
-            <!-- <span class="text-2xl md:text-3xl">📚</span> -->
-            <div>
-              <h2 class="m-0 text-lg md:text-2xl font-serif font-bold text-amber-200 tracking-wide">
-                {{ viewMode === 'bookshelf' ? 'Nhật ký đánh bắt' : `Nhật ký đánh bắt: ${selectedCountry?.name}` }}
-              </h2>
-              <!-- <p class="m-0 text-xs text-amber-400/80">
-                {{ viewMode === 'bookshelf' ? `Tổng cộng ${allCountries.length} quốc gia` : `Mã quốc gia: ${selectedCountry?.code} • ${countryStats.caught}/${countryStats.total} loài đã thu thập` }}
-              </p> -->
-            </div>
-          </div>
-          <button v-if="viewMode === 'openbook'" type="button"
-            class="flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-amber-800/80 hover:bg-amber-700 text-amber-100 font-bold text-xs border border-amber-500/50 transition-all cursor-pointer shadow"
-            @click="returnToBookshelf">
-            <span>⬅</span>
-            <span>Quay lại giá sách</span>
-          </button>
-        </div>
 
         <!-- Search Bar on Bookshelf mode -->
         <div v-if="viewMode === 'bookshelf'" class="flex items-center gap-2">
@@ -187,6 +161,13 @@ function returnToBookshelf() {
           </div>
         </div>
       </div>
+
+      <button v-if="viewMode === 'openbook'" type="button"
+            class="flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-amber-800/80 hover:bg-amber-700 text-amber-100 font-bold text-xs border border-amber-500/50 transition-all cursor-pointer shadow"
+            @click="returnToBookshelf">
+            <span>⬅</span>
+            <span>Quay lại giá sách</span>
+        </button>
 
       <!-- ================= MODE 1: BOOKSHELF (GIÁ SÁCH CÁC QUỐC GIA) ================= -->
       <div v-if="viewMode === 'bookshelf'" class="flex-1 flex flex-col justify-between overflow-hidden">
@@ -270,5 +251,5 @@ function returnToBookshelf() {
       </div>
 
     </div>
-  </div>
+  </Modal>
 </template>

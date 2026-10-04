@@ -3,8 +3,8 @@ import { computed, onMounted, ref } from "vue";
 import { useMissionStore } from "../../stores/mission";
 import { useCaughtStore } from "../../stores/caught";
 import Cash from "../currency/Cash.vue";
+import Modal from "../Modal.vue";
 
-const emit = defineEmits<{ close: [] }>();
 const missionStore = useMissionStore();
 const caughtStore = useCaughtStore();
 const selectedMissionId = ref("");
@@ -134,50 +134,18 @@ async function claimMission() {
 }
 </script>
 <template>
-  <div class="fixed inset-0 z-50 bg-black/65" @click.self="emit('close')">
-    <section
-      class="relative w-screen h-dvh max-w-none overflow-hidden border-0 bg-[#f4f5e9] text-[#20372a] shadow-2xl flex flex-col"
-      role="dialog"
-      aria-modal="true"
-      aria-labelledby="mission-title"
-    >
-      <header
-        class="flex items-center justify-between gap-4 px-5 py-4 sm:px-7 border-b border-emerald-950/10 bg-[#e7ecda]"
-      >
-        <div>
-          <p class="m-0 text-[10px] font-extrabold tracking-[0.14em] uppercase text-emerald-800">Bảng nhiệm vụ</p>
-          <h2 id="mission-title" class="m-0 mt-1 text-xl sm:text-2xl font-bold">Nhiệm vụ theo giờ</h2>
-        </div>
-        <div class="flex items-center gap-2">
-          <button
-            type="button"
-            class="px-3 py-2 rounded-md border border-emerald-900/15 bg-white/70 text-sm font-bold text-emerald-950 hover:bg-white disabled:opacity-50 disabled:cursor-not-allowed"
-            :disabled="isRefreshing || isClaiming || isLoading"
-            @click="loadMissionData()"
-          >
-            <span aria-hidden="true" class="mr-1">↻</span>{{ isRefreshing ? "Đang tải..." : "Làm mới" }}
-          </button>
-          <button
-            type="button"
-            class="w-9 h-9 rounded-full border border-emerald-900/15 bg-white/70 text-emerald-950 hover:bg-white text-2xl leading-none cursor-pointer"
-            aria-label="Đóng nhiệm vụ"
-            @click="emit('close')"
-          >
-            &times;
-          </button>
-        </div>
-      </header>
+  <Modal title="Bảng nhiệm vụ" sub-title="Nhiệm vụ theo giờ" @refresh="loadMissionData()">
 
       <div v-if="isLoading" class="flex-1 grid place-items-center text-sm text-emerald-900/70">
         Đang tải cá và nhiệm vụ...
       </div>
-      <div v-else class="grid grid-rows-[minmax(0,1fr)_minmax(0,1fr)] md:grid-rows-1 md:grid-cols-[minmax(0,1fr)_minmax(0,1fr)] min-h-0 flex-1">
-        <section class="min-h-0 flex flex-col border-b md:border-b-0 md:border-r border-emerald-950/10">
+      <div v-else class="grid grid-rows-[minmax(0,1fr)_minmax(0,1fr)] md:grid-rows-1 md:grid-cols-[minmax(0,1fr)_minmax(0,1fr)] h-full flex-1">
+        <section class="h-full flex flex-col border-b md:border-b-0 md:border-r border-emerald-950/10">
           <div class="px-5 py-3 sm:px-6 border-b border-emerald-950/10 flex items-center justify-between">
             <h3 class="m-0 text-sm font-bold">Cá đã câu</h3>
             <span class="text-xs text-emerald-900/60">{{ caughtStore.caughtFishes.length }} con</span>
           </div>
-          <div class="flex-1 overflow-y-auto p-3 sm:p-4 space-y-2">
+          <div class="p-3 sm:p-4 space-y-2 h-0 grow overflow-y-scroll">
             <p v-if="!caughtStore.caughtFishes.length" class="py-8 text-center text-sm text-emerald-900/55">
               Bạn chưa có cá trong bộ sưu tập.
             </p>
@@ -293,8 +261,7 @@ async function claimMission() {
           </footer>
         </section>
       </div>
-    </section>
-  </div>
+  </Modal>
 
   <!-- Popup thông báo nộp nhiệm vụ thành công -->
   <Transition name="claim-success">

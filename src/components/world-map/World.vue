@@ -33,9 +33,9 @@ function closePrepare() {
   pendingAnchor.value = null;
 }
 
-function onPrepareConfirm(anchor: any) {
+async function onPrepareConfirm(anchor: any) {
+  await goToFishingArea(anchor);
   showPrepare.value = false;
-  goToFishingArea(anchor);
 }
 
 watch(
@@ -73,9 +73,7 @@ async function goToFishingArea(anchor: any) {
   if (isEntering.value) return;
   isEntering.value = true;
   try {
-    if (authStore.userId) {
-      await supabaseUserInAreaRepository.setUserEnterArea(anchor.id);
-    }
+    await supabaseUserInAreaRepository.setUserEnterArea(anchor.id);
   } catch (err) {
     console.error("Lỗi cập nhật user_in_area khi đi đến bãi câu:", err);
   } finally {

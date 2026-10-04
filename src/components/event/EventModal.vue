@@ -2,6 +2,7 @@
 import { computed, onMounted, ref } from "vue";
 import { supabaseEventScheduleRepository, type EventScheduleRow } from "../../data/supabaseEventScheduleRepository";
 import EventThumbnail from "./EventThumbnail.vue";
+import Modal from "../Modal.vue";
 
 const emit = defineEmits(["close"]);
 
@@ -55,39 +56,10 @@ async function selectSchedule(item: EventScheduleRow) {
 onMounted(loadSchedules);
 </script>
 <template>
-  <div class="fixed inset-0 z-50 bg-black/65" @click.self="emit('close')">
+  <Modal title="Bảng sự kiện" sub-title="Sự kiện đang diễn ra" @refresh="loadSchedules()">
     <section
       class="relative flex h-dvh w-screen max-w-none flex-col overflow-hidden border-0 bg-[#f4f5e9] text-[#20372a] shadow-2xl"
-      role="dialog"
-      aria-modal="true"
-      aria-labelledby="event-title"
-    >
-      <header
-        class="flex items-center justify-between gap-4 border-b border-emerald-950/10 bg-[#e7ecda] px-5 py-4 sm:px-7"
-      >
-        <div>
-          <!-- <p class="m-0 text-[10px] font-extrabold uppercase tracking-[0.14em] text-emerald-800">Bảng sự kiện</p> -->
-          <h2 id="event-title" class="m-0 mt-1 text-xl font-bold sm:text-2xl">Sự kiện đang diễn ra</h2>
-        </div>
-        <div class="flex items-center gap-2">
-          <button
-            type="button"
-            class="rounded-md border border-emerald-900/15 bg-white/70 px-3 py-2 text-sm font-bold text-emerald-950 hover:bg-white disabled:cursor-not-allowed disabled:opacity-50"
-            :disabled="isLoading"
-            @click="loadSchedules"
-          >
-            <span aria-hidden="true" class="mr-1">↻</span>{{ isLoading ? "Đang tải..." : "Làm mới" }}
-          </button>
-          <button
-            type="button"
-            class="flex h-9 w-9 cursor-pointer items-center justify-center rounded-full border border-emerald-900/15 bg-white/70 text-2xl font-bold leading-none text-emerald-950 hover:bg-white"
-            aria-label="Đóng sự kiện"
-            @click="emit('close')"
-          >
-            &times;
-          </button>
-        </div>
-      </header>
+      role="dialog" aria-modal="true" aria-labelledby="event-title">
 
       <div v-if="isLoading" class="grid flex-1 place-items-center text-sm text-emerald-900/70">Đang tải sự kiện...</div>
       <div v-else-if="loadError" class="grid flex-1 place-items-center text-center text-sm text-red-700">
@@ -96,10 +68,8 @@ onMounted(loadSchedules);
           <button type="button" class="mt-2 font-bold underline" @click="loadSchedules">Thử lại</button>
         </div>
       </div>
-      <div
-        v-else
-        class="grid min-h-0 flex-1 grid-rows-[minmax(0,1fr)_minmax(0,1fr)] md:grid-cols-[26rem_minmax(0,1fr)] md:grid-rows-1"
-      >
+      <div v-else
+        class="grid min-h-0 flex-1 grid-rows-[minmax(0,1fr)_minmax(0,1fr)] md:grid-cols-[26rem_minmax(0,1fr)] md:grid-rows-1">
         <!-- Danh sách sự kiện -->
         <section class="flex min-h-0 flex-col border-b border-emerald-950/10 md:border-b-0 md:border-r">
           <div class="flex items-center justify-between border-b border-emerald-950/10 px-5 py-3 sm:px-6">
@@ -110,33 +80,23 @@ onMounted(loadSchedules);
             <p v-if="!activeSchedules.length" class="py-8 text-center text-sm text-emerald-900/55">
               Hiện không có sự kiện nào.
             </p>
-            <button
-              v-for="item in activeSchedules"
-              :key="item.id"
-              type="button"
-              class="w-full cursor-pointer rounded-lg p-3 text-left transition-colors"
-              :class="
-                selectedId === item.id
+            <button v-for="item in activeSchedules" :key="item.id" type="button"
+              class="w-full cursor-pointer rounded-lg p-3 text-left transition-colors" :class="selectedId === item.id
                   ? 'bg-gray-50'
                   : ''
-              "
-              @click="selectSchedule(item)"
-            >
+                " @click="selectSchedule(item)">
               <span class="flex items-start gap-3">
                 <div>
-                    <EventThumbnail :src="item.eventThumbnail" :rotate="-8" :width="160" :height="190" />
+                  <EventThumbnail :src="item.eventThumbnail" :rotate="-8" :width="160" :height="190" />
                 </div>
                 <span class="min-w-0 flex-1">
                   <span class="flex flex-col gap-2">
                     <span class="truncate text-sm font-bold">{{ item.eventName || "Sự kiện" }}</span>
-                    <span
-                      class="shrink-0 rounded-full w-fit px-2 py-0.5 text-[10px] font-bold"
-                      :class="{
-                        'bg-emerald-200 text-emerald-900': scheduleStatus(item) === 'ongoing',
-                        'bg-amber-200 text-amber-900': scheduleStatus(item) === 'upcoming',
-                        'bg-gray-200 text-gray-700': scheduleStatus(item) === 'ended',
-                      }"
-                    >
+                    <span class="shrink-0 rounded-full w-fit px-2 py-0.5 text-[10px] font-bold" :class="{
+                      'bg-emerald-200 text-emerald-900': scheduleStatus(item) === 'ongoing',
+                      'bg-amber-200 text-amber-900': scheduleStatus(item) === 'upcoming',
+                      'bg-gray-200 text-gray-700': scheduleStatus(item) === 'ended',
+                    }">
                       {{
                         scheduleStatus(item) === "ongoing"
                           ? "Đang diễn ra"
@@ -146,9 +106,8 @@ onMounted(loadSchedules);
                       }}
                     </span>
                   </span>
-                  <span class="mt-1 block text-xs text-emerald-900/60"
-                    >{{ formatDate(item.start) }} - {{ formatDate(item.end) }}</span
-                  >
+                  <span class="mt-1 block text-xs text-emerald-900/60">{{ formatDate(item.start) }} - {{
+                    formatDate(item.end) }}</span>
                 </span>
               </span>
             </button>
@@ -158,13 +117,9 @@ onMounted(loadSchedules);
         <!-- Chi tiết sự kiện -->
         <section class="min-h-0 overflow-y-auto">
           <article v-if="selectedSchedule" class="mx-auto min-w-3xl p-5 sm:p-8">
-            <img
-              v-if="selectedSchedule.eventImage"
-              :src="selectedSchedule.eventImage"
+            <img v-if="selectedSchedule.eventImage" :src="selectedSchedule.eventImage"
               :alt="selectedSchedule.eventName || ''"
-              class="mb-5 h-56 w-full rounded-xl border border-emerald-950/10 object-cover sm:h-72"
-              draggable="false"
-            />
+              class="mb-5 h-56 w-full rounded-xl border border-emerald-950/10 object-cover sm:h-72" draggable="false" />
             <p class="m-0 text-[10px] font-extrabold uppercase tracking-[0.14em] text-emerald-800">
               {{
                 scheduleStatus(selectedSchedule) === "ongoing"
@@ -193,5 +148,5 @@ onMounted(loadSchedules);
         </section>
       </div>
     </section>
-  </div>
+  </Modal>
 </template>

@@ -64,10 +64,6 @@ export const useDiaryStore = defineStore("diary", {
   },
 
   actions: {
-    async loadDiary(userId?: string) {
-      await this.initDiary(userId);
-    },
-
     async initDiary(userId?: string) {
       this.isLoading = true;
       this.error = null;

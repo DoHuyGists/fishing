@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { computed, onBeforeUnmount, onMounted, ref, watch } from "vue";
-import type { EquipmentVariant } from "../data/equipmentCatalog";
+import type { EquipmentVariant } from "../../data/equipmentCatalog";
 
 const props = defineProps<{
   options: EquipmentVariant[];

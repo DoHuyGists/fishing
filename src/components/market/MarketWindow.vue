@@ -1,11 +1,12 @@
 <script lang="ts" setup>
-import { computed, ref } from 'vue';
+import { computed, onMounted, ref } from 'vue';
 import { useCurrencyStore } from '../../stores/currency';
 import { supabaseMarketRepository, type MarketListing } from '../../data/supabaseMarketRepository';
 import { useAuthStore } from '../../stores/auth';
 import { useMarketStore } from '../../stores/market';
 import { useCaughtStore } from '../../stores/caught';
 import Cash from '../currency/Cash.vue';
+import Modal from '../Modal.vue';
 
 const authStore = useAuthStore();
 const currencyStore = useCurrencyStore();
@@ -147,43 +148,17 @@ function getRarityBadgeClass(rarity: string | null | undefined) {
       return "bg-gray-100 text-gray-700 border-gray-300";
   }
 }
+
+onMounted(()=>{
+  marketStore.loadMarketListings();
+})
+
 </script>
 
 <template>
-     <div 
-      class="fixed inset-0 z-50 flex items-center justify-center bg-black/60 p-4 backdrop-blur-xs">
+     <Modal title="Chợ cá">
       <div
         class="w-full h-full bg-white border border-gray-300 rounded-2xl shadow-[0_20px_50px_rgba(0,0,0,0.3)] flex flex-col overflow-hidden relative">
-
-        <!-- Header -->
-        <div
-          class="px-6 py-4 bg-[#153221] text-white flex items-center justify-between border-b border-emerald-800 flex-shrink-0">
-          <div class="flex items-center gap-3">
-            <div
-              class="w-10 h-10 rounded-xl bg-emerald-700/60 border border-emerald-500/40 grid place-items-center text-xl shadow-inner">
-              🏪
-            </div>
-            <div>
-              <h2 class="m-0 text-lg font-extrabold tracking-wide">Chợ Cá</h2>
-              <!-- <p class="m-0 text-xs text-emerald-200">Mua bán, giao dịch cá quý hiếm giữa các cần thủ</p> -->
-            </div>
-          </div>
-
-          <div class="flex items-center gap-4">
-            <!-- Số tiền người dùng -->
-            <div
-              class="flex items-center gap-2 px-3 py-1.5 bg-emerald-950/60 border border-emerald-600/50 rounded-xl text-amber-300 font-bold text-sm">
-              <Cash :amount="currencyStore.formattedCash"/>
-            </div>
-
-            <button type="button"
-              class="w-8 h-8 rounded-full border border-emerald-600/50 bg-emerald-900/50 text-white hover:bg-emerald-800 font-bold text-lg flex items-center justify-center cursor-pointer transition-colors"
-              @click="emit('close')"
-              >
-              &times;
-            </button>
-          </div>
-        </div>
 
         <!-- Navigation Tabs & Utility Toolbar -->
         <div
@@ -207,7 +182,7 @@ function getRarityBadgeClass(rarity: string | null | undefined) {
               </span>
             </button>
           </div>
-
+          <Cash :amount="currencyStore.formattedCash"/>
           <!-- Quick Refresh Button -->
           <button type="button" @click="marketStore.loadMarketListings" title="Làm mới danh sách"
             class="px-3 py-1.5 border border-gray-300 rounded-lg bg-white hover:bg-gray-100 text-gray-700 text-xs font-bold flex items-center gap-1.5 cursor-pointer transition-colors">
@@ -391,7 +366,7 @@ function getRarityBadgeClass(rarity: string | null | undefined) {
         </div>
 
       </div>
-    </div>
+    </Modal>
     <!-- Confirm Buy Dialog -->
     <div v-if="itemToBuy" class="fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-4 backdrop-blur-xs"
       @click.self="cancelBuy">

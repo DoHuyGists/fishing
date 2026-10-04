@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { computed } from "vue";
-import { useFishingStore } from "../stores/fishing";
+import { useFishingStore } from "../../stores/fishing";
 
 const store = useFishingStore();
 const caught = computed(() => store.inventory[0]);
@@ -19,35 +19,34 @@ const variantFrameClass = computed(() => {
 <template>
   <Teleport to="body">
     <Transition name="catch-dialog">
-      <div
-        v-if="store.catchDialogOpen && caught"
+      <div v-if="store.catchDialogOpen && caught"
         class="fixed z-30 inset-0 grid place-items-center p-5 bg-[rgba(4,17,11,0.72)] backdrop-blur-[7px]"
-        role="presentation"
-        @click.self="store.closeCatchDialog"
-      >
+        role="presentation" @click.self="store.closeCatchDialog">
         <section
           class="catch-card w-[min(360px,100%)] overflow-hidden border-2 rounded-[22px] bg-[linear-gradient(145deg,#173d2b,#0e281b)] shadow-[0_24px_70px_rgba(0,0,0,0.48)] text-center text-[#f4f0df]"
-          :class="variantFrameClass"
-          role="dialog"
-          aria-modal="true"
-          aria-labelledby="catch-title"
-        >
-          <p class="mt-[19px] mb-2.5 text-[#e8bd62] text-[10px] font-black tracking-[0.16em] uppercase">Cú câu thành công</p>
-          <img :src="caught.image" :alt="caught.name" class="block w-[calc(100%-28px)] h-[178px] mx-3.5 rounded-[14px] object-cover" draggable="false"/>
+          :class="variantFrameClass" role="dialog" aria-modal="true" aria-labelledby="catch-title">
+          <p class="mt-[19px] mb-2.5 text-[#e8bd62] text-[10px] font-black tracking-[0.16em] uppercase">Cú câu thành
+            công</p>
+          <img :src="caught.image" :alt="caught.name"
+            class="block w-[calc(100%-28px)] h-[178px] mx-3.5 rounded-[14px] object-cover" draggable="false" />
           <div class="px-5 pt-3.5 pb-3">
-            <span class="inline-block px-2 py-1 rounded-full bg-[#dcae52] text-[#254130] text-[9px] font-black tracking-[0.1em]">{{ caught.variantType }}</span>
-            <span v-if="caught.isShiny" class="inline-block ml-1 px-2 py-1 rounded-full bg-[#fff1a8] text-[#6b4b00] text-[9px] font-black tracking-widest">CÁ XỊN</span>
-            <p v-if="caught.starRating !== undefined" class="mt-2 mb-0 text-[#ffd65a] text-sm font-black" :aria-label="`${caught.starRating} sao`">
+            <span
+              class="inline-block px-2 py-1 rounded-full bg-[#dcae52] text-[#254130] text-[9px] font-black tracking-[0.1em]">{{
+                caught.variantType }}</span>
+            <span v-if="caught.isShiny"
+              class="inline-block ml-1 px-2 py-1 rounded-full bg-[#fff1a8] text-[#6b4b00] text-[9px] font-black tracking-widest">CÁ
+              XỊN</span>
+            <p v-if="caught.starRating !== undefined" class="mt-2 mb-0 text-[#ffd65a] text-sm font-black"
+              :aria-label="`${caught.starRating} sao`">
               {{ "★".repeat(Math.max(0, Math.floor(caught.starRating))) }}
             </p>
             <h2 id="catch-title" class="mt-2 mb-[3px] text-2xl">{{ caught.name }}</h2>
-            <p class="m-0 text-[#b7cfb9] text-[13px]">{{ caught.weight }}<span v-if="caught.length"> · {{ caught.length }}</span></p>
+            <p class="m-0 text-[#b7cfb9] text-[13px]">{{ caught.weight }}<span v-if="caught.length"> · {{ caught.length
+                }}</span></p>
           </div>
-          <button
-            type="button"
+          <button type="button"
             class="w-[calc(100%-40px)] mx-5 mt-1 mb-5 p-3 border-0 rounded-[10px] bg-[#e1aa49] text-[#173223] cursor-pointer font-black"
-            @click="store.closeCatchDialog"
-          >
+            @click="store.closeCatchDialog">
             Câu tiếp
           </button>
         </section>
@@ -61,16 +60,19 @@ const variantFrameClass = computed(() => {
 .catch-dialog-leave-active {
   transition: opacity 0.2s ease;
 }
+
 .catch-dialog-enter-active .catch-card,
 .catch-dialog-leave-active .catch-card {
   transition:
     transform 0.2s ease,
     opacity 0.2s ease;
 }
+
 .catch-dialog-enter-from,
 .catch-dialog-leave-to {
   opacity: 0;
 }
+
 .catch-dialog-enter-from .catch-card,
 .catch-dialog-leave-to .catch-card {
   opacity: 0;

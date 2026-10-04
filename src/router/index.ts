@@ -2,7 +2,6 @@ import { createRouter, createWebHistory } from "vue-router";
 import supabase from "../database/connection";
 import { supabaseUserInAreaRepository } from "../data/supabaseUserInAreaRepository.ts";
 import ProtectedLayout from "../layouts/ProtectedLayout.vue";
-import Admin from "../components/admin/Admin.vue";
 
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
@@ -30,7 +29,7 @@ const router = createRouter({
         },
         {
           path: "admin",
-          component: Admin
+          component: import("../views/AdminView.vue")
         }
       ],
     },

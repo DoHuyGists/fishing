@@ -1,11 +1,11 @@
 <script setup lang="ts">
 import { computed, onBeforeMount, onBeforeUnmount, onMounted, ref, watch } from "vue";
-import { isPointInWater } from "../data/fishingMap";
-import { useFishingStore } from "../stores/fishing";
-import { useAuthStore } from "../stores/auth";
+import { isPointInWater } from "../../data/fishingMap";
+import { useFishingStore } from "../../stores/fishing";
+import { useAuthStore } from "../../stores/auth";
 import { onBeforeRouteLeave, useRouter } from "vue-router";
-import { useFishingAreaStore } from "../stores/fishingArea";
-import { supabaseUserInAreaRepository } from "../data/supabaseUserInAreaRepository";
+import { useFishingAreaStore } from "../../stores/fishingArea";
+import { supabaseUserInAreaRepository } from "../../data/supabaseUserInAreaRepository";
 
 const environment = import.meta.env.VITE_ENVIRONTMENT;
 
@@ -47,20 +47,20 @@ onBeforeRouteLeave(async (to) => {
   return true;
 });
 
-onBeforeMount(async()=>{
+onBeforeMount(async () => {
   await fishingStore.updateCurrentAreaId(authStore.userId);
 })
 
-watch(()=> fishingStore.currentAreaId, (areaId)=>{
-  if(areaId){
+watch(() => fishingStore.currentAreaId, (areaId) => {
+  if (areaId) {
     fishingStore.initializeFishingArea(areaId as string);
     fishingAreaStore.fetchCurrentArea(areaId as string);
     realtimeSubscription = supabaseUserInAreaRepository.subscribeToAreaUsers(async () => {
       await fishingStore.updateCurrentAreaId(authStore.userId);
       fishingStore.fetchPlayersInArea(areaId as string);
     });
-  }else{
-    router.replace({name: "home"})
+  } else {
+    router.replace({ name: "home" })
   }
 })
 
@@ -199,14 +199,8 @@ function handleClickOnScene(event: MouseEvent) {
 
 <template>
   <section class="fishing-scene" @contextmenu.prevent="">
-    <img
-      :src="currentScenePhace"
-      alt="Ao câu trong rừng"
-      class="pond-image"
-      draggable="false"
-      ref="sceneElement"
-      @click="handleClickOnScene"
-    />
+    <img :src="currentScenePhace" alt="Ao câu trong rừng" class="pond-image" draggable="false" ref="sceneElement"
+      @click="handleClickOnScene" />
     <div class="scene-shade"></div>
     <div class="scene-top flex justify-between items-start">
       <div class="flex flex-col gap-2">
@@ -218,15 +212,12 @@ function handleClickOnScene(event: MouseEvent) {
             <strong>{{ timeLabel }}</strong>
             <small>{{ currentPhase.label }}</small>
             <small>26°C <i></i> Gió nhẹ</small>
-          </div>    
+          </div>
         </div>
         <div class="backdrop-blur-2xl h-fit w-fit rounded p-1">
-          <button
-            type="button"
+          <button type="button"
             class="text-sm text-red-500 bg-transparent border-0 cursor-pointer font-medium p-0 hover:underline disabled:opacity-50"
-            :disabled="isLeaving"
-            @click="handleBackToMap"
-          >
+            :disabled="isLeaving" @click="handleBackToMap">
             {{ isLeaving ? "Đang quay lại..." : "Quay lại bản đồ" }}
           </button>
         </div>
@@ -239,36 +230,26 @@ function handleClickOnScene(event: MouseEvent) {
         <button type="button" class="bag-button" @click.stop="fishingStore.openBag">
           Túi cá <b>{{ fishingStore.inventory.length }}</b>
         </button>
-        <label v-if="environment == 'Development'" class="select-none cursor-pointer">Dev mode <input v-model="isDevMode" type="checkbox" /> </label>
+        <label v-if="environment == 'Development'" class="select-none cursor-pointer">Dev mode <input
+            v-model="isDevMode" type="checkbox" /> </label>
       </div>
     </div>
 
     <!-- <div class="scene-instruction">Chạm mặt hồ để vung cần đến điểm đó</div> -->
     <div class="water-glow"></div>
-    <svg v-if="isDevMode" class="water-boundary-debug" viewBox="0 0 100 100" preserveAspectRatio="none" aria-hidden="true">
+    <svg v-if="isDevMode" class="water-boundary-debug" viewBox="0 0 100 100" preserveAspectRatio="none"
+      aria-hidden="true">
       <polygon :points="waterBoundaryPoints" />
     </svg>
     <div v-if="invalidTap" class="invalid-tap">Chọn phần mặt nước</div>
-    <div
-      v-if="ripple"
-      class="ripple"
-      :style="{ left: `${fishingStore.baitPosition.x}%`, top: `${fishingStore.baitPosition.y}%` }"
-    ></div>
-    <svg
-      class="casting-line"
-      :class="castClass"
-      viewBox="0 0 100 100"
-      preserveAspectRatio="none"
-      pathLength="100"
-      aria-hidden="true"
-    >
+    <div v-if="ripple" class="ripple"
+      :style="{ left: `${fishingStore.baitPosition.x}%`, top: `${fishingStore.baitPosition.y}%` }"></div>
+    <svg class="casting-line" :class="castClass" viewBox="0 0 100 100" preserveAspectRatio="none" pathLength="100"
+      aria-hidden="true">
       <path :d="linePath" />
     </svg>
-    <div
-      class="bait-float"
-      :class="castClass"
-      :style="{ left: `${fishingStore.baitPosition.x}%`, top: `${fishingStore.baitPosition.y}%` }"
-    >
+    <div class="bait-float" :class="castClass"
+      :style="{ left: `${fishingStore.baitPosition.x}%`, top: `${fishingStore.baitPosition.y}%` }">
       <span></span>
     </div>
     <div class="rod-holder" :class="castClass" aria-hidden="true">
@@ -276,10 +257,7 @@ function handleClickOnScene(event: MouseEvent) {
       <span ref="rodLineAnchor" class="rod-line-anchor"></span>
     </div>
     <div class="bite-alert" :class="{ visible: fishingStore.castPhase === 'bite' }">! CÁ CẮN CÂU !</div>
-    <div
-      class="scene-status"
-      :class="{ active: fishingStore.castPhase !== 'idle' }"
-    >
+    <div class="scene-status" :class="{ active: fishingStore.castPhase !== 'idle' }">
       <span class="status-dot"></span>{{ fishingStore.castMessage }}
     </div>
   </section>
@@ -292,6 +270,7 @@ function handleClickOnScene(event: MouseEvent) {
   overflow: hidden;
   background: #294430;
 }
+
 .pond-image {
   position: absolute;
   inset: 0;
@@ -301,12 +280,14 @@ function handleClickOnScene(event: MouseEvent) {
   object-position: center 62%;
   cursor: crosshair;
 }
+
 .scene-shade {
   position: absolute;
   inset: 0;
   background: linear-gradient(180deg, rgba(9, 27, 20, 0.42), transparent 28%, transparent 66%, rgba(7, 29, 24, 0.24));
   pointer-events: none;
 }
+
 .scene-top {
   position: absolute;
   z-index: 2;
@@ -315,6 +296,7 @@ function handleClickOnScene(event: MouseEvent) {
   right: 21px;
   color: white;
 }
+
 .location,
 .weather,
 .scene-status {
@@ -323,6 +305,7 @@ function handleClickOnScene(event: MouseEvent) {
   border: 1px solid rgba(255, 255, 255, 0.2);
   box-shadow: 0 6px 18px rgba(9, 20, 14, 0.16);
 }
+
 .location {
   display: flex;
   align-items: center;
@@ -330,6 +313,7 @@ function handleClickOnScene(event: MouseEvent) {
   padding: 9px 15px 9px 10px;
   border-radius: 13px;
 }
+
 .location-icon {
   display: grid;
   place-items: center;
@@ -341,24 +325,29 @@ function handleClickOnScene(event: MouseEvent) {
   color: #244635;
   font-size: 21px;
 }
+
 .location strong,
 .location small {
   display: block;
   line-height: 1.15;
 }
+
 .location strong {
   font-size: 14px;
 }
+
 .location small {
   margin-top: 3px;
   color: #d9e6dc;
   font-size: 10px;
 }
+
 .scene-actions {
   display: flex;
   align-items: center;
   gap: 8px;
 }
+
 .weather {
   display: flex;
   gap: 7px;
@@ -368,16 +357,19 @@ function handleClickOnScene(event: MouseEvent) {
   font-size: 12px;
   font-weight: 650;
 }
+
 .weather span {
   color: #ffcf67;
   font-size: 16px;
 }
+
 .weather i {
   width: 3px;
   height: 3px;
   border-radius: 50%;
   background: #d6dfd8;
 }
+
 .bag-button {
   padding: 10px 12px;
   border: 1px solid rgba(255, 255, 255, 0.2);
@@ -390,6 +382,7 @@ function handleClickOnScene(event: MouseEvent) {
   font-weight: 800;
   backdrop-filter: blur(10px);
 }
+
 .players-button {
   padding: 10px 12px;
   border: 1px solid rgba(255, 255, 255, 0.2);
@@ -402,6 +395,7 @@ function handleClickOnScene(event: MouseEvent) {
   font-weight: 800;
   backdrop-filter: blur(10px);
 }
+
 .players-button b {
   display: inline-grid;
   place-items: center;
@@ -413,6 +407,7 @@ function handleClickOnScene(event: MouseEvent) {
   color: #173c31;
   font-size: 10px;
 }
+
 .bag-button b {
   display: inline-grid;
   place-items: center;
@@ -424,6 +419,7 @@ function handleClickOnScene(event: MouseEvent) {
   color: #244635;
   font-size: 10px;
 }
+
 .scene-instruction {
   position: absolute;
   z-index: 2;
@@ -439,6 +435,7 @@ function handleClickOnScene(event: MouseEvent) {
   opacity: 0.78;
   white-space: nowrap;
 }
+
 .water-glow {
   position: absolute;
   width: 58%;
@@ -449,6 +446,7 @@ function handleClickOnScene(event: MouseEvent) {
   background: radial-gradient(ellipse, rgba(225, 242, 187, 0.28), transparent 68%);
   pointer-events: none;
 }
+
 .water-boundary-debug {
   position: absolute;
   z-index: 2;
@@ -458,6 +456,7 @@ function handleClickOnScene(event: MouseEvent) {
   overflow: visible;
   pointer-events: none;
 }
+
 .water-boundary-debug polygon {
   fill: none;
   /* fill: rgba(255, 255, 255, 0.219); */
@@ -466,6 +465,7 @@ function handleClickOnScene(event: MouseEvent) {
   stroke-dasharray: 10 6;
   vector-effect: non-scaling-stroke;
 }
+
 .invalid-tap {
   position: absolute;
   z-index: 5;
@@ -481,6 +481,7 @@ function handleClickOnScene(event: MouseEvent) {
   animation: invalid-tap 0.52s ease-out forwards;
   pointer-events: none;
 }
+
 .casting-line {
   position: absolute;
   z-index: 3;
@@ -490,6 +491,7 @@ function handleClickOnScene(event: MouseEvent) {
   overflow: visible;
   pointer-events: none;
 }
+
 .casting-line path {
   fill: none;
   stroke: rgba(241, 242, 223, 0.9);
@@ -497,16 +499,19 @@ function handleClickOnScene(event: MouseEvent) {
   vector-effect: non-scaling-stroke;
   filter: drop-shadow(0 1px 1px rgba(0, 0, 0, 0.35));
 }
+
 .casting-line.phase-idle path,
 .casting-line.phase-lost path,
 .casting-line.phase-caught path {
   opacity: 0;
 }
+
 .casting-line.phase-casting path {
   stroke-dasharray: 100;
   stroke-dashoffset: 100;
   animation: cast-line 0.38s 0.17s ease-out forwards;
 }
+
 .bait-float {
   position: absolute;
   z-index: 4;
@@ -519,24 +524,29 @@ function handleClickOnScene(event: MouseEvent) {
   transform: translate(-50%, -50%) scale(0);
   pointer-events: none;
 }
+
 .bait-float span {
   position: absolute;
   inset: 3px;
   border-radius: inherit;
   background: rgba(255, 255, 255, 0.52);
 }
+
 .bait-float.phase-casting {
   animation: bait-fly 0.55s cubic-bezier(0.16, 0.78, 0.38, 1) forwards;
 }
+
 .bait-float.phase-waiting,
 .bait-float.phase-bite,
 .bait-float.phase-fighting {
   transform: translate(-50%, -50%);
   animation: bob 1.8s ease-in-out infinite;
 }
+
 .bait-float.phase-bite {
   animation: bite-bob 0.24s linear infinite;
 }
+
 .rod-holder {
   position: absolute;
   z-index: 4;
@@ -548,6 +558,7 @@ function handleClickOnScene(event: MouseEvent) {
   transform-origin: 64% 91%;
   transition: transform 0.28s ease-out;
 }
+
 .fishing-rod {
   width: 100%;
   height: 100%;
@@ -556,6 +567,7 @@ function handleClickOnScene(event: MouseEvent) {
   mix-blend-mode: multiply;
   filter: drop-shadow(-5px 7px 5px rgba(0, 0, 0, 0.25));
 }
+
 .rod-line-anchor {
   position: absolute;
   top: 2.2%;
@@ -564,6 +576,7 @@ function handleClickOnScene(event: MouseEvent) {
   height: 1px;
   pointer-events: none;
 }
+
 .rod-holder.phase-idle,
 .rod-holder.phase-waiting,
 .rod-holder.phase-bite,
@@ -571,12 +584,15 @@ function handleClickOnScene(event: MouseEvent) {
 .rod-holder.phase-caught {
   transform: rotate(-27deg);
 }
+
 .rod-holder.phase-fighting {
   animation: reel-rod 0.48s ease-in-out infinite;
 }
+
 .rod-holder.phase-casting {
   animation: swing-rod 0.72s cubic-bezier(0.18, 0.76, 0.22, 1) both;
 }
+
 .ripple {
   position: absolute;
   z-index: 1;
@@ -587,6 +603,7 @@ function handleClickOnScene(event: MouseEvent) {
   transform: translate(-50%, -50%);
   animation: ripple 1s linear forwards;
 }
+
 .ripple::after {
   content: "";
   position: absolute;
@@ -594,6 +611,7 @@ function handleClickOnScene(event: MouseEvent) {
   border: 1px solid rgba(255, 255, 255, 0.8);
   border-radius: inherit;
 }
+
 .scene-status {
   position: absolute;
   z-index: 6;
@@ -608,6 +626,7 @@ function handleClickOnScene(event: MouseEvent) {
   font-size: 11px;
   font-weight: 650;
 }
+
 .status-dot {
   width: 7px;
   height: 7px;
@@ -615,10 +634,12 @@ function handleClickOnScene(event: MouseEvent) {
   background: #9bdf73;
   box-shadow: 0 0 0 3px rgba(155, 223, 115, 0.18);
 }
+
 .scene-status.active .status-dot {
   background: #ffc653;
   animation: pulse 0.8s infinite;
 }
+
 .bite-alert {
   position: absolute;
   z-index: 6;
@@ -639,94 +660,115 @@ function handleClickOnScene(event: MouseEvent) {
   transform: translate(-50%, -50%) scale(0.7);
   pointer-events: none;
 }
+
 .bite-alert.visible {
   opacity: 1;
   transform: translate(-50%, -50%) scale(1);
   animation: bite-alert 0.48s ease-in-out infinite alternate;
 }
+
 @keyframes cast-line {
   to {
     stroke-dashoffset: 0;
   }
 }
+
 @keyframes reel-line {
   to {
     stroke-dashoffset: -40;
   }
 }
+
 @keyframes bait-fly {
   0% {
     transform: translate(40%, 105%) scale(0.2);
     opacity: 0;
   }
+
   42% {
     opacity: 1;
   }
+
   100% {
     transform: translate(-50%, -50%) scale(1);
   }
 }
+
 @keyframes swing-rod {
   0% {
     transform: rotate(-44deg);
   }
+
   36% {
     transform: rotate(21deg);
   }
+
   100% {
     transform: rotate(-27deg);
   }
 }
+
 @keyframes reel-rod {
+
   0%,
   100% {
     transform: rotate(-27deg);
   }
+
   50% {
     transform: rotate(-17deg);
   }
 }
+
 @keyframes bob {
   50% {
     transform: translate(-50%, calc(-50% - 4px));
   }
 }
+
 @keyframes bite-bob {
   50% {
     transform: translate(-50%, calc(-50% - 8px)) scale(1.3);
   }
 }
+
 @keyframes bite-alert {
   to {
     transform: translate(-50%, -50%) scale(1.08);
   }
 }
+
 @keyframes ripple {
   to {
     width: 100px;
     opacity: 0;
   }
 }
+
 @keyframes invalid-tap {
   0% {
     opacity: 0;
     transform: translate(-50%, -35%);
   }
+
   20%,
   70% {
     opacity: 1;
   }
+
   100% {
     opacity: 0;
     transform: translate(-50%, -70%);
   }
 }
+
 @keyframes pulse {
   50% {
     transform: scale(1.65);
     opacity: 0.45;
   }
 }
+
 .guide-button {
   padding: 10px 12px;
   border: 1px solid rgba(255, 255, 255, 0.2);
@@ -739,24 +781,30 @@ function handleClickOnScene(event: MouseEvent) {
   font-weight: 800;
   backdrop-filter: blur(10px);
 }
+
 @media (max-width: 620px) {
   .weather {
     display: none;
   }
+
   .scene-top {
     top: 13px;
     left: 13px;
   }
+
   .players-button {
     font-size: 0;
     padding: 9px;
   }
+
   .players-button b {
     margin: 0;
   }
+
   .scene-instruction {
     font-size: 9px;
   }
+
   .scene-status {
     bottom: 12px;
     left: 12px;

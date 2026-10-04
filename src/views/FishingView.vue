@@ -1,13 +1,13 @@
 <script setup lang="ts">
 import { storeToRefs } from "pinia";
 import { onBeforeUnmount, onMounted, watch } from "vue";
-import EquipmentMenu from "../components/EquipmentMenu.vue";
-import CatchDialog from "../components/CatchDialog.vue";
-import FishingBag from "../components/FishingBag.vue";
-import FishingPlayers from "../components/FishingPlayers.vue";
-import FishingScene from "../components/FishingScene.vue";
-import LakeFishGuide from "../components/LakeFishGuide.vue";
-import PowerMeter from "../components/PowerMeter.vue";
+import EquipmentMenu from "../components/fishing/EquipmentMenu.vue";
+import CatchDialog from "../components/fishing/CatchDialog.vue";
+import FishingBag from "../components/fishing/FishingBag.vue";
+import FishingPlayers from "../components/fishing/FishingPlayers.vue";
+import FishingScene from "../components/fishing/FishingScene.vue";
+import LakeFishGuide from "../components/fishing/LakeFishGuide.vue";
+import PowerMeter from "../components/fishing/PowerMeter.vue";
 import { useAuthStore } from "../stores/auth";
 import { useEquipmentStore } from "../stores/equipment";
 
@@ -53,9 +53,7 @@ onBeforeUnmount(() => {
 </script>
 
 <template>
-  <main
-    class="w-full h-screen overflow-hidden touch-none overscroll-none bg-[#193224] text-[#e9f4e8]"
-  >
+  <main class="w-full h-screen overflow-hidden touch-none overscroll-none bg-[#193224] text-[#e9f4e8]">
     <div class="grid grid-rows-[minmax(0,1fr)_auto] w-full h-full">
       <FishingScene />
       <section class="control-deck">
@@ -86,64 +84,80 @@ onBeforeUnmount(() => {
   background: linear-gradient(180deg, #1b3929, #11251a);
   box-shadow: 0 -8px 24px rgba(3, 13, 7, 0.25);
 }
+
 .side-panel {
   padding: 11px 13px 13px;
   border: 1px solid rgba(225, 246, 214, 0.23);
   border-radius: 16px;
   background: linear-gradient(135deg, rgba(16, 42, 27, 0.89), rgba(27, 61, 41, 0.82));
 }
+
 .control-deck :deep(.tool) {
   border-color: rgba(237, 248, 221, 0.14);
   background: rgba(11, 35, 22, 0.72);
   color: #edf4e8;
 }
+
 .control-deck :deep(.tool:hover) {
   border-color: #b6d67f;
 }
+
 .control-deck :deep(.tool.selected) {
   border-color: #a6cc78;
   background: rgba(62, 109, 55, 0.87);
   box-shadow: inset 0 0 0 1px rgba(211, 239, 164, 0.24);
 }
+
 .control-deck :deep(.tool-icon) {
   background: rgba(238, 210, 136, 0.2);
 }
+
 .control-deck :deep(.selected .tool-icon) {
   background: rgba(194, 225, 142, 0.3);
 }
+
 .control-deck :deep(.tool small) {
   color: #aebfaa;
 }
+
 .control-deck :deep(.power-meter) {
   border-color: rgba(225, 246, 214, 0.23);
   background: linear-gradient(135deg, rgba(16, 42, 27, 0.92), rgba(27, 61, 41, 0.84));
 }
+
 .control-deck :deep(.power-title) {
   color: #eaf4e8;
 }
+
 .control-deck :deep(.power-title small) {
   color: #b8cab5;
 }
+
 .control-deck :deep(.power-track) {
   background: #daefc92e;
 }
+
 .control-deck :deep(.cast-button) {
   background: #d49c42;
   box-shadow: 0 4px 0 #9e6929;
   color: #1e3528;
 }
+
 .control-deck :deep(.cast-button:active) {
   box-shadow: 0 1px 0 #9e6929;
 }
+
 @media (max-width: 720px) {
   .control-deck {
     grid-template-columns: 1fr;
     gap: 8px;
     padding: 9px 12px 12px;
   }
+
   .side-panel {
     padding: 9px;
   }
+
   .panel-heading {
     display: none;
   }

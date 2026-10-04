@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { useFishingStore } from "../stores/fishing";
+import { useFishingStore } from "../../stores/fishing";
 
 const store = useFishingStore();
 </script>
@@ -16,7 +16,8 @@ const store = useFishingStore();
           <header class="flex justify-between px-5 pt-[19px] pb-3 border-b border-[rgba(223,241,207,0.14)]">
             <div>
               <p class="m-0 text-[#e8bd62] text-[10px] font-black tracking-[0.16em] uppercase">Cùng bãi câu</p>
-              <h2 id="players-title" class="mt-1.5 mb-0 text-xl">Người chơi đang câu ({{ store.nearbyPlayers.length }})</h2>
+              <h2 id="players-title" class="mt-1.5 mb-0 text-xl">Người chơi đang câu ({{ store.nearbyPlayers.length }})
+              </h2>
             </div>
             <button type="button"
               class="w-[29px] h-[29px] border-0 rounded-full bg-[rgba(235,243,219,0.13)] text-white cursor-pointer text-[22px] leading-none"
@@ -28,7 +29,8 @@ const store = useFishingStore();
           <div v-if="store.isLoadingPlayers" class="py-8 text-center text-[#b7cfb9] text-xs">
             Đang cập nhật danh sách người câu...
           </div>
-          <div v-else-if="!store.selectedPlayer && !store.nearbyPlayers.length" class="py-8 px-4 text-center text-[#b7cfb9] text-xs">
+          <div v-else-if="!store.selectedPlayer && !store.nearbyPlayers.length"
+            class="py-8 px-4 text-center text-[#b7cfb9] text-xs">
             <span class="text-2xl mb-1 block">🎣</span>
             <p class="m-0">Hiện chưa có người chơi nào trong khu vực này.</p>
           </div>
@@ -62,7 +64,7 @@ const store = useFishingStore();
               :style="{ background: store.selectedPlayer.color }">{{ store.selectedPlayer.avatar }}</span>
             <h3 class="m-0 text-xl">{{ store.selectedPlayer.name }}</h3>
             <p class="mt-1 text-[#b7cfb9] text-xs">Cấp {{ store.selectedPlayer.level }} · {{ store.selectedPlayer.title
-              }}</p>
+            }}</p>
             <div class="grid grid-cols-2 w-full gap-2 mt-[18px]">
               <span
                 class="grid gap-1 py-[11px] px-1.5 rounded-[10px] bg-[rgba(7,28,18,0.38)] text-[#b7cfb9] text-[10px]"><b
