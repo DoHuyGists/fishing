@@ -4,17 +4,39 @@ import { useRouter } from "vue-router";
 import { useWorldStore } from "../../stores/world";
 import { useAuthStore } from "../../stores/auth";
 import { supabaseUserInAreaRepository } from "../../data/supabaseUserInAreaRepository";
+import PrepareModal from "./PrepareModal.vue";
 
 const props = defineProps<{
   anchors: any[];
   zoom?: number;
 }>();
 
+defineOptions({
+  inheritAttrs: false
+})
+
 const router = useRouter();
 const authStore = useAuthStore();
 const worldStore = useWorldStore();
 const selectedAnchor = ref<any | null>(null);
 const isEntering = ref(false);
+const showPrepare = ref(false);
+const pendingAnchor = ref<any | null>(null);
+
+function openPrepare(anchor: any) {
+  pendingAnchor.value = anchor;
+  showPrepare.value = true;
+}
+
+function closePrepare() {
+  showPrepare.value = false;
+  pendingAnchor.value = null;
+}
+
+function onPrepareConfirm(anchor: any) {
+  showPrepare.value = false;
+  goToFishingArea(anchor);
+}
 
 watch(
   () => worldStore.selectedArea,
@@ -158,6 +180,7 @@ async function goToFishingArea(anchor: any) {
 </style>
 <template>
   <svg
+    v-bind="$attrs"
     xmlns:mapsvg="http://mapsvg.com"
     xmlns:dc="http://purl.org/dc/elements/1.1/"
     xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
@@ -1480,7 +1503,7 @@ async function goToFishingArea(anchor: any) {
                 class="anchor-dialog-link"
                 :disabled="isEntering"
                 @pointerdown.stop
-                @click.stop="goToFishingArea(anchor)"
+                @click.stop="openPrepare(anchor)"
               >
                 {{ isEntering ? "Đang vào..." : "Đi đến bãi câu" }}
               </button>
@@ -1492,4 +1515,11 @@ async function goToFishingArea(anchor: any) {
       </g>
     </template>
   </svg>
+
+  <PrepareModal
+    v-if="showPrepare && pendingAnchor"
+    :anchor="pendingAnchor"
+    @close="closePrepare"
+    @confirm="onPrepareConfirm"
+  />
 </template>

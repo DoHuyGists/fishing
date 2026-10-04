@@ -61,9 +61,9 @@ watch(open, (value) => {
         <strong class="text-[11px] font-bold whitespace-nowrap overflow-hidden text-ellipsis">{{
           selected?.name ?? "Chọn trang bị"
         }}</strong>
-        <small class="text-[10px] text-[#6c7d6e] whitespace-nowrap overflow-hidden text-ellipsis">{{
+        <!-- <small class="text-[10px] text-[#6c7d6e] whitespace-nowrap overflow-hidden text-ellipsis">{{
           selected?.detail
-        }}</small>
+        }}</small> -->
       </span>
       <span class="flex-none text-[10px] text-[#6c7d6e]">▾</span>
     </button>

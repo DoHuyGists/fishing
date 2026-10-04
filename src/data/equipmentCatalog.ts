@@ -12,12 +12,12 @@ export interface EquipmentVariant {
   baitName?: string;
 }
 
-export const equipmentCategories: { id: FishingTool; name: string; icon: string }[] = [
-  { id: "rod", name: "Cần câu", icon: "🎣" },
-  { id: "line", name: "Dây câu", icon: "🧵" },
-  { id: "reel", name: "Cuộn câu", icon: "🎡" },
-  { id: "hook", name: "Móc câu", icon: "🪝" },
-  { id: "bait", name: "Mồi câu", icon: "🪱" },
+export const equipmentCategories: { id: FishingTool; name: string; }[] = [
+  { id: "rod", name: "Cần câu"},
+  { id: "line", name: "Dây câu"},
+  { id: "reel", name: "Cuộn câu"},
+  { id: "hook", name: "Móc câu"},
+  { id: "bait", name: "Mồi câu"},
 ];
 
 // Seed data used only to bootstrap a brand-new user's row in Supabase; live data always comes from the DB afterwards.

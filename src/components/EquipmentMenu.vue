@@ -21,7 +21,6 @@ function onVariantChange(category: FishingTool, variantId: string) {
       :class="{ 'border-[#5d9a5b] bg-[#eef8e9] shadow-[inset_0_0_0_1px_#b9dba7]': store.selectedTool === category.id }"
       @click="store.selectTool(category.id)"
     >
-      <span class="flex-none text-[15px]">{{ category.icon }}</span>
       <span class="flex-none max-[620px]:w-[50px] text-[#345344] text-[11px] font-bold whitespace-nowrap">{{
         category.name
       }}</span>

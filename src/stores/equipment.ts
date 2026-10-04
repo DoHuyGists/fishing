@@ -43,7 +43,7 @@ export const useEquipmentStore = defineStore("equipment", {
       this.loading = true;
       this.error = "";
       try {
-        this.variants = await supabaseEquipmentRepository.fetchEquipment(userId);
+        this.variants = await supabaseEquipmentRepository.fetchEquipment();
         this.userId = userId;
         this.loaded = true;
         const selected = await supabaseEquipmentRepository.fetchSelected(userId);

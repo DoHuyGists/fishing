@@ -14,12 +14,10 @@ const COLUMN_BY_TOOL: Record<FishingTool, string> = {
 type EquipmentRow = Record<(typeof COLUMN_BY_TOOL)[FishingTool], EquipmentVariant[] | null>;
 
 class SupabaseEquipmentRepository {
-  async fetchEquipment(userId: string): Promise<Record<FishingTool, EquipmentVariant[]>> {
-    const { data, error } = await supabase.from("user_equipments").select("rod, line, reel, hook, bait").eq("user_id", userId).eq("is_used", true).maybeSingle<EquipmentRow>();
+  async fetchEquipment(): Promise<Record<FishingTool, EquipmentVariant[]>> {
+    const { data, error } = await supabase.rpc("get_user_equipment_set_using").single<EquipmentRow>();
 
     if (error) throw new Error(error.message);
-
-    if (!data) return this.seedDefaultRow(userId);
 
     const toVariants = (list: unknown[] | null): EquipmentVariant[] =>
       (list ?? []).map((raw) => {
@@ -41,12 +39,12 @@ class SupabaseEquipmentRepository {
       bait: toVariants(data.bait),
     };
   }
-  async fetchAllEquipmentSet(userId: string): Promise<EquipmentSet[]> {
-    const { data, error } = await supabase.from("user_equipments").select("*").eq("user_id", userId);
+  async fetchAllEquipmentSet(): Promise<EquipmentSet[]> {
+    const { data, error } = await supabase.rpc("get_all_user_equipment_sets");;
 
     if (error) throw new Error(error.message);
 
-    return data.map((x) => ({
+    return data.map((x: any) => ({
       id: x.id,
       createdAt: x.created_at,
       userId: x.user_id,
@@ -71,20 +69,6 @@ class SupabaseEquipmentRepository {
   async UpdateSet(userId: string, set: EquipmentSet) {
     const { error } = await supabase.from("user_equipments").update({ rod: set.rod, line: set.line, reel: set.reel, hook: set.hook, bait: set.bait }).eq("id", set.id).eq("user_id", userId);
     if (error) throw new Error(error.message);
-  }
-
-  private async seedDefaultRow(userId: string): Promise<Record<FishingTool, EquipmentVariant[]>> {
-    const seed = defaultEquipmentVariants;
-    const { error } = await supabase.from("user_equipments").insert({
-      user_id: userId,
-      rod: seed.rod,
-      line: seed.line,
-      reel: seed.reel,
-      hook: seed.hook,
-      bait: seed.bait,
-    });
-    if (error) throw new Error(error.message);
-    return seed;
   }
 
   async selectItem(itemId: string) {

@@ -12,8 +12,8 @@ export const useInventoryStore = defineStore("Inventory", {
         async setUserInventory(userId: string) {
             this.items = await supabaseUserInventoryRepository.fetchUserInventory(userId);
         },
-        async setEquipmentSet(userId: string) {
-            this.equipmentSets = await supabaseEquipmentRepository.fetchAllEquipmentSet(userId);
+        async setEquipmentSet() {
+            this.equipmentSets = await supabaseEquipmentRepository.fetchAllEquipmentSet();
         },
         async removeItem(userId: string, inventoryIds: string[]) {
             await supabaseUserInventoryRepository.deleteInventory(userId,inventoryIds)

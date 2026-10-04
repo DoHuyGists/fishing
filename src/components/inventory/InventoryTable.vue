@@ -66,7 +66,7 @@ async function load() {
   }
 
   await inventoryStore.setUserInventory(userId.value);
-  await inventoryStore.setEquipmentSet(userId.value);
+  await inventoryStore.setEquipmentSet();
   savedSnapshot.value = Object.fromEntries(inventoryStore.equipmentSets.map((s) => [s.id, snapshotOf(s)]));
   loading.value = false;
 }
@@ -206,7 +206,7 @@ async function buySet() {
   try {
     busy.value = true
     await equipmentStore.buySet();
-    await inventoryStore.setEquipmentSet(userId.value!);
+    await inventoryStore.setEquipmentSet();
     toast('ok', 'Đã thêm set mới.')
   } catch (error) {
     toast('error', (error as Error).message) 

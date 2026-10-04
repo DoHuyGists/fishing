@@ -24,7 +24,7 @@ const store = useFishingStore();
               ×
             </button>
           </header>
-          <p class="px-5 pt-3 pb-1.5 text-[#b7cfb9] text-xs">Chạm vào người chơi để xem thông tin.</p>
+          <!-- <p class="px-5 pt-3 pb-1.5 text-[#b7cfb9] text-xs">Chạm vào người chơi để xem thông tin.</p> -->
           <div v-if="store.isLoadingPlayers" class="py-8 text-center text-[#b7cfb9] text-xs">
             Đang cập nhật danh sách người câu...
           </div>
