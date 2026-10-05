@@ -1,4 +1,4 @@
-import dayjs from 'dayjs';
+﻿import dayjs from 'dayjs';
 import utc from 'dayjs/plugin/utc';
 dayjs.extend(utc);
 
@@ -32,4 +32,13 @@ export function formatTime(value: string) {
   }
 
   return parsed.local().format('HH:mm:ss');
+}
+
+// Parse timestamp UTC của Supabase (vd "2026-10-05T15:01:00.034781+00:00" hoặc "2026-10-05 15:01:00+00") thành epoch ms; NaN nếu sai định dạng
+export function utcToLocalMs(value: string | null | undefined): number {
+  if (!value) return NaN;
+  let s = value.trim().replace(' ', 'T').replace(/(\.\d{3})\d+/, '$1');
+  if (/[+-]\d{2}$/.test(s) && s.includes('T')) s += ':00';
+  else if (!/(Z|[+-]\d{2}:\d{2})$/i.test(s)) s += 'Z';
+  return new Date(s).getTime();
 }

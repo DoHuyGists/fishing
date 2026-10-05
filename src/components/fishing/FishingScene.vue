@@ -5,6 +5,7 @@ import { useFishingStore } from "../../stores/fishing";
 import { useAuthStore } from "../../stores/auth";
 import { onBeforeRouteLeave, useRouter } from "vue-router";
 import { useFishingAreaStore } from "../../stores/fishingArea";
+import ZoneWeather from "./ZoneWeather.vue";
 import { supabaseUserInAreaRepository } from "../../data/supabaseUserInAreaRepository";
 
 const environment = import.meta.env.VITE_ENVIRONTMENT;
@@ -214,6 +215,7 @@ function handleClickOnScene(event: MouseEvent) {
             <small>26°C <i></i> Gió nhẹ</small>
           </div>
         </div>
+        <ZoneWeather :area-id="fishingStore.currentAreaId as string | null" />
         <div class="backdrop-blur-2xl h-fit w-fit rounded p-1">
           <button type="button"
             class="text-sm text-red-500 bg-transparent border-0 cursor-pointer font-medium p-0 hover:underline disabled:opacity-50"
