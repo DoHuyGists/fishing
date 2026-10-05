@@ -27,11 +27,11 @@ onBeforeMount(async () => {
   areaUserSocket.subcribe();
 
   if (authStore.userId) {
-    currencyStore.fetchCurrency(authStore.userId);
+    currencyStore.fetchCurrency();
     currencyChannel = supabaseCurrencyRepository.subscribeToCurrency(
       authStore.userId,
       () => {
-        currencyStore.fetchCurrency(authStore.userId);
+        currencyStore.fetchCurrency();
       }
     );
   }

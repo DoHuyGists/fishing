@@ -16,7 +16,7 @@
  * -----------------------------------------------------------------------
  */
 import { ref, computed, onBeforeUnmount } from 'vue'
-
+import Cash from '../currency/Cash.vue'
 export interface Reward {
   id: string | number
   label: string
@@ -28,6 +28,10 @@ export interface Reward {
 
 interface Props {
   rewards: Reward[]
+  spinConfirmation?: {
+    currentBalance: number
+    totalCost: number
+  }
   /** Endpoint trả về JSON dạng { index: number }. Bỏ qua nếu dùng fetchRewardIndex */
   apiUrl?: string
   /** Hàm tự định nghĩa để lấy index ngẫu nhiên, ưu tiên hơn apiUrl nếu có */
@@ -43,6 +47,7 @@ interface Props {
 }
 
 const props = withDefaults(defineProps<Props>(), {
+  spinConfirmation: undefined,
   apiUrl: undefined,
   fetchRewardIndex: undefined,
   spinDuration: 4200,
@@ -69,6 +74,7 @@ const showResult = ref(false)
 const resultReward = ref<Reward | null>(null)
 const errorMsg = ref('')
 const pendingReward = ref<Reward | null>(null)
+const showSpinConfirmation = ref(false)
 
 const segmentAngle = computed(() => 360 / Math.max(props.rewards.length, 1))
 
@@ -153,6 +159,24 @@ async function spin() {
   }
 }
 
+function requestSpin() {
+  if (spinning.value || props.disabled || props.rewards.length === 0) return
+  if (props.spinConfirmation) {
+    showSpinConfirmation.value = true
+    return
+  }
+  void spin()
+}
+
+function cancelSpin() {
+  showSpinConfirmation.value = false
+}
+
+function confirmSpin() {
+  showSpinConfirmation.value = false
+  void spin()
+}
+
 function onTransitionEnd(e: TransitionEvent) {
   if (e.propertyName !== 'transform' || !spinning.value) return
   spinning.value = false
@@ -183,19 +207,19 @@ onBeforeUnmount(() => {
 </script>
 
 <template>
-  <div class="flex flex-col items-center gap-6">
+  <div class="flex flex-col items-center gap-6 overflow-hidden p-3">
     <div class="relative" :style="{ width: `${size}px`, height: `${size}px` }">
       <!-- Con trỏ chỉ phần thưởng, cố định phía trên -->
       <div
         class="absolute left-1/2 -top-2 z-20 -translate-x-1/2"
-        style="filter: drop-shadow(0 2px 3px rgba(0,0,0,0.35))"
+        style="filter: drop-shadow(0 1px 1px rgba(0,0,0,0.35))"
       >
-        <div class="h-0 w-0 border-x-[14px] border-t-[24px] border-x-transparent border-t-amber-400" />
+        <div class="h-0 w-0 border-x-14 border-t-24 border-x-transparent border-t-amber-400" />
       </div>
 
       <!-- Bánh xe -->
       <div
-        class="absolute inset-0 overflow-hidden rounded-full border-[6px] border-white shadow-[0_10px_30px_rgba(0,0,0,0.25)]"
+        class="absolute inset-0 overflow-hidden rounded-full border-[6px] border-white shadow-[0_1px_10px_rgba(0,0,0,0.25)]"
         :style="wheelStyle"
         @transitionend="onTransitionEnd"
         @transitionrun="armFallback"
@@ -225,7 +249,7 @@ onBeforeUnmount(() => {
         type="button"
         class="absolute cursor-pointer inset-0 m-auto flex h-16 w-16 items-center justify-center rounded-full border-4 border-white bg-slate-900 text-xs font-bold tracking-wide text-white shadow-lg transition-transform active:scale-95 disabled:cursor-not-allowed disabled:opacity-60"
         :disabled="spinning || disabled || rewards.length === 0"
-        @click="spin"
+        @click="requestSpin"
       >
         {{ spinning ? '...' : 'QUAY' }}
       </button>
@@ -233,12 +257,59 @@ onBeforeUnmount(() => {
 
     <p v-if="errorMsg" class="text-sm font-medium text-red-500">{{ errorMsg }}</p>
 
+    <Teleport to="body">
+      <div
+        v-if="showSpinConfirmation && spinConfirmation"
+        class="fixed inset-0 z-[10000] flex items-center justify-center bg-black/60 px-4"
+        role="presentation"
+        @click.self="cancelSpin"
+      >
+        <section
+          class="w-full max-w-sm rounded-2xl bg-white p-6 text-slate-900 shadow-2xl"
+          role="dialog"
+          aria-modal="true"
+          aria-labelledby="spin-confirmation-title"
+        >
+          <h2 id="spin-confirmation-title" class="m-0 text-center text-lg font-bold">
+            Xác nhận quay?
+          </h2>
+          <div class="mt-5 space-y-3 text-sm">
+            <div class="flex items-center justify-between gap-3">
+              <span>Số dư hiện tại:</span>
+              <Cash :amount="spinConfirmation.currentBalance" />
+            </div>
+            <hr>
+            <div class="flex items-center justify-between gap-3 font-semibold">
+              <span>Tổng chi phí lượt quay:</span>
+              <Cash :amount="spinConfirmation.totalCost" />
+            </div>
+          </div>
+          <div class="mt-6 flex justify-center gap-3">
+            <button
+              type="button"
+              class="rounded-lg border border-gray-300 px-4 py-2 text-sm font-semibold text-gray-700 hover:bg-gray-100"
+              @click="cancelSpin"
+            >
+              Hủy
+            </button>
+            <button
+              type="button"
+              class="rounded-lg bg-[#153221] px-4 py-2 text-sm font-semibold text-white hover:bg-[#1a3e29]"
+              @click="confirmSpin"
+            >
+              Xác nhận quay
+            </button>
+          </div>
+        </section>
+      </div>
+    </Teleport>
+
     <!-- Popup thông báo kết quả -->
     <Teleport to="body">
       <Transition name="reward-fade">
         <div
           v-if="showResult"
-          class="fixed inset-0 z-50 flex items-center justify-center bg-black/60 px-4"
+          class="fixed inset-0 z-[10000] flex items-center justify-center bg-black/60 px-4"
           @click.self="closeResult"
         >
           <div class="w-full max-w-sm rounded-2xl bg-white p-8 text-center shadow-2xl">

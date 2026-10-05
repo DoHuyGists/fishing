@@ -1,6 +1,6 @@
 import type { FishingTool } from "../stores/fishing";
 import supabase from "../database/connection";
-import { defaultEquipmentVariants, type EquipmentVariant } from "./equipmentCatalog";
+import { type EquipmentVariant } from "./equipmentCatalog";
 import type { EquipmentSet } from "../stores/equipment";
 
 const COLUMN_BY_TOOL: Record<FishingTool, string> = {

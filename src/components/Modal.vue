@@ -1,6 +1,8 @@
 <script lang="ts" setup>
 import { onUnmounted, ref, watch } from 'vue'
 import { useModalStore } from '../stores/modal';
+import { useCurrencyStore } from '../stores/currency';
+import Cash from './currency/Cash.vue';
 
 const props = withDefaults(
     defineProps<{ 
@@ -18,6 +20,7 @@ const emit = defineEmits<{
   refresh: []
 }>()
 
+const currencyStore = useCurrencyStore()
 const modalStore = useModalStore();
 const REFRESH_COOLDOWN = 5;
 const isRefreshing = ref<boolean>(false);
@@ -56,12 +59,15 @@ onUnmounted(() => {
 </script>
 
 <template>
-    <div class="fixed w-screen h-screen inset-0 z-[9999] bg-white flex flex-col">
+    <div class="fixed w-screen h-screen inset-0 z-9999 bg-white flex flex-col">
         <header
             class="flex items-center justify-between gap-4 px-5 py-4 sm:px-7 border-b border-emerald-950/10 bg-[#e7ecda]">
             <div>
-                <p class="m-0 text-[10px] font-extrabold tracking-[0.14em] uppercase text-emerald-800">{{ props.title }}</p>
-                <h2 class="m-0 mt-1 text-xl sm:text-2xl font-bold">{{ props.subTitle }}</h2>
+                <h2 class="m-0 mt-1 text-xl sm:text-2xl font-bold">{{ props.title }}</h2>
+                <p class="m-0 text-[10px] font-extrabold tracking-[0.14em] uppercase text-emerald-800">{{ props.subTitle }}</p>
+            </div>
+            <div>
+                <Cash :amount="currencyStore.formattedCash" />
             </div>
             <div class="flex items-center gap-2">
                 <button v-if="props.canRefresh" type="button"
@@ -76,7 +82,7 @@ onUnmounted(() => {
                 </button>
             </div>
         </header>
-        <div class="grow">
+        <div class="grow p-2">
             <slot></slot>
         </div>
     </div>

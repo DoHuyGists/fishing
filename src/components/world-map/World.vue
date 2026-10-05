@@ -1,8 +1,7 @@
 <script lang="ts" setup>
-import { computed, onBeforeMount, onBeforeUnmount, ref, watch } from "vue";
+import { computed,ref, watch } from "vue";
 import { useRouter } from "vue-router";
 import { useWorldStore } from "../../stores/world";
-import { useAuthStore } from "../../stores/auth";
 import { supabaseUserInAreaRepository } from "../../data/supabaseUserInAreaRepository";
 import PrepareModal from "./PrepareModal.vue";
 
@@ -16,7 +15,6 @@ defineOptions({
 })
 
 const router = useRouter();
-const authStore = useAuthStore();
 const worldStore = useWorldStore();
 const selectedAnchor = ref<any | null>(null);
 const isEntering = ref(false);

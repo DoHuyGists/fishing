@@ -89,14 +89,6 @@ class SupabaseFishRepository {
     });
   }
 
-  private async fetchListedCaughtIds(userId: string): Promise<string[]> {
-    const { data, error } = await supabase.from("species_market").select("caught_id").eq("user_id", userId).eq("status", "normal");
-
-    if (error) throw new Error(error.message);
-
-    return (data ?? []).map((listing) => listing.caught_id);
-  }
-
   async deleteCaughtFish(caughtId: string): Promise<void> {
     const { error } = await supabase.from("caught").delete().eq("id", caughtId);
 

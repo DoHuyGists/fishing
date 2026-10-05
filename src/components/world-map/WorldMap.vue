@@ -1,14 +1,12 @@
 <script setup lang="ts">
-import { onMounted, watch, ref, computed } from "vue";
+import { onMounted } from "vue";
 import { useCurrencyStore } from "../../stores/currency.ts";
 import { useAuthStore } from "../../stores/auth.ts";
 import InteractWorldWrapper from "./InteractWorldMap.vue";
 import MarketWindow from "../market/MarketWindow.vue";
-import { useMarketStore } from "../../stores/market.ts";
 import { useCaughtStore } from "../../stores/caught.ts";
 import CaughtList from "../caught/CaughtList.vue";
 import CatchDiaryModal from "../diary/CatchDiaryModal.vue";
-import { useDiaryStore } from "../../stores/diary.ts";
 import AccountInfoModal from "../account/AccountInfoModal.vue";
 import SpinWheelModal from "../spin-wheel/SpinWheelModal.vue";
 import InventoryModal from "../inventory/InventoryModal.vue";

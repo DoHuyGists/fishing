@@ -26,7 +26,7 @@ class SupabaseUserInventoryRepository {
     );
   }
   async claimRandomItem(itemIds: string[]): Promise<string> {
-    const { data, error } = await supabase.rpc("claim_random_item", {
+    const { data, error } = await supabase.rpc("spin_wheel", {
       p_item_ids: itemIds,
     });
     if (error) {

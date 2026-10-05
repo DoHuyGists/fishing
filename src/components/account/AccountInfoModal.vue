@@ -2,6 +2,7 @@
 import { onMounted, ref, computed } from "vue";
 import { useAuthStore } from "../../stores/auth";
 import { useCurrencyStore } from "../../stores/currency";
+import { useModalStore } from "../../stores/modal";
 import { useUserProfileStore } from "../../stores/userProfile";
 import Modal from "../Modal.vue";
 import Cash from "../currency/Cash.vue";
@@ -10,8 +11,33 @@ import dayjs from "dayjs";
 const authStore = useAuthStore();
 const currencyStore = useCurrencyStore();
 const userProfileStore = useUserProfileStore();
+const modalStore = useModalStore();
 
 const copied = ref(false);
+const showSignOutConfirm = ref(false);
+const isSigningOut = ref(false);
+const signOutError = ref("");
+
+async function signOut() {
+  if (isSigningOut.value) return;
+
+  isSigningOut.value = true;
+  signOutError.value = "";
+  try {
+    const succeeded = await authStore.signOut();
+    if (succeeded) {
+      showSignOutConfirm.value = false;
+      modalStore.close();
+    } else {
+      signOutError.value = authStore.error || "Không thể đăng xuất. Vui lòng thử lại.";
+    }
+  } catch (error) {
+    console.error("Lỗi khi đăng xuất:", error);
+    signOutError.value = "Không thể đăng xuất. Vui lòng thử lại.";
+  } finally {
+    isSigningOut.value = false;
+  }
+}
 
 function copyUserId() {
   const id = authStore.user?.id;
@@ -179,12 +205,67 @@ const userInitial = computed(() => {
 
             <div class="flex justify-between items-center px-3.5 py-2.5">
               <span class="text-gray-500 font-medium">Ngày tham gia</span>
-              <span class="font-medium text-gray-700">{{ formattedCreatedAt }}</span>
+              <!-- <span class="font-medium text-gray-700">{{ formattedCreatedAt }}</span> -->
             </div>
           </div>
+        </div>
+
+        <div class="flex items-end">
+          <button
+          type="button"
+          class="inline-flex items-center gap-2 rounded-lg border border-red-200 bg-red-50 px-4 py-2 text-sm font-semibold text-red-700 transition-colors hover:border-red-300 hover:bg-red-100 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-red-600"
+          @click="showSignOutConfirm = true; signOutError = ''"
+          >
+          <span aria-hidden="true">
+              <img src="/icons/signout.svg?v=2" width="20" alt="" draggable="false">
+            </span>
+            Đăng xuất
+          </button>
         </div>
       </div>
 
     </div>
   </Modal>
+
+  <Teleport to="body">
+    <div
+      v-if="showSignOutConfirm"
+      class="fixed z-[10000] inset-0 grid place-items-center p-5 bg-black/60 backdrop-blur-sm"
+      role="presentation"
+      @click.self="!isSigningOut && (showSignOutConfirm = false)"
+    >
+      <section
+        class="w-[min(380px,100%)] rounded-2xl border border-gray-200 bg-white p-5 shadow-2xl"
+        role="dialog"
+        aria-modal="true"
+        aria-labelledby="sign-out-title"
+      >
+        <h2 id="sign-out-title" class="m-0 text-lg font-bold text-[#263238]">Xác nhận đăng xuất</h2>
+        <p class="my-3 text-sm leading-relaxed text-gray-600">
+          Bạn có chắc chắn muốn đăng xuất khỏi tài khoản này không?
+        </p>
+        <p v-if="signOutError" role="alert" class="mb-3 text-sm font-medium text-red-700">
+          {{ signOutError }}
+        </p>
+        <div class="flex justify-end gap-2">
+          <button
+            type="button"
+            class="rounded-lg border border-gray-200 bg-white px-4 py-2 text-sm font-semibold text-gray-700 transition-colors hover:bg-gray-50 disabled:cursor-not-allowed disabled:opacity-50"
+            :disabled="isSigningOut"
+            @click="showSignOutConfirm = false"
+          >
+            Hủy
+          </button>
+          <button
+            type="button"
+            class="rounded-lg border border-red-600 bg-red-600 px-4 py-2 text-sm font-bold text-white transition-colors hover:bg-red-700 disabled:cursor-not-allowed disabled:opacity-50"
+            :disabled="isSigningOut"
+            @click="signOut"
+          >
+            {{ isSigningOut ? "Đang đăng xuất..." : "Đăng xuất" }}
+          </button>
+        </div>
+      </section>
+    </div>
+  </Teleport>
 </template>

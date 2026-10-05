@@ -1,17 +1,7 @@
 <template>
     <section class="flex h-full min-h-0 w-full flex-col overflow-hidden rounded-xl border border-white/15 bg-slate-950/80 text-white shadow-2xl">
         <header class="border-b border-white/10 px-4 py-3">
-            <div class="flex items-start justify-between gap-3">
-                <div>
-                    <p class="text-xs font-semibold uppercase tracking-[0.18em] text-emerald-300">Vòng quay may mắn</p>
-                    <h2 class="mt-1 text-lg font-bold">Chọn phần thưởng</h2>
-                </div>
-                <span class="shrink-0 rounded-full bg-emerald-400/15 px-3 py-1 text-sm font-semibold text-emerald-200">
-                    {{ spinWheelStore.selectedReward.length }} đã chọn
-                </span>
-            </div>
-            <div class="mt-3 flex items-center justify-between gap-3">
-                <p class="text-sm text-slate-300">Cần chọn ít nhất 4 món để quay</p>
+            <div class="mt-3 flex items-center justify-end gap-3">
                 <button
                     type="button"
                     class="shrink-0 text-sm font-semibold text-emerald-300 transition-colors hover:text-emerald-100 disabled:cursor-not-allowed disabled:text-slate-500"
@@ -32,14 +22,14 @@
                 <input
                     v-model="searchQuery"
                     type="search"
-                    placeholder="Tìm phần thưởng..."
-                    aria-label="Tìm phần thưởng"
+                    placeholder="Tìm vật phẩm..."
+                    aria-label="Tìm vật phẩm"
                     class="h-10 w-full min-w-0 bg-transparent text-sm text-white outline-none placeholder:text-slate-400"
                 >
             </label>
             <select
                 v-model="selectedCategory"
-                aria-label="Lọc theo loại phần thưởng"
+                aria-label="Lọc theo loại vật phẩm"
                 class="h-10 max-w-36 rounded-lg border border-white/15 bg-slate-900 px-2 text-sm text-white outline-none focus:border-emerald-300/70"
             >
                 <option value="all">Tất cả loại</option>
@@ -50,16 +40,16 @@
         <div class="min-h-0 flex-1 overflow-y-auto p-3">
             <div v-if="loading" class="flex h-full min-h-32 items-center justify-center gap-3 text-sm text-slate-300" role="status">
                 <span class="h-5 w-5 animate-spin rounded-full border-2 border-emerald-300/30 border-t-emerald-300" />
-                Đang tải phần thưởng...
+                Đang tải vật phẩm...
             </div>
             <div v-else-if="loadError" class="flex h-full min-h-32 flex-col items-center justify-center gap-3 text-center">
-                <p class="text-sm text-rose-200">Không tải được danh sách phần thưởng.</p>
+                <p class="text-sm text-rose-200">Không tải được danh sách vật phẩm.</p>
                 <button type="button" class="text-sm font-semibold text-emerald-300 hover:text-emerald-100" @click="loadRewards">
                     Thử tải lại
                 </button>
             </div>
             <div v-else-if="visibleRewards.length === 0" class="flex h-full min-h-32 items-center justify-center px-4 text-center text-sm text-slate-400">
-                Không tìm thấy phần thưởng phù hợp.
+                Không tìm thấy vật phẩm phù hợp.
             </div>
             <div v-else class="grid grid-cols-3 gap-2 sm:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6">
                 <button
@@ -84,10 +74,15 @@
         </div>
 
         <footer class="flex items-center justify-between border-t border-white/10 px-5 py-3 text-xs text-slate-400">
-            <span>{{ visibleRewards.length }} phần thưởng hiển thị</span>
-            <span :class="spinWheelStore.selectedReward.length >= 4 ? 'text-emerald-300' : 'text-amber-200'">
-                {{ spinWheelStore.selectedReward.length >= 4 ? 'Sẵn sàng quay' : `Còn ${4 - spinWheelStore.selectedReward.length} món nữa` }}
-            </span>
+            <span>{{ visibleRewards.length }} vật phẩm hiển thị</span>
+            <div class="flex gap-2 items-center">
+                <span class="shrink-0 rounded-full bg-emerald-400/15 px-3 py-1 text-xs font-semibold text-emerald-200">
+                    {{ spinWheelStore.selectedReward.length }} đã chọn
+                </span>
+                <span :class="spinWheelStore.selectedReward.length >= 4 ? 'text-emerald-300' : 'text-amber-200'">
+                    {{ spinWheelStore.selectedReward.length >= 4 ? 'Sẵn sàng quay' : `Còn ${4 - spinWheelStore.selectedReward.length} món nữa` }}
+                </span>
+            </div>
         </footer>
     </section>
 </template>

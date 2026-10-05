@@ -263,7 +263,7 @@ function handleClickOnScene(event: MouseEvent) {
   </section>
 </template>
 
-<style scoped>
+<style lang="css" scoped>
 .fishing-scene {
   position: relative;
   min-height: 0;

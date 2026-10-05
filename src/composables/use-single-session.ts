@@ -1,6 +1,6 @@
 // Phát hiện truy cập trên tab khác, đảm bảo chỉ được dùng trên một màn hình
 
-import { ref, watch, onUnmounted, type Ref } from 'vue';
+import { ref, watch, onUnmounted} from 'vue';
 import { RealtimeChannel } from '@supabase/supabase-js';
 import supabase from "../database/connection";
 
