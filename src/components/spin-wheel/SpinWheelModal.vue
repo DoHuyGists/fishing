@@ -1,8 +1,8 @@
 <template>
   <Modal title="Gacha">
-    <div class="flex h-full w-full flex-col lg:flex-row">
+    <div class="flex w-full flex-col lg:flex-row">
       <div
-        class="h-1/2 min-h-0 w-full border-b border-emerald-300/20 p-3 sm:p-5 lg:h-full lg:w-1/2 lg:border-b-0 lg:border-r"
+        class="h-75 overflow-y-scroll min-h-0 w-full border-b border-emerald-300/20 p-3 sm:p-5 lg:h-full lg:w-1/2 lg:border-b-0 lg:border-r"
       >
         <ListItems />
       </div>

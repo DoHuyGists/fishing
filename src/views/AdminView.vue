@@ -6,8 +6,10 @@ import SpeciesManagement from "../components/admin/SpeciesManagement.vue";
 import SpeciesInAreaManagement from "../components/admin/SpeciesInAreaManagement.vue";
 import EventManagement from "../components/admin/EventManagement.vue";
 import EventScheduleManagement from "../components/admin/EventScheduleManagement.vue";
+import RedeemCodeManagement from "../components/admin/RedeemCodeManagement.vue";
+import NotificationManagement from "../components/admin/NotificationManagement.vue";
 
-type ModuleKey = "area" | "item" | "species" | "speciesInArea" | "event" | "schedule";
+type ModuleKey = "area" | "item" | "species" | "speciesInArea" | "event" | "schedule" | "redeemCode" | "notifications";
 
 interface AdminModule {
   key: ModuleKey;
@@ -28,6 +30,8 @@ const groups: ModuleGroup[] = [
     modules: [
       { key: "area", icon: "🗺️", label: "Bãi câu", desc: "Thêm, sửa và xoá các bãi câu trong game.", component: FishingAreaManagement },
       { key: "item", icon: "🎒", label: "Vật phẩm", desc: "Quản lý cần câu, mồi và các vật phẩm khác.", component: ItemManagement },
+      { key: "redeemCode", icon: "🎟️", label: "Mã đổi thưởng", desc: "Tạo mã nhận xu, đặt hạn dùng và bật hoặc tắt mã.", component: RedeemCodeManagement },
+      { key: "notifications", icon: "🔔", label: "Thông báo", desc: "Tạo và quản lý thông báo cá nhân, thông báo hệ thống.", component: NotificationManagement },
       { key: "species", icon: "🐟", label: "Loài cá", desc: "Chỉnh thông tin và thuộc tính của từng loài cá.", component: SpeciesManagement },
       { key: "speciesInArea", icon: "🎯", label: "Cá theo bãi câu", desc: "Chọn loài cá xuất hiện ở mỗi bãi câu.", component: SpeciesInAreaManagement },
     ],

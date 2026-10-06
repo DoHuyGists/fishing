@@ -10,6 +10,8 @@ type ModalName =
     "feedback" |
     "mission" |
     "event"
+    | "redeem"
+    | "notifications"
 
 export const useModalStore = defineStore("Modal", {
     state: () => ({

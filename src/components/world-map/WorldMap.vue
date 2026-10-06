@@ -13,6 +13,8 @@ import InventoryModal from "../inventory/InventoryModal.vue";
 import Feedbackmodal from "../feedback/Feedbackmodal.vue";
 import MissionModal from "../mission/MissionModal.vue";
 import EventModal from "../event/EventModal.vue";
+import RedeemCode from "./RedeemCode.vue";
+import NotificationModal from "../notification/NotificationModal.vue";
 import { useModalStore } from "../../stores/modal.ts";
 
 const currencyStore = useCurrencyStore();
@@ -101,6 +103,21 @@ onMounted(() => {
           <span class="text-sm">📄</span>
           <span>Sự kiện</span>
         </button>
+
+        <!-- Redeem code -->
+        <button type="button"
+          class="flex items-center gap-1.5 px-3 py-1.5 bg-[#153221] hover:bg-[#1a3e29] border border-gray-300 text-white rounded-xl shadow-sm font-bold text-xs cursor-pointer transition-colors"
+          @click="modalStore.open('redeem')">
+          <span class="text-sm" aria-hidden="true">🎁</span>
+          <span>Đổi mã</span>
+        </button>
+
+        <button type="button"
+          class="flex items-center gap-1.5 px-3 py-1.5 bg-[#153221] hover:bg-[#1a3e29] border border-gray-300 text-white rounded-xl shadow-sm font-bold text-xs cursor-pointer transition-colors"
+          @click="modalStore.open('notifications')">
+          <span class="text-sm" aria-hidden="true">🔔</span>
+          <span>Thông báo</span>
+        </button>
       </div>
     </div>
 
@@ -116,6 +133,8 @@ onMounted(() => {
           <Feedbackmodal v-if="modalStore.isOpening('feedback')"/>
           <MissionModal v-if="modalStore.isOpening('mission')"/>
           <EventModal v-if="modalStore.isOpening('event')"/>
+          <RedeemCode v-if="modalStore.isOpening('redeem')" />
+          <NotificationModal v-if="modalStore.isOpening('notifications')" />
         </div>
       </Transition>
     </Teleport>

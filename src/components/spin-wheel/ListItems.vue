@@ -1,6 +1,6 @@
 <template>
     <section class="flex h-full min-h-0 w-full flex-col overflow-hidden rounded-xl border border-white/15 bg-slate-950/80 text-white shadow-2xl">
-        <header class="border-b border-white/10 px-4 py-3">
+        <header class="border-b border-white/10 px-4 py-0">
             <div class="mt-3 flex items-center justify-end gap-3">
                 <button
                     type="button"
@@ -74,7 +74,7 @@
         </div>
 
         <footer class="flex items-center justify-between border-t border-white/10 px-5 py-3 text-xs text-slate-400">
-            <span>{{ visibleRewards.length }} vật phẩm hiển thị</span>
+            <span>{{ visibleRewards.length }} vật phẩm</span>
             <div class="flex gap-2 items-center">
                 <span class="shrink-0 rounded-full bg-emerald-400/15 px-3 py-1 text-xs font-semibold text-emerald-200">
                     {{ spinWheelStore.selectedReward.length }} đã chọn
