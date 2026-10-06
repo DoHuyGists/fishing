@@ -12,20 +12,7 @@ export const useZoneStore = defineStore("zones", {
   }),
   getters: {
     weather: (state) => state.zone?.weather ?? null,
-    modifiers: (state): [string, number][] => {
-      let raw: unknown = state.zone?.weather_active_modifiers ?? {};
-      if (typeof raw === "string") {
-        try {
-          raw = JSON.parse(raw);
-        } catch {
-          raw = {};
-        }
-      }
-      if (!raw || typeof raw !== "object") return [];
-      return Object.entries(raw as Record<string, unknown>)
-        .map(([k, v]) => [k, Number(v)] as [string, number])
-        .filter(([, v]) => Number.isFinite(v));
-    },
+    modifiers: (state) => state.zone?.weather_active_modifiers ?? [],
   },
   actions: {
     async load(areaId: string) {

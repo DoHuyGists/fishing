@@ -212,10 +212,9 @@ function handleClickOnScene(event: MouseEvent) {
           <div>
             <strong>{{ timeLabel }}</strong>
             <small>{{ currentPhase.label }}</small>
-            <small>26°C <i></i> Gió nhẹ</small>
+            <ZoneWeather :area-id="fishingStore.currentAreaId as string | null" />
           </div>
         </div>
-        <ZoneWeather :area-id="fishingStore.currentAreaId as string | null" />
         <div class="backdrop-blur-2xl h-fit w-fit rounded p-1">
           <button type="button"
             class="text-sm text-red-500 bg-transparent border-0 cursor-pointer font-medium p-0 hover:underline disabled:opacity-50"

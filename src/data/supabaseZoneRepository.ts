@@ -17,7 +17,7 @@ export type ZoneWeatherRow = {
   name: string;
   weather_id: string | null;
   weather_expires_at: string | null;
-  weather_active_modifiers: Record<string, number> | null;
+  weather_active_modifiers: any[] | null;
   weather_updated_at: string | null;
   weather: WeatherRow | null;
 };
