@@ -38,43 +38,43 @@ const WEATHER_ICON: Record<string, string> = {
 };
 
 // Nhãn/biểu tượng cho modifier đã biết; key lạ sẽ tự được định dạng
-const MODIFIER_META: Record<string, { label: string; icon: string }> = {
-  EXP_BONUS: { label: "Kinh nghiệm", icon: "✨" },
-  RARE_CATCH_RATE: { label: "Tỷ lệ cá Rare", icon: "✨" },
-  FISHING_SPEED_DOWN: { label: "Giảm tốc độ câu cá", icon: "✨" },
-  LUCK_DOWN: { label: "Giảm may mắn", icon: "✨" },
-  LUCK: { label: "May mắn", icon: "✨" },
-  COOLDOWN_UP: { label: "Tăng thời gian hồi", icon: "✨" },
-  EPIC_CATCH_RATE: { label: "Tỷ lệ cá Epic", icon: "✨" },
-  CATCH_RATE_DOWN: { label: "Giảm tỷ lệ câu cá", icon: "✨" },
-  RARE_ITEM_RATE: { label: "Tỷ lệ vật phẩm hiếm", icon: "✨" },
-  FISH_WEIGHT: { label: "Trọng lượng cá", icon: "✨" },
-  ENERGY_COST: { label: "Tiêu hao năng lượng", icon: "✨" },
-  CATCH_RATE: { label: "Tỷ lệ câu cá", icon: "✨" },
-  COOLDOWN: { label: "Thời gian hồi", icon: "✨" },
-  LEGENDARY_CATCH_RATE: { label: "Tỷ lệ cá Legendary", icon: "✨" },
-  DOUBLE_CATCH: { label: "Cơ hội câu đôi", icon: "✨" },
-  BIG_FISH_RATE: { label: "Tỷ lệ cá lớn", icon: "✨" },
-  ITEM_DROP_RATE: { label: "Tỷ lệ rơi vật phẩm", icon: "✨" },
-  FISH_WEIGHT_DOWN: { label: "Giảm trọng lượng cá", icon: "✨" },
-  ENERGY_COST_UP: { label: "Tăng tiêu hao năng lượng", icon: "✨" },
-  BAIT_EFFICIENCY: { label: "Hiệu quả mồi câu", icon: "✨" },
-  FISHING_SPEED: { label: "Tốc độ câu cá", icon: "✨" },
-  RARE_RATE_DOWN: { label: "Giảm tỷ lệ cá hiếm", icon: "✨" },
-  CASH_BONUS: { label: "Tiền thưởng", icon: "✨" },
-};
+// const MODIFIER_META: Record<string, { label: string; icon: string }> = {
+//   EXP_BONUS: { label: "Kinh nghiệm", icon: "✨" },
+//   RARE_CATCH_RATE: { label: "Tỷ lệ cá Rare", icon: "✨" },
+//   FISHING_SPEED_DOWN: { label: "Giảm tốc độ câu cá", icon: "✨" },
+//   LUCK_DOWN: { label: "Giảm may mắn", icon: "✨" },
+//   LUCK: { label: "May mắn", icon: "✨" },
+//   COOLDOWN_UP: { label: "Tăng thời gian hồi", icon: "✨" },
+//   EPIC_CATCH_RATE: { label: "Tỷ lệ cá Epic", icon: "✨" },
+//   CATCH_RATE_DOWN: { label: "Giảm tỷ lệ câu cá", icon: "✨" },
+//   RARE_ITEM_RATE: { label: "Tỷ lệ vật phẩm hiếm", icon: "✨" },
+//   FISH_WEIGHT: { label: "Trọng lượng cá", icon: "✨" },
+//   ENERGY_COST: { label: "Tiêu hao năng lượng", icon: "✨" },
+//   CATCH_RATE: { label: "Tỷ lệ câu cá", icon: "✨" },
+//   COOLDOWN: { label: "Thời gian hồi", icon: "✨" },
+//   LEGENDARY_CATCH_RATE: { label: "Tỷ lệ cá Legendary", icon: "✨" },
+//   DOUBLE_CATCH: { label: "Cơ hội câu đôi", icon: "✨" },
+//   BIG_FISH_RATE: { label: "Tỷ lệ cá lớn", icon: "✨" },
+//   ITEM_DROP_RATE: { label: "Tỷ lệ rơi vật phẩm", icon: "✨" },
+//   FISH_WEIGHT_DOWN: { label: "Giảm trọng lượng cá", icon: "✨" },
+//   ENERGY_COST_UP: { label: "Tăng tiêu hao năng lượng", icon: "✨" },
+//   BAIT_EFFICIENCY: { label: "Hiệu quả mồi câu", icon: "✨" },
+//   FISHING_SPEED: { label: "Tốc độ câu cá", icon: "✨" },
+//   RARE_RATE_DOWN: { label: "Giảm tỷ lệ cá hiếm", icon: "✨" },
+//   CASH_BONUS: { label: "Tiền thưởng", icon: "✨" },
+// };
 
 const weather = computed(() => zoneStore.weather);
 const rarityLabel = computed(() => RARITY_LABEL[weather.value?.rarity_tier ?? ""] ?? weather.value?.rarity_tier ?? "");
 const weatherIcon = computed(() => (weather.value ? (WEATHER_ICON[weather.value.code] ?? "🌤️") : "🌤️"));
 
-function prettify(key: string) {
-  return key
-    .toLowerCase()
-    .split("_")
-    .map((w) => w.charAt(0).toUpperCase() + w.slice(1))
-    .join(" ");
-}
+// function prettify(key: string) {
+//   return key
+//     .toLowerCase()
+//     .split("_")
+//     .map((w) => w.charAt(0).toUpperCase() + w.slice(1))
+//     .join(" ");
+// }
 
 const modifiers = computed(() =>
   zoneStore.modifiers.map((modifier) => {

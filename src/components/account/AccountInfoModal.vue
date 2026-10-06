@@ -61,10 +61,10 @@ onMounted(() => {
   loadProfile();
 });
 
-const formattedCreatedAt = computed(() => {
-  if (!userProfileStore.profile?.created_at) return "Chưa cập nhật";
-  return dayjs(userProfileStore.profile.created_at).format("DD/MM/YYYY HH:mm");
-});
+// const formattedCreatedAt = computed(() => {
+//   if (!userProfileStore.profile?.created_at) return "Chưa cập nhật";
+//   return dayjs(userProfileStore.profile.created_at).format("DD/MM/YYYY HH:mm");
+// });
 
 const formattedExp = computed(() => {
   const exp = userProfileStore.profile?.experience_point;
