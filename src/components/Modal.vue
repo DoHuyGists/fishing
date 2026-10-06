@@ -82,7 +82,7 @@ onUnmounted(() => {
                 </button>
             </div>
         </header>
-        <div class="grow p-2">
+        <div class="grow overflow-y-scroll p-2">
             <slot></slot>
         </div>
     </div>

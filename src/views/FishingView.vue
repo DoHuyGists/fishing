@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { storeToRefs } from "pinia";
-import { onBeforeUnmount, onMounted, watch } from "vue";
+import { onBeforeUnmount, onMounted, ref, watch } from "vue";
 import EquipmentMenu from "../components/fishing/EquipmentMenu.vue";
 import CatchDialog from "../components/fishing/CatchDialog.vue";
 import FishingBag from "../components/fishing/FishingBag.vue";
@@ -14,6 +14,11 @@ import { useEquipmentStore } from "../stores/equipment";
 const authStore = useAuthStore();
 const equipmentStore = useEquipmentStore();
 const { user } = storeToRefs(authStore);
+const equipmentCollapsed = ref(false);
+
+function toggleEquipment() {
+  equipmentCollapsed.value = !equipmentCollapsed.value;
+}
 
 watch(
   user,
@@ -58,11 +63,21 @@ onBeforeUnmount(() => {
       <FishingScene />
       <section class="control-deck">
         <div class="side-panel">
-          <div class="flex justify-between items-baseline mx-[3px] mb-2">
+          <div class="equipment-heading flex justify-between items-center mx-[3px]">
             <span class="text-[#f1e6b7] text-[11px] font-black tracking-[0.08em] uppercase">Trang bị</span>
-            <!-- <small class="text-[#b8cab5] text-[9px]">Chạm để đổi dụng cụ</small> -->
+            <button
+              type="button"
+              class="equipment-toggle"
+              :aria-expanded="!equipmentCollapsed"
+              aria-controls="equipment-menu"
+              @click="toggleEquipment"
+            >
+              {{ equipmentCollapsed ? "Mở" : "Thu gọn" }}
+            </button>
           </div>
-          <EquipmentMenu />
+          <div id="equipment-menu" :class="{ 'equipment-menu-collapsed': equipmentCollapsed }">
+            <EquipmentMenu />
+          </div>
         </div>
         <PowerMeter />
       </section>
@@ -90,6 +105,10 @@ onBeforeUnmount(() => {
   border: 1px solid rgba(225, 246, 214, 0.23);
   border-radius: 16px;
   background: linear-gradient(135deg, rgba(16, 42, 27, 0.89), rgba(27, 61, 41, 0.82));
+}
+
+.equipment-toggle {
+  display: none;
 }
 
 .control-deck :deep(.tool) {
@@ -158,7 +177,25 @@ onBeforeUnmount(() => {
     padding: 9px;
   }
 
-  .panel-heading {
+  .equipment-heading {
+    margin-bottom: 7px;
+  }
+
+  .equipment-toggle {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-height: 32px;
+    padding: 0 10px;
+    border: 1px solid rgba(225, 246, 214, 0.24);
+    border-radius: 9px;
+    background: rgba(11, 35, 22, 0.58);
+    color: #e9f4e8;
+    font-size: 11px;
+    font-weight: 700;
+  }
+
+  .equipment-menu-collapsed {
     display: none;
   }
 }

@@ -48,7 +48,7 @@ const currencyStore = useCurrencyStore();
 const viewportWidth = ref(window.innerWidth);
 const eligibleRewards = computed(() => spinWheelStore.selectedReward);
 const canSpin = computed(() => eligibleRewards.value.length >= 4);
-const wheelSize = computed(() => (viewportWidth.value < 640 ? 260 : viewportWidth.value < 1024 ? 340 : 480));
+const wheelSize = computed(() => (viewportWidth.value < 640 ? 200 : viewportWidth.value < 1024 ? 340 : 480));
 const SPIN_BASE_COST = 1000;
 const spinFee = computed(() => {
   return (spinWheelStore.rewardList.length + 1) * SPIN_BASE_COST - eligibleRewards.value.length * SPIN_BASE_COST;

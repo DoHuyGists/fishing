@@ -203,7 +203,7 @@ function handleClickOnScene(event: MouseEvent) {
     <img :src="currentScenePhace" alt="Ao câu trong rừng" class="pond-image" draggable="false" ref="sceneElement"
       @click="handleClickOnScene" />
     <div class="scene-shade"></div>
-    <div class="scene-top flex justify-between items-start">
+    <div class="absolute top-2 left-2 text-white flex justify-between items-start">
       <div class="flex flex-col gap-2">
         <div class="location">
           <div class="w-10 h-10 overflow-hidden">
@@ -223,7 +223,7 @@ function handleClickOnScene(event: MouseEvent) {
           </button>
         </div>
       </div>
-      <div class="scene-actions">
+      <div class="flex gap-1 justify-end flex-wrap">
         <button type="button" class="guide-button" @click.stop="fishingStore.openLakeGuide">Cá trong hồ</button>
         <button type="button" class="players-button" @click.stop="fishingStore.openPlayers">
           Người câu <b>{{ fishingStore.nearbyPlayers.length }}</b>
@@ -289,15 +289,6 @@ function handleClickOnScene(event: MouseEvent) {
   pointer-events: none;
 }
 
-.scene-top {
-  position: absolute;
-  z-index: 2;
-  top: 20px;
-  left: 21px;
-  right: 21px;
-  color: white;
-}
-
 .location,
 .weather,
 .scene-status {
@@ -341,12 +332,6 @@ function handleClickOnScene(event: MouseEvent) {
   margin-top: 3px;
   color: #d9e6dc;
   font-size: 10px;
-}
-
-.scene-actions {
-  display: flex;
-  align-items: center;
-  gap: 8px;
 }
 
 .weather {
@@ -788,19 +773,6 @@ function handleClickOnScene(event: MouseEvent) {
     display: none;
   }
 
-  .scene-top {
-    top: 13px;
-    left: 13px;
-  }
-
-  .players-button {
-    font-size: 0;
-    padding: 9px;
-  }
-
-  .players-button b {
-    margin: 0;
-  }
 
   .scene-instruction {
     font-size: 9px;
@@ -809,6 +781,18 @@ function handleClickOnScene(event: MouseEvent) {
   .scene-status {
     bottom: 12px;
     left: 12px;
+  }
+
+  .rod-holder {
+    position: absolute;
+    z-index: 4;
+    right: -8px;
+    bottom: -10%;
+    width: 90px;
+    height: min(80vh, 740px);
+    pointer-events: none;
+    transform-origin: 64% 91%;
+    transition: transform 0.28s ease-out;
   }
 }
 </style>

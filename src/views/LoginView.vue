@@ -15,178 +15,34 @@ async function submit() {
 </script>
 
 <template>
-  <main class="login-page">
-    <section class="login-panel" aria-labelledby="login-title">
-      <h1 id="login-title">Đăng nhập</h1>
-      <!-- <p class="intro">Đăng nhập để tiếp tục hành trình của bạn.</p> -->
+  <main class="grid min-h-screen place-items-center bg-[#dcebe4] bg-[linear-gradient(115deg,rgba(255,255,255,0.5)_1px,transparent_1px),linear-gradient(25deg,rgba(52,100,87,0.08)_1px,transparent_1px)] bg-size-[24px_24px,32px_32px] px-6 py-8 text-[#18312d]">
+    <section class="w-full max-w-[408px] rounded-lg border border-[#b8cbc3] bg-[#fffdf8] p-8 shadow-[12px_12px_0_#346457] sm:p-[42px]" aria-labelledby="login-title">
+      <div class="grid size-[42px] place-items-center rounded-full bg-[#e57a44] font-serif text-[22px] font-bold text-[#fffdf8]" aria-hidden="true">F</div>
+      <p class="mb-[5px] mt-7 text-xs font-bold uppercase tracking-[0.08em] text-[#b9522c]">Chào mừng trở lại</p>
+      <h1 id="login-title" class="font-serif text-[34px] leading-tight">Đăng nhập</h1>
+      <p class="mb-7 mt-2 text-[#61716d]">Đăng nhập để tiếp tục hành trình của bạn.</p>
 
-      <form class="login-form mt-3" @submit.prevent="submit">
-        <label>
+      <form class="grid gap-[18px]" @submit.prevent="submit">
+        <label class="grid gap-[7px] text-sm font-bold">
           <span>Email</span>
-          <input v-model.trim="form.email" type="email" autocomplete="email" required placeholder="...@gmail.com" />
+          <input v-model.trim="form.email" class="min-h-[46px] w-full rounded border border-[#9eb3aa] bg-white px-3 py-[10px] font-normal outline-none transition focus:border-[#346457] focus:ring-[3px] focus:ring-[#346457]/20" type="email" autocomplete="email" required placeholder="...@gmail.com" />
         </label>
-        <label>
+        <label class="grid gap-[7px] text-sm font-bold">
           <span>Mật khẩu</span>
-          <div class="password-field">
-            <input
-              v-model="form.password"
-              :type="showPassword ? 'text' : 'password'"
-              autocomplete="current-password"
-              required
-              placeholder="Nhập mật khẩu"
-            />
-            <button
-              type="button"
-              :aria-label="showPassword ? 'Ẩn mật khẩu' : 'Hiện mật khẩu'"
-              @click="showPassword = !showPassword"
-            >
-              {{ showPassword ? "Ẩn" : "Hiện" }}
-            </button>
+          <div class="relative">
+            <input v-model="form.password" class="min-h-[46px] w-full rounded border border-[#9eb3aa] bg-white py-[10px] pl-3 pr-14 font-normal outline-none transition focus:border-[#346457] focus:ring-[3px] focus:ring-[#346457]/20" :type="showPassword ? 'text' : 'password'" autocomplete="current-password" required placeholder="Nhập mật khẩu" />
+            <button class="absolute inset-y-0 right-0 px-3 text-xs font-bold text-[#346457]" type="button" :aria-label="showPassword ? 'Ẩn mật khẩu' : 'Hiện mật khẩu'" @click="showPassword = !showPassword">{{ showPassword ? "Ẩn" : "Hiện" }}</button>
           </div>
         </label>
-        <p v-if="auth.error" class="login-error" role="alert">{{ auth.error }}</p>
-        <button class="submit-button" type="submit" :disabled="auth.loading">
+        <p v-if="auth.error" class="-mt-1 text-[13px] leading-relaxed text-[#b52d26]" role="alert">{{ auth.error }}</p>
+        <button class="min-h-12 rounded bg-[#346457] font-bold text-white transition-colors hover:bg-[#254b40] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#346457] disabled:cursor-wait disabled:opacity-70" type="submit" :disabled="auth.loading">
           {{ auth.loading ? "Đang đăng nhập..." : "Đăng nhập" }}
         </button>
       </form>
+
+      <p class="mt-6 text-center text-sm text-[#61716d]">Chưa có tài khoản?
+        <RouterLink class="font-bold text-[#346457] underline decoration-transparent underline-offset-4 transition hover:decoration-current" to="/signup">Đăng ký</RouterLink>
+      </p>
     </section>
   </main>
 </template>
-
-<style scoped>
-.login-page {
-  --ink: #18312d;
-  --muted: #61716d;
-  min-height: 100vh;
-  display: grid;
-  place-items: center;
-  padding: 24px;
-  color: var(--ink);
-  background-color: #dcebe4;
-  background-image:
-    linear-gradient(115deg, rgba(255, 255, 255, 0.5) 1px, transparent 1px),
-    linear-gradient(25deg, rgba(52, 100, 87, 0.08) 1px, transparent 1px);
-  background-size:
-    24px 24px,
-    32px 32px;
-}
-
-.login-panel {
-  width: min(100%, 408px);
-  padding: 42px;
-  border: 1px solid #b8cbc3;
-  border-radius: 8px;
-  background: #fffdf8;
-  box-shadow: 12px 12px 0 #346457;
-}
-
-.brand-mark {
-  width: 42px;
-  height: 42px;
-  display: grid;
-  place-items: center;
-  border-radius: 50%;
-  background: #e57a44;
-  color: #fffdf8;
-  font:
-    700 22px Georgia,
-    serif;
-}
-.eyebrow {
-  margin: 28px 0 5px;
-  color: #b9522c;
-  font-size: 12px;
-  font-weight: 700;
-  letter-spacing: 0.08em;
-  text-transform: uppercase;
-}
-.login-panel h1 {
-  margin: 0;
-  font-family: Georgia, serif;
-  font-size: 34px;
-  line-height: 1.1;
-}
-.intro {
-  margin: 10px 0 28px;
-  color: var(--muted);
-}
-.login-form {
-  display: grid;
-  gap: 18px;
-}
-.login-form label {
-  display: grid;
-  gap: 7px;
-  color: var(--ink);
-  font-size: 14px;
-  font-weight: 700;
-}
-.login-form input {
-  width: 100%;
-  box-sizing: border-box;
-  min-height: 46px;
-  border: 1px solid #9eb3aa;
-  border-radius: 4px;
-  padding: 10px 12px;
-  color: var(--ink);
-  background: #fff;
-  font: inherit;
-  font-weight: 400;
-  outline: none;
-}
-.login-form input:focus {
-  border-color: #346457;
-  box-shadow: 0 0 0 3px rgba(52, 100, 87, 0.18);
-}
-.password-field {
-  position: relative;
-}
-.password-field input {
-  padding-right: 55px;
-}
-.password-field button {
-  position: absolute;
-  top: 0;
-  right: 0;
-  height: 46px;
-  border: 0;
-  padding: 0 12px;
-  color: #346457;
-  background: transparent;
-  cursor: pointer;
-  font: inherit;
-  font-size: 12px;
-  font-weight: 700;
-}
-.login-error {
-  margin: -4px 0 0;
-  color: #b52d26;
-  font-size: 13px;
-  line-height: 1.4;
-}
-.submit-button {
-  min-height: 48px;
-  border: 0;
-  border-radius: 4px;
-  background: #346457;
-  color: #fff;
-  cursor: pointer;
-  font: inherit;
-  font-weight: 700;
-  transition: background 150ms ease;
-}
-.submit-button:hover:not(:disabled) {
-  background: #254b40;
-}
-.submit-button:disabled {
-  cursor: wait;
-  opacity: 0.7;
-}
-
-@media (max-width: 480px) {
-  .login-panel {
-    padding: 30px 24px;
-    box-shadow: 7px 7px 0 #346457;
-  }
-}
-</style>

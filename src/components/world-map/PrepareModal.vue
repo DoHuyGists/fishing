@@ -307,7 +307,7 @@ function confirm() {
                   </div>
                 </div>
 
-                <div class="grid grid-cols-5 gap-3">
+                <div class="grid grid-cols-2 lg:grid-cols-5 gap-3">
                   <div
                     v-for="cat in equipmentCategories"
                     :key="cat.id"
@@ -356,7 +356,7 @@ function confirm() {
 
               <!-- SECTION 2: EQUIPMENT SETS LIST & ITEMS IN USED SET -->
               <div class="flex flex-col gap-3 bg-white/[0.025] border border-white/[0.06] rounded-2xl p-4 sm:px-5 shadow-[0_4px_20px_rgba(0,0,0,0.2)]">
-                <div class="flex items-center justify-between gap-4 border-b border-white/[0.06] pb-3">
+                <div class="flex items-center flex-wrap justify-between gap-4 border-b border-white/[0.06] pb-3">
                   <div class="flex items-center gap-2.5">
                     <span class="w-2.5 h-2.5 rounded-full bg-sky-400 shadow-[0_0_10px_#38bdf8] shrink-0"></span>
                     <div>
@@ -409,7 +409,7 @@ function confirm() {
 
                 <!-- Category Items in Currently Used Set -->
                 <div v-else-if="usedSet">
-                  <div class="grid grid-cols-5 gap-3">
+                  <div class="grid grid-cols-2 lg:grid-cols-5 gap-3">
                     <div
                       v-for="cat in equipmentCategories"
                       :key="cat.id"
@@ -493,7 +493,7 @@ function confirm() {
           </div>
 
           <!-- Footer -->
-          <footer class="flex items-center justify-between gap-4 px-7 py-3.5 bg-black/25 border-t border-white/[0.06]">
+          <footer class="flex items-center justify-between flex-wrap gap-4 px-7 py-3.5 bg-black/25 border-t border-white/[0.06]">
             <div v-if="proceedBlockReason" class="flex items-center gap-2 px-3.5 py-2 bg-amber-500/10 border border-amber-500/30 rounded-lg text-amber-200 text-sm leading-snug max-w-[65%]">
               <span class="text-base shrink-0">⚠️</span>
               <span class="font-medium">{{ proceedBlockReason }}</span>
