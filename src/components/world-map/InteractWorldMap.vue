@@ -32,7 +32,7 @@ function handleWheel(event: WheelEvent) {
   }
 
   event.preventDefault();
-  if (!mapFrame.value) {
+  if (!mapFrame.value || !worldStore.zoomable) {
     return;
   }
 
@@ -74,7 +74,7 @@ function handlePointerDown(event: PointerEvent) {
     return;
   }
 
-  if (worldStore.isAnchorMode || worldStore.zoom === MIN_ZOOM || event.button !== 0 || !mapFrame.value) {
+  if (!worldStore.dragable || worldStore.isAnchorMode || worldStore.zoom === MIN_ZOOM || event.button !== 0 || !mapFrame.value) {
     return;
   }
 
@@ -137,20 +137,16 @@ onMounted(() => {
           <World class="w-full h-full" @mousemove="handleMouseMove" :anchors="anchors" :zoom="worldStore.zoom" />
         </div>
       </div>
-      <div class="space-y-2 mt-4">
+      <div class="space-y-2 space-x-2 mt-4">
         <button
           type="button"
           class="py-2 px-3 rounded-lg border border-gray-300 bg-transparent text-[#263238] text-xs font-bold cursor-pointer hover:bg-[#eef3f1] transition-colors"
           :aria-pressed="worldStore.isAnchorMode"
+          :disabled="!worldStore.anchorable"
           @click="worldStore.isAnchorMode = !worldStore.isAnchorMode"
         >
           {{ worldStore.isAnchorMode ? "Tắt chọn vị trí" : "Chọn vị trí anchor" }}
         </button>
-        <p v-if="worldStore.selectedLocation" class="text-xs text-[#263238]">
-          Tọa độ anchor: x={{ worldStore.selectedLocation.x.toFixed(2) }}, y={{
-            worldStore.selectedLocation.y.toFixed(2)
-          }}
-        </p>
         <button
           type="button"
           class="py-2 px-3 rounded-lg border border-gray-300 bg-transparent text-[#263238] text-xs font-bold cursor-pointer hover:bg-[#eef3f1] transition-colors"

@@ -17,20 +17,22 @@ export const useWorldStore = defineStore("world", {
   state: () => ({
     selectedArea: {} as any,
     zoom: 1,
-    pan: { x: 0, y: 0 },
+    zoomable: true,
     isAnchorMode: false,
+    anchorable: true,
+    pan: { x: 0, y: 0 },
     didDrag: false,
-    selectedLocation: null as { x: number; y: number } | null,
+    dragable: true,
+    selectedCoordinate: null as { x: number; y: number } | null,
+    selectedCountry: null as { id: string; title: string } | null,
   }),
-  getters: {
-    getCurrentlocation: (state) => state.pan,
-    getSelectedLocation: (state) => state.selectedLocation,
-  },
+  getters: {},
   actions: {
-    getCurrentArea(){
+    getCurrentArea() {
       return {
-        zoom: this, pan: this.pan 
-      }
+        zoom: this,
+        pan: this.pan,
+      };
     },
     cachedMapLocation() {
       localStorage.setItem(MAP_VIEW_STORAGE_KEY, JSON.stringify({ zoom: this.zoom, pan: this.pan }));
@@ -75,16 +77,24 @@ export const useWorldStore = defineStore("world", {
       this.handleMoveToArea({});
     },
 
-    resetSelectedLocation(){
-      this.selectedLocation = null;
+    resetSelectedCoordinate() {
+      this.selectedCoordinate = null;
     },
 
-    setWorldClickPosition(position: { x: number; y: number }) {
-      if (!this.isAnchorMode || this.didDrag) {
+    resetSelectedCountry() {
+      this.selectedCountry = null;
+    },
+
+    setWorldSelectedCoordinate(position: { x: number; y: number }) {
+      if (this.didDrag) {
         this.didDrag = false;
         return;
       }
-      this.selectedLocation = position;
+      this.selectedCoordinate = position;
+    },
+
+    setCountrySelected(country: { id: string; title: string }) {
+      this.selectedCountry = country;
     },
   },
 });

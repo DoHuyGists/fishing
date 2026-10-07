@@ -10,7 +10,7 @@ export interface FishingAreaRow {
   title: string | null;
   location: any;
   scenePath: string | null;
-  fishingBoundary: any[];
+  fishingBoundary: any[] | string;
 }
 
 export interface FishingAreaPayload {

@@ -22,6 +22,17 @@ const showPrepare = ref(false);
 const pendingAnchor = ref<any | null>(null);
 
 function handleWorldClick(event: MouseEvent) {
+  if(!worldStore.isAnchorMode) return;
+
+  const target = event.target;
+  if (target instanceof SVGPathElement) {
+    const id = target.id;
+    const title = target.getAttribute("title");
+    if (id && title) {
+      worldStore.setCountrySelected({ id, title });
+    }
+  }
+
   // SVG coordinates are in the viewBox coordinate system, so they remain stable
   // when the SVG or its parent is translated and scaled.
   const svg = event.currentTarget as SVGSVGElement;
@@ -32,7 +43,7 @@ function handleWorldClick(event: MouseEvent) {
   point.x = event.clientX;
   point.y = event.clientY;
   const position = point.matrixTransform(matrix.inverse());
-  worldStore.setWorldClickPosition({ x: position.x, y: position.y });
+  worldStore.setWorldSelectedCoordinate({ x: position.x, y: position.y });
 }
 
 function openPrepare(anchor: any) {
@@ -1470,7 +1481,7 @@ async function goToFishingArea(anchor: any) {
       id="ZW"
     />
 
-    <g v-if="worldStore.selectedLocation" :transform="`translate(${worldStore.selectedLocation.x} ${worldStore.selectedLocation.y})`">
+    <g v-if="worldStore.selectedCoordinate" :transform="`translate(${worldStore.selectedCoordinate.x} ${worldStore.selectedCoordinate.y})`">
       <circle r="1" fill="red" stroke-width=".5" opacity="0" class="anchor-pulse">
           <animate attributeName="r" values="1;5" dur="1.5s" repeatCount="indefinite" />
           <animate attributeName="opacity" values="0.8;0" dur="1.5s" repeatCount="indefinite" />

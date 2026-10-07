@@ -1,38 +1,24 @@
 <script lang="ts" setup>
 import { computed, reactive, ref, watch } from "vue";
-import { useFishingAreaStore } from "../../stores/fishingArea";
-import { mapData } from "../../data/map";
-import type { FishingAreaPayload, FishingAreaRow } from "../../data/supabaseFishingAreaRepository";
-import InteractWorldWrapper from "../../components/world-map/InteractWorldMap.vue";
-import { useWorldStore } from "../../stores/world.ts";
+import { mapData } from "../../../data/map.ts";
+import InteractWorldMap from "../../world-map/InteractWorldMap.vue";
+import { useAdminFishingAreaStore } from "./admin-fishing-area-store.ts";
+import FishingAreaManagementForm from "./FishingAreaManagementForm.vue";
+import { useWorldStore } from "../../../stores/world.ts";
+
 
 const emit = defineEmits(["close"]);
-const fishingAreaStore = useFishingAreaStore();
+const adminFishingAreaStore = useAdminFishingAreaStore();
 const worldStore = useWorldStore();
-
 const search = ref("");
 const countryFilter = ref("ALL");
 const availabilityFilter = ref<"ALL" | "AVAILABLE" | "UNAVAILABLE">("ALL");
 
-const isFormOpen = ref(false);
-const isSaving = ref(false);
-const formError = ref("");
+
+
 const deletingId = ref<string | null>(null);
 const confirmDeleteId = ref<string | null>(null);
 
-const emptyForm = () => ({
-  id: null as string | null,
-  countryId: "VN",
-  isAvailable: false,
-  x: 0,
-  y: 0,
-  title: "",
-  scenePath: "",
-  locationJson: "",
-  boundaryJson: "[]",
-});
-
-const form = reactive(emptyForm());
 
 const countryOptions = computed(() =>
   Object.entries(mapData)
@@ -41,7 +27,7 @@ const countryOptions = computed(() =>
 );
 
 const countryFilterOptions = computed(() => {
-  const codes = new Set(fishingAreaStore.adminAreas.map((area) => area.countryId));
+  const codes = new Set(adminFishingAreaStore.adminAreas.map((area) => area.countryId));
   return countryOptions.value.filter((option) => codes.has(option.code));
 });
 
@@ -51,7 +37,7 @@ function countryName(code: string) {
 
 const filteredAreas = computed(() => {
   const keyword = search.value.trim().toLowerCase();
-  return fishingAreaStore.adminAreas.filter((area) => {
+  return adminFishingAreaStore.adminAreas.filter((area) => {
     const keywordMatch =
       !keyword ||
       area.title?.toLowerCase().includes(keyword) ||
@@ -74,94 +60,7 @@ function formatDate(dateStr: string) {
   return new Date(dateStr).toLocaleString("vi-VN");
 }
 
-function openCreateForm() {
-  Object.assign(form, emptyForm());
-  formError.value = "";
-  isFormOpen.value = true;
-}
 
-function openEditForm(area: FishingAreaRow) {
-  form.id = area.id;
-  form.countryId = area.countryId;
-  form.isAvailable = area.isAvailable;
-  form.x = area.x;
-  form.y = area.y;
-  form.title = area.title ?? "";
-  form.scenePath = area.scenePath ?? "";
-  form.locationJson = area.location ? JSON.stringify(area.location, null, 2) : "";
-  form.boundaryJson = JSON.stringify(area.fishingBoundary ?? [], null, 2);
-  formError.value = "";
-  isFormOpen.value = true;
-}
-
-function closeForm() {
-  isFormOpen.value = false;
-  formError.value = "";
-}
-
-function buildPayload(): FishingAreaPayload | null {
-  if (!form.countryId) {
-    formError.value = "Vui lòng chọn quốc gia";
-    return null;
-  }
-
-  let location: any = null;
-  if (form.locationJson.trim()) {
-    try {
-      location = JSON.parse(form.locationJson);
-    } catch {
-      formError.value = "Location không đúng định dạng JSON";
-      return null;
-    }
-  }
-
-  let fishingBoundary: any[];
-  try {
-    fishingBoundary = JSON.parse(form.boundaryJson.trim() || "[]");
-  } catch {
-    formError.value = "Vùng câu (fishing_boundary) không đúng định dạng JSON";
-    return null;
-  }
-
-  if (
-    !Array.isArray(fishingBoundary) ||
-    !fishingBoundary.every((point) => point && typeof point.x === "number" && typeof point.y === "number")
-  ) {
-    formError.value = 'Vùng câu (fishing_boundary) phải là mảng các object dạng {"x": number, "y": number}';
-    return null;
-  }
-
-  return {
-    countryId: form.countryId,
-    isAvailable: form.isAvailable,
-    x: Number(form.x),
-    y: Number(form.y),
-    title: form.title.trim() || null,
-    location,
-    scenePath: form.scenePath.trim() || null,
-    fishingBoundary,
-  };
-}
-
-async function handleSave() {
-  formError.value = "";
-  const payload = buildPayload();
-  if (!payload) return;
-
-  isSaving.value = true;
-  try {
-    if (form.id) {
-      await fishingAreaStore.updateAreaAdmin(form.id, payload);
-    } else {
-      await fishingAreaStore.createAreaAdmin(payload);
-    }
-    closeForm();
-  } catch (err) {
-    formError.value = err instanceof Error ? err.message : "Không thể lưu bãi câu";
-  } finally {
-    isSaving.value = false;
-  }
-}
 
 function askDelete(id: string) {
   confirmDeleteId.value = id;
@@ -175,28 +74,34 @@ async function handleDelete() {
   if (!confirmDeleteId.value) return;
   deletingId.value = confirmDeleteId.value;
   try {
-    await fishingAreaStore.deleteAreaAdmin(confirmDeleteId.value);
-    if (form.id === confirmDeleteId.value) closeForm();
+    await adminFishingAreaStore.deleteAreaAdmin(confirmDeleteId.value);
+    // if (form.id === confirmDeleteId.value) closeForm();
   } catch (err) {
-    fishingAreaStore.adminError = err instanceof Error ? err.message : "Không thể xoá bãi câu";
+    adminFishingAreaStore.adminError = err instanceof Error ? err.message : "Không thể xoá bãi câu";
   } finally {
     deletingId.value = null;
     confirmDeleteId.value = null;
   }
 }
 
-fishingAreaStore.fetchAllAreasAdmin();
+adminFishingAreaStore.fetchAllAreasAdmin();
 
-watch(
-  () => [worldStore.selectedLocation],
-  ([newSelectedLocation]) => {
-    if(worldStore.isAnchorMode && newSelectedLocation){
-      form.x = newSelectedLocation.x;
-      form.y = newSelectedLocation.y;
-      // form.locationJson = JSON.stringify(getCurrentArea);
-    }
+watch(()=>adminFishingAreaStore.isFormOpen, (isFormOpen)=>{
+  if(isFormOpen === false){
+    clear();
   }
-);
+}, {immediate: true,deep:true})
+
+
+function clear() {
+    worldStore.resetSelectedCountry();
+    worldStore.resetSelectedCoordinate();
+    worldStore.isAnchorMode = false;
+    worldStore.dragable = true;
+    worldStore.zoomable = true;
+    worldStore.anchorable = true;
+}
+
 </script>
 
 <template>
@@ -279,13 +184,13 @@ watch(
 
       <button
         type="button"
-        @click="fishingAreaStore.fetchAllAreasAdmin"
+        @click="adminFishingAreaStore.fetchAllAreasAdmin"
         title="Làm mới danh sách"
         class="px-3 py-1.5 border border-gray-300 rounded-lg bg-white hover:bg-gray-100 text-gray-700 text-xs font-bold flex items-center gap-1.5 cursor-pointer transition-colors"
       >
         <svg
           class="w-3.5 h-3.5"
-          :class="{ 'animate-spin': fishingAreaStore.adminLoading }"
+          :class="{ 'animate-spin': adminFishingAreaStore.adminLoading }"
           fill="none"
           stroke="currentColor"
           viewBox="0 0 24 24"
@@ -302,7 +207,7 @@ watch(
 
       <button
         type="button"
-        @click="openCreateForm"
+        @click="adminFishingAreaStore.openForm()"
         class="px-3 py-1.5 rounded-lg bg-[#153221] hover:bg-emerald-800 text-white text-xs font-bold flex items-center gap-1.5 cursor-pointer transition-colors"
       >
         <span>+ Thêm bãi câu</span>
@@ -312,17 +217,17 @@ watch(
     <!-- Body -->
     <div class="flex-1 flex min-h-0">
       <!-- List -->
-      <div v-if="!isFormOpen" class="flex-1 min-w-0 overflow-y-auto p-6 bg-gray-50/50">
+      <div v-if="!adminFishingAreaStore.isFormOpen" class="flex-1 min-w-0 overflow-y-auto p-6 bg-gray-50/50">
         <div
-          v-if="fishingAreaStore.adminLoading"
+          v-if="adminFishingAreaStore.adminLoading"
           class="py-16 text-center text-gray-500 text-xs flex flex-col items-center gap-2"
         >
           <div class="w-8 h-8 border border-emerald-600 border-t-transparent rounded-full animate-spin"></div>
           <span>Đang tải danh sách bãi câu...</span>
         </div>
 
-        <div v-else-if="fishingAreaStore.adminError" class="py-16 text-center text-red-500 text-xs">
-          {{ fishingAreaStore.adminError }}
+        <div v-else-if="adminFishingAreaStore.adminError" class="py-16 text-center text-red-500 text-xs">
+          {{ adminFishingAreaStore.adminError }}
         </div>
 
         <div v-else-if="!filteredAreas.length" class="py-16 text-center text-gray-400 text-xs">
@@ -370,7 +275,7 @@ watch(
                   <div class="flex items-center justify-end gap-2">
                     <button
                       type="button"
-                      @click="openEditForm(area)"
+                      @click="adminFishingAreaStore.openForm(area)"
                       class="px-2.5 py-1 rounded-lg border border-gray-300 hover:bg-gray-100 text-gray-700 font-bold cursor-pointer transition-colors"
                     >
                       Sửa
@@ -390,128 +295,11 @@ watch(
           </table>
         </div>
       </div>
-      <InteractWorldWrapper v-else />
-
-      <!-- Form panel -->
-      <div v-if="isFormOpen" class="w-full sm:w-105 shrink-0 border-l border-gray-200 bg-white overflow-y-auto">
-        <div class="p-5 flex flex-col gap-4">
-          <div class="flex items-center justify-between">
-            <h3 class="m-0 text-sm font-extrabold text-[#153221]">
-              {{ form.id ? "Chỉnh sửa bãi câu" : "Thêm bãi câu mới" }}
-            </h3>
-            <button
-              type="button"
-              @click="closeForm"
-              class="text-gray-400 hover:text-gray-700 cursor-pointer text-lg leading-none"
-            >
-              &times;
-            </button>
-          </div>
-
-          <div v-if="formError" class="px-3 py-2 rounded-lg bg-red-50 border border-red-200 text-red-600 text-xs">
-            {{ formError }}
-          </div>
-
-          <div class="flex flex-col gap-1.5">
-            <label class="text-[11px] font-bold text-gray-500 uppercase">Tên bãi câu</label>
-            <input
-              v-model="form.title"
-              type="text"
-              placeholder="Ví dụ: Hồ Xanh"
-              class="px-3 py-1.5 border border-gray-300 rounded-lg text-xs focus:outline-none focus:border-emerald-500"
-            />
-          </div>
-
-          <div class="flex flex-col gap-1.5">
-            <label class="text-[11px] font-bold text-gray-500 uppercase">Quốc gia</label>
-            <select
-              v-model="form.countryId"
-              class="px-3 py-1.5 border border-gray-300 rounded-lg text-xs bg-white focus:outline-none focus:border-emerald-500"
-            >
-              <option v-for="option in countryOptions" :key="option.code" :value="option.code">
-                {{ option.name }}
-              </option>
-            </select>
-          </div>
-
-          <div class="grid grid-cols-2 gap-3">
-            <div class="flex flex-col gap-1.5">
-              <label class="text-[11px] font-bold text-gray-500 uppercase">Toạ độ X</label>
-              <input
-                v-model.number="form.x"
-                type="number"
-                step="any"
-                class="px-3 py-1.5 border border-gray-300 rounded-lg text-xs focus:outline-none focus:border-emerald-500"
-              />
-            </div>
-            <div class="flex flex-col gap-1.5">
-              <label class="text-[11px] font-bold text-gray-500 uppercase">Toạ độ Y</label>
-              <input
-                v-model.number="form.y"
-                type="number"
-                step="any"
-                class="px-3 py-1.5 border border-gray-300 rounded-lg text-xs focus:outline-none focus:border-emerald-500"
-              />
-            </div>
-          </div>
-
-          <label class="flex items-center gap-2 text-xs font-medium text-gray-700 cursor-pointer select-none">
-            <input v-model="form.isAvailable" type="checkbox" class="w-4 h-4 accent-emerald-700" />
-            Kích hoạt (hiển thị trên bản đồ)
-          </label>
-
-          <div class="flex flex-col gap-1.5">
-            <label class="text-[11px] font-bold text-gray-500 uppercase">Đường dẫn cảnh (scene_path)</label>
-            <input
-              v-model="form.scenePath"
-              type="text"
-              placeholder="area/VN/770.400"
-              class="px-3 py-1.5 border border-gray-300 rounded-lg text-xs focus:outline-none focus:border-emerald-500"
-            />
-          </div>
-
-          <div class="flex flex-col gap-1.5">
-            <label class="text-[11px] font-bold text-gray-500 uppercase">Location (JSON, không bắt buộc)</label>
-            <textarea
-              v-model="form.locationJson"
-              rows="4"
-              placeholder='{"x": 0, "y": 0, "zoom": 1}'
-              class="px-3 py-1.5 border border-gray-300 rounded-lg text-xs font-mono focus:outline-none focus:border-emerald-500"
-            ></textarea>
-          </div>
-
-          <div class="flex flex-col gap-1.5">
-            <label class="text-[11px] font-bold text-gray-500 uppercase">Vùng câu (fishing_boundary, JSON)</label>
-            <textarea
-              v-model="form.boundaryJson"
-              rows="10"
-              placeholder='[{"x": 0, "y": 0}, {"x": 10, "y": 0}]'
-              class="px-3 py-1.5 border border-gray-300 rounded-lg text-xs font-mono focus:outline-none focus:border-emerald-500"
-            ></textarea>
-            <p class="text-[11px] text-gray-400">
-              Dán mảng các object dạng {{ '{ "x": number, "y": number }' }} tạo thành vòng cung giới hạn phạm vi quăng
-              mồi.
-            </p>
-          </div>
-
-          <div class="flex items-center gap-2 pt-2 border-t border-gray-100">
-            <button
-              type="button"
-              @click="handleSave"
-              :disabled="isSaving"
-              class="flex-1 px-3 py-2 rounded-lg bg-[#153221] hover:bg-emerald-800 text-white text-xs font-bold cursor-pointer transition-colors disabled:opacity-50"
-            >
-              {{ isSaving ? "Đang lưu..." : "Lưu" }}
-            </button>
-            <button
-              type="button"
-              @click="closeForm"
-              class="px-3 py-2 rounded-lg border border-gray-300 hover:bg-gray-100 text-gray-700 text-xs font-bold cursor-pointer transition-colors"
-            >
-              Huỷ
-            </button>
-          </div>
-        </div>
+      <div v-else class="flex gap-2 p-2">
+        <InteractWorldMap  />
+  
+        <!-- Form panel -->
+        <FishingAreaManagementForm/>
       </div>
     </div>
 

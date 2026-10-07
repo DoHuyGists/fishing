@@ -1,6 +1,6 @@
 <script lang="ts" setup>
 import { computed, ref } from "vue";
-import FishingAreaManagement from "../components/admin/FishingAreaManagement.vue";
+import FishingAreaManagement from "../components/admin/fishing-area-management/FishingAreaManagement.vue";
 import ItemManagement from "../components/admin/ItemManagement.vue";
 import SpeciesManagement from "../components/admin/SpeciesManagement.vue";
 import SpeciesInAreaManagement from "../components/admin/SpeciesInAreaManagement.vue";
