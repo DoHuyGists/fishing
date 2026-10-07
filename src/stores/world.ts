@@ -1,5 +1,13 @@
 import { defineStore } from "pinia";
 
+interface Location {
+  zoom: number;
+  pan: {
+    x: number;
+    y: number;
+  };
+}
+
 const MAP_VIEW_STORAGE_KEY = "worldMapView";
 export const MIN_ZOOM = 1;
 export const MAX_ZOOM = 40;
@@ -9,25 +17,37 @@ export const useWorldStore = defineStore("world", {
   state: () => ({
     selectedArea: {} as any,
     zoom: 1,
-    pan: { x: 0, y: 0 }
+    pan: { x: 0, y: 0 },
+    isAnchorMode: false,
+    didDrag: false,
+    selectedLocation: null as { x: number; y: number } | null,
   }),
+  getters: {
+    getCurrentlocation: (state) => state.pan,
+    getCurrentArea: (state) => ({ zoom: state.zoom, pan: state.pan }),
+    getSelectedLocation: (state) => state.selectedLocation,
+  },
   actions: {
     cachedMapLocation() {
       localStorage.setItem(MAP_VIEW_STORAGE_KEY, JSON.stringify({ zoom: this.zoom, pan: this.pan }));
     },
-    setMapLocation(anchor: any) {
-      localStorage.setItem(MAP_VIEW_STORAGE_KEY, JSON.stringify(anchor.location));
+
+    setMapLocation(location: Location) {
+      localStorage.setItem(MAP_VIEW_STORAGE_KEY, JSON.stringify(location));
     },
+
     targetArea(anchor: any) {
       this.selectedArea = anchor;
     },
-    handleMoveToArea(anchor: any) {
-      this.setMapLocation(anchor);
+
+    handleMoveToArea(fishingArea: any) {
+      this.setMapLocation(fishingArea.location);
       this.moveMapToCachedLocation();
       setTimeout(() => {
-        this.targetArea(anchor);
+        this.targetArea(fishingArea);
       }, 0);
     },
+
     moveMapToCachedLocation() {
       // Load cached location
       try {
@@ -44,10 +64,23 @@ export const useWorldStore = defineStore("world", {
         // ignore corrupted storage
       }
     },
-    resetZoom() {
+
+    resetLocation() {
       this.zoom = MIN_ZOOM;
       this.pan = { x: 0, y: 0 };
       this.handleMoveToArea({});
-    }
+    },
+
+    resetSelectedLocation(){
+      this.selectedLocation = null;
+    },
+
+    setWorldClickPosition(position: { x: number; y: number }) {
+      if (!this.isAnchorMode || this.didDrag) {
+        this.didDrag = false;
+        return;
+      }
+      this.selectedLocation = position;
+    },
   },
 });

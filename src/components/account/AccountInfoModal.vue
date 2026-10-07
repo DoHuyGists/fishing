@@ -6,7 +6,6 @@ import { useModalStore } from "../../stores/modal";
 import { useUserProfileStore } from "../../stores/userProfile";
 import Modal from "../Modal.vue";
 import Cash from "../currency/Cash.vue";
-import dayjs from "dayjs";
 
 const authStore = useAuthStore();
 const currencyStore = useCurrencyStore();

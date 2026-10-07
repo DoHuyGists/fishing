@@ -1,5 +1,5 @@
 <script lang="ts" setup>
-import { computed,ref, watch } from "vue";
+import { computed, ref, watch } from "vue";
 import { useRouter } from "vue-router";
 import { useWorldStore } from "../../stores/world";
 import { supabaseUserInAreaRepository } from "../../data/supabaseUserInAreaRepository";
@@ -11,8 +11,8 @@ const props = defineProps<{
 }>();
 
 defineOptions({
-  inheritAttrs: false
-})
+  inheritAttrs: false,
+});
 
 const router = useRouter();
 const worldStore = useWorldStore();
@@ -20,6 +20,20 @@ const selectedAnchor = ref<any | null>(null);
 const isEntering = ref(false);
 const showPrepare = ref(false);
 const pendingAnchor = ref<any | null>(null);
+
+function handleWorldClick(event: MouseEvent) {
+  // SVG coordinates are in the viewBox coordinate system, so they remain stable
+  // when the SVG or its parent is translated and scaled.
+  const svg = event.currentTarget as SVGSVGElement;
+  const matrix = svg.getScreenCTM();
+  if (!matrix) return;
+
+  const point = svg.createSVGPoint();
+  point.x = event.clientX;
+  point.y = event.clientY;
+  const position = point.matrixTransform(matrix.inverse());
+  worldStore.setWorldClickPosition({ x: position.x, y: position.y });
+}
 
 function openPrepare(anchor: any) {
   pendingAnchor.value = anchor;
@@ -76,11 +90,9 @@ async function goToFishingArea(anchor: any) {
     console.error("Lỗi cập nhật user_in_area khi đi đến bãi câu:", err);
   } finally {
     isEntering.value = false;
-    router.push({name: "fishing"});
+    router.push({ name: "fishing" });
   }
 }
-
-
 </script>
 <style lang="css">
 .anchors {
@@ -153,7 +165,9 @@ async function goToFishingArea(anchor: any) {
   font-weight: 700;
   text-decoration: none;
   cursor: pointer;
-  transition: opacity 0.15s ease, background 0.15s ease;
+  transition:
+    opacity 0.15s ease,
+    background 0.15s ease;
 }
 .anchor-dialog-link:hover:not(:disabled) {
   background: #16a34a;
@@ -177,6 +191,7 @@ async function goToFishingArea(anchor: any) {
 <template>
   <svg
     v-bind="$attrs"
+    @click="handleWorldClick"
     xmlns:mapsvg="http://mapsvg.com"
     xmlns:dc="http://purl.org/dc/elements/1.1/"
     xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
@@ -1454,9 +1469,20 @@ async function goToFishingArea(anchor: any) {
       title="Zimbabwe"
       id="ZW"
     />
-    <!-- <g :transform="`translate(${771} ${436})`">
-      <circle r="1" fill="red" stroke-width=".5"></circle>
-    </g> -->
+
+    <g v-if="worldStore.selectedLocation" :transform="`translate(${worldStore.selectedLocation.x} ${worldStore.selectedLocation.y})`">
+      <circle r="1" fill="red" stroke-width=".5" opacity="0" class="anchor-pulse">
+          <animate attributeName="r" values="1;5" dur="1.5s" repeatCount="indefinite" />
+          <animate attributeName="opacity" values="0.8;0" dur="1.5s" repeatCount="indefinite" />
+        </circle>
+        <circle
+          r=".7"
+          fill="white"
+          stroke="#ffffff"
+          stroke-width=".3"
+          class="anchors"
+        />
+    </g>
 
     <template v-for="anchor in props.anchors" :key="anchor.id">
       <g :transform="`translate(${anchor.x} ${anchor.y})`">

@@ -1,14 +1,12 @@
 <script lang="ts" setup>
-import { computed, onMounted, ref, watch } from 'vue';
-import { MIN_ZOOM, MAX_ZOOM, ZOOM_STEP, useWorldStore } from '../../stores/world';
-import { useFishingAreaStore } from '../../stores/fishingArea';
-import World from './World.vue';
-import FishingAnchor from './FishingAnchor.vue';
+import { computed, onMounted, ref, watch } from "vue";
+import { MIN_ZOOM, MAX_ZOOM, ZOOM_STEP, useWorldStore } from "../../stores/world";
+import { useFishingAreaStore } from "../../stores/fishingArea";
+import World from "./World.vue";
+import FishingAnchor from "./FishingAnchor.vue";
 const hoveredTitle = ref("");
 const tooltipPos = ref({ x: 0, y: 0 });
 const isDragging = ref(false);
-const didDrag = ref(false);
-const isAnchorMode = ref(false);
 const mapFrame = ref<HTMLElement | null>(null);
 const dragStart = ref({ x: 0, y: 0 });
 const panStart = ref({ x: 0, y: 0 });
@@ -76,7 +74,7 @@ function handlePointerDown(event: PointerEvent) {
     return;
   }
 
-  if (worldStore.zoom === MIN_ZOOM || event.button !== 0 || !mapFrame.value) {
+  if (worldStore.isAnchorMode || worldStore.zoom === MIN_ZOOM || event.button !== 0 || !mapFrame.value) {
     return;
   }
 
@@ -92,7 +90,7 @@ function handlePointerMove(event: PointerEvent) {
   }
 
   if (Math.hypot(event.clientX - dragStart.value.x, event.clientY - dragStart.value.y) > 3) {
-    didDrag.value = true;
+    worldStore.didDrag = true;
   }
 
   worldStore.pan = {
@@ -121,22 +119,43 @@ onMounted(() => {
   <div class="flex flex-col md:flex-row gap-2">
     <FishingAnchor />
     <div class="flex flex-col">
-      <div ref="mapFrame"
+      <div
+        ref="mapFrame"
         class="map-frame flex-1 min-w-0 h-full overflow-hidden border mb-0 border-gray-300 rounded-xl bg-[#eef3f1] touch-none relative"
-        :class="isDragging ? 'cursor-grabbing' : isAnchorMode ? 'cursor-crosshair' : 'cursor-grab'"
-        @wheel.stop="handleWheel" @pointerdown="handlePointerDown" @pointermove="handlePointerMove"
-        @pointerup="stopDragging" @pointercancel="stopDragging">
+        :class="isDragging ? 'cursor-grabbing' : worldStore.isAnchorMode ? 'cursor-crosshair' : 'cursor-grab'"
+        @wheel.stop="handleWheel"
+        @pointerdown="handlePointerDown"
+        @pointermove="handlePointerMove"
+        @pointerup="stopDragging"
+        @pointercancel="stopDragging"
+      >
         <div
           class="w-full h-full relative grid place-items-center origin-center transition-transform duration-[120ms] ease-out"
           :class="{ '!transition-none': isDragging }"
-          :style="{ transform: `translate(${worldStore.pan.x}px, ${worldStore.pan.y}px) scale(${worldStore.zoom})` }">
+          :style="{ transform: `translate(${worldStore.pan.x}px, ${worldStore.pan.y}px) scale(${worldStore.zoom})` }"
+        >
           <World class="w-full h-full" @mousemove="handleMouseMove" :anchors="anchors" :zoom="worldStore.zoom" />
         </div>
       </div>
       <div class="space-y-2 mt-4">
-        <button type="button"
+        <button
+          type="button"
           class="py-2 px-3 rounded-lg border border-gray-300 bg-transparent text-[#263238] text-xs font-bold cursor-pointer hover:bg-[#eef3f1] transition-colors"
-          @click="worldStore.resetZoom">
+          :aria-pressed="worldStore.isAnchorMode"
+          @click="worldStore.isAnchorMode = !worldStore.isAnchorMode"
+        >
+          {{ worldStore.isAnchorMode ? "Tắt chọn vị trí" : "Chọn vị trí anchor" }}
+        </button>
+        <p v-if="worldStore.selectedLocation" class="text-xs text-[#263238]">
+          Tọa độ anchor: x={{ worldStore.selectedLocation.x.toFixed(2) }}, y={{
+            worldStore.selectedLocation.y.toFixed(2)
+          }}
+        </p>
+        <button
+          type="button"
+          class="py-2 px-3 rounded-lg border border-gray-300 bg-transparent text-[#263238] text-xs font-bold cursor-pointer hover:bg-[#eef3f1] transition-colors"
+          @click="worldStore.resetLocation"
+        >
           Reset zoom
         </button>
         <div class="py-2 px-3 rounded-lg border border-gray-300">
