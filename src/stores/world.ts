@@ -24,10 +24,14 @@ export const useWorldStore = defineStore("world", {
   }),
   getters: {
     getCurrentlocation: (state) => state.pan,
-    getCurrentArea: (state) => ({ zoom: state.zoom, pan: state.pan }),
     getSelectedLocation: (state) => state.selectedLocation,
   },
   actions: {
+    getCurrentArea(){
+      return {
+        zoom: this, pan: this.pan 
+      }
+    },
     cachedMapLocation() {
       localStorage.setItem(MAP_VIEW_STORAGE_KEY, JSON.stringify({ zoom: this.zoom, pan: this.pan }));
     },
