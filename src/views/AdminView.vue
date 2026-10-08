@@ -8,6 +8,8 @@ import EventManagement from "../components/admin/EventManagement.vue";
 import EventScheduleManagement from "../components/admin/EventScheduleManagement.vue";
 import RedeemCodeManagement from "../components/admin/RedeemCodeManagement.vue";
 import NotificationManagement from "../components/admin/NotificationManagement.vue";
+import FeedbackListModal from "../components/admin/FeedbackListModal.vue";
+import ErrorFeedbackManagementModal from "../components/admin/ErrorFeedbackManagementModal.vue";
 
 type ModuleKey = "area" | "item" | "species" | "speciesInArea" | "event" | "schedule" | "redeemCode" | "notifications";
 
@@ -48,6 +50,7 @@ const groups: ModuleGroup[] = [
 const allModules = groups.flatMap((g) => g.modules);
 const active = ref<ModuleKey | null>(null);
 const keyword = ref("");
+const feedbackModal = ref<"opinion" | "errors" | null>(null);
 
 const activeComponent = computed(() => allModules.find((m) => m.key === active.value)?.component ?? null);
 
@@ -108,6 +111,9 @@ const close = () => {
           <p class="text-sm text-slate-500">Chọn một mục để quản lý dữ liệu.</p>
         </div>
 
+        <div class="flex w-full flex-col gap-3 sm:w-auto sm:flex-row sm:items-center">
+        <button type="button" class="rounded-lg bg-emerald-700 px-4 py-2 text-sm font-semibold text-white hover:bg-emerald-800 focus-visible:outline-2 focus-visible:outline-emerald-600" @click="feedbackModal = 'opinion'">Xem góp ý</button>
+        <button type="button" class="rounded-lg bg-amber-600 px-4 py-2 text-sm font-semibold text-white hover:bg-amber-700 focus-visible:outline-2 focus-visible:outline-amber-600" @click="feedbackModal = 'errors'">Xử lý báo lỗi</button>
         <label class="relative w-full sm:w-72">
           <span class="sr-only">Tìm mục quản lý</span>
           <input
@@ -118,6 +124,7 @@ const close = () => {
           />
           <span class="pointer-events-none absolute left-3 top-1/2 -translate-y-1/2 text-slate-400" aria-hidden="true">🔍</span>
         </label>
+        </div>
       </header>
 
       <div class="px-5 py-6 sm:px-8 space-y-8">
@@ -154,5 +161,7 @@ const close = () => {
 
     <!-- Module dialogs (giữ nguyên cơ chế @close của từng component) -->
     <component :is="activeComponent" v-if="activeComponent" @close="close" />
+    <FeedbackListModal v-if="feedbackModal === 'opinion'" @close="feedbackModal = null" />
+    <ErrorFeedbackManagementModal v-if="feedbackModal === 'errors'" @close="feedbackModal = null" />
   </div>
 </template>
