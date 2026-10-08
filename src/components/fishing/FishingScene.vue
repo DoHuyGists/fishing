@@ -277,7 +277,7 @@ function handleClickOnScene(event: MouseEvent) {
   inset: 0;
   width: 100%;
   height: 100%;
-  object-fit: cover;
+  object-fit: fill;
   object-position: center 62%;
   cursor: crosshair;
 }

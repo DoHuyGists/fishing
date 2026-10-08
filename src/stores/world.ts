@@ -18,9 +18,11 @@ export const useWorldStore = defineStore("world", {
     selectedArea: {} as any,
     zoom: 1,
     zoomable: true,
+    isZooming: true,
     isAnchorMode: false,
     anchorable: true,
     pan: { x: 0, y: 0 },
+    isDragging: false,
     didDrag: false,
     dragable: true,
     selectedCoordinate: null as { x: number; y: number } | null,
@@ -28,6 +30,28 @@ export const useWorldStore = defineStore("world", {
   }),
   getters: {},
   actions: {
+    resetDefault() {
+      this.isAnchorMode = false;
+      this.dragable = true;
+      this.zoomable = true;
+      this.anchorable = true;
+      this.selectedCountry = null;
+      this.selectedCoordinate = null;
+    },
+
+    disabledInteraction() {
+      this.isAnchorMode = false;
+      this.dragable = false;
+      this.anchorable = false;
+      this.zoomable = false;
+    },
+
+    enableInteraction() {
+      this.dragable = true;
+      this.anchorable = true;
+      this.zoomable = true;
+    },
+
     getCurrentArea() {
       return {
         zoom: this,
@@ -96,5 +120,9 @@ export const useWorldStore = defineStore("world", {
     setCountrySelected(country: { id: string; title: string }) {
       this.selectedCountry = country;
     },
+
+    toggleAnchorMode(){
+      this.isAnchorMode = !this.isAnchorMode;
+    }
   },
 });

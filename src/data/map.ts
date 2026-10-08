@@ -1,4 +1,8 @@
 export const mapData = {
+  UNKNOWN: {
+    name: "Unknown",
+    information: ""
+  },
   AD: {
     name: "Andorra",
     information: "",

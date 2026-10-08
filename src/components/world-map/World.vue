@@ -23,9 +23,9 @@ const pendingAnchor = ref<any | null>(null);
 
 function handleWorldClick(event: MouseEvent) {
   if(!worldStore.isAnchorMode) return;
-
+ 
   const target = event.target;
-  if (target instanceof SVGPathElement) {
+  if (target instanceof SVGPathElement && target != null) {
     const id = target.id;
     const title = target.getAttribute("title");
     if (id && title) {
@@ -203,6 +203,8 @@ async function goToFishingArea(anchor: any) {
   <svg
     v-bind="$attrs"
     @click="handleWorldClick"
+    title="Unknow"
+    id="UNKNOWN"
     xmlns:mapsvg="http://mapsvg.com"
     xmlns:dc="http://purl.org/dc/elements/1.1/"
     xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"

@@ -4,13 +4,13 @@ import { MIN_ZOOM, MAX_ZOOM, ZOOM_STEP, useWorldStore } from "../../stores/world
 import { useFishingAreaStore } from "../../stores/fishingArea";
 import World from "./World.vue";
 import FishingAnchor from "./FishingAnchor.vue";
+import { useToast } from "../../composables/useToast.ts";
 const hoveredTitle = ref("");
 const tooltipPos = ref({ x: 0, y: 0 });
-const isDragging = ref(false);
 const mapFrame = ref<HTMLElement | null>(null);
 const dragStart = ref({ x: 0, y: 0 });
 const panStart = ref({ x: 0, y: 0 });
-
+const toast = useToast()
 const worldStore = useWorldStore();
 const fishingAreaStore = useFishingAreaStore();
 const anchors = computed(() => fishingAreaStore.areas);
@@ -36,9 +36,14 @@ function handleWheel(event: WheelEvent) {
     return;
   }
 
+  worldStore.isZooming = true;
   const previousZoom = worldStore.zoom;
   const direction = event.deltaY < 0 ? 1 : -1;
   const nextZoom = Math.min(MAX_ZOOM, Math.max(MIN_ZOOM, Number((worldStore.zoom + direction * ZOOM_STEP).toFixed(2))));
+  if (nextZoom === previousZoom) {
+    worldStore.isZooming = false;
+    return;
+  }
   const frameRect = mapFrame.value.getBoundingClientRect();
   const mouseOffset = {
     x: event.clientX - (frameRect.left + frameRect.width / 2),
@@ -51,6 +56,14 @@ function handleWheel(event: WheelEvent) {
   };
   worldStore.zoom = nextZoom;
   clampPan();
+}
+
+function handleZoomTransitionEnd(event: TransitionEvent) {
+  if (event.target !== event.currentTarget || event.propertyName !== "transform") {
+    return;
+  }
+
+  worldStore.isZooming = false;
 }
 
 function clampPan() {
@@ -74,18 +87,24 @@ function handlePointerDown(event: PointerEvent) {
     return;
   }
 
-  if (!worldStore.dragable || worldStore.isAnchorMode || worldStore.zoom === MIN_ZOOM || event.button !== 0 || !mapFrame.value) {
+  if (
+    !worldStore.dragable ||
+    worldStore.isAnchorMode ||
+    worldStore.zoom === MIN_ZOOM ||
+    event.button !== 0 ||
+    !mapFrame.value
+  ) {
     return;
   }
 
-  isDragging.value = true;
+  worldStore.isDragging = true;
   dragStart.value = { x: event.clientX, y: event.clientY };
   panStart.value = { ...worldStore.pan };
   mapFrame.value.setPointerCapture(event.pointerId);
 }
 
 function handlePointerMove(event: PointerEvent) {
-  if (!isDragging.value) {
+  if (!worldStore.isDragging) {
     return;
   }
 
@@ -101,12 +120,20 @@ function handlePointerMove(event: PointerEvent) {
 }
 
 function stopDragging(event: PointerEvent) {
-  if (!isDragging.value) {
+  if (!worldStore.isDragging) {
     return;
   }
 
-  isDragging.value = false;
+  worldStore.isDragging = false;
   mapFrame.value?.releasePointerCapture(event.pointerId);
+}
+
+function handleAnchorMode() {
+  if(worldStore.anchorable){
+    worldStore.toggleAnchorMode();
+  }else{
+    toast.info("Mở khóa form để thao tác", {title: "Nhắc nhở" , position: "bottom",duration: 2000})
+  }
 }
 
 watch([() => worldStore.zoom, () => worldStore.pan], worldStore.cachedMapLocation, { deep: true });
@@ -122,7 +149,9 @@ onMounted(() => {
       <div
         ref="mapFrame"
         class="map-frame flex-1 min-w-0 h-full overflow-hidden border mb-0 border-gray-300 rounded-xl bg-[#eef3f1] touch-none relative"
-        :class="isDragging ? 'cursor-grabbing' : worldStore.isAnchorMode ? 'cursor-crosshair' : 'cursor-grab'"
+        :class="
+          worldStore.isDragging ? 'cursor-grabbing' : worldStore.isAnchorMode ? 'cursor-crosshair' : 'cursor-grab'
+        "
         @wheel.stop="handleWheel"
         @pointerdown="handlePointerDown"
         @pointermove="handlePointerMove"
@@ -131,8 +160,9 @@ onMounted(() => {
       >
         <div
           class="w-full h-full relative grid place-items-center origin-center transition-transform duration-[120ms] ease-out"
-          :class="{ '!transition-none': isDragging }"
+          :class="{ '!transition-none': worldStore.isDragging }"
           :style="{ transform: `translate(${worldStore.pan.x}px, ${worldStore.pan.y}px) scale(${worldStore.zoom})` }"
+          @transitionend="handleZoomTransitionEnd"
         >
           <World class="w-full h-full" @mousemove="handleMouseMove" :anchors="anchors" :zoom="worldStore.zoom" />
         </div>
@@ -140,10 +170,8 @@ onMounted(() => {
       <div class="space-y-2 space-x-2 mt-4">
         <button
           type="button"
-          class="py-2 px-3 rounded-lg border border-gray-300 bg-transparent text-[#263238] text-xs font-bold cursor-pointer hover:bg-[#eef3f1] transition-colors"
-          :aria-pressed="worldStore.isAnchorMode"
-          :disabled="!worldStore.anchorable"
-          @click="worldStore.isAnchorMode = !worldStore.isAnchorMode"
+          class="py-2 px-3 cursor-pointer rounded-lg border border-gray-300 bg-transparent text-[#263238] text-xs font-bold hover:bg-[#eef3f1] transition-colors"
+          @click="handleAnchorMode"
         >
           {{ worldStore.isAnchorMode ? "Tắt chọn vị trí" : "Chọn vị trí anchor" }}
         </button>

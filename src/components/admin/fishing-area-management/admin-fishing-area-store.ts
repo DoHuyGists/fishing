@@ -1,5 +1,9 @@
 import { defineStore } from "pinia";
-import { supabaseFishingAreaRepository, type FishingAreaPayload, type FishingAreaRow } from "../../../data/supabaseFishingAreaRepository";
+import {
+  supabaseFishingAreaRepository,
+  type FishingAreaPayload,
+  type FishingAreaRow,
+} from "../../../data/supabaseFishingAreaRepository";
 
 export const useAdminFishingAreaStore = defineStore("AdminFishingArea", {
   state: () => ({
@@ -48,10 +52,20 @@ export const useAdminFishingAreaStore = defineStore("AdminFishingArea", {
       this.adminAreas = this.adminAreas.filter((area) => area.id !== id);
     },
 
-    emptyForm() : FishingAreaRow {
+    resetDefault() {
+      this.target = null;
+      this.adminLoading = false;
+      this.adminError = "";
+      this.isFormOpen = false;
+      this.isCreate = false;
+      this.isUpdate = false;
+      this.isFormLock = true;
+    },
+
+    emptyForm(): FishingAreaRow {
       return {
         id: "",
-        countryId: "VN",
+        countryId: "UNKNOWN",
         isAvailable: false,
         x: 0,
         y: 0,
@@ -59,7 +73,7 @@ export const useAdminFishingAreaStore = defineStore("AdminFishingArea", {
         scenePath: "",
         location: "",
         fishingBoundary: [],
-        createdAt: ""
+        createdAt: "",
       };
     },
 
@@ -78,10 +92,10 @@ export const useAdminFishingAreaStore = defineStore("AdminFishingArea", {
       }
       this.adminError = "";
     },
-    closeForm(){
+    closeForm() {
       this.isFormOpen = false;
       this.adminError = "";
       this.target = null;
-    }
+    },
   },
 });

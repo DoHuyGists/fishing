@@ -1,11 +1,10 @@
 <script lang="ts" setup>
-import { computed, reactive, ref, watch } from "vue";
+import { computed, ref, watch } from "vue";
 import { mapData } from "../../../data/map.ts";
 import InteractWorldMap from "../../world-map/InteractWorldMap.vue";
 import { useAdminFishingAreaStore } from "./admin-fishing-area-store.ts";
 import FishingAreaManagementForm from "./FishingAreaManagementForm.vue";
 import { useWorldStore } from "../../../stores/world.ts";
-
 
 const emit = defineEmits(["close"]);
 const adminFishingAreaStore = useAdminFishingAreaStore();
@@ -14,11 +13,8 @@ const search = ref("");
 const countryFilter = ref("ALL");
 const availabilityFilter = ref<"ALL" | "AVAILABLE" | "UNAVAILABLE">("ALL");
 
-
-
 const deletingId = ref<string | null>(null);
 const confirmDeleteId = ref<string | null>(null);
-
 
 const countryOptions = computed(() =>
   Object.entries(mapData)
@@ -60,8 +56,6 @@ function formatDate(dateStr: string) {
   return new Date(dateStr).toLocaleString("vi-VN");
 }
 
-
-
 function askDelete(id: string) {
   confirmDeleteId.value = id;
 }
@@ -86,21 +80,16 @@ async function handleDelete() {
 
 adminFishingAreaStore.fetchAllAreasAdmin();
 
-watch(()=>adminFishingAreaStore.isFormOpen, (isFormOpen)=>{
-  if(isFormOpen === false){
-    clear();
-  }
-}, {immediate: true,deep:true})
-
-
-function clear() {
-    worldStore.resetSelectedCountry();
-    worldStore.resetSelectedCoordinate();
-    worldStore.isAnchorMode = false;
-    worldStore.dragable = true;
-    worldStore.zoomable = true;
-    worldStore.anchorable = true;
-}
+watch(
+  () => adminFishingAreaStore.isFormOpen,
+  (isFormOpen) => {
+    if (isFormOpen === false) {
+      adminFishingAreaStore.resetDefault();
+      worldStore.resetDefault();
+    }
+  },
+  { immediate: true, deep: true },
+);
 
 </script>
 
@@ -296,10 +285,10 @@ function clear() {
         </div>
       </div>
       <div v-else class="flex gap-2 p-2">
-        <InteractWorldMap  />
-  
+        <InteractWorldMap />
+
         <!-- Form panel -->
-        <FishingAreaManagementForm/>
+        <FishingAreaManagementForm />
       </div>
     </div>
 

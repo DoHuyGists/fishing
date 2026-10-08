@@ -1,7 +1,7 @@
 
 
 <script lang="ts" setup>
-import { computed, onMounted, reactive, ref, watch } from "vue";
+import { computed, ref, watch } from "vue";
 import { mapData } from "../../../data/map.ts";
 import type { FishingAreaPayload, FishingAreaRow } from "../../../data/supabaseFishingAreaRepository.ts";
 import { useWorldStore } from "../../../stores/world.ts";
@@ -75,7 +75,7 @@ async function handleSave() {
     adminFishingAreaStore.closeForm();
 
     // Clear
-    clear();
+    worldStore.resetDefault();
 
   } catch (err) {
     formError.value = err instanceof Error ? err.message : "Không thể lưu bãi câu";
@@ -102,20 +102,22 @@ watch(
 
     if(adminFishingAreaStore.isFormLock === false){
       if(worldStore.isAnchorMode && newSelectedLocation && newCountry){
-        adminFishingAreaStore.target.x = Math.round(newSelectedLocation.x);
-        adminFishingAreaStore.target.y = Math.round(newSelectedLocation.y);
-        
+        const X = Math.round(newSelectedLocation.x);
+        const Y = Math.round(newSelectedLocation.y);
+        adminFishingAreaStore.target.x = X;
+        adminFishingAreaStore.target.y = Y;
         adminFishingAreaStore.target.countryId = newCountry.id;
-        adminFishingAreaStore.target.title = `${newCountry.title} - ${adminFishingAreaStore.target.x}:${adminFishingAreaStore.target.y}`;
+        adminFishingAreaStore.target.title = `${newCountry.title} - ${X}:${Y}`;
+        adminFishingAreaStore.target.scenePath = `/area/${newCountry.id}/${X}.${Y}`
       }
-      if(worldStore.didDrag){
+      if(worldStore.didDrag || worldStore.isZooming){
         adminFishingAreaStore.target.location = {
           zoom: newZoom,
           pan: newPan
         };
       }
     }
-  }
+  }, {deep: true}
 );
 
 // Đồng bộ từ form cập nhật ra bản đồ
@@ -124,38 +126,19 @@ watch([
 ], 
 ([area])=>{
   if(area != null && adminFishingAreaStore.isUpdate){
-   handleUpdate(area)
+   worldStore.setWorldSelectedCoordinate({x: area.x, y: area.y});
+   worldStore.handleMoveToArea(area);
   }
 }, {deep:true, immediate: true})
 
-
-function handleUpdate(area : FishingAreaRow) {
-  worldStore.setWorldSelectedCoordinate({x: area.x, y: area.y});
-  worldStore.handleMoveToArea(area);
-}
-
-
 watch(()=>adminFishingAreaStore.isFormLock, (isFormLock)=>{
   if(isFormLock){
-    worldStore.isAnchorMode = false;
-    worldStore.dragable = false;
-    worldStore.anchorable = false;
-    worldStore.zoomable = false;
+    worldStore.disabledInteraction();
   }else{
-    worldStore.dragable = true;
-    worldStore.anchorable = true;
-    worldStore.zoomable = true;
+    worldStore.enableInteraction();
   }
 }, {immediate: true})
 
-function clear() {
-    worldStore.resetSelectedCountry();
-    worldStore.resetSelectedCoordinate();
-    worldStore.isAnchorMode = false;
-    worldStore.dragable = true;
-    worldStore.zoomable = true;
-    worldStore.anchorable = true;
-}
 
 </script>
 
@@ -180,8 +163,8 @@ function clear() {
     </div>
 
     <div v-if="adminFishingAreaStore.isUpdate" class="text-xs">
-      <button v-if="adminFishingAreaStore.isFormLock" @click="adminFishingAreaStore.isFormLock = false" type="button">🔒 Lock</button>
-      <button v-else @click="adminFishingAreaStore.isFormLock = true" type="button">🔒 Unlock</button>
+      <button v-if="adminFishingAreaStore.isFormLock" @click="adminFishingAreaStore.isFormLock = false" type="button">🔒 Đang khóa</button>
+      <button v-else @click="adminFishingAreaStore.isFormLock = true" type="button">🔒 Đã mở khóa</button>
     </div>
 
     <div class="flex flex-col gap-1.5">
