@@ -80,8 +80,6 @@ export const useAdminFishingAreaStore = defineStore("AdminFishingArea", {
     openForm(fishingAreaData?: FishingAreaRow) {
       this.isFormOpen = true;
       if (fishingAreaData) {
-        // fishingAreaData.location = fishingAreaData.location ? JSON.stringify(fishingAreaData.location, null, 2) : ""
-        fishingAreaData.fishingBoundary = JSON.stringify(fishingAreaData.fishingBoundary ?? [], null, 2);
         this.target = fishingAreaData;
         this.isUpdate = true;
         this.isFormLock = true;

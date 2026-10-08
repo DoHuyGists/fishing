@@ -33,7 +33,7 @@ function buildPayload(): FishingAreaPayload | null {
 
   let fishingBoundary: any[];
   try {
-    fishingBoundary = JSON.parse((adminFishingAreaStore.target.fishingBoundary as string).trim() || "[]");
+    fishingBoundary = adminFishingAreaStore.target.fishingBoundary;
   } catch {
     formError.value = "Vùng câu (fishing_boundary) không đúng định dạng JSON";
     return null;
@@ -108,7 +108,8 @@ watch(
         adminFishingAreaStore.target.y = Y;
         adminFishingAreaStore.target.countryId = newCountry.id;
         adminFishingAreaStore.target.title = `${newCountry.title} - ${X}:${Y}`;
-        adminFishingAreaStore.target.scenePath = `/area/${newCountry.id}/${X}.${Y}`
+        adminFishingAreaStore.target.scenePath = `/area/${newCountry.id}/${X}.${Y}`;
+        adminFishingAreaStore.target.fishingBoundary = []
       }
       if(worldStore.didDrag || worldStore.isZooming){
         adminFishingAreaStore.target.location = {
@@ -244,7 +245,7 @@ watch(()=>adminFishingAreaStore.isFormLock, (isFormLock)=>{
     <div class="flex flex-col gap-1.5">
       <label class="text-[11px] font-bold text-gray-500 uppercase">Vùng câu (fishing_boundary, JSON)</label>
       <textarea
-        v-model="adminFishingAreaStore.target.fishingBoundary"
+        :value="JSON.stringify(adminFishingAreaStore.target.fishingBoundary ?? [], null, 2)"
         rows="7"
         placeholder='[{"x": 0, "y": 0}, {"x": 10, "y": 0}]'
         class="px-3 py-1.5 border border-gray-300 rounded-lg text-xs font-mono focus:outline-none focus:border-emerald-500 resize-none"
