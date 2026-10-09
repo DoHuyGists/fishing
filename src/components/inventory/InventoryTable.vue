@@ -239,7 +239,7 @@ function handleUpdateSetUsed(event: Event, setId: string) {
 
     <div v-if="loading" class="py-24 text-center text-sm text-slate-500">Đang tải kho đồ…</div>
 
-    <div v-else class="grid grid-cols-1 gap-6 lg:grid-cols-2 h-0 grow overflow-y-scroll">
+    <div v-else class="grid grid-cols-1 gap-6 lg:grid-cols-2">
       <!-- TRÁI: Kho đồ -->
       <div id="user-inventory" class="flex min-w-0 flex-col rounded-lg border border-slate-200 bg-white">
         <header class="space-y-3 border-b border-slate-200 p-4">

@@ -58,7 +58,7 @@ onMounted(loadSchedules);
 <template>
   <Modal title="Bảng sự kiện" sub-title="Sự kiện đang diễn ra" :on-refresh="loadSchedules">
     <section
-      class="relative flex h-dvh w-screen max-w-none flex-col overflow-hidden border-0 bg-[#f4f5e9] text-[#20372a] shadow-2xl"
+      class="relative flex max-w-none h-full flex-col overflow-hidden border-0 bg-[#f4f5e9] text-[#20372a] shadow-2xl"
       role="dialog"
       aria-modal="true"
       aria-labelledby="event-title"
@@ -80,7 +80,7 @@ onMounted(loadSchedules);
             <h3 class="m-0 text-sm font-bold">Danh sách sự kiện</h3>
             <span class="text-xs text-emerald-900/60">{{ activeSchedules.length }} sự kiện</span>
           </div>
-          <div class="flex-1 space-y-2 overflow-y-auto p-3 sm:p-4">
+          <div class="grow h-0 space-y-2 overflow-y-scroll p-3 sm:p-4">
             <p v-if="!activeSchedules.length" class="py-8 text-center text-sm text-emerald-900/55">
               Hiện không có sự kiện nào.
             </p>
@@ -126,8 +126,8 @@ onMounted(loadSchedules);
         </section>
 
         <!-- Chi tiết sự kiện -->
-        <section class="min-h-0 overflow-y-auto">
-          <article v-if="selectedSchedule" class="mx-auto min-w-3xl p-5 sm:p-8">
+        <section class="min-h-0">
+          <article v-if="selectedSchedule" class="mx-auto min-w-3xl p-5 sm:p-8 overflow-y-scroll h-full">
             <img
               v-if="selectedSchedule.eventImage"
               :src="selectedSchedule.eventImage"

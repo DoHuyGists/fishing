@@ -1,89 +1,35 @@
 <script setup lang="ts">
-import { computed, onMounted, ref } from "vue";
+import { computed, onMounted, onUnmounted, ref, watch } from "vue";
 import Modal from "../Modal.vue";
-import supabase from "../../database/connection";
 import { useAuthStore } from "../../stores/auth";
+import { useNotificationStore } from "../../stores/notification";
+import type { NotificationRow } from "../../data/supabaseNotificationRepository";
 
 type NotificationKind = "personal" | "system";
-interface NotificationRow {
-  id: string;
-  title: string;
-  body: string;
-  type: string | null;
-  data: Record<string, unknown> | null;
-  created_at: string;
-  expires_at?: string | null;
-  is_read: boolean;
-}
 
 const auth = useAuthStore();
+const notifications = useNotificationStore();
 const activeTab = ref<NotificationKind>("personal");
-const personal = ref<NotificationRow[]>([]);
-const system = ref<NotificationRow[]>([]);
 const selected = ref<NotificationRow | null>(null);
-const loading = ref(false);
-const loadError = ref("");
 const readError = ref("");
-const currentItems = computed(() => (activeTab.value === "personal" ? personal.value : system.value));
+const currentItems = computed(() => (activeTab.value === "personal" ? notifications.personal : notifications.system));
 const unreadCount = computed(() => currentItems.value.filter((item) => !item.is_read).length);
 
-async function loadNotifications() {
-  if (!auth.userId) return;
-  loading.value = true;
-  loadError.value = "";
-  try {
-    const now = new Date().toISOString();
-    const [personalResult, systemResult, readsResult] = await Promise.all([
-      supabase
-        .from("personal_notifications")
-        .select("id,title,body,type,data,is_read,created_at")
-        .eq("user_id", auth.userId)
-        .order("created_at", { ascending: false }),
-      supabase
-        .from("system_notifications")
-        .select("id,title,body,type,data,created_at,expires_at")
-        .or(`expires_at.is.null,expires_at.gt.${now}`)
-        .order("created_at", { ascending: false }),
-      supabase.from("system_notification_reads").select("notification_id").eq("user_id", auth.userId),
-    ]);
-    if (personalResult.error) throw personalResult.error;
-    if (systemResult.error) throw systemResult.error;
-    if (readsResult.error) throw readsResult.error;
-    personal.value = (personalResult.data ?? []) as NotificationRow[];
-    const readIds = new Set((readsResult.data ?? []).map((row) => row.notification_id as string));
-    system.value = ((systemResult.data ?? []) as Omit<NotificationRow, "is_read">[]).map((row) => ({
-      ...row,
-      is_read: readIds.has(row.id),
-    }));
-    if (selected.value) selected.value = currentItems.value.find((item) => item.id === selected.value?.id) ?? null;
-  } catch (error) {
-    loadError.value = error instanceof Error ? error.message : "Không thể tải thông báo.";
-  } finally {
-    loading.value = false;
-  }
+function loadNotifications() {
+  const userId = auth.user?.id;
+  if (userId) return notifications.loadNotifications(userId);
 }
 
 async function selectNotification(item: NotificationRow) {
   selected.value = item;
   readError.value = "";
-  if (activeTab.value === "personal" && !item.is_read) {
-    const { error } = await supabase
-      .from("personal_notifications")
-      .update({ is_read: true, read_at: new Date().toISOString() })
-      .eq("id", item.id)
-      .eq("user_id", auth.userId);
-    if (error) {
-      readError.value = error.message;
-      return;
+  const userId = auth.user?.id;
+  if (userId && !item.is_read) {
+    try {
+      await notifications.markAsRead(activeTab.value, item, userId);
+    } catch (error) {
+      readError.value = error instanceof Error ? error.message : "Không thể cập nhật trạng thái đã đọc.";
     }
-    item.is_read = true;
-  } else if (activeTab.value === "system" && !item.is_read) {
-    const { error } = await supabase.rpc("mark_system_notification_read", { notif_id: item.id });
-    if (error) {
-      readError.value = error.message;
-      return;
-    }
-    item.is_read = true;
   }
 }
 
@@ -97,7 +43,20 @@ function formatDate(value: string) {
   return new Date(value).toLocaleString("vi-VN");
 }
 
-onMounted(loadNotifications);
+watch([() => notifications.personal, () => notifications.system], () => {
+  if (selected.value) selected.value = currentItems.value.find((item) => item.id === selected.value?.id) ?? null;
+});
+
+onMounted(() => {
+  const userId = auth.user?.id;
+  if (!userId) return;
+  void notifications.loadNotifications(userId);
+  notifications.subscribeToNotifications(userId);
+});
+
+onUnmounted(() => {
+  void notifications.unsubscribeFromNotifications();
+});
 </script>
 
 <template>
@@ -129,10 +88,10 @@ onMounted(loadNotifications);
           >
         </button>
       </div>
-      <p v-if="loadError" role="alert" class="m-4 rounded-lg bg-red-50 p-3 text-sm text-red-700">{{ loadError }}</p>
+      <p v-if="notifications.loadError" role="alert" class="m-4 rounded-lg bg-red-50 p-3 text-sm text-red-700">{{ notifications.loadError }}</p>
       <div class="flex min-h-0 flex-1">
         <aside class="w-[42%] shrink-0 overflow-y-auto border-r border-gray-200 sm:w-80">
-          <p v-if="loading" class="p-5 text-sm text-gray-500">Đang tải thông báo...</p>
+          <p v-if="notifications.loading" class="p-5 text-sm text-gray-500">Đang tải thông báo...</p>
           <p v-else-if="!currentItems.length" class="p-5 text-sm text-gray-500">Chưa có thông báo nào.</p>
           <button
             v-for="item in currentItems"

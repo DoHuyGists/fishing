@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { computed, onMounted, ref } from "vue";
+import { computed, onMounted, onUnmounted, ref } from "vue";
 import { useCurrencyStore } from "../../stores/currency.ts";
 import { useAuthStore } from "../../stores/auth.ts";
 import InteractWorldWrapper from "./InteractWorldMap.vue";
@@ -20,17 +20,20 @@ import { supabaseFishRepository } from "../../data/supabaseFishRepository";
 import { useMarketStore } from "../../stores/market";
 import FishSellConfirm from "../caught/FishSellConfirm.vue";
 import FishReleaseConfirm from "../caught/FishReleaseConfirm.vue";
+import { useNotificationStore } from "../../stores/notification";
 
 const currencyStore = useCurrencyStore();
 const authStore = useAuthStore();
 const caughtStore = useCaughtStore();
 const modalStore = useModalStore();
+const notificationStore = useNotificationStore();
 const marketStore = useMarketStore();
 const fishToSell = ref<any | null>(null);
 const fishToRelease = ref<any | null>(null);
 const isSellingFish = ref(false);
 const isReleasingFish = ref(false);
 const fishActionError = ref("");
+const hasNewNotification = ref(false);
 const recentCaughtFishes = computed(() =>
   [...caughtStore.caughtFishes]
     .sort((a, b) => new Date(b.created_at ?? 0).getTime() - new Date(a.created_at ?? 0).getTime())
@@ -80,7 +83,14 @@ onMounted(() => {
   if (authStore.userId) {
     currencyStore.fetchCurrency();
     caughtStore.loadCaughtFishes();
+    notificationStore.subscribeToNewNotifications(authStore.userId, () => {
+      hasNewNotification.value = true;
+    });
   }
+});
+
+onUnmounted(() => {
+  void notificationStore.unsubscribeFromNewNotifications();
 });
 
 </script>
@@ -172,9 +182,10 @@ onMounted(() => {
 
         <button type="button"
           class="flex items-center gap-1.5 px-3 py-1.5 bg-[#153221] hover:bg-[#1a3e29] border border-gray-300 text-white rounded-xl shadow-sm font-bold text-xs cursor-pointer transition-colors"
-          @click="modalStore.open('notifications')">
+          @click="hasNewNotification = false; modalStore.open('notifications')">
           <span class="text-sm" aria-hidden="true">🔔</span>
           <span>Thông báo</span>
+          <span v-if="hasNewNotification" class="size-2 rounded-full bg-red-500" aria-label="Có thông báo mới"></span>
         </button>
       </div>
 
