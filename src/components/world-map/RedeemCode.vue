@@ -49,7 +49,7 @@ onUnmounted(() => {
 </script>
 
 <template>
-  <Modal title="Đổi mã quà tặng" sub-title="Nhập mã để nhận phần thưởng" :can-refresh="false">
+  <Modal title="Đổi mã quà tặng" sub-title="Nhập mã để nhận phần thưởng">
     <form class="mx-auto mt-8 w-full max-w-md rounded-2xl border border-emerald-950/10 bg-white p-6 shadow-sm" @submit.prevent="redeemCode">
       <label for="redeem-code" class="mb-2 block text-sm font-bold text-emerald-950">Mã đổi thưởng</label>
       <input

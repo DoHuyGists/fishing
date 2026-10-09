@@ -228,7 +228,7 @@ function handleUpdateSetUsed(event: Event, setId: string) {
 </script>
 
 <template>
-  <section class="relative mx-auto w-full h-full p-4 text-slate-800">
+  <section class="relative mx-auto w-full h-full flex flex-col p-4 text-slate-800">
     <!-- Toast -->
     <div v-if="notice" role="status" :class="[
       'fixed right-4 top-4 z-50 rounded-md px-4 py-2 text-sm shadow-lg',
@@ -239,9 +239,9 @@ function handleUpdateSetUsed(event: Event, setId: string) {
 
     <div v-if="loading" class="py-24 text-center text-sm text-slate-500">Đang tải kho đồ…</div>
 
-    <div v-else class="grid grid-cols-1 gap-6 lg:grid-cols-2 h-full">
+    <div v-else class="grid grid-cols-1 gap-6 lg:grid-cols-2 h-0 grow overflow-y-scroll">
       <!-- TRÁI: Kho đồ -->
-      <div class="flex min-w-0 flex-col rounded-lg border border-slate-200 bg-white">
+      <div id="user-inventory" class="flex min-w-0 flex-col rounded-lg border border-slate-200 bg-white">
         <header class="space-y-3 border-b border-slate-200 p-4">
           <div class="flex items-center justify-between gap-2">
             <div class="text-lg font-semibold">
@@ -349,14 +349,14 @@ function handleUpdateSetUsed(event: Event, setId: string) {
       </div>
 
       <!-- PHẢI: Set trang bị -->
-      <div class="flex min-w-0 flex-col rounded-lg border border-slate-200 bg-slate-50">
+      <div id="user-equipment-sets" class="flex min-w-0 flex-col rounded-lg border border-slate-200 bg-slate-50">
         <header class="space-y-3 border-b border-slate-200 bg-white p-4 lg:rounded-t-lg">
           <div class="flex items-center justify-between gap-2">
             <div class="text-lg font-semibold">
               Set trang bị
               <span class="text-sm font-normal text-slate-500">({{ inventoryStore.equipmentSets.length }})</span>
             </div>
-            <button type="button" class="rounded-md bg-teal-700 px-3 py-1.5 text-sm text-white hover:bg-teal-800"
+            <button id="buy-set-button" type="button" class="rounded-md bg-teal-700 px-3 py-1.5 text-sm text-white hover:bg-teal-800"
               @click="modal = 'buy'">
               Mua thêm set
             </button>
@@ -374,11 +374,11 @@ function handleUpdateSetUsed(event: Event, setId: string) {
             }}
           </p>
 
-          <article v-for="{ set, index } in pagedSets" :key="set.id"
+          <article v-for="{ set, index: setIndex } in pagedSets" :key="set.id"
             class="rounded-md border border-slate-200 bg-white p-3">
             <div class="mb-3 flex items-center justify-between">
               <div class="text-sm font-semibold">
-                Set {{ index + 1 }}
+                Set {{ setIndex + 1 }}
                 <span v-if="isDirty(set)" class="ml-2 text-xs font-normal text-amber-600">Chưa lưu</span>
               </div>
               <div class="select-none flex gap-2">
@@ -396,13 +396,14 @@ function handleUpdateSetUsed(event: Event, setId: string) {
             </div>
 
             <div class="grid grid-cols-2 gap-2 xl:grid-cols-5">
-              <div v-for="slot in SLOTS" :key="slot" :class="[
+              <div v-for="(slot, slotIndex) in SLOTS" :key="slot" :class="[
                 'min-w-0 cursor-pointer rounded-md border p-2 transition',
                 isActiveSlot(set.id, slot)
                   ? 'border-teal-600 bg-teal-50 ring-2 ring-teal-200'
                   : 'border-slate-200 hover:border-slate-400',
               ]" @click="toggleActive(set.id, slot)">
                 <button type="button"
+                  :id="`set-${setIndex}-slot-${slotIndex}`"
                   class="mb-1 flex w-full items-center justify-between text-left text-xs font-medium text-slate-600"
                   :aria-pressed="isActiveSlot(set.id, slot)" @click.stop="toggleActive(set.id, slot)">
                   <span class="truncate">{{ LABELS[slot] }}</span>

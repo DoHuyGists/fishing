@@ -80,7 +80,7 @@ const userInitial = computed(() => {
 </script>
 
 <template>
-  <Modal title="Thông tin tài khoản" @refresh="loadProfile()">
+  <Modal title="Thông tin tài khoản" :on-refresh="loadProfile">
     <div>
       <!-- Loading State -->
       <div
@@ -248,16 +248,28 @@ const userInitial = computed(() => {
                 type="button"
                 class="text-xs font-semibold text-emerald-700 underline cursor-pointer"
                 @click="badgesStore.fetchForUser(authStore.user?.id || '', true)"
-              >Tải lại</button>
+              >
+                Tải lại
+              </button>
             </div>
 
-            <div v-if="badgesStore.loading && badgesStore.badges.length === 0" class="py-8 text-center text-sm text-gray-500">
+            <div
+              v-if="badgesStore.loading && badgesStore.badges.length === 0"
+              class="py-8 text-center text-sm text-gray-500"
+            >
               Đang tải huy hiệu...
             </div>
-            <div v-else-if="badgesStore.error && badgesStore.badges.length === 0" role="alert" class="rounded-xl bg-red-50 p-3 text-sm text-red-700">
+            <div
+              v-else-if="badgesStore.error && badgesStore.badges.length === 0"
+              role="alert"
+              class="rounded-xl bg-red-50 p-3 text-sm text-red-700"
+            >
               Không thể tải huy hiệu: {{ badgesStore.error }}
             </div>
-            <div v-else-if="badgesStore.badges.length === 0" class="rounded-xl border border-dashed border-gray-200 p-6 text-center text-sm text-gray-500">
+            <div
+              v-else-if="badgesStore.badges.length === 0"
+              class="rounded-xl border border-dashed border-gray-200 p-6 text-center text-sm text-gray-500"
+            >
               Chưa có huy hiệu nào.
             </div>
             <div v-else class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-3">
@@ -265,14 +277,20 @@ const userInitial = computed(() => {
                 v-for="badge in badgesStore.badges"
                 :key="badge.id"
                 class="group relative z-0 min-w-0 rounded-2xl border bg-white p-3 text-center shadow-sm transition duration-200 hover:z-20 hover:-translate-y-0.5 hover:shadow-md"
-                :class="badgesStore.ownedBadgeMap.has(badge.id) ? 'border-emerald-200 hover:border-emerald-300' : 'border-gray-200 border-dashed hover:border-gray-300'"
+                :class="
+                  badgesStore.ownedBadgeMap.has(badge.id)
+                    ? 'border-emerald-200 hover:border-emerald-300'
+                    : 'border-gray-200 border-dashed hover:border-gray-300'
+                "
                 :title="badge.description || badge.name"
               >
                 <!-- <span
                   v-if="badgesStore.ownedBadgeMap.has(badge.id)"
                   class="absolute right-2 top-2 rounded-full bg-emerald-50 px-2 py-0.5 text-[9px] font-bold uppercase tracking-wide text-emerald-700"
                 >Đã mở khóa</span> -->
-                <div class="relative z-0 flex h-24 items-center justify-center overflow-hidden px-2 pt-3 group-hover:overflow-visible">
+                <div
+                  class="relative z-0 flex h-24 items-center justify-center overflow-hidden px-2 pt-3 group-hover:overflow-visible"
+                >
                   <img
                     v-if="badge.icon_url"
                     :src="badge.icon_url"
@@ -290,7 +308,9 @@ const userInitial = computed(() => {
                 <p
                   v-if="badgesStore.ownedBadgeMap.has(badge.id)"
                   class="m-0 mt-2 inline-flex rounded-full bg-emerald-50 px-2.5 py-1 text-[10px] font-bold text-emerald-800"
-                >Số lần đạt: {{ badgesStore.ownedBadgeMap.get(badge.id)?.quantity ?? 0 }}</p>
+                >
+                  Số lần đạt: {{ badgesStore.ownedBadgeMap.get(badge.id)?.quantity ?? 0 }}
+                </p>
                 <p v-else class="m-0 mt-2 text-[10px] font-medium text-gray-400">Chưa sở hữu</p>
               </article>
             </div>

@@ -147,7 +147,6 @@ async function goToFishingArea(anchor: any) {
   display: flex;
   flex-direction: column;
   gap: 6px;
-  width: 200px;
   padding: 8px 10px 10px;
   border-radius: 10px;
   background: white;
@@ -164,6 +163,7 @@ async function goToFishingArea(anchor: any) {
   overflow: visible;
   pointer-events: auto;
   user-select: none;
+  width: 199.2px;
 }
 
 .anchor-dialog-wrapper > div {
@@ -231,7 +231,7 @@ async function goToFishingArea(anchor: any) {
     @click="handleWorldClick"
     @mousemove="handleWorldMouseMove"
     @mouseleave="cursorPosition = null"
-    title="Unknow"
+    title="Unknown"
     id="UNKNOWN"
     xmlns:mapsvg="http://mapsvg.com"
     xmlns:dc="http://purl.org/dc/elements/1.1/"

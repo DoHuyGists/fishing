@@ -39,8 +39,12 @@ const filteredCaughtFishes = computed(() => {
   });
 });
 
-watch([searchQuery, selectedRarity], () => { currentPage.value = 1; });
-watch(pageCount, (count) => { if (currentPage.value > count) currentPage.value = count; });
+watch([searchQuery, selectedRarity], () => {
+  currentPage.value = 1;
+});
+watch(pageCount, (count) => {
+  if (currentPage.value > count) currentPage.value = count;
+});
 
 const rarityOptions = computed(() => {
   const set = new Set<string>();
@@ -85,7 +89,7 @@ async function handleSell(priceNum: number) {
     showSellSuccess(fishName);
   } catch (err: any) {
     console.error("Lỗi khi đăng bán cá:", err);
-    sellError.value = err.message || "Không thá»ƒ Ä‘Äƒng bán cá. Vui lòng thử lại.";
+    sellError.value = err.message || "Đăng bán không thành công. Vui lòng thử lại.";
   } finally {
     isSelling.value = false;
   }
@@ -152,157 +156,198 @@ function closeSellSuccess() {
 }
 </script>
 <template>
-  <Modal title="Túi cá" sub-title="Những loài cá bạn sẵn được" @refresh="caughtStore.loadCaughtFishes">
-    <section class="h-full p-3 sm:p-5 text-[#263238] flex flex-col overflow-hidden">
-    <!-- Header  -->
-    <div class="flex items-center justify-between border-b border-gray-300 pb-3 mb-3">
-      <div class="flex items-center gap-2">
-        <h2 class="m-0 text-base font-bold text-[#263238]">Thành quả câu được</h2>
-        <span class="px-2 py-0.5 rounded-full bg-[#153221] text-white text-[11px] font-extrabold shadow-xs">
-          {{ caughtStore.caughtFishes.length }}
-        </span>
+  <Modal
+    class="caught-list-modal"
+    title="Túi cá"
+    sub-title="Những loài cá bạn sẵn được"
+    :on-refresh="caughtStore.loadCaughtFishes"
+  >
+    <section class="h-full min-h-0 p-3 sm:p-5 text-[#263238] flex flex-col overflow-hidden">
+      <!-- Header  -->
+      <div class="flex items-center justify-between border-b border-gray-300 pb-3 mb-3">
+        <div class="flex items-center gap-2">
+          <h2 class="m-0 text-base font-bold text-[#263238]">Thành quả câu được</h2>
+          <span class="px-2 py-0.5 rounded-full bg-[#153221] text-white text-[11px] font-extrabold shadow-xs">
+            {{ caughtStore.caughtFishes.length }}
+          </span>
+        </div>
       </div>
-    </div>
 
-    <!-- Công cụ tìm kiếm -->
-    <div class="flex flex-col gap-2 mb-3">
-      <div class="relative">
-        <input
-          v-model="searchQuery"
-          type="text"
-          placeholder="Tìm theo tên cá..."
-          class="w-full pl-8 pr-3 py-1.5 text-xs border border-gray-300 rounded-lg focus:outline-none focus:border-gray-300 bg-gray-50/80"
-        />
-        <svg
-          class="w-3.5 h-3.5 absolute left-2.5 top-2.5 text-gray-400"
-          fill="none"
-          stroke="currentColor"
-          viewBox="0 0 24 24"
-        >
-          <path
-            stroke-linecap="round"
-            stroke-linejoin="round"
-            stroke-width="2"
-            d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"
+      <!-- Công cụ tìm kiếm -->
+      <div class="flex flex-col gap-2 mb-3">
+        <div class="relative">
+          <input
+            v-model="searchQuery"
+            type="text"
+            placeholder="Tìm theo tên cá..."
+            class="w-full pl-8 pr-3 py-1.5 text-xs border border-gray-300 rounded-lg focus:outline-none focus:border-gray-300 bg-gray-50/80"
           />
-        </svg>
+          <svg
+            class="w-3.5 h-3.5 absolute left-2.5 top-2.5 text-gray-400"
+            fill="none"
+            stroke="currentColor"
+            viewBox="0 0 24 24"
+          >
+            <path
+              stroke-linecap="round"
+              stroke-linejoin="round"
+              stroke-width="2"
+              d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"
+            />
+          </svg>
+        </div>
+
+        <div
+          v-if="rarityOptions.length"
+          class="flex items-center gap-1 overflow-x-auto pb-1 text-[11px] [scrollbar-width:none]"
+        >
+          <button
+            type="button"
+            class="px-2 py-0.5 rounded-md border text-[11px] transition-colors cursor-pointer whitespace-nowrap"
+            :class="
+              selectedRarity === 'ALL'
+                ? 'bg-[#153221] text-white border-gray-300 font-bold'
+                : 'bg-gray-100 text-gray-700 border-gray-200 hover:bg-gray-200'
+            "
+            @click="selectedRarity = 'ALL'"
+          >
+            Tất cả
+          </button>
+          <button
+            v-for="rarity in rarityOptions"
+            :key="rarity"
+            type="button"
+            class="px-2 py-0.5 rounded-md border text-[11px] transition-colors cursor-pointer whitespace-nowrap"
+            :class="
+              selectedRarity === rarity
+                ? 'bg-[#153221] text-white border-gray-300 font-bold'
+                : 'bg-gray-100 text-gray-700 border-gray-200 hover:bg-gray-200'
+            "
+            @click="selectedRarity = rarity"
+          >
+            {{ rarity }}
+          </button>
+        </div>
       </div>
 
+      <!-- Danh sách thẻ cá -->
       <div
-        v-if="rarityOptions.length"
-        class="flex items-center gap-1 overflow-x-auto pb-1 text-[11px] [scrollbar-width:none]"
+        class="h-0 grow overflow-y-auto pr-1 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-3 content-start"
       >
-        <button
-          type="button"
-          class="px-2 py-0.5 rounded-md border text-[11px] transition-colors cursor-pointer whitespace-nowrap"
-          :class="
-            selectedRarity === 'ALL'
-              ? 'bg-[#153221] text-white border-gray-300 font-bold'
-              : 'bg-gray-100 text-gray-700 border-gray-200 hover:bg-gray-200'
-          "
-          @click="selectedRarity = 'ALL'"
+        <div v-if="caughtStore.isLoadingCaught" class="col-span-full text-center text-xs text-gray-500">
+          Đang tải danh sách cá...
+        </div>
+        <div v-else-if="!filteredCaughtFishes.length" class="col-span-full py-12 text-center text-xs text-gray-400">
+          {{
+            searchQuery || selectedRarity !== "ALL"
+              ? "Không tìm thấy cá phù hợp"
+              : "Chưa có con cá nào trong bộ sưu tập"
+          }}
+        </div>
+        <div
+          v-for="item in paginatedCaughtFishes"
+          :key="item.id"
+          class="min-w-0 p-2 border border-gray-200 hover:border-emerald-300 rounded-xl bg-gray-50/70 hover:bg-emerald-50/30 transition-all flex flex-col gap-2 shadow-sm"
         >
-          Tất cả
-        </button>
-        <button
-          v-for="rarity in rarityOptions"
-          :key="rarity"
-          type="button"
-          class="px-2 py-0.5 rounded-md border text-[11px] transition-colors cursor-pointer whitespace-nowrap"
-          :class="
-            selectedRarity === rarity
-              ? 'bg-[#153221] text-white border-gray-300 font-bold'
-              : 'bg-gray-100 text-gray-700 border-gray-200 hover:bg-gray-200'
-          "
-          @click="selectedRarity = rarity"
-        >
-          {{ rarity }}
-        </button>
-      </div>
-    </div>
-
-    <!-- Danh sách thẻ cá -->
-    <div class="min-h-0 flex-1 overflow-y-auto pr-1 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-3 content-start">
-      <div v-if="caughtStore.isLoadingCaught" class="col-span-full text-center text-xs text-gray-500">Đang tải danh sách cá...</div>
-      <div v-else-if="!filteredCaughtFishes.length" class="col-span-full py-12 text-center text-xs text-gray-400">
-        {{
-          searchQuery || selectedRarity !== "ALL" ? "Không tìm thấy cá phù hợp" : "Chưa có con cá nào trong bá»™ sưu tập"
-        }}
-      </div>
-      <div
-        v-for="item in paginatedCaughtFishes"
-        :key="item.id"
-        class="min-w-0 p-2 border border-gray-200 hover:border-emerald-300 rounded-xl bg-gray-50/70 hover:bg-emerald-50/30 transition-all flex flex-col gap-2 shadow-sm"
-      >
-        <img
-          :src="item.species?.image || '/fish/VN/fish.jpg'"
-          :alt="item.species?.name"
-          class="w-full h-36 rounded-lg object-cover border border-gray-200 bg-gray-200"
-        />
-        <div class="flex flex-1 min-w-0 flex-col gap-2">
-          <div class="flex-1 min-w-0 flex flex-col gap-0.5">
-            <div class="flex items-center justify-between gap-1">
-              <span class="font-bold text-xs truncate text-[#263238]">{{ item.species?.name }}</span>
-            </div>
-            <div class="flex items-center gap-2 text-[11px] text-gray-600">
-              <span>{{
-                typeof item.species?.weight === "number" ? item.species.weight + " kg" : item.species?.weight
-              }}</span>
-            </div>
-            <div class="flex items-center justify-between text-[10px] text-gray-400">
-              <span class="shrink-0 ml-1">{{ formatDate(item.created_at) }}</span>
-            </div>
-            <div>
-              <span
-                class="px-1.5 py-1 text-[9px] font-extrabold rounded border shrink-0 uppercase"
-                :class="getRarityBadgeClass(item.species?.rarity)"
-              >
-                {{ item.species?.rarity }}
-              </span>
-              <span class="text-xs px-1.5 py-1">{{ item.variant_type }}</span>
-              <div
-                @click="worldStore.handleMoveToArea(item.origin)"
-                class="text-xs mt-1 cursor-pointer hover:underline"
-              >
-                {{ item.origin.country }} - {{ item.origin.name }}
+          <img
+            :src="item.species?.image || '/fish/VN/fish.jpg'"
+            :alt="item.species?.name"
+            class="w-full h-36 rounded-lg object-cover border border-gray-200 bg-gray-200"
+          />
+          <div class="flex flex-1 min-w-0 flex-col gap-2">
+            <div class="flex-1 min-w-0 flex flex-col gap-0.5">
+              <div class="flex items-center justify-between gap-1">
+                <span class="font-bold text-xs truncate text-[#263238]">{{ item.species?.name }}</span>
+              </div>
+              <div class="flex items-center gap-2 text-[11px] text-gray-600">
+                <span>{{
+                  typeof item.species?.weight === "number" ? item.species.weight + " kg" : item.species?.weight
+                }}</span>
+              </div>
+              <div class="flex items-center justify-between text-[10px] text-gray-400">
+                <span class="shrink-0 ml-1">{{ formatDate(item.created_at) }}</span>
+              </div>
+              <div>
+                <span
+                  class="px-1.5 py-1 text-[9px] font-extrabold rounded border shrink-0 uppercase"
+                  :class="getRarityBadgeClass(item.species?.rarity)"
+                >
+                  {{ item.species?.rarity }}
+                </span>
+                <span class="text-xs px-1.5 py-1">{{ item.variant_type }}</span>
+                <div
+                  @click="worldStore.handleMoveToArea(item.origin)"
+                  class="text-xs mt-1 cursor-pointer hover:underline"
+                >
+                  {{ item.origin.country }} - {{ item.origin.name }}
+                </div>
               </div>
             </div>
-          </div>
-          <div class="flex gap-2 shrink-0">
-            <button
-              type="button"
-              class="px-2 py-1.5 border border-emerald-200 rounded-lg bg-emerald-50 hover:bg-emerald-100 text-emerald-700 font-bold text-xs transition-colors cursor-pointer"
-              title="ĐÄƒng bán cá lên thá»‹ trường"
-              @click="openSellConfirm(item)"
-            >
-              Bán
-            </button>
-            <button
-              type="button"
-              class="px-2 py-1.5 border border-red-200 rounded-lg bg-red-50 hover:bg-red-100 text-red-600 font-bold text-xs transition-colors cursor-pointer"
-              title="Thả cá về lại tự nhiên"
-              @click="openReleaseConfirm(item)"
-            >
-              Thả
-            </button>
+            <div class="flex gap-2 shrink-0">
+              <button
+                type="button"
+                class="px-2 py-1.5 border border-emerald-200 rounded-lg bg-emerald-50 hover:bg-emerald-100 text-emerald-700 font-bold text-xs transition-colors cursor-pointer"
+                title="Đăng bán"
+                @click="openSellConfirm(item)"
+              >
+                Bán
+              </button>
+              <button
+                type="button"
+                class="px-2 py-1.5 border border-red-200 rounded-lg bg-red-50 hover:bg-red-100 text-red-600 font-bold text-xs transition-colors cursor-pointer"
+                title="Thả cá về lại tự nhiên"
+                @click="openReleaseConfirm(item)"
+              >
+                Thả
+              </button>
+            </div>
           </div>
         </div>
       </div>
-    </div>
-    <div v-if="filteredCaughtFishes.length > pageSize" class="flex items-center justify-between gap-3 border-t border-gray-200 pt-3 mt-3 text-xs">
-      <span class="text-gray-500">Trang {{ currentPage }} / {{ pageCount }} ({{ filteredCaughtFishes.length }} cá)</span>
-      <div class="flex gap-2">
-        <button type="button" class="px-3 py-1.5 rounded-lg border border-gray-300 disabled:opacity-40" :disabled="currentPage === 1" @click="currentPage--">Trước</button>
-        <button type="button" class="px-3 py-1.5 rounded-lg border border-gray-300 disabled:opacity-40" :disabled="currentPage === pageCount" @click="currentPage++">Sau</button>
+      <div
+        v-if="filteredCaughtFishes.length > pageSize"
+        class="flex items-center justify-between gap-3 border-t border-gray-200 pt-3 mt-3 text-xs"
+      >
+        <span class="text-gray-500"
+          >Trang {{ currentPage }} / {{ pageCount }} ({{ filteredCaughtFishes.length }} cá)</span
+        >
+        <div class="flex gap-2">
+          <button
+            type="button"
+            class="px-3 py-1.5 rounded-lg border border-gray-300 disabled:opacity-40"
+            :disabled="currentPage === 1"
+            @click="currentPage--"
+          >
+            Trước
+          </button>
+          <button
+            type="button"
+            class="px-3 py-1.5 rounded-lg border border-gray-300 disabled:opacity-40"
+            :disabled="currentPage === pageCount"
+            @click="currentPage++"
+          >
+            Sau
+          </button>
+        </div>
       </div>
-    </div>
     </section>
   </Modal>
 
   <!-- Dialog xác nhận thả cá -->
   <!-- Dialog Ä‘Äƒng bán cá -->
-  <FishReleaseConfirm :fish="fishToRelease" :is-loading="isReleasing" @cancel="cancelRelease" @confirm="handleRelease" />
-  <FishSellConfirm :fish="fishToSell" :is-loading="isSelling" :error="sellError" @cancel="cancelSell" @confirm="submitSell" />
+  <FishReleaseConfirm
+    :fish="fishToRelease"
+    :is-loading="isReleasing"
+    @cancel="cancelRelease"
+    @confirm="handleRelease"
+  />
+  <FishSellConfirm
+    :fish="fishToSell"
+    :is-loading="isSelling"
+    :error="sellError"
+    @cancel="cancelSell"
+    @confirm="submitSell"
+  />
 
   <!-- Popup thông báo bán thành công -->
   <Transition name="sell-success">
@@ -347,5 +392,3 @@ function closeSellSuccess() {
   }
 }
 </style>
-
-

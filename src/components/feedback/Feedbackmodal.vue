@@ -37,7 +37,7 @@ onBeforeUnmount(() => {
 </script>
 
 <template>
-  <Modal title="Phản hồi" sub-title="Chia sẻ ý kiến hoặc báo lỗi để chúng tôi cải thiện trò chơi." :can-refresh="false">
+  <Modal title="Phản hồi" sub-title="Chia sẻ ý kiến hoặc báo lỗi để chúng tôi cải thiện trò chơi.">
     <div role="dialog" aria-modal="true" aria-label="Gửi phản hồi" class="flex max-h-[92vh] w-full max-w-lg flex-col rounded-t-2xl bg-white shadow-xl sm:rounded-2xl">
       <div role="tablist" aria-label="Loại phản hồi" class="flex border-b border-gray-200 px-6">
         <button id="opinion-tab" type="button" role="tab" :aria-selected="activeTab === 'opinion'" aria-controls="opinion-panel" class="border-b-2 px-4 py-3 text-sm font-medium transition-colors" :class="activeTab === 'opinion' ? 'border-indigo-600 text-indigo-700' : 'border-transparent text-gray-500 hover:text-gray-800'" @click="activeTab = 'opinion'">Góp ý</button>

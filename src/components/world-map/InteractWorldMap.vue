@@ -182,7 +182,7 @@ onMounted(() => {
         >
           Reset zoom
         </button>
-        <div class="py-2 px-3 rounded-lg border border-gray-300">
+        <div class="py-2 px-3 rounded-lg border border-gray-300 text-xs">
           <div>1. Nhấn giữ Ctrl + cuộn chuột để zoom bản đồ</div>
           <div>2. Nhấn giữ chuột trái + di chuyển chuột để di chuyển bản đồ</div>
           <div>3. Nhấn vào chấm đỏ để đi câu</div>
