@@ -16,6 +16,8 @@ import EventModal from "../event/EventModal.vue";
 import RedeemCode from "./RedeemCode.vue";
 import NotificationModal from "../notification/NotificationModal.vue";
 import FactionSelectModal from "../faction/FactionSelectModal.vue";
+import FriendModal from "../friend/FriendModal.vue";
+import TeamModal from "../team/TeamModal.vue";
 import { useModalStore } from "../../stores/modal.ts";
 import { supabaseFishRepository } from "../../data/supabaseFishRepository";
 import { useMarketStore } from "../../stores/market";
@@ -195,6 +197,20 @@ onUnmounted(() => {
           <span class="text-sm" aria-hidden="true">🛡️</span>
           <span>Phe phái</span>
         </button>
+
+        <button type="button"
+          class="flex items-center gap-1.5 px-3 py-1.5 bg-[#153221] hover:bg-[#1a3e29] border border-gray-300 text-white rounded-xl shadow-sm font-bold text-xs cursor-pointer transition-colors"
+          @click="modalStore.open('friend')">
+          <span class="text-sm" aria-hidden="true">👥</span>
+          <span>Bạn bè</span>
+        </button>
+
+        <button type="button"
+          class="flex items-center gap-1.5 px-3 py-1.5 bg-[#153221] hover:bg-[#1a3e29] border border-gray-300 text-white rounded-xl shadow-sm font-bold text-xs cursor-pointer transition-colors"
+          @click="modalStore.open('team')">
+          <span class="text-sm" aria-hidden="true">🎣</span>
+          <span>Lập đội</span>
+        </button>
       </div>
 
       <section class="mt-3 w-full max-w-sm rounded-xl border border-emerald-900/15 bg-white/95 p-3 shadow-sm">
@@ -245,6 +261,8 @@ onUnmounted(() => {
           <NotificationModal v-if="modalStore.isOpening('notifications')" />
           <CaughtList v-if="modalStore.isOpening('caught')" />
           <FactionSelectModal v-if="modalStore.isOpening('faction')" />
+          <FriendModal v-if="modalStore.isOpening('friend')" />
+          <TeamModal v-if="modalStore.isOpening('team')" />
         </div>
       </Transition>
     </Teleport>

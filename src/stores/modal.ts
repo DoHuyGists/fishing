@@ -14,6 +14,8 @@ type ModalName =
     | "notifications"
     | "caught"
     | "faction"
+    | "friend"
+    | "team";
 
 export const useModalStore = defineStore("Modal", {
     state: () => ({
