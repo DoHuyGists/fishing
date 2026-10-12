@@ -135,7 +135,7 @@ async function claimMission() {
 </script>
 <template>
   <Modal title="Bảng nhiệm vụ" sub-title="Nhiệm vụ theo giờ" :on-refresh="loadMissionData">
-    <div v-if="isLoading" class="flex-1 grid place-items-center text-sm text-emerald-900/70">
+    <div v-if="isLoading || isRefreshing" class="h-full grid place-items-center text-sm text-emerald-900/70">
       Đang tải cá và nhiệm vụ...
     </div>
     <div
@@ -147,10 +147,10 @@ async function claimMission() {
           <h3 class="m-0 text-sm font-bold">Cá đã câu</h3>
           <span class="text-xs text-emerald-900/60">{{ caughtStore.caughtFishes.length }} con</span>
         </div>
-        <div class="p-3 sm:p-4 space-y-2 h-0 grow overflow-y-scroll">
-          <p v-if="!caughtStore.caughtFishes.length" class="py-8 text-center text-sm text-emerald-900/55">
-            Bạn chưa có cá trong bộ sưu tập.
-          </p>
+        <p v-if="!caughtStore.caughtFishes.length" class="py-8 text-center text-sm text-emerald-900/55">
+          Bạn chưa có cá trong bộ sưu tập.
+        </p>
+        <div v-else class="p-3 sm:p-4 space-y-2 h-0 grow overflow-y-scroll grid grid-cols-2">
           <button
             v-for="caught in caughtStore.caughtFishes"
             :key="caught.id"

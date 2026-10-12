@@ -70,7 +70,7 @@ onUnmounted(() => {
 <template>
     <div class="fixed w-screen h-screen inset-0 z-9999 bg-white flex flex-col">
         <header
-            class="flex items-center justify-between gap-4 px-5 py-4 sm:px-7 border-b border-emerald-950/10 bg-[#e7ecda]">
+            class="flex items-center justify-between gap-4 p-2 border-b border-emerald-950/10 bg-[#e7ecda]">
             <div>
                 <h2 class="m-0 mt-1 text-xl sm:text-2xl font-bold">{{ title }}</h2>
                 <p class="m-0 text-[10px] font-extrabold tracking-[0.14em] uppercase text-emerald-800">{{ subTitle }}</p>
