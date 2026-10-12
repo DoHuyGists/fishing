@@ -15,6 +15,7 @@ import MissionModal from "../mission/MissionModal.vue";
 import EventModal from "../event/EventModal.vue";
 import RedeemCode from "./RedeemCode.vue";
 import NotificationModal from "../notification/NotificationModal.vue";
+import FactionSelectModal from "../faction/FactionSelectModal.vue";
 import { useModalStore } from "../../stores/modal.ts";
 import { supabaseFishRepository } from "../../data/supabaseFishRepository";
 import { useMarketStore } from "../../stores/market";
@@ -187,6 +188,13 @@ onUnmounted(() => {
           <span>Thông báo</span>
           <span v-if="hasNewNotification" class="size-2 rounded-full bg-red-500" aria-label="Có thông báo mới"></span>
         </button>
+
+        <button type="button"
+          class="flex items-center gap-1.5 px-3 py-1.5 bg-[#153221] hover:bg-[#1a3e29] border border-gray-300 text-white rounded-xl shadow-sm font-bold text-xs cursor-pointer transition-colors"
+          @click="modalStore.open('faction')">
+          <span class="text-sm" aria-hidden="true">🛡️</span>
+          <span>Phe phái</span>
+        </button>
       </div>
 
       <section class="mt-3 w-full max-w-sm rounded-xl border border-emerald-900/15 bg-white/95 p-3 shadow-sm">
@@ -236,6 +244,7 @@ onUnmounted(() => {
           <RedeemCode v-if="modalStore.isOpening('redeem')" />
           <NotificationModal v-if="modalStore.isOpening('notifications')" />
           <CaughtList v-if="modalStore.isOpening('caught')" />
+          <FactionSelectModal v-if="modalStore.isOpening('faction')" />
         </div>
       </Transition>
     </Teleport>

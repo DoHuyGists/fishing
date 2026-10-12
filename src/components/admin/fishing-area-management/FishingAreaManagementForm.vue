@@ -3,13 +3,13 @@
 <script lang="ts" setup>
 import { computed, ref, watch } from "vue";
 import { mapData } from "../../../data/map.ts";
-import type { FishingAreaPayload, FishingAreaRow } from "../../../data/supabaseFishingAreaRepository.ts";
+import type { FishingAreaPayload } from "../../../data/supabaseFishingAreaRepository.ts";
 import { useWorldStore } from "../../../stores/world.ts";
 import { useAdminFishingAreaStore } from "./admin-fishing-area-store.ts";
 
 const worldStore = useWorldStore();
 const fishingAreaStore = useAdminFishingAreaStore();
-const adminFishingAreaStore = useAdminFishingAreaStore();
+const adminFishingAreaStore = fishingAreaStore;
 const isSaving = ref(false);
 const formError = ref("");
 
