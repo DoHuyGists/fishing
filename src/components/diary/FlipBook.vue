@@ -154,9 +154,9 @@ function getSheetZIndex(sheetIndex: number): number {
   <div class="w-full flex-1 flex flex-col justify-between select-none overflow-hidden">
     <!-- Book Container with 3D Perspective -->
     <div class="flex-1 flex items-center justify-center perspective-container">
-      <div class="book-wrapper relative w-full h-full bg-[#211209] rounded-2xl shadow-[0_25px_60px_rgba(0,0,0,0.9)]">
+      <div class="book-wrapper relative w-full h-full bg-[#211209] rounded-2xl">
         <!-- Book 3D Stage -->
-        <div class="book-stage relative w-full h-full rounded-sm overflow-hidden shadow-2xl flex">
+        <div class="book-stage relative w-full h-full rounded-sm overflow-hidden shadow-xl flex">
           <!-- Center Spine Drop Shadow Overlay -->
           <!-- <div class="absolute top-0 bottom-0 left-1/2 -translate-x-1/2 w-10 bg-gradient-to-r from-amber-950/40 via-amber-950/70 to-amber-950/40 z-30 pointer-events-none border-x border-amber-950/30 shadow-2xl"></div> -->
 
@@ -171,7 +171,7 @@ function getSheetZIndex(sheetIndex: number): number {
               <!-- Country Overview Card -->
               <div class="bg-amber-900/10 p-4 rounded-sm border border-amber-900/20 mb-4">
                 <h4 class="m-0 font-serif font-bold text-sm text-amber-950 mb-2">Tổng Quan</h4>
-                <p class="m-0 text-amber-900/80 leading-relaxed italic text-lg">
+                <p class="m-0 text-amber-900/80 leading-relaxed italic text-sm">
                   {{
                     country.information ||
                     `Vùng biển và hồ nước tại khu vực ${country.name} là nơi cư trú của nhiều
@@ -214,7 +214,7 @@ function getSheetZIndex(sheetIndex: number): number {
             </div>
 
             <!-- Page Number -->
-            <div class="pt-1 border-t border-amber-900/20 text-[10px] text-amber-900/60 font-serif text-left">
+            <div class="pt-1 border-t border-amber-900/20 text-[10px] text-amber-900/60 font-serif text-left mt-3">
               {{ country.name }}
             </div>
           </div>
@@ -253,7 +253,7 @@ function getSheetZIndex(sheetIndex: number): number {
             </div>
 
             <!-- Page Number -->
-            <div class="pt-1 border-t border-amber-900/20 text-[10px] text-amber-900/60 font-serif text-right">End</div>
+            <div class="pt-1 border-t border-amber-900/20 text-[10px] text-amber-900/60 font-serif text-right mt-3">End</div>
           </div>
 
           <!-- ================= 3D FLIPPING SHEETS STACK ================= -->
@@ -279,7 +279,7 @@ function getSheetZIndex(sheetIndex: number): number {
                 <div class="flex items-center justify-between border-b-1 border-amber-900/30 mb-3"></div>
 
                 <!-- 6 Species Cards Grid (2 Columns) -->
-                <div class="grid grid-cols-1 grid-rows-5 gap-2 h-full">
+                <div class="space-y-2 h-full">
                   <div
                     v-for="entry in getSpeciesForPage(sheetIdx * 2 + 1)"
                     :key="entry.species.id"
@@ -289,6 +289,9 @@ function getSheetZIndex(sheetIndex: number): number {
                         ? 'bg-gradient-to-r from-amber-50 to-emerald-50/80 border-emerald-700/40 shadow-sm'
                         : 'bg-amber-900/10 border-amber-900/20 opacity-75 grayscale',
                     ]"
+                    :style="{
+                      'height': 'calc(100% / 5 - 7px)'
+                    }"
                   >
                     <!-- Fish Image -->
                     <div
@@ -373,7 +376,7 @@ function getSheetZIndex(sheetIndex: number): number {
               ></div>
 
               <!-- Footer -->
-              <div class="pt-1 border-t border-amber-900/20 text-[10px] text-amber-900/60 font-serif text-right">
+              <div class="pt-1 border-t border-amber-900/20 text-[10px] text-amber-900/60 font-serif text-right mt-3">
                 Trang {{ sheetIdx * 2 + 1 }}
               </div>
             </div>
@@ -387,7 +390,7 @@ function getSheetZIndex(sheetIndex: number): number {
                 <div class="flex items-center justify-between border-b-1 border-amber-900/30 mb-3"></div>
 
                 <!-- 6 Species Cards Grid (2 Columns) -->
-                <div class="grid grid-cols-1 grid-rows-5 gap-2 h-full">
+                <div class="space-y-2 h-full">
                   <div
                     v-for="entry in getSpeciesForPage(sheetIdx * 2 + 2)"
                     :key="entry.species.id"
@@ -397,6 +400,9 @@ function getSheetZIndex(sheetIndex: number): number {
                         ? 'bg-gradient-to-r from-amber-50 to-emerald-50/80 border-emerald-700/40 shadow-sm'
                         : 'bg-amber-900/10 border-amber-900/20 opacity-75 grayscale',
                     ]"
+                    :style="{
+                      'height': 'calc(100% / 5 - 7px)'
+                    }"
                   >
                     <!-- Fish Image -->
                     <div
@@ -481,7 +487,7 @@ function getSheetZIndex(sheetIndex: number): number {
               ></div>
 
               <!-- Footer -->
-              <div class="pt-1 border-t border-amber-900/20 text-[10px] text-amber-900/60 font-serif text-left">
+              <div class="pt-1 border-t border-amber-900/20 text-[10px] text-amber-900/60 font-serif text-left mt-3">
                 Trang {{ sheetIdx * 2 + 2 }}
               </div>
             </div>
@@ -503,7 +509,7 @@ function getSheetZIndex(sheetIndex: number): number {
         <span>Trang trước</span>
       </button>
 
-      <div class="text-xs font-serif font-bold text-amber-200">{{ currentSheetIndex }} / {{ totalSheets }}</div>
+      <div class="text-xs font-serif font-bold">{{ currentSheetIndex }} / {{ totalSheets }}</div>
 
       <button
         type="button"

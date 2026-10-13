@@ -1,132 +1,41 @@
 <script setup lang="ts">
-import { ref, computed, watch, onMounted } from "vue";
+import { computed, onMounted, ref, watch } from "vue";
 import { useDiaryStore, type DiaryFishEntry } from "../../stores/diary";
 import { useAuthStore } from "../../stores/auth";
 import { mapData } from "../../data/map";
+import BookShelf from "./BookShelf.vue";
 import FlipBook from "./FlipBook.vue";
-import BookCover, { type BookVariant } from "./BookCover.vue";
 import Modal from "../Modal.vue";
 
-const emit = defineEmits(["close"]);
-
+type Country = { code: string; name: string; information: string };
 const diaryStore = useDiaryStore();
 const authStore = useAuthStore();
-
-// View Mode: 'bookshelf' (Giá sách) | 'openbook' (Xem nội dung sách 3D)
 const viewMode = ref<"bookshelf" | "openbook">("bookshelf");
+const selectedCountry = ref<Country | null>(null);
 
-// Selected Country
-const selectedCountry = ref<{ code: string; name: string; information: string } | null>(null);
+onMounted(() => diaryStore.initDiary(authStore.userId));
+watch(() => authStore.userId, (userId) => { if (userId) diaryStore.initDiary(userId); });
 
-// Bookshelf Pagination & Search State
-const searchQuery = ref("");
-const shelfPage = ref(0);
-const SHELF_PAGE_SIZE = 12; // 12 quyển sách trên 1 trang giá sách
-
-onMounted(() => {
-  diaryStore.initDiary(authStore.userId);
-});
-
-watch(
-  () => authStore.userId,
-  (userId) => {
-    if (userId) {
-      diaryStore.initDiary(userId);
-    }
-  }
+const allCountries = computed<Country[]>(() =>
+  Object.entries(mapData)
+    .filter(([code]) => ["VN"].includes(code))
+    .map(([code, item]) => ({ code, name: item.name, information: item.information || "" })),
 );
 
-const availableContries = ["VN"]
-
-// Format list of all countries from mapData
-const allCountries = computed(() => {
-  return Object.entries(mapData).filter(([code, _]) => availableContries.includes(code)).map(([code, item]) => ({
-    code,
-    name: item.name,
-    information: item.information || "",
+const currentBookEntries = computed<DiaryFishEntry[]>(() => {
+  if (!selectedCountry.value) return [];
+  if (diaryStore.currentLocationEntries.length) return diaryStore.currentLocationEntries;
+  return Array.from({ length: 10 }, (_, index) => ({
+    species: {
+      id: `mock-${selectedCountry.value!.code}-${index + 1}`, created_at: "", name: `Cá thần thoại #${index + 1}`,
+      information: `Loài cá sinh sống tại khu vực ${selectedCountry.value!.name}. Hãy thả câu ở vùng biển này để ghi chép lại thông tin!`,
+      location: selectedCountry.value!.code, status: "Chưa khám phá", image: null, "3d": null,
+    },
+    isCaught: false,
   }));
 });
 
-// Filtered countries based on search query
-const filteredCountries = computed(() => {
-  const query = searchQuery.value.trim().toLowerCase();
-  if (!query) return allCountries.value;
-  return allCountries.value.filter(
-    (c) => c.name.toLowerCase().includes(query) || c.code.toLowerCase().includes(query)
-  );
-});
-
-// Paginated countries on current bookshelf page
-const totalShelfPages = computed(() => {
-  return Math.max(1, Math.ceil(filteredCountries.value.length / SHELF_PAGE_SIZE));
-});
-
-const paginatedCountries = computed(() => {
-  const start = shelfPage.value * SHELF_PAGE_SIZE;
-  return filteredCountries.value.slice(start, start + SHELF_PAGE_SIZE);
-});
-
-function prevShelfPage() {
-  if (shelfPage.value > 0) shelfPage.value--;
-}
-
-function nextShelfPage() {
-  if (shelfPage.value < totalShelfPages.value - 1) shelfPage.value++;
-}
-
-// Reset page when search query changes
-watch(searchQuery, () => {
-  shelfPage.value = 0;
-});
-
-// Get species count for a country
-function getSpeciesCount(country: { code: string; name: string }): number {
-  return (
-    diaryStore.speciesCountByLocation[country.code] ||
-    diaryStore.speciesCountByLocation[country.name.toUpperCase()] ||
-    0
-  );
-}
-
-// Determine Book variant based on collection status & country hash
-function getBookVariant(countryCode: string, speciesCount: number): BookVariant {
-  if (speciesCount >= 10) return "gold";
-  if (speciesCount >= 5) return "emerald";
-  if (speciesCount > 0) return "ocean";
-
-  const hash = countryCode.split("").reduce((acc, char) => acc + char.charCodeAt(0), 0);
-  const variants: BookVariant[] = ["default", "dark", "ocean", "emerald", "gold"];
-  return variants[hash % variants.length];
-}
-
-// Species entries for the opened book
-const currentBookEntries = computed<DiaryFishEntry[]>(() => {
-  if (!selectedCountry.value) return [];
-  const entries = diaryStore.currentLocationEntries;
-
-  if (entries.length > 0) return entries;
-
-  const mockSpeciesList: DiaryFishEntry[] = [];
-  for (let i = 1; i <= 10; i++) {
-    mockSpeciesList.push({
-      species: {
-        id: `mock-${selectedCountry.value.code}-${i}`,
-        created_at: "",
-        name: `Cá thần thoại #${i}`,
-        information: `Loài cá sinh sống tại khu vực ${selectedCountry.value.name}. Hãy thả câu ở vùng biển này để ghi chép lại thông tin!`,
-        location: selectedCountry.value.code,
-        status: "Chưa khám phá",
-        image: null,
-        "3d": null,
-      },
-      isCaught: false,
-    });
-  }
-  return mockSpeciesList;
-});
-
-// Open a country book
-async function openCountryBook(country: { code: string; name: string; information: string }) {
+async function openCountryBook(country: Country) {
   selectedCountry.value = country;
   await diaryStore.selectLocation(authStore.userId, country.code, country.name);
   viewMode.value = "openbook";
@@ -141,115 +50,22 @@ function returnToBookshelf() {
 
 <template>
   <Modal :title="viewMode === 'bookshelf' ? 'Nhật ký đánh bắt' : `Nhật ký đánh bắt: ${selectedCountry?.name}`">
-    <!-- Main Window Container -->
-    <div
-      class="relative bg-[#1c120c] rounded-2xl p-4 md:p-6 shadow-[0_25px_70px_rgba(0,0,0,0.9)] border-1 border-[#4a2e1b] text-amber-100 flex flex-col min-h-[620px] h-full w-full">
-
-      <!-- TOP BAR HEADER -->
-      <div class="flex flex-wrap items-center justify-between gap-3 border-b-2 border-amber-900/50 pb-3 mb-4 shrink-0">
-
-        <!-- Search Bar on Bookshelf mode -->
-        <div v-if="viewMode === 'bookshelf'" class="flex items-center gap-2">
-          <div class="relative w-48 md:w-64">
-            <input v-model="searchQuery" type="text" placeholder="🔍 Tìm quốc gia"
-              class="w-full bg-[#2a1b12] border border-amber-700/60 rounded-xl px-3 py-1.5 text-xs text-amber-100 placeholder-amber-400/50 focus:outline-none focus:border-amber-400 shadow-inner" />
-            <button v-if="searchQuery" type="button"
-              class="absolute right-2 top-1/2 -translate-y-1/2 text-amber-400 hover:text-amber-200 text-xs font-bold"
-              @click="searchQuery = ''">
-              ✕
-            </button>
-          </div>
-        </div>
-      </div>
-
-      <button v-if="viewMode === 'openbook'" type="button"
-            class="flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-amber-800/80 hover:bg-amber-700 text-amber-100 font-bold text-xs border border-amber-500/50 transition-all cursor-pointer shadow"
-            @click="returnToBookshelf">
-            <span>⬅</span>
-            <span>Quay lại giá sách</span>
+    <div class="relative flex flex-col min-h-[620px] h-full w-full">
+      <div class="mb-2">
+        <button v-if="viewMode === 'openbook'" type="button" class="flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-amber-800/80 hover:bg-amber-700 text-amber-100 font-bold text-xs border border-amber-500/50 transition-all cursor-pointer shadow" @click="returnToBookshelf">
+          <span>⬅</span><span>Quay lại giá sách</span>
         </button>
-
-      <!-- ================= MODE 1: BOOKSHELF (GIÁ SÁCH CÁC QUỐC GIA) ================= -->
-      <div v-if="viewMode === 'bookshelf'" class="flex-1 flex flex-col justify-between overflow-hidden">
-        <!-- Shelf Display Grid -->
-        <div class="flex-1 overflow-y-auto">
-          <div class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-6 py-2">
-            <div v-for="country in paginatedCountries" :key="country.code"
-              class="group relative select-none flex flex-col items-center justify-between p-3 rounded-2xl bg-gradient-to-b from-[#3a2213]/60 to-[#1c1008]/80 border border-amber-900/40 hover:border-amber-400/80 shadow-lg hover:shadow-amber-950/90 transition-all duration-300 cursor-pointer transform hover:-translate-y-2"
-              @click="openCountryBook(country)">
-              <!-- 3D Dynamic Book Component Container -->
-              <div class="w-[140px] h-[190px] flex items-center justify-center overflow-hidden my-1">
-                <BookCover :title="country.name" author="Nhật Ký Câu Cá" :num-up="country.code"
-                  :num-down="`${getSpeciesCount(country)} loài`"
-                  :variant="getBookVariant(country.code, getSpeciesCount(country))" :scale="0.33">
-                  <template #cover-icon>
-                    <div
-                      class="absolute inset-0 flex flex-col items-center justify-center opacity-90 pointer-events-none">
-                      <span class="text-4xl drop-shadow-md">{{ country.code }}</span>
-                    </div>
-                  </template>
-                </BookCover>
-              </div>
-
-              <!-- Country Title & Species Count Badge -->
-              <div class="w-full text-center mt-2 pt-2 border-t border-amber-800/40">
-                <h3
-                  class="m-0 text-xs md:text-sm font-serif font-bold text-amber-200 group-hover:text-amber-100 truncate px-1">
-                  {{ country.name }}
-                </h3>
-                <span class="inline-block mt-1 text-[10px] font-bold px-2 py-0.5 rounded-full" :class="[
-                  getSpeciesCount(country) > 0
-                    ? 'bg-emerald-900/80 text-emerald-300 border border-emerald-600/40'
-                    : 'bg-amber-950/60 text-amber-400/70 border border-amber-900/40'
-                ]">
-                  {{ getSpeciesCount(country) }} loài cá
-                </span>
-              </div>
-            </div>
-          </div>
-
-          <!-- Empty Search State -->
-          <div v-if="paginatedCountries.length === 0"
-            class="flex flex-col items-center justify-center p-12 text-amber-300/70">
-            <span class="text-4xl mb-2">🔍</span>
-            <p class="font-serif text-base">Không tìm thấy quốc gia phù hợp với "{{ searchQuery }}"</p>
-          </div>
-        </div>
-
-        <!-- Bookshelf Pagination Bar -->
-        <div class="mt-4 pt-2 border-t border-amber-900/40 flex items-center justify-between text-xs font-serif">
-          <button type="button"
-            class="px-3.5 py-1.5 rounded-lg bg-amber-900/80 hover:bg-amber-800 disabled:opacity-40 text-amber-100 font-bold transition-all cursor-pointer border border-amber-700/40"
-            :disabled="shelfPage === 0" @click="prevShelfPage">
-            ◀ Trang trước
-          </button>
-
-          <span class="text-amber-300 font-bold">
-            {{ shelfPage + 1 }} / {{ totalShelfPages }}
-          </span>
-
-          <button type="button"
-            class="px-3.5 py-1.5 rounded-lg bg-amber-900/80 hover:bg-amber-800 disabled:opacity-40 text-amber-100 font-bold transition-all cursor-pointer border border-amber-700/40"
-            :disabled="shelfPage === totalShelfPages - 1" @click="nextShelfPage">
-            Trang sau ▶
-          </button>
-        </div>
       </div>
 
-      <!-- ================= MODE 2: OPENED BOOK (HIỆU ỨNG 3D PAGE FLIP BOOK) ================= -->
-      <div v-else class="flex-1 flex flex-col justify-between overflow-hidden relative">
+      <BookShelf v-if="viewMode === 'bookshelf'" :countries="allCountries" :species-count-by-location="diaryStore.speciesCountByLocation" @select-country="openCountryBook" />
 
-        <!-- Loading State for Book -->
+      <div v-else class="flex-1 flex flex-col justify-between overflow-hidden relative">
         <div v-if="diaryStore.isLoading" class="flex-1 flex flex-col items-center justify-center p-12 text-amber-200">
-          <div class="w-10 h-10 border-1 border-amber-400 border-t-transparent rounded-full animate-spin mb-3"></div>
+          <div class="w-10 h-10 border border-amber-400 border-t-transparent rounded-full animate-spin mb-3"></div>
           <p class="font-serif text-sm">Đang lật mở trang nhật ký {{ selectedCountry?.name }}...</p>
         </div>
-
-        <!-- 3D FlipBook Component -->
-        <FlipBook v-else-if="selectedCountry" :country="selectedCountry" :entries="currentBookEntries"
-          @back="returnToBookshelf" />
+        <FlipBook v-else-if="selectedCountry" :country="selectedCountry" :entries="currentBookEntries" @back="returnToBookshelf" />
       </div>
-
     </div>
   </Modal>
 </template>

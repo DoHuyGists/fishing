@@ -105,8 +105,6 @@ onUnmounted(() => {
     <!-- Khung Bản đồ trung tâm -->
     <InteractWorldWrapper />
         
-    <InteractWorldMap2/>
-
     <div>
       <div class="flex items-center flex-wrap gap-2">
         <button type="button"
