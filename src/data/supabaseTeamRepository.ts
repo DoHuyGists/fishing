@@ -1,6 +1,8 @@
 import supabase from "../database/connection";
+import type { UserProfile } from "./supabaseUserProfileRepository";
 
-export type TeamStatus = "OPEN" | "FULL" | "FISHING" | "CLOSED";
+export type TeamStatus = "PENDING" | "OPEN" | "FULL" | "FISHING" | "CLOSED";
+export type TeamJoinType = "everyone" | "friend" | "invited";
 export type TeamMemberRole = "LEADER" | "MEMBER";
 
 export interface UserTeam {
@@ -10,6 +12,7 @@ export interface UserTeam {
   leader_id: string;
   max_members: number;
   status: TeamStatus;
+  join_type: TeamJoinType;
   created_at: string;
   updated_at: string;
 }
@@ -20,6 +23,7 @@ export interface UserTeamMember {
   user_id: string;
   role: TeamMemberRole;
   joined_at: string;
+  user_profile: Pick<UserProfile, "id" | "level" | "experience_point"> | null;
 }
 
 class SupabaseTeamRepository {
@@ -44,7 +48,21 @@ class SupabaseTeamRepository {
       .order("joined_at", { ascending: true });
 
     if (error) throw new Error(error.message || "Không thể tải danh sách thành viên");
-    return (data ?? []) as UserTeamMember[];
+    const members = data ?? [];
+    if (members.length === 0) return [];
+
+    const { data: profiles, error: profileError } = await supabase
+      .from("user_profile")
+      .select("id, level, experience_point")
+      .in("id", members.map((member) => member.user_id));
+
+    if (profileError) throw new Error(profileError.message || "Không thể tải hồ sơ thành viên");
+    const profileById = new Map((profiles ?? []).map((profile) => [profile.id, profile]));
+
+    return members.map((member) => ({
+      ...member,
+      user_profile: profileById.get(member.user_id) ?? null,
+    })) as UserTeamMember[];
   }
 
   /** Lấy nhóm mà user đang tham gia (nếu có) */
@@ -72,13 +90,33 @@ class SupabaseTeamRepository {
     return { team: team as UserTeam, members };
   }
 
-  async createTeam(name: string, description: string | null, maxMembers: number): Promise<void> {
+  async createTeam(name: string, description: string | null, maxMembers: number, status: TeamStatus, joinType: TeamJoinType): Promise<void> {
     const { error } = await supabase.rpc("create_team", {
       p_name: name,
       p_description: description,
       p_max_members: maxMembers,
     });
     if (error) throw new Error(error.message || "Không thể tạo nhóm");
+
+    const { data: membership, error: membershipError } = await supabase
+      .from("user_team_members")
+      .select("team_id")
+      .eq("role", "LEADER")
+      .order("joined_at", { ascending: false })
+      .limit(1)
+      .maybeSingle();
+    if (membershipError) throw new Error(membershipError.message);
+    if (!membership) throw new Error("Không tìm thấy nhóm vừa tạo");
+
+    await this.updateTeam(membership.team_id, { status, join_type: joinType });
+  }
+
+  async updateTeam(teamId: string, updates: Partial<Pick<UserTeam, "name" | "description" | "max_members" | "status" | "join_type">>): Promise<void> {
+    const { error } = await supabase
+      .from("user_teams")
+      .update(updates)
+      .eq("id", teamId);
+    if (error) throw new Error(error.message || "Không thể cập nhật nhóm");
   }
 
   async joinTeam(teamId: string): Promise<void> {

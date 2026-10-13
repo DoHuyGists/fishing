@@ -60,7 +60,7 @@ watch(
     sheetFlippedState.value = new Array(newTotal).fill(false);
     currentSheetIndex.value = 0;
   },
-  { immediate: true }
+  { immediate: true },
 );
 
 // Format date helper
@@ -152,38 +152,37 @@ function getSheetZIndex(sheetIndex: number): number {
 
 <template>
   <div class="w-full flex-1 flex flex-col justify-between select-none overflow-hidden">
-
     <!-- Book Container with 3D Perspective -->
     <div class="flex-1 flex items-center justify-center perspective-container">
-
-      <div class="book-wrapper relative w-full h-full  bg-[#211209] rounded-2xl shadow-[0_25px_60px_rgba(0,0,0,0.9)]">
-
+      <div class="book-wrapper relative w-full h-full bg-[#211209] rounded-2xl shadow-[0_25px_60px_rgba(0,0,0,0.9)]">
         <!-- Book 3D Stage -->
         <div class="book-stage relative w-full h-full rounded-sm overflow-hidden shadow-2xl flex">
-
           <!-- Center Spine Drop Shadow Overlay -->
           <!-- <div class="absolute top-0 bottom-0 left-1/2 -translate-x-1/2 w-10 bg-gradient-to-r from-amber-950/40 via-amber-950/70 to-amber-950/40 z-30 pointer-events-none border-x border-amber-950/30 shadow-2xl"></div> -->
 
           <!-- ================= BASE LEFT PAGE (Inside Cover / Page 0) ================= -->
           <div
-            class="w-1/2 h-full bg-gradient-to-br from-[#faf3e3] via-[#f4e7d0] to-[#e8d7bb] p-3 md:p-5 flex flex-col justify-between border-r border-amber-900/20 relative shadow-inner">
+            class="w-1/2 h-full bg-linear-to-br from-[#faf3e3] via-[#f4e7d0] to-[#e8d7bb] p-3 md:p-5 flex flex-col justify-between border-r border-amber-900/20 relative shadow-inner"
+          >
             <div>
               <!-- Header -->
               <div class="flex items-center justify-between border-b-1 border-amber-900/30 mb-3"></div>
 
               <!-- Country Overview Card -->
               <div class="bg-amber-900/10 p-4 rounded-sm border border-amber-900/20 mb-4">
-                <h4 class="m-0 font-serif font-bold text-sm text-amber-950 mb-2">
-                  Tổng Quan
-                </h4>
+                <h4 class="m-0 font-serif font-bold text-sm text-amber-950 mb-2">Tổng Quan</h4>
                 <p class="m-0 text-amber-900/80 leading-relaxed italic text-lg">
-                  {{ country.information || `Vùng biển và hồ nước tại khu vực ${country.name} là nơi cư trú của nhiều
-                  loài sinh vật độc đáo.` }}
+                  {{
+                    country.information ||
+                    `Vùng biển và hồ nước tại khu vực ${country.name} là nơi cư trú của nhiều
+                  loài sinh vật độc đáo.`
+                  }}
                 </p>
               </div>
               <!-- Collection Progress Badge -->
               <div
-                class="bg-gradient-to-r from-amber-100 to-emerald-100/80 p-4 rounded-sm border border-emerald-700/30 text-amber-950 shadow-sm">
+                class="bg-gradient-to-r from-amber-100 to-emerald-100/80 p-4 rounded-sm border border-emerald-700/30 text-amber-950 shadow-sm"
+              >
                 <div class="flex items-center justify-between mb-2">
                   <span class="font-serif font-bold text-xs">Tiến độ sưu tầm</span>
                   <span class="font-bold text-xs text-emerald-800">{{ stats.caught }}/{{ stats.total }} loài</span>
@@ -191,20 +190,25 @@ function getSheetZIndex(sheetIndex: number): number {
                 <div class="w-full bg-amber-900/20 h-2.5 rounded-full overflow-hidden border border-amber-900/20">
                   <div
                     class="bg-gradient-to-r from-emerald-600 to-teal-500 h-full transition-all duration-500 rounded-full"
-                    :style="{ width: `${stats.percentage}%` }"></div>
+                    :style="{ width: `${stats.percentage}%` }"
+                  ></div>
                 </div>
                 <p class="m-0 text-[10px] text-amber-900/70 mt-2 text-right italic font-serif">
                   Hoàn thành {{ stats.percentage }}%
                 </p>
               </div>
             </div>
-            
+
             <!-- Left Base Hotspot for Flipping Prev -->
-            <div v-if="currentSheetIndex > 0"
+            <div
+              v-if="currentSheetIndex > 0"
               class="absolute inset-y-0 left-0 w-1/5 cursor-pointer group hover:bg-amber-900/5 transition-colors z-20 flex items-center justify-start pl-2"
-              @click="flipPrev" title="Lật trang trước">
+              @click="flipPrev"
+              title="Lật trang trước"
+            >
               <div
-                class="w-8 h-8 rounded-full bg-amber-900/40 text-amber-100 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center font-bold text-sm shadow">
+                class="w-8 h-8 rounded-full bg-amber-900/40 text-amber-100 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center font-bold text-sm shadow"
+              >
                 ◀
               </div>
             </div>
@@ -217,12 +221,12 @@ function getSheetZIndex(sheetIndex: number): number {
 
           <!-- ================= BASE RIGHT PAGE (End Cover / Page Final) ================= -->
           <div
-            class="w-1/2 h-full bg-gradient-to-bl from-[#faf3e3] via-[#f4e7d0] to-[#e8d7bb] p-3 md:p-5 flex flex-col justify-between relative shadow-inner">
+            class="w-1/2 h-full bg-gradient-to-bl from-[#faf3e3] via-[#f4e7d0] to-[#e8d7bb] p-3 md:p-5 flex flex-col justify-between relative shadow-inner"
+          >
             <div class="h-full">
               <div class="flex items-center justify-between border-b-1 border-amber-900/30"></div>
               <div class="grid place-items-center w-full h-full">
-                <div
-                  class="p-6 text-center text-amber-950/80 flex flex-col items-center justify-center">
+                <div class="p-6 text-center text-amber-950/80 flex flex-col items-center justify-center">
                   <span class="text-4xl mb-3">⚓</span>
                   <h4 class="m-0 font-serif font-bold text-base text-amber-950 mb-1">
                     Đã xem hết nhật ký {{ country.name }}
@@ -235,60 +239,81 @@ function getSheetZIndex(sheetIndex: number): number {
             </div>
 
             <!-- Right Base Hotspot for Flipping Next -->
-            <div v-if="currentSheetIndex < totalSheets"
+            <div
+              v-if="currentSheetIndex < totalSheets"
               class="absolute inset-y-0 right-0 w-1/5 cursor-pointer group hover:bg-amber-900/5 transition-colors z-20 flex items-center justify-end pr-2"
-              @click="flipNext" title="Lật trang kế tiếp">
+              @click="flipNext"
+              title="Lật trang kế tiếp"
+            >
               <div
-                class="w-8 h-8 rounded-full bg-amber-900/40 text-amber-100 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center font-bold text-sm shadow">
+                class="w-8 h-8 rounded-full bg-amber-900/40 text-amber-100 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center font-bold text-sm shadow"
+              >
                 ▶
               </div>
             </div>
 
             <!-- Page Number -->
-            <div class="pt-1 border-t border-amber-900/20 text-[10px] text-amber-900/60 font-serif text-right">
-              End
-            </div>
+            <div class="pt-1 border-t border-amber-900/20 text-[10px] text-amber-900/60 font-serif text-right">End</div>
           </div>
 
           <!-- ================= 3D FLIPPING SHEETS STACK ================= -->
-          <div v-for="(sheetFlipped, sheetIdx) in sheetFlippedState" :key="sheetIdx"
-            class="paper-sheet absolute top-0 right-0 w-1/2 h-full" :style="{
+          <div
+            v-for="(sheetFlipped, sheetIdx) in sheetFlippedState"
+            :key="sheetIdx"
+            class="paper-sheet absolute top-0 right-0 w-1/2 h-full"
+            :style="{
               zIndex: getSheetZIndex(sheetIdx),
               transformOrigin: 'left center',
-            }" :class="{
+            }"
+            :class="{
               'is-flipped': sheetFlipped,
-              'is-animating': animatingSheet === sheetIdx
-            }">
+              'is-animating': animatingSheet === sheetIdx,
+            }"
+          >
             <!-- FRONT FACE OF SHEET (Page 2*sheetIdx + 1: Right Side Page) -->
             <div
-              class="sheet-face sheet-front absolute inset-0 bg-gradient-to-bl from-[#faf4e6] via-[#f5e9d3] to-[#ebdcc3] p-3 md:p-5 flex flex-col justify-between shadow-xl border-l border-amber-900/20">
-
+              class="sheet-face sheet-front absolute inset-0 bg-gradient-to-bl from-[#faf4e6] via-[#f5e9d3] to-[#ebdcc3] p-3 md:p-5 flex flex-col justify-between shadow-xl border-l border-amber-900/20"
+            >
               <div class="flex flex-col h-full">
                 <!-- Header -->
                 <div class="flex items-center justify-between border-b-1 border-amber-900/30 mb-3"></div>
 
                 <!-- 6 Species Cards Grid (2 Columns) -->
                 <div class="grid grid-cols-1 grid-rows-5 gap-2 h-full">
-                  <div v-for="entry in getSpeciesForPage(sheetIdx * 2 + 1)" :key="entry.species.id"
+                  <div
+                    v-for="entry in getSpeciesForPage(sheetIdx * 2 + 1)"
+                    :key="entry.species.id"
                     class="flex gap-2 p-1.5 rounded-lg border transition-all duration-200 relative overflow-hidden text-amber-950"
                     :class="[
                       entry.isCaught
                         ? 'bg-gradient-to-r from-amber-50 to-emerald-50/80 border-emerald-700/40 shadow-sm'
-                        : 'bg-amber-900/10 border-amber-900/20 opacity-75 grayscale'
-                    ]">
+                        : 'bg-amber-900/10 border-amber-900/20 opacity-75 grayscale',
+                    ]"
+                  >
                     <!-- Fish Image -->
                     <div
                       class="relative w-1/5 shrink-0 rounded-md overflow-hidden p-1 border-amber-900/30 bg-amber-900/20 flex items-center justify-center"
-                      :class="{ 'cursor-pointer hover:ring-2 hover:ring-emerald-500/60 transition-shadow': entry.isCaught && entry.species['3d'] }"
-                      @click="open3DViewer(entry)">
-                      <img v-if="entry.species.image" :src="entry.species.image" :alt="entry.isCaught ? entry.species.name : '_???'"
+                      :class="{
+                        'cursor-pointer hover:ring-2 hover:ring-emerald-500/60 transition-shadow':
+                          entry.isCaught && entry.species['3d'],
+                      }"
+                      @click="open3DViewer(entry)"
+                    >
+                      <img
+                        v-if="entry.species.image"
+                        :src="entry.species.image"
+                        :alt="entry.isCaught ? entry.species.name : '_???'"
                         class="w-full h-full object-cover"
-                        :class="{ 'brightness-0 opacity-40 blur-[1px]': !entry.isCaught }" />
-                      <span v-else class="text-base select-none">{{ entry.isCaught ? '🐟' : '❓' }}</span>
+                        :class="{ 'brightness-0 opacity-40 blur-[1px]': !entry.isCaught }"
+                      />
+                      <span v-else class="text-base select-none">{{ entry.isCaught ? "🐟" : "❓" }}</span>
                       <div v-if="!entry.isCaught" class="absolute inset-0 flex items-center justify-center bg-black/30">
                         <span class="text-[10px]">🔒</span>
                       </div>
-                      <div v-if="entry.isCaught && entry.species['3d']" class="absolute bottom-0.5 right-0.5 bg-emerald-600/90 text-white text-[7px] font-bold px-1 py-px rounded leading-tight">
+                      <div
+                        v-if="entry.isCaught && entry.species['3d']"
+                        class="absolute bottom-0.5 right-0.5 bg-emerald-600/90 text-white text-[7px] font-bold px-1 py-px rounded leading-tight"
+                      >
                         3D
                       </div>
                     </div>
@@ -298,20 +323,24 @@ function getSheetZIndex(sheetIndex: number): number {
                       <div>
                         <div class="flex items-center justify-between gap-1">
                           <h4 class="m-0 font-serif font-bold text-lg text-amber-950 truncate">
-                            {{ entry.isCaught ? entry.species.name : '???' }}
+                            {{ entry.isCaught ? entry.species.name : "???" }}
                           </h4>
-                          <span class="px-1 py-0.2 rounded text-[8px] font-bold uppercase shrink-0 border" :class="[
-                            entry.isCaught
-                              ? 'bg-emerald-100 text-emerald-800 border-emerald-300'
-                              : 'bg-gray-200 text-gray-700 border-gray-300'
-                          ]">
-                            {{ entry.isCaught ? (entry.species.status || 'Đã câu') : 'Chưa bắt' }}
+                          <span
+                            class="px-1 py-0.2 rounded text-[8px] font-bold uppercase shrink-0 border"
+                            :class="[
+                              entry.isCaught
+                                ? 'bg-emerald-100 text-emerald-800 border-emerald-300'
+                                : 'bg-gray-200 text-gray-700 border-gray-300',
+                            ]"
+                          >
+                            {{ entry.isCaught ? entry.species.status || "Đã câu" : "Chưa bắt" }}
                           </span>
                         </div>
                         <p class="m-0 text-md text-amber-900/80 line-clamp-1 leading-tight italic mt-0.5">
-                          {{ entry.isCaught
-                            ? (entry.species.information || 'Chưa có thông tin sinh thái.')
-                            : 'Chưa khám phá.'
+                          {{
+                            entry.isCaught
+                              ? entry.species.information || "Chưa có thông tin sinh thái."
+                              : "Chưa khám phá."
                           }}
                         </p>
                       </div>
@@ -323,18 +352,25 @@ function getSheetZIndex(sheetIndex: number): number {
                   </div>
 
                   <!-- Placeholder slot if less than ITEMS_PER_PAGE species -->
-                  <div v-for="emptyIdx in (ITEMS_PER_PAGE - getSpeciesForPage(sheetIdx * 2 + 1).length)"
+                  <div
+                    v-for="emptyIdx in ITEMS_PER_PAGE - getSpeciesForPage(sheetIdx * 2 + 1).length"
                     :key="'empty-front-' + emptyIdx"
-                    class="p-1.5 text-center text-amber-900/40 italic border border-dashed border-amber-900/20 rounded-lg text-xs flex items-center justify-center min-h-[44px]">
+                    class="p-1.5 text-center text-amber-900/40 italic border border-dashed border-amber-900/20 rounded-lg text-xs flex items-center justify-center min-h-[44px]"
+                  >
                     Trống
                   </div>
                 </div>
               </div>
 
               <!-- Front Face Shadow overlay during turn -->
-              <div class="absolute inset-0 pointer-events-none transition-opacity duration-300" :class="[
-                animatingSheet === sheetIdx && flipDirection === 'next' ? 'bg-gradient-to-l from-black/40 to-transparent opacity-80' : 'opacity-0'
-              ]"></div>
+              <div
+                class="absolute inset-0 pointer-events-none transition-opacity duration-300"
+                :class="[
+                  animatingSheet === sheetIdx && flipDirection === 'next'
+                    ? 'bg-gradient-to-l from-black/40 to-transparent opacity-80'
+                    : 'opacity-0',
+                ]"
+              ></div>
 
               <!-- Footer -->
               <div class="pt-1 border-t border-amber-900/20 text-[10px] text-amber-900/60 font-serif text-right">
@@ -344,34 +380,48 @@ function getSheetZIndex(sheetIndex: number): number {
 
             <!-- BACK FACE OF SHEET (Page 2*sheetIdx + 2: Left Side Page when flipped) -->
             <div
-              class="sheet-face sheet-back absolute inset-0 bg-gradient-to-br from-[#faf4e6] via-[#f5e9d3] to-[#ebdcc3] p-3 md:p-5 flex flex-col justify-between shadow-xl border-r border-amber-900/20">
-
+              class="sheet-face sheet-back absolute inset-0 bg-linear-to-br from-[#faf4e6] via-[#f5e9d3] to-[#ebdcc3] p-3 md:p-5 flex flex-col justify-between shadow-xl border-r border-amber-900/20"
+            >
               <div class="flex flex-col h-full">
                 <!-- Header -->
                 <div class="flex items-center justify-between border-b-1 border-amber-900/30 mb-3"></div>
 
                 <!-- 6 Species Cards Grid (2 Columns) -->
                 <div class="grid grid-cols-1 grid-rows-5 gap-2 h-full">
-                  <div v-for="entry in getSpeciesForPage(sheetIdx * 2 + 2)" :key="entry.species.id"
+                  <div
+                    v-for="entry in getSpeciesForPage(sheetIdx * 2 + 2)"
+                    :key="entry.species.id"
                     class="flex gap-2 p-1.5 rounded-lg border transition-all duration-200 relative overflow-hidden text-amber-950"
                     :class="[
                       entry.isCaught
                         ? 'bg-gradient-to-r from-amber-50 to-emerald-50/80 border-emerald-700/40 shadow-sm'
-                        : 'bg-amber-900/10 border-amber-900/20 opacity-75 grayscale'
-                    ]">
+                        : 'bg-amber-900/10 border-amber-900/20 opacity-75 grayscale',
+                    ]"
+                  >
                     <!-- Fish Image -->
                     <div
                       class="relative w-1/5 shrink-0 rounded-md overflow-hidden p-1 bg-amber-900/20 flex items-center justify-center"
-                      :class="{ 'cursor-pointer hover:ring-2 hover:ring-emerald-500/60 transition-shadow': entry.isCaught && entry.species['3d'] }"
-                      @click="open3DViewer(entry)">
-                      <img v-if="entry.species.image" :src="entry.species.image" :alt="entry.species.name"
+                      :class="{
+                        'cursor-pointer hover:ring-2 hover:ring-emerald-500/60 transition-shadow':
+                          entry.isCaught && entry.species['3d'],
+                      }"
+                      @click="open3DViewer(entry)"
+                    >
+                      <img
+                        v-if="entry.species.image"
+                        :src="entry.species.image"
+                        :alt="entry.species.name"
                         class="w-full h-full object-cover"
-                        :class="{ 'brightness-0 opacity-40 blur-[1px]': !entry.isCaught }" />
-                      <span v-else class="text-base select-none">{{ entry.isCaught ? '🐟' : '❓' }}</span>
+                        :class="{ 'brightness-0 opacity-40 blur-[1px]': !entry.isCaught }"
+                      />
+                      <span v-else class="text-base select-none">{{ entry.isCaught ? "🐟" : "❓" }}</span>
                       <div v-if="!entry.isCaught" class="absolute inset-0 flex items-center justify-center bg-black/30">
                         <span class="text-[10px]">🔒</span>
                       </div>
-                      <div v-if="entry.isCaught && entry.species['3d']" class="absolute bottom-0.5 right-0.5 bg-emerald-600/90 text-white text-[7px] font-bold px-1 py-px rounded leading-tight">
+                      <div
+                        v-if="entry.isCaught && entry.species['3d']"
+                        class="absolute bottom-0.5 right-0.5 bg-emerald-600/90 text-white text-[7px] font-bold px-1 py-px rounded leading-tight"
+                      >
                         3D
                       </div>
                     </div>
@@ -381,20 +431,24 @@ function getSheetZIndex(sheetIndex: number): number {
                       <div>
                         <div class="flex items-center justify-between gap-1">
                           <h4 class="m-0 font-serif font-bold text-[11px] text-amber-950 truncate">
-                            {{ entry.isCaught ? entry.species.name : '???' }}
+                            {{ entry.isCaught ? entry.species.name : "???" }}
                           </h4>
-                          <span class="px-1 py-0.2 rounded text-[8px] font-bold uppercase shrink-0 border" :class="[
-                            entry.isCaught
-                              ? 'bg-emerald-100 text-emerald-800 border-emerald-300'
-                              : 'bg-gray-200 text-gray-700 border-gray-300'
-                          ]">
-                            {{ entry.isCaught ? (entry.species.status || 'Đã câu') : 'Chưa bắt' }}
+                          <span
+                            class="px-1 py-0.2 rounded text-[8px] font-bold uppercase shrink-0 border"
+                            :class="[
+                              entry.isCaught
+                                ? 'bg-emerald-100 text-emerald-800 border-emerald-300'
+                                : 'bg-gray-200 text-gray-700 border-gray-300',
+                            ]"
+                          >
+                            {{ entry.isCaught ? entry.species.status || "Đã câu" : "Chưa bắt" }}
                           </span>
                         </div>
                         <p class="m-0 text-[9px] text-amber-900/80 line-clamp-1 leading-tight italic mt-0.5">
-                          {{ entry.isCaught
-                            ? (entry.species.information || 'Chưa có thông tin sinh thái.')
-                            : 'Chưa khám phá.'
+                          {{
+                            entry.isCaught
+                              ? entry.species.information || "Chưa có thông tin sinh thái."
+                              : "Chưa khám phá."
                           }}
                         </p>
                       </div>
@@ -406,76 +460,88 @@ function getSheetZIndex(sheetIndex: number): number {
                   </div>
 
                   <!-- Placeholder slot if less than ITEMS_PER_PAGE species -->
-                  <div v-for="emptyIdx in (ITEMS_PER_PAGE - getSpeciesForPage(sheetIdx * 2 + 2).length)"
+                  <div
+                    v-for="emptyIdx in ITEMS_PER_PAGE - getSpeciesForPage(sheetIdx * 2 + 2).length"
                     :key="'empty-back-' + emptyIdx"
-                    class="p-1.5 text-center text-amber-900/40 italic border border-dashed border-amber-900/20 rounded-lg text-xs flex items-center justify-center min-h-[44px]">
+                    class="p-1.5 text-center text-amber-900/40 italic border border-dashed border-amber-900/20 rounded-lg text-xs flex items-center justify-center min-h-[44px]"
+                  >
                     Trống
                   </div>
                 </div>
               </div>
 
               <!-- Back Face Shadow overlay during turn -->
-              <div class="absolute inset-0 pointer-events-none transition-opacity duration-300" :class="[
-                animatingSheet === sheetIdx && flipDirection === 'prev' ? 'bg-gradient-to-r from-black/40 to-transparent opacity-80' : 'opacity-0'
-              ]"></div>
+              <div
+                class="absolute inset-0 pointer-events-none transition-opacity duration-300"
+                :class="[
+                  animatingSheet === sheetIdx && flipDirection === 'prev'
+                    ? 'bg-gradient-to-r from-black/40 to-transparent opacity-80'
+                    : 'opacity-0',
+                ]"
+              ></div>
 
               <!-- Footer -->
               <div class="pt-1 border-t border-amber-900/20 text-[10px] text-amber-900/60 font-serif text-left">
                 Trang {{ sheetIdx * 2 + 2 }}
               </div>
             </div>
-
           </div>
-
         </div>
-
       </div>
-
     </div>
 
     <!-- Navigation Control Buttons -->
     <div class="mt-2 flex items-center justify-center gap-2 px-4 shrink-0">
-        <button type="button"
-          class="flex items-center gap-1.5 px-4 py-2 rounded-sm bg-amber-800 hover:bg-amber-700 disabled:opacity-40 text-amber-100 font-bold text-xs transition-all shadow-md cursor-pointer border border-amber-500/40 active:scale-95 disabled:cursor-not-allowed"
-          :disabled="isFlipping" @click="flipPrev"
-          :class="currentSheetIndex === 0 ? 'invisible' : 'visible'"
-          >
-          <span>◀</span>
-          <span>Trang trước</span>
-        </button>
-  
-        <div class="text-xs font-serif font-bold text-amber-200">
-           {{ currentSheetIndex }} / {{ totalSheets }}
-        </div>
-  
-        <button type="button"
-          class="flex items-center gap-1.5 px-4 py-2 rounded-sm bg-amber-800 hover:bg-amber-700 disabled:opacity-40 text-amber-100 font-bold text-xs transition-all shadow-md cursor-pointer border border-amber-500/40 active:scale-95 disabled:cursor-not-allowed"
-          :disabled="isFlipping" @click="flipNext"
-          :class="currentSheetIndex >= totalSheets ? 'invisible' : 'visible'"
-          >
-          <span>Trang kế tiếp</span>
-          <span>▶</span>
-        </button>
-    </div>
+      <button
+        type="button"
+        class="flex items-center gap-1.5 px-4 py-2 rounded-sm bg-amber-800 hover:bg-amber-700 disabled:opacity-40 text-amber-100 font-bold text-xs transition-all shadow-md cursor-pointer border border-amber-500/40 active:scale-95 disabled:cursor-not-allowed"
+        :disabled="isFlipping"
+        @click="flipPrev"
+        :class="currentSheetIndex === 0 ? 'invisible' : 'visible'"
+      >
+        <span>◀</span>
+        <span>Trang trước</span>
+      </button>
 
+      <div class="text-xs font-serif font-bold text-amber-200">{{ currentSheetIndex }} / {{ totalSheets }}</div>
+
+      <button
+        type="button"
+        class="flex items-center gap-1.5 px-4 py-2 rounded-sm bg-amber-800 hover:bg-amber-700 disabled:opacity-40 text-amber-100 font-bold text-xs transition-all shadow-md cursor-pointer border border-amber-500/40 active:scale-95 disabled:cursor-not-allowed"
+        :disabled="isFlipping"
+        @click="flipNext"
+        :class="currentSheetIndex >= totalSheets ? 'invisible' : 'visible'"
+      >
+        <span>Trang kế tiếp</span>
+        <span>▶</span>
+      </button>
+    </div>
   </div>
 
   <!-- 3D Model Viewer Modal -->
   <Teleport to="body">
     <Transition name="model-viewer-dialog">
-      <div v-if="modelViewerOpen"
+      <div
+        v-if="modelViewerOpen"
         class="fixed inset-0 z-[100] grid place-items-center p-4 bg-black/80 backdrop-blur-md"
-        @click.self="close3DViewer">
-        <div class="relative w-full max-w-2xl aspect-square bg-gradient-to-br from-[#1a2e1a] to-[#0d1f0d] rounded-2xl overflow-hidden shadow-[0_30px_80px_rgba(0,0,0,0.7)] border border-emerald-800/40">
+        @click.self="close3DViewer"
+      >
+        <div
+          class="relative w-full max-w-2xl aspect-square bg-linear-to-br from-[#1a2e1a] to-[#0d1f0d] rounded-2xl overflow-hidden shadow-[0_30px_80px_rgba(0,0,0,0.7)] border border-emerald-800/40"
+        >
           <!-- Header -->
-          <div class="absolute top-0 inset-x-0 z-10 flex items-center justify-between px-5 py-3 bg-gradient-to-b from-black/60 to-transparent">
+          <div
+            class="absolute top-0 inset-x-0 z-10 flex items-center justify-between px-5 py-3 bg-gradient-to-b from-black/60 to-transparent"
+          >
             <div>
               <p class="m-0 text-emerald-400 text-[10px] font-black tracking-[0.16em] uppercase">Mô hình 3D</p>
               <h3 class="m-0 text-white text-lg font-bold">{{ modelViewerName }}</h3>
             </div>
-            <button type="button"
+            <button
+              type="button"
               class="w-8 h-8 border-0 rounded-full bg-white/15 hover:bg-white/25 text-white cursor-pointer text-xl leading-none transition-colors"
-              @click="close3DViewer">
+              @click="close3DViewer"
+            >
               ×
             </button>
           </div>
@@ -489,11 +555,13 @@ function getSheetZIndex(sheetIndex: number): number {
             touch-action="pan-y"
             shadow-intensity="1"
             environment-image="neutral"
-            style="width: 100%; height: 100%; --poster-color: transparent;"
+            style="width: 100%; height: 100%; --poster-color: transparent"
           ></model-viewer>
 
           <!-- Footer hint -->
-          <div class="absolute bottom-0 inset-x-0 z-10 px-5 py-2 bg-gradient-to-t from-black/50 to-transparent text-center">
+          <div
+            class="absolute bottom-0 inset-x-0 z-10 px-5 py-2 bg-gradient-to-t from-black/50 to-transparent text-center"
+          >
             <p class="m-0 text-white/60 text-[10px]">Kéo để xoay · Cuộn để phóng to</p>
           </div>
         </div>

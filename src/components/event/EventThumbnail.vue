@@ -34,7 +34,7 @@ watch(
   () => props.src,
   () => {
     failed.value = false;
-  }
+  },
 );
 
 const showImage = computed(() => !!props.src && !failed.value);
@@ -66,7 +66,7 @@ const frameStyle = computed(() => ({
       v-else
       role="img"
       aria-label="Chưa có ảnh"
-      class="flex h-full w-full items-center justify-center bg-gradient-to-br from-zinc-700 to-zinc-600 text-zinc-400"
+      class="flex h-full w-full items-center justify-center bg-linear-to-br from-zinc-700 to-zinc-600 text-zinc-400"
     >
       <svg
         class="w-[36%]"

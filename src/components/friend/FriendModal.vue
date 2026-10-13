@@ -36,13 +36,9 @@ const profilesMap = computed(() => friendStore.profilesMap);
 
 const acceptedFriends = computed(() => friendStore.acceptedFriends);
 
-const receivedRequests = computed(() =>
-  friendStore.getReceivedRequests(currentUserId.value)
-);
+const receivedRequests = computed(() => friendStore.getReceivedRequests(currentUserId.value));
 
-const sentRequests = computed(() =>
-  friendStore.getSentRequests(currentUserId.value)
-);
+const sentRequests = computed(() => friendStore.getSentRequests(currentUserId.value));
 
 // Danh sách tất cả người chơi khác từ user_profile
 const otherPlayers = computed(() => {
@@ -54,9 +50,7 @@ const filteredPlayers = computed(() => {
   const query = searchQuery.value.trim().toLowerCase();
   if (!query) return otherPlayers.value;
 
-  return otherPlayers.value.filter((profile) =>
-    profile.id.toLowerCase().includes(query)
-  );
+  return otherPlayers.value.filter((profile) => profile.id.toLowerCase().includes(query));
 });
 
 // Lọc bạn bè ở tab Bạn bè
@@ -185,8 +179,8 @@ function confirmDelete(record: UserFriend, type: "friend" | "sent_request" | "re
         ? record.friend_id
         : record.user_id
       : type === "sent_request"
-      ? record.friend_id
-      : record.user_id;
+        ? record.friend_id
+        : record.user_id;
 
   deleteConfirmTarget.value = {
     id: record.id,
@@ -219,11 +213,7 @@ async function executeDelete() {
 </script>
 
 <template>
-  <Modal
-    title="Quản lý bạn bè"
-    sub-title="Kết nối cộng đồng câu cá"
-    :on-refresh="handleRefresh"
-  >
+  <Modal title="Quản lý bạn bè" sub-title="Kết nối cộng đồng câu cá" :on-refresh="handleRefresh">
     <div class="max-w-5xl mx-auto space-y-4 pb-10">
       <!-- ID Người chơi hiện tại & Banner -->
       <div
@@ -236,9 +226,7 @@ async function executeDelete() {
             🎣
           </div>
           <div class="min-w-0">
-            <h3 class="m-0 text-base sm:text-lg font-bold text-white tracking-wide">
-              Mã người chơi của bạn
-            </h3>
+            <h3 class="m-0 text-base sm:text-lg font-bold text-white tracking-wide">Mã người chơi của bạn</h3>
             <p class="m-0 text-xs text-emerald-200/70 font-mono truncate" :title="currentUserId">
               {{ currentUserId || "Chưa đăng nhập" }}
             </p>
@@ -377,7 +365,10 @@ async function executeDelete() {
             :disabled="!directFriendIdInput.trim() || friendStore.actionLoadingId === directFriendIdInput.trim()"
             @click="handleSendDirectId"
           >
-            <span v-if="friendStore.actionLoadingId === directFriendIdInput.trim()" class="size-3 border-2 border-white border-t-transparent rounded-full animate-spin"></span>
+            <span
+              v-if="friendStore.actionLoadingId === directFriendIdInput.trim()"
+              class="size-3 border-2 border-white border-t-transparent rounded-full animate-spin"
+            ></span>
             <span>+ Gửi lời mời</span>
           </button>
         </div>
@@ -398,22 +389,25 @@ async function executeDelete() {
         class="p-4 rounded-xl bg-red-50 border border-red-200 text-red-700 text-xs flex items-center justify-between"
       >
         <span>{{ friendStore.error }}</span>
-        <button
-          type="button"
-          class="font-bold underline hover:no-underline cursor-pointer"
-          @click="handleRefresh"
-        >
+        <button type="button" class="font-bold underline hover:no-underline cursor-pointer" @click="handleRefresh">
           Tải lại
         </button>
       </div>
 
       <!-- ================= TAB 1: BẠN BÈ ================= -->
       <div v-else-if="activeTab === 'friends'" class="space-y-3">
-        <div v-if="filteredFriends.length === 0" class="py-14 text-center bg-white/60 rounded-2xl border border-emerald-900/10 p-6">
+        <div
+          v-if="filteredFriends.length === 0"
+          class="py-14 text-center bg-white/60 rounded-2xl border border-emerald-900/10 p-6"
+        >
           <div class="text-4xl mb-2">🤝</div>
           <h4 class="m-0 text-sm font-bold text-gray-800">Chưa có bạn bè nào</h4>
           <p class="m-0 text-xs text-gray-500 mt-1">
-            {{ searchQuery ? "Không tìm thấy bạn bè phù hợp với tìm kiếm." : "Hãy chuyển sang tab 'Thêm bạn bè' để kết bạn cùng những ngư thủ khác nhé!" }}
+            {{
+              searchQuery
+                ? "Không tìm thấy bạn bè phù hợp với tìm kiếm."
+                : "Hãy chuyển sang tab 'Thêm bạn bè' để kết bạn cùng những ngư thủ khác nhé!"
+            }}
           </p>
           <button
             v-if="!searchQuery"
@@ -435,7 +429,7 @@ async function executeDelete() {
               <div class="flex items-center gap-3 min-w-0">
                 <!-- Avatar -->
                 <div
-                  class="size-11 rounded-xl bg-gradient-to-br flex items-center justify-center text-white text-sm font-black shadow-sm shrink-0"
+                  class="size-11 rounded-xl bg-linear-to-br flex items-center justify-center text-white text-sm font-black shadow-sm shrink-0"
                   :class="getAvatarGradient(record.user_id === currentUserId ? record.friend_id : record.user_id)"
                 >
                   {{ (record.user_id === currentUserId ? record.friend_id : record.user_id).slice(0, 2).toUpperCase() }}
@@ -457,20 +451,17 @@ async function executeDelete() {
                   </div>
 
                   <!-- Thông số hồ sơ nếu có -->
-                  <div
-                    v-if="getFriendProfile(record)"
-                    class="flex items-center gap-2 mt-1 flex-wrap text-[11px]"
-                  >
-                    <span class="px-2 py-0.5 rounded-full bg-amber-100 text-amber-800 font-bold border border-amber-200">
+                  <div v-if="getFriendProfile(record)" class="flex items-center gap-2 mt-1 flex-wrap text-[11px]">
+                    <span
+                      class="px-2 py-0.5 rounded-full bg-amber-100 text-amber-800 font-bold border border-amber-200"
+                    >
                       ⭐ Cấp {{ getFriendProfile(record)?.level }}
                     </span>
                     <span class="px-2 py-0.5 rounded-full bg-emerald-100 text-emerald-800 font-medium">
                       ✨ {{ Number(getFriendProfile(record)?.experience_point ?? 0).toLocaleString("vi-VN") }} EXP
                     </span>
                   </div>
-                  <div v-else class="text-[10px] text-gray-400 mt-0.5">
-                    Chưa tải dữ liệu hồ sơ
-                  </div>
+                  <div v-else class="text-[10px] text-gray-400 mt-0.5">Chưa tải dữ liệu hồ sơ</div>
                 </div>
               </div>
 
@@ -496,7 +487,10 @@ async function executeDelete() {
 
       <!-- ================= TAB 2: LỜI MỜI ĐÃ NHẬN ================= -->
       <div v-else-if="activeTab === 'received'" class="space-y-3">
-        <div v-if="receivedRequests.length === 0" class="py-14 text-center bg-white/60 rounded-2xl border border-emerald-900/10 p-6">
+        <div
+          v-if="receivedRequests.length === 0"
+          class="py-14 text-center bg-white/60 rounded-2xl border border-emerald-900/10 p-6"
+        >
           <div class="text-4xl mb-2">📬</div>
           <h4 class="m-0 text-sm font-bold text-gray-800">Không có lời mời nào</h4>
           <p class="m-0 text-xs text-gray-500 mt-1">
@@ -512,7 +506,7 @@ async function executeDelete() {
           >
             <div class="flex items-center gap-3 min-w-0">
               <div
-                class="size-11 rounded-xl bg-gradient-to-br flex items-center justify-center text-white text-sm font-black shadow-sm shrink-0"
+                class="size-11 rounded-xl bg-linear-to-br flex items-center justify-center text-white text-sm font-black shadow-sm shrink-0"
                 :class="getAvatarGradient(record.user_id)"
               >
                 {{ record.user_id.slice(0, 2).toUpperCase() }}
@@ -536,13 +530,8 @@ async function executeDelete() {
                   </span>
                 </div>
 
-                <div
-                  v-if="getSenderProfile(record)"
-                  class="flex items-center gap-2 mt-1 text-[11px]"
-                >
-                  <span class="font-bold text-amber-800">
-                    ⭐ Cấp {{ getSenderProfile(record)?.level }}
-                  </span>
+                <div v-if="getSenderProfile(record)" class="flex items-center gap-2 mt-1 text-[11px]">
+                  <span class="font-bold text-amber-800"> ⭐ Cấp {{ getSenderProfile(record)?.level }} </span>
                   <span class="text-gray-500">·</span>
                   <span class="text-emerald-800 font-medium">
                     {{ Number(getSenderProfile(record)?.experience_point ?? 0).toLocaleString("vi-VN") }} EXP
@@ -563,7 +552,10 @@ async function executeDelete() {
                 :disabled="friendStore.actionLoadingId === record.id"
                 @click="handleRespondRequest(record.id, true)"
               >
-                <span v-if="friendStore.actionLoadingId === record.id" class="size-3 border-2 border-white border-t-transparent rounded-full animate-spin"></span>
+                <span
+                  v-if="friendStore.actionLoadingId === record.id"
+                  class="size-3 border-2 border-white border-t-transparent rounded-full animate-spin"
+                ></span>
                 <span>✓ Đồng ý</span>
               </button>
 
@@ -592,12 +584,13 @@ async function executeDelete() {
 
       <!-- ================= TAB 3: LỜI MỜI ĐÃ GỬI ================= -->
       <div v-else-if="activeTab === 'sent'" class="space-y-3">
-        <div v-if="sentRequests.length === 0" class="py-14 text-center bg-white/60 rounded-2xl border border-emerald-900/10 p-6">
+        <div
+          v-if="sentRequests.length === 0"
+          class="py-14 text-center bg-white/60 rounded-2xl border border-emerald-900/10 p-6"
+        >
           <div class="text-4xl mb-2">📤</div>
           <h4 class="m-0 text-sm font-bold text-gray-800">Chưa gửi lời mời nào</h4>
-          <p class="m-0 text-xs text-gray-500 mt-1">
-            Bạn chưa gửi yêu cầu kết bạn nào đang ở trạng thái chờ.
-          </p>
+          <p class="m-0 text-xs text-gray-500 mt-1">Bạn chưa gửi yêu cầu kết bạn nào đang ở trạng thái chờ.</p>
         </div>
 
         <div v-else class="space-y-2">
@@ -608,7 +601,7 @@ async function executeDelete() {
           >
             <div class="flex items-center gap-3 min-w-0">
               <div
-                class="size-11 rounded-xl bg-gradient-to-br flex items-center justify-center text-white text-sm font-black shadow-sm shrink-0"
+                class="size-11 rounded-xl bg-linear-to-br flex items-center justify-center text-white text-sm font-black shadow-sm shrink-0"
                 :class="getAvatarGradient(record.friend_id)"
               >
                 {{ record.friend_id.slice(0, 2).toUpperCase() }}
@@ -627,18 +620,15 @@ async function executeDelete() {
                   >
                     📋
                   </button>
-                  <span class="px-2 py-0.5 rounded text-[10px] font-semibold bg-gray-100 text-gray-700 border border-gray-200">
+                  <span
+                    class="px-2 py-0.5 rounded text-[10px] font-semibold bg-gray-100 text-gray-700 border border-gray-200"
+                  >
                     ⏳ Đang chờ đồng ý
                   </span>
                 </div>
 
-                <div
-                  v-if="getRecipientProfile(record)"
-                  class="flex items-center gap-2 mt-1 text-[11px]"
-                >
-                  <span class="font-bold text-amber-800">
-                    ⭐ Cấp {{ getRecipientProfile(record)?.level }}
-                  </span>
+                <div v-if="getRecipientProfile(record)" class="flex items-center gap-2 mt-1 text-[11px]">
+                  <span class="font-bold text-amber-800"> ⭐ Cấp {{ getRecipientProfile(record)?.level }} </span>
                   <span class="text-gray-500">·</span>
                   <span class="text-gray-400 text-[10px]">
                     Gửi lúc: {{ new Date(record.created_at).toLocaleDateString("vi-VN") }}
@@ -667,12 +657,13 @@ async function executeDelete() {
           <span class="text-[11px] text-gray-400">Sắp xếp theo cấp độ cao xuống thấp</span>
         </div>
 
-        <div v-if="filteredPlayers.length === 0" class="py-14 text-center bg-white/60 rounded-2xl border border-emerald-900/10 p-6">
+        <div
+          v-if="filteredPlayers.length === 0"
+          class="py-14 text-center bg-white/60 rounded-2xl border border-emerald-900/10 p-6"
+        >
           <div class="text-4xl mb-2">🔍</div>
           <h4 class="m-0 text-sm font-bold text-gray-800">Không tìm thấy người chơi</h4>
-          <p class="m-0 text-xs text-gray-500 mt-1">
-            Không có người chơi nào khớp với từ khóa tìm kiếm.
-          </p>
+          <p class="m-0 text-xs text-gray-500 mt-1">Không có người chơi nào khớp với từ khóa tìm kiếm.</p>
         </div>
 
         <div v-else class="grid grid-cols-1 md:grid-cols-2 gap-3">
@@ -685,7 +676,7 @@ async function executeDelete() {
               <div class="flex items-center gap-3 min-w-0">
                 <!-- Avatar -->
                 <div
-                  class="size-11 rounded-xl bg-gradient-to-br flex items-center justify-center text-white text-sm font-black shadow-sm shrink-0"
+                  class="size-11 rounded-xl bg-linear-to-br flex items-center justify-center text-white text-sm font-black shadow-sm shrink-0"
                   :class="getAvatarGradient(player.id)"
                 >
                   {{ player.id.slice(0, 2).toUpperCase() }}
@@ -708,7 +699,9 @@ async function executeDelete() {
 
                   <!-- Thông số: Cấp & EXP -->
                   <div class="flex items-center gap-2 mt-1 flex-wrap text-[11px]">
-                    <span class="px-2 py-0.5 rounded-full bg-amber-100 text-amber-800 font-bold border border-amber-200">
+                    <span
+                      class="px-2 py-0.5 rounded-full bg-amber-100 text-amber-800 font-bold border border-amber-200"
+                    >
                       ⭐ Cấp {{ player.level }}
                     </span>
                     <span class="px-2 py-0.5 rounded-full bg-emerald-100 text-emerald-800 font-medium">
@@ -729,11 +722,10 @@ async function executeDelete() {
                 </span>
 
                 <!-- Đã gửi lời mời đang chờ -->
-                <div
-                  v-else-if="getRelation(player.id).type === 'SENT_PENDING'"
-                  class="flex items-center gap-1.5"
-                >
-                  <span class="px-2.5 py-1.5 rounded-lg bg-gray-100 text-gray-700 border border-gray-200 text-xs font-semibold">
+                <div v-else-if="getRelation(player.id).type === 'SENT_PENDING'" class="flex items-center gap-1.5">
+                  <span
+                    class="px-2.5 py-1.5 rounded-lg bg-gray-100 text-gray-700 border border-gray-200 text-xs font-semibold"
+                  >
                     Đã gửi
                   </span>
                   <button
@@ -743,7 +735,7 @@ async function executeDelete() {
                     @click="
                       confirmDelete(
                         (getRelation(player.id) as { type: 'SENT_PENDING'; record: UserFriend }).record,
-                        'sent_request'
+                        'sent_request',
                       )
                     "
                   >
@@ -752,17 +744,14 @@ async function executeDelete() {
                 </div>
 
                 <!-- Người này đã gửi lời mời cho mình -->
-                <div
-                  v-else-if="getRelation(player.id).type === 'RECEIVED_PENDING'"
-                  class="flex items-center gap-1.5"
-                >
+                <div v-else-if="getRelation(player.id).type === 'RECEIVED_PENDING'" class="flex items-center gap-1.5">
                   <button
                     type="button"
                     class="px-2.5 py-1.5 rounded-lg bg-emerald-700 hover:bg-emerald-800 text-white text-xs font-bold cursor-pointer"
                     @click="
                       handleRespondRequest(
                         (getRelation(player.id) as { type: 'RECEIVED_PENDING'; record: UserFriend }).record.id,
-                        true
+                        true,
                       )
                     "
                   >
@@ -774,7 +763,7 @@ async function executeDelete() {
                     @click="
                       handleRespondRequest(
                         (getRelation(player.id) as { type: 'RECEIVED_PENDING'; record: UserFriend }).record.id,
-                        false
+                        false,
                       )
                     "
                   >
@@ -790,7 +779,10 @@ async function executeDelete() {
                   :disabled="friendStore.actionLoadingId === player.id"
                   @click="handleSendRequest(player.id)"
                 >
-                  <span v-if="friendStore.actionLoadingId === player.id" class="size-3 border-2 border-white border-t-transparent rounded-full animate-spin"></span>
+                  <span
+                    v-if="friendStore.actionLoadingId === player.id"
+                    class="size-3 border-2 border-white border-t-transparent rounded-full animate-spin"
+                  ></span>
                   <span>+ Thêm bạn</span>
                 </button>
               </div>
@@ -810,24 +802,19 @@ async function executeDelete() {
     </div>
 
     <!-- Hộp thoại xác nhận xóa (Modal xác nhận bên trong) -->
-    <div
-      v-if="deleteConfirmTarget"
-      class="fixed inset-0 z-50 bg-black/50 flex items-center justify-center p-4"
-    >
+    <div v-if="deleteConfirmTarget" class="fixed inset-0 z-50 bg-black/50 flex items-center justify-center p-4">
       <div
         class="bg-white rounded-2xl max-w-sm w-full p-5 shadow-2xl border border-gray-200 space-y-4 animate-in fade-in zoom-in duration-150"
       >
         <div class="flex items-center gap-3 text-red-600">
-          <div class="size-10 rounded-full bg-red-100 flex items-center justify-center text-lg shrink-0">
-            ⚠️
-          </div>
+          <div class="size-10 rounded-full bg-red-100 flex items-center justify-center text-lg shrink-0">⚠️</div>
           <h4 class="m-0 text-base font-bold text-gray-900">
             {{
               deleteConfirmTarget.type === "friend"
                 ? "Xác nhận hủy kết bạn"
                 : deleteConfirmTarget.type === "sent_request"
-                ? "Hủy lời mời kết bạn"
-                : "Xóa yêu cầu kết bạn"
+                  ? "Hủy lời mời kết bạn"
+                  : "Xóa yêu cầu kết bạn"
             }}
           </h4>
         </div>
@@ -837,8 +824,8 @@ async function executeDelete() {
             deleteConfirmTarget.type === "friend"
               ? "Bạn có chắc chắn muốn xóa người này khỏi danh sách bạn bè? Hai người sẽ không còn là bạn của nhau nữa."
               : deleteConfirmTarget.type === "sent_request"
-              ? "Bạn có chắc chắn muốn hủy lời mời kết bạn đã gửi tới người chơi này?"
-              : "Bạn có chắc chắn muốn xóa yêu cầu kết bạn này?"
+                ? "Bạn có chắc chắn muốn hủy lời mời kết bạn đã gửi tới người chơi này?"
+                : "Bạn có chắc chắn muốn xóa yêu cầu kết bạn này?"
           }}
         </p>
 

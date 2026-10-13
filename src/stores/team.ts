@@ -5,6 +5,8 @@ import {
   supabaseTeamRepository,
   type UserTeam,
   type UserTeamMember,
+  type TeamStatus,
+  type TeamJoinType,
 } from "../data/supabaseTeamRepository";
 
 // Module-level: không đưa vào Pinia state để tránh serialize warning
@@ -82,16 +84,34 @@ export const useTeamStore = defineStore("team", {
       userId: string,
       name: string,
       description: string | null,
-      maxMembers: number
+      maxMembers: number,
+      status: TeamStatus,
+      joinType: TeamJoinType
     ): Promise<boolean> {
       this.actionLoading = true;
       this.error = "";
       try {
-        await supabaseTeamRepository.createTeam(name, description, maxMembers);
+        await supabaseTeamRepository.createTeam(name, description, maxMembers, status, joinType);
         await this.loadData(userId);
         return true;
       } catch (err) {
         this.error = err instanceof Error ? err.message : "Không thể tạo nhóm";
+        return false;
+      } finally {
+        this.actionLoading = false;
+      }
+    },
+
+    async updateTeam(userId: string, updates: Pick<UserTeam, "name" | "description" | "max_members" | "status" | "join_type">): Promise<boolean> {
+      if (!this.myTeam || this.myTeam.leader_id !== userId) return false;
+      this.actionLoading = true;
+      this.error = "";
+      try {
+        await supabaseTeamRepository.updateTeam(this.myTeam.id, updates);
+        await this.loadData(userId);
+        return true;
+      } catch (err) {
+        this.error = err instanceof Error ? err.message : "Không thể cập nhật nhóm";
         return false;
       } finally {
         this.actionLoading = false;

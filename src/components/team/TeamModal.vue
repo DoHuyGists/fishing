@@ -3,45 +3,99 @@ import { computed, onMounted, onUnmounted, ref } from 'vue';
 import Modal from '../Modal.vue';
 import { useTeamStore } from '../../stores/team';
 import { useAuthStore } from '../../stores/auth';
+import { useFriendStore } from '../../stores/friend';
+import type { TeamJoinType, TeamStatus } from '../../data/supabaseTeamRepository';
+import TeamListSidebar from './TeamListSidebar.vue';
+import MyTeamPanel from './MyTeamPanel.vue';
 
 // ─── Store ────────────────────────────────────────────────────────────────────
 const authStore = useAuthStore();
 const teamStore = useTeamStore();
+const friendStore = useFriendStore();
 
 const userId = computed(() => authStore.userId);
 const isLeader = computed(() => teamStore.isLeader(userId.value));
 const otherMembers = computed(() =>
   teamStore.myTeamMembers.filter((m) => m.user_id !== userId.value)
 );
+const teamSearch = ref('');
+const teamStatusFilter = ref('ALL');
+const filteredTeams = computed(() => {
+  const query = teamSearch.value.trim().toLocaleLowerCase();
+  return teamStore.teams.filter((team) => {
+    const matchesSearch = !query || `${team.name} ${team.description ?? ''}`.toLocaleLowerCase().includes(query);
+    return matchesSearch && (teamStatusFilter.value === 'ALL' || team.status === teamStatusFilter.value);
+  });
+});
+
+function canJoinTeam(team: (typeof teamStore.teams)[number]) {
+  if (team.status !== 'OPEN') return false;
+  if (team.join_type === 'everyone') return true;
+  if (team.join_type === 'friend') {
+    return friendStore.friends.some((friend) => friend.status === 'ACCEPTED' &&
+      ((friend.user_id === userId.value && friend.friend_id === team.leader_id) ||
+       (friend.friend_id === userId.value && friend.user_id === team.leader_id)));
+  }
+  return false;
+}
+
+function joinRestrictionLabel(team: (typeof teamStore.teams)[number]) {
+  if (team.status !== 'OPEN') return 'Không thể tham gia';
+  if (team.join_type === 'friend') return 'Chỉ bạn bè của trưởng nhóm';
+  if (team.join_type === 'invited') return 'Chỉ người được mời';
+  return '';
+}
 
 // ─── Views ───────────────────────────────────────────────────────────────────
 // 'list'  → danh sách nhóm
 // 'create'→ form tạo nhóm
 // 'room'  → phòng nhóm đang tham gia
-type View = 'list' | 'create' | 'room';
+type View = 'list' | 'create' | 'edit' | 'room';
 // Khởi tạo mặc định 'list'; onMounted() sẽ cập nhật sang 'room' nếu đang trong nhóm
 const view = ref<View>('list');
 
 // ─── Create form ─────────────────────────────────────────────────────────────
-const createForm = ref({ name: '', description: '', maxMembers: 4 });
+const defaultTeamForm = {
+  name: 'Đội săn thủy quái', description: 'Cùng lập tổ, thả cần và chinh phục những mẻ cá thật lớn!'
+}
+const createForm = ref({ name: defaultTeamForm.name, description: defaultTeamForm.description, maxMembers: 4, status: 'OPEN' as TeamStatus, joinType: 'everyone' as TeamJoinType });
 const createError = ref('');
+
+function openEditForm() {
+  const team = teamStore.myTeam;
+  if (!team) return;
+  createForm.value = { name: team.name, description: team.description ?? '', maxMembers: team.max_members, status: team.status, joinType: team.join_type };
+  createError.value = '';
+  view.value = 'edit';
+}
 
 async function handleCreate() {
   createError.value = '';
-  const { name, description, maxMembers } = createForm.value;
+  const { name, description, maxMembers, status, joinType } = createForm.value;
   if (!name.trim()) { createError.value = 'Vui lòng nhập tên nhóm'; return; }
   const ok = await teamStore.createTeam(
     userId.value,
     name.trim(),
     description.trim() || null,
-    maxMembers
+    maxMembers,
+    status,
+    joinType
   );
   if (ok) {
-    createForm.value = { name: '', description: '', maxMembers: 4 };
+    createForm.value = { name: '', description: '', maxMembers: 4, status: 'OPEN', joinType: 'everyone' };
     view.value = 'room';
   } else {
     createError.value = teamStore.error;
   }
+}
+
+async function handleUpdate() {
+  createError.value = '';
+  const { name, description, maxMembers, status, joinType } = createForm.value;
+  if (!name.trim()) { createError.value = 'Vui lòng nhập tên nhóm'; return; }
+  const ok = await teamStore.updateTeam(userId.value, { name: name.trim(), description: description.trim() || null, max_members: maxMembers, status, join_type: joinType });
+  if (ok) view.value = 'room';
+  else createError.value = teamStore.error;
 }
 
 // ─── Join ────────────────────────────────────────────────────────────────────
@@ -62,11 +116,11 @@ async function handleLeave() {
   // member rời / leader rời nhóm 1 mình → close + leave
   if (isLeader.value && otherMembers.value.length === 0) {
     await teamStore.closeTeam(userId.value);
-    view.value = 'list';
+    view.value = 'room';
     return;
   }
   await teamStore.leaveTeam(userId.value);
-  view.value = 'list';
+  view.value = 'room';
 }
 
 async function handleLeaveAndTransfer() {
@@ -75,25 +129,32 @@ async function handleLeaveAndTransfer() {
   if (ok) {
     await teamStore.leaveTeam(userId.value);
     showLeaveOptions.value = false;
-    view.value = 'list';
+    view.value = 'room';
   }
 }
 
 async function handleLeaveAndClose() {
   await teamStore.closeTeam(userId.value);
   showLeaveOptions.value = false;
-  view.value = 'list';
+  view.value = 'room';
 }
 
 // ─── Kick ────────────────────────────────────────────────────────────────────
 async function handleKick(memberId: string) {
-  await teamStore.kickMember(userId.value, memberId);
+  const ok = await teamStore.kickMember(userId.value, memberId);
+  if (ok) {
+    showKickConfirm.value = false;
+    kickTargetId.value = '';
+  }
 }
+
+const showKickConfirm = ref(false);
+const kickTargetId = ref('');
 
 // ─── Close team (leader đóng nhóm) ───────────────────────────────────────────
 async function handleClose() {
   const ok = await teamStore.closeTeam(userId.value);
-  if (ok) view.value = 'list';
+  if (ok) view.value = 'room';
 }
 
 // ─── Transfer leadership ──────────────────────────────────────────────────────
@@ -109,9 +170,10 @@ async function handleTransfer() {
 
 // ─── Status badge helpers ─────────────────────────────────────────────────────
 const statusLabel: Record<string, string> = {
-  OPEN: 'Mở', FULL: 'Đầy', FISHING: 'Đang câu', CLOSED: 'Đã đóng',
+  PENDING: 'Chờ duyệt', OPEN: 'Mở', FULL: 'Đầy', FISHING: 'Đang câu', CLOSED: 'Đã đóng',
 };
 const statusClass: Record<string, string> = {
+  PENDING: 'bg-[#f0e0e0] text-[#8a2020] border border-[#e8a0a0]',
   OPEN:    'bg-[#d4f4dd] text-[#1a6e35] border border-[#9de2b4]',
   FULL:    'bg-[#fde8cc] text-[#8a4500] border border-[#f7bf7f]',
   FISHING: 'bg-[#dceeff] text-[#1a4fa0] border border-[#9ac4f7]',
@@ -120,9 +182,9 @@ const statusClass: Record<string, string> = {
 
 // ─── Lifecycle ───────────────────────────────────────────────────────────────
 onMounted(async () => {
-  await teamStore.loadData(userId.value);
+  await Promise.all([teamStore.loadData(userId.value), friendStore.loadData(userId.value)]);
   teamStore.subscribeRealtime(userId.value);
-  view.value = teamStore.isInTeam ? 'room' : 'list';
+  view.value = 'room';
 });
 
 onUnmounted(() => {
@@ -140,13 +202,40 @@ onUnmounted(() => {
     </div>
 
     <template v-else>
+      <div v-if="view === 'room'" class="flex flex-col gap-4 lg:grid lg:grid-cols-[minmax(260px,0.8fr)_minmax(0,1.7fr)] lg:items-start">
+        <TeamListSidebar
+          :teams="teamStore.teams"
+          :current-team-id="teamStore.myTeam?.id"
+          :action-loading="teamStore.actionLoading"
+          :can-join="canJoinTeam"
+          :join-restriction-label="joinRestrictionLabel"
+          @create="view = 'create'"
+          @join="handleJoin"
+        />
+        <div class="min-w-0">
+          <p v-if="teamStore.error" class="mb-3 rounded-lg border border-[#f5c6c3] bg-[#fef0ef] px-3 py-2 text-[0.83rem] text-[#c0392b]">{{ teamStore.error }}</p>
+          <MyTeamPanel
+            :team="teamStore.myTeam"
+            :members="teamStore.myTeamMembers"
+            :user-id="userId"
+            :is-leader="isLeader"
+            :action-loading="teamStore.actionLoading"
+            @create="view = 'create'"
+            @edit="openEditForm"
+            @close="handleClose"
+            @leave="handleLeave"
+            @transfer="(memberId) => { transferTarget = memberId; showTransferModal = true; }"
+            @kick="(memberId) => { kickTargetId = memberId; showKickConfirm = true; }"
+          />
+        </div>
+      </div>
 
       <!-- ════════════════════════════════════════════════════════ -->
       <!-- VIEW: ROOM (đang trong nhóm)                            -->
       <!-- ════════════════════════════════════════════════════════ -->
-      <div v-if="view === 'room' && teamStore.myTeam" class="flex flex-col gap-4">
+      <div v-if="view === 'list' && teamStore.myTeam" class="flex flex-col gap-4">
         <!-- Room header -->
-        <div class="flex items-start justify-between gap-3 p-4 bg-gradient-to-br from-[#e8f5e2] to-[#d4edcc] rounded-2xl border border-[#b8dab0]">
+        <div class="flex items-start justify-between gap-3 p-4 bg-linear-to-br from-[#e8f5e2] to-[#d4edcc] rounded-2xl border border-[#b8dab0]">
           <div>
             <h3 class="m-0 mb-1 text-[1.1rem] font-extrabold text-[#1a3a1a]">{{ teamStore.myTeam.name }}</h3>
             <p v-if="teamStore.myTeam.description" class="m-0 mb-2 text-[0.82rem] text-[#556655]">
@@ -167,17 +256,18 @@ onUnmounted(() => {
         </div>
 
         <!-- Member list -->
-        <ul class="list-none m-0 p-0 flex flex-col gap-2">
+        <ul class="list-none m-0 p-0 grid grid-cols-1 sm:grid-cols-5 gap-3">
           <li
             v-for="member in teamStore.myTeamMembers"
             :key="member.id"
-            class="flex items-center gap-3 px-[14px] py-[10px] bg-[#f8fbf5] border border-[#daefd4] rounded-xl"
+            class="flex flex-col gap-3 p-4 bg-linear-to-br from-white to-[#f5faf2] border border-[#daefd4] rounded-2xl shadow-sm"
           >
-            <div class="w-9 h-9 rounded-full bg-gradient-to-br from-[#3b7a57] to-[#2e6644] text-white flex items-center justify-center text-[0.78rem] font-extrabold shrink-0">
+            <div class="flex items-center gap-3 min-w-0">
+            <div class="w-11 h-11 rounded-full bg-linear-to-br from-[#3b7a57] to-[#2e6644] text-white flex items-center justify-center text-[0.78rem] font-extrabold shrink-0 shadow-sm">
               {{ member.user_id.slice(0, 2).toUpperCase() }}
             </div>
-            <div class="flex-1 flex flex-col gap-0.5">
-              <span class="text-[0.82rem] text-[#334433] font-mono">{{ member.user_id.slice(0, 8) }}…</span>
+            <div class="flex-1 min-w-0 flex flex-col gap-1">
+              <span class="text-[0.82rem] text-[#334433] font-mono truncate">{{ member.user_id.slice(0, 8) }}…</span>
               <span
                 :class="[
                   'inline-block px-[7px] py-[1px] rounded-full text-[0.7rem] font-bold',
@@ -188,9 +278,15 @@ onUnmounted(() => {
               >
                 {{ member.role === 'LEADER' ? '👑 Trưởng nhóm' : 'Thành viên' }}
               </span>
+              <span class="text-xs font-semibold text-[#648064]">
+                ⭐ Cấp {{ member.user_profile?.level ?? 1 }}
+                <span class="mx-1 text-[#b2c8ae]">·</span>
+                {{ Number(member.user_profile?.experience_point ?? 0).toLocaleString('vi-VN') }} EXP
+              </span>
+            </div>
             </div>
             <!-- Leader actions for members -->
-            <div v-if="isLeader && member.user_id !== userId" class="flex gap-1.5">
+            <div v-if="isLeader && member.user_id !== userId" class="flex gap-1.5 justify-end border-t border-[#e3eee0] pt-2">
               <button
                 class="inline-flex items-center justify-center px-[10px] py-[5px] rounded-lg text-[0.78rem] font-bold bg-transparent text-[#556655] border border-[#c0d8b8] cursor-pointer hover:bg-[#f0f7ec] active:scale-[0.97] disabled:opacity-55 disabled:cursor-not-allowed transition-colors"
                 :disabled="teamStore.actionLoading"
@@ -200,7 +296,7 @@ onUnmounted(() => {
               <button
                 class="inline-flex items-center justify-center px-[10px] py-[5px] rounded-lg text-[0.78rem] font-bold bg-[#fde8e8] text-[#c0392b] border border-[#f5b7b1] cursor-pointer hover:bg-[#fbd4d4] active:scale-[0.97] disabled:opacity-55 disabled:cursor-not-allowed transition-colors"
                 :disabled="teamStore.actionLoading"
-                @click="handleKick(member.user_id)"
+                @click="() => { kickTargetId = member.user_id; showKickConfirm = true; }"
                 title="Kick"
               >✕</button>
             </div>
@@ -210,8 +306,16 @@ onUnmounted(() => {
         <!-- Error -->
         <p v-if="teamStore.error" class="m-0 text-[#c0392b] bg-[#fef0ef] border border-[#f5c6c3] rounded-lg px-3 py-2 text-[0.83rem]">{{ teamStore.error }}</p>
 
+        <div class="grid grid-cols-1 sm:grid-cols-[1fr_180px] gap-2 mb-3">
+          <input v-model="teamSearch" type="search" aria-label="Tìm tổ đội" placeholder="Tìm theo tên hoặc mô tả..." class="min-w-0 px-3 py-[9px] border border-[#c0d8b8] rounded-lg bg-[#fafefc] text-[0.9rem] text-[#1a3a1a]" />
+          <select v-model="teamStatusFilter" aria-label="Lọc theo trạng thái" class="px-3 py-[9px] border border-[#c0d8b8] rounded-lg bg-[#fafefc] text-[0.9rem] text-[#1a3a1a]">
+            <option value="ALL">Tất cả trạng thái</option><option value="OPEN">Mở</option><option value="FULL">Đầy</option><option value="FISHING">Đang câu</option><option value="CLOSED">Đã đóng</option>
+          </select>
+        </div>
+
         <!-- Room actions -->
         <div class="flex gap-2.5 justify-end pt-1">
+          <button v-if="isLeader" class="inline-flex items-center justify-center gap-1.5 px-4 py-2 rounded-lg text-[0.87rem] font-bold bg-transparent text-[#3b7a57] border-[1.5px] border-[#3b7a57] cursor-pointer hover:bg-[#e8f5e2]" :disabled="teamStore.actionLoading" @click="openEditForm">Cập nhật tổ đội</button>
           <button
             v-if="isLeader"
             class="inline-flex items-center justify-center gap-1.5 px-4 py-2 rounded-lg text-[0.87rem] font-bold bg-[#fde8e8] text-[#c0392b] border border-[#f5b7b1] cursor-pointer hover:bg-[#fbd4d4] active:scale-[0.97] disabled:opacity-55 disabled:cursor-not-allowed transition-colors"
@@ -237,7 +341,7 @@ onUnmounted(() => {
         <div class="flex items-center justify-between gap-3 mb-4">
           <h3 class="m-0 text-base font-bold text-[#1a3a1a]">Nhóm đang hoạt động</h3>
           <button
-            class="inline-flex items-center justify-center gap-1.5 px-4 py-2 rounded-lg text-[0.87rem] font-bold bg-gradient-to-br from-[#3b7a57] to-[#2e6644] text-white cursor-pointer hover:from-[#2e6644] hover:to-[#245236] active:scale-[0.97] transition-all"
+            class="inline-flex items-center justify-center gap-1.5 px-4 py-2 rounded-lg text-[0.87rem] font-bold bg-linear-to-br from-[#3b7a57] to-[#2e6644] text-white cursor-pointer hover:from-[#2e6644] hover:to-[#245236] active:scale-[0.97] transition-all"
             @click="view = 'create'"
           >
             + Tạo nhóm
@@ -250,9 +354,11 @@ onUnmounted(() => {
           <p>Chưa có nhóm nào. Hãy tạo nhóm đầu tiên!</p>
         </div>
 
+        <div v-else-if="filteredTeams.length === 0" class="text-center py-8 px-5 text-[#778877] text-[0.9rem]">Không tìm thấy tổ đội phù hợp.</div>
+
         <ul v-else class="list-none m-0 p-0 flex flex-col gap-2.5">
           <li
-            v-for="team in teamStore.teams"
+            v-for="team in filteredTeams"
             :key="team.id"
             class="bg-[#f5f9f0] border border-[#cde0c9] rounded-xl overflow-hidden transition-shadow hover:shadow-[0_4px_16px_rgba(59,122,87,0.12)]"
           >
@@ -264,17 +370,18 @@ onUnmounted(() => {
                 </span>
               </div>
               <p v-if="team.description" class="text-[0.82rem] text-[#556655] my-1 mb-2">{{ team.description }}</p>
+              <p class="text-[0.76rem] text-[#778877] my-1">{{ team.join_type === 'everyone' ? 'Ai cũng có thể tham gia' : team.join_type === 'friend' ? 'Chỉ bạn bè của trưởng nhóm' : 'Chỉ người được mời' }}</p>
               <div class="flex items-center justify-between gap-2 mt-2">
                 <span class="text-[0.78rem] text-[#778877]">Chỗ trống · max {{ team.max_members }}</span>
                 <button
-                  v-if="team.status === 'OPEN'"
-                  class="inline-flex items-center justify-center gap-1.5 px-[10px] py-[5px] rounded-lg text-[0.78rem] font-bold bg-gradient-to-br from-[#3b7a57] to-[#2e6644] text-white cursor-pointer hover:from-[#2e6644] hover:to-[#245236] active:scale-[0.97] disabled:opacity-55 disabled:cursor-not-allowed transition-all"
+                  v-if="canJoinTeam(team)"
+                  class="inline-flex items-center justify-center gap-1.5 px-[10px] py-[5px] rounded-lg text-[0.78rem] font-bold bg-linear-to-br from-[#3b7a57] to-[#2e6644] text-white cursor-pointer hover:from-[#2e6644] hover:to-[#245236] active:scale-[0.97] disabled:opacity-55 disabled:cursor-not-allowed transition-all"
                   :disabled="teamStore.actionLoading"
                   @click="handleJoin(team.id)"
                 >
                   Tham gia
                 </button>
-                <span v-else class="inline-block px-[10px] py-[2px] rounded-full text-[0.72rem] font-bold tracking-wide bg-[#fde8cc] text-[#8a4500] border border-[#f7bf7f]">Không thể join</span>
+                <span v-else class="inline-block px-[10px] py-[2px] rounded-full text-[0.72rem] font-bold tracking-wide bg-[#fde8cc] text-[#8a4500] border border-[#f7bf7f]">{{ joinRestrictionLabel(team) }}</span>
               </div>
             </div>
           </li>
@@ -284,16 +391,16 @@ onUnmounted(() => {
       <!-- ════════════════════════════════════════════════════════ -->
       <!-- VIEW: CREATE                                            -->
       <!-- ════════════════════════════════════════════════════════ -->
-      <div v-else-if="view === 'create'" class="max-w-[480px] mx-auto">
+      <div v-else-if="view === 'create' || view === 'edit'" class="max-w-[480px] mx-auto">
         <div class="flex items-center justify-between gap-3 mb-4">
           <button
             class="inline-flex items-center justify-center gap-1.5 px-4 py-2 rounded-lg text-[0.87rem] font-bold bg-transparent text-[#556655] border border-[#c0d8b8] cursor-pointer hover:bg-[#f0f7ec] active:scale-[0.97] transition-colors"
-            @click="view = 'list'"
+            @click="view = 'room'"
           >← Quay lại</button>
-          <h3 class="m-0 text-base font-bold text-[#1a3a1a]">Tạo nhóm mới</h3>
+          <h3 class="m-0 text-base font-bold text-[#1a3a1a]">{{ view === 'edit' ? 'Cập nhật tổ đội' : 'Tạo nhóm mới' }}</h3>
         </div>
 
-        <form class="flex flex-col gap-4" @submit.prevent="handleCreate">
+        <form class="flex flex-col gap-4" @submit.prevent="view === 'edit' ? handleUpdate() : handleCreate()">
           <label class="flex flex-col gap-1.5 text-[0.85rem] font-semibold text-[#2a4a2a]">
             Tên nhóm <span class="text-[#c0392b]">*</span>
             <input
@@ -329,14 +436,20 @@ onUnmounted(() => {
             </div>
           </label>
 
+          <label class="flex flex-col gap-1.5 text-[0.85rem] font-semibold text-[#2a4a2a]">Trạng thái
+            <select v-model="createForm.status" class="px-3 py-[9px] border border-[#c0d8b8] rounded-lg bg-[#fafefc] text-[0.9rem] text-[#1a3a1a]"><option value="PENDING">Chờ duyệt (chưa hiển thị)</option><option value="OPEN">Mở</option><option value="FULL">Đầy</option><option value="FISHING">Đang câu</option><option value="CLOSED">Đã đóng</option></select>
+          </label>
+          <label class="flex flex-col gap-1.5 text-[0.85rem] font-semibold text-[#2a4a2a]">Quyền tham gia
+            <select v-model="createForm.joinType" class="px-3 py-[9px] border border-[#c0d8b8] rounded-lg bg-[#fafefc] text-[0.9rem] text-[#1a3a1a]"><option value="everyone">Ai cũng có thể tham gia</option><option value="friend">Chỉ bạn bè của trưởng nhóm</option><option value="invited">Chỉ người được mời</option></select>
+          </label>
           <p v-if="createError" class="m-0 text-[#c0392b] bg-[#fef0ef] border border-[#f5c6c3] rounded-lg px-3 py-2 text-[0.83rem]">{{ createError }}</p>
 
           <button
             type="submit"
-            class="w-full inline-flex items-center justify-center gap-1.5 px-4 py-2 rounded-lg text-[0.87rem] font-bold bg-gradient-to-br from-[#3b7a57] to-[#2e6644] text-white cursor-pointer hover:from-[#2e6644] hover:to-[#245236] active:scale-[0.97] disabled:opacity-55 disabled:cursor-not-allowed transition-all"
+            class="w-full inline-flex items-center justify-center gap-1.5 px-4 py-2 rounded-lg text-[0.87rem] font-bold bg-linear-to-br from-[#3b7a57] to-[#2e6644] text-white cursor-pointer hover:from-[#2e6644] hover:to-[#245236] active:scale-[0.97] disabled:opacity-55 disabled:cursor-not-allowed transition-all"
             :disabled="teamStore.actionLoading"
           >
-            {{ teamStore.actionLoading ? 'Đang tạo…' : '🎣 Tạo nhóm' }}
+            {{ teamStore.actionLoading ? 'Đang lưu…' : view === 'edit' ? 'Lưu thay đổi' : '🎣 Tạo nhóm' }}
           </button>
         </form>
       </div>
@@ -366,7 +479,7 @@ onUnmounted(() => {
 
           <div class="flex flex-col gap-2 mt-4">
             <button
-              class="inline-flex items-center justify-center gap-1.5 px-4 py-2 rounded-lg text-[0.87rem] font-bold bg-gradient-to-br from-[#3b7a57] to-[#2e6644] text-white cursor-pointer hover:from-[#2e6644] hover:to-[#245236] active:scale-[0.97] disabled:opacity-55 disabled:cursor-not-allowed transition-all"
+              class="inline-flex items-center justify-center gap-1.5 px-4 py-2 rounded-lg text-[0.87rem] font-bold bg-linear-to-br from-[#3b7a57] to-[#2e6644] text-white cursor-pointer hover:from-[#2e6644] hover:to-[#245236] active:scale-[0.97] disabled:opacity-55 disabled:cursor-not-allowed transition-all"
               :disabled="!transferTargetId || teamStore.actionLoading"
               @click="handleLeaveAndTransfer"
             >
@@ -398,7 +511,7 @@ onUnmounted(() => {
           </p>
           <div class="flex flex-col gap-2 mt-4">
             <button
-              class="inline-flex items-center justify-center gap-1.5 px-4 py-2 rounded-lg text-[0.87rem] font-bold bg-gradient-to-br from-[#3b7a57] to-[#2e6644] text-white cursor-pointer hover:from-[#2e6644] hover:to-[#245236] active:scale-[0.97] disabled:opacity-55 disabled:cursor-not-allowed transition-all"
+              class="inline-flex items-center justify-center gap-1.5 px-4 py-2 rounded-lg text-[0.87rem] font-bold bg-linear-to-br from-[#3b7a57] to-[#2e6644] text-white cursor-pointer hover:from-[#2e6644] hover:to-[#245236] active:scale-[0.97] disabled:opacity-55 disabled:cursor-not-allowed transition-all"
               :disabled="teamStore.actionLoading"
               @click="handleTransfer"
             >
@@ -410,6 +523,28 @@ onUnmounted(() => {
             >
               Hủy bỏ
             </button>
+          </div>
+        </div>
+      </div>
+
+      <!-- OVERLAY: Confirm kick -->
+      <div v-if="showKickConfirm" class="fixed inset-0 z-[10000] bg-black/45 flex items-center justify-center p-4" style="animation: fadeIn 0.18s ease" @click.self="showKickConfirm = false; kickTargetId = ''">
+        <div class="bg-white rounded-2xl px-6 py-7 max-w-[380px] w-full shadow-[0_20px_60px_rgba(0,0,0,0.22)]" style="animation: slideUp 0.2s ease">
+          <h4 class="m-0 mb-2 text-[1.05rem] font-extrabold text-[#1a3a1a]">Xác nhận xóa thành viên?</h4>
+          <p class="m-0 mb-4 text-[0.88rem] text-[#445544]">
+            Thành viên <strong class="font-mono">{{ kickTargetId.slice(0, 8) }}…</strong> sẽ bị đưa khỏi tổ đội.
+          </p>
+          <div class="flex gap-2 mt-4">
+            <button
+              class="flex-1 inline-flex items-center justify-center px-4 py-2 rounded-lg text-[0.87rem] font-bold bg-[#fde8e8] text-[#c0392b] border border-[#f5b7b1] cursor-pointer hover:bg-[#fbd4d4] disabled:opacity-55 disabled:cursor-not-allowed transition-colors"
+              :disabled="teamStore.actionLoading"
+              @click="handleKick(kickTargetId)"
+            >Xóa thành viên</button>
+            <button
+              class="flex-1 inline-flex items-center justify-center px-4 py-2 rounded-lg text-[0.87rem] font-bold bg-transparent text-[#556655] border border-[#c0d8b8] cursor-pointer hover:bg-[#f0f7ec] transition-colors"
+              :disabled="teamStore.actionLoading"
+              @click="showKickConfirm = false; kickTargetId = ''"
+            >Hủy</button>
           </div>
         </div>
       </div>
