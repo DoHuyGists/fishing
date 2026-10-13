@@ -24,6 +24,7 @@ import { useMarketStore } from "../../stores/market";
 import FishSellConfirm from "../caught/FishSellConfirm.vue";
 import FishReleaseConfirm from "../caught/FishReleaseConfirm.vue";
 import { useNotificationStore } from "../../stores/notification";
+import InteractWorldMap2 from "./InteractWorldMap2.vue";
 
 const currencyStore = useCurrencyStore();
 const authStore = useAuthStore();
@@ -103,6 +104,8 @@ onUnmounted(() => {
 
     <!-- Khung Bản đồ trung tâm -->
     <InteractWorldWrapper />
+        
+    <InteractWorldMap2/>
 
     <div>
       <div class="flex items-center flex-wrap gap-2">
