@@ -1,9 +1,7 @@
 <script setup lang="ts">
 import { computed } from "vue";
-import {
-  FACTION_ACTIVITY_MILESTONES,
-  type ActivityMilestone,
-} from "../../data/factionActivityMilestones";
+import { FACTION_ACTIVITY_MILESTONES, type ActivityMilestone } from "../../data/factionActivityMilestones";
+import Hint from "../Hint.vue";
 
 interface Props {
   currentPoints: number;
@@ -32,9 +30,7 @@ const overallProgressPercent = computed(() => {
  * Mốc tiếp theo người chơi đang hướng tới.
  */
 const nextMilestone = computed<ActivityMilestone | null>(() => {
-  return (
-    FACTION_ACTIVITY_MILESTONES.find((m) => m.points > safeCurrentPoints.value) ?? null
-  );
+  return FACTION_ACTIVITY_MILESTONES.find((m) => m.points > safeCurrentPoints.value) ?? null;
 });
 
 /**
@@ -61,27 +57,26 @@ function isMilestoneReached(pointsRequired: number): boolean {
           <h3 class="m-0 text-xs sm:text-sm font-bold uppercase tracking-wider font-serif text-emerald-900">
             Phần Thưởng Năng Động Hàng Ngày
           </h3>
-          <p class="m-0 text-[11px] text-[#617565]">
-            Tích lũy hoạt động trong ngày để mở khóa 10 mốc ban thưởng
-          </p>
+          <p class="m-0 text-[11px] text-[#617565]">Tích lũy hoạt động trong ngày để mở khóa 10 mốc ban thưởng</p>
         </div>
       </div>
 
       <!-- Huy hiệu điểm & Tiến độ mốc tiếp theo -->
-      <div class="flex flex-wrap items-center gap-2 text-xs">
+      <div class="flex flex-col items-end gap-2 text-xs">
         <div class="px-3 py-1 rounded-full bg-[#eaf2e5] border border-[#cbd9c6] flex items-center gap-1.5 shadow-sm">
           <span class="text-emerald-800 font-bold font-serif">Điểm:</span>
           <span class="font-bold text-emerald-700 font-mono text-sm sm:text-base">{{ safeCurrentPoints }}</span>
           <span class="text-[#617565] text-[11px]">/ {{ maxPoints }}</span>
+          <Hint text="Điểm có thể thu thập từ hoạt động câu cá" />
         </div>
 
         <div
           v-if="nextMilestone"
           class="hidden sm:flex items-center gap-1.5 px-3 py-1 rounded-full bg-[#eaf2e5] border border-[#cbd9c6] text-[11px] text-[#526a58]"
         >
-          <span>Mục tiêu kế tiếp:</span>
-          <strong class="text-emerald-800">Mốc {{ nextMilestone.level }}</strong>
           <span class="text-[#617565]">(cần thêm {{ nextMilestone.points - safeCurrentPoints }} điểm)</span>
+          <span>để đạt mốc kế tiếp:</span>
+          <strong class="text-emerald-800">Mốc {{ nextMilestone.level }}</strong>
         </div>
         <div
           v-else
@@ -95,7 +90,9 @@ function isMilestoneReached(pointsRequired: number): boolean {
     <!-- Thanh tiến trình tổng quan -->
     <div class="space-y-1.5">
       <div class="flex items-center justify-between text-[11px] text-[#617565]">
-        <span>Tiến trình hoàn thành: <strong class="text-emerald-800">{{ completedMilestonesCount }}/10 Mốc</strong></span>
+        <span
+          >Tiến trình hoàn thành: <strong class="text-emerald-800">{{ completedMilestonesCount }}/10 Mốc</strong></span
+        >
         <span class="font-mono text-emerald-700 font-bold">{{ overallProgressPercent }}%</span>
       </div>
       <div class="w-full h-2 rounded-full bg-[#e1eadc] border border-[#cbd9c6] overflow-hidden p-[1px]">
@@ -176,7 +173,11 @@ function isMilestoneReached(pointsRequired: number): boolean {
             <!-- Mô tả phần thưởng -->
             <div
               class="mt-2 p-1.5 rounded bg-[#f5f9f0] border text-[11px] text-center leading-tight min-h-[38px] flex items-center justify-center"
-              :class="isMilestoneReached(item.points) ? 'border-emerald-300 text-emerald-900' : 'border-[#cbd9c6] text-[#617565]'"
+              :class="
+                isMilestoneReached(item.points)
+                  ? 'border-emerald-300 text-emerald-900'
+                  : 'border-[#cbd9c6] text-[#617565]'
+              "
             >
               <span>{{ item.reward }}</span>
             </div>
@@ -190,10 +191,7 @@ function isMilestoneReached(pointsRequired: number): boolean {
             >
               <span class="text-xs">✓</span> Đã hoàn thành
             </span>
-            <span
-              v-else
-              class="inline-block text-[10px] text-[#617565] font-medium"
-            >
+            <span v-else class="inline-block text-[10px] text-[#617565] font-medium">
               Cần thêm {{ item.points - safeCurrentPoints }} đ
             </span>
           </div>
@@ -205,12 +203,7 @@ function isMilestoneReached(pointsRequired: number): boolean {
 
 <style scoped>
 .milestones-track-wrapper {
-  mask-image: linear-gradient(
-    to right,
-    black 0%,
-    black calc(100% - 16px),
-    transparent 100%
-  );
+  mask-image: linear-gradient(to right, black 0%, black calc(100% - 16px), transparent 100%);
 }
 
 .no-scrollbar::-webkit-scrollbar {

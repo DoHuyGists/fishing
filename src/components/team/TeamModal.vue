@@ -7,6 +7,7 @@ import { useFriendStore } from '../../stores/friend';
 import type { TeamJoinType, TeamStatus } from '../../data/supabaseTeamRepository';
 import TeamListSidebar from './TeamListSidebar.vue';
 import MyTeamPanel from './MyTeamPanel.vue';
+import InteractWorldMap2 from '../world-map/InteractWorldMap2.vue';
 
 // ─── Store ────────────────────────────────────────────────────────────────────
 const authStore = useAuthStore();
@@ -227,6 +228,7 @@ onUnmounted(() => {
             @transfer="(memberId) => { transferTarget = memberId; showTransferModal = true; }"
             @kick="(memberId) => { kickTargetId = memberId; showKickConfirm = true; }"
           />
+          <InteractWorldMap2/>
         </div>
       </div>
 

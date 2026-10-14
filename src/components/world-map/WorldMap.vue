@@ -13,7 +13,7 @@ import InventoryModal from "../inventory/InventoryModal.vue";
 import Feedbackmodal from "../feedback/Feedbackmodal.vue";
 import MissionModal from "../mission/MissionModal.vue";
 import EventModal from "../event/EventModal.vue";
-import RedeemCode from "./RedeemCode.vue";
+import RedeemCode from "../redeem-code/RedeemCode.vue";
 import NotificationModal from "../notification/NotificationModal.vue";
 import FactionSelectModal from "../faction/FactionSelectModal.vue";
 import FriendModal from "../friend/FriendModal.vue";
@@ -24,7 +24,6 @@ import { useMarketStore } from "../../stores/market";
 import FishSellConfirm from "../caught/FishSellConfirm.vue";
 import FishReleaseConfirm from "../caught/FishReleaseConfirm.vue";
 import { useNotificationStore } from "../../stores/notification";
-import InteractWorldMap2 from "./InteractWorldMap2.vue";
 
 const currencyStore = useCurrencyStore();
 const authStore = useAuthStore();
