@@ -1,7 +1,7 @@
 
 
 <script lang="ts" setup>
-import { computed, ref, watch } from "vue";
+import { computed, onMounted, ref, watch } from "vue";
 import { mapData } from "../../../data/map.ts";
 import type { FishingAreaPayload } from "../../../data/supabaseFishingAreaRepository.ts";
 import { useWorldStore } from "../../../stores/world.ts";
@@ -140,6 +140,10 @@ watch(()=>adminFishingAreaStore.isFormLock, (isFormLock)=>{
   }
 }, {immediate: true})
 
+
+onMounted(()=>{
+  worldStore.showAnchorSelectButton = true;
+})
 
 </script>
 

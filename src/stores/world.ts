@@ -27,6 +27,7 @@ export const useWorldStore = defineStore("world", {
     dragable: true,
     selectedCoordinate: null as { x: number; y: number } | null,
     selectedCountry: null as { id: string; title: string } | null,
+    showAnchorSelectButton: false
   }),
   getters: {},
   actions: {

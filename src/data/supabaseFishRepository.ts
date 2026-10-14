@@ -17,6 +17,7 @@ export type CaughtRow = {
   is_shiny: boolean;
   variant_type: "NORMAL" | "GOLDEN" | "MUTATED";
   species: CaughtFishDetails;
+  status: string;
   origin: {
     id: string;
     country: string;
@@ -69,6 +70,7 @@ class SupabaseFishRepository {
         weight: Number(row.weight),
         is_shiny: row.is_shiny,
         variant_type: row.variant_type,
+        status: row.status,
         species: {
           id: row.species.id,
           name: row.species.name,

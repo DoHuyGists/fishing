@@ -97,7 +97,7 @@ function isMilestoneReached(pointsRequired: number): boolean {
       </div>
       <div class="w-full h-2 rounded-full bg-[#e1eadc] border border-[#cbd9c6] overflow-hidden p-[1px]">
         <div
-          class="h-full rounded-full bg-gradient-to-r from-emerald-700 via-emerald-600 to-lime-500 transition-all duration-500 ease-out shadow-sm"
+          class="h-full rounded-full bg-linear-to-r from-emerald-700 via-emerald-600 to-lime-500 transition-all duration-500 ease-out shadow-sm"
           :style="{ width: `${overallProgressPercent}%` }"
         />
       </div>

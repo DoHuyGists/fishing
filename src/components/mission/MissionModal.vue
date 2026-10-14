@@ -51,6 +51,11 @@ function canSelectCaught(caught: CaughtFish) {
 }
 
 function toggleCaught(caught: CaughtFish) {
+  if(caught.status === 'on-market'){
+    toast.error("Con này đang ở được bày bán", {title: "Không thể chọn",position: 'bottom'});
+    return;
+  }
+
   if (selectedCaughtIds.value.includes(caught.id)) {
     selectedCaughtIds.value = selectedCaughtIds.value.filter((id) => id !== caught.id);
   } else if (canSelectCaught(caught)) {

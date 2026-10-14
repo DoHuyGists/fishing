@@ -158,7 +158,7 @@ function getSheetZIndex(sheetIndex: number): number {
         <!-- Book 3D Stage -->
         <div class="book-stage relative w-full h-full rounded-sm overflow-hidden shadow-xl flex">
           <!-- Center Spine Drop Shadow Overlay -->
-          <!-- <div class="absolute top-0 bottom-0 left-1/2 -translate-x-1/2 w-10 bg-gradient-to-r from-amber-950/40 via-amber-950/70 to-amber-950/40 z-30 pointer-events-none border-x border-amber-950/30 shadow-2xl"></div> -->
+          <!-- <div class="absolute top-0 bottom-0 left-1/2 -translate-x-1/2 w-10 bg-linear-to-r from-amber-950/40 via-amber-950/70 to-amber-950/40 z-30 pointer-events-none border-x border-amber-950/30 shadow-2xl"></div> -->
 
           <!-- ================= BASE LEFT PAGE (Inside Cover / Page 0) ================= -->
           <div
@@ -181,7 +181,7 @@ function getSheetZIndex(sheetIndex: number): number {
               </div>
               <!-- Collection Progress Badge -->
               <div
-                class="bg-gradient-to-r from-amber-100 to-emerald-100/80 p-4 rounded-sm border border-emerald-700/30 text-amber-950 shadow-sm"
+                class="bg-linear-to-r from-amber-100 to-emerald-100/80 p-4 rounded-sm border border-emerald-700/30 text-amber-950 shadow-sm"
               >
                 <div class="flex items-center justify-between mb-2">
                   <span class="font-serif font-bold text-xs">Tiến độ sưu tầm</span>
@@ -189,7 +189,7 @@ function getSheetZIndex(sheetIndex: number): number {
                 </div>
                 <div class="w-full bg-amber-900/20 h-2.5 rounded-full overflow-hidden border border-amber-900/20">
                   <div
-                    class="bg-gradient-to-r from-emerald-600 to-teal-500 h-full transition-all duration-500 rounded-full"
+                    class="bg-linear-to-r from-emerald-600 to-teal-500 h-full transition-all duration-500 rounded-full"
                     :style="{ width: `${stats.percentage}%` }"
                   ></div>
                 </div>
@@ -286,7 +286,7 @@ function getSheetZIndex(sheetIndex: number): number {
                     class="flex gap-2 p-1.5 rounded-lg border transition-all duration-200 relative overflow-hidden text-amber-950"
                     :class="[
                       entry.isCaught
-                        ? 'bg-gradient-to-r from-amber-50 to-emerald-50/80 border-emerald-700/40 shadow-sm'
+                        ? 'bg-linear-to-r from-amber-50 to-emerald-50/80 border-emerald-700/40 shadow-sm'
                         : 'bg-amber-900/10 border-amber-900/20 opacity-75 grayscale',
                     ]"
                     :style="{
@@ -397,7 +397,7 @@ function getSheetZIndex(sheetIndex: number): number {
                     class="flex gap-2 p-1.5 rounded-lg border transition-all duration-200 relative overflow-hidden text-amber-950"
                     :class="[
                       entry.isCaught
-                        ? 'bg-gradient-to-r from-amber-50 to-emerald-50/80 border-emerald-700/40 shadow-sm'
+                        ? 'bg-linear-to-r from-amber-50 to-emerald-50/80 border-emerald-700/40 shadow-sm'
                         : 'bg-amber-900/10 border-amber-900/20 opacity-75 grayscale',
                     ]"
                     :style="{
@@ -481,7 +481,7 @@ function getSheetZIndex(sheetIndex: number): number {
                 class="absolute inset-0 pointer-events-none transition-opacity duration-300"
                 :class="[
                   animatingSheet === sheetIdx && flipDirection === 'prev'
-                    ? 'bg-gradient-to-r from-black/40 to-transparent opacity-80'
+                    ? 'bg-linear-to-r from-black/40 to-transparent opacity-80'
                     : 'opacity-0',
                 ]"
               ></div>

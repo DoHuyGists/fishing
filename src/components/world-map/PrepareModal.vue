@@ -235,29 +235,29 @@ function confirm() {
       leave-to-class="opacity-0"
     >
       <div
-        class="fixed inset-0 z-[9999] flex items-center justify-center bg-black/65 backdrop-blur-md"
+        class="fixed inset-0 z-[9999] flex items-center justify-center bg-[#24352a]/65 backdrop-blur-md"
         @click.self="emit('close')"
       >
         <div
-          class="flex flex-col w-screen h-screen bg-[linear-gradient(160deg,#09172e_0%,#102444_40%,#0b1c35_100%)] text-slate-200 overflow-hidden"
+          class="flex flex-col w-screen h-screen bg-[#f5f9f0] text-[#24352a] overflow-hidden"
           role="dialog"
           aria-modal="true"
           aria-labelledby="prepare-title"
         >
           <!-- Header -->
-          <header class="flex items-center justify-between px-7 py-4 bg-white/[0.03] border-b border-white/[0.08]">
+          <header class="flex items-center justify-between px-7 py-4 bg-[#eaf2e5] border-b border-[#cbd9c6]">
             <div class="flex items-center gap-3.5">
-              <span class="text-3xl drop-shadow-[0_0_10px_rgba(34,197,94,0.4)] select-none">🎣</span>
+              <span class="text-3xl drop-shadow-[0_0_10px_rgba(36,53,42,0.2)] select-none">🎣</span>
               <div>
-                <h2 id="prepare-title" class="m-0 text-[19px] font-bold text-slate-100 tracking-tight leading-snug">
+                <h2 id="prepare-title" class="m-0 text-[19px] font-bold text-[#24352a] tracking-tight leading-snug">
                   Chuẩn bị vào bãi câu
                 </h2>
-                <p class="m-0 mt-0.5 text-[13px] text-slate-400 leading-normal">{{ anchor?.title ?? "" }}</p>
+                <p class="m-0 mt-0.5 text-[13px] text-[#617565] leading-normal">{{ anchor?.title ?? "" }}</p>
               </div>
             </div>
             <button
               type="button"
-              class="flex items-center justify-center w-9 h-9 border-none rounded-xl bg-white/[0.06] text-slate-400 hover:bg-white/[0.12] hover:text-slate-100 transition-colors cursor-pointer"
+              class="flex items-center justify-center w-9 h-9 border-none rounded-xl bg-[#dce9d7] text-[#526a58] hover:bg-[#cbd9c6] hover:text-[#24352a] transition-colors cursor-pointer"
               aria-label="Đóng"
               @click="emit('close')"
             >
@@ -271,11 +271,11 @@ function confirm() {
 
           <!-- Body -->
           <div
-            class="flex-1 overflow-y-auto px-7 py-5 flex flex-col gap-5 [&::-webkit-scrollbar]:w-1.5 [&::-webkit-scrollbar-thumb]:bg-white/10 [&::-webkit-scrollbar-thumb]:rounded-full [&::-webkit-scrollbar-track]:bg-transparent"
+            class="flex-1 overflow-y-auto px-7 py-5 flex flex-col gap-5 [&::-webkit-scrollbar]:w-1.5 [&::-webkit-scrollbar-thumb]:bg-[#b7cbb4] [&::-webkit-scrollbar-thumb]:rounded-full [&::-webkit-scrollbar-track]:bg-transparent"
           >
             <!-- Loading state -->
-            <div v-if="loading" class="flex-1 flex flex-col items-center justify-center gap-3.5 text-slate-400 text-sm">
-              <div class="w-9 h-9 border-[3px] border-white/10 border-t-emerald-500 rounded-full animate-spin"></div>
+            <div v-if="loading" class="flex-1 flex flex-col items-center justify-center gap-3.5 text-[#617565] text-sm">
+              <div class="w-9 h-9 border-[3px] border-[#cbd9c6] border-t-[#526a58] rounded-full animate-spin"></div>
               <span>Đang tải trang bị…</span>
             </div>
 
@@ -289,16 +289,16 @@ function confirm() {
             <template v-else>
               <!-- SECTION 1: SELECTED EQUIPMENT (ALWAYS IN USED SET) -->
               <div
-                class="flex flex-col gap-3 bg-white/[0.025] border border-white/[0.06] rounded-2xl p-4 sm:px-5 shadow-[0_4px_20px_rgba(0,0,0,0.2)]"
+                class="flex flex-col gap-3 bg-[#eaf2e5] border border-[#cbd9c6] rounded-2xl p-4 sm:px-5 shadow-sm"
               >
-                <div class="flex items-center justify-between gap-4 border-b border-white/[0.06] pb-3">
+                <div class="flex items-center justify-between gap-4 border-b border-[#cbd9c6] pb-3">
                   <div class="flex items-center gap-2.5">
-                    <span class="w-2.5 h-2.5 rounded-full bg-emerald-500 shadow-[0_0_10px_#22c55e] shrink-0"></span>
+                    <span class="w-2.5 h-2.5 rounded-full bg-[#526a58] shrink-0"></span>
                     <div>
-                      <h3 class="m-0 text-[15px] font-bold text-slate-50 tracking-tight leading-snug">
+                      <h3 class="m-0 text-[15px] font-bold text-[#24352a] tracking-tight leading-snug">
                         Trang bị đã chọn
                       </h3>
-                      <p class="m-0 mt-0.5 text-xs text-slate-400 leading-normal">
+                      <p class="m-0 mt-0.5 text-xs text-[#617565] leading-normal">
                         Các món đồ chính trong set đang dùng sẽ mang vào bãi câu
                       </p>
                     </div>
@@ -307,8 +307,8 @@ function confirm() {
                     class="text-xs font-semibold px-3 py-1 rounded-full border transition-colors"
                     :class="
                       allSlotsReady
-                        ? 'bg-emerald-500/15 text-emerald-400 border-emerald-500/30'
-                        : 'bg-amber-400/15 text-amber-400 border-amber-400/30'
+                        ? 'bg-[#dce9d7] text-[#344f3b] border-[#b7cbb4]'
+                        : 'bg-amber-100 text-amber-800 border-amber-300'
                     "
                   >
                     {{ readySlotsCount }}/{{ equipmentCategories.length }} ô đã sẵn sàng
@@ -319,19 +319,19 @@ function confirm() {
                   <div
                     v-for="cat in equipmentCategories"
                     :key="cat.id"
-                    class="rounded-xl bg-white/[0.035] border overflow-hidden transition-all duration-200 h-full flex flex-col"
+                    class="rounded-xl bg-[#f5f9f0] border overflow-hidden transition-all duration-200 h-full flex flex-col"
                     :class="
                       selected[cat.id]
-                        ? 'border-emerald-500/35 shadow-[inset_0_0_0_1px_rgba(34,197,94,0.1)]'
-                        : 'border-amber-400/25'
+                        ? 'border-[#8eaa91] shadow-[inset_0_0_0_1px_rgba(82,106,88,0.12)]'
+                        : 'border-amber-300'
                     "
                   >
-                    <div class="flex items-center gap-2 px-3.5 py-2.5 bg-white/[0.03] border-b border-white/[0.04]">
-                      <span class="font-semibold text-[13px] flex-1 text-slate-200 truncate">{{ cat.name }}</span>
+                    <div class="flex items-center gap-2 px-3.5 py-2.5 bg-[#eaf2e5] border-b border-[#cbd9c6]">
+                      <span class="font-semibold text-[13px] flex-1 text-[#24352a] truncate">{{ cat.name }}</span>
                       <span
                         class="text-[11px] font-semibold px-2 py-0.5 rounded-full shrink-0"
                         :class="
-                          selected[cat.id] ? 'bg-emerald-500/15 text-emerald-400' : 'bg-amber-400/15 text-amber-400'
+                          selected[cat.id] ? 'bg-[#dce9d7] text-[#344f3b]' : 'bg-amber-100 text-amber-800'
                         "
                       >
                         {{ selected[cat.id] ? "✓ Sẵn sàng" : "✗ Chưa chọn" }}
@@ -353,10 +353,10 @@ function confirm() {
                             </span>
                           </div>
                           <div class="flex flex-col gap-0.5 text-center">
-                            <span class="font-semibold text-[13px] text-slate-100 truncate">{{
+                            <span class="font-semibold text-[13px] text-[#24352a] truncate">{{
                               selectedVariant(cat.id)!.name
                             }}</span>
-                            <span class="text-[11px] text-slate-400 line-clamp-2">{{
+                            <span class="text-[11px] text-[#617565] line-clamp-2">{{
                               selectedVariant(cat.id)!.detail
                             }}</span>
                           </div>
@@ -364,7 +364,7 @@ function confirm() {
                       </template>
                       <template v-else>
                         <div class="flex flex-col items-center justify-center py-5 text-center">
-                          <p class="m-0 text-xs text-slate-400">Chưa chọn {{ cat.name.toLowerCase() }} nào.</p>
+                          <p class="m-0 text-xs text-[#617565]">Chưa chọn {{ cat.name.toLowerCase() }} nào.</p>
                         </div>
                       </template>
                     </div>
@@ -374,16 +374,16 @@ function confirm() {
 
               <!-- SECTION 2: EQUIPMENT SETS LIST & ITEMS IN USED SET -->
               <div
-                class="flex flex-col gap-3 bg-white/[0.025] border border-white/[0.06] rounded-2xl p-4 sm:px-5 shadow-[0_4px_20px_rgba(0,0,0,0.2)]"
+                class="flex flex-col gap-3 bg-[#eaf2e5] border border-[#cbd9c6] rounded-2xl p-4 sm:px-5 shadow-sm"
               >
-                <div class="flex items-center flex-wrap justify-between gap-4 border-b border-white/[0.06] pb-3">
+                <div class="flex items-center flex-wrap justify-between gap-4 border-b border-[#cbd9c6] pb-3">
                   <div class="flex items-center gap-2.5">
-                    <span class="w-2.5 h-2.5 rounded-full bg-sky-400 shadow-[0_0_10px_#38bdf8] shrink-0"></span>
+                    <span class="w-2.5 h-2.5 rounded-full bg-[#8eaa91] shrink-0"></span>
                     <div>
-                      <h3 class="m-0 text-[15px] font-bold text-slate-50 tracking-tight leading-snug">
+                      <h3 class="m-0 text-[15px] font-bold text-[#24352a] tracking-tight leading-snug">
                         Danh sách set trang bị
                       </h3>
-                      <p class="m-0 mt-0.5 text-xs text-slate-400 leading-normal">
+                      <p class="m-0 mt-0.5 text-xs text-[#617565] leading-normal">
                         Bấm để đổi set sử dụng. Chọn trang bị chính trong set để hiển thị ở bảng phía trên.
                       </p>
                     </div>
@@ -391,12 +391,12 @@ function confirm() {
                   <div v-if="usedSet" class="flex items-center gap-2">
                     <span
                       v-if="!isUsedSetComplete"
-                      class="inline-flex items-center gap-1 px-3 py-1 bg-amber-500/15 border border-amber-500/35 text-amber-400 text-xs font-semibold rounded-lg"
+                      class="inline-flex items-center gap-1 px-3 py-1 bg-amber-100 border border-amber-300 text-amber-800 text-xs font-semibold rounded-lg"
                     >
                       ⚠️ Set chưa đủ 5 loại
                     </span>
                     <span
-                      class="inline-flex items-center gap-1 px-3 py-1 bg-emerald-500/15 border border-emerald-500/30 text-emerald-400 text-xs font-semibold rounded-lg"
+                      class="inline-flex items-center gap-1 px-3 py-1 bg-[#dce9d7] border border-[#b7cbb4] text-[#344f3b] text-xs font-semibold rounded-lg"
                     >
                       ✓ Đang dùng Set {{ usedSetIndex + 1 }}
                     </span>
@@ -409,11 +409,11 @@ function confirm() {
                     v-for="(s, idx) in inventoryStore.equipmentSets"
                     :key="s.id"
                     type="button"
-                    class="group flex flex-col items-start gap-0.5 px-3.5 py-2 rounded-xl cursor-pointer text-slate-300 transition-all duration-150 border disabled:cursor-not-allowed"
+                    class="group flex flex-col items-start gap-0.5 px-3.5 py-2 rounded-xl cursor-pointer text-[#405446] transition-all duration-150 border disabled:cursor-not-allowed"
                     :class="[
                       s.isUsed
-                        ? '!bg-emerald-500/15 !border-emerald-500 !text-emerald-50 shadow-[0_0_12px_rgba(34,197,94,0.25)] cursor-default'
-                        : 'bg-white/[0.04] border-white/[0.08] hover:bg-white/[0.08] hover:border-white/20',
+                        ? '!bg-[#dce9d7] !border-[#8eaa91] !text-[#24352a] shadow-sm cursor-default'
+                        : 'bg-[#f5f9f0] border-[#cbd9c6] hover:bg-white hover:border-[#8eaa91]',
                       switchingSet && !s.isUsed ? 'opacity-60' : '',
                     ]"
                     :disabled="switchingSet"
@@ -423,28 +423,28 @@ function confirm() {
                       <span class="text-[13px] font-bold">Set {{ idx + 1 }}</span>
                       <span
                         v-if="s.isUsed"
-                        class="text-[10px] font-semibold px-1.5 py-px rounded-full bg-emerald-500/20 text-emerald-400"
+                        class="text-[10px] font-semibold px-1.5 py-px rounded-full bg-[#dce9d7] text-[#344f3b]"
                         >Đang dùng</span
                       >
                       <span
                         v-else
-                        class="text-[10px] font-medium px-1.5 py-px rounded-full bg-sky-400/15 text-sky-400 transition-colors group-hover:bg-sky-400 group-hover:text-sky-950 group-hover:font-semibold"
+                        class="text-[10px] font-medium px-1.5 py-px rounded-full bg-[#eaf2e5] text-[#526a58] transition-colors group-hover:bg-[#cbd9c6] group-hover:text-[#24352a] group-hover:font-semibold"
                         >Đổi sang set này</span
                       >
                       <span
                         v-if="!isSetComplete(s)"
-                        class="text-[10px] font-semibold px-1.5 py-px rounded-md bg-amber-500/15 border border-amber-500/30 text-amber-400"
+                        class="text-[10px] font-semibold px-1.5 py-px rounded-md bg-amber-100 border border-amber-300 text-amber-800"
                         >Thiếu loại</span
                       >
                     </div>
-                    <span class="text-[11px] text-slate-400"> {{ countSetItems(s) }} vật phẩm </span>
+                    <span class="text-[11px] text-[#617565]"> {{ countSetItems(s) }} vật phẩm </span>
                   </button>
                 </div>
 
                 <!-- Empty state if user has no sets -->
                 <div
                   v-if="inventoryStore.equipmentSets.length === 0"
-                  class="p-6 text-center text-[13px] text-slate-400 bg-white/[0.02] rounded-xl border border-white/[0.04]"
+                  class="p-6 text-center text-[13px] text-[#617565] bg-[#f5f9f0] rounded-xl border border-[#cbd9c6]"
                 >
                   <span>📦 Bạn chưa có set trang bị nào trong kho đồ. Hãy vào Kho đồ để tạo hoặc mua thêm set.</span>
                 </div>
@@ -455,21 +455,21 @@ function confirm() {
                     <div
                       v-for="cat in equipmentCategories"
                       :key="cat.id"
-                      class="flex flex-col bg-white/[0.025] border border-white/[0.06] rounded-xl overflow-hidden min-h-[180px]"
+                      class="flex flex-col bg-[#f5f9f0] border border-[#cbd9c6] rounded-xl overflow-hidden min-h-[180px]"
                     >
                       <!-- Slot Header -->
                       <div
-                        class="flex items-center justify-between px-3 py-2 bg-white/[0.03] border-b border-white/[0.05]"
+                        class="flex items-center justify-between px-3 py-2 bg-[#eaf2e5] border-b border-[#cbd9c6]"
                       >
                         <div class="flex items-center gap-1.5">
-                          <span class="text-xs font-semibold text-slate-200">{{ cat.name }}</span>
+                          <span class="text-xs font-semibold text-[#24352a]">{{ cat.name }}</span>
                         </div>
-                        <span class="text-[11px] text-slate-400"> {{ (usedSet[cat.id] || []).length }} món </span>
+                        <span class="text-[11px] text-[#617565]"> {{ (usedSet[cat.id] || []).length }} món </span>
                       </div>
 
                       <!-- Items list in this category -->
                       <div
-                        class="flex flex-col gap-2 p-2.5 max-h-[240px] overflow-y-auto [&::-webkit-scrollbar]:w-1.5 [&::-webkit-scrollbar-thumb]:bg-white/10 [&::-webkit-scrollbar-thumb]:rounded-full [&::-webkit-scrollbar-track]:bg-transparent"
+                        class="flex flex-col gap-2 p-2.5 max-h-[240px] overflow-y-auto [&::-webkit-scrollbar]:w-1.5 [&::-webkit-scrollbar-thumb]:bg-[#b7cbb4] [&::-webkit-scrollbar-thumb]:rounded-full [&::-webkit-scrollbar-track]:bg-transparent"
                       >
                         <template v-if="(usedSet[cat.id] || []).length > 0">
                           <div
@@ -478,14 +478,14 @@ function confirm() {
                             class="group flex items-center gap-2.5 p-2 rounded-lg cursor-pointer transition-all duration-150 border text-left"
                             :class="[
                               isItemSelected(cat.id, item.id)
-                                ? '!bg-emerald-500/15 !border-emerald-500 shadow-[0_0_8px_rgba(34,197,94,0.25)]'
-                                : 'bg-white/[0.04] border-white/[0.06] hover:bg-white/[0.08] hover:border-white/15 hover:-translate-y-0.5',
+                                ? '!bg-[#dce9d7] !border-[#8eaa91] shadow-sm'
+                                : 'bg-[#f5f9f0] border-[#cbd9c6] hover:bg-white hover:border-[#8eaa91] hover:-translate-y-0.5',
                               selectingItemId === String(item.id) ? 'opacity-70 pointer-events-none' : '',
                             ]"
                             @click="chooseMainItem(cat.id, item)"
                           >
                             <div
-                              class="flex items-center justify-center w-9 h-9 shrink-0 bg-black/20 rounded-md overflow-hidden"
+                              class="flex items-center justify-center w-9 h-9 shrink-0 bg-[#eaf2e5] rounded-md overflow-hidden"
                             >
                               <img
                                 v-if="isImageUrl(getItemDisplay(item).iconOrImage)"
@@ -500,20 +500,20 @@ function confirm() {
                             <div class="flex-1 min-w-0 flex flex-col gap-0.5">
                               <div class="flex items-center justify-between gap-1">
                                 <span
-                                  class="text-xs font-semibold text-slate-100 truncate block"
+                                  class="text-xs font-semibold text-[#24352a] truncate block"
                                   :title="getItemDisplay(item).name"
                                 >
                                   {{ getItemDisplay(item).name }}
                                 </span>
                                 <span
                                   v-if="isItemSelected(cat.id, item.id)"
-                                  class="text-[9px] font-bold bg-emerald-500/20 text-emerald-400 px-1 py-px rounded shrink-0"
+                                  class="text-[9px] font-bold bg-[#dce9d7] text-[#344f3b] px-1 py-px rounded shrink-0"
                                 >
                                   Chính
                                 </span>
                               </div>
                               <span
-                                class="text-[11px] text-slate-400 truncate block"
+                                class="text-[11px] text-[#617565] truncate block"
                                 :title="getItemDisplay(item).detail"
                               >
                                 {{ getItemDisplay(item).detail || "Trang bị" }}
@@ -522,15 +522,15 @@ function confirm() {
                             <div class="shrink-0">
                               <span
                                 v-if="selectingItemId === String(item.id)"
-                                class="inline-block w-3.5 h-3.5 border-2 border-white/20 border-t-current rounded-full animate-spin"
+                                class="inline-block w-3.5 h-3.5 border-2 border-[#cbd9c6] border-t-[#526a58] rounded-full animate-spin"
                               ></span>
                               <span
                                 v-else
                                 class="text-[10px] font-semibold px-2 py-0.5 rounded-md transition-all duration-150"
                                 :class="
                                   isItemSelected(cat.id, item.id)
-                                    ? 'bg-emerald-500/25 text-emerald-300'
-                                    : 'bg-white/[0.08] text-slate-300 group-hover:bg-sky-400 group-hover:text-sky-950 group-hover:font-bold'
+                                    ? 'bg-[#cbd9c6] text-[#344f3b]'
+                                    : 'bg-[#eaf2e5] text-[#526a58] group-hover:bg-[#cbd9c6] group-hover:text-[#24352a] group-hover:font-bold'
                                 "
                               >
                                 {{ isItemSelected(cat.id, item.id) ? "✓ Đang dùng" : "Chọn" }}
@@ -539,8 +539,8 @@ function confirm() {
                           </div>
                         </template>
                         <template v-else>
-                          <div class="flex items-center justify-center py-6 px-2 text-[11px] text-slate-500 italic">
-                            <span class="text-amber-400/90 font-medium">⚠️ Chưa có đồ</span>
+                          <div class="flex items-center justify-center py-6 px-2 text-[11px] text-[#617565] italic">
+                            <span class="text-amber-700 font-medium">⚠️ Chưa có đồ</span>
                           </div>
                         </template>
                       </div>
@@ -553,11 +553,11 @@ function confirm() {
 
           <!-- Footer -->
           <footer
-            class="flex items-center justify-between flex-wrap gap-4 px-7 py-3.5 bg-black/25 border-t border-white/[0.06]"
+            class="flex items-center justify-between flex-wrap gap-4 px-7 py-3.5 bg-[#eaf2e5] border-t border-[#cbd9c6]"
           >
             <div
               v-if="proceedBlockReason"
-              class="flex items-center gap-2 px-3.5 py-2 bg-amber-500/10 border border-amber-500/30 rounded-lg text-amber-200 text-sm leading-snug max-w-[65%]"
+              class="flex items-center gap-2 px-3.5 py-2 bg-amber-100 border border-amber-300 rounded-lg text-amber-800 text-sm leading-snug max-w-[65%]"
             >
               <span class="text-base shrink-0">⚠️</span>
               <span class="font-medium">{{ proceedBlockReason }}</span>
@@ -567,14 +567,14 @@ function confirm() {
             <div class="flex items-center gap-3 ml-auto">
               <button
                 type="button"
-                class="inline-flex items-center justify-center gap-2 px-6 py-2.5 border-none rounded-xl text-sm font-bold cursor-pointer transition-all duration-150 active:scale-95 bg-white/[0.08] text-slate-300 hover:bg-white/[0.14]"
+                class="inline-flex items-center justify-center gap-2 px-6 py-2.5 border border-[#b7cbb4] rounded-xl text-sm font-bold cursor-pointer transition-all duration-150 active:scale-95 bg-[#f5f9f0] text-[#405446] hover:bg-[#dce9d7]"
                 @click="emit('close')"
               >
                 Quay lại
               </button>
               <button
                 type="button"
-                class="inline-flex items-center justify-center gap-2 px-6 py-2.5 border-none rounded-xl text-sm font-bold cursor-pointer transition-all duration-150 active:scale-95 bg-linear-to-br from-emerald-500 to-emerald-600 text-white shadow-[0_4px_14px_rgba(34,197,94,0.3)] hover:not-disabled:from-emerald-600 hover:not-disabled:to-emerald-700 hover:not-disabled:shadow-[0_6px_20px_rgba(34,197,94,0.45)] disabled:opacity-50 disabled:cursor-not-allowed"
+                class="inline-flex items-center justify-center gap-2 px-6 py-2.5 border border-[#344f3b] rounded-xl text-sm font-bold cursor-pointer transition-all duration-150 active:scale-95 bg-[#344f3b] text-[#f5f9f0] shadow-md hover:not-disabled:bg-[#24352a] disabled:opacity-50 disabled:cursor-not-allowed"
                 :disabled="!canProceed"
                 :title="proceedBlockReason || 'Sẵn sàng tiếp tục'"
                 @click="confirm"

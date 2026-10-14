@@ -48,7 +48,7 @@ onBeforeUnmount(() => {
 </script>
 
 <template>
-  <div class="layout-container">
+  <div>
     <router-view />
 
     <!-- Dialog Cảnh Báo Trùng Tab / Cross-Browser -->

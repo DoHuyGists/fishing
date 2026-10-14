@@ -214,10 +214,10 @@ async function executeDelete() {
 
 <template>
   <Modal title="Quản lý bạn bè" sub-title="Kết nối cộng đồng câu cá" :on-refresh="handleRefresh">
-    <div class="max-w-5xl mx-auto space-y-4 pb-10">
+    <div class="w-full space-y-4 pb-10">
       <!-- ID Người chơi hiện tại & Banner -->
       <div
-        class="bg-gradient-to-r from-[#173223] via-[#1c3f2d] to-[#122b1e] rounded-2xl p-4 sm:p-5 border border-emerald-800/40 shadow-md text-emerald-50 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4"
+        class="bg-linear-to-r from-[#173223] via-[#1c3f2d] to-[#122b1e] rounded-2xl p-4 sm:p-5 border border-emerald-800/40 shadow-md text-emerald-50 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4"
       >
         <div class="flex items-center gap-3.5 min-w-0">
           <div
@@ -419,7 +419,7 @@ async function executeDelete() {
           </button>
         </div>
 
-        <div v-else class="grid grid-cols-1 md:grid-cols-2 gap-3">
+        <div v-else class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-3">
           <div
             v-for="record in filteredFriends"
             :key="record.id"

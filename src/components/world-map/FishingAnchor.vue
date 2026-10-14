@@ -11,7 +11,7 @@ onMounted(() => {
 </script>
 <template>
   <aside
-    class="map-sidebar w-60 flex-none h-full p-4 border border-gray-300 rounded-xl bg-white text-[#263238] flex flex-col overflow-hidden"
+    class="w-60 flex-none h-full p-4 border border-gray-300 rounded-xl bg-white text-[#263238] flex flex-col overflow-hidden"
   >
     <div class="flex items-center gap-2">
       <img src="/icons/check-point.svg" width="35" alt="" draggable="false" />

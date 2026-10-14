@@ -99,12 +99,15 @@ onUnmounted(() => {
 </script>
 
 <template>
-  <div class="map-page h-screen p-3 relative flex gap-3 overflow-hidden">
+  <div class="w-screen h-screen p-3 relative grid grid-cols-1 md:grid-cols-2 gap-2 overflow-x-hidden">
 
     <!-- Khung Bản đồ trung tâm -->
-    <InteractWorldWrapper />
+     <div class="">
+
+       <InteractWorldWrapper />
+     </div>
         
-    <div>
+    <div class="">
       <div class="flex items-center flex-wrap gap-2">
         <button type="button"
           class="flex items-center gap-1.5 px-3 py-1.5 bg-[#153221] hover:bg-[#1a3e29] border border-gray-300 text-white rounded-xl shadow-sm font-bold text-xs cursor-pointer transition-colors"
@@ -226,7 +229,7 @@ onUnmounted(() => {
         </p>
         <ul v-else class="m-0 max-h-[min(55vh,520px)] list-none space-y-2 overflow-y-auto p-0">
           <li v-for="(fish, index) in recentCaughtFishes" :key="fish.id" class="flex min-w-0 items-center gap-2 rounded-lg bg-emerald-50/70 p-2">
-            <img :src="fish.species?.image || '/fish/VN/fish.jpg'" :alt="fish.species?.name || 'Cá'" class="h-10 w-10 shrink-0 rounded-md object-cover" />
+            <img :src="fish.species?.image || '/fish/VN/fish.jpg'" :alt="fish.species?.name || 'Cá'" class="h-10 w-1/3 shrink-0 rounded-md object-cover" />
             <div class="min-w-0 flex-1">
               <p class="m-0 truncate text-xs font-bold text-gray-800">{{ fish.species?.name || 'Cá chưa rõ tên' }}</p>
               <p class="m-0 text-[10px] text-gray-500">{{ fish.species?.rarity || 'Thường' }} · {{ fish.created_at ? new Date(fish.created_at).toLocaleDateString('vi-VN') : '' }}</p>
@@ -266,25 +269,8 @@ onUnmounted(() => {
         </div>
       </Transition>
     </Teleport>
+
     <FishSellConfirm :fish="fishToSell" :is-loading="isSellingFish" :error="fishActionError" @cancel="fishToSell = null" @confirm="sellFish" />
     <FishReleaseConfirm :fish="fishToRelease" :is-loading="isReleasingFish" @cancel="fishToRelease = null" @confirm="releaseFish" />
   </div>
 </template>
-
-<style lang="css">
-@media (max-width: 1024px) {
-  .map-page {
-    height: auto;
-    min-height: 100vh;
-    flex-direction: column;
-    overflow: auto;
-  }
-
-  .map-sidebar,
-  .caught-sidebar {
-    width: 100%;
-    flex-basis: auto;
-    height: 350px;
-  }
-}
-</style>

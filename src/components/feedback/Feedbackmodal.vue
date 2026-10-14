@@ -4,10 +4,15 @@ import { useModalStore } from '../../stores/modal'
 import Modal from '../Modal.vue'
 import OpinionFeedbackForm from './OpinionFeedbackForm.vue'
 import ErrorFeedbackForm from './ErrorFeedbackForm.vue'
+import Tab from '../Tab.vue'
 
 const SUCCESS_MESSAGE = 'Cảm ơn bạn đã gửi phản hồi!'
 const modalStore = useModalStore()
-const activeTab = ref<'opinion' | 'error'>('opinion')
+const currentActiveTab = ref<'opinion' | 'error'>('opinion')
+const tabs = [
+  {key: 'opinion', label: "Góp ý"},
+  {key: 'error', label: "Báo lỗi"},
+]
 const toastVisible = ref(false)
 let toastTimer: ReturnType<typeof setTimeout> | undefined
 
@@ -38,17 +43,15 @@ onBeforeUnmount(() => {
 
 <template>
   <Modal title="Phản hồi" sub-title="Chia sẻ ý kiến hoặc báo lỗi để chúng tôi cải thiện trò chơi.">
-    <div role="dialog" aria-modal="true" aria-label="Gửi phản hồi" class="flex max-h-[92vh] w-full max-w-lg flex-col rounded-t-2xl bg-white shadow-xl sm:rounded-2xl">
-      <div role="tablist" aria-label="Loại phản hồi" class="flex border-b border-gray-200 px-6">
-        <button id="opinion-tab" type="button" role="tab" :aria-selected="activeTab === 'opinion'" aria-controls="opinion-panel" class="border-b-2 px-4 py-3 text-sm font-medium transition-colors" :class="activeTab === 'opinion' ? 'border-indigo-600 text-indigo-700' : 'border-transparent text-gray-500 hover:text-gray-800'" @click="activeTab = 'opinion'">Góp ý</button>
-        <button id="error-tab" type="button" role="tab" :aria-selected="activeTab === 'error'" aria-controls="error-panel" class="border-b-2 px-4 py-3 text-sm font-medium transition-colors" :class="activeTab === 'error' ? 'border-indigo-600 text-indigo-700' : 'border-transparent text-gray-500 hover:text-gray-800'" @click="activeTab = 'error'">Báo lỗi</button>
-      </div>
-      <div v-show="activeTab === 'opinion'" id="opinion-panel" role="tabpanel" aria-labelledby="opinion-tab" class="flex min-h-0 flex-1 flex-col">
-        <OpinionFeedbackForm @submitted="showToast" />
-      </div>
-      <div v-show="activeTab === 'error'" id="error-panel" role="tabpanel" aria-labelledby="error-tab" class="flex min-h-0 flex-1 flex-col">
-        <ErrorFeedbackForm @submitted="showToast" />
-      </div>
+    <div role="dialog" aria-modal="true" aria-label="Gửi phản hồi" class="flex w-full flex-col rounded-t-2xl bg-white sm:rounded-2xl">
+      <Tab v-model="currentActiveTab" :tabs="tabs">
+        <template #opinion>
+          <OpinionFeedbackForm @submitted="showToast" />
+        </template>
+        <template #error>
+          <ErrorFeedbackForm @submitted="showToast" />
+        </template>
+      </Tab>
     </div>
   </Modal>
 

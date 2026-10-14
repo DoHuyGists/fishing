@@ -110,7 +110,7 @@ const userInitial = computed(() => {
         <div class="flex flex-col gap-5">
           <!-- User Highlight Card -->
           <div
-            class="flex items-center gap-4 bg-gradient-to-r from-emerald-50 to-teal-50/70 border border-emerald-100/80 rounded-xl p-4"
+            class="flex items-center gap-4 bg-linear-to-r from-emerald-50 to-teal-50/70 border border-emerald-100/80 rounded-xl p-4"
           >
             <div
               class="w-14 h-14 rounded-full bg-emerald-600 text-white flex items-center justify-center text-xl font-black shadow-md shrink-0"
