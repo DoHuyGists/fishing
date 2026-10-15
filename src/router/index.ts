@@ -1,7 +1,8 @@
 import { createRouter, createWebHistory } from "vue-router";
 import supabase from "../database/connection";
 import { supabaseUserInAreaRepository } from "../data/supabaseUserInAreaRepository.ts";
-import ProtectedLayout from "../layouts/ProtectedLayout.vue";
+import PlayerLayout from "../layouts/PlayerLayout.vue";
+import AdminLayout from "../layouts/AdminLayout.vue";
 
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
@@ -11,7 +12,7 @@ const router = createRouter({
       children: [
         {
           path: "",
-          component: ProtectedLayout,
+          component: PlayerLayout,
           children: [
             {
               path: "",
@@ -29,7 +30,13 @@ const router = createRouter({
         },
         {
           path: "admin",
-          component: () => import("../views/AdminView.vue"),
+          component: AdminLayout,
+          children: [
+            {
+              path: "",
+              component: () => import("../views/AdminView.vue"),
+            }
+          ]
         },
       ],
     },
@@ -43,6 +50,12 @@ const router = createRouter({
       name: "signup",
       component: () => import("../views/SignUpView.vue"),
     },
+    // ĐẶT Ở CUỐI CÙNG: Bắt tất cả các route không tồn tại
+    {
+      path: '/:pathMatch(.*)*',
+      name: 'NotFound',
+      component: () => import("../components/404.vue")
+    }
   ],
 });
 

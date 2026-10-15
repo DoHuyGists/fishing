@@ -25,10 +25,16 @@ const authStore = useAuthStore();
 const fishingAreaStore = useFishingAreaStore();
 const fishingStore = useFishingStore();
 const isLeaving = ref(false);
+const showExitConfirmation = ref(false);
+const tripCaughtCount = ref(0);
 let realtimeSubscription: ReturnType<typeof supabaseUserInAreaRepository.subscribeToAreaUsers> | null = null;
 
-// 1. Hàm trên UI chỉ làm nhiệm vụ chuyển hướng
+watch(() => fishingStore.castPhase, (phase) => {
+  if (phase === "caught") tripCaughtCount.value++;
+});
+
 function handleBackToMap() {
+  showExitConfirmation.value = false;
   router.push({ name: "home" });
 }
 
@@ -260,7 +266,7 @@ function handleClickOnScene(event: MouseEvent) {
         <div class="backdrop-blur-2xl h-fit w-fit rounded p-1">
           <button type="button"
             class="text-sm text-red-500 bg-transparent border-0 cursor-pointer font-medium p-0 hover:underline disabled:opacity-50"
-            :disabled="isLeaving" @click="handleBackToMap">
+            :disabled="isLeaving" @click="showExitConfirmation = true">
             {{ isLeaving ? "Đang quay lại..." : "Kết thúc chuyến câu" }}
           </button>
         </div>
@@ -303,10 +309,49 @@ function handleClickOnScene(event: MouseEvent) {
     <div class="scene-status" :class="{ active: fishingStore.castPhase !== 'idle' }">
       <span class="status-dot"></span>{{ fishingStore.castMessage }}
     </div>
+    <Teleport to="body">
+      <Transition name="exit-dialog">
+        <div v-if="showExitConfirmation"
+          class="fixed z-[40] inset-0 grid place-items-center p-5 bg-[rgba(4,17,11,0.72)] backdrop-blur-[7px]"
+          role="presentation" @click.self="showExitConfirmation = false">
+          <section
+            class="w-[min(380px,100%)] p-5 border border-[rgba(255,226,149,0.5)] rounded-[20px] bg-[linear-gradient(145deg,#1b4531,#0f2e1f)] shadow-[0_24px_70px_rgba(0,0,0,0.6)] text-[#f4f0df] text-center"
+            role="dialog" aria-modal="true" aria-labelledby="confirm-exit-title">
+            <h2 id="confirm-exit-title" class="m-0 text-lg font-bold text-[#e8bd62]">Kết thúc chuyến câu?</h2>
+            <p class="my-4 text-sm text-[#c8dccb] leading-relaxed">
+              Chuyến này bạn đã câu được <strong class="text-white">{{ tripCaughtCount }}</strong> con cá.
+              Bạn có chắc chắn muốn quay lại bản đồ không?
+            </p>
+            <div class="flex justify-center gap-3 mt-5">
+              <button type="button"
+                class="px-4 py-2 border border-[rgba(255,255,255,0.2)] rounded-xl bg-[rgba(255,255,255,0.1)] hover:bg-[rgba(255,255,255,0.2)] text-white text-xs font-semibold transition-colors cursor-pointer"
+                @click="showExitConfirmation = false">
+                Ở lại câu
+              </button>
+              <button type="button"
+                class="px-4 py-2 border border-[#e65c5c] rounded-xl bg-[#c23b3b] hover:bg-[#d94848] text-white text-xs font-bold shadow-[0_4px_12px_rgba(194,59,59,0.4)] transition-colors cursor-pointer disabled:opacity-50"
+                :disabled="isLeaving" @click="handleBackToMap">
+                {{ isLeaving ? "Đang quay lại..." : "Kết thúc chuyến câu" }}
+              </button>
+            </div>
+          </section>
+        </div>
+      </Transition>
+    </Teleport>
   </section>
 </template>
 
 <style lang="css" scoped>
+.exit-dialog-enter-active,
+.exit-dialog-leave-active {
+  transition: opacity 0.18s ease;
+}
+
+.exit-dialog-enter-from,
+.exit-dialog-leave-to {
+  opacity: 0;
+}
+
 .fishing-scene {
   position: relative;
   min-height: 0;

@@ -1,6 +1,7 @@
 import type { Session, User } from "@supabase/supabase-js";
 import { defineStore } from "pinia";
 import supabase from "../database/connection";
+import { supabaseUserProfileRepository } from "../data/supabaseUserProfileRepository";
 
 type Credentials = {
   email: string;
@@ -14,6 +15,7 @@ export const useAuthStore = defineStore("auth", {
     loading: false,
     initialized: false,
     error: "",
+    isAdmin: false,
   }),
   getters: {
     isAuthenticated: (state) => Boolean(state.session),
@@ -35,13 +37,27 @@ export const useAuthStore = defineStore("auth", {
       this.session = data.session;
       this.user = data.session?.user ?? null;
       this.error = error?.message ?? "";
-      this.loading = false;
-      this.initialized = true;
+      this.isAdmin = false;
 
       supabase.auth.onAuthStateChange((_event, session) => {
+        const previousUserId = this.user?.id;
         this.session = session;
         this.user = session?.user ?? null;
+        if (!session?.user) {
+          this.isAdmin = false;
+          return;
+        }
+        if (previousUserId !== session.user.id) {
+          this.isAdmin = false;
+        }
+        void this.loadAdminStatus(session.user.id);
       });
+
+      if (this.user) {
+        await this.loadAdminStatus(this.user.id);
+      }
+      this.loading = false;
+      this.initialized = true;
     },
     async signIn({ email, password }: Credentials) {
       this.loading = true;
@@ -50,6 +66,10 @@ export const useAuthStore = defineStore("auth", {
       this.session = data.session;
       this.user = data.user;
       this.error = error?.message ?? "";
+      this.isAdmin = false;
+      if (!error && data.user) {
+        await this.loadAdminStatus(data.user.id);
+      }
       this.loading = false;
       return !error;
     },
@@ -60,10 +80,24 @@ export const useAuthStore = defineStore("auth", {
       if (!error) {
         this.session = null;
         this.user = null;
+        this.isAdmin = false;
       }
       this.error = error?.message ?? "";
       this.loading = false;
       return !error;
+    },
+    async loadAdminStatus(userId: string) {
+      try {
+        const profile = await supabaseUserProfileRepository.fetchUserProfile(userId);
+        if (this.user?.id === userId) {
+          this.isAdmin = profile?.is_admin ?? false;
+        }
+      } catch (err) {
+        if (this.user?.id === userId) {
+          this.isAdmin = false;
+          this.error = err instanceof Error ? err.message : "Không thể tải quyền quản trị";
+        }
+      }
     },
   },
 });

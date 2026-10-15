@@ -6,6 +6,7 @@ export interface UserProfile {
   level: number;
   inventory_capacity: number;
   species_storage_capacity: number;
+  is_admin: boolean;
   created_at: string;
   updated_at: string;
 }
