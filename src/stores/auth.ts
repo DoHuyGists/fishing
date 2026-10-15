@@ -24,7 +24,6 @@ export const useAuthStore = defineStore("auth", {
         return state.user.id;
       }else{
         throw new Error("Missing user id");
-        
       }
     }
   },
@@ -33,31 +32,36 @@ export const useAuthStore = defineStore("auth", {
       if (this.initialized) return;
 
       this.loading = true;
-      const { data, error } = await supabase.auth.getSession();
-      this.session = data.session;
-      this.user = data.session?.user ?? null;
-      this.error = error?.message ?? "";
-      this.isAdmin = false;
-
-      supabase.auth.onAuthStateChange((_event, session) => {
+      
+      // Đăng ký listener TRƯỚC khi gọi getSession hoặc để Supabase tự quản lý
+      supabase.auth.onAuthStateChange(async (event, session) => {
+        
         const previousUserId = this.user?.id;
         this.session = session;
         this.user = session?.user ?? null;
+        
         if (!session?.user) {
           this.isAdmin = false;
           return;
         }
+        
         if (previousUserId !== session.user.id) {
           this.isAdmin = false;
         }
-        void this.loadAdminStatus(session.user.id);
+        
+        // Gọi loadAdminStatus tại đây là đủ cho mọi trường hợp (khởi động, login, token refresh)
+
+        await this.loadAdminStatus(session.user.id);
       });
 
-      if (this.user) {
-        await this.loadAdminStatus(this.user.id);
+      // Chỉ cần gọi getSession để ép Supabase trigger event ban đầu (nếu SDK chưa tự chạy)
+      // Hoặc thậm chí để onAuthStateChange tự bắt session hiện tại của trình duyệt.
+      const { data } = await supabase.auth.getSession();
+      
+      if (data.session?.user != null) {
+        this.loading = false;
+        this.initialized = true;
       }
-      this.loading = false;
-      this.initialized = true;
     },
     async signIn({ email, password }: Credentials) {
       this.loading = true;

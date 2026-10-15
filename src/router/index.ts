@@ -34,9 +34,11 @@ const router = createRouter({
           children: [
             {
               path: "",
+              name: "admin",
               component: () => import("../views/AdminView.vue"),
-            }
-          ]
+              meta: { requiresAuth: true },
+            },
+          ],
         },
       ],
     },
@@ -52,10 +54,10 @@ const router = createRouter({
     },
     // ĐẶT Ở CUỐI CÙNG: Bắt tất cả các route không tồn tại
     {
-      path: '/:pathMatch(.*)*',
-      name: 'NotFound',
-      component: () => import("../components/404.vue")
-    }
+      path: "/:pathMatch(.*)*",
+      name: "notFound",
+      component: () => import("../components/NotFound.vue"),
+    },
   ],
 });
 
@@ -71,7 +73,7 @@ router.beforeEach(async (to) => {
       if (to.name == "fishing") {
         return { name: "home" };
       }
-    } else if(fishingArea.status == 'enter') {
+    } else if (fishingArea.status == "enter") {
       if (to.name != "fishing") {
         return { name: "fishing" };
       }

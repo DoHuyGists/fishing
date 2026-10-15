@@ -2,18 +2,17 @@
 import { onMounted, ref, computed } from "vue";
 import { useAuthStore } from "../../stores/auth";
 import { useCurrencyStore } from "../../stores/currency";
-import { useModalStore } from "../../stores/modal";
 import { useUserProfileStore } from "../../stores/userProfile";
 import { useBadgesStore } from "../../stores/badges";
 import Modal from "../Modal.vue";
 import Cash from "../currency/Cash.vue";
+import { useRouter } from "vue-router";
 
 const authStore = useAuthStore();
 const currencyStore = useCurrencyStore();
 const userProfileStore = useUserProfileStore();
-const modalStore = useModalStore();
 const badgesStore = useBadgesStore();
-
+const router = useRouter()
 const copied = ref(false);
 const showSignOutConfirm = ref(false);
 const isSigningOut = ref(false);
@@ -28,7 +27,6 @@ async function signOut() {
     const succeeded = await authStore.signOut();
     if (succeeded) {
       showSignOutConfirm.value = false;
-      modalStore.close();
     } else {
       signOutError.value = authStore.error || "Không thể đăng xuất. Vui lòng thử lại.";
     }
@@ -37,6 +35,7 @@ async function signOut() {
     signOutError.value = "Không thể đăng xuất. Vui lòng thử lại.";
   } finally {
     isSigningOut.value = false;
+    router.replace("login");
   }
 }
 
