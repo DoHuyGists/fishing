@@ -123,7 +123,8 @@ export const useFishingStore = defineStore("fishing", {
   },
   actions: {
     async updateCurrentAreaId(userId: string) {
-      this.currentAreaId = await supabaseUserInAreaRepository.getCurrentUserArea(userId);
+      const currentUserArea = await supabaseUserInAreaRepository.getCurrentUserArea(userId);
+      this.currentAreaId = currentUserArea.area_id;
     },
     async initializeFishingArea(areaId: string) {
       if (!areaId) return;

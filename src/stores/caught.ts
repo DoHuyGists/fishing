@@ -33,7 +33,23 @@ export const useCaughtStore = defineStore("Caught", {
     isLoadingCaught: false,
     caughtFishes: [] as CaughtFish[],
   }),
+  getters: {
+    inNetFishes: (state) => state.caughtFishes.filter((f) => f.status === "in-net"),
+    storedFishes: (state) => state.caughtFishes.filter((f) => f.status === "normal"),
+  },
   actions: {
+    async moveFishes(ids: string[], status: "normal" | "in-net") {
+      await supabaseFishRepository.updateCaughtStatus(ids, status);
+      const set = new Set(ids);
+      this.caughtFishes.forEach((f) => {
+        if (set.has(f.id)) f.status = status;
+      });
+    },
+    async finishFishing() {
+      await supabaseFishRepository.deleteInNetFishes();
+      this.caughtFishes = this.caughtFishes.filter((f) => f.status !== "in-net");
+      await supabaseFishRepository.completeFishing();
+    },
     async loadCaughtFishes() {
       const userId = authStore.userId;
       if (!userId) return;

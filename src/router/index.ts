@@ -53,12 +53,12 @@ router.beforeEach(async (to) => {
   if (to.meta.requiresAuth && !data.session) {
     return { name: "login" };
   } else if (userId != null) {
-    const fishingAreaId = await supabaseUserInAreaRepository.getCurrentUserArea(userId);
-    if (fishingAreaId == null) {
+    const fishingArea = await supabaseUserInAreaRepository.getCurrentUserArea(userId);
+    if (fishingArea.status == null) {
       if (to.name == "fishing") {
         return { name: "home" };
       }
-    } else {
+    } else if(fishingArea.status == 'enter') {
       if (to.name != "fishing") {
         return { name: "fishing" };
       }

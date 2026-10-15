@@ -1,50 +1,64 @@
 <script lang="ts" setup>
-import { onBeforeMount, onBeforeUnmount } from 'vue';
-import type { RealtimeChannel } from '@supabase/supabase-js';
-import { useSingleSession } from '../composables/use-single-session';
-import { useAuthStore } from '../stores/auth';
-import { useTimezoneCheck } from '../composables/use-timezone-check';
-import { useAreaUserSocket } from '../composables/use-area-check';
-import { useRouter } from 'vue-router';
-import { useCurrencyStore } from '../stores/currency';
-import { supabaseCurrencyRepository } from '../data/supabaseCurrencyRepository';
+import { onBeforeMount, onBeforeUnmount, onMounted, watch } from "vue";
+import type { RealtimeChannel } from "@supabase/supabase-js";
+import { useSingleSession } from "../composables/use-single-session";
+import { useAuthStore } from "../stores/auth";
+import { useTimezoneCheck } from "../composables/use-timezone-check";
+import { useRouter } from "vue-router";
+import { useCurrencyStore } from "../stores/currency";
+import { supabaseCurrencyRepository } from "../data/supabaseCurrencyRepository";
+import { supabaseUserInAreaRepository } from "../data/supabaseUserInAreaRepository";
+import { useUserInAreaStore } from "../stores/userInArea";
 
 const router = useRouter();
 const authStore = useAuthStore();
 const currencyStore = useCurrencyStore();
-const areaUserSocket = useAreaUserSocket(authStore.userId, router);
+const userInAreaStore = useUserInAreaStore();
 let currencyChannel: RealtimeChannel | null = null;
+let userInAreaChannel: ReturnType<typeof supabaseUserInAreaRepository.subscribeToAreaUsers> | null = null;
 
-const {
-  showConflictModal,
-  modalMessage,
-  closeCurrentTab,
-  logoutAccount,
-} = useSingleSession(authStore.userId);
+const { showConflictModal, modalMessage, closeCurrentTab, logoutAccount } = useSingleSession(authStore.userId);
 
 onBeforeMount(async () => {
   await useTimezoneCheck();
-  areaUserSocket.subcribe();
+  // Lắng nghe user_in_area thay đổi để chuyển hướng user về đúng màn hình
+  userInAreaChannel = supabaseUserInAreaRepository.subscribeToAreaUsers(async () => {
+    userInAreaStore.setCurrentUserInArea(authStore.userId);
+  });
 
-  if (authStore.userId) {
+  // Lắng nghe để đồng bộ currency
+  currencyChannel = supabaseCurrencyRepository.subscribeToCurrency(authStore.userId, () => {
     currencyStore.fetchCurrency();
-    currencyChannel = supabaseCurrencyRepository.subscribeToCurrency(
-      authStore.userId,
-      () => {
-        currencyStore.fetchCurrency();
-      }
-    );
-  }
+  });
+});
+
+onMounted(() => {
+  currencyStore.fetchCurrency();
 });
 
 onBeforeUnmount(() => {
-  areaUserSocket.unSubscribe();
+  if (userInAreaChannel) {
+    supabaseUserInAreaRepository.unsubscribe(userInAreaChannel);
+    userInAreaChannel = null;
+  }
   if (currencyChannel) {
     supabaseCurrencyRepository.unsubscribe(currencyChannel);
     currencyChannel = null;
   }
 });
 
+watch(
+  () => userInAreaStore.userInArea,
+  (session) => {
+    if (session) {
+      if (session.status == "enter") {
+        router.replace({ name: "fishing" });
+      } else if (session.status == null) {
+        router.replace({ name: "home" });
+      }
+    }
+  },
+);
 </script>
 
 <template>
@@ -58,19 +72,15 @@ onBeforeUnmount(() => {
           <div class="modal-header">
             <h3>⚠️ Phát hiện trùng phiên truy cập</h3>
           </div>
-          
+
           <div class="modal-body">
             <p>{{ modalMessage }}</p>
             <p class="sub-text">Bạn vui lòng chọn thao tác tiếp theo:</p>
           </div>
 
           <div class="modal-actions">
-            <button class="btn btn-secondary" @click="closeCurrentTab">
-              Đóng tab này
-            </button>
-            <button class="btn btn-danger" @click="logoutAccount">
-              Đăng xuất tài khoản
-            </button>
+            <button class="btn btn-secondary" @click="closeCurrentTab">Đóng tab này</button>
+            <button class="btn btn-danger" @click="logoutAccount">Đăng xuất tài khoản</button>
           </div>
         </div>
       </div>

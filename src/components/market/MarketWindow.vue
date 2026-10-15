@@ -85,7 +85,6 @@ async function handleBuyFish() {
     const speciesMarketId = itemToBuy.value.id;
     const fishName = itemToBuy.value.caught?.fish?.name || 'cá';
     await supabaseMarketRepository.buyFish(speciesMarketId);
-    await currencyStore.fetchCurrency();
     await marketStore.loadMarketListings();
     await caughtStore.loadCaughtFishes();
     cancelBuy();

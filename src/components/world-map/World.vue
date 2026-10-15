@@ -1,9 +1,12 @@
 <script lang="ts" setup>
-import { computed, ref, watch } from "vue";
+import { computed, onMounted, ref, watch } from "vue";
 import { useRouter } from "vue-router";
 import { useWorldStore } from "../../stores/world";
 import { supabaseUserInAreaRepository } from "../../data/supabaseUserInAreaRepository";
 import PrepareModal from "./PrepareModal.vue";
+import { useUserInAreaStore } from "../../stores/userInArea.ts";
+import { useAuthStore } from "../../stores/auth.ts";
+import { useToast } from "../../composables/useToast.ts";
 
 const props = defineProps<{
   anchors: any[];
@@ -16,6 +19,9 @@ defineOptions({
 
 const router = useRouter();
 const worldStore = useWorldStore();
+const authStore = useAuthStore();
+const toast = useToast();
+const userInAreaStore = useUserInAreaStore();
 const selectedAnchor = ref<any | null>(null);
 const isEntering = ref(false);
 const showPrepare = ref(false);
@@ -65,6 +71,10 @@ function handleWorldClick(event: MouseEvent) {
 }
 
 function openPrepare(anchor: any) {
+  if(!userInAreaStore.canEnterFishingArea){
+    toast.error("Cần kết thúc xử lý cá trong lưới trước", {title: "Thao tác bị chặn", position: "top"})
+    return;
+  }
   pendingAnchor.value = anchor;
   showPrepare.value = true;
 }
@@ -122,6 +132,11 @@ async function goToFishingArea(anchor: any) {
     router.push({ name: "fishing" });
   }
 }
+
+onMounted(()=>{
+  userInAreaStore.setCurrentUserInArea(authStore.userId);
+})
+
 </script>
 <style lang="css">
 .anchors {
@@ -163,7 +178,8 @@ async function goToFishingArea(anchor: any) {
   overflow: visible;
   pointer-events: auto;
   user-select: none;
-  width: 199.2px;
+  width: 200px;
+  transform: translateX(-100px);
 }
 
 .anchor-dialog-wrapper > div {
@@ -1548,7 +1564,7 @@ async function goToFishingArea(anchor: any) {
         />
 
         <g v-if="selectedAnchor && selectedAnchor.id === anchor.id" transform="translate(0 0)">
-          <foreignObject x="-100" y="-69" class="anchor-dialog-wrapper">
+          <foreignObject y="-69" class="anchor-dialog-wrapper">
             <div
               xmlns="http://www.w3.org/1999/xhtml"
               class="anchor-dialog"

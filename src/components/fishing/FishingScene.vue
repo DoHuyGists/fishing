@@ -72,6 +72,7 @@ const fishingRod = ref({
   x: 0,
   y: 0,
 });
+const biteOffset = ref({ x: 0, y: 0 });
 const rodLineOffset = {
   x: 0,
   y: 0,
@@ -81,13 +82,53 @@ const invalidTap = ref(false);
 const castClass = computed(() => `phase-${fishingStore.castPhase}`);
 const linePath = computed(() => {
   const { x, y } = fishingStore.baitPosition;
+  const endX = x + biteOffset.value.x;
+  const endY = y + biteOffset.value.y;
   const { x: rodX, y: rodY } = fishingRod.value;
-  const distance = Math.hypot(x - rodX, y - rodY);
+  const distance = Math.hypot(endX - rodX, endY - rodY);
   const sag = Math.min(18, Math.max(8, distance * 0.18));
-  const controlX = (rodX + x) / 2;
-  const controlY = (rodY + y) / 2 + sag;
-  return `M ${rodX} ${rodY} Q ${controlX} ${controlY} ${x} ${y}`;
+  const controlX = (rodX + endX) / 2;
+  const controlY = (rodY + endY) / 2 + sag;
+  return `M ${rodX} ${rodY} Q ${controlX} ${controlY} ${endX} ${endY}`;
 });
+
+let biteMotionFrame: number | undefined;
+let biteMotionStartedAt: number | undefined;
+
+function animateBiteMotion(timestamp: number) {
+  if (fishingStore.castPhase !== "bite") {
+    biteMotionFrame = undefined;
+    biteMotionStartedAt = undefined;
+    biteOffset.value = { x: 0, y: 0 };
+    return;
+  }
+
+  biteMotionStartedAt ??= timestamp;
+  const angle = ((timestamp - biteMotionStartedAt) / 620) * Math.PI * 2;
+  biteOffset.value = {
+    x: Math.cos(angle) * 1.1,
+    y: Math.sin(angle) * 0.55,
+  };
+  biteMotionFrame = window.requestAnimationFrame(animateBiteMotion);
+}
+
+watch(
+  () => fishingStore.castPhase,
+  (phase) => {
+    if (phase === "bite") {
+      biteMotionStartedAt = undefined;
+      biteMotionFrame = window.requestAnimationFrame(animateBiteMotion);
+      return;
+    }
+
+    if (biteMotionFrame !== undefined) {
+      window.cancelAnimationFrame(biteMotionFrame);
+      biteMotionFrame = undefined;
+    }
+    biteMotionStartedAt = undefined;
+    biteOffset.value = { x: 0, y: 0 };
+  },
+);
 
 // 4 giai đoạn trong ngày: rạng đông, ban ngày, hoàng hôn, ban đêm
 const DAY_PHASES = [
@@ -125,6 +166,7 @@ onMounted(() => {
 onBeforeUnmount(() => {
   if (clockTimer) window.clearInterval(clockTimer);
   if (rodPositionFrame) window.cancelAnimationFrame(rodPositionFrame);
+  if (biteMotionFrame !== undefined) window.cancelAnimationFrame(biteMotionFrame);
   window.removeEventListener("resize", updateRodPosition);
   if (realtimeSubscription) {
     supabaseUserInAreaRepository.unsubscribe(realtimeSubscription);
@@ -219,7 +261,7 @@ function handleClickOnScene(event: MouseEvent) {
           <button type="button"
             class="text-sm text-red-500 bg-transparent border-0 cursor-pointer font-medium p-0 hover:underline disabled:opacity-50"
             :disabled="isLeaving" @click="handleBackToMap">
-            {{ isLeaving ? "Đang quay lại..." : "Quay lại bản đồ" }}
+            {{ isLeaving ? "Đang quay lại..." : "Kết thúc chuyến câu" }}
           </button>
         </div>
       </div>
@@ -250,7 +292,7 @@ function handleClickOnScene(event: MouseEvent) {
       <path :d="linePath" />
     </svg>
     <div class="bait-float" :class="castClass"
-      :style="{ left: `${fishingStore.baitPosition.x}%`, top: `${fishingStore.baitPosition.y}%` }">
+      :style="{ left: `${fishingStore.baitPosition.x + biteOffset.x}%`, top: `${fishingStore.baitPosition.y + biteOffset.y}%` }">
       <span></span>
     </div>
     <div class="rod-holder" :class="castClass" aria-hidden="true">
@@ -714,7 +756,7 @@ function handleClickOnScene(event: MouseEvent) {
 
 @keyframes bite-bob {
   50% {
-    transform: translate(-50%, calc(-50% - 8px)) scale(1.3);
+    transform: translate(-50%, -50%) scale(1.3);
   }
 }
 

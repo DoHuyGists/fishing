@@ -29,7 +29,6 @@ async function redeemCode() {
 
     if (error) throw error;
 
-    await currencyStore.fetchCurrency();
     code.value = "";
     showNotice("success", "Đổi mã thành công!");
     // Keep the returned value available for RPCs that provide a reward message.

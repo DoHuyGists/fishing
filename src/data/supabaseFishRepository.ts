@@ -97,6 +97,25 @@ class SupabaseFishRepository {
     if (error) throw new Error(error.message);
   }
 
+  async updateCaughtStatus(ids: string[], status: "normal" | "in-net"): Promise<void> {
+    if (ids.length === 0) return;
+    const { error } = await supabase.from("caught").update({ status }).in("id", ids);
+
+    if (error) throw new Error(error.message);
+  }
+
+  async deleteInNetFishes(): Promise<void> {
+    const { error } = await supabase.from("caught").delete().eq("status", "in-net");
+
+    if (error) throw new Error(error.message);
+  }
+
+  async completeFishing(): Promise<void> {
+    const { error } = await supabase.rpc("user_complete_fishing");
+
+    if (error) throw new Error(error.message);
+  }
+
   async listFishOnMarket(caughtId: string, price: number): Promise<void> {
     const { data, error } = await supabase.rpc("list_species_on_market", {
       p_caught_id: caughtId,

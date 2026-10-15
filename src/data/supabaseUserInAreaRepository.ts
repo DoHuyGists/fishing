@@ -7,6 +7,7 @@ export type UserInAreaRow = {
   area_id: string | null;
   user_id: string;
   updated_at: string;
+  status: string;
 };
 
 class SupabaseUserInAreaRepository {
@@ -34,7 +35,7 @@ class SupabaseUserInAreaRepository {
   async fetchUsersInArea(areaId: string): Promise<UserInAreaRow[]> {
     if (!areaId) return [];
 
-    const { data, error } = await supabase.from("user_in_area").select("id, created_at, area_id, user_id, updated_at").eq("area_id", areaId);
+    const { data, error } = await supabase.from("user_in_area").select("id, created_at, area_id, user_id, updated_at, status").eq("area_id", areaId);
 
     if (error) {
       console.error("Lỗi khi lấy danh sách user_in_area:", error.message);
@@ -71,14 +72,14 @@ class SupabaseUserInAreaRepository {
     await supabase.removeChannel(channel);
   }
 
-  async getCurrentUserArea(userId: string) {
-    const { data, error } = await supabase.from("user_in_area").select("area_id").eq("user_id", userId).maybeSingle();
+  async getCurrentUserArea(userId: string) : Promise<UserInAreaRow> {
+    const { data, error } = await supabase.from("user_in_area").select("*").eq("user_id", userId).maybeSingle();
 
     if (error) {
       throw new Error(error.message);
     }
 
-    return data?.area_id;
+    return data;
   }
 }
 

@@ -18,6 +18,7 @@ import NotificationModal from "../notification/NotificationModal.vue";
 import FactionSelectModal from "../faction/FactionSelectModal.vue";
 import FriendModal from "../friend/FriendModal.vue";
 import TeamModal from "../team/TeamModal.vue";
+import PostProduction from "../fishing-post-production/PostProduction.vue";
 import { useModalStore } from "../../stores/modal.ts";
 import { supabaseFishRepository } from "../../data/supabaseFishRepository";
 import { useMarketStore } from "../../stores/market";
@@ -84,7 +85,6 @@ async function releaseFish() {
 
 onMounted(() => {
   if (authStore.userId) {
-    currencyStore.fetchCurrency();
     caughtStore.loadCaughtFishes();
     notificationStore.subscribeToNewNotifications(authStore.userId, () => {
       hasNewNotification.value = true;
@@ -175,7 +175,14 @@ onUnmounted(() => {
           class="flex items-center gap-1.5 px-3 py-1.5 bg-[#153221] hover:bg-[#1a3e29] border border-gray-300 text-white rounded-xl shadow-sm font-bold text-xs cursor-pointer transition-colors"
           @click="modalStore.open('caught')">
           <span class="text-sm" aria-hidden="true">🐟</span>
-          <span>Túi cá</span>
+          <span>Kho cá</span>
+        </button>
+
+        <button type="button"
+          class="flex items-center gap-1.5 px-3 py-1.5 bg-[#153221] hover:bg-[#1a3e29] border border-gray-300 text-white rounded-xl shadow-sm font-bold text-xs cursor-pointer transition-colors"
+          @click="modalStore.open('post-production')">
+          <span class="text-sm" aria-hidden="true">🕸️</span>
+          <span>Lưới cá</span>
         </button>
 
         <!-- Redeem code -->
@@ -266,6 +273,7 @@ onUnmounted(() => {
           <FactionSelectModal v-if="modalStore.isOpening('faction')" />
           <FriendModal v-if="modalStore.isOpening('friend')" />
           <TeamModal v-if="modalStore.isOpening('team')" />
+          <PostProduction v-if="modalStore.isOpening('post-production')" />
         </div>
       </Transition>
     </Teleport>
