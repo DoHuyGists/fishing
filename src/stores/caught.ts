@@ -3,7 +3,7 @@ import { useAuthStore } from "./auth";
 import { supabaseFishRepository } from "../data/supabaseFishRepository";
 export interface CaughtFish {
   id: string;
-  created_at: string | null;
+  created_at: string;
   user_id: string;
   weight: number;
   is_shiny: boolean;

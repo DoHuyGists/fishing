@@ -48,10 +48,8 @@ async function submit() {
 <template>
   <main class="grid min-h-screen place-items-center bg-[#dcebe4] bg-[linear-gradient(115deg,rgba(255,255,255,0.5)_1px,transparent_1px),linear-gradient(25deg,rgba(52,100,87,0.08)_1px,transparent_1px)] bg-size-[24px_24px,32px_32px] px-6 py-8 text-[#18312d]">
     <section class="w-full max-w-[408px] rounded-lg border border-[#b8cbc3] bg-[#fffdf8] p-8 shadow-[12px_12px_0_#346457] sm:p-[42px]" aria-labelledby="signup-title">
-      <div class="grid size-[42px] place-items-center rounded-full bg-[#e57a44] font-serif text-[22px] font-bold text-[#fffdf8]" aria-hidden="true">F</div>
       <p class="mb-[5px] mt-7 text-xs font-bold uppercase tracking-[0.08em] text-[#b9522c]">Bắt đầu hành trình</p>
       <h1 id="signup-title" class="font-serif text-[34px] leading-tight">Tạo tài khoản</h1>
-      <p class="mb-7 mt-2 text-[#61716d]">Đăng ký để cùng khám phá những chuyến câu mới.</p>
 
       <div v-if="confirmationSent" class="leading-relaxed text-[#61716d]" role="status">
         <h2 class="mb-2 font-serif text-[22px] text-[#18312d]">Kiểm tra email của bạn</h2>

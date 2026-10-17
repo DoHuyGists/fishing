@@ -58,7 +58,7 @@ export const useAuthStore = defineStore("auth", {
       // Hoặc thậm chí để onAuthStateChange tự bắt session hiện tại của trình duyệt.
       const { data } = await supabase.auth.getSession();
       
-      if (data.session?.user != null) {
+      if (!data.session?.user) {
         this.loading = false;
         this.initialized = true;
       }

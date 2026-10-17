@@ -1,34 +1,53 @@
 ﻿<script lang="ts" setup>
 import { computed, ref, watch } from "vue";
-import { useCaughtStore } from "../../stores/caught";
-import { useAuthStore } from "../../stores/auth";
-import { supabaseFishRepository } from "../../data/supabaseFishRepository";
-import { useMarketStore } from "../../stores/market";
-import { useWorldStore } from "../../stores/world";
+import { useCaughtStore, type CaughtFish } from "../../stores/caught.ts";
+import { supabaseFishRepository } from "../../data/supabaseFishRepository.ts";
+import { useMarketStore } from "../../stores/market.ts";
+import { useWorldStore } from "../../stores/world.ts";
 import Modal from "../Modal.vue";
 import FishSellConfirm from "./FishSellConfirm.vue";
 import FishReleaseConfirm from "./FishReleaseConfirm.vue";
+import { useToast } from "../../composables/useToast.ts";
+import { formatDateTime } from "../../utils/time.ts";
 const worldStore = useWorldStore();
 const caughtStore = useCaughtStore();
 const marketStore = useMarketStore();
 const fishToRelease = ref<any | null>(null);
 const searchQuery = ref("");
 const selectedRarity = ref("ALL");
+const groupBySpecies = ref(false);
+const expandedSpecies = ref<string | null>(null);
 const currentPage = ref(1);
 const pageSize = 12;
-const pageCount = computed(() => Math.max(1, Math.ceil(filteredCaughtFishes.value.length / pageSize)));
+const groupedCaughtFishes = computed(() => {
+  const groups = new Map<string, CaughtFish[]>();
+  filteredCaughtFishes.value.forEach((fish) => {
+    const groupId = fish.species?.id || fish.species?.name || fish.id;
+    const group = groups.get(groupId);
+    if (group) {
+      group.push(fish);
+    } else {
+      groups.set(groupId, [fish]);
+    }
+  });
+  return Array.from(groups, ([id, fishes]) => ({ id, fishes }));
+});
+const pageCount = computed(() =>
+  Math.max(1, Math.ceil((groupBySpecies.value ? groupedCaughtFishes.value.length : filteredCaughtFishes.value.length) / pageSize)),
+);
 const paginatedCaughtFishes = computed(() => {
   const start = (currentPage.value - 1) * pageSize;
   return filteredCaughtFishes.value.slice(start, start + pageSize);
+});
+const paginatedFishGroups = computed(() => {
+  const start = (currentPage.value - 1) * pageSize;
+  return groupedCaughtFishes.value.slice(start, start + pageSize);
 });
 const isReleasing = ref(false);
 const fishToSell = ref<any | null>(null);
 const isSelling = ref(false);
 const sellError = ref("");
-const sellSuccess = ref(false);
-const soldFishName = ref("");
-let sellSuccessTimer: ReturnType<typeof setTimeout> | null = null;
-const authStore = useAuthStore();
+const toast = useToast();
 
 const filteredCaughtFishes = computed(() => {
   return caughtStore.caughtFishes.filter((item) => {
@@ -39,8 +58,9 @@ const filteredCaughtFishes = computed(() => {
   });
 });
 
-watch([searchQuery, selectedRarity], () => {
+watch([searchQuery, selectedRarity, groupBySpecies], () => {
   currentPage.value = 1;
+  expandedSpecies.value = null;
 });
 watch(pageCount, (count) => {
   if (currentPage.value > count) currentPage.value = count;
@@ -64,32 +84,21 @@ function cancelSell() {
   sellError.value = "";
 }
 
-function submitSell(price: number) {
-  void handleSell(price);
-}
 
 async function handleSell(priceNum: number) {
   if (!fishToSell.value) return;
-
-  const userId = authStore.userId;
-  if (!userId) {
-    sellError.value = "Bạn chưa đăng nhập";
-    return;
-  }
 
   isSelling.value = true;
   sellError.value = "";
 
   try {
-    const fishName = fishToSell.value.species?.name || "cá";
     await supabaseFishRepository.listFishOnMarket(fishToSell.value.id, priceNum);
     caughtStore.caughtFishes = caughtStore.caughtFishes.filter((f) => f.id !== fishToSell.value.id);
     await marketStore.loadMarketListings();
     cancelSell();
-    showSellSuccess(fishName);
+    toast.success("Đã đăng bán", { title: "Thành công", position: "bottom" });
   } catch (err: any) {
-    console.error("Lỗi khi đăng bán cá:", err);
-    sellError.value = err.message || "Đăng bán không thành công. Vui lòng thử lại.";
+    toast.error("Lỗi khi đăng bán cá", { title: "Không thành công", position: "bottom" });
   } finally {
     isSelling.value = false;
   }
@@ -108,17 +117,6 @@ function getRarityBadgeClass(rarity: string | null | undefined) {
   }
 }
 
-function formatDate(dateStr: string | null) {
-  if (!dateStr) return "";
-  const d = new Date(dateStr);
-  return d.toLocaleDateString("vi-VN", {
-    day: "2-digit",
-    month: "2-digit",
-    hour: "2-digit",
-    minute: "2-digit",
-  });
-}
-
 function openReleaseConfirm(item: any) {
   fishToRelease.value = item;
 }
@@ -134,26 +132,14 @@ async function handleRelease() {
     await supabaseFishRepository.deleteCaughtFish(fishToRelease.value.id);
     caughtStore.caughtFishes = caughtStore.caughtFishes.filter((f) => f.id !== fishToRelease.value.id);
     fishToRelease.value = null;
+    toast.success("Đã thả", { title: "Thành công", position: "bottom" });
   } catch (err) {
-    console.error("Lỗi khi thả cá:", err);
+    toast.success("Lỗi khi thả", { title: "Không thành công", position: "bottom" });
   } finally {
     isReleasing.value = false;
   }
 }
 
-function showSellSuccess(fishName: string) {
-  soldFishName.value = fishName;
-  sellSuccess.value = true;
-  if (sellSuccessTimer) clearTimeout(sellSuccessTimer);
-  sellSuccessTimer = setTimeout(() => {
-    sellSuccess.value = false;
-  }, 2500);
-}
-
-function closeSellSuccess() {
-  sellSuccess.value = false;
-  if (sellSuccessTimer) clearTimeout(sellSuccessTimer);
-}
 </script>
 <template>
   <Modal
@@ -162,15 +148,28 @@ function closeSellSuccess() {
     sub-title="Những loài cá bạn sẵn được"
     :on-refresh="caughtStore.loadCaughtFishes"
   >
-    <section class="h-full min-h-0 p-3 sm:p-5 text-[#263238] flex flex-col overflow-hidden">
+    <section class="h-full min-h-0 text-[#263238] flex flex-col overflow-hidden">
       <!-- Header  -->
-      <div class="flex items-center justify-between border-b border-gray-300 pb-3 mb-3">
+      <div class="flex items-center justify-between pb-3">
         <div class="flex items-center gap-2">
-          <h2 class="m-0 text-base font-bold text-[#263238]">Thành quả câu được</h2>
+          <h2 class="m-0 text-base font-bold text-[#263238]">Tổng số cá</h2>
           <span class="px-2 py-0.5 rounded-full bg-[#153221] text-white text-[11px] font-extrabold shadow-xs">
             {{ caughtStore.caughtFishes.length }}
           </span>
         </div>
+        <button
+          type="button"
+          class="px-3 py-1.5 rounded-lg border text-xs font-bold transition-colors cursor-pointer"
+          :class="
+            groupBySpecies
+              ? 'bg-[#153221] text-white border-[#153221]'
+              : 'bg-white text-[#153221] border-emerald-900/20 hover:bg-emerald-50'
+          "
+          :aria-pressed="groupBySpecies"
+          @click="groupBySpecies = !groupBySpecies"
+        >
+          {{ groupBySpecies ? "Đang gom theo loài" : "Gom theo loài" }}
+        </button>
       </div>
 
       <!-- Công cụ tìm kiếm -->
@@ -232,7 +231,7 @@ function closeSellSuccess() {
 
       <!-- Danh sách thẻ cá -->
       <div
-        class="h-0 grow overflow-y-auto pr-1 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-3 content-start"
+        class="h-0 grow overflow-y-auto pr-1 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 xl:grid-cols-8 gap-3 content-start"
       >
         <div v-if="caughtStore.isLoadingCaught" class="col-span-full text-center text-xs text-gray-500">
           Đang tải danh sách cá...
@@ -244,7 +243,88 @@ function closeSellSuccess() {
               : "Chưa có con cá nào trong bộ sưu tập"
           }}
         </div>
+        <template v-else-if="groupBySpecies">
+          <article
+            v-for="group in paginatedFishGroups"
+            :key="group.id"
+            class="min-w-0 overflow-hidden h-fit border border-gray-200 hover:border-emerald-300 rounded-xl bg-gray-50/70 transition-all shadow-sm"
+          >
+            <img
+              :src="group.fishes[0].species?.image || '/fish/VN/fish.jpg'"
+              :alt="group.fishes[0].species?.name || 'Cá'"
+              class="w-full h-36 object-cover border-b border-gray-200 bg-gray-200"
+            />
+            <div class="p-2">
+              <div class="flex items-start justify-between gap-2">
+                <div class="min-w-0">
+                  <h3 class="m-0 truncate font-bold text-xs text-[#263238]">
+                    {{ group.fishes[0].species?.name || "Cá chưa rõ tên" }}
+                  </h3>
+                  <span
+                    v-if="group.fishes[0].species?.rarity"
+                    class="inline-block mt-1 px-1.5 py-1 text-[9px] font-extrabold rounded border uppercase"
+                    :class="getRarityBadgeClass(group.fishes[0].species?.rarity)"
+                  >
+                    {{ group.fishes[0].species?.rarity }}
+                  </span>
+                </div>
+                <span class="shrink-0 px-2 py-1 rounded-full bg-[#153221] text-white text-[10px] font-extrabold">
+                  {{ group.fishes.length }} con
+                </span>
+              </div>
+              <button
+                type="button"
+                class="mt-2 w-full px-2 py-1.5 rounded-lg border border-emerald-200 bg-emerald-50 hover:bg-emerald-100 text-emerald-800 font-bold text-xs transition-colors cursor-pointer"
+                :aria-expanded="expandedSpecies === group.id"
+                @click="expandedSpecies = expandedSpecies === group.id ? null : group.id"
+              >
+                {{ expandedSpecies === group.id ? "Ẩn chi tiết" : "Xem từng con" }}
+              </button>
+              <div
+                v-if="expandedSpecies === group.id"
+                class="mt-2 space-y-2 border-t border-gray-200 pt-2 overflow-y-scroll h-60"
+              >
+                <div
+                  v-for="fish in group.fishes"
+                  :key="fish.id"
+                  class="rounded-lg bg-white p-2 text-[10px] text-gray-600"
+                >
+                  <div class="flex items-center justify-between gap-2">
+                    <span class="font-semibold text-gray-800">{{ fish.weight }} kg · {{ fish.variant_type }}</span>
+                    <span class="shrink-0">{{ formatDateTime(fish.created_at) }}</span>
+                  </div>
+                  <button
+                    type="button"
+                    class="mt-1 cursor-pointer text-left hover:underline"
+                    @click="worldStore.handleMoveToArea(fish.origin)"
+                  >
+                    {{ fish.origin.country }} - {{ fish.origin.name }}
+                  </button>
+                  <div class="mt-2 flex gap-2">
+                    <button
+                      type="button"
+                      class="px-2 py-1 border border-emerald-200 rounded-lg bg-emerald-50 hover:bg-emerald-100 text-emerald-700 font-bold transition-colors cursor-pointer"
+                      title="Đăng bán"
+                      @click="openSellConfirm(fish)"
+                    >
+                      Bán
+                    </button>
+                    <button
+                      type="button"
+                      class="px-2 py-1 border border-red-200 rounded-lg bg-red-50 hover:bg-red-100 text-red-600 font-bold transition-colors cursor-pointer"
+                      title="Thả cá về lại tự nhiên"
+                      @click="openReleaseConfirm(fish)"
+                    >
+                      Thả
+                    </button>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </article>
+        </template>
         <div
+          v-else
           v-for="item in paginatedCaughtFishes"
           :key="item.id"
           class="min-w-0 p-2 border border-gray-200 hover:border-emerald-300 rounded-xl bg-gray-50/70 hover:bg-emerald-50/30 transition-all flex flex-col gap-2 shadow-sm"
@@ -265,7 +345,7 @@ function closeSellSuccess() {
                 }}</span>
               </div>
               <div class="flex items-center justify-between text-[10px] text-gray-400">
-                <span class="shrink-0 ml-1">{{ formatDate(item.created_at) }}</span>
+                <span class="shrink-0 ml-1">{{ formatDateTime(item.created_at!) }}</span>
               </div>
               <div>
                 <span
@@ -305,11 +385,13 @@ function closeSellSuccess() {
         </div>
       </div>
       <div
-        v-if="filteredCaughtFishes.length > pageSize"
+        v-if="(groupBySpecies ? groupedCaughtFishes.length : filteredCaughtFishes.length) > pageSize"
         class="flex items-center justify-between gap-3 border-t border-gray-200 pt-3 mt-3 text-xs"
       >
         <span class="text-gray-500"
-          >Trang {{ currentPage }} / {{ pageCount }} ({{ filteredCaughtFishes.length }} cá)</span
+          >Trang {{ currentPage }} / {{ pageCount }} ({{
+            groupBySpecies ? `${groupedCaughtFishes.length} loài` : `${filteredCaughtFishes.length} cá`
+          }})</span
         >
         <div class="flex gap-2">
           <button
@@ -333,8 +415,6 @@ function closeSellSuccess() {
     </section>
   </Modal>
 
-  <!-- Dialog xác nhận thả cá -->
-  <!-- Dialog Ä‘Äƒng bán cá -->
   <FishReleaseConfirm
     :fish="fishToRelease"
     :is-loading="isReleasing"
@@ -346,49 +426,6 @@ function closeSellSuccess() {
     :is-loading="isSelling"
     :error="sellError"
     @cancel="cancelSell"
-    @confirm="submitSell"
+    @confirm="handleSell"
   />
-
-  <!-- Popup thông báo bán thành công -->
-  <Transition name="sell-success">
-    <div
-      v-if="sellSuccess"
-      class="fixed top-6 left-1/2 -translate-x-1/2 z-[100] flex items-center gap-2.5 px-5 py-3 rounded-xl bg-emerald-600 text-white shadow-[0_8px_30px_rgba(21,50,33,0.35)] border border-emerald-500"
-      @click="closeSellSuccess"
-    >
-      <span class="text-lg"></span>
-      <span class="text-sm font-semibold"
-        >Đã đăng bán <strong>{{ soldFishName }}</strong> thành công!</span
-      >
-    </div>
-  </Transition>
 </template>
-
-<style scoped>
-.sell-success-enter-active {
-  animation: sell-success-in 0.4s ease-out;
-}
-.sell-success-leave-active {
-  animation: sell-success-out 0.3s ease-in forwards;
-}
-@keyframes sell-success-in {
-  0% {
-    opacity: 0;
-    transform: translateX(-50%) translateY(-20px) scale(0.95);
-  }
-  100% {
-    opacity: 1;
-    transform: translateX(-50%) translateY(0) scale(1);
-  }
-}
-@keyframes sell-success-out {
-  0% {
-    opacity: 1;
-    transform: translateX(-50%) translateY(0) scale(1);
-  }
-  100% {
-    opacity: 0;
-    transform: translateX(-50%) translateY(-20px) scale(0.95);
-  }
-}
-</style>

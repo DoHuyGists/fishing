@@ -10,7 +10,7 @@ export type CaughtFishDetails = {
 
 export type CaughtRow = {
   id: string;
-  created_at: string | null;
+  created_at: string;
   user_id: string;
   species_id: string;
   weight: number;
