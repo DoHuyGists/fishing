@@ -1,6 +1,8 @@
 <script setup lang="ts">
 defineProps<{ fish: any; isLoading?: boolean }>();
 const emit = defineEmits<{ cancel: []; confirm: [] }>();
+
+
 </script>
 
 <template>

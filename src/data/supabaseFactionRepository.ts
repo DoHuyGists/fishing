@@ -27,6 +27,7 @@ export interface Faction {
   sort_order: number;
   created_at: string;
   faction_effects?: FactionEffect[];
+  leader_1_image?: string;
 }
 
 export interface CurrentFactionEffect {

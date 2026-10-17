@@ -4,6 +4,8 @@ import { supabaseFishRepository } from "../../data/supabaseFishRepository";
 import { useMarketStore } from "../../stores/market";
 import { useAuthStore } from "../../stores/auth";
 import { useCaughtStore } from "../../stores/caught";
+import FishSellConfirm from "./FishSellConfirm.vue";
+import FishReleaseConfirm from "./FishReleaseConfirm.vue";
 const marketStore = useMarketStore();
 const fishToSell = ref<any | null>(null);
 const fishToRelease = ref<any | null>(null);
@@ -91,5 +93,5 @@ async function releaseFish() {
       </section>
 
       <FishSellConfirm :fish="fishToSell" :is-loading="isSellingFish" :error="fishActionError" @cancel="fishToSell = null" @confirm="sellFish" />
-    <FishReleaseConfirm :fish="fishToRelease" :is-loading="isReleasingFish" @cancel="fishToRelease = null" @confirm="releaseFish" />
+      <FishReleaseConfirm :fish="fishToRelease" :is-loading="isReleasingFish" @cancel="fishToRelease = null" @confirm="releaseFish" />
 </template>

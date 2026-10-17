@@ -306,7 +306,7 @@ onMounted(() => {
             </div>
 
             <!-- Cột Phải (8 cols): Thông tin chi tiết & Hiệu ứng -->
-            <div class="lg:col-span-8 space-y-5">
+            <div class="lg:col-span-4 space-y-5">
               <!-- Giới thiệu / Tôn chỉ -->
               <div class="p-4 rounded-lg border border-[#d5e1d0] bg-[#eaf2e5]">
                 <h4 class="m-0 mb-2 text-xs uppercase tracking-widest font-extrabold text-[#344f3b] font-serif flex items-center gap-1.5">
@@ -378,6 +378,10 @@ onMounted(() => {
                   </article>
                 </div>
               </div>
+            </div>
+
+            <div class="col-span-4">
+              <img :src="factionStore.activeFaction?.leader_1_image" alt="" draggable="false">
             </div>
           </div>
         </section>
