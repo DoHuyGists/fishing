@@ -21,11 +21,13 @@ import PostProduction from "../fishing-post-production/PostProduction.vue";
 import { useModalStore } from "../../stores/modal.ts";
 import { useNotificationStore } from "../../stores/notification";
 import LatestCaughtList from "../caught/LatestCaughtList.vue";
+import { useConfigStore } from "../../stores/config.ts";
 
 const authStore = useAuthStore();
 const caughtStore = useCaughtStore();
 const modalStore = useModalStore();
 const notificationStore = useNotificationStore();
+const configStore = useConfigStore();
 
 const hasNewNotification = ref(false);
 
@@ -172,6 +174,7 @@ onUnmounted(() => {
         </button>
 
         <button
+          v-if="configStore.showFaction"
           type="button"
           class="flex items-center gap-1.5 px-3 py-1.5 bg-[#153221] hover:bg-[#1a3e29] border border-gray-300 text-white rounded-xl shadow-sm font-bold text-xs cursor-pointer transition-colors"
           @click="modalStore.open('faction')"

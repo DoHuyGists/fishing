@@ -1,7 +1,7 @@
 import type { Session, User } from "@supabase/supabase-js";
 import { defineStore } from "pinia";
 import supabase from "../database/connection";
-import { supabaseUserProfileRepository } from "../data/supabaseUserProfileRepository";
+import { supabaseUserProfileRepository, type UserProfile } from "../data/supabaseUserProfileRepository";
 
 type Credentials = {
   email: string;
@@ -12,6 +12,7 @@ export const useAuthStore = defineStore("auth", {
   state: () => ({
     session: null as Session | null,
     user: null as User | null,
+    profile: null as UserProfile | null,
     loading: false,
     initialized: false,
     error: "",
@@ -96,6 +97,7 @@ export const useAuthStore = defineStore("auth", {
         if (this.user?.id === userId) {
           this.isAdmin = profile?.is_admin ?? false;
         }
+        this.profile = profile;
       } catch (err) {
         if (this.user?.id === userId) {
           this.isAdmin = false;

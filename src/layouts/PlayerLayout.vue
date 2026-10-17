@@ -10,11 +10,13 @@ import { supabaseCurrencyRepository } from "../data/supabaseCurrencyRepository";
 import { supabaseUserInAreaRepository } from "../data/supabaseUserInAreaRepository";
 import { useUserInAreaStore } from "../stores/userInArea";
 import TwoOptionsModal from "../components/TwoOptionsModal.vue";
+import { useConfigStore } from "../stores/config.ts";
 
 const router = useRouter();
 const authStore = useAuthStore();
 const currencyStore = useCurrencyStore();
 const userInAreaStore = useUserInAreaStore();
+const configStore = useConfigStore();
 let currencyChannel: RealtimeChannel | null = null;
 let userInAreaChannel: ReturnType<typeof supabaseUserInAreaRepository.subscribeToAreaUsers> | null = null;
 
@@ -60,6 +62,13 @@ watch(
     }
   },
 );
+
+watch(()=> authStore.profile, (userProfile)=>{
+  if(userProfile != null){
+    configStore.loadConfig(userProfile)
+  }
+}, {immediate: true})
+
 </script>
 
 <template>
