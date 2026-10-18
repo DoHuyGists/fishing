@@ -1586,8 +1586,8 @@ onMounted(()=>{
                 </button>
               </div>
 
-              <div>
-                <img :src="dayPhaseStore.currentScenePhace" class="w-full" draggalbe="false"/>
+              <div class="rounded-md overflow-hidden">
+                <img :src="dayPhaseStore.currentScenePhace" class="w-full" draggable="false"/>
               </div>
 
               <button
