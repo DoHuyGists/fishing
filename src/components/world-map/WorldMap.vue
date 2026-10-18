@@ -193,6 +193,7 @@ onUnmounted(() => {
         </button>
 
         <button
+        v-if="configStore.showTeam"
           type="button"
           class="flex items-center gap-1.5 px-3 py-1.5 bg-[#153221] hover:bg-[#1a3e29] border border-gray-300 text-white rounded-xl shadow-sm font-bold text-xs cursor-pointer transition-colors"
           @click="modalStore.open('team')"

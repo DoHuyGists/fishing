@@ -25,9 +25,11 @@ const { showConflictModal, modalMessage, closeCurrentTab, logoutAccount } = useS
 onBeforeMount(async () => {
   await useTimezoneCheck();
   // Lắng nghe user_in_area thay đổi để chuyển hướng user về đúng màn hình
-  userInAreaChannel = supabaseUserInAreaRepository.subscribeToAreaUsers(async () => {
-    userInAreaStore.setCurrentUserInArea(authStore.userId);
-  });
+  if(!userInAreaChannel){
+    userInAreaChannel = supabaseUserInAreaRepository.subscribeToAreaUsers(async () => {
+      userInAreaStore.setCurrentUserInArea(authStore.userId);
+    });
+  }
 
   // Lắng nghe để đồng bộ currency
   currencyChannel = supabaseCurrencyRepository.subscribeToCurrency(authStore.userId, () => {
@@ -36,6 +38,7 @@ onBeforeMount(async () => {
 });
 
 onMounted(() => {
+  userInAreaStore.setCurrentUserInArea(authStore.userId);
   currencyStore.fetchCurrency();
 });
 

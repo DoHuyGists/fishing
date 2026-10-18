@@ -74,7 +74,7 @@ router.beforeEach(async (to) => {
         return { name: "home" };
       }
     } else if (fishingArea.status == "enter") {
-      if (to.name != "fishing") {
+      if (to.name != "fishing" && to.name != "admin") {
         return { name: "fishing" };
       }
     }

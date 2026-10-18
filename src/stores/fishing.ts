@@ -5,6 +5,7 @@ import { supabaseEquipmentRepository } from "../data/supabaseEquipmentRepository
 import { supabaseFishRepository } from "../data/supabaseFishRepository";
 import { supabaseUserInAreaRepository } from "../data/supabaseUserInAreaRepository";
 import supabase from "../database/connection";
+import { supabaseFishingAreaRepository } from "../data/supabaseFishingAreaRepository";
 export type FishingTool = "rod" | "line" | "reel" | "hook" | "bait";
 export type CastPhase = "idle" | "casting" | "waiting" | "bite" | "submitting" | "caught" | "lost";
 export type FishingChallenge = {
@@ -114,6 +115,7 @@ export const useFishingStore = defineStore("fishing", {
     nearbyPlayers: [] as FishingPlayer[],
     isLoadingPlayers: false,
     inventory: [] as CaughtFish[],
+    currentArea: {} as any,
     currentAreaId: null as string | null,
   }),
   getters: {
@@ -122,17 +124,20 @@ export const useFishingStore = defineStore("fishing", {
     canReelIn: (s) => ["casting", "waiting", "bite"].includes(s.castPhase),
   },
   actions: {
-    async updateCurrentAreaId(userId: string) {
-      const currentUserArea = await supabaseUserInAreaRepository.getCurrentUserArea(userId);
-      this.currentAreaId = currentUserArea.area_id;
-    },
     async initializeFishingArea(areaId: string) {
       if (!areaId) return;
       this.currentAreaId = areaId;
-      await Promise.all([this.fetchCaughtFishes(areaId), this.fetchPlayersInArea(areaId)]);
+      await Promise.all([this.fetchCurrentArea(areaId), this.fetchCaughtFishes(areaId), this.fetchPlayersInArea(areaId)]);
+    },
+    async fetchCurrentArea(areaId: string) {
+      try {
+        this.currentArea = await supabaseFishingAreaRepository.fetchOneAreas(areaId);
+      } catch (err) {
+        console.log(err);
+      }
     },
     async fetchPlayersInArea(areaId?: string) {
-      const targetAreaId = areaId || this.currentAreaId || useFishingAreaStore().currentArea?.id;
+      const targetAreaId = areaId || this.currentAreaId;
       if (!targetAreaId) return;
 
       this.isLoadingPlayers = true;
@@ -266,7 +271,7 @@ export const useFishingStore = defineStore("fishing", {
         this.rejectCast("Hãy thu mồi trước khi quăng mồi lại");
         return;
       }
-      const areaId = this.currentAreaId || useFishingAreaStore().currentArea?.id;
+      const areaId = this.currentAreaId;
       if (!areaId) {
         this.rejectCast("Không tìm thấy bãi câu. Hãy thử vào lại khu vực.");
         return;

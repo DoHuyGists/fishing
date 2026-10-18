@@ -7,6 +7,8 @@ import { onBeforeRouteLeave, useRouter } from "vue-router";
 import { useFishingAreaStore } from "../../stores/fishingArea";
 import ZoneWeather from "./ZoneWeather.vue";
 import { supabaseUserInAreaRepository } from "../../data/supabaseUserInAreaRepository";
+import { useDayPhaseStore } from "../../stores/dayPhase.ts";
+import { useUserInAreaStore } from "../../stores/userInArea.ts";
 
 const environment = import.meta.env.VITE_ENVIRONTMENT;
 
@@ -22,10 +24,12 @@ const waterBoundaryPoints = computed(() => waterBoundary.value.map(({ x, y }) =>
 
 const router = useRouter();
 const authStore = useAuthStore();
+const dayPhaseStore = useDayPhaseStore();
 const fishingAreaStore = useFishingAreaStore();
 const fishingStore = useFishingStore();
 const isLeaving = ref(false);
 const showExitConfirmation = ref(false);
+const userInAreaStore = useUserInAreaStore();
 const tripCaughtCount = ref(0);
 let realtimeSubscription: ReturnType<typeof supabaseUserInAreaRepository.subscribeToAreaUsers> | null = null;
 
@@ -54,21 +58,14 @@ onBeforeRouteLeave(async (to) => {
   return true;
 });
 
-onBeforeMount(async () => {
-  await fishingStore.updateCurrentAreaId(authStore.userId);
-})
-
-watch(() => fishingStore.currentAreaId, (areaId) => {
+watch(() => userInAreaStore.userInArea?.area_id, (areaId) => {
   if (areaId) {
     fishingStore.initializeFishingArea(areaId as string);
-    fishingAreaStore.fetchCurrentArea(areaId as string);
-    realtimeSubscription = supabaseUserInAreaRepository.subscribeToAreaUsers(async () => {
-      await fishingStore.updateCurrentAreaId(authStore.userId);
-      fishingStore.fetchPlayersInArea(areaId as string);
-    });
-  } else {
-    router.replace({ name: "home" })
   }
+})
+
+watch(()=> fishingStore.currentArea, (newArea) => {
+  dayPhaseStore.setCurrentScenePhase(newArea);
 })
 
 
@@ -136,13 +133,6 @@ watch(
   },
 );
 
-// 4 giai đoạn trong ngày: rạng đông, ban ngày, hoàng hôn, ban đêm
-const DAY_PHASES = [
-  { key: "dawn", label: "Sáng", from: 3, to: 9, icon: "/time/sunrise.png" },
-  { key: "day", label: "Trưa", from: 9, to: 17, icon: "/time/noon.png" },
-  { key: "dusk", label: "Hoàng hôn", from: 17, to: 19, icon: "/time/dusk.png" },
-  { key: "night", label: "Ban đêm", from: 19, to: 3, icon: "/time/night.png" },
-] as const;
 
 const now = ref(new Date());
 let clockTimer: number | undefined;
@@ -176,36 +166,10 @@ onBeforeUnmount(() => {
   window.removeEventListener("resize", updateRodPosition);
   if (realtimeSubscription) {
     supabaseUserInAreaRepository.unsubscribe(realtimeSubscription);
+    realtimeSubscription = null;
   }
 });
 
-const currentPhase = computed(() => {
-  const hour = now.value.getHours();
-  return (
-    DAY_PHASES.find((phase) =>
-      phase.from < phase.to ? hour >= phase.from && hour < phase.to : hour >= phase.from || hour < phase.to,
-    ) ?? DAY_PHASES[3]
-  );
-});
-
-const currentScenePhace = computed(() => {
-  if (fishingAreaStore.currentArea) {
-    switch (currentPhase.value.key) {
-      case "dawn":
-        return `${fishingAreaStore.currentArea.scenePath}/dawn.png`;
-      case "day":
-        return `${fishingAreaStore.currentArea.scenePath}/day.png`;
-      case "dusk":
-        return `${fishingAreaStore.currentArea.scenePath}/dusk.png`;
-      case "night":
-        return `${fishingAreaStore.currentArea.scenePath}/night.png`;
-      default:
-        break;
-    }
-  } else {
-    return "";
-  }
-});
 
 const timeLabel = computed(() =>
   now.value.toLocaleTimeString("vi-VN", { hour: "2-digit", minute: "2-digit", second: "2-digit" }),
@@ -226,7 +190,7 @@ function castAt(event: MouseEvent) {
   const bounds = scene.getBoundingClientRect();
   const x = ((event.clientX - bounds.left) / bounds.width) * 100;
   const y = ((event.clientY - bounds.top) / bounds.height) * 100;
-  if (!isPointInWater({ x, y }, fishingAreaStore.currentArea.fishingBoundary)) {
+  if (!isPointInWater({ x, y }, fishingStore.currentArea.fishingBoundary)) {
     invalidTap.value = true;
     fishingStore.rejectCast();
     window.setTimeout(() => (invalidTap.value = false), 520);
@@ -244,23 +208,24 @@ function handleClickOnScene(event: MouseEvent) {
     castAt(event);
   }
 }
+
 </script>
 
 <template>
   <section class="fishing-scene" @contextmenu.prevent="">
-    <img :src="currentScenePhace" alt="Ao câu trong rừng" class="pond-image" draggable="false" ref="sceneElement"
+    <img :src="dayPhaseStore.currentScenePhace" alt="Ao câu trong rừng" class="pond-image" draggable="false" ref="sceneElement"
       @click="handleClickOnScene" />
     <div class="scene-shade"></div>
     <div class="absolute top-2 left-2 text-white flex justify-between items-start">
       <div class="flex flex-col gap-2">
         <div class="location">
           <div class="w-10 h-10 overflow-hidden">
-            <img :src="currentPhase.icon" :alt="currentPhase.label" class="location-icon" />
+            <img :src="dayPhaseStore.currentPhase.icon" :alt="dayPhaseStore.currentPhase.label" class="location-icon" />
           </div>
           <div>
             <strong>{{ timeLabel }}</strong>
-            <small>{{ currentPhase.label }}</small>
-            <ZoneWeather :area-id="fishingStore.currentAreaId as string | null" />
+            <small>{{ dayPhaseStore.currentPhase.label }}</small>
+            <ZoneWeather :area-id="userInAreaStore.userInArea?.area_id as string | null" />
           </div>
         </div>
         <div class="backdrop-blur-2xl h-fit w-fit rounded p-1">

@@ -7,6 +7,7 @@ import PrepareModal from "./PrepareModal.vue";
 import { useUserInAreaStore } from "../../stores/userInArea.ts";
 import { useAuthStore } from "../../stores/auth.ts";
 import { useToast } from "../../composables/useToast.ts";
+import { useDayPhaseStore } from "../../stores/dayPhase.ts";
 
 const props = defineProps<{
   anchors: any[];
@@ -27,6 +28,7 @@ const isEntering = ref(false);
 const showPrepare = ref(false);
 const pendingAnchor = ref<any | null>(null);
 const cursorPosition = ref<{ x: number; y: number } | null>(null);
+const dayPhaseStore = useDayPhaseStore();
 
 function handleWorldMouseMove(event: MouseEvent) {
   if (!worldStore.isAnchorMode) {
@@ -114,6 +116,7 @@ const popupScale = computed(() => {
 
 function openAreaWindow(anchor: any) {
   selectedAnchor.value = anchor;
+  dayPhaseStore.setCurrentScenePhase(anchor);
 }
 
 function closeAreaWindow() {
@@ -179,7 +182,7 @@ onMounted(()=>{
   pointer-events: auto;
   user-select: none;
   width: 200px;
-  transform: translateX(-100px);
+  transform: translateX(-100px) translateY(-176px);
 }
 
 .anchor-dialog-wrapper > div {
@@ -1564,7 +1567,7 @@ onMounted(()=>{
         />
 
         <g v-if="selectedAnchor && selectedAnchor.id === anchor.id" transform="translate(0 0)">
-          <foreignObject y="-69" class="anchor-dialog-wrapper">
+          <foreignObject class="anchor-dialog-wrapper">
             <div
               xmlns="http://www.w3.org/1999/xhtml"
               class="anchor-dialog"
@@ -1578,10 +1581,13 @@ onMounted(()=>{
             >
               <div class="anchor-dialog-header">
                 <span class="whitespace-nowrap">{{ anchor.title }}</span>
-
                 <button type="button" class="anchor-dialog-close" @pointerdown.stop @click.stop="closeAreaWindow">
                   ×
                 </button>
+              </div>
+
+              <div>
+                <img :src="dayPhaseStore.currentScenePhace" class="w-full" draggalbe="false"/>
               </div>
 
               <button
