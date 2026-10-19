@@ -155,13 +155,13 @@ onMounted(()=>{
 </script>
 
 <template>
-     <Modal title="Chợ cá">
+     <Modal title="Chợ cá" :on-refresh="marketStore.loadMarketListings">
       <div
-        class="w-full h-full bg-white border border-gray-300 rounded-2xl shadow-[0_20px_50px_rgba(0,0,0,0.3)] flex flex-col overflow-hidden relative">
+        class="w-full h-full bg-white flex flex-col overflow-hidden relative">
 
         <!-- Navigation Tabs & Utility Toolbar -->
         <div
-          class="px-6 py-3 bg-gray-50 border-b border-gray-200 flex flex-wrap items-center justify-between gap-3 flex-shrink-0">
+          class="flex flex-wrap items-center justify-between gap-3 flex-shrink-0">
           <!-- Tabs -->
           <div class="flex items-center bg-gray-200/80 p-1 rounded-xl gap-1 text-xs font-bold">
             <button type="button" class="px-4 py-1.5 rounded-lg transition-all cursor-pointer flex items-center gap-1.5"
@@ -181,22 +181,11 @@ onMounted(()=>{
               </span>
             </button>
           </div>
-          <Cash :amount="currencyStore.formattedCash"/>
-          <!-- Quick Refresh Button -->
-          <button type="button" @click="marketStore.loadMarketListings" title="Làm mới danh sách"
-            class="px-3 py-1.5 border border-gray-300 rounded-lg bg-white hover:bg-gray-100 text-gray-700 text-xs font-bold flex items-center gap-1.5 cursor-pointer transition-colors">
-            <svg class="w-3.5 h-3.5" :class="{ 'animate-spin': marketStore.isLoadingMarket }" fill="none" stroke="currentColor"
-              viewBox="0 0 24 24">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
-            </svg>
-            <span>Làm mới</span>
-          </button>
         </div>
 
         <!-- Filter & Search Toolbar (shown for 'all' tab) -->
         <div v-if="activeMarketTab === 'all'"
-          class="px-6 py-2.5 bg-white border-b border-gray-100 flex flex-wrap items-center gap-3 flex-shrink-0">
+          class="mt-2 bg-white border-b border-gray-100 flex flex-wrap items-center gap-3 flex-shrink-0">
           <!-- Search input -->
           <div class="relative flex-1 min-w-[200px]">
             <input v-model="marketSearch" type="text" placeholder="Tìm kiếm cá rao bán..."
@@ -234,7 +223,7 @@ onMounted(()=>{
         </div>
 
         <!-- Content Area -->
-        <div class="flex-1 p-6 bg-gray-50/50">
+        <div class="flex-1 mt-2 bg-gray-50/50">
 
           <!-- Tab 1: Sàn Giao Dịch -->
           <div v-if="activeMarketTab === 'all'">
@@ -249,7 +238,7 @@ onMounted(()=>{
               <p class="m-0 font-medium">{{ marketSearch || marketRarity !== 'ALL' ? 'Không tìm thấy con cá nào phù hợp với bộ lọc' : 'Hiện chưa có cá nào được đăng bán trên thị trường.' }}</p>
             </div>
 
-            <div v-else class="grid grid-cols-1 sm:grid-cols-3 md:grid-cols-5 gap-4">
+            <div v-else class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-4">
               <div v-for="item in filteredMarketListings" :key="item.id"
                 class="bg-white border border-gray-200 hover:border-emerald-500/50 rounded-xl p-3 shadow-2xs hover:shadow-md transition-all flex flex-col justify-between relative group">
 

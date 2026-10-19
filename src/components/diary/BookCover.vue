@@ -120,6 +120,7 @@ const styleVars = computed(() => {
           </slot>
           <p class="num-down">{{ numDown }}</p>
           <p class="author">{{ author }}</p>
+          <p class="title">{{ title }}</p>
         </div>
       </div>
       <div class="left-side">
@@ -205,15 +206,15 @@ const styleVars = computed(() => {
   position: absolute;
   top: 64px;
   left: 47px;
-  letter-spacing: 50px;
+  letter-spacing: 5px;
   transform: rotate(-90deg);
   color: var(--book-text-color);
 }
 
 .cover .num-down {
-  position: relative;
-  top: 65px;
-  left: -95px;
+  position: absolute;
+  top: 125px;
+  left: 38px;
   transform: rotate(-90deg);
   color: var(--book-text-color);
 }
@@ -223,6 +224,16 @@ const styleVars = computed(() => {
   font-weight: 400;
   position: absolute;
   top: 475px;
+  left: 50px;
+  opacity: 0.8;
+  color: var(--book-text-color);
+}
+
+.title{
+  font-family: acumin-pro, sans-serif;
+  font-weight: 400;
+  position: absolute;
+  top: 495px;
   left: 50px;
   opacity: 0.8;
   color: var(--book-text-color);
@@ -273,9 +284,11 @@ const styleVars = computed(() => {
   font-weight: 400;
   font-size: 13px;
   padding-right: 20px;
+  color: white;
 }
 
 .left-side h2 span:last-child {
   font-family: acumin-pro, sans-serif;
+  color: white;
 }
 </style>

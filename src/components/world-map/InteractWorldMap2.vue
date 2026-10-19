@@ -135,10 +135,6 @@ function onPick(p: PickPoint) {
   anchor.value = p.lon != null && p.lat != null ? { lon: p.lon, lat: p.lat, k: p.k } : null;
 }
 
-function goHanoi() {
-  mapRef.value?.setView({ lon: 105.85, lat: 21.03, k: 30, duration: 800 });
-}
-
 function zoomTo(k: number) {
   mapRef.value?.setView({ k, duration: 300 }); // giữ nguyên tâm, chỉ đổi zoom
 }
@@ -147,26 +143,11 @@ const anchor = ref<{ lon: number; lat: number; k: number } | null>(null);
 </script>
 
 <template>
-  <div class="grid grid-cols-1 md:grid-cols-[auto_1fr] gap-2">
+  <div class="grid grid-cols-1 md:grid-cols-[auto_1fr] h-full gap-2">
     <FishingAnchor />
-    <div class="flex flex-col">
-      <div class="flex">
-        <button @click="goHanoi">Hà Nội</button>
-        <button @click="zoomTo(3)">Zoom 3x</button>
-        <button @click="mapRef?.resetView()">Về toàn cảnh</button>
-        <button @click="togglePick">{{ pickEnabled ? "Tắt xác định vị trí" : "Bật xác định vị trí" }}</button>
-      </div>
-      <div class="md:w-full overflow-hidden">
-        <World2
-          ref="mapRef"
-          :areas="fishingAreaStore.fishingAreas"
-          :selected-area-id="selectedArea?.id ?? null"
-          :pick-enabled="pickEnabled"
-          :anchor="anchor"
-          @pick="onPick"
-          @zoom="onZoom"
-          @select-area="onSelectArea"
-        >
+    <div class="flex flex-col gap-2">
+      <div class="w-full h-[50dvh] overflow-hidden grid place-items-center border border-gray-300 rounded-xl">
+        <World2 ref="mapRef" :areas="fishingAreaStore.fishingAreas" :selected-area-id="selectedArea?.id ?? null" :pick-enabled="pickEnabled" :anchor="anchor" @pick="onPick" @zoom="onZoom" @select-area="onSelectArea">
           <template #tooltip>
             <template v-if="anchor"> {{ anchor }} </template>
           </template>
@@ -179,25 +160,25 @@ const anchor = ref<{ lon: number; lat: number; k: number } | null>(null);
                 </button>
               </div>
               <img :src="dayPhaseStore.currentScenePhace" class="w-full rounded-md" draggable="false" />
-              <button
-                type="button"
-                class="w-full rounded-lg bg-green-500 px-2 py-1.5 font-bold text-white hover:bg-green-600 disabled:opacity-70"
-                :disabled="isEntering"
-                @click="openPrepare(area)"
-              >
+              <button type="button" class="w-full rounded-lg bg-green-500 px-2 py-1.5 font-bold text-white hover:bg-green-600 disabled:opacity-70" :disabled="isEntering" @click="openPrepare(area)">
                 {{ isEntering ? "Đang vào..." : "Đi đến bãi câu" }}
               </button>
             </div>
           </template>
         </World2>
       </div>
+      <div class="flex gap-2">
+        <button @click="zoomTo(3)" class="border border-gray-300 rounded-md px-3">3x</button>
+        <button @click="zoomTo(6)" class="border border-gray-300 rounded-md px-3">6x</button>
+        <button @click="zoomTo(12)" class="border border-gray-300 rounded-md px-3">12x</button>
+        <button @click="zoomTo(24)" class="border border-gray-300 rounded-md px-3">24x</button>
+      </div>
+      <div class="flex gap-2">
+        <button @click="mapRef?.resetView()" class="border border-gray-300 rounded-md px-3">Về toàn cảnh</button>
+        <button @click="togglePick" class="border border-gray-300 rounded-md px-3">{{ pickEnabled ? "Tắt xác định vị trí" : "Bật xác định vị trí" }}</button>
+      </div>
     </div>
-    <PrepareModal
-      v-if="showPrepare && pendingArea"
-      :anchor="pendingArea"
-      @close="closePrepare"
-      @confirm="onPrepareConfirm"
-    />
+    <PrepareModal v-if="showPrepare && pendingArea" :anchor="pendingArea" @close="closePrepare" @confirm="onPrepareConfirm" />
     <!-- <p>Zoom: {{ zoomInfo.k.toFixed(2) }}x | Dịch: {{ zoomInfo.x.toFixed(0) }}, {{ zoomInfo.y.toFixed(0) }}</p> -->
     <!-- <p>{{ picked }}</p> -->
   </div>

@@ -410,7 +410,7 @@ defineExpose({ reload: loadColors, setView, resetView });
 .world-map {
   display: block;
   width: 100%;
-  aspect-ratio: 2 / 1;
+  aspect-ratio: 1 / 1;
   cursor: grab;
 }
 .world-map:active {

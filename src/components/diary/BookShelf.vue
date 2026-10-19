@@ -44,15 +44,15 @@ function getBookVariant(countryCode: string, speciesCount: number): BookVariant 
 
     <div class="flex-1 overflow-y-auto">
       <div class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-6 py-2">
-        <div v-for="country in paginatedCountries" :key="country.code" class="group relative select-none flex flex-col items-center justify-between p-3 rounded-2xl bg-gradient-to-b from-[#3a2213]/60 to-[#1c1008]/80 border border-amber-900/40 hover:border-amber-400/80 shadow-lg transition-all duration-300 cursor-pointer" @click="emit('selectCountry', country)">
+        <div v-for="country in paginatedCountries" :key="country.code" class="group relative select-none flex flex-col items-center justify-between p-3 rounded-2xl transition-all duration-300 cursor-pointer" @click="emit('selectCountry', country)">
           <div class="w-[140px] h-[190px] flex items-center justify-center overflow-hidden my-1">
             <BookCover :title="country.name" author="Nhật Ký Câu Cá" :num-up="country.code" :num-down="`${getSpeciesCount(country)} loài`" :variant="getBookVariant(country.code, getSpeciesCount(country))" :scale="0.33">
               <template #cover-icon><div class="absolute inset-0 flex flex-col items-center justify-center opacity-90 pointer-events-none"><span class="text-4xl drop-shadow-md">{{ country.code }}</span></div></template>
             </BookCover>
           </div>
-          <div class="w-full text-center mt-2 pt-2 border-t border-amber-800/40">
-            <h3 class="m-0 text-xs md:text-sm font-serif font-bold text-amber-200 group-hover:text-amber-100 truncate px-1">{{ country.name }}</h3>
-            <span class="inline-block mt-1 text-[10px] font-bold px-2 py-0.5 rounded-full" :class="getSpeciesCount(country) > 0 ? 'bg-emerald-900/80 text-emerald-300 border border-emerald-600/40' : 'bg-amber-950/60 text-amber-400/70 border border-amber-900/40'">{{ getSpeciesCount(country) }} loài cá</span>
+          <div class="w-full text-center mt-2 pt-2 border-amber-800/40">
+            <h3 class="m-0 text-xs md:text-sm font-serif font-bold truncate px-1">{{ country.name }}</h3>
+            <span class="inline-block mt-1 text-[10px] font-bold px-2 py-0.5 rounded-full" :class="getSpeciesCount(country) > 0 ? 'bg-emerald-900/80 text-white border border-emerald-600/40' : 'bg-amber-950/60 text-amber-400/70 border border-amber-900/40'">{{ getSpeciesCount(country) }} loài cá</span>
           </div>
         </div>
       </div>

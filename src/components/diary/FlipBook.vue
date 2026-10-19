@@ -154,15 +154,15 @@ function getSheetZIndex(sheetIndex: number): number {
   <div class="w-full flex-1 flex flex-col justify-between select-none overflow-hidden">
     <!-- Book Container with 3D Perspective -->
     <div class="flex-1 flex items-center justify-center perspective-container">
-      <div class="book-wrapper relative w-full h-full bg-[#211209] rounded-2xl">
+      <div class="book-wrapper relative w-full h-full rounded-2xl">
         <!-- Book 3D Stage -->
-        <div class="book-stage relative w-full h-full rounded-sm overflow-hidden shadow-xl flex">
+        <div class="book-stage relative w-full h-full rounded-sm flex">
           <!-- Center Spine Drop Shadow Overlay -->
           <!-- <div class="absolute top-0 bottom-0 left-1/2 -translate-x-1/2 w-10 bg-linear-to-r from-amber-950/40 via-amber-950/70 to-amber-950/40 z-30 pointer-events-none border-x border-amber-950/30 shadow-2xl"></div> -->
 
           <!-- ================= BASE LEFT PAGE (Inside Cover / Page 0) ================= -->
           <div
-            class="w-1/2 h-full bg-linear-to-br from-[#faf3e3] via-[#f4e7d0] to-[#e8d7bb] p-3 md:p-5 flex flex-col justify-between border-r border-amber-900/20 relative shadow-inner"
+            class="w-1/2 h-full bg-linear-to-br from-[#faf3e3] via-[#f4e7d0] to-[#e8d7bb] p-3 md:p-5 flex flex-col justify-between border-r border-amber-900/20 relative shadow-inner shadow-xl"
           >
             <div>
               <!-- Header -->
@@ -221,7 +221,7 @@ function getSheetZIndex(sheetIndex: number): number {
 
           <!-- ================= BASE RIGHT PAGE (End Cover / Page Final) ================= -->
           <div
-            class="w-1/2 h-full bg-gradient-to-bl from-[#faf3e3] via-[#f4e7d0] to-[#e8d7bb] p-3 md:p-5 flex flex-col justify-between relative shadow-inner"
+            class="w-1/2 h-full bg-gradient-to-bl from-[#faf3e3] via-[#f4e7d0] to-[#e8d7bb] p-3 md:p-5 flex flex-col justify-between relative shadow-inner shadow-xl"
           >
             <div class="h-full">
               <div class="flex items-center justify-between border-b-1 border-amber-900/30"></div>
@@ -295,7 +295,7 @@ function getSheetZIndex(sheetIndex: number): number {
                   >
                     <!-- Fish Image -->
                     <div
-                      class="relative w-1/5 shrink-0 rounded-md overflow-hidden p-1 border-amber-900/30 bg-amber-900/20 flex items-center justify-center"
+                      class="relative w-full lg:w-1/5 shrink-0 rounded-md overflow-hidden p-1 border-amber-900/30 bg-amber-900/20 flex items-center justify-center"
                       :class="{
                         'cursor-pointer hover:ring-2 hover:ring-emerald-500/60 transition-shadow':
                           entry.isCaught && entry.species['3d'],
@@ -322,10 +322,12 @@ function getSheetZIndex(sheetIndex: number): number {
                     </div>
 
                     <!-- Fish Info -->
-                    <div class="flex-1 flex flex-col justify-between text-[10px] min-w-0">
+                    <div class="absolute left-0 bottom-0 bg-linear-to-t from-black to-black/0 w-full p-3 hover:opacity-0 duration-200 ease-in-out
+                    md:relative md:bg-none md:from-transparent md:to-transparent md:w-auto md:p-0 md:hover:opacity-100 md:duration-0 md:ease-linear
+                    flex-1 flex flex-col justify-between text-[10px] min-w-0">
                       <div>
                         <div class="flex items-center justify-between gap-1">
-                          <h4 class="m-0 font-serif font-bold text-lg text-amber-950 truncate">
+                          <h4 class="m-0 font-serif font-bold text-lg text-white lg:text-amber-950 truncate">
                             {{ entry.isCaught ? entry.species.name : "???" }}
                           </h4>
                           <span
@@ -339,7 +341,7 @@ function getSheetZIndex(sheetIndex: number): number {
                             {{ entry.isCaught ? entry.species.status || "Đã câu" : "Chưa bắt" }}
                           </span>
                         </div>
-                        <p class="m-0 text-md text-amber-900/80 line-clamp-1 leading-tight italic mt-0.5">
+                        <p class="m-0 text-md text-white lg:text-amber-900/80 line-clamp-1 leading-tight italic mt-0.5">
                           {{
                             entry.isCaught
                               ? entry.species.information || "Chưa có thông tin sinh thái."
@@ -347,7 +349,7 @@ function getSheetZIndex(sheetIndex: number): number {
                           }}
                         </p>
                       </div>
-                      <div class="text-[8px] text-emerald-800 font-semibold mt-0.5">
+                      <div class="text-[8px] text-white lg:text-emerald-800 font-semibold mt-0.5">
                         <span v-if="entry.isCaught">✓ {{ formatDate(entry.caughtAt) }}</span>
                         <span v-else class="text-amber-800/60 font-medium"></span>
                       </div>
@@ -358,7 +360,10 @@ function getSheetZIndex(sheetIndex: number): number {
                   <div
                     v-for="emptyIdx in ITEMS_PER_PAGE - getSpeciesForPage(sheetIdx * 2 + 1).length"
                     :key="'empty-front-' + emptyIdx"
-                    class="p-1.5 text-center text-amber-900/40 italic border border-dashed border-amber-900/20 rounded-lg text-xs flex items-center justify-center min-h-[44px]"
+                    :style="{
+                      'height': 'calc(100% / 5 - 7px)'
+                    }"
+                    class="p-1.5 text-center text-amber-900/40 italic border border-dashed border-amber-900/20 rounded-lg text-xs flex items-center justify-center"
                   >
                     Trống
                   </div>
@@ -406,7 +411,7 @@ function getSheetZIndex(sheetIndex: number): number {
                   >
                     <!-- Fish Image -->
                     <div
-                      class="relative w-1/5 shrink-0 rounded-md overflow-hidden p-1 bg-amber-900/20 flex items-center justify-center"
+                      class="relative w-full lg:w-1/5 shrink-0 rounded-md overflow-hidden p-1 bg-amber-900/20 flex items-center justify-center"
                       :class="{
                         'cursor-pointer hover:ring-2 hover:ring-emerald-500/60 transition-shadow':
                           entry.isCaught && entry.species['3d'],
@@ -433,10 +438,12 @@ function getSheetZIndex(sheetIndex: number): number {
                     </div>
 
                     <!-- Fish Info -->
-                    <div class="flex-1 flex flex-col justify-between text-[10px] min-w-0">
+                    <div class="absolute left-0 bottom-0 bg-linear-to-t from-black to-black/0 w-full p-3 hover:opacity-0 duration-200 ease-in-out
+                    md:relative md:bg-none md:from-transparent md:to-transparent md:w-auto md:p-0 md:hover:opacity-100 md:duration-0 md:ease-linear
+                    flex-1 flex flex-col justify-between text-[10px] min-w-0">
                       <div>
                         <div class="flex items-center justify-between gap-1">
-                          <h4 class="m-0 font-serif font-bold text-[11px] text-amber-950 truncate">
+                          <h4 class="m-0 font-serif font-bold text-[11px] text-white lg:text-amber-950 truncate">
                             {{ entry.isCaught ? entry.species.name : "???" }}
                           </h4>
                           <span
@@ -450,7 +457,7 @@ function getSheetZIndex(sheetIndex: number): number {
                             {{ entry.isCaught ? entry.species.status || "Đã câu" : "Chưa bắt" }}
                           </span>
                         </div>
-                        <p class="m-0 text-[9px] text-amber-900/80 line-clamp-1 leading-tight italic mt-0.5">
+                        <p class="m-0 text-[9px] text-white lg:text-amber-900/80 line-clamp-1 leading-tight italic mt-0.5">
                           {{
                             entry.isCaught
                               ? entry.species.information || "Chưa có thông tin sinh thái."
@@ -458,7 +465,7 @@ function getSheetZIndex(sheetIndex: number): number {
                           }}
                         </p>
                       </div>
-                      <div class="text-[8px] text-emerald-800 font-semibold mt-0.5">
+                      <div class="text-[8px] text-white lg:text-emerald-800 font-semibold mt-0.5">
                         <span v-if="entry.isCaught">✓ {{ formatDate(entry.caughtAt) }}</span>
                         <span v-else class="text-amber-800/60 font-medium"></span>
                       </div>
@@ -469,6 +476,9 @@ function getSheetZIndex(sheetIndex: number): number {
                   <div
                     v-for="emptyIdx in ITEMS_PER_PAGE - getSpeciesForPage(sheetIdx * 2 + 2).length"
                     :key="'empty-back-' + emptyIdx"
+                    :style="{
+                      'height': `calc(100% / 5 - 7px)`
+                    }"
                     class="p-1.5 text-center text-amber-900/40 italic border border-dashed border-amber-900/20 rounded-lg text-xs flex items-center justify-center min-h-[44px]"
                   >
                     Trống

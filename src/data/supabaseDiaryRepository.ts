@@ -12,7 +12,7 @@ export interface Species {
 }
 
 export interface CaughtDiary {
-  id: number;
+  id: string;
   created_at: string;
   user_id: string;
   species_id: string;
