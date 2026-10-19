@@ -1,16 +1,113 @@
 <script lang="ts" setup>
-import { ref } from "vue";
+import { computed, nextTick, onMounted, ref, watch } from "vue";
+import { useWorld2Store } from "../../stores/world2.ts";
+import { useRouter } from "vue-router";
 import World2 from "./World2.vue";
+import PrepareModal from "./PrepareModal.vue";
+import { useFishingAreaStore } from "../../stores/fishingArea.ts";
+import { useUserInAreaStore } from "../../stores/userInArea.ts";
+import { useAuthStore } from "../../stores/auth.ts";
+import { useDayPhaseStore } from "../../stores/dayPhase.ts";
+import { useToast } from "../../composables/useToast.ts";
+import { supabaseUserInAreaRepository } from "../../data/supabaseUserInAreaRepository";
+import FishingAnchor from "./FishingAnchor.vue";
 
+const router = useRouter();
+const toast = useToast();
+const authStore = useAuthStore();
+const userInAreaStore = useUserInAreaStore();
+const dayPhaseStore = useDayPhaseStore();
+const fishingAreaStore = useFishingAreaStore();
 const zoomInfo = ref({ lon: 0, lat: 0, k: 1 });
 const picked = ref<string>("");
 const mapRef = ref<InstanceType<typeof World2> | null>(null);
+const pickEnabled = ref(false);
+const worldStore = useWorld2Store();
+const selectedArea = computed(() => (worldStore.selectedArea?.id ? worldStore.selectedArea : null));
+const pendingArea = ref<any | null>(null);
+const showPrepare = ref(false);
+const isEntering = ref(false);
+
+onMounted(async () => {
+  // Khôi phục vị trí đã lưu trước đó rồi đưa bản đồ tới đó ngay
+  worldStore.moveMapToCachedLocation();
+  await nextTick();
+  if (worldStore.k !== 1 || worldStore.lon !== 0 || worldStore.lat !== 0) {
+    mapRef.value?.setView({ lon: worldStore.lon, lat: worldStore.lat, k: worldStore.k });
+  }
+  if (!fishingAreaStore.loaded) fishingAreaStore.fetchArea();
+  userInAreaStore.setCurrentUserInArea(authStore.userId);
+});
+
+function togglePick() {
+  pickEnabled.value = !pickEnabled.value;
+  if (!pickEnabled.value) anchor.value = null;
+}
+
+function onSelectArea(area: any) {
+  worldStore.targetArea(area);
+}
+
+// Store -> map: đổi k/lon/lat từ bên ngoài thì map di chuyển theo
+watch(
+  () => [worldStore.k, worldStore.lon, worldStore.lat],
+  ([k, lon, lat]) => {
+    const cur = zoomInfo.value;
+    if (Math.abs(cur.k - k) < 1e-6 && Math.abs(cur.lon - lon) < 1e-6 && Math.abs(cur.lat - lat) < 1e-6) return;
+    mapRef.value?.setView({ lon, lat, k, duration: 600 });
+  },
+);
+
+// Chọn bãi câu (từ chấm đỏ hoặc từ store) -> cập nhật cảnh và bay tới bãi đó
+watch(
+  () => worldStore.selectedArea,
+  (area) => {
+    if (!area?.id) return;
+    dayPhaseStore.setCurrentScenePhase(area);
+    const loc = area.location;
+    if (typeof loc?.lon === "number" && typeof loc?.lat === "number") {
+      worldStore.lon = loc.lon;
+      worldStore.lat = loc.lat;
+      if (typeof loc.k === "number") worldStore.k = loc.k;
+    }
+  },
+  { immediate: true },
+);
+
+function openPrepare(area: any) {
+  if (!userInAreaStore.canEnterFishingArea) {
+    toast.error("Cần kết thúc xử lý cá trong lưới trước", { title: "Thao tác bị chặn", position: "top" });
+    return;
+  }
+  pendingArea.value = area;
+  showPrepare.value = true;
+}
+
+function closePrepare() {
+  showPrepare.value = false;
+  pendingArea.value = null;
+}
+
+async function onPrepareConfirm(area: any) {
+  if (isEntering.value) return;
+  isEntering.value = true;
+  try {
+    await supabaseUserInAreaRepository.setUserEnterArea(area.id);
+  } catch (err) {
+    console.error("Lỗi cập nhật user_in_area khi đi đến bãi câu:", err);
+  } finally {
+    isEntering.value = false;
+    showPrepare.value = false;
+    router.push({ name: "fishing" });
+  }
+}
 
 interface PickPoint {
-  screen: { x: number; y: number };
-  map: { x: number; y: number };
+  screen: { x: number; y: number }; // px trên canvas
+  map: { x: number; y: number }; // toạ độ trong hệ chưa zoom
   lon: number | null;
   lat: number | null;
+  k: number;
 }
 
 function onZoom(s: { center: [number, number] | null; k: number }) {
@@ -19,6 +116,10 @@ function onZoom(s: { center: [number, number] | null; k: number }) {
     lat: s.center?.[1] ?? 0,
     k: s.k,
   };
+  worldStore.k = s.k;
+  worldStore.lon = zoomInfo.value.lon;
+  worldStore.lat = zoomInfo.value.lat;
+  worldStore.cachedMapLocation();
 }
 
 function onPick(p: PickPoint) {
@@ -31,7 +132,7 @@ function onPick(p: PickPoint) {
   if (p.lon != null && p.lat != null) {
     mapRef.value?.setView({ lon: p.lon, lat: p.lat, k: 15, duration: 600 });
   }
-  anchor.value = p.lon != null && p.lat != null ? { lon: p.lon, lat: p.lat } : null;
+  anchor.value = p.lon != null && p.lat != null ? { lon: p.lon, lat: p.lat, k: p.k } : null;
 }
 
 function goHanoi() {
@@ -42,24 +143,62 @@ function zoomTo(k: number) {
   mapRef.value?.setView({ k, duration: 300 }); // giữ nguyên tâm, chỉ đổi zoom
 }
 
-const anchor = ref<{ lon: number; lat: number } | null>(null);
+const anchor = ref<{ lon: number; lat: number; k: number } | null>(null);
 </script>
 
 <template>
-  <div class="flex flex-col">
-    <div class="flex">
-      <button @click="goHanoi">Hà Nội</button>
-      <button @click="zoomTo(3)">Zoom 3x</button>
-      <button @click="mapRef?.resetView()">Về toàn cảnh</button>
+  <div class="grid grid-cols-1 md:grid-cols-[auto_1fr] gap-2">
+    <FishingAnchor />
+    <div class="flex flex-col">
+      <div class="flex">
+        <button @click="goHanoi">Hà Nội</button>
+        <button @click="zoomTo(3)">Zoom 3x</button>
+        <button @click="mapRef?.resetView()">Về toàn cảnh</button>
+        <button @click="togglePick">{{ pickEnabled ? "Tắt xác định vị trí" : "Bật xác định vị trí" }}</button>
+      </div>
+      <div class="md:w-full overflow-hidden">
+        <World2
+          ref="mapRef"
+          :areas="fishingAreaStore.fishingAreas"
+          :selected-area-id="selectedArea?.id ?? null"
+          :pick-enabled="pickEnabled"
+          :anchor="anchor"
+          @pick="onPick"
+          @zoom="onZoom"
+          @select-area="onSelectArea"
+        >
+          <template #tooltip>
+            <template v-if="anchor"> {{ anchor }} </template>
+          </template>
+          <template #popup="{ area }">
+            <div class="flex flex-col gap-1.5 rounded-lg bg-white p-2 text-xs text-gray-800 shadow-lg">
+              <div class="flex items-center justify-between gap-2 font-bold">
+                <span class="whitespace-nowrap">{{ area.title }}</span>
+                <button type="button" class="text-base leading-none text-gray-500" @click="worldStore.targetArea({})">
+                  ×
+                </button>
+              </div>
+              <img :src="dayPhaseStore.currentScenePhace" class="w-full rounded-md" draggable="false" />
+              <button
+                type="button"
+                class="w-full rounded-lg bg-green-500 px-2 py-1.5 font-bold text-white hover:bg-green-600 disabled:opacity-70"
+                :disabled="isEntering"
+                @click="openPrepare(area)"
+              >
+                {{ isEntering ? "Đang vào..." : "Đi đến bãi câu" }}
+              </button>
+            </div>
+          </template>
+        </World2>
+      </div>
     </div>
-    <div class="w-[50dvw] overflow-hidden">
-      <World2 ref="mapRef" @pick="onPick" @zoom="onZoom" :anchor="anchor">
-        <template #tooltip>
-          <template v-if="anchor"> {{ anchor.lat.toFixed(3) }}, {{ anchor.lon.toFixed(3) }} </template>
-        </template>
-      </World2>
-    </div>
+    <PrepareModal
+      v-if="showPrepare && pendingArea"
+      :anchor="pendingArea"
+      @close="closePrepare"
+      @confirm="onPrepareConfirm"
+    />
+    <!-- <p>Zoom: {{ zoomInfo.k.toFixed(2) }}x | Dịch: {{ zoomInfo.x.toFixed(0) }}, {{ zoomInfo.y.toFixed(0) }}</p> -->
+    <!-- <p>{{ picked }}</p> -->
   </div>
-  <!-- <p>Zoom: {{ zoomInfo.k.toFixed(2) }}x | Dịch: {{ zoomInfo.x.toFixed(0) }}, {{ zoomInfo.y.toFixed(0) }}</p> -->
-  <!-- <p>{{ picked }}</p> -->
 </template>

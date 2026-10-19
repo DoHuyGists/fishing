@@ -1,7 +1,6 @@
 <script setup lang="ts">
 import { onMounted, onUnmounted, ref } from "vue";
 import { useAuthStore } from "../../stores/auth.ts";
-import InteractWorldWrapper from "./InteractWorldMap.vue";
 import MarketWindow from "../market/MarketWindow.vue";
 import { useCaughtStore } from "../../stores/caught.ts";
 import CaughtModal from "../caught/CaughtModal.vue";
@@ -22,6 +21,7 @@ import { useModalStore } from "../../stores/modal.ts";
 import { useNotificationStore } from "../../stores/notification";
 import LatestCaughtList from "../caught/LatestCaughtList.vue";
 import { useConfigStore } from "../../stores/config.ts";
+import InteractWorldMap2 from "./InteractWorldMap2.vue";
 
 const authStore = useAuthStore();
 const caughtStore = useCaughtStore();
@@ -49,7 +49,7 @@ onUnmounted(() => {
   <div class="w-screen h-screen p-3 relative grid grid-cols-1 md:grid-cols-2 gap-2 overflow-x-hidden">
     <!-- Khung Bản đồ trung tâm -->
     <div class="">
-      <InteractWorldWrapper />
+      <InteractWorldMap2 />
     </div>
 
     <div class="">

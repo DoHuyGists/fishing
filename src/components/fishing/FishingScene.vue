@@ -23,9 +23,7 @@ const waterBoundaryPoints = computed(() => waterBoundary.value.map(({ x, y }) =>
 //
 
 const router = useRouter();
-const authStore = useAuthStore();
 const dayPhaseStore = useDayPhaseStore();
-const fishingAreaStore = useFishingAreaStore();
 const fishingStore = useFishingStore();
 const isLeaving = ref(false);
 const showExitConfirmation = ref(false);

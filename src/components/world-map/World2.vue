@@ -31,11 +31,20 @@ interface PickPoint {
   map: { x: number; y: number }; // toạ độ trong hệ chưa zoom
   lon: number | null;
   lat: number | null;
+  k: number
+}
+
+interface AreaPoint {
+  id: string;
+  title?: string | null;
+  location?: { lon?: number; lat?: number } | null;
+  [key: string]: any;
 }
 
 const emit = defineEmits<{
   zoom: [state: ZoomState];
   pick: [point: PickPoint];
+  "select-area": [area: AreaPoint];
 }>();
 
 const props = withDefaults(
@@ -44,14 +53,22 @@ const props = withDefaults(
     landColor?: string;
     borderColor?: string;
     anchor?: { lon: number; lat: number } | null; // điểm gắn tooltip
+    areas?: AreaPoint[]; // các bãi câu hiển thị dưới dạng chấm đỏ
+    selectedAreaId?: string | null;
+    pickEnabled?: boolean; // bật/tắt chọn vị trí bằng click
   }>(),
   {
     seaColor: "#cfe8f3",
     landColor: "#e8e4d8",
     borderColor: "#ffffff",
     anchor: null,
+    areas: () => [],
+    selectedAreaId: null,
+    pickEnabled: false,
   },
 );
+
+const markers = ref<{ area: AreaPoint; x: number; y: number }[]>([]);
 
 const canvasRef = ref<HTMLCanvasElement | null>(null);
 
@@ -101,7 +118,7 @@ function resetView(duration = 400) {
 
 function onClick(event: MouseEvent) {
   const canvas = canvasRef.value;
-  if (!canvas || !projection) return;
+  if (!canvas || !projection || !props.pickEnabled) return;
 
   const rect = canvas.getBoundingClientRect();
   if (!rect.width || !rect.height) return;
@@ -126,6 +143,7 @@ function onClick(event: MouseEvent) {
     map: { x: mx, y: my },
     lon,
     lat,
+    k: transform.k
   });
 }
 
@@ -231,7 +249,7 @@ function draw() {
   updateTip();
 }
 
-watch(() => props.anchor, updateTip, { deep: true });
+watch(() => [props.anchor, props.pickEnabled], updateTip, { deep: true });
 
 async function loadColors() {
   const { data, error } = await supabase
@@ -315,17 +333,39 @@ onBeforeUnmount(() => {
 });
 
 function updateTip() {
-  const a = props.anchor;
+  const a = props.pickEnabled ? props.anchor : null;
   const p = a && projection ? projection([a.lon, a.lat]) : null;
-  
+
   if (!p) {
     tip.value.visible = false;
+  } else {
+    const [x, y] = transform.apply(p); // lon/lat -> px, đã tính cả zoom và kéo
+    const inside = x >= 0 && x <= width && y >= 0 && y <= height;
+    tip.value = { x, y, visible: inside };
+  }
+  updateMarkers();
+}
+
+function updateMarkers() {
+  if (!projection) {
+    markers.value = [];
     return;
   }
-  const [x, y] = transform.apply(p); // lon/lat -> px, đã tính cả zoom và kéo
-  const inside = x >= 0 && x <= width && y >= 0 && y <= height;
-  tip.value = { x, y, visible: inside };
+  const next: { area: AreaPoint; x: number; y: number }[] = [];
+  for (const area of props.areas) {
+    const lon = area.location?.lon;
+    const lat = area.location?.lat;
+    if (typeof lon !== "number" || typeof lat !== "number") continue;
+    const p = projection([lon, lat]);
+    if (!p) continue;
+    const [x, y] = transform.apply(p);
+    if (x < 0 || x > width || y < 0 || y > height) continue;
+    next.push({ area, x, y });
+  }
+  markers.value = next;
 }
+
+watch(() => props.areas, updateMarkers, { deep: true });
 
 // Đổi màu qua props thì vẽ lại
 watch(() => [props.seaColor, props.landColor, props.borderColor], draw);
@@ -336,6 +376,24 @@ defineExpose({ reload: loadColors, setView, resetView });
 <template>
   <div class="world-map-wrap">
     <canvas ref="canvasRef" @click="onClick" class="world-map" />
+    <div
+      v-for="m in markers"
+      :key="m.area.id"
+      class="world-map-marker"
+      :style="{ transform: `translate(${m.x}px, ${m.y}px)`, zIndex: m.area.id === selectedAreaId ? 2 : 1 }"
+    >
+      <span class="world-map-marker__pulse" />
+      <button
+        type="button"
+        class="world-map-marker__dot"
+        :class="{ 'is-selected': m.area.id === selectedAreaId }"
+        :title="m.area.title ?? ''"
+        @click.stop="emit('select-area', m.area)"
+      />
+      <div v-if="m.area.id === selectedAreaId" class="world-map-marker__popup" @click.stop @pointerdown.stop>
+        <slot name="popup" :area="m.area" />
+      </div>
+    </div>
     <div v-if="tip.visible" class="world-map-tip" :style="{ transform: `translate(${tip.x}px, ${tip.y}px)` }">
       <div class="world-map-tip__body">
         <slot name="tooltip" />
@@ -363,6 +421,54 @@ defineExpose({ reload: loadColors, setView, resetView });
   left: 0;
   top: 0;
   pointer-events: none; /* không chặn kéo/click bản đồ bên dưới */
+}
+.world-map-marker {
+  position: absolute;
+  left: 0;
+  top: 0;
+  width: 0;
+  height: 0;
+}
+.world-map-marker__dot {
+  position: absolute;
+  width: 10px;
+  height: 10px;
+  margin: -5px 0 0 -5px;
+  padding: 0;
+  border-radius: 50%;
+  border: 1.5px solid #fff;
+  background: red;
+  cursor: pointer;
+}
+.world-map-marker__dot.is-selected {
+  background: #22c55e;
+}
+.world-map-marker__pulse {
+  position: absolute;
+  width: 10px;
+  height: 10px;
+  margin: -5px 0 0 -5px;
+  border-radius: 50%;
+  background: red;
+  pointer-events: none;
+  animation: world-map-pulse 1.5s ease-out infinite;
+}
+@keyframes world-map-pulse {
+  from {
+    transform: scale(1);
+    opacity: 0.8;
+  }
+  to {
+    transform: scale(4);
+    opacity: 0;
+  }
+}
+.world-map-marker__popup {
+  position: absolute;
+  left: 0;
+  bottom: 0;
+  transform: translate(-50%, -16px);
+  width: 200px;
 }
 .world-map-tip__body {
   /* căn giữa ngang, nằm phía trên điểm 10px */

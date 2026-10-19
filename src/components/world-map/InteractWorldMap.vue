@@ -1,7 +1,6 @@
 <script lang="ts" setup>
 import { computed, onMounted, ref, watch } from "vue";
 import { MIN_ZOOM, MAX_ZOOM, ZOOM_STEP, useWorldStore } from "../../stores/world";
-import { useFishingAreaStore } from "../../stores/fishingArea";
 import World from "./World.vue";
 import FishingAnchor from "./FishingAnchor.vue";
 import { useToast } from "../../composables/useToast.ts";
@@ -10,10 +9,9 @@ const tooltipPos = ref({ x: 0, y: 0 });
 const mapFrame = ref<HTMLElement | null>(null);
 const dragStart = ref({ x: 0, y: 0 });
 const panStart = ref({ x: 0, y: 0 });
-const toast = useToast()
+const toast = useToast();
 const worldStore = useWorldStore();
-const fishingAreaStore = useFishingAreaStore();
-const anchors = computed(() => fishingAreaStore.areas);
+const anchors = computed(() => []);
 
 function handleMouseMove(event: any) {
   const targetTitle = event.target.getAttribute("title");
@@ -132,7 +130,7 @@ function handleAnchorMode() {
   if (worldStore.anchorable) {
     worldStore.toggleAnchorMode();
   } else {
-    toast.info("Mở khóa form để thao tác", { title: "Nhắc nhở", position: "bottom", duration: 2000 })
+    toast.info("Mở khóa form để thao tác", { title: "Nhắc nhở", position: "bottom", duration: 2000 });
   }
 }
 
@@ -146,18 +144,41 @@ onMounted(() => {
   <div class="grid grid-cols-1 md:grid-cols-[auto_1fr] gap-2">
     <FishingAnchor />
     <div class="flex flex-col">
-      <div ref="mapFrame" class="map-frame flex-1 min-w-0 h-full overflow-hidden border mb-0 border-gray-300 rounded-xl bg-[#eef3f1] touch-none relative" :class="worldStore.isDragging ? 'cursor-grabbing' : worldStore.isAnchorMode ? 'cursor-crosshair' : 'cursor-grab'
-        " @wheel.stop="handleWheel" @pointerdown="handlePointerDown" @pointermove="handlePointerMove" @pointerup="stopDragging" @pointercancel="stopDragging">
-        <div class="w-full h-full relative grid place-items-center origin-center transition-transform duration-[120ms] ease-out" :class="{ 'transition-none!': worldStore.isDragging }" :style="{ transform: `translate(${worldStore.pan.x}px, ${worldStore.pan.y}px) scale(${worldStore.zoom})` }"
-          @transitionend="handleZoomTransitionEnd">
+      <div
+        ref="mapFrame"
+        class="map-frame flex-1 min-w-0 h-full overflow-hidden border mb-0 border-gray-300 rounded-xl bg-[#eef3f1] touch-none relative"
+        :class="
+          worldStore.isDragging ? 'cursor-grabbing' : worldStore.isAnchorMode ? 'cursor-crosshair' : 'cursor-grab'
+        "
+        @wheel.stop="handleWheel"
+        @pointerdown="handlePointerDown"
+        @pointermove="handlePointerMove"
+        @pointerup="stopDragging"
+        @pointercancel="stopDragging"
+      >
+        <div
+          class="w-full h-full relative grid place-items-center origin-center transition-transform duration-[120ms] ease-out"
+          :class="{ 'transition-none!': worldStore.isDragging }"
+          :style="{ transform: `translate(${worldStore.pan.x}px, ${worldStore.pan.y}px) scale(${worldStore.zoom})` }"
+          @transitionend="handleZoomTransitionEnd"
+        >
           <World class="w-full h-full" @mousemove="handleMouseMove" :anchors="anchors" :zoom="worldStore.zoom" />
         </div>
       </div>
       <div class="space-y-2 space-x-2 mt-4">
-        <button v-if="worldStore.showAnchorSelectButton" type="button" class="py-2 px-3 cursor-pointer rounded-lg border border-gray-300 bg-transparent text-[#263238] text-xs font-bold hover:bg-[#eef3f1] transition-colors" @click="handleAnchorMode">
+        <button
+          v-if="worldStore.showAnchorSelectButton"
+          type="button"
+          class="py-2 px-3 cursor-pointer rounded-lg border border-gray-300 bg-transparent text-[#263238] text-xs font-bold hover:bg-[#eef3f1] transition-colors"
+          @click="handleAnchorMode"
+        >
           {{ worldStore.isAnchorMode ? "Tắt chọn vị trí" : "Chọn vị trí anchor" }}
         </button>
-        <button type="button" class="py-2 px-3 rounded-lg border border-gray-300 bg-transparent text-[#263238] text-xs font-bold cursor-pointer hover:bg-[#eef3f1] transition-colors" @click="worldStore.resetLocation">
+        <button
+          type="button"
+          class="py-2 px-3 rounded-lg border border-gray-300 bg-transparent text-[#263238] text-xs font-bold cursor-pointer hover:bg-[#eef3f1] transition-colors"
+          @click="worldStore.resetLocation"
+        >
           Reset zoom
         </button>
         <div class="py-2 px-3 rounded-lg border border-gray-300 text-xs">
