@@ -1,6 +1,5 @@
 import { defineStore } from "pinia";
 import { useAuthStore } from "./auth";
-import { useFishingAreaStore } from "./fishingArea";
 import { supabaseEquipmentRepository } from "../data/supabaseEquipmentRepository";
 import { supabaseFishRepository } from "../data/supabaseFishRepository";
 import { supabaseUserInAreaRepository } from "../data/supabaseUserInAreaRepository";

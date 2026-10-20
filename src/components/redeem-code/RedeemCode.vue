@@ -2,9 +2,7 @@
 import { onUnmounted, ref } from "vue";
 import Modal from "../Modal.vue";
 import supabase from "../../database/connection";
-import { useCurrencyStore } from "../../stores/currency";
 
-const currencyStore = useCurrencyStore();
 const code = ref("");
 const isSubmitting = ref(false);
 const notice = ref<{ type: "success" | "error"; text: string } | null>(null);

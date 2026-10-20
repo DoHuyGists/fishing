@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { computed, onMounted, onUnmounted, ref, watch } from "vue";
+import { computed, onMounted, onUnmounted, ref } from "vue";
 import Modal from "../Modal.vue";
 import { useAuthStore } from "../../stores/auth";
 import { useNotificationStore } from "../../stores/notification";

@@ -35,7 +35,7 @@ export const useAuthStore = defineStore("auth", {
       this.loading = true;
       
       // Đăng ký listener TRƯỚC khi gọi getSession hoặc để Supabase tự quản lý
-      supabase.auth.onAuthStateChange(async (event, session) => {
+      supabase.auth.onAuthStateChange(async (_, session) => {
         
         const previousUserId = this.user?.id;
         this.session = session;
@@ -57,7 +57,7 @@ export const useAuthStore = defineStore("auth", {
 
       // Chỉ cần gọi getSession để ép Supabase trigger event ban đầu (nếu SDK chưa tự chạy)
       // Hoặc thậm chí để onAuthStateChange tự bắt session hiện tại của trình duyệt.
-      const { data } = await supabase.auth.getSession();
+      await supabase.auth.getSession();
       
       this.loading = false;
       this.initialized = true;

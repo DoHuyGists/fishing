@@ -14,7 +14,7 @@ export const useDayPhaseStore = defineStore("DayPhase", {
         currentScenePhace: "",
     }),
     getters: {
-        currentPhase : (state) => {
+        currentPhase : (_) => {
             const now = new Date();
             const hour = now.getHours();
             return (

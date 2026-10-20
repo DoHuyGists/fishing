@@ -1,10 +1,8 @@
 <script setup lang="ts">
-import { computed, onBeforeMount, onBeforeUnmount, onMounted, ref, watch } from "vue";
+import { computed, onBeforeUnmount, onMounted, ref, watch } from "vue";
 import { isPointInWater } from "../../data/fishingMap";
 import { useFishingStore } from "../../stores/fishing";
-import { useAuthStore } from "../../stores/auth";
 import { onBeforeRouteLeave, useRouter } from "vue-router";
-import { useFishingAreaStore } from "../../stores/fishingArea";
 import ZoneWeather from "./ZoneWeather.vue";
 import { supabaseUserInAreaRepository } from "../../data/supabaseUserInAreaRepository";
 import { useDayPhaseStore } from "../../stores/dayPhase.ts";
