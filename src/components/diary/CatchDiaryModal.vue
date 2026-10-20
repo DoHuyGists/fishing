@@ -2,7 +2,7 @@
 import { computed, onMounted, ref, watch } from "vue";
 import { useDiaryStore, type DiaryFishEntry } from "../../stores/diary";
 import { useAuthStore } from "../../stores/auth";
-import { mapData } from "../../data/map";
+import { useCountryStore } from "../../stores/country";
 import BookShelf from "./BookShelf.vue";
 import FlipBook from "./FlipBook.vue";
 import Modal from "../Modal.vue";
@@ -10,16 +10,22 @@ import Modal from "../Modal.vue";
 type Country = { code: string; name: string; information: string };
 const diaryStore = useDiaryStore();
 const authStore = useAuthStore();
+const countryStore = useCountryStore();
 const viewMode = ref<"bookshelf" | "openbook">("bookshelf");
 const selectedCountry = ref<Country | null>(null);
 
-onMounted(() => diaryStore.initDiary(authStore.userId));
+onMounted(() => {
+  countryStore.fetchCountries();
+  diaryStore.initDiary(authStore.userId);
+});
 watch(() => authStore.userId, (userId) => { if (userId) diaryStore.initDiary(userId); });
 
 const allCountries = computed<Country[]>(() =>
-  Object.entries(mapData)
-    .filter(([code]) => ["VN"].includes(code))
-    .map(([code, item]) => ({ code, name: item.name, information: item.information || "" })),
+  countryStore.countries.map((item) => ({
+    code: item.code,
+    name: item.name,
+    information: item.information,
+  })),
 );
 
 const currentBookEntries = computed<DiaryFishEntry[]>(() => {
