@@ -23,6 +23,7 @@ import LatestCaughtList from "../caught/LatestCaughtList.vue";
 import { useConfigStore } from "../../stores/config.ts";
 import InteractWorldMap2 from "./InteractWorldMap2.vue";
 import { useUserTurnsStore } from "../../stores/userTurns";
+import UserTurn from "../stamina/UserTurn.vue";
 
 const authStore = useAuthStore();
 const caughtStore = useCaughtStore();
@@ -55,23 +56,7 @@ onUnmounted(() => {
       class="flex flex-wrap items-center justify-between gap-3 rounded-xl border border-[#cbd9c6] bg-[#f5f9f0] px-4 py-2.5 text-[#24352a] shadow-sm"
     >
       <span class="font-bold">Bản đồ thế giới</span>
-      <div
-        class="flex items-center gap-2 rounded-lg border border-[#cbd9c6] bg-white/70 px-3 py-1.5 text-sm"
-        aria-live="polite"
-      >
-        <span aria-hidden="true">🎣</span>
-        <span class="font-semibold">Lượt câu</span>
-        <span class="font-bold"
-          >{{ userTurnsStore.status?.turns ?? "—" }} / {{ userTurnsStore.status?.max_turns ?? "—" }}</span
-        >
-        <span
-          v-if="userTurnsStore.status && userTurnsStore.status.turns < userTurnsStore.status.max_turns"
-          class="text-xs text-[#617565]"
-        >
-          +1 sau {{ userTurnsStore.countdown }}
-        </span>
-        <span v-else-if="userTurnsStore.error" class="text-xs text-red-700">Không tải được</span>
-      </div>
+      <UserTurn />
     </header>
     <main class="grid flex-1 grid-cols-1 gap-2 md:grid-cols-2">
       <!-- Khung Bản đồ trung tâm -->

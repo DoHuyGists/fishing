@@ -6,6 +6,7 @@ import { supabaseEquipmentRepository } from "../../data/supabaseEquipmentReposit
 import { equipmentCategories } from "../../data/equipmentCatalog";
 import type { FishingTool } from "../../stores/fishing";
 import type { EquipmentSet } from "../../stores/equipment";
+import UserTurn from "../stamina/UserTurn.vue";
 
 const props = defineProps<{
   anchor: any;
@@ -245,7 +246,7 @@ function confirm() {
           aria-labelledby="prepare-title"
         >
           <!-- Header -->
-          <header class="flex items-center justify-between px-7 py-4 bg-[#eaf2e5] border-b border-[#cbd9c6]">
+          <header class="flex items-center justify-between gap-4 px-7 py-4 bg-[#eaf2e5] border-b border-[#cbd9c6]">
             <div class="flex items-center gap-3.5">
               <span class="text-3xl drop-shadow-[0_0_10px_rgba(36,53,42,0.2)] select-none">🎣</span>
               <div>
@@ -255,6 +256,7 @@ function confirm() {
                 <p class="m-0 mt-0.5 text-[13px] text-[#617565] leading-normal">{{ anchor?.title ?? "" }}</p>
               </div>
             </div>
+            <UserTurn />
             <button
               type="button"
               class="flex items-center justify-center w-9 h-9 border-none rounded-xl bg-[#dce9d7] text-[#526a58] hover:bg-[#cbd9c6] hover:text-[#24352a] transition-colors cursor-pointer"
