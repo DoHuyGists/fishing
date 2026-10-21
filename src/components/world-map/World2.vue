@@ -406,11 +406,15 @@ defineExpose({ reload: loadColors, setView, resetView });
 .world-map-wrap {
   position: relative;
   overflow: hidden;
-}
-.world-map {
-  display: block;
   width: 100%;
   aspect-ratio: 1 / 1;
+}
+.world-map {
+  position: absolute;
+  inset: 0;
+  display: block;
+  width: 100%;
+  height: 100%;
   cursor: grab;
 }
 .world-map:active {
