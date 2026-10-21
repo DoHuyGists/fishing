@@ -1,8 +1,8 @@
 <script setup lang="ts">
 import { computed, ref, watch } from "vue";
+import type { Country } from "../../stores/country";
 import BookCover, { type BookVariant } from "./BookCover.vue";
 
-type Country = { code: string; name: string; information: string };
 const props = defineProps<{ countries: Country[]; speciesCountByLocation: Record<string, number> }>();
 const emit = defineEmits<{ selectCountry: [country: Country] }>();
 const searchQuery = ref("");

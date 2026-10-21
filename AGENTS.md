@@ -5,3 +5,4 @@
 - Reuse `src/components/shared/*`. Create components only if no suitable component exists or existing components cover less than 30% of essential requirements.
 - Preferred UI colors: `border-[#cbd9c6]`, `bg-[#f5f9f0]`, `text-[#24352a]`.
 - Avoid duplication, unrelated changes, and oversimplification. Preserve existing behavior and validate changes when practical.
+- Always run a build check after changing code

@@ -26,5 +26,14 @@ export const useUserProfileStore = defineStore("userProfile", {
         this.loading = false;
       }
     },
+    async updateCountry(userId: string, countryId: string) {
+      this.error = "";
+      try {
+        this.profile = await supabaseUserProfileRepository.updateCountry(userId, countryId);
+      } catch (err) {
+        this.error = err instanceof Error ? err.message : "Không thể cập nhật quốc gia";
+        throw err;
+      }
+    },
   },
 });

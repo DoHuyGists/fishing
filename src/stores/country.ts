@@ -32,5 +32,15 @@ export const useCountryStore = defineStore("Country", {
         this.isLoading = false;
       }
     },
+    async fetchMyUnlockedCountries() {
+      this.isLoading = true;
+      try {
+        this.countries = await supabaseCountryRepository.fetchMyUnlockedCountries();
+      } catch (error) {
+        console.error("Failed to fetch unlocked countries:", error);
+      } finally {
+        this.isLoading = false;
+      }
+    },
   },
 });

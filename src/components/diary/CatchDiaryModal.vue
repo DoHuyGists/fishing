@@ -3,11 +3,11 @@ import { computed, onMounted, ref, watch } from "vue";
 import { useDiaryStore, type DiaryFishEntry } from "../../stores/diary";
 import { useAuthStore } from "../../stores/auth";
 import { useCountryStore } from "../../stores/country";
+import type { Country } from "../../stores/country";
 import BookShelf from "./BookShelf.vue";
 import FlipBook from "./FlipBook.vue";
 import Modal from "../shared/Modal.vue";
 
-type Country = { code: string; name: string; information: string };
 const diaryStore = useDiaryStore();
 const authStore = useAuthStore();
 const countryStore = useCountryStore();
@@ -15,7 +15,7 @@ const viewMode = ref<"bookshelf" | "openbook">("bookshelf");
 const selectedCountry = ref<Country | null>(null);
 
 onMounted(() => {
-  countryStore.fetchCountries();
+  countryStore.fetchMyUnlockedCountries();
   diaryStore.initDiary(authStore.userId);
 });
 watch(
@@ -25,13 +25,7 @@ watch(
   },
 );
 
-const allCountries = computed<Country[]>(() =>
-  countryStore.countries.map((item) => ({
-    code: item.code,
-    name: item.name,
-    information: item.information,
-  })),
-);
+const unlockedCountries = computed<Country[]>(() => countryStore.countries);
 
 const currentBookEntries = computed<DiaryFishEntry[]>(() => {
   if (!selectedCountry.value) return [];
@@ -80,7 +74,7 @@ function returnToBookshelf() {
 
       <BookShelf
         v-if="viewMode === 'bookshelf'"
-        :countries="allCountries"
+        :countries="unlockedCountries"
         :species-count-by-location="diaryStore.speciesCountByLocation"
         @select-country="openCountryBook"
       />
