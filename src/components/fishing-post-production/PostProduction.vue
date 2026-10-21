@@ -1,11 +1,11 @@
 <script lang="ts" setup>
 import { computed, onMounted, reactive, ref } from "vue";
-import Modal from "../Modal.vue";
-import Hint from "../Hint.vue";
+import Modal from "../shared/Modal.vue";
+import Hint from "../shared/Hint.vue";
 import { useCaughtStore, type CaughtFish } from "../../stores/caught";
 import { useModalStore } from "../../stores/modal";
 import { useToast } from "../../composables/useToast";
-import TwoOptionsModal from "../TwoOptionsModal.vue";
+import TwoOptionsModal from "../shared/TwoOptionsModal.vue";
 
 type Side = "net" | "stored";
 
@@ -93,15 +93,26 @@ onMounted(() => {
         <template v-for="(panel, index) in panels" :key="panel.key">
           <section class="flex min-w-0 flex-1 flex-col rounded-lg border border-emerald-900/15 bg-white">
             <div class="flex flex-wrap items-center gap-2 border-b border-emerald-900/10 p-2">
-              <h3 class="m-0 text-sm font-bold text-emerald-950">
-                {{ panel.title }} ({{ panel.total }})
-              </h3>
-              <input v-model="search[panel.key]" type="search" placeholder="Tìm cá..." class="min-w-0 grow rounded-md border border-gray-300 px-2 py-1 text-sm focus:border-emerald-600 focus:outline-none" />
-              <button type="button" class="rounded-md border border-emerald-900/15 px-2 py-1 text-xs font-bold hover:bg-emerald-50" @click="selectAllVisible(panel.key)">
+              <h3 class="m-0 text-sm font-bold text-emerald-950">{{ panel.title }} ({{ panel.total }})</h3>
+              <input
+                v-model="search[panel.key]"
+                type="search"
+                placeholder="Tìm cá..."
+                class="min-w-0 grow rounded-md border border-gray-300 px-2 py-1 text-sm focus:border-emerald-600 focus:outline-none"
+              />
+              <button
+                type="button"
+                class="rounded-md border border-emerald-900/15 px-2 py-1 text-xs font-bold hover:bg-emerald-50"
+                @click="selectAllVisible(panel.key)"
+              >
                 Chọn tất cả
               </button>
-              <button type="button" class="rounded-md border border-emerald-900/15 px-2 py-1 text-xs font-bold hover:bg-emerald-50" :aria-label="viewMode[panel.key] === 'grid' ? 'Chuyển sang dạng danh sách' : 'Chuyển sang dạng lưới'"
-                @click="viewMode[panel.key] = viewMode[panel.key] === 'grid' ? 'list' : 'grid'">
+              <button
+                type="button"
+                class="rounded-md border border-emerald-900/15 px-2 py-1 text-xs font-bold hover:bg-emerald-50"
+                :aria-label="viewMode[panel.key] === 'grid' ? 'Chuyển sang dạng danh sách' : 'Chuyển sang dạng lưới'"
+                @click="viewMode[panel.key] = viewMode[panel.key] === 'grid' ? 'list' : 'grid'"
+              >
                 {{ viewMode[panel.key] === "grid" ? "☰ Danh sách" : "▦ Lưới" }}
               </button>
             </div>
@@ -110,11 +121,27 @@ onMounted(() => {
               <p v-if="caughtStore.isLoadingCaught" class="text-center text-sm text-gray-500">Đang tải...</p>
               <p v-else-if="panel.fishes.length === 0" class="text-center text-sm text-gray-500">Không có cá</p>
 
-              <div v-else-if="viewMode[panel.key] === 'grid'" class="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-5 gap-2">
-                <button v-for="fish in panel.fishes" :key="fish.id" type="button" class="flex flex-col items-center gap-1 rounded-md border p-1 text-center transition-colors" :class="selected[panel.key].has(fish.id)
-                  ? 'border-emerald-600 bg-emerald-100 ring-2 ring-emerald-500'
-                  : 'border-gray-200 bg-gray-50 hover:bg-emerald-50'" @click="toggle(panel.key, fish.id)">
-                  <img :src="fish.species?.image || '/fish/VN/fish.jpg'" :alt="fish.species?.name || 'Cá'" class="h-14 w-full rounded object-cover" />
+              <div
+                v-else-if="viewMode[panel.key] === 'grid'"
+                class="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-5 gap-2"
+              >
+                <button
+                  v-for="fish in panel.fishes"
+                  :key="fish.id"
+                  type="button"
+                  class="flex flex-col items-center gap-1 rounded-md border p-1 text-center transition-colors"
+                  :class="
+                    selected[panel.key].has(fish.id)
+                      ? 'border-emerald-600 bg-emerald-100 ring-2 ring-emerald-500'
+                      : 'border-gray-200 bg-gray-50 hover:bg-emerald-50'
+                  "
+                  @click="toggle(panel.key, fish.id)"
+                >
+                  <img
+                    :src="fish.species?.image || '/fish/VN/fish.jpg'"
+                    :alt="fish.species?.name || 'Cá'"
+                    class="h-14 w-full rounded object-cover"
+                  />
                   <span class="w-full truncate text-[11px] font-bold">{{ fish.species?.name }}</span>
                   <span class="text-[10px] text-gray-600">{{ fish.weight }} kg</span>
                 </button>
@@ -122,10 +149,21 @@ onMounted(() => {
 
               <ul v-else class="m-0 flex list-none flex-col gap-1 p-0">
                 <li v-for="fish in panel.fishes" :key="fish.id">
-                  <button type="button" class="flex w-full items-center gap-2 rounded-md border p-1 text-left transition-colors" :class="selected[panel.key].has(fish.id)
-                    ? 'border-emerald-600 bg-emerald-100'
-                    : 'border-gray-200 bg-gray-50 hover:bg-emerald-50'" @click="toggle(panel.key, fish.id)">
-                    <img :src="fish.species?.image || '/fish/VN/fish.jpg'" :alt="fish.species?.name || 'Cá'" class="h-10 w-14 shrink-0 rounded object-cover" />
+                  <button
+                    type="button"
+                    class="flex w-full items-center gap-2 rounded-md border p-1 text-left transition-colors"
+                    :class="
+                      selected[panel.key].has(fish.id)
+                        ? 'border-emerald-600 bg-emerald-100'
+                        : 'border-gray-200 bg-gray-50 hover:bg-emerald-50'
+                    "
+                    @click="toggle(panel.key, fish.id)"
+                  >
+                    <img
+                      :src="fish.species?.image || '/fish/VN/fish.jpg'"
+                      :alt="fish.species?.name || 'Cá'"
+                      class="h-10 w-14 shrink-0 rounded object-cover"
+                    />
                     <span class="grow truncate text-sm font-bold">{{ fish.species?.name }}</span>
                     <span class="text-xs text-gray-600">{{ fish.weight }} kg</span>
                   </button>
@@ -138,10 +176,20 @@ onMounted(() => {
             <div class="">
               <Hint text="Chọn cá rồi nhấn nút chuyển. Cá còn trong lưới khi kết thúc sẽ bị thả." />
             </div>
-            <button type="button" class="rounded-md w-full bg-[#153221] px-3 py-2 text-sm font-bold text-white hover:bg-[#1a3e29] disabled:cursor-not-allowed disabled:opacity-50" :disabled="isMoving || selected.net.size === 0" @click="move('net')">
+            <button
+              type="button"
+              class="rounded-md w-full bg-[#153221] px-3 py-2 text-sm font-bold text-white hover:bg-[#1a3e29] disabled:cursor-not-allowed disabled:opacity-50"
+              :disabled="isMoving || selected.net.size === 0"
+              @click="move('net')"
+            >
               Chuyển vào kho ➜
             </button>
-            <button type="button" class="rounded-md w-full bg-[#153221] px-3 py-2 text-sm font-bold text-white hover:bg-[#1a3e29] disabled:cursor-not-allowed disabled:opacity-50" :disabled="isMoving || selected.stored.size === 0" @click="move('stored')">
+            <button
+              type="button"
+              class="rounded-md w-full bg-[#153221] px-3 py-2 text-sm font-bold text-white hover:bg-[#1a3e29] disabled:cursor-not-allowed disabled:opacity-50"
+              :disabled="isMoving || selected.stored.size === 0"
+              @click="move('stored')"
+            >
               ⬅ Chuyển ra lưới
             </button>
           </div>
@@ -149,15 +197,32 @@ onMounted(() => {
       </div>
 
       <div class="flex justify-end">
-        <button type="button" class="rounded-md bg-red-600 px-5 py-2 text-sm font-bold text-white hover:bg-red-700 disabled:opacity-50" :disabled="isFinishing" @click="showConfirm = true">
+        <button
+          type="button"
+          class="rounded-md bg-red-600 px-5 py-2 text-sm font-bold text-white hover:bg-red-700 disabled:opacity-50"
+          :disabled="isFinishing"
+          @click="showConfirm = true"
+        >
           Kết thúc
         </button>
       </div>
     </div>
 
     <Teleport to="body">
-      <TwoOptionsModal v-if="showConfirm" title="⚠️ Xác nhận" message="Kết thúc thì cá trong lưới sẽ được thả." sub-text="Bạn vui lòng chọn thao tác tiếp theo:" first-text="Hủy" second-text="Đồng ý" :on-first="()=>{showConfirm = false}" :on-second="finish" />
+      <TwoOptionsModal
+        v-if="showConfirm"
+        title="⚠️ Xác nhận"
+        message="Kết thúc thì cá trong lưới sẽ được thả."
+        sub-text="Bạn vui lòng chọn thao tác tiếp theo:"
+        first-text="Hủy"
+        second-text="Đồng ý"
+        :on-first="
+          () => {
+            showConfirm = false;
+          }
+        "
+        :on-second="finish"
+      />
     </Teleport>
-
   </Modal>
 </template>

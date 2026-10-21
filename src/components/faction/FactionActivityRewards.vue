@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { computed } from "vue";
 import { FACTION_ACTIVITY_MILESTONES, type ActivityMilestone } from "../../data/factionActivityMilestones";
-import Hint from "../Hint.vue";
+import Hint from "../shared/Hint.vue";
 
 interface Props {
   currentPoints: number;

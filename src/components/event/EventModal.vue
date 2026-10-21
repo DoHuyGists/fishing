@@ -2,7 +2,7 @@
 import { computed, onMounted, ref } from "vue";
 import { supabaseEventScheduleRepository, type EventScheduleRow } from "../../data/supabaseEventScheduleRepository";
 import EventThumbnail from "./EventThumbnail.vue";
-import Modal from "../Modal.vue";
+import Modal from "../shared/Modal.vue";
 
 const emit = defineEmits(["close"]);
 

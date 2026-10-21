@@ -9,7 +9,7 @@ import { useCurrencyStore } from "../stores/currency";
 import { supabaseCurrencyRepository } from "../data/supabaseCurrencyRepository";
 import { supabaseUserInAreaRepository } from "../data/supabaseUserInAreaRepository";
 import { useUserInAreaStore } from "../stores/userInArea";
-import TwoOptionsModal from "../components/TwoOptionsModal.vue";
+import TwoOptionsModal from "../components/shared/TwoOptionsModal.vue/index.js";
 import { useConfigStore } from "../stores/config.ts";
 
 const router = useRouter();
@@ -25,7 +25,7 @@ const { showConflictModal, modalMessage, closeCurrentTab, logoutAccount } = useS
 onBeforeMount(async () => {
   await useTimezoneCheck();
   // Lắng nghe user_in_area thay đổi để chuyển hướng user về đúng màn hình
-  if(!userInAreaChannel){
+  if (!userInAreaChannel) {
     userInAreaChannel = supabaseUserInAreaRepository.subscribeToAreaUsers(async () => {
       userInAreaStore.setCurrentUserInArea(authStore.userId);
     });
@@ -66,12 +66,15 @@ watch(
   },
 );
 
-watch(()=> authStore.profile, (userProfile)=>{
-  if(userProfile != null){
-    configStore.loadConfig(userProfile)
-  }
-}, {immediate: true})
-
+watch(
+  () => authStore.profile,
+  (userProfile) => {
+    if (userProfile != null) {
+      configStore.loadConfig(userProfile);
+    }
+  },
+  { immediate: true },
+);
 </script>
 
 <template>
@@ -80,7 +83,16 @@ watch(()=> authStore.profile, (userProfile)=>{
 
     <!-- Dialog Cảnh Báo Trùng Tab / Cross-Browser -->
     <Teleport to="body">
-      <TwoOptionsModal v-if="showConflictModal" title="⚠️ Phát hiện trùng phiên truy cập" :message="modalMessage" sub-text="Bạn vui lòng chọn thao tác tiếp theo:" first-text="Đóng tab này" second-text="Đăng xuất tài khoản" :on-first="closeCurrentTab" :on-second="logoutAccount" />
+      <TwoOptionsModal
+        v-if="showConflictModal"
+        title="⚠️ Phát hiện trùng phiên truy cập"
+        :message="modalMessage"
+        sub-text="Bạn vui lòng chọn thao tác tiếp theo:"
+        first-text="Đóng tab này"
+        second-text="Đăng xuất tài khoản"
+        :on-first="closeCurrentTab"
+        :on-second="logoutAccount"
+      />
     </Teleport>
   </div>
 </template>

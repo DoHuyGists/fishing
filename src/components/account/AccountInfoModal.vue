@@ -4,7 +4,7 @@ import { useAuthStore } from "../../stores/auth";
 import { useCurrencyStore } from "../../stores/currency";
 import { useUserProfileStore } from "../../stores/userProfile";
 import { useBadgesStore } from "../../stores/badges";
-import Modal from "../Modal.vue";
+import Modal from "../shared/Modal.vue";
 import Cash from "../currency/Cash.vue";
 import { useRouter } from "vue-router";
 
@@ -12,7 +12,7 @@ const authStore = useAuthStore();
 const currencyStore = useCurrencyStore();
 const userProfileStore = useUserProfileStore();
 const badgesStore = useBadgesStore();
-const router = useRouter()
+const router = useRouter();
 const copied = ref(false);
 const showSignOutConfirm = ref(false);
 const isSigningOut = ref(false);

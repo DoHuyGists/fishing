@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { computed, onMounted, ref } from "vue";
-import Modal from "../Modal.vue";
+import Modal from "../shared/Modal.vue";
 import { useAuthStore } from "../../stores/auth";
 import { useFriendStore, type FriendshipRelation } from "../../stores/friend";
 import { useToast } from "../../composables/useToast";

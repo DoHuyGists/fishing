@@ -4,7 +4,7 @@ import { useCaughtStore, type CaughtFish } from "../../stores/caught.ts";
 import { supabaseFishRepository } from "../../data/supabaseFishRepository.ts";
 import { useMarketStore } from "../../stores/market.ts";
 import { useWorldStore } from "../../stores/world.ts";
-import Modal from "../Modal.vue";
+import Modal from "../shared/Modal.vue";
 import FishSellConfirm from "./FishSellConfirm.vue";
 import FishReleaseConfirm from "./FishReleaseConfirm.vue";
 import { useToast } from "../../composables/useToast.ts";
@@ -33,7 +33,10 @@ const groupedCaughtFishes = computed(() => {
   return Array.from(groups, ([id, fishes]) => ({ id, fishes }));
 });
 const pageCount = computed(() =>
-  Math.max(1, Math.ceil((groupBySpecies.value ? groupedCaughtFishes.value.length : filteredCaughtFishes.value.length) / pageSize)),
+  Math.max(
+    1,
+    Math.ceil((groupBySpecies.value ? groupedCaughtFishes.value.length : filteredCaughtFishes.value.length) / pageSize),
+  ),
 );
 const paginatedCaughtFishes = computed(() => {
   const start = (currentPage.value - 1) * pageSize;
@@ -83,7 +86,6 @@ function cancelSell() {
   fishToSell.value = null;
   sellError.value = "";
 }
-
 
 async function handleSell(priceNum: number) {
   if (!fishToSell.value) return;
@@ -139,7 +141,6 @@ async function handleRelease() {
     isReleasing.value = false;
   }
 }
-
 </script>
 <template>
   <Modal

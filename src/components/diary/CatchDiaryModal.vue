@@ -5,7 +5,7 @@ import { useAuthStore } from "../../stores/auth";
 import { useCountryStore } from "../../stores/country";
 import BookShelf from "./BookShelf.vue";
 import FlipBook from "./FlipBook.vue";
-import Modal from "../Modal.vue";
+import Modal from "../shared/Modal.vue";
 
 type Country = { code: string; name: string; information: string };
 const diaryStore = useDiaryStore();
@@ -18,7 +18,12 @@ onMounted(() => {
   countryStore.fetchCountries();
   diaryStore.initDiary(authStore.userId);
 });
-watch(() => authStore.userId, (userId) => { if (userId) diaryStore.initDiary(userId); });
+watch(
+  () => authStore.userId,
+  (userId) => {
+    if (userId) diaryStore.initDiary(userId);
+  },
+);
 
 const allCountries = computed<Country[]>(() =>
   countryStore.countries.map((item) => ({
@@ -33,9 +38,14 @@ const currentBookEntries = computed<DiaryFishEntry[]>(() => {
   if (diaryStore.currentLocationEntries.length) return diaryStore.currentLocationEntries;
   return Array.from({ length: 10 }, (_, index) => ({
     species: {
-      id: `mock-${selectedCountry.value!.code}-${index + 1}`, created_at: "", name: `Cá thần thoại #${index + 1}`,
+      id: `mock-${selectedCountry.value!.code}-${index + 1}`,
+      created_at: "",
+      name: `Cá thần thoại #${index + 1}`,
       information: `Loài cá sinh sống tại khu vực ${selectedCountry.value!.name}. Hãy thả câu ở vùng biển này để ghi chép lại thông tin!`,
-      location: selectedCountry.value!.code, status: "Chưa khám phá", image: null, "3d": null,
+      location: selectedCountry.value!.code,
+      status: "Chưa khám phá",
+      image: null,
+      "3d": null,
     },
     isCaught: false,
   }));
@@ -58,19 +68,34 @@ function returnToBookshelf() {
   <Modal :title="viewMode === 'bookshelf' ? 'Nhật ký đánh bắt' : `Nhật ký đánh bắt: ${selectedCountry?.name}`">
     <div class="relative flex flex-col min-h-[620px] h-full w-full">
       <div class="mb-2">
-        <button v-if="viewMode === 'openbook'" type="button" class="flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-amber-800/80 hover:bg-amber-700 text-amber-100 font-bold text-xs border border-amber-500/50 transition-all cursor-pointer shadow" @click="returnToBookshelf">
+        <button
+          v-if="viewMode === 'openbook'"
+          type="button"
+          class="flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-amber-800/80 hover:bg-amber-700 text-amber-100 font-bold text-xs border border-amber-500/50 transition-all cursor-pointer shadow"
+          @click="returnToBookshelf"
+        >
           <span>⬅</span><span>Quay lại giá sách</span>
         </button>
       </div>
 
-      <BookShelf v-if="viewMode === 'bookshelf'" :countries="allCountries" :species-count-by-location="diaryStore.speciesCountByLocation" @select-country="openCountryBook" />
+      <BookShelf
+        v-if="viewMode === 'bookshelf'"
+        :countries="allCountries"
+        :species-count-by-location="diaryStore.speciesCountByLocation"
+        @select-country="openCountryBook"
+      />
 
       <div v-else class="flex-1 flex flex-col justify-between overflow-hidden relative">
         <div v-if="diaryStore.isLoading" class="flex-1 flex flex-col items-center justify-center p-12 text-amber-200">
           <div class="w-10 h-10 border border-amber-400 border-t-transparent rounded-full animate-spin mb-3"></div>
           <p class="font-serif text-sm">Đang lật mở trang nhật ký {{ selectedCountry?.name }}...</p>
         </div>
-        <FlipBook v-else-if="selectedCountry" :country="selectedCountry" :entries="currentBookEntries" @back="returnToBookshelf" />
+        <FlipBook
+          v-else-if="selectedCountry"
+          :country="selectedCountry"
+          :entries="currentBookEntries"
+          @back="returnToBookshelf"
+        />
       </div>
     </div>
   </Modal>

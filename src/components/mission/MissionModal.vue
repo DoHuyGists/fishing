@@ -3,7 +3,7 @@ import { computed, onMounted, ref } from "vue";
 import { useMissionStore } from "../../stores/mission";
 import { useCaughtStore, type CaughtFish } from "../../stores/caught";
 import { useToast } from "../../composables/useToast.ts";
-import Modal from "../Modal.vue";
+import Modal from "../shared/Modal.vue";
 import CaughtFishList from "./CaughtFishList.vue";
 import MissionList from "./MissionList.vue";
 
@@ -18,8 +18,8 @@ const isClaiming = ref(false);
 const statusMessage = ref("");
 const statusIsError = ref(false);
 
-const selectedMission = computed(() =>
-  missionStore.missions.find((mission) => mission.id === selectedMissionId.value) ?? null,
+const selectedMission = computed(
+  () => missionStore.missions.find((mission) => mission.id === selectedMissionId.value) ?? null,
 );
 const requiredFishCounts = computed(() => {
   const counts = new Map<string, number>();
@@ -40,8 +40,9 @@ const selectedFishCounts = computed(() => {
 });
 const isMissionComplete = computed(() => {
   const requirements = [...requiredFishCounts.value.entries()];
-  return requirements.length > 0 && requirements.every(
-    ([fishId, required]) => (selectedFishCounts.value.get(fishId) ?? 0) >= required,
+  return (
+    requirements.length > 0 &&
+    requirements.every(([fishId, required]) => (selectedFishCounts.value.get(fishId) ?? 0) >= required)
   );
 });
 
@@ -51,8 +52,8 @@ function canSelectCaught(caught: CaughtFish) {
 }
 
 function toggleCaught(caught: CaughtFish) {
-  if(caught.status === 'on-market'){
-    toast.error("Con này đang ở được bày bán", {title: "Không thể chọn",position: 'bottom'});
+  if (caught.status === "on-market") {
+    toast.error("Con này đang ở được bày bán", { title: "Không thể chọn", position: "bottom" });
     return;
   }
 
@@ -118,7 +119,10 @@ onMounted(() => void loadMissionData(true));
     <div v-if="isLoading || isRefreshing" class="h-full grid place-items-center text-sm text-emerald-900/70">
       Đang tải cá và nhiệm vụ...
     </div>
-    <div v-else class="grid grid-rows-[minmax(0,1fr)_minmax(0,1fr)] md:grid-rows-1 md:grid-cols-[minmax(0,1fr)_minmax(0,1fr)] h-full flex-1">
+    <div
+      v-else
+      class="grid grid-rows-[minmax(0,1fr)_minmax(0,1fr)] md:grid-rows-1 md:grid-cols-[minmax(0,1fr)_minmax(0,1fr)] h-full flex-1"
+    >
       <CaughtFishList
         :caught-fishes="caughtStore.caughtFishes"
         :selected-caught-ids="selectedCaughtIds"

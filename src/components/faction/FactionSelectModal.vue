@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { computed, nextTick, onMounted, ref } from "vue";
-import Modal from "../Modal.vue";
+import Modal from "../shared/Modal.vue";
 import FactionActivityRewards from "./FactionActivityRewards.vue";
 import { useFactionStore } from "../../stores/faction";
 import { useAuthStore } from "../../stores/auth";
@@ -141,11 +141,7 @@ onMounted(() => {
 </script>
 
 <template>
-  <Modal
-    title="Phe phái"
-    sub-title="Gia nhập phe phái để nhận các lợi ích tập thể"
-    :on-refresh="handleRefresh"
-  >
+  <Modal title="Phe phái" sub-title="Gia nhập phe phái để nhận các lợi ích tập thể" :on-refresh="handleRefresh">
     <div class="faction-screen min-h-full p-5 sm:p-8 space-y-6 bg-[#f5f9f0] text-[#24352a]">
       <!-- Thanh trạng thái người chơi -->
       <section
@@ -157,9 +153,7 @@ onMounted(() => {
           <span v-if="joinedFaction" class="font-bold text-[#344f3b] font-serif text-sm sm:text-base">
             {{ joinedFaction.name }} ({{ joinedFaction.code }})
           </span>
-          <span v-else class="text-[#617565] italic">
-            Chưa gia nhập phe nào
-          </span>
+          <span v-else class="text-[#617565] italic"> Chưa gia nhập phe nào </span>
         </div>
 
         <div v-if="joinedFaction && activeFaction && activeFaction.id !== joinedFaction.id">
@@ -175,7 +169,7 @@ onMounted(() => {
 
       <!-- Loading State -->
       <div v-if="factionStore.loading" class="py-16 text-center text-[#526a5e] space-y-2">
-      <div class="inline-block animate-spin text-2xl text-[#526a58]">❖</div>
+        <div class="inline-block animate-spin text-2xl text-[#526a58]">❖</div>
         <p class="text-xs uppercase tracking-widest font-bold">Đang tải thông tin phe phái...</p>
       </div>
 
@@ -217,7 +211,13 @@ onMounted(() => {
           <div class="mb-5 flex flex-wrap items-center justify-between gap-2 border-b border-[#cbd9c6] pb-3">
             <div class="flex items-center gap-2">
               <span class="text-xs uppercase tracking-widest font-extrabold text-[#344f3b] font-serif">
-                {{ isActiveJoined ? "👑 Phe Hiện Tại" : (hasJoined ? "👁️ Chi Tiết Phe Đang Xem Xét" : "⚔️ Chi Tiết Phe Đã Chọn") }}
+                {{
+                  isActiveJoined
+                    ? "👑 Phe Hiện Tại"
+                    : hasJoined
+                      ? "👁️ Chi Tiết Phe Đang Xem Xét"
+                      : "⚔️ Chi Tiết Phe Đã Chọn"
+                }}
               </span>
               <span
                 v-if="isActiveJoined"
@@ -230,7 +230,9 @@ onMounted(() => {
               <span v-if="activeFaction.element">
                 Mệnh: <span class="font-bold text-[#526a58]">{{ activeFaction.element }}</span>
               </span>
-              <span class="inline-flex items-center gap-1 px-2 py-0.5 rounded bg-[#eaf2e5] border border-[#cbd9c6] text-[#344f3b] font-sans font-medium text-[11px]">
+              <span
+                class="inline-flex items-center gap-1 px-2 py-0.5 rounded bg-[#eaf2e5] border border-[#cbd9c6] text-[#344f3b] font-sans font-medium text-[11px]"
+              >
                 <span>👥</span>
                 <span class="font-bold">{{ getMemberCount(activeFaction.id).toLocaleString("vi-VN") }}</span> thành viên
               </span>
@@ -240,7 +242,9 @@ onMounted(() => {
           <!-- Bố cục 2 cột: Cột trái (Biểu tượng & Thông tin cốt lõi) | Cột phải (Thông tin chi tiết & Hiệu ứng) -->
           <div class="grid grid-cols-1 lg:grid-cols-12 gap-6 items-start">
             <!-- Cột Trái (4 cols) -->
-            <div class="lg:col-span-4 flex flex-col items-center text-center p-5 rounded-lg border border-[#d5e1d0] bg-[#eaf2e5]">
+            <div
+              class="lg:col-span-4 flex flex-col items-center text-center p-5 rounded-lg border border-[#d5e1d0] bg-[#eaf2e5]"
+            >
               <!-- Huy hiệu / Symbol -->
               <div
                 class="size-24 sm:size-28 rounded-full border-2 border-[#8eaa91] bg-[#f5f9f0] flex items-center justify-center text-4xl sm:text-5xl shadow-md text-[#344f3b] mb-4 select-none"
@@ -264,9 +268,14 @@ onMounted(() => {
                 >
                   Trung Lập
                 </span>
-                <span class="px-2 py-0.5 rounded bg-[#f5f9f0] border border-[#cbd9c6] text-[#344f3b] flex items-center gap-1">
+                <span
+                  class="px-2 py-0.5 rounded bg-[#f5f9f0] border border-[#cbd9c6] text-[#344f3b] flex items-center gap-1"
+                >
                   <span>👥</span>
-                  <span class="font-sans font-bold">{{ getMemberCount(activeFaction.id).toLocaleString("vi-VN") }}</span> thành viên
+                  <span class="font-sans font-bold">{{
+                    getMemberCount(activeFaction.id).toLocaleString("vi-VN")
+                  }}</span>
+                  thành viên
                 </span>
               </div>
 
@@ -309,7 +318,9 @@ onMounted(() => {
             <div class="lg:col-span-4 space-y-5">
               <!-- Giới thiệu / Tôn chỉ -->
               <div class="p-4 rounded-lg border border-[#d5e1d0] bg-[#eaf2e5]">
-                <h4 class="m-0 mb-2 text-xs uppercase tracking-widest font-extrabold text-[#344f3b] font-serif flex items-center gap-1.5">
+                <h4
+                  class="m-0 mb-2 text-xs uppercase tracking-widest font-extrabold text-[#344f3b] font-serif flex items-center gap-1.5"
+                >
                   <span>📜</span>
                   <span>Tôn Chỉ & Giới Thiệu</span>
                 </h4>
@@ -321,7 +332,9 @@ onMounted(() => {
               <!-- Danh sách Hiệu ứng Phe -->
               <div class="p-4 rounded-lg border border-[#d5e1d0] bg-[#eaf2e5] space-y-3">
                 <div class="flex items-center justify-between border-b border-[#cbd9c6] pb-2">
-                  <h4 class="m-0 text-xs uppercase tracking-widest font-extrabold text-[#344f3b] font-serif flex items-center gap-1.5">
+                  <h4
+                    class="m-0 text-xs uppercase tracking-widest font-extrabold text-[#344f3b] font-serif flex items-center gap-1.5"
+                  >
                     <span>⚡</span>
                     <span>Hiệu Ứng Áp Dụng ({{ displayedEffects.length }})</span>
                   </h4>
@@ -381,7 +394,7 @@ onMounted(() => {
             </div>
 
             <div class="col-span-4">
-              <img :src="factionStore.activeFaction?.leader_1_image" alt="" draggable="false">
+              <img :src="factionStore.activeFaction?.leader_1_image" alt="" draggable="false" />
             </div>
           </div>
         </section>
@@ -389,13 +402,13 @@ onMounted(() => {
         <!-- ================= BOTTOM SECTION: CÁC PHE CÒN LẠI ================= -->
         <section class="space-y-4 pt-2">
           <div class="flex items-center justify-between border-b border-[#cbd9c6] pb-2">
-            <h3 class="m-0 text-xs sm:text-sm uppercase tracking-widest font-extrabold text-[#526a58] font-serif flex items-center gap-2">
+            <h3
+              class="m-0 text-xs sm:text-sm uppercase tracking-widest font-extrabold text-[#526a58] font-serif flex items-center gap-2"
+            >
               <span>🏛️</span>
               <span>Các phe Khác ({{ otherFactions.length }})</span>
             </h3>
-            <span class="text-[11px] text-[#617565]">
-              Chọn phe bên dưới để xem chi tiết bên trên
-            </span>
+            <span class="text-[11px] text-[#617565]"> Chọn phe bên dưới để xem chi tiết bên trên </span>
           </div>
 
           <div v-if="otherFactions.length === 0" class="py-8 text-center text-xs text-[#617565] italic">
@@ -434,9 +447,12 @@ onMounted(() => {
 
                 <!-- Tóm tắt số thành viên & số hiệu ứng -->
                 <div class="mb-4 flex flex-wrap gap-1.5 text-[10px]">
-                  <span class="px-1.5 py-0.5 rounded bg-[#eaf2e5] border border-[#cbd9c6] text-[#344f3b] flex items-center gap-1">
+                  <span
+                    class="px-1.5 py-0.5 rounded bg-[#eaf2e5] border border-[#cbd9c6] text-[#344f3b] flex items-center gap-1"
+                  >
                     <span>👥</span>
-                    <span class="font-sans font-bold">{{ getMemberCount(faction.id).toLocaleString("vi-VN") }}</span> thành viên
+                    <span class="font-sans font-bold">{{ getMemberCount(faction.id).toLocaleString("vi-VN") }}</span>
+                    thành viên
                   </span>
                   <span class="px-1.5 py-0.5 rounded bg-[#eaf2e5] border border-[#cbd9c6] text-[#405446]">
                     {{ (faction.faction_effects ?? []).length }} Hiệu ứng
@@ -487,15 +503,14 @@ onMounted(() => {
 
       <!-- ================= CONFIRMATION DIALOG ================= -->
       <Teleport to="body">
-        <div
-          v-if="confirmingAction"
-          class="fixed inset-0 z-[10001] bg-black/75 flex items-center justify-center p-4"
-        >
+        <div v-if="confirmingAction" class="fixed inset-0 z-[10001] bg-black/75 flex items-center justify-center p-4">
           <div
             class="w-full max-w-md rounded-xl border border-[#cbd9c6] bg-[#f5f9f0] text-[#24352a] p-6 shadow-2xl space-y-4 animate-scale-in"
           >
             <div class="text-center space-y-2">
-              <div class="size-14 mx-auto rounded-full border-2 border-[#8eaa91] bg-[#eaf2e5] flex items-center justify-center text-2xl text-[#344f3b]">
+              <div
+                class="size-14 mx-auto rounded-full border-2 border-[#8eaa91] bg-[#eaf2e5] flex items-center justify-center text-2xl text-[#344f3b]"
+              >
                 {{ confirmingAction.faction.symbol || "❖" }}
               </div>
               <h3 class="m-0 text-lg font-bold font-serif text-[#24352a]">
@@ -504,13 +519,13 @@ onMounted(() => {
               <p class="m-0 text-xs text-[#405446] leading-relaxed">
                 <template v-if="confirmingAction.type === 'join'">
                   Bạn đang chuẩn bị gia nhập phe
-                  <strong class="text-[#344f3b] font-serif text-sm">{{ confirmingAction.faction.name }}</strong>.
-                  Sau khi gia nhập, các hiệu ứng chúc phúc và ràng buộc sẽ được kích hoạt lên nhân vật.
+                  <strong class="text-[#344f3b] font-serif text-sm">{{ confirmingAction.faction.name }}</strong
+                  >. Sau khi gia nhập, các hiệu ứng chúc phúc và ràng buộc sẽ được kích hoạt lên nhân vật.
                 </template>
                 <template v-else>
                   Bạn đang chọn chuyển sang
-                  <strong class="text-[#344f3b] font-serif text-sm">{{ confirmingAction.faction.name }}</strong>.
-                  Mọi hiệu ứng của phe hiện tại sẽ được thay thế bằng hiệu ứng của phe mới.
+                  <strong class="text-[#344f3b] font-serif text-sm">{{ confirmingAction.faction.name }}</strong
+                  >. Mọi hiệu ứng của phe hiện tại sẽ được thay thế bằng hiệu ứng của phe mới.
                 </template>
               </p>
             </div>

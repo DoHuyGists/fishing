@@ -40,7 +40,7 @@ import { useCurrencyStore } from "../../stores/currency.ts";
 import ListItems from "./ListItems.vue";
 import SpinWheel from "./SpinWheel.vue";
 import type { Reward } from "./SpinWheel.vue";
-import Modal from "../Modal.vue";
+import Modal from "../shared/Modal.vue";
 import Cash from "../currency/Cash.vue";
 
 const spinWheelStore = useSpinWheelStore();
