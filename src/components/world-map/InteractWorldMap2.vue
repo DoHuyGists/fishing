@@ -1,4 +1,4 @@
-<script lang="ts" setup>
+﻿<script lang="ts" setup>
 import { computed, nextTick, onMounted, ref, watch } from "vue";
 import { useWorld2Store } from "../../stores/world2.ts";
 import { useRouter } from "vue-router";
@@ -11,6 +11,7 @@ import { useDayPhaseStore } from "../../stores/dayPhase.ts";
 import { useToast } from "../../composables/useToast.ts";
 import { supabaseUserInAreaRepository } from "../../data/supabaseUserInAreaRepository";
 import FishingAnchor from "./FishingAnchor.vue";
+import { useUserTurnsStore } from "../../stores/userTurns";
 
 const router = useRouter();
 const toast = useToast();
@@ -18,6 +19,7 @@ const authStore = useAuthStore();
 const userInAreaStore = useUserInAreaStore();
 const dayPhaseStore = useDayPhaseStore();
 const fishingAreaStore = useFishingAreaStore();
+const userTurnsStore = useUserTurnsStore();
 const zoomInfo = ref({ lon: 0, lat: 0, k: 1 });
 const picked = ref<string>("");
 const mapRef = ref<InstanceType<typeof World2> | null>(null);
@@ -92,16 +94,19 @@ async function onPrepareConfirm(area: any) {
   if (isEntering.value) return;
   isEntering.value = true;
   try {
+    await userTurnsStore.consumeTurn();
     await supabaseUserInAreaRepository.setUserEnterArea(area.id);
   } catch (err) {
-    console.error("Lỗi cập nhật user_in_area khi đi đến bãi câu:", err);
+    console.error("Failed to consume turn or enter area:", err);
+    toast.error(err instanceof Error ? err.message : "Không thể trừ lượt câu cá", { title: "Chưa thể vào bãi câu", position: "top" });
+    isEntering.value = false;
+    return;
   } finally {
     isEntering.value = false;
-    showPrepare.value = false;
-    router.push({ name: "fishing" });
   }
+  showPrepare.value = false;
+  router.push({ name: "fishing" });
 }
-
 interface PickPoint {
   screen: { x: number; y: number }; // px trên canvas
   map: { x: number; y: number }; // toạ độ trong hệ chưa zoom

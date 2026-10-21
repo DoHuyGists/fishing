@@ -22,16 +22,19 @@ import { useNotificationStore } from "../../stores/notification";
 import LatestCaughtList from "../caught/LatestCaughtList.vue";
 import { useConfigStore } from "../../stores/config.ts";
 import InteractWorldMap2 from "./InteractWorldMap2.vue";
+import { useUserTurnsStore } from "../../stores/userTurns";
 
 const authStore = useAuthStore();
 const caughtStore = useCaughtStore();
 const modalStore = useModalStore();
 const notificationStore = useNotificationStore();
 const configStore = useConfigStore();
+const userTurnsStore = useUserTurnsStore();
 
 const hasNewNotification = ref(false);
 
 onMounted(() => {
+  void userTurnsStore.fetchStatus().then(() => userTurnsStore.startCountdown());
   if (authStore.userId) {
     caughtStore.loadCaughtFishes();
     notificationStore.subscribeToNewNotifications(authStore.userId, () => {
@@ -42,169 +45,193 @@ onMounted(() => {
 
 onUnmounted(() => {
   void notificationStore.unsubscribeFromNewNotifications();
+  userTurnsStore.stopCountdown();
 });
 </script>
 
 <template>
-  <div class="w-screen h-screen p-3 relative grid grid-cols-1 md:grid-cols-2 gap-2 overflow-x-hidden">
-    <!-- Khung Bản đồ trung tâm -->
-    <div class="">
-      <InteractWorldMap2 />
-    </div>
-
-    <div class="">
-      <div class="flex items-center flex-wrap gap-2">
-        <button
-          type="button"
-          class="flex items-center gap-1.5 px-3 py-1.5 bg-[#153221] hover:bg-[#1a3e29] border border-gray-300 text-white rounded-xl shadow-sm font-bold text-xs cursor-pointer transition-colors"
-          @click="modalStore.open('account')"
+  <div class="w-screen min-h-screen p-3 relative flex flex-col gap-2 overflow-x-hidden">
+    <header
+      class="flex flex-wrap items-center justify-between gap-3 rounded-xl border border-[#cbd9c6] bg-[#f5f9f0] px-4 py-2.5 text-[#24352a] shadow-sm"
+    >
+      <span class="font-bold">Bản đồ thế giới</span>
+      <div
+        class="flex items-center gap-2 rounded-lg border border-[#cbd9c6] bg-white/70 px-3 py-1.5 text-sm"
+        aria-live="polite"
+      >
+        <span aria-hidden="true">🎣</span>
+        <span class="font-semibold">Lượt câu</span>
+        <span class="font-bold"
+          >{{ userTurnsStore.status?.turns ?? "—" }} / {{ userTurnsStore.status?.max_turns ?? "—" }}</span
         >
-          <span class="text-sm">⚙️</span>
-          <span>Tài khoản</span>
-        </button>
-
-        <button
-          type="button"
-          class="flex items-center gap-1.5 px-3 py-1.5 bg-[#153221] hover:bg-[#1a3e29] border border-gray-300 text-white rounded-xl shadow-sm font-bold text-xs cursor-pointer transition-colors"
-          @click="modalStore.open('market')"
+        <span
+          v-if="userTurnsStore.status && userTurnsStore.status.turns < userTurnsStore.status.max_turns"
+          class="text-xs text-[#617565]"
         >
-          <span class="text-sm">🏪</span>
-          <span>Chợ cá</span>
-        </button>
-
-        <!-- Nhật ký -->
-        <button
-          type="button"
-          class="flex items-center gap-1.5 px-3 py-1.5 bg-[#153221] hover:bg-[#1a3e29] border border-gray-300 text-white rounded-xl shadow-sm font-bold text-xs cursor-pointer transition-colors"
-          @click="modalStore.open('diary')"
-        >
-          <span class="text-sm">📖</span>
-          <span>Nhật ký</span>
-        </button>
-
-        <!-- Gacha -->
-        <button
-          type="button"
-          class="flex items-center gap-1.5 px-3 py-1.5 bg-[#153221] hover:bg-[#1a3e29] border border-gray-300 text-white rounded-xl shadow-sm font-bold text-xs cursor-pointer transition-colors"
-          @click="modalStore.open('gacha')"
-        >
-          <span class="text-sm">🎁</span>
-          <span>Gacha</span>
-        </button>
-
-        <!-- Túi đồ -->
-        <button
-          type="button"
-          class="flex items-center gap-1.5 px-3 py-1.5 bg-[#153221] hover:bg-[#1a3e29] border border-gray-300 text-white rounded-xl shadow-sm font-bold text-xs cursor-pointer transition-colors"
-          @click="modalStore.open('inventory')"
-        >
-          <span class="text-sm">📦</span>
-          <span>Túi đồ</span>
-        </button>
-
-        <!-- Feedback -->
-        <button
-          type="button"
-          class="flex items-center gap-1.5 px-3 py-1.5 bg-[#153221] hover:bg-[#1a3e29] border border-gray-300 text-white rounded-xl shadow-sm font-bold text-xs cursor-pointer transition-colors"
-          @click="modalStore.open('feedback')"
-        >
-          <span class="text-sm">📄</span>
-          <span>Phản hồi</span>
-        </button>
-
-        <!-- Mission -->
-        <button
-          type="button"
-          class="flex items-center gap-1.5 px-3 py-1.5 bg-[#153221] hover:bg-[#1a3e29] border border-gray-300 text-white rounded-xl shadow-sm font-bold text-xs cursor-pointer transition-colors"
-          @click="modalStore.open('mission')"
-        >
-          <span class="text-sm">📄</span>
-          <span>Nhiệm vụ</span>
-        </button>
-
-        <!-- Event -->
-        <button
-          type="button"
-          class="flex items-center gap-1.5 px-3 py-1.5 bg-[#153221] hover:bg-[#1a3e29] border border-gray-300 text-white rounded-xl shadow-sm font-bold text-xs cursor-pointer transition-colors"
-          @click="modalStore.open('event')"
-        >
-          <span class="text-sm">📄</span>
-          <span>Sự kiện</span>
-        </button>
-
-        <button
-          type="button"
-          class="flex items-center gap-1.5 px-3 py-1.5 bg-[#153221] hover:bg-[#1a3e29] border border-gray-300 text-white rounded-xl shadow-sm font-bold text-xs cursor-pointer transition-colors"
-          @click="modalStore.open('caught')"
-        >
-          <span class="text-sm" aria-hidden="true">🐟</span>
-          <span>Kho cá</span>
-        </button>
-
-        <button
-          type="button"
-          class="flex items-center gap-1.5 px-3 py-1.5 bg-[#153221] hover:bg-[#1a3e29] border border-gray-300 text-white rounded-xl shadow-sm font-bold text-xs cursor-pointer transition-colors"
-          @click="modalStore.open('post-production')"
-        >
-          <span class="text-sm" aria-hidden="true">🕸️</span>
-          <span>Lưới cá</span>
-        </button>
-
-        <!-- Redeem code -->
-        <button
-          type="button"
-          class="flex items-center gap-1.5 px-3 py-1.5 bg-[#153221] hover:bg-[#1a3e29] border border-gray-300 text-white rounded-xl shadow-sm font-bold text-xs cursor-pointer transition-colors"
-          @click="modalStore.open('redeem')"
-        >
-          <span class="text-sm" aria-hidden="true">🎁</span>
-          <span>Đổi mã</span>
-        </button>
-
-        <button
-          type="button"
-          class="flex items-center gap-1.5 px-3 py-1.5 bg-[#153221] hover:bg-[#1a3e29] border border-gray-300 text-white rounded-xl shadow-sm font-bold text-xs cursor-pointer transition-colors"
-          @click="
-            hasNewNotification = false;
-            modalStore.open('notifications');
-          "
-        >
-          <span class="text-sm" aria-hidden="true">🔔</span>
-          <span>Thông báo</span>
-          <span v-if="hasNewNotification" class="size-2 rounded-full bg-red-500" aria-label="Có thông báo mới"></span>
-        </button>
-
-        <button
-          v-if="configStore.showFaction"
-          type="button"
-          class="flex items-center gap-1.5 px-3 py-1.5 bg-[#153221] hover:bg-[#1a3e29] border border-gray-300 text-white rounded-xl shadow-sm font-bold text-xs cursor-pointer transition-colors"
-          @click="modalStore.open('faction')"
-        >
-          <span class="text-sm" aria-hidden="true">🛡️</span>
-          <span>Phe phái</span>
-        </button>
-
-        <button
-          type="button"
-          class="flex items-center gap-1.5 px-3 py-1.5 bg-[#153221] hover:bg-[#1a3e29] border border-gray-300 text-white rounded-xl shadow-sm font-bold text-xs cursor-pointer transition-colors"
-          @click="modalStore.open('friend')"
-        >
-          <span class="text-sm" aria-hidden="true">👥</span>
-          <span>Bạn bè</span>
-        </button>
-
-        <button
-        v-if="configStore.showTeam"
-          type="button"
-          class="flex items-center gap-1.5 px-3 py-1.5 bg-[#153221] hover:bg-[#1a3e29] border border-gray-300 text-white rounded-xl shadow-sm font-bold text-xs cursor-pointer transition-colors"
-          @click="modalStore.open('team')"
-        >
-          <span class="text-sm" aria-hidden="true">🎣</span>
-          <span>Lập đội</span>
-        </button>
+          +1 sau {{ userTurnsStore.countdown }}
+        </span>
+        <span v-else-if="userTurnsStore.error" class="text-xs text-red-700">Không tải được</span>
       </div>
+    </header>
+    <main class="grid flex-1 grid-cols-1 gap-2 md:grid-cols-2">
+      <!-- Khung Bản đồ trung tâm -->
+      <div class="">
+        <InteractWorldMap2 />
+      </div>
+      <div class="">
+        <div class="flex items-center flex-wrap gap-2">
+          <button
+            type="button"
+            class="flex items-center gap-1.5 px-3 py-1.5 bg-[#153221] hover:bg-[#1a3e29] border border-gray-300 text-white rounded-xl shadow-sm font-bold text-xs cursor-pointer transition-colors"
+            @click="modalStore.open('account')"
+          >
+            <span class="text-sm">⚙️</span>
+            <span>Tài khoản</span>
+          </button>
 
-      <LatestCaughtList />
-    </div>
+          <button
+            type="button"
+            class="flex items-center gap-1.5 px-3 py-1.5 bg-[#153221] hover:bg-[#1a3e29] border border-gray-300 text-white rounded-xl shadow-sm font-bold text-xs cursor-pointer transition-colors"
+            @click="modalStore.open('market')"
+          >
+            <span class="text-sm">🏪</span>
+            <span>Chợ cá</span>
+          </button>
+
+          <!-- Nhật ký -->
+          <button
+            type="button"
+            class="flex items-center gap-1.5 px-3 py-1.5 bg-[#153221] hover:bg-[#1a3e29] border border-gray-300 text-white rounded-xl shadow-sm font-bold text-xs cursor-pointer transition-colors"
+            @click="modalStore.open('diary')"
+          >
+            <span class="text-sm">📖</span>
+            <span>Nhật ký</span>
+          </button>
+
+          <!-- Gacha -->
+          <button
+            type="button"
+            class="flex items-center gap-1.5 px-3 py-1.5 bg-[#153221] hover:bg-[#1a3e29] border border-gray-300 text-white rounded-xl shadow-sm font-bold text-xs cursor-pointer transition-colors"
+            @click="modalStore.open('gacha')"
+          >
+            <span class="text-sm">🎁</span>
+            <span>Gacha</span>
+          </button>
+
+          <!-- Túi đồ -->
+          <button
+            type="button"
+            class="flex items-center gap-1.5 px-3 py-1.5 bg-[#153221] hover:bg-[#1a3e29] border border-gray-300 text-white rounded-xl shadow-sm font-bold text-xs cursor-pointer transition-colors"
+            @click="modalStore.open('inventory')"
+          >
+            <span class="text-sm">📦</span>
+            <span>Túi đồ</span>
+          </button>
+
+          <!-- Feedback -->
+          <button
+            type="button"
+            class="flex items-center gap-1.5 px-3 py-1.5 bg-[#153221] hover:bg-[#1a3e29] border border-gray-300 text-white rounded-xl shadow-sm font-bold text-xs cursor-pointer transition-colors"
+            @click="modalStore.open('feedback')"
+          >
+            <span class="text-sm">📄</span>
+            <span>Phản hồi</span>
+          </button>
+
+          <!-- Mission -->
+          <button
+            type="button"
+            class="flex items-center gap-1.5 px-3 py-1.5 bg-[#153221] hover:bg-[#1a3e29] border border-gray-300 text-white rounded-xl shadow-sm font-bold text-xs cursor-pointer transition-colors"
+            @click="modalStore.open('mission')"
+          >
+            <span class="text-sm">📄</span>
+            <span>Nhiệm vụ</span>
+          </button>
+
+          <!-- Event -->
+          <button
+            type="button"
+            class="flex items-center gap-1.5 px-3 py-1.5 bg-[#153221] hover:bg-[#1a3e29] border border-gray-300 text-white rounded-xl shadow-sm font-bold text-xs cursor-pointer transition-colors"
+            @click="modalStore.open('event')"
+          >
+            <span class="text-sm">📄</span>
+            <span>Sự kiện</span>
+          </button>
+
+          <button
+            type="button"
+            class="flex items-center gap-1.5 px-3 py-1.5 bg-[#153221] hover:bg-[#1a3e29] border border-gray-300 text-white rounded-xl shadow-sm font-bold text-xs cursor-pointer transition-colors"
+            @click="modalStore.open('caught')"
+          >
+            <span class="text-sm" aria-hidden="true">🐟</span>
+            <span>Kho cá</span>
+          </button>
+
+          <button
+            type="button"
+            class="flex items-center gap-1.5 px-3 py-1.5 bg-[#153221] hover:bg-[#1a3e29] border border-gray-300 text-white rounded-xl shadow-sm font-bold text-xs cursor-pointer transition-colors"
+            @click="modalStore.open('post-production')"
+          >
+            <span class="text-sm" aria-hidden="true">🕸️</span>
+            <span>Lưới cá</span>
+          </button>
+
+          <!-- Redeem code -->
+          <button
+            type="button"
+            class="flex items-center gap-1.5 px-3 py-1.5 bg-[#153221] hover:bg-[#1a3e29] border border-gray-300 text-white rounded-xl shadow-sm font-bold text-xs cursor-pointer transition-colors"
+            @click="modalStore.open('redeem')"
+          >
+            <span class="text-sm" aria-hidden="true">🎁</span>
+            <span>Đổi mã</span>
+          </button>
+
+          <button
+            type="button"
+            class="flex items-center gap-1.5 px-3 py-1.5 bg-[#153221] hover:bg-[#1a3e29] border border-gray-300 text-white rounded-xl shadow-sm font-bold text-xs cursor-pointer transition-colors"
+            @click="
+              hasNewNotification = false;
+              modalStore.open('notifications');
+            "
+          >
+            <span class="text-sm" aria-hidden="true">🔔</span>
+            <span>Thông báo</span>
+            <span v-if="hasNewNotification" class="size-2 rounded-full bg-red-500" aria-label="Có thông báo mới"></span>
+          </button>
+
+          <button
+            v-if="configStore.showFaction"
+            type="button"
+            class="flex items-center gap-1.5 px-3 py-1.5 bg-[#153221] hover:bg-[#1a3e29] border border-gray-300 text-white rounded-xl shadow-sm font-bold text-xs cursor-pointer transition-colors"
+            @click="modalStore.open('faction')"
+          >
+            <span class="text-sm" aria-hidden="true">🛡️</span>
+            <span>Phe phái</span>
+          </button>
+
+          <button
+            type="button"
+            class="flex items-center gap-1.5 px-3 py-1.5 bg-[#153221] hover:bg-[#1a3e29] border border-gray-300 text-white rounded-xl shadow-sm font-bold text-xs cursor-pointer transition-colors"
+            @click="modalStore.open('friend')"
+          >
+            <span class="text-sm" aria-hidden="true">👥</span>
+            <span>Bạn bè</span>
+          </button>
+
+          <button
+            v-if="configStore.showTeam"
+            type="button"
+            class="flex items-center gap-1.5 px-3 py-1.5 bg-[#153221] hover:bg-[#1a3e29] border border-gray-300 text-white rounded-xl shadow-sm font-bold text-xs cursor-pointer transition-colors"
+            @click="modalStore.open('team')"
+          >
+            <span class="text-sm" aria-hidden="true">🎣</span>
+            <span>Lập đội</span>
+          </button>
+        </div>
+
+        <LatestCaughtList />
+      </div>
+    </main>
 
     <Teleport to="body">
       <Transition

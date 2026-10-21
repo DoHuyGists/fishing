@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import Toast from "./components/shared/Toast.vue/index.js";
+import Toast from "./components/shared/Toast.vue";
 </script>
 
 <template>

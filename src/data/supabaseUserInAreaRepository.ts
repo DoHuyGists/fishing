@@ -10,7 +10,26 @@ export type UserInAreaRow = {
   status: string;
 };
 
+export type UserTurnStatus = {
+  turns: number;
+  max_turns: number;
+  last_recharge_at: string | null;
+  cooldown_seconds: number;
+};
+
 class SupabaseUserInAreaRepository {
+  async fetchTurnStatus(): Promise<UserTurnStatus> {
+    const { data, error } = await supabase.rpc("get_user_status");
+    if (error) throw new Error(error.message);
+    return data as UserTurnStatus;
+  }
+
+  async consumeTurn(): Promise<UserTurnStatus | null> {
+    const { data, error } = await supabase.rpc("consume_turn");
+    if (error) throw new Error(error.message);
+    return data as UserTurnStatus | null;
+  }
+
   async setUserEnterArea(areaId: string): Promise<void> {
     const { error } = await supabase.rpc("user_enter_area", {
       p_area_id: areaId,

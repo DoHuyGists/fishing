@@ -9,7 +9,7 @@ import { useCurrencyStore } from "../stores/currency";
 import { supabaseCurrencyRepository } from "../data/supabaseCurrencyRepository";
 import { supabaseUserInAreaRepository } from "../data/supabaseUserInAreaRepository";
 import { useUserInAreaStore } from "../stores/userInArea";
-import TwoOptionsModal from "../components/shared/TwoOptionsModal.vue/index.js";
+import TwoOptionsModal from "../components/shared/TwoOptionsModal.vue";
 import { useConfigStore } from "../stores/config.ts";
 
 const router = useRouter();
