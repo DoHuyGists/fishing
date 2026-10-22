@@ -23,6 +23,7 @@ const loading = ref(true);
 const savedSnapshot = ref<Record<string, string>>({});
 const savingId = ref<string | null>(null);
 const busy = ref(false);
+const usingItemId = ref<string | null>(null);
 const authStore = useAuthStore();
 const inventoryStore = useInventoryStore();
 const equipmentStore = useEquipmentStore();
@@ -106,6 +107,22 @@ function toggleSelectPage() {
   if (allOnPageSelected.value) pagedItems.value.forEach((i) => next.delete(i.id));
   else pagedItems.value.forEach((i) => next.add(i.id));
   selected.value = next;
+}
+
+async function useSelectedItem() {
+  const item = inventoryStore.items.find((i) => selected.value.has(i.id));
+  if (!item || item.rpc == null || usingItemId.value) return;
+  usingItemId.value = item.id;
+  try {
+    await inventoryStore.useItem(item.id);
+    await inventoryStore.setUserInventory(userId.value!);
+    selected.value = new Set();
+    toast("ok", "Đã sử dụng vật phẩm.");
+  } catch (error) {
+    toast("error", (error as Error).message);
+  } finally {
+    usingItemId.value = null;
+  }
 }
 
 async function deleteSelected() {
@@ -275,6 +292,12 @@ function handleUpdateSetUsed(event: Event, setId: string) {
               class="rounded-md bg-red-600 px-3 py-1 text-white hover:bg-red-700 disabled:cursor-not-allowed disabled:bg-slate-200 disabled:text-slate-400"
               @click="modal = 'delete'">
               Xóa đã chọn<span v-if="selected.size"> ({{ selected.size }})</span>
+            </button>
+            <button v-if="selected.size === 1 && inventoryStore.items.find((i) => selected.has(i.id))?.rpc != null"
+              type="button" :disabled="!!usingItemId"
+              class="rounded-md bg-teal-700 px-3 py-1 text-white hover:bg-teal-800 disabled:cursor-not-allowed disabled:opacity-50"
+              @click="useSelectedItem">
+              {{ usingItemId ? "Đang sử dụng…" : "Sử dụng" }}
             </button>
           </div>
 

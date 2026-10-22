@@ -17,6 +17,9 @@ export const useInventoryStore = defineStore("Inventory", {
         },
         async removeItem(userId: string, inventoryIds: string[]) {
             await supabaseUserInventoryRepository.deleteInventory(userId,inventoryIds)
-        }
+        },
+        async useItem(inventoryId: string) {
+            return await supabaseUserInventoryRepository.useItem(inventoryId);
+        },
     }
 })
