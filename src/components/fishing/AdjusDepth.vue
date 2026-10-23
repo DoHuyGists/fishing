@@ -141,7 +141,7 @@ onBeforeUnmount(() => window.removeEventListener("keydown", onKeydown));
     overflow: hidden;
     border-radius: 3px;
     /* background: linear-gradient(180deg, #53c7d0 0%, #138c9b 22%, #07546d 58%, #07324d 82%, #102d37 100%); */
-    background-image: url('./Mystical Underwater Lightbeams.png');
+    background-image: url('/Mystical Underwater Lightbeams.png');
     background-position: bottom;
     background-size: cover;
     background-repeat: no-repeat;
