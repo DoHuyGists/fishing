@@ -11,18 +11,25 @@ const icons: Record<ToastVariant, string> = {
   neutral: "•",
 };
 const variantClasses: Record<ToastVariant, string> = {
-  success: "border-l-green-600",
-  error: "border-l-red-600",
-  warning: "border-l-amber-600",
-  info: "border-l-blue-600",
-  neutral: "border-l-slate-500",
+  success: "border-l-emerald-500",
+  error: "border-l-rose-500",
+  warning: "border-l-amber-500",
+  info: "border-l-sky-500",
+  neutral: "border-l-slate-400",
 };
 const variantTextClasses: Record<ToastVariant, string> = {
-  success: "text-green-600",
-  error: "text-red-600",
-  warning: "text-amber-600",
-  info: "text-blue-600",
-  neutral: "text-slate-500",
+  success: "text-emerald-700",
+  error: "text-rose-700",
+  warning: "text-amber-700",
+  info: "text-sky-700",
+  neutral: "text-slate-600",
+};
+const variantIconClasses: Record<ToastVariant, string> = {
+  success: "bg-emerald-100",
+  error: "bg-rose-100",
+  warning: "bg-amber-100",
+  info: "bg-sky-100",
+  neutral: "bg-slate-100",
 };
 const positionClasses: Record<ToastPosition, string> = {
   "top-left": "left-4 [left:max(1rem,env(safe-area-inset-left))] [top:max(1rem,env(safe-area-inset-top))]",
@@ -108,24 +115,24 @@ onBeforeUnmount(() => activeTimers.forEach(clearTimeout));
         <article
           v-for="toast in group.items"
           :key="toast.id"
-          class="pointer-events-auto flex items-start gap-3 rounded-xl border border-slate-200 border-l-4 bg-white px-4 py-3.5 text-slate-800 shadow-[0_12px_32px_rgba(15,23,42,0.16)] transition-[opacity,transform] duration-200 ease-out motion-reduce:transition-none"
+          class="pointer-events-auto flex items-start gap-3 rounded-2xl border border-[#cbd9c6] border-l-4 bg-[#f5f9f0] px-4 py-4 text-[#24352a] shadow-[0_16px_40px_rgba(36,53,42,0.16)] ring-1 ring-white/80 transition-[opacity,transform,box-shadow] duration-200 ease-out hover:shadow-[0_20px_48px_rgba(36,53,42,0.2)] motion-reduce:transition-none"
           :class="variantClasses[toast.variant]"
           :role="toast.variant === 'error' ? 'alert' : 'status'"
           @mouseenter="clearTimer(toast.id)"
           @mouseleave="startTimer(toast)"
         >
           <span
-            class="grid h-6 w-6 flex-none place-items-center rounded-full border-2 border-current font-extrabold leading-none"
-            :class="variantTextClasses[toast.variant]"
+            class="grid h-8 w-8 flex-none place-items-center rounded-xl text-sm font-extrabold leading-none"
+            :class="[variantTextClasses[toast.variant], variantIconClasses[toast.variant]]"
             aria-hidden="true"
             >{{ icons[toast.variant] }}</span
           >
           <div class="min-w-0 flex-1">
-            <strong v-if="toast.title" class="mb-0.5 block text-sm">{{ toast.title }}</strong>
-            <p class="m-0 break-words text-sm leading-snug text-slate-600">{{ toast.message }}</p>
+            <strong v-if="toast.title" class="mb-1 block text-sm font-bold leading-snug tracking-[0.01em]">{{ toast.title }}</strong>
+            <p class="m-0 break-words text-sm leading-relaxed text-[#526354]">{{ toast.message }}</p>
             <button
               v-if="toast.action"
-              class="mt-2 bg-transparent p-0 text-sm font-bold underline"
+              class="mt-2 inline-flex rounded-md bg-transparent p-0 text-sm font-bold underline decoration-1 underline-offset-4 transition-colors hover:brightness-75 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#78906f] focus-visible:ring-offset-2"
               :class="variantTextClasses[toast.variant]"
               type="button"
               @click="runAction(toast)"
@@ -135,7 +142,7 @@ onBeforeUnmount(() => activeTimers.forEach(clearTimeout));
           </div>
           <button
             v-if="toast.dismissible"
-            class="flex-none bg-transparent px-1 text-2xl leading-none"
+            class="-mr-1 -mt-1 grid h-8 w-8 flex-none place-items-center rounded-lg bg-transparent text-xl leading-none transition-colors hover:bg-black/5 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#78906f]"
             :class="variantTextClasses[toast.variant]"
             type="button"
             :aria-label="`Đóng thông báo: ${toast.message}`"

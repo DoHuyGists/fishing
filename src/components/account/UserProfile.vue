@@ -1,10 +1,11 @@
-<script lang="ts" setup>
+﻿<script lang="ts" setup>
 import { computed, onMounted, ref } from "vue";
 import { useAuthStore } from "../../stores/auth";
 import { useCurrencyStore } from "../../stores/currency";
 import { useUserProfileStore } from "../../stores/userProfile";
 import { useCountryStore } from "../../stores/country";
 import Cash from "../currency/Cash.vue";
+import TwoOptionsModal from "../shared/TwoOptionsModal.vue";
 
 defineEmits<{ signOut: [] }>();
 
@@ -199,18 +200,16 @@ const userInitial = computed(() => {
     </div>
 
     <Teleport to="body">
-      <div v-if="showCountryConfirm" class="fixed inset-0 z-[10001] grid place-items-center bg-black/60 p-4" @click.self="!isUpdatingCountry && (showCountryConfirm = false)">
-        <section class="w-full max-w-sm rounded-2xl border border-[#cbd9c6] bg-[#f5f9f0] p-5 shadow-2xl" role="dialog" aria-modal="true" aria-labelledby="country-confirm-title">
-          <h2 id="country-confirm-title" class="m-0 text-lg font-bold text-[#24352a]">Xác nhận quốc gia</h2>
-          <p class="my-3 text-sm leading-relaxed text-[#24352a]">Sau khi đổi, bạn sẽ nhận được một chìa khóa mở khu vực câu</p>
-          <p v-if="!userProfileStore.profile?.country_id" class="my-3 text-sm leading-relaxed text-[#24352a]">Sau khi cập nhật quốc gia, bạn cần chờ 365 ngày để có thể đổi</p>
-          <p v-else class="my-3 text-sm leading-relaxed text-[#24352a]">Sau khi cập nhật quốc gia, bạn cần chờ {{ countryCooldownDaysRemaining }} ngày để có thể đổi</p>
-          <div class="flex justify-end gap-2">
-            <button type="button" class="rounded-lg border border-[#cbd9c6] bg-white px-4 py-2 font-semibold text-[#24352a] disabled:opacity-50" :disabled="isUpdatingCountry" @click="showCountryConfirm = false; selectedCountryId = ''">Huỷ</button>
-            <button type="button" class="rounded-lg bg-emerald-700 px-4 py-2 font-bold text-white disabled:opacity-50" :disabled="isUpdatingCountry || !selectedCountryId" @click="updateCountry">{{ isUpdatingCountry ? "Đang cập nhật..." : "Xác nhận" }}</button>
-          </div>
-        </section>
-      </div>
+      <TwoOptionsModal
+        v-if="showCountryConfirm"
+        title="Xác nhận quốc gia"
+        message="Sau khi đổi, bạn sẽ nhận được một chìa khóa mở khu vực câu."
+        :sub-text="`Sau khi cập nhật quốc gia, bạn cần chờ ${userProfileStore.profile?.country_id ? countryCooldownDaysRemaining : 365} ngày để có thể đổi.`"
+        first-text="Hủy"
+        :second-text="isUpdatingCountry ? 'Đang cập nhật...' : 'Xác nhận'"
+        :on-first="() => { if (!isUpdatingCountry) { showCountryConfirm = false; selectedCountryId = ''; } }"
+        :on-second="updateCountry"
+      />
     </Teleport>
 
     <div class="flex items-end">
@@ -225,3 +224,5 @@ const userInitial = computed(() => {
     </div>
   </div>
 </template>
+
+

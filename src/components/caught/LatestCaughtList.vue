@@ -61,7 +61,7 @@ async function releaseFish() {
 <template>
     <section class="mt-3 w-full max-w-sm rounded-xl border border-emerald-900/15 bg-white/95 p-3 shadow-sm">
         <div class="mb-2 flex items-center justify-between">
-          <h2 class="m-0 text-sm font-bold text-[#153221]">Cá mới câu</h2>
+          <h2 class="m-0 text-sm font-bold text-[#153221]">Cá trong lưới</h2>
           <span class="text-[11px] text-gray-500">{{ recentCaughtFishes.length }} cá</span>
         </div>
         <p v-if="caughtStore.isLoadingCaught && !recentCaughtFishes.length" class="m-0 py-3 text-center text-xs text-gray-500">

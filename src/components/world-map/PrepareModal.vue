@@ -273,7 +273,7 @@ function confirm() {
 
           <!-- Body -->
           <div
-            class="flex-1 overflow-y-auto px-7 py-5 flex flex-col gap-5 [&::-webkit-scrollbar]:w-1.5 [&::-webkit-scrollbar-thumb]:bg-[#b7cbb4] [&::-webkit-scrollbar-thumb]:rounded-full [&::-webkit-scrollbar-track]:bg-transparent"
+            class="flex-1 overflow-y-auto px-7 py-5 flex flex-col gap-4 [&::-webkit-scrollbar]:w-1.5 [&::-webkit-scrollbar-thumb]:bg-[#b7cbb4] [&::-webkit-scrollbar-thumb]:rounded-full [&::-webkit-scrollbar-track]:bg-transparent"
           >
             <!-- Loading state -->
             <div v-if="loading" class="flex-1 flex flex-col items-center justify-center gap-3.5 text-[#617565] text-sm">
@@ -291,7 +291,7 @@ function confirm() {
             <template v-else>
               <!-- SECTION 1: SELECTED EQUIPMENT (ALWAYS IN USED SET) -->
               <div
-                class="flex flex-col gap-3 bg-[#eaf2e5] border border-[#cbd9c6] rounded-2xl p-4 sm:px-5 shadow-sm"
+                class="flex flex-col gap-1.5 bg-[#eaf2e5] border border-[#cbd9c6] rounded-lg p-2 shadow-sm"
               >
                 <div class="flex items-center justify-between gap-4 border-b border-[#cbd9c6] pb-3">
                   <div class="flex items-center gap-2.5">
@@ -317,21 +317,21 @@ function confirm() {
                   </div>
                 </div>
 
-                <div class="grid grid-cols-2 lg:grid-cols-5 gap-3">
+                <div class="grid grid-cols-2 md:grid-cols-3 xl:grid-cols-5 2xl:grid-cols-6 gap-1.5">
                   <div
                     v-for="cat in equipmentCategories"
                     :key="cat.id"
-                    class="rounded-xl bg-[#f5f9f0] border overflow-hidden transition-all duration-200 h-full flex flex-col"
+                    class="rounded-lg bg-[#f5f9f0] border overflow-hidden transition-all duration-200 h-full flex flex-col"
                     :class="
                       selected[cat.id]
                         ? 'border-[#8eaa91] shadow-[inset_0_0_0_1px_rgba(82,106,88,0.12)]'
                         : 'border-amber-300'
                     "
                   >
-                    <div class="flex items-center gap-2 px-3.5 py-2.5 bg-[#eaf2e5] border-b border-[#cbd9c6]">
-                      <span class="font-semibold text-[13px] flex-1 text-[#24352a] truncate">{{ cat.name }}</span>
+                    <div class="flex items-center gap-1.5 px-2 py-1 bg-[#eaf2e5] border-b border-[#cbd9c6]">
+                      <span class="font-semibold text-xs flex-1 text-[#24352a] truncate">{{ cat.name }}</span>
                       <span
-                        class="text-[11px] font-semibold px-2 py-0.5 rounded-full shrink-0"
+                        class="text-[10px] font-semibold px-1.5 py-0.5 rounded-full shrink-0"
                         :class="
                           selected[cat.id] ? 'bg-[#dce9d7] text-[#344f3b]' : 'bg-amber-100 text-amber-800'
                         "
@@ -340,32 +340,32 @@ function confirm() {
                       </span>
                     </div>
 
-                    <div class="p-3 flex-1 flex flex-col justify-center">
+                    <div class="p-1.5 flex-1 flex flex-col justify-center">
                       <template v-if="selectedVariant(cat.id)">
-                        <div class="flex flex-col gap-2 h-full justify-center">
-                          <div class="h-20 flex items-center justify-center">
+                        <div class="flex items-center gap-2 min-w-0">
+                          <div class="w-9 h-9 shrink-0 flex items-center justify-center">
                             <img
                               v-if="isImageUrl(selectedVariant(cat.id)!.image || selectedVariant(cat.id)!.icon)"
                               :src="selectedVariant(cat.id)!.image || selectedVariant(cat.id)!.icon"
                               alt=""
-                              class="h-20 max-w-full object-contain drop-shadow"
+                              class="h-9 max-w-full object-contain drop-shadow"
                             />
-                            <span v-else class="text-4xl select-none">
+                            <span v-else class="text-2xl select-none">
                               {{ selectedVariant(cat.id)!.icon || "🎣" }}
                             </span>
                           </div>
-                          <div class="flex flex-col gap-0.5 text-center">
-                            <span class="font-semibold text-[13px] text-[#24352a] truncate">{{
+                          <div class="flex flex-col gap-0.5 min-w-0">
+                            <span class="font-semibold text-xs text-[#24352a] truncate">{{
                               selectedVariant(cat.id)!.name
                             }}</span>
-                            <span class="text-[11px] text-[#617565] line-clamp-2">{{
+                            <span class="text-[10px] text-[#617565] line-clamp-1">{{
                               selectedVariant(cat.id)!.detail
                             }}</span>
                           </div>
                         </div>
                       </template>
                       <template v-else>
-                        <div class="flex flex-col items-center justify-center py-5 text-center">
+                        <div class="flex flex-col items-center justify-center py-2 text-center">
                           <p class="m-0 text-xs text-[#617565]">Chưa chọn {{ cat.name.toLowerCase() }} nào.</p>
                         </div>
                       </template>
@@ -376,9 +376,9 @@ function confirm() {
 
               <!-- SECTION 2: EQUIPMENT SETS LIST & ITEMS IN USED SET -->
               <div
-                class="flex flex-col gap-3 bg-[#eaf2e5] border border-[#cbd9c6] rounded-2xl p-4 sm:px-5 shadow-sm"
+                class="flex flex-col gap-1.5 bg-[#eaf2e5] border border-[#cbd9c6] rounded-lg p-2 shadow-sm"
               >
-                <div class="flex items-center flex-wrap justify-between gap-4 border-b border-[#cbd9c6] pb-3">
+                <div class="flex items-center flex-wrap justify-between gap-2 border-b border-[#cbd9c6] pb-1.5">
                   <div class="flex items-center gap-2.5">
                     <span class="w-2.5 h-2.5 rounded-full bg-[#8eaa91] shrink-0"></span>
                     <div>
@@ -406,12 +406,12 @@ function confirm() {
                 </div>
 
                 <!-- Sets Navigation Tabs -->
-                <div v-if="inventoryStore.equipmentSets.length > 0" class="flex flex-wrap gap-2.5">
+                <div v-if="inventoryStore.equipmentSets.length > 0" class="flex flex-wrap gap-1.5">
                   <button
                     v-for="(s, idx) in inventoryStore.equipmentSets"
                     :key="s.id"
                     type="button"
-                    class="group flex flex-col items-start gap-0.5 px-3.5 py-2 rounded-xl cursor-pointer text-[#405446] transition-all duration-150 border disabled:cursor-not-allowed"
+                      class="group flex flex-col items-start gap-0.5 px-2.5 py-1 rounded-lg cursor-pointer text-[#405446] transition-all duration-150 border disabled:cursor-not-allowed"
                     :class="[
                       s.isUsed
                         ? '!bg-[#dce9d7] !border-[#8eaa91] !text-[#24352a] shadow-sm cursor-default'
@@ -453,15 +453,15 @@ function confirm() {
 
                 <!-- Category Items in Currently Used Set -->
                 <div v-else-if="usedSet">
-                  <div class="grid grid-cols-2 lg:grid-cols-5 gap-3">
+                  <div class="grid grid-cols-2 md:grid-cols-3 xl:grid-cols-5 2xl:grid-cols-6 gap-1.5">
                     <div
                       v-for="cat in equipmentCategories"
                       :key="cat.id"
-                      class="flex flex-col bg-[#f5f9f0] border border-[#cbd9c6] rounded-xl overflow-hidden min-h-[180px]"
+                      class="flex flex-col bg-[#f5f9f0] border border-[#cbd9c6] rounded-md overflow-hidden min-h-[88px]"
                     >
                       <!-- Slot Header -->
                       <div
-                        class="flex items-center justify-between px-3 py-2 bg-[#eaf2e5] border-b border-[#cbd9c6]"
+                        class="flex items-center justify-between px-1.5 py-1 bg-[#eaf2e5] border-b border-[#cbd9c6]"
                       >
                         <div class="flex items-center gap-1.5">
                           <span class="text-xs font-semibold text-[#24352a]">{{ cat.name }}</span>
@@ -471,13 +471,13 @@ function confirm() {
 
                       <!-- Items list in this category -->
                       <div
-                        class="flex flex-col gap-2 p-2.5 max-h-[240px] overflow-y-auto [&::-webkit-scrollbar]:w-1.5 [&::-webkit-scrollbar-thumb]:bg-[#b7cbb4] [&::-webkit-scrollbar-thumb]:rounded-full [&::-webkit-scrollbar-track]:bg-transparent"
+                        class="flex flex-col gap-1 p-1 max-h-[120px] overflow-y-auto [&::-webkit-scrollbar]:w-1.5 [&::-webkit-scrollbar-thumb]:bg-[#b7cbb4] [&::-webkit-scrollbar-thumb]:rounded-full [&::-webkit-scrollbar-track]:bg-transparent"
                       >
                         <template v-if="(usedSet[cat.id] || []).length > 0">
                           <div
                             v-for="item in usedSet[cat.id]"
                             :key="item.id"
-                            class="group flex items-center gap-2.5 p-2 rounded-lg cursor-pointer transition-all duration-150 border text-left"
+                            class="group flex items-center gap-1 p-1 rounded cursor-pointer transition-all duration-150 border text-left"
                             :class="[
                               isItemSelected(cat.id, item.id)
                                 ? '!bg-[#dce9d7] !border-[#8eaa91] shadow-sm'
@@ -487,13 +487,13 @@ function confirm() {
                             @click="chooseMainItem(cat.id, item)"
                           >
                             <div
-                              class="flex items-center justify-center w-9 h-9 shrink-0 bg-[#eaf2e5] rounded-md overflow-hidden"
+                              class="flex items-center justify-center w-6 h-6 shrink-0 bg-[#eaf2e5] rounded overflow-hidden"
                             >
                               <img
                                 v-if="isImageUrl(getItemDisplay(item).iconOrImage)"
                                 :src="getItemDisplay(item).iconOrImage"
                                 :alt="getItemDisplay(item).name"
-                                class="h-8 w-8 object-contain"
+                                class="h-5 w-5 object-contain"
                               />
                               <span v-else class="text-lg">
                                 {{ getItemDisplay(item).iconOrImage }}
