@@ -1,20 +1,5 @@
 <script lang="ts" setup>
-import { computed, ref } from "vue";
-import FishingAreaManagement from "../components/admin/fishing-area-management/FishingAreaManagement.vue";
-import ZoneManagement from "../components/admin/zone-management/ZoneManagement.vue";
-import WeatherManagement from "../components/admin/weather-management/WeatherManagement.vue";
-import ZoneWeatherManagement from "../components/admin/zone-weather-management/ZoneWeatherManagement.vue";
-import WeatherModifierManagement from "../components/admin/weather-modifier-management/WeatherModifierManagement.vue";
-import ModifierManagement from "../components/admin/modifier-management/ModifierManagement.vue";
-import ItemManagement from "../components/admin/item-management/ItemManagement.vue";
-import SpeciesManagement from "../components/admin/SpeciesManagement.vue";
-import SpeciesInAreaManagement from "../components/admin/SpeciesInAreaManagement.vue";
-import EventManagement from "../components/admin/EventManagement.vue";
-import EventScheduleManagement from "../components/admin/EventScheduleManagement.vue";
-import RedeemCodeManagement from "../components/admin/RedeemCodeManagement.vue";
-import NotificationManagement from "../components/admin/NotificationManagement.vue";
-import FeedbackListModal from "../components/admin/FeedbackListModal.vue";
-import ErrorFeedbackManagementModal from "../components/admin/ErrorFeedbackManagementModal.vue";
+import { computed, defineAsyncComponent, ref } from "vue";
 
 type ModuleKey =
   | "zone"
@@ -36,8 +21,29 @@ interface AdminModule {
   icon: string;
   label: string;
   desc: string;
-  component: unknown;
+  component: ReturnType<typeof defineAsyncComponent>;
 }
+
+const moduleComponents = {
+  area: defineAsyncComponent(() => import("../components/admin/fishing-area-management/FishingAreaManagement.vue")),
+  item: defineAsyncComponent(() => import("../components/admin/item-management/ItemManagement.vue")),
+  redeemCode: defineAsyncComponent(() => import("../components/admin/RedeemCodeManagement.vue")),
+  notifications: defineAsyncComponent(() => import("../components/admin/NotificationManagement.vue")),
+  species: defineAsyncComponent(() => import("../components/admin/SpeciesManagement.vue")),
+  speciesInArea: defineAsyncComponent(() => import("../components/admin/SpeciesInAreaManagement.vue")),
+  zone: defineAsyncComponent(() => import("../components/admin/zone-management/ZoneManagement.vue")),
+  weather: defineAsyncComponent(() => import("../components/admin/weather-management/WeatherManagement.vue")),
+  zoneWeather: defineAsyncComponent(() => import("../components/admin/zone-weather-management/ZoneWeatherManagement.vue")),
+  modifier: defineAsyncComponent(() => import("../components/admin/modifier-management/ModifierManagement.vue")),
+  weatherModifier: defineAsyncComponent(() => import("../components/admin/weather-modifier-management/WeatherModifierManagement.vue")),
+  event: defineAsyncComponent(() => import("../components/admin/EventManagement.vue")),
+  schedule: defineAsyncComponent(() => import("../components/admin/EventScheduleManagement.vue")),
+};
+
+const FeedbackListModal = defineAsyncComponent(() => import("../components/admin/FeedbackListModal.vue"));
+const ErrorFeedbackManagementModal = defineAsyncComponent(
+  () => import("../components/admin/ErrorFeedbackManagementModal.vue"),
+);
 
 interface ModuleGroup {
   title: string;
@@ -53,42 +59,42 @@ const groups: ModuleGroup[] = [
         icon: "🗺️",
         label: "Bãi câu",
         desc: "Thêm, sửa và xoá các bãi câu trong game.",
-        component: FishingAreaManagement,
+        component: moduleComponents.area,
       },
       {
         key: "item",
         icon: "🎒",
         label: "Vật phẩm",
         desc: "Quản lý cần câu, mồi và các vật phẩm khác.",
-        component: ItemManagement,
+        component: moduleComponents.item,
       },
       {
         key: "redeemCode",
         icon: "🎟️",
         label: "Mã đổi thưởng",
         desc: "Tạo mã nhận xu, đặt hạn dùng và bật hoặc tắt mã.",
-        component: RedeemCodeManagement,
+        component: moduleComponents.redeemCode,
       },
       {
         key: "notifications",
         icon: "🔔",
         label: "Thông báo",
         desc: "Tạo và quản lý thông báo cá nhân, thông báo hệ thống.",
-        component: NotificationManagement,
+        component: moduleComponents.notifications,
       },
       {
         key: "species",
         icon: "🐟",
         label: "Loài cá",
         desc: "Chỉnh thông tin và thuộc tính của từng loài cá.",
-        component: SpeciesManagement,
+        component: moduleComponents.species,
       },
       {
         key: "speciesInArea",
         icon: "🎯",
         label: "Cá theo bãi câu",
         desc: "Chọn loài cá xuất hiện ở mỗi bãi câu.",
-        component: SpeciesInAreaManagement,
+        component: moduleComponents.speciesInArea,
       },
     ],
   },
@@ -100,35 +106,35 @@ const groups: ModuleGroup[] = [
         icon: "🌊",
         label: "Vùng",
         desc: "Quản lý các vùng câu và thời tiết hiện tại.",
-        component: ZoneManagement,
+        component: moduleComponents.zone,
       },
       {
         key: "weather",
         icon: "⛅",
         label: "Thời tiết",
         desc: "Quản lý các loại thời tiết và thời lượng.",
-        component: WeatherManagement,
+        component: moduleComponents.weather,
       },
       {
         key: "zoneWeather",
         icon: "🌦️",
         label: "Thời tiết theo vùng",
         desc: "Chọn thời tiết được phép ở mỗi vùng.",
-        component: ZoneWeatherManagement,
+        component: moduleComponents.zoneWeather,
       },
       {
         key: "modifier",
         icon: "📊",
         label: "Chỉ số",
         desc: "Quản lý các chỉ số (modifiers).",
-        component: ModifierManagement,
+        component: moduleComponents.modifier,
       },
       {
         key: "weatherModifier",
         icon: "🎚️",
         label: "Chỉ số theo thời tiết",
         desc: "Cấu hình khoảng giá trị chỉ số của thời tiết.",
-        component: WeatherModifierManagement,
+        component: moduleComponents.weatherModifier,
       },
     ],
   },
@@ -140,14 +146,14 @@ const groups: ModuleGroup[] = [
         icon: "🎉",
         label: "Sự kiện",
         desc: "Tạo và cập nhật nội dung các sự kiện.",
-        component: EventManagement,
+        component: moduleComponents.event,
       },
       {
         key: "schedule",
         icon: "🗓️",
         label: "Lịch sự kiện",
         desc: "Đặt thời gian bắt đầu và kết thúc cho sự kiện.",
-        component: EventScheduleManagement,
+        component: moduleComponents.schedule,
       },
     ],
   },

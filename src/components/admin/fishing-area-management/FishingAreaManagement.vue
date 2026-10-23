@@ -90,7 +90,6 @@ watch(
   },
   { immediate: true, deep: true },
 );
-
 </script>
 
 <template>
@@ -285,7 +284,7 @@ watch(
         </div>
       </div>
       <div v-else class="flex gap-2 p-2">
-        <InteractWorldMap />
+        <!-- <InteractWorldMap /> -->
 
         <!-- Form panel -->
         <FishingAreaManagementForm />
