@@ -70,13 +70,36 @@ const props = withDefaults(
 
 const markers = ref<{ area: AreaPoint; x: number; y: number }[]>([]);
 
+const MIN_ZOOM = 2;
+const MAX_ZOOM = 30;
+
+function constrainMapTransform(
+  transform: d3.ZoomTransform,
+  extent: [[number, number], [number, number]],
+  translateExtent: [[number, number], [number, number]],
+): d3.ZoomTransform {
+  const [[viewportLeft, viewportTop], [viewportRight, viewportBottom]] = extent;
+  const [[mapLeft, mapTop], [mapRight, mapBottom]] = translateExtent;
+  const minX = viewportRight - transform.k * mapRight;
+  const maxX = viewportLeft - transform.k * mapLeft;
+  const minY = viewportBottom - transform.k * mapBottom;
+  const maxY = viewportTop - transform.k * mapTop;
+
+  return d3.zoomIdentity
+    .translate(
+      Math.max(minX, Math.min(maxX, transform.x)),
+      Math.max(minY, Math.min(maxY, transform.y)),
+    )
+    .scale(transform.k);
+}
+
 const canvasRef = ref<HTMLCanvasElement | null>(null);
 
 function setView({ lon, lat, k, duration = 0 }: ViewTarget) {
   const canvas = canvasRef.value;
   if (!canvas || !projection) return;
 
-  const nextK = Math.min(30, Math.max(1, k ?? transform.k));
+  const nextK = Math.min(MAX_ZOOM, Math.max(MIN_ZOOM, k ?? transform.k));
 
   // Tâm đích trong hệ chưa zoom
   let target: [number, number] | null = null;
@@ -95,7 +118,7 @@ function setView({ lon, lat, k, duration = 0 }: ViewTarget) {
     [0, 0],
     [width, height],
   ];
-  const next = zoomBehavior.constrain()(raw, box, box);
+  const next = constrainMapTransform(raw, box, box);
 
   const sel = d3.select(canvas);
   if (duration > 0) {
@@ -165,7 +188,8 @@ const tip = ref({ x: 0, y: 0, visible: false });
 
 const zoomBehavior = d3
   .zoom<HTMLCanvasElement, unknown>()
-  .scaleExtent([1, 30])
+  .scaleExtent([MIN_ZOOM, MAX_ZOOM])
+  .constrain(constrainMapTransform)
   .on("zoom", (event: d3.D3ZoomEvent<HTMLCanvasElement, unknown>) => {
     transform = event.transform;
     draw();
@@ -199,11 +223,12 @@ function setupCanvas() {
     .geoEquirectangular()
     .fitSize([width, height], { type: "Sphere" });
   path = d3.geoPath(projection, ctx);
+  const sphereBounds = path.bounds({ type: "Sphere" });
 
   // Không cho kéo bản đồ ra khỏi khung nhìn
   zoomBehavior.translateExtent([
-    [0, 0],
-    [width, height],
+    sphereBounds[0] as [number, number],
+    sphereBounds[1] as [number, number],
   ]);
 }
 

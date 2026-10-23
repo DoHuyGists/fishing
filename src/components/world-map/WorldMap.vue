@@ -54,7 +54,7 @@ onUnmounted(() => {
 <template>
   <div class="w-screen min-h-screen p-3 relative flex flex-col gap-2 overflow-x-hidden">
     <header
-      class="flex flex-wrap items-center justify-between gap-3 rounded-xl border border-[#cbd9c6] bg-[#f5f9f0] px-4 py-2.5 text-[#24352a] shadow-sm"
+      class="flex flex-wrap items-center justify-between gap-3 rounded-xl border border-[#cbd9c6] bg-[#f5f9f0] px-4 py-2.5 text-[#24352a]"
     >
       <span class="font-bold">Bản đồ thế giới</span>
       <UserTurn />

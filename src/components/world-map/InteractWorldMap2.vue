@@ -151,7 +151,7 @@ const anchor = ref<{ lon: number; lat: number; k: number } | null>(null);
   <div class="grid grid-cols-1 md:grid-cols-[auto_1fr] h-full gap-2">
     <FishingAnchor />
     <div class="flex flex-col gap-2">
-      <div class="w-full h-[50dvh] overflow-hidden grid place-items-center border border-gray-300 rounded-xl">
+      <div class="w-full h-[70dvh] overflow-hidden grid place-items-center border border-gray-300 rounded-xl">
         <World2 ref="mapRef" :areas="fishingAreaStore.fishingAreas" :selected-area-id="selectedArea?.id ?? null" :pick-enabled="pickEnabled" :anchor="anchor" @pick="onPick" @zoom="onZoom" @select-area="onSelectArea">
           <template #tooltip>
             <template v-if="anchor"> {{ anchor }} </template>
@@ -179,7 +179,6 @@ const anchor = ref<{ lon: number; lat: number; k: number } | null>(null);
         <button @click="zoomTo(24)" class="border border-gray-300 rounded-md px-3">24x</button>
       </div>
       <div class="flex gap-2">
-        <button @click="mapRef?.resetView()" class="border border-gray-300 rounded-md px-3">Về toàn cảnh</button>
         <button @click="togglePick" class="border border-gray-300 rounded-md px-3">{{ pickEnabled ? "Tắt xác định vị trí" : "Bật xác định vị trí" }}</button>
       </div>
     </div>
