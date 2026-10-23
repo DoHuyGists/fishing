@@ -14,6 +14,8 @@ const userProfileStore = useUserProfileStore();
 const countryStore = useCountryStore();
 const copied = ref(false);
 const selectedCountryId = ref("");
+const countrySearch = ref("");
+const isCountryDropdownOpen = ref(false);
 const showCountryConfirm = ref(false);
 const isUpdatingCountry = ref(false);
 const countryError = ref("");
@@ -25,6 +27,11 @@ const countryCooldownDaysRemaining = computed(() => {
   return Number.isFinite(remainingMs) && remainingMs > 0 ? Math.ceil(remainingMs / (24 * 60 * 60 * 1000)) : 0;
 });
 const canChangeCountry = computed(() => !userProfileStore.profile?.country_id || countryCooldownDaysRemaining.value === 0);
+const selectedCountry = computed(() => countryStore.countries.find((country) => country.id === selectedCountryId.value));
+const filteredCountries = computed(() => {
+  const query = countrySearch.value.trim().toLocaleLowerCase();
+  return query ? countryStore.countries.filter((country) => country.name.toLocaleLowerCase().includes(query)) : countryStore.countries;
+});
 
 onMounted(() => countryStore.fetchCountries());
 
@@ -41,6 +48,13 @@ async function updateCountry() {
   } finally {
     isUpdatingCountry.value = false;
   }
+}
+
+function selectCountry(countryId: string) {
+  selectedCountryId.value = countryId;
+  isCountryDropdownOpen.value = false;
+  countrySearch.value = "";
+  showCountryConfirm.value = !!countryId;
 }
 
 function copyUserId() {
@@ -141,16 +155,18 @@ const userInitial = computed(() => {
       <div class="bg-gray-50 border border-gray-100 rounded-xl divide-y divide-gray-100 text-xs">
         <div class="px-3.5 py-2.5">
           <label for="profile-country" class="mb-1.5 block text-gray-500 font-medium">Quốc gia</label>
-          <select
-            id="profile-country"
-            v-model="selectedCountryId"
-            class="w-full rounded-lg border border-[#cbd9c6] bg-[#f5f9f0] px-3 py-2 text-sm text-[#24352a] disabled:cursor-not-allowed disabled:opacity-60"
-            :disabled="!canChangeCountry || countryStore.isLoading || isUpdatingCountry"
-            @change="showCountryConfirm = !!selectedCountryId"
-          >
-            <option value="" disabled>{{ countryStore.isLoading ? "Đang tải quốc gia..." : "Chọn quốc gia" }}</option>
-            <option v-for="country in countryStore.countries" :key="country.id" :value="country.id">{{ country.name }}</option>
-          </select>
+          <div class="relative">
+            <button id="profile-country" type="button" class="flex w-full items-center justify-between rounded-lg border border-[#cbd9c6] bg-[#f5f9f0] px-3 py-2 text-left text-sm text-[#24352a] disabled:cursor-not-allowed disabled:opacity-60" :disabled="!canChangeCountry || countryStore.isLoading || isUpdatingCountry" :aria-expanded="isCountryDropdownOpen" aria-haspopup="listbox" @click="isCountryDropdownOpen = !isCountryDropdownOpen">
+              <span>{{ selectedCountry?.name || (countryStore.isLoading ? "Đang tải quốc gia..." : "Chọn quốc gia") }}</span><span aria-hidden="true" class="ml-2 text-gray-500">▾</span>
+            </button>
+            <div v-if="isCountryDropdownOpen" class="absolute z-20 mt-1 w-full overflow-hidden rounded-lg border border-[#cbd9c6] bg-[#f5f9f0] shadow-lg">
+              <div class="border-b border-[#cbd9c6] p-2"><input v-model="countrySearch" type="search" autocomplete="off" placeholder="Tìm quốc gia..." aria-label="Tìm quốc gia" class="w-full rounded-md border border-[#cbd9c6] bg-white px-3 py-2 text-sm text-[#24352a] outline-none focus:ring-2 focus:ring-emerald-600" @keydown.esc="isCountryDropdownOpen = false" /></div>
+              <ul role="listbox" aria-label="Danh sách quốc gia" class="max-h-52 overflow-y-auto py-1">
+                <li v-for="country in filteredCountries" :key="country.id" role="option" :aria-selected="country.id === selectedCountryId"><button type="button" class="w-full px-3 py-2 text-left text-sm text-[#24352a] hover:bg-emerald-100 focus:bg-emerald-100 focus:outline-none" @click="selectCountry(country.id)">{{ country.name }}</button></li>
+                <li v-if="filteredCountries.length === 0" class="px-3 py-2 text-sm text-gray-500">Không tìm thấy quốc gia.</li>
+              </ul>
+            </div>
+          </div>
           <p v-if="userProfileStore.profile?.country_id && countryCooldownDaysRemaining > 0" class="mt-1 text-gray-500">
             Bạn còn {{ countryCooldownDaysRemaining }} ngày nữa mới có thể đổi quốc gia.
           </p>
