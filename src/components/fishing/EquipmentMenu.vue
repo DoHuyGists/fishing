@@ -3,6 +3,7 @@ import { equipmentCategories } from "../../data/equipmentCatalog.ts";
 import { useEquipmentStore } from "../../stores/equipment.ts";
 import { useFishingStore, type FishingTool } from "../../stores/fishing.ts";
 import SearchableDropdown from "./SearchableDropdown.vue";
+import AdjusDepth from "./AdjusDepth.vue";
 
 const store = useFishingStore();
 const equipmentStore = useEquipmentStore();
@@ -25,5 +26,12 @@ function onVariantChange(category: FishingTool, variantId: string) {
         :model-value="store.equipmentLoadout[category.id]"
         @update:model-value="(id) => onVariantChange(category.id, id)" />
     </div>
+    <button type="button"
+      class="flex items-center gap-2 rounded-xl border border-[#cbd9c6] bg-[#f5f9f0] px-3 py-2 text-[11px] font-bold text-[#24352a] transition hover:border-[#70a77e] hover:bg-[#eaf5e8]"
+      @click="store.openDepthAdjuster()">
+      <span aria-hidden="true" class="text-base text-[#398d80]">≋</span>
+      Điều chỉnh độ sâu
+    </button>
+    <AdjusDepth />
   </div>
 </template>

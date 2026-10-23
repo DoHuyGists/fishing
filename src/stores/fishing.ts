@@ -5,6 +5,7 @@ import { supabaseFishRepository } from "../data/supabaseFishRepository";
 import { supabaseUserInAreaRepository } from "../data/supabaseUserInAreaRepository";
 import supabase from "../database/connection";
 import { supabaseFishingAreaRepository } from "../data/supabaseFishingAreaRepository";
+import { FISHING_DEPTH_CONFIG } from "../data/fishingDepth";
 export type FishingTool = "rod" | "line" | "reel" | "hook" | "bait";
 export type CastPhase = "idle" | "casting" | "waiting" | "bite" | "submitting" | "caught" | "lost";
 export type FishingChallenge = {
@@ -116,11 +117,14 @@ export const useFishingStore = defineStore("fishing", {
     inventory: [] as CaughtFish[],
     currentArea: {} as any,
     currentAreaId: null as string | null,
+    appliedDepthMeters: 0,
+    depthAdjusterOpen: false,
   }),
   getters: {
     canPull: (s) => s.castPhase === "bite",
     canCast: (s) => s.castPhase === "idle" || s.castPhase === "lost",
     canReelIn: (s) => ["casting", "waiting", "bite"].includes(s.castPhase),
+    canAdjustDepth: (s) => s.castPhase === "idle" || s.castPhase === "lost",
   },
   actions: {
     async initializeFishingArea(areaId: string) {
@@ -254,6 +258,15 @@ export const useFishingStore = defineStore("fishing", {
     },
     selectTool(tool: FishingTool) {
       this.selectedTool = tool;
+    },
+    applyDepth(depth: number) {
+      if (!this.canAdjustDepth) return false;
+      const step = FISHING_DEPTH_CONFIG.stepMeters;
+      this.appliedDepthMeters = Math.max(0, Math.min(FISHING_DEPTH_CONFIG.maxMeters, Math.round(depth / step) * step));
+      return true;
+    },
+    openDepthAdjuster() {
+      this.depthAdjusterOpen = true;
     },
     async selectVariant(category: FishingTool, variantId: string) {
       const previous = this.equipmentLoadout[category];
