@@ -241,6 +241,11 @@ function handleUpdateSetUsed(event: Event, setId: string) {
   }
 }
 
+function hasRpc() {
+  const targetItem = inventoryStore.items.find((i) => selected.value.has(i.id))
+  return targetItem?.rpc != null && targetItem?.rpc != "";
+}
+
 
 </script>
 
@@ -293,7 +298,7 @@ function handleUpdateSetUsed(event: Event, setId: string) {
               @click="modal = 'delete'">
               Xóa đã chọn<span v-if="selected.size"> ({{ selected.size }})</span>
             </button>
-            <button v-if="selected.size === 1 && inventoryStore.items.find((i) => selected.has(i.id))?.rpc != null"
+            <button v-if="selected.size === 1 && hasRpc()"
               type="button" :disabled="!!usingItemId"
               class="rounded-md bg-teal-700 px-3 py-1 text-white hover:bg-teal-800 disabled:cursor-not-allowed disabled:opacity-50"
               @click="useSelectedItem">

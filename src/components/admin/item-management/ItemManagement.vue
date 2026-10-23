@@ -1,6 +1,7 @@
 <script lang="ts" setup>
-import { computed, onMounted, reactive, ref } from 'vue';
-import { supabaseItemRepository, type AdminItemRow, type ItemPayload } from '../../data/supabaseItemRepository';
+import { computed, onMounted, ref } from 'vue';
+import { supabaseItemRepository, type AdminItemRow, type ItemPayload } from '../../../data/supabaseItemRepository';
+import ItemForm from './ItemForm.vue';
 
 const emit = defineEmits(['close']);
 
@@ -17,17 +18,7 @@ const deletingId = ref<string | null>(null);
 const updatingId = ref<string | null>(null);
 const confirmDeleteId = ref<string | null>(null);
 
-const emptyForm = () => ({
-	id: null as string | null,
-	category: '',
-	name: '',
-	information: '',
-	image: '',
-	icon: '',
-	isDisabled: true,
-});
-
-const form = reactive(emptyForm());
+const editingItem = ref<AdminItemRow | null>(null);
 
 const categories = computed(() => [...new Set(items.value.map((item) => item.category?.trim()).filter((value): value is string => Boolean(value)))].sort((a, b) => a.localeCompare(b, 'vi')));
 
@@ -57,21 +48,13 @@ async function loadItems() {
 }
 
 function openCreateForm() {
-	Object.assign(form, emptyForm());
+	editingItem.value = null;
 	formError.value = '';
 	isFormOpen.value = true;
 }
 
 function openEditForm(item: AdminItemRow) {
-	Object.assign(form, {
-		id: item.id,
-		category: item.category ?? '',
-		name: item.name,
-		information: item.information,
-		image: item.image ?? '',
-		icon: item.icon ?? '',
-		isDisabled: item.isDisabled !== false,
-	});
+	editingItem.value = item;
 	formError.value = '';
 	isFormOpen.value = true;
 }
@@ -81,32 +64,12 @@ function closeForm() {
 	formError.value = '';
 }
 
-function buildPayload(): ItemPayload | null {
-	const name = form.name.trim();
-	const information = form.information.trim();
-	if (!name || !information) {
-		formError.value = 'Tên và thông tin vật phẩm là bắt buộc';
-		return null;
-	}
-
-	return {
-		category: form.category.trim() || null,
-		name,
-		information,
-		image: form.image.trim() || null,
-		icon: form.icon.trim() || null,
-		isDisabled: form.isDisabled,
-	};
-}
-
-async function handleSave() {
+async function handleSave(payload: ItemPayload) {
 	formError.value = '';
-	const payload = buildPayload();
-	if (!payload) return;
 
 	isSaving.value = true;
 	try {
-		if (form.id) await supabaseItemRepository.update(form.id, payload);
+		if (editingItem.value) await supabaseItemRepository.update(editingItem.value.id, payload);
 		else await supabaseItemRepository.create(payload);
 		closeForm();
 		await loadItems();
@@ -123,10 +86,14 @@ async function toggleEnabled(item: AdminItemRow) {
 	try {
 		await supabaseItemRepository.update(item.id, {
 			category: item.category,
+			classification: item.classification,
+			rpc: item.rpc,
 			name: item.name,
 			information: item.information,
 			image: item.image,
 			icon: item.icon,
+			quantity: item.quantity,
+			price: item.price,
 			isDisabled: item.isDisabled === false,
 		});
 		await loadItems();
@@ -142,7 +109,7 @@ async function handleDelete() {
 	deletingId.value = confirmDeleteId.value;
 	try {
 		await supabaseItemRepository.delete(confirmDeleteId.value);
-		if (form.id === confirmDeleteId.value) closeForm();
+		if (editingItem.value?.id === confirmDeleteId.value) closeForm();
 		confirmDeleteId.value = null;
 		await loadItems();
 	} catch (error) {
@@ -215,7 +182,8 @@ onMounted(loadItems);
 						<thead class="text-[11px] uppercase text-gray-600">
 							<tr>
 								<th class="sticky top-0 z-10 bg-gray-100 px-4 py-3">Vật phẩm</th>
-								<th class="sticky top-0 z-10 bg-gray-100 px-4 py-3">Danh mục</th>
+								<th class="sticky top-0 z-10 bg-gray-100 px-4 py-3">Danh mục / phân loại</th>
+								<th class="sticky top-0 z-10 bg-gray-100 px-4 py-3">Giá / tồn kho</th>
 								<th class="sticky top-0 z-10 bg-gray-100 px-4 py-3">Biểu tượng</th>
 								<th class="sticky top-0 z-10 bg-gray-100 px-4 py-3">Hiển thị</th>
 								<th class="sticky top-0 z-10 bg-gray-100 px-4 py-3">Ngày tạo</th>
@@ -236,7 +204,8 @@ onMounted(loadItems);
 										</div>
 									</div>
 								</td>
-								<td class="px-4 py-3 text-gray-700">{{ item.category || '—' }}</td>
+								<td class="px-4 py-3 text-gray-700"><div>{{ item.category || '—' }}</div><div class="mt-1 text-xs text-gray-500">{{ item.classification || '—' }}</div></td>
+								<td class="whitespace-nowrap px-4 py-3 text-gray-700"><div class="font-semibold">{{ item.price.toLocaleString('vi-VN') }} đ</div><div class="mt-1 text-xs text-gray-500">{{ item.quantity == null ? 'Không giới hạn' : `Tồn ${item.quantity.toLocaleString('vi-VN')}` }}</div></td>
 								<td class="px-4 py-3 text-2xl">{{ item.icon || '—' }}</td>
 								<td class="px-4 py-3"><span class="rounded-full border px-2.5 py-1 text-xs font-semibold" :class="item.isDisabled === false ? 'border-emerald-200 bg-emerald-50 text-emerald-800' : 'border-gray-200 bg-gray-100 text-gray-600'">{{ item.isDisabled === false ? 'Đang bật' : 'Đang tắt' }}</span></td>
 								<td class="whitespace-nowrap px-4 py-3 text-xs text-gray-500">{{ formatDate(item.createdAt) }}</td>
@@ -254,49 +223,7 @@ onMounted(loadItems);
 				</div>
 			</section>
 
-			<div v-if="isFormOpen" class="absolute inset-0 z-20 bg-black/25 lg:static lg:inset-auto lg:z-auto lg:bg-transparent" @click.self="closeForm">
-				<aside class="ml-auto flex h-full w-full max-w-xl flex-col border-l border-gray-200 bg-white shadow-xl">
-					<div class="flex shrink-0 items-center justify-between border-b border-gray-200 px-5 py-4">
-						<div>
-							<h3 class="m-0 text-base font-extrabold text-[#153221]">{{ form.id ? 'Chỉnh sửa vật phẩm' : 'Thêm vật phẩm' }}</h3>
-							<p class="m-0 mt-1 text-xs text-gray-500">Thông tin trong bảng items</p>
-						</div>
-						<button type="button" aria-label="Đóng biểu mẫu" class="grid size-8 place-items-center rounded-md text-xl text-gray-500 hover:bg-gray-100" @click="closeForm">&times;</button>
-					</div>
-					<form class="flex-1 space-y-4 overflow-y-auto p-5" @submit.prevent="handleSave">
-						<div v-if="formError" class="rounded-lg border border-red-200 bg-red-50 px-3 py-2 text-sm text-red-700">{{ formError }}</div>
-						<div class="grid gap-4 sm:grid-cols-2">
-							<label class="flex flex-col gap-1.5 text-xs font-bold text-gray-600 sm:col-span-2">Tên vật phẩm *
-								<input v-model="form.name" required maxlength="200" class="rounded-md border border-gray-300 px-3 py-2 text-sm font-normal text-gray-800 focus:border-emerald-600 focus:outline-none" />
-							</label>
-							<label class="flex flex-col gap-1.5 text-xs font-bold text-gray-600">Danh mục
-								<input v-model="form.category" list="item-category-options" placeholder="Chọn hoặc nhập danh mục" maxlength="100" class="rounded-md border border-gray-300 px-3 py-2 text-sm font-normal text-gray-800 focus:border-emerald-600 focus:outline-none" />
-								<datalist id="item-category-options"><option v-for="category in categories" :key="category" :value="category" /></datalist>
-							</label>
-							<label class="flex flex-col gap-1.5 text-xs font-bold text-gray-600">Biểu tượng
-								<input v-model="form.icon" placeholder="Ví dụ: 🎣 hoặc icon class" maxlength="100" class="rounded-md border border-gray-300 px-3 py-2 text-sm font-normal text-gray-800 focus:border-emerald-600 focus:outline-none" />
-							</label>
-							<label class="flex flex-col gap-1.5 text-xs font-bold text-gray-600 sm:col-span-2">Đường dẫn hình ảnh
-								<input v-model="form.image" type="text" placeholder="https://... hoặc đường dẫn asset" class="rounded-md border border-gray-300 px-3 py-2 text-sm font-normal text-gray-800 focus:border-emerald-600 focus:outline-none" />
-							</label>
-							<div v-if="form.image" class="sm:col-span-2">
-								<img :src="form.image" :alt="form.name || 'Xem trước vật phẩm'" class="h-36 w-full rounded-md border border-gray-200 bg-gray-50 object-contain" />
-							</div>
-							<label class="flex flex-col gap-1.5 text-xs font-bold text-gray-600 sm:col-span-2">Thông tin *
-								<textarea v-model="form.information" required rows="6" class="resize-y rounded-md border border-gray-300 px-3 py-2 text-sm font-normal text-gray-800 focus:border-emerald-600 focus:outline-none"></textarea>
-							</label>
-							<label class="flex items-center gap-3 rounded-md border border-gray-200 px-3 py-3 text-sm font-semibold text-gray-700 sm:col-span-2">
-								<input v-model="form.isDisabled" type="checkbox" class="size-4 accent-emerald-800" />
-								<span>Tắt hiển thị vật phẩm</span>
-							</label>
-						</div>
-					</form>
-					<div class="flex shrink-0 items-center justify-end gap-2 border-t border-gray-200 px-5 py-4">
-						<button type="button" class="rounded-lg border border-gray-300 px-4 py-2 text-sm font-bold text-gray-700 hover:bg-gray-100" @click="closeForm">Huỷ</button>
-						<button type="button" :disabled="isSaving" class="rounded-lg bg-[#153221] px-4 py-2 text-sm font-bold text-white hover:bg-emerald-800 disabled:opacity-50" @click="handleSave">{{ isSaving ? 'Đang lưu...' : 'Lưu vật phẩm' }}</button>
-					</div>
-				</aside>
-			</div>
+			<ItemForm v-if="isFormOpen" :item="editingItem" :categories="categories" :saving="isSaving" :error="formError" @close="closeForm" @save="handleSave" />
 		</main>
 
 		<div v-if="confirmDeleteId" class="fixed inset-0 z-40 grid place-items-center bg-black/45 p-4">

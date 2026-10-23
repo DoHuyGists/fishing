@@ -48,6 +48,31 @@ class SupabaseFishRepository {
     return this.fetchAllCaughtFishes();
   }
 
+  async fetchLatestInNetCaughtFishes(userId: string, limit = 10): Promise<CaughtRow[]> {
+    const { data, error } = await supabase
+      .from("caught")
+      .select("id, created_at, user_id, species_id, weight, is_shiny, variant_type, status, species(id, name, image, rarity), origin(id, country, name, x, y, location, is_available)")
+      .eq("user_id", userId)
+      .eq("status", "in-net")
+      .order("created_at", { ascending: false })
+      .limit(limit);
+
+    if (error) throw new Error(error.message);
+
+    return (data ?? []).map((row: any) => ({
+      id: row.id,
+      created_at: row.created_at,
+      user_id: row.user_id,
+      species_id: row.species_id,
+      weight: Number(row.weight),
+      is_shiny: row.is_shiny,
+      variant_type: row.variant_type,
+      status: row.status,
+      species: { id: row.species.id, name: row.species.name, weight: Number(row.weight), image: row.species.image, rarity: row.species.rarity },
+      origin: { id: row.origin.id, country: row.origin.country, name: row.origin.name, x: row.origin.x, y: row.origin.y, location: row.origin.location, isAvailable: row.origin.is_available },
+    }));
+  }
+
   async fetchFishingInventory(areaId: string): Promise<FishingInventoryRow[]> {
     const { data, error } = await supabase.rpc('get_caught_in_area ', {
       p_area_id: areaId
@@ -99,9 +124,16 @@ class SupabaseFishRepository {
 
   async updateCaughtStatus(ids: string[], status: "normal" | "in-net"): Promise<void> {
     if (ids.length === 0) return;
-    const { error } = await supabase.from("caught").update({ status }).in("id", ids);
+    await Promise.all(
+      ids.map(async (caughtId) => {
+        const { error } = await supabase.rpc("move_species", {
+          p_caught_id: caughtId,
+          p_status: status,
+        });
 
-    if (error) throw new Error(error.message);
+        if (error) throw new Error(error.message);
+      })
+    );
   }
 
   async deleteInNetFishes(): Promise<void> {

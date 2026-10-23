@@ -21,6 +21,23 @@ export interface AdminItemRow {
   updatedAt: string | null;
   isDisabled: boolean | null;
   icon: string | null;
+  classification: string | null;
+  quantity: number | null;
+  price: number;
+  rpc: string | null;
+}
+
+export interface ShopItem {
+  id: string;
+  category: string | null;
+  classification: string | null;
+  name: string;
+  information: string;
+  image: string | null;
+  icon: string | null;
+  quantity: number | null;
+  price: number;
+  rpc: string | null;
 }
 
 export interface ItemPayload {
@@ -30,9 +47,19 @@ export interface ItemPayload {
   image: string | null;
   isDisabled: boolean;
   icon: string | null;
+  classification: string | null;
+  quantity: number | null;
+  price: number;
+  rpc: string | null;
 }
 
 class SupabaseItemRepository {
+  async fetchShopItems(): Promise<ShopItem[]> {
+    const { data, error } = await supabase.from("items").select("id,category,classification,name,information,image,icon,quantity,price,rpc").eq("isDisabled", false).order("classification").order("name");
+    if (error) throw new Error(error.message);
+    return data.map((item) => ({ ...item, price: Number(item.price), quantity: item.quantity == null ? null : Number(item.quantity), rpc: item.rpc }));
+  }
+
   async fetchAll(): Promise<AdminItemRow[]> {
     const { data, error } = await supabase.from("items").select("*").order("created_at", { ascending: false });
     if (error) throw new Error(error.message);
@@ -47,6 +74,10 @@ class SupabaseItemRepository {
       updatedAt: item.updated_at,
       isDisabled: item.isDisabled,
       icon: item.icon,
+      classification: item.classification,
+      quantity: item.quantity == null ? null : Number(item.quantity),
+      price: Number(item.price),
+      rpc: item.rpc,
     }));
   }
 

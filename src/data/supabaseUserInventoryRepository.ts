@@ -36,6 +36,10 @@ class SupabaseUserInventoryRepository {
     }
     return data.item_id;
   }
+  async purchaseItem(itemId: string, quantity: number): Promise<void> {
+    const { error } = await supabase.rpc("purchase_item", { p_item_id: itemId, p_quantity: quantity });
+    if (error) throw new Error(error.message);
+  }
   async useItem(inventoryId: string): Promise<unknown> {
     const { data, error } = await supabase.rpc("use_inventory_item", {
       p_inventory_id: inventoryId,

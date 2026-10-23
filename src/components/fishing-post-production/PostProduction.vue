@@ -3,6 +3,7 @@ import { computed, onMounted, reactive, ref } from "vue";
 import Modal from "../shared/Modal.vue";
 import Hint from "../shared/Hint.vue";
 import { useCaughtStore, type CaughtFish } from "../../stores/caught";
+import { useUserProfileStore } from "../../stores/userProfile";
 import { useModalStore } from "../../stores/modal";
 import { useToast } from "../../composables/useToast";
 import TwoOptionsModal from "../shared/TwoOptionsModal.vue";
@@ -10,6 +11,7 @@ import TwoOptionsModal from "../shared/TwoOptionsModal.vue";
 type Side = "net" | "stored";
 
 const caughtStore = useCaughtStore();
+const userProfileStore = useUserProfileStore();
 const modalStore = useModalStore();
 const toast = useToast();
 
@@ -19,6 +21,8 @@ const selected = reactive<Record<Side, Set<string>>>({ net: new Set(), stored: n
 const isMoving = ref(false);
 const isFinishing = ref(false);
 const showConfirm = ref(false);
+const storageCapacity = computed(() => userProfileStore.speciesStorageCapacity);
+const remainingStorage = computed(() => Math.max(0, storageCapacity.value - caughtStore.storedFishes.length));
 
 function filtered(fishes: CaughtFish[], keyword: string) {
   const k = keyword.trim().toLowerCase();
@@ -37,6 +41,7 @@ const panels = computed(() => [
     key: "stored" as Side,
     title: "Kho",
     total: caughtStore.storedFishes.length,
+    capacity: storageCapacity.value,
     fishes: filtered(caughtStore.storedFishes, search.stored),
   },
 ]);
@@ -56,6 +61,10 @@ function selectAllVisible(side: Side) {
 async function move(from: Side) {
   const ids = [...selected[from]];
   if (ids.length === 0 || isMoving.value) return;
+  if (from === "net" && ids.length > remainingStorage.value) {
+    toast.error(`Kho cá đã đạt giới hạn (${caughtStore.storedFishes.length}/${storageCapacity.value}). Có thể chuyển tối đa ${remainingStorage.value} cá.`);
+    return;
+  }
   isMoving.value = true;
   try {
     await caughtStore.moveFishes(ids, from === "net" ? "normal" : "in-net");
@@ -93,7 +102,9 @@ onMounted(() => {
         <template v-for="(panel, index) in panels" :key="panel.key">
           <section class="flex min-w-0 flex-1 flex-col rounded-lg border border-emerald-900/15 bg-white">
             <div class="flex flex-wrap items-center gap-2 border-b border-emerald-900/10 p-2">
-              <h3 class="m-0 text-sm font-bold text-emerald-950">{{ panel.title }} ({{ panel.total }})</h3>
+              <h3 class="m-0 text-sm font-bold text-emerald-950">
+                {{ panel.title }} ({{ panel.total }}<template v-if="panel.key === 'stored'">/{{ panel.capacity }}</template>)
+              </h3>
               <input
                 v-model="search[panel.key]"
                 type="search"

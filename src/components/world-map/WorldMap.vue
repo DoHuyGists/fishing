@@ -24,6 +24,7 @@ import { useConfigStore } from "../../stores/config.ts";
 import InteractWorldMap2 from "./InteractWorldMap2.vue";
 import { useUserTurnsStore } from "../../stores/userTurns";
 import UserTurn from "../stamina/UserTurn.vue";
+import ShopModal from "../shop/ShopModal.vue";
 
 const authStore = useAuthStore();
 const caughtStore = useCaughtStore();
@@ -81,6 +82,15 @@ onUnmounted(() => {
           >
             <span class="text-sm">🏪</span>
             <span>Chợ cá</span>
+          </button>
+
+          <button
+            type="button"
+            class="flex items-center gap-1.5 px-3 py-1.5 bg-[#153221] hover:bg-[#1a3e29] border border-gray-300 text-white rounded-xl shadow-sm font-bold text-xs cursor-pointer transition-colors"
+            @click="modalStore.open('shop')"
+          >
+            <span class="text-sm" aria-hidden="true">🎁</span>
+            <span>Cửa hàng</span>
           </button>
 
           <!-- Nhật ký -->
@@ -228,6 +238,7 @@ onUnmounted(() => {
         <div v-if="modalStore.isModalOpening">
           <AccountInfoModal v-if="modalStore.isOpening('account')" />
           <MarketWindow v-if="modalStore.isOpening('market')" />
+          <ShopModal v-if="modalStore.isOpening('shop')" />
           <CatchDiaryModal v-if="modalStore.isOpening('diary')" />
           <SpinWheelModal v-if="modalStore.isOpening('gacha')" />
           <InventoryModal v-if="modalStore.isOpening('inventory')" />

@@ -1,5 +1,5 @@
 <script lang="ts" setup>
-import { computed, ref } from "vue";
+import { computed, onMounted, ref } from "vue";
 import { supabaseFishRepository } from "../../data/supabaseFishRepository";
 import { useMarketStore } from "../../stores/market";
 import { useAuthStore } from "../../stores/auth";
@@ -16,9 +16,7 @@ const authStore = useAuthStore();
 const caughtStore = useCaughtStore();
 
 const recentCaughtFishes = computed(() =>
-  [...caughtStore.caughtFishes]
-    .sort((a, b) => new Date(b.created_at ?? 0).getTime() - new Date(a.created_at ?? 0).getTime())
-    .slice(0, 10),
+  caughtStore.inNetFishes,
 );
 
 function openSellConfirm(fish: any) {
@@ -63,7 +61,7 @@ async function releaseFish() {
 <template>
     <section class="mt-3 w-full max-w-sm rounded-xl border border-emerald-900/15 bg-white/95 p-3 shadow-sm">
         <div class="mb-2 flex items-center justify-between">
-          <h2 class="m-0 text-sm font-bold text-[#153221]">10 cá mới câu</h2>
+          <h2 class="m-0 text-sm font-bold text-[#153221]">Cá mới câu</h2>
           <span class="text-[11px] text-gray-500">{{ recentCaughtFishes.length }} cá</span>
         </div>
         <p v-if="caughtStore.isLoadingCaught && !recentCaughtFishes.length" class="m-0 py-3 text-center text-xs text-gray-500">

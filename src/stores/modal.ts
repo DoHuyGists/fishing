@@ -16,7 +16,8 @@ type ModalName =
     | "faction"
     | "friend"
     | "team"
-    | "post-production";
+    | "post-production"
+    | "shop";
 
 export const useModalStore = defineStore("Modal", {
     state: () => ({

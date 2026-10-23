@@ -8,10 +8,10 @@ export const useUserProfileStore = defineStore("userProfile", {
     error: "",
   }),
   getters: {
-    level: (state) => state.profile?.level ?? 1,
+    level: (state) => state.profile?.level ?? 0,
     experiencePoint: (state) => state.profile?.experience_point ?? 0,
-    inventoryCapacity: (state) => state.profile?.inventory_capacity ?? 20,
-    speciesStorageCapacity: (state) => state.profile?.species_storage_capacity ?? 50,
+    inventoryCapacity: (state) => state.profile?.inventory_capacity ?? 0,
+    speciesStorageCapacity: (state) => state.profile?.species_storage_capacity ?? 0,
   },
   actions: {
     async fetchProfile(userId: string) {

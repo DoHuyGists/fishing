@@ -6,7 +6,7 @@ import WeatherManagement from "../components/admin/weather-management/WeatherMan
 import ZoneWeatherManagement from "../components/admin/zone-weather-management/ZoneWeatherManagement.vue";
 import WeatherModifierManagement from "../components/admin/weather-modifier-management/WeatherModifierManagement.vue";
 import ModifierManagement from "../components/admin/modifier-management/ModifierManagement.vue";
-import ItemManagement from "../components/admin/ItemManagement.vue";
+import ItemManagement from "../components/admin/item-management/ItemManagement.vue";
 import SpeciesManagement from "../components/admin/SpeciesManagement.vue";
 import SpeciesInAreaManagement from "../components/admin/SpeciesInAreaManagement.vue";
 import EventManagement from "../components/admin/EventManagement.vue";
@@ -16,7 +16,20 @@ import NotificationManagement from "../components/admin/NotificationManagement.v
 import FeedbackListModal from "../components/admin/FeedbackListModal.vue";
 import ErrorFeedbackManagementModal from "../components/admin/ErrorFeedbackManagementModal.vue";
 
-type ModuleKey = "zone" | "weather" | "zoneWeather" | "weatherModifier" | "modifier" | "area" | "item" | "species" | "speciesInArea" | "event" | "schedule" | "redeemCode" | "notifications";
+type ModuleKey =
+  | "zone"
+  | "weather"
+  | "zoneWeather"
+  | "weatherModifier"
+  | "modifier"
+  | "area"
+  | "item"
+  | "species"
+  | "speciesInArea"
+  | "event"
+  | "schedule"
+  | "redeemCode"
+  | "notifications";
 
 interface AdminModule {
   key: ModuleKey;
@@ -35,29 +48,107 @@ const groups: ModuleGroup[] = [
   {
     title: "Dữ liệu trò chơi",
     modules: [
-      { key: "area", icon: "🗺️", label: "Bãi câu", desc: "Thêm, sửa và xoá các bãi câu trong game.", component: FishingAreaManagement },
-      { key: "item", icon: "🎒", label: "Vật phẩm", desc: "Quản lý cần câu, mồi và các vật phẩm khác.", component: ItemManagement },
-      { key: "redeemCode", icon: "🎟️", label: "Mã đổi thưởng", desc: "Tạo mã nhận xu, đặt hạn dùng và bật hoặc tắt mã.", component: RedeemCodeManagement },
-      { key: "notifications", icon: "🔔", label: "Thông báo", desc: "Tạo và quản lý thông báo cá nhân, thông báo hệ thống.", component: NotificationManagement },
-      { key: "species", icon: "🐟", label: "Loài cá", desc: "Chỉnh thông tin và thuộc tính của từng loài cá.", component: SpeciesManagement },
-      { key: "speciesInArea", icon: "🎯", label: "Cá theo bãi câu", desc: "Chọn loài cá xuất hiện ở mỗi bãi câu.", component: SpeciesInAreaManagement },
+      {
+        key: "area",
+        icon: "🗺️",
+        label: "Bãi câu",
+        desc: "Thêm, sửa và xoá các bãi câu trong game.",
+        component: FishingAreaManagement,
+      },
+      {
+        key: "item",
+        icon: "🎒",
+        label: "Vật phẩm",
+        desc: "Quản lý cần câu, mồi và các vật phẩm khác.",
+        component: ItemManagement,
+      },
+      {
+        key: "redeemCode",
+        icon: "🎟️",
+        label: "Mã đổi thưởng",
+        desc: "Tạo mã nhận xu, đặt hạn dùng và bật hoặc tắt mã.",
+        component: RedeemCodeManagement,
+      },
+      {
+        key: "notifications",
+        icon: "🔔",
+        label: "Thông báo",
+        desc: "Tạo và quản lý thông báo cá nhân, thông báo hệ thống.",
+        component: NotificationManagement,
+      },
+      {
+        key: "species",
+        icon: "🐟",
+        label: "Loài cá",
+        desc: "Chỉnh thông tin và thuộc tính của từng loài cá.",
+        component: SpeciesManagement,
+      },
+      {
+        key: "speciesInArea",
+        icon: "🎯",
+        label: "Cá theo bãi câu",
+        desc: "Chọn loài cá xuất hiện ở mỗi bãi câu.",
+        component: SpeciesInAreaManagement,
+      },
     ],
   },
   {
     title: "Thời tiết",
     modules: [
-      { key: "zone", icon: "🌊", label: "Vùng", desc: "Quản lý các vùng câu và thời tiết hiện tại.", component: ZoneManagement },
-      { key: "weather", icon: "⛅", label: "Thời tiết", desc: "Quản lý các loại thời tiết và thời lượng.", component: WeatherManagement },
-      { key: "zoneWeather", icon: "🌦️", label: "Thời tiết theo vùng", desc: "Chọn thời tiết được phép ở mỗi vùng.", component: ZoneWeatherManagement },
-      { key: "modifier", icon: "📊", label: "Chỉ số", desc: "Quản lý các chỉ số (modifiers).", component: ModifierManagement },
-      { key: "weatherModifier", icon: "🎚️", label: "Chỉ số theo thời tiết", desc: "Cấu hình khoảng giá trị chỉ số của thời tiết.", component: WeatherModifierManagement },
+      {
+        key: "zone",
+        icon: "🌊",
+        label: "Vùng",
+        desc: "Quản lý các vùng câu và thời tiết hiện tại.",
+        component: ZoneManagement,
+      },
+      {
+        key: "weather",
+        icon: "⛅",
+        label: "Thời tiết",
+        desc: "Quản lý các loại thời tiết và thời lượng.",
+        component: WeatherManagement,
+      },
+      {
+        key: "zoneWeather",
+        icon: "🌦️",
+        label: "Thời tiết theo vùng",
+        desc: "Chọn thời tiết được phép ở mỗi vùng.",
+        component: ZoneWeatherManagement,
+      },
+      {
+        key: "modifier",
+        icon: "📊",
+        label: "Chỉ số",
+        desc: "Quản lý các chỉ số (modifiers).",
+        component: ModifierManagement,
+      },
+      {
+        key: "weatherModifier",
+        icon: "🎚️",
+        label: "Chỉ số theo thời tiết",
+        desc: "Cấu hình khoảng giá trị chỉ số của thời tiết.",
+        component: WeatherModifierManagement,
+      },
     ],
   },
   {
     title: "Sự kiện",
     modules: [
-      { key: "event", icon: "🎉", label: "Sự kiện", desc: "Tạo và cập nhật nội dung các sự kiện.", component: EventManagement },
-      { key: "schedule", icon: "🗓️", label: "Lịch sự kiện", desc: "Đặt thời gian bắt đầu và kết thúc cho sự kiện.", component: EventScheduleManagement },
+      {
+        key: "event",
+        icon: "🎉",
+        label: "Sự kiện",
+        desc: "Tạo và cập nhật nội dung các sự kiện.",
+        component: EventManagement,
+      },
+      {
+        key: "schedule",
+        icon: "🗓️",
+        label: "Lịch sự kiện",
+        desc: "Đặt thời gian bắt đầu và kết thúc cho sự kiện.",
+        component: EventScheduleManagement,
+      },
     ],
   },
 ];
@@ -105,7 +196,9 @@ const close = () => {
               <button
                 type="button"
                 class="w-full flex items-center gap-3 rounded-lg px-3 py-2 text-left text-sm font-medium transition-colors cursor-pointer focus-visible:outline-2 focus-visible:outline-emerald-300"
-                :class="active === m.key ? 'bg-white/15 text-white' : 'text-emerald-50/80 hover:bg-white/10 hover:text-white'"
+                :class="
+                  active === m.key ? 'bg-white/15 text-white' : 'text-emerald-50/80 hover:bg-white/10 hover:text-white'
+                "
                 :aria-current="active === m.key ? 'true' : undefined"
                 @click="open(m.key)"
               >
@@ -120,25 +213,41 @@ const close = () => {
 
     <!-- Main -->
     <main class="flex-1 min-w-0">
-      <header class="bg-white border-b border-slate-200 px-5 py-4 sm:px-8 flex flex-wrap items-center gap-4 justify-between">
+      <header
+        class="bg-white border-b border-slate-200 px-5 py-4 sm:px-8 flex flex-wrap items-center gap-4 justify-between"
+      >
         <div>
           <h1 class="text-xl font-extrabold text-[#153221]">Bảng điều khiển</h1>
           <p class="text-sm text-slate-500">Chọn một mục để quản lý dữ liệu.</p>
         </div>
 
         <div class="flex w-full flex-col gap-3 sm:w-auto sm:flex-row sm:items-center">
-        <button type="button" class="rounded-lg bg-emerald-700 px-4 py-2 text-sm font-semibold text-white hover:bg-emerald-800 focus-visible:outline-2 focus-visible:outline-emerald-600" @click="feedbackModal = 'opinion'">Xem góp ý</button>
-        <button type="button" class="rounded-lg bg-amber-600 px-4 py-2 text-sm font-semibold text-white hover:bg-amber-700 focus-visible:outline-2 focus-visible:outline-amber-600" @click="feedbackModal = 'errors'">Xử lý báo lỗi</button>
-        <label class="relative w-full sm:w-72">
-          <span class="sr-only">Tìm mục quản lý</span>
-          <input
-            v-model="keyword"
-            type="search"
-            placeholder="Tìm mục quản lý..."
-            class="w-full rounded-lg border border-slate-300 bg-white py-2 pl-9 pr-3 text-sm placeholder:text-slate-400 focus:border-emerald-600 focus:outline-none focus:ring-2 focus:ring-emerald-600/25"
-          />
-          <span class="pointer-events-none absolute left-3 top-1/2 -translate-y-1/2 text-slate-400" aria-hidden="true">🔍</span>
-        </label>
+          <button
+            type="button"
+            class="rounded-lg bg-emerald-700 px-4 py-2 text-sm font-semibold text-white hover:bg-emerald-800 focus-visible:outline-2 focus-visible:outline-emerald-600"
+            @click="feedbackModal = 'opinion'"
+          >
+            Xem góp ý
+          </button>
+          <button
+            type="button"
+            class="rounded-lg bg-amber-600 px-4 py-2 text-sm font-semibold text-white hover:bg-amber-700 focus-visible:outline-2 focus-visible:outline-amber-600"
+            @click="feedbackModal = 'errors'"
+          >
+            Xử lý báo lỗi
+          </button>
+          <label class="relative w-full sm:w-72">
+            <span class="sr-only">Tìm mục quản lý</span>
+            <input
+              v-model="keyword"
+              type="search"
+              placeholder="Tìm mục quản lý..."
+              class="w-full rounded-lg border border-slate-300 bg-white py-2 pl-9 pr-3 text-sm placeholder:text-slate-400 focus:border-emerald-600 focus:outline-none focus:ring-2 focus:ring-emerald-600/25"
+            />
+            <span class="pointer-events-none absolute left-3 top-1/2 -translate-y-1/2 text-slate-400" aria-hidden="true"
+              >🔍</span
+            >
+          </label>
         </div>
       </header>
 
@@ -168,7 +277,10 @@ const close = () => {
           </div>
         </section>
 
-        <p v-if="filteredGroups.length === 0" class="rounded-xl border border-dashed border-slate-300 bg-white p-8 text-center text-sm text-slate-500">
+        <p
+          v-if="filteredGroups.length === 0"
+          class="rounded-xl border border-dashed border-slate-300 bg-white p-8 text-center text-sm text-slate-500"
+        >
           Không có mục nào khớp với "{{ keyword }}". Hãy thử từ khoá khác.
         </p>
       </div>

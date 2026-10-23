@@ -11,12 +11,14 @@ import { supabaseUserInAreaRepository } from "../data/supabaseUserInAreaReposito
 import { useUserInAreaStore } from "../stores/userInArea";
 import TwoOptionsModal from "../components/shared/TwoOptionsModal.vue";
 import { useConfigStore } from "../stores/config.ts";
+import { useUserProfileStore } from "../stores/userProfile";
 
 const router = useRouter();
 const authStore = useAuthStore();
 const currencyStore = useCurrencyStore();
 const userInAreaStore = useUserInAreaStore();
 const configStore = useConfigStore();
+const userProfileStore = useUserProfileStore();
 let currencyChannel: RealtimeChannel | null = null;
 let userInAreaChannel: ReturnType<typeof supabaseUserInAreaRepository.subscribeToAreaUsers> | null = null;
 
@@ -38,6 +40,7 @@ onBeforeMount(async () => {
 });
 
 onMounted(() => {
+  userProfileStore.fetchProfile(authStore.userId);
   userInAreaStore.setCurrentUserInArea(authStore.userId);
   currencyStore.fetchCurrency();
 });
