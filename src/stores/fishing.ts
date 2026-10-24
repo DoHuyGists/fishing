@@ -1,7 +1,7 @@
 import { defineStore } from "pinia";
 import { useAuthStore } from "./auth";
 import { supabaseEquipmentRepository } from "../data/supabaseEquipmentRepository";
-import { supabaseFishRepository } from "../data/supabaseFishRepository";
+import { supabaseFishRepository, type AreaSpeciesDiaryResponse, type FishDepthPreviewResponse } from "../data/supabaseFishRepository";
 import { supabaseUserInAreaRepository } from "../data/supabaseUserInAreaRepository";
 import supabase from "../database/connection";
 import { supabaseFishingAreaRepository } from "../data/supabaseFishingAreaRepository";
@@ -119,6 +119,14 @@ export const useFishingStore = defineStore("fishing", {
     currentAreaId: null as string | null,
     appliedDepthMeters: 0,
     depthAdjusterOpen: false,
+    depthPreview: null as FishDepthPreviewResponse | null,
+    isLoadingDepthPreview: false,
+    depthPreviewError: "",
+    depthPreviewRequestId: 0,
+    areaSpeciesDiary: null as AreaSpeciesDiaryResponse | null,
+    isLoadingAreaSpeciesDiary: false,
+    areaSpeciesDiaryError: "",
+    areaSpeciesDiaryRequestId: 0,
   }),
   getters: {
     canPull: (s) => s.castPhase === "bite",
@@ -137,6 +145,38 @@ export const useFishingStore = defineStore("fishing", {
         this.currentArea = await supabaseFishingAreaRepository.fetchOneAreas(areaId);
       } catch (err) {
         console.log(err);
+      }
+    },
+    async fetchDepthPreview(castDepth: number) {
+      const requestId = ++this.depthPreviewRequestId;
+      this.isLoadingDepthPreview = true;
+      this.depthPreviewError = "";
+      try {
+        const preview = await supabaseFishRepository.previewFishByDepth(castDepth);
+        if (requestId !== this.depthPreviewRequestId) return;
+        this.depthPreview = preview;
+      } catch (err) {
+        if (requestId !== this.depthPreviewRequestId) return;
+        this.depthPreview = null;
+        this.depthPreviewError = err instanceof Error ? err.message : "Không thể tải dự đoán cá ở độ sâu này.";
+      } finally {
+        if (requestId === this.depthPreviewRequestId) this.isLoadingDepthPreview = false;
+      }
+    },
+    async fetchAreaSpeciesDiary() {
+      const requestId = ++this.areaSpeciesDiaryRequestId;
+      this.isLoadingAreaSpeciesDiary = true;
+      this.areaSpeciesDiaryError = "";
+      try {
+        const diary = await supabaseFishRepository.fetchAreaSpeciesDiary();
+        if (requestId !== this.areaSpeciesDiaryRequestId) return;
+        this.areaSpeciesDiary = diary;
+      } catch (err) {
+        if (requestId !== this.areaSpeciesDiaryRequestId) return;
+        this.areaSpeciesDiary = null;
+        this.areaSpeciesDiaryError = err instanceof Error ? err.message : "Không thể tải sổ tay cá trong hồ.";
+      } finally {
+        if (requestId === this.areaSpeciesDiaryRequestId) this.isLoadingAreaSpeciesDiary = false;
       }
     },
     async fetchPlayersInArea(areaId?: string) {
@@ -299,7 +339,7 @@ export const useFishingStore = defineStore("fishing", {
       this.castMessage = "Đang kết nối với bãi câu...";
 
       try {
-        const { data, error } = await withTimeout(supabase.rpc("cast_rod", { p_area_id: areaId }), RPC_TIMEOUT_MS);
+        const { data, error } = await withTimeout(supabase.rpc("cast_rod", { p_area_id: areaId, p_cast_depth: this.appliedDepthMeters }), RPC_TIMEOUT_MS);
         if (requestId !== this.castRequestId) return;
         if (error) throw error;
 
@@ -403,6 +443,7 @@ export const useFishingStore = defineStore("fishing", {
     },
     openLakeGuide() {
       this.lakeGuideOpen = true;
+      void this.fetchAreaSpeciesDiary();
     },
     closeLakeGuide() {
       this.lakeGuideOpen = false;

@@ -10,12 +10,33 @@ const layer = computed(() => getDepthLayer(depth.value));
 const depthPercent = computed(() => (depth.value / FISHING_DEPTH_CONFIG.maxMeters) * 100);
 const formattedDepth = computed(() => new Intl.NumberFormat("vi-VN", { maximumFractionDigits: 1 }).format(depth.value));
 const errorMessage = ref("");
+let depthPreviewTimeout: ReturnType<typeof setTimeout> | undefined;
+
+function scheduleDepthPreview(castDepth: number) {
+    if (depthPreviewTimeout !== undefined) clearTimeout(depthPreviewTimeout);
+    store.isLoadingDepthPreview = true;
+    store.depthPreviewError = "";
+    depthPreviewTimeout = setTimeout(() => {
+        depthPreviewTimeout = undefined;
+        if (store.depthAdjusterOpen) void store.fetchDepthPreview(castDepth);
+    }, 2000);
+}
 
 watch(() => store.depthAdjusterOpen, (isOpen) => {
     if (isOpen) {
         draftDepth.value = store.appliedDepthMeters;
         errorMessage.value = "";
+        scheduleDepthPreview(store.appliedDepthMeters);
+    } else {
+        if (depthPreviewTimeout !== undefined) clearTimeout(depthPreviewTimeout);
+        depthPreviewTimeout = undefined;
+        store.depthPreviewRequestId += 1;
+        store.isLoadingDepthPreview = false;
     }
+});
+
+watch(depth, (castDepth) => {
+    if (store.depthAdjusterOpen) scheduleDepthPreview(castDepth);
 });
 
 function onKeydown(event: KeyboardEvent) {
@@ -37,7 +58,10 @@ function apply() {
 }
 
 onMounted(() => window.addEventListener("keydown", onKeydown));
-onBeforeUnmount(() => window.removeEventListener("keydown", onKeydown));
+onBeforeUnmount(() => {
+    window.removeEventListener("keydown", onKeydown);
+    if (depthPreviewTimeout !== undefined) clearTimeout(depthPreviewTimeout);
+});
 </script>
 
 <template>
@@ -95,7 +119,24 @@ onBeforeUnmount(() => window.removeEventListener("keydown", onKeydown));
                             </ul>
                             <div class="mt-3 border-t border-white/10 pt-3">
                                 <h3 class="m-0 text-[11px] font-bold text-[#d8e9e0]">Cá có thể xuất hiện</h3>
-                                <p class="mb-0 mt-2 rounded-lg bg-black/10 px-2.5 py-2 text-[10px] leading-relaxed text-[#91aaa0]">Dự án chưa có dữ liệu loài cá theo độ sâu để dự đoán tại {{ formattedDepth }} m.</p>
+                                <p v-if="store.isLoadingDepthPreview" class="mb-0 mt-2 flex items-center gap-2 rounded-lg bg-black/10 px-2.5 py-2 text-[10px] text-[#91aaa0]" role="status" aria-live="polite"><span class="h-3 w-3 shrink-0 animate-spin rounded-full border-2 border-[#91aaa0]/30 border-t-[#5ad0b3]" aria-hidden="true"></span>Đang cập nhật danh sách cá ở {{ formattedDepth }} m...</p>
+                                <p v-else-if="store.depthPreviewError" class="mb-0 mt-2 rounded-lg bg-black/10 px-2.5 py-2 text-[10px] leading-relaxed text-[#ffc18b]">{{ store.depthPreviewError }}</p>
+                                <template v-else-if="store.depthPreview">
+                                    <p class="mb-2 mt-1 text-[9px] text-[#91aaa0]">{{ store.depthPreview.total_species }} loài · {{ store.depthPreview.discovered_species }} đã khám phá · {{ store.depthPreview.undiscovered_species }} chưa khám phá</p>
+                                    <ul v-if="store.depthPreview.fishes.length" class="m-0 max-h-36 list-none space-y-1.5 overflow-y-auto p-0">
+                                        <li v-for="fish in store.depthPreview.fishes" :key="fish.species_id" class="flex items-center gap-2 rounded-lg bg-black/10 px-2 py-1.5">
+                                            <img v-if="fish.is_discovered && fish.image" :src="fish.image" :alt="fish.display_name" class="h-8 w-8 shrink-0 rounded-md object-cover" />
+                                            <span v-else class="grid h-8 w-8 shrink-0 place-items-center rounded-md bg-white/10 text-sm text-[#91aaa0]" aria-hidden="true">?</span>
+                                            <span class="min-w-0 flex-1">
+                                                <span class="block truncate text-[10px] font-semibold text-[#d8e9e0]">{{ fish.display_name }}</span>
+                                                <span class="block text-[9px] text-[#91aaa0]">{{ fish.spawn_chance }}% · {{ fish.weight_min != null && fish.weight_max != null ? `${fish.weight_min}–${fish.weight_max} kg` : "Chưa rõ cân nặng" }}</span>
+                                            </span>
+                                            <span v-if="fish.rarity" class="text-[8px] text-[#a9c4b8]">{{ fish.rarity }}</span>
+                                        </li>
+                                    </ul>
+                                    <p v-else class="mb-0 mt-2 text-[10px] text-[#91aaa0]">Không có loài cá ở độ sâu này.</p>
+                                </template>
+                                <p v-else class="mb-0 mt-2 rounded-lg bg-black/10 px-2.5 py-2 text-[10px] leading-relaxed text-[#91aaa0]">Chưa có dữ liệu dự đoán ở {{ formattedDepth }} m.</p>
                             </div>
                         </section>
                     </div>
@@ -122,7 +163,6 @@ onBeforeUnmount(() => window.removeEventListener("keydown", onKeydown));
 .info-card {
     min-width: 0;
     border: 1px solid rgba(128, 183, 158, .15);
-    /* border-radius: 15px; */
     background: rgba(14, 47, 38, .42);
     padding: 14px
 }
