@@ -1,28 +1,28 @@
 <script lang="ts" setup>
 import { computed, onMounted, reactive, ref } from 'vue';
-import { supabaseSpeciesInAreaRepository, type SpeciesInAreaPayload, type SpeciesInAreaRow } from '../../data/supabaseSpeciesInAreaRepository';
-import { supabaseFishingAreaRepository, type FishingAreaRow } from '../../data/supabaseFishingAreaRepository';
-import { supabaseSpeciesRepository, type SpeciesRow } from '../../data/supabaseSpeciesRepository';
-import { mapData } from '../../data/map';
+import { storeToRefs } from 'pinia';
+import type { SpeciesInAreaPayload, SpeciesInAreaRow } from '../../../data/supabaseSpeciesInAreaRepository';
+import { useSpeciesInAreaStore } from './speciesInArea';
+import { mapData } from '../../../data/map';
+import { useDepthScopeStore } from '../depth-scope-management/depthScope';
+import SpeciesInAreaForm from './SpeciesInAreaForm.vue';
 
 const emit = defineEmits(['close']);
 
-const rows = ref<SpeciesInAreaRow[]>([]);
-const areas = ref<FishingAreaRow[]>([]);
-const species = ref<SpeciesRow[]>([]);
+const store = useSpeciesInAreaStore();
+const { rows, areas, species, loading: isLoading, deletingKey } = storeToRefs(store);
+const depthScopeStore = useDepthScopeStore();
 
 const search = ref('');
 const areaFilter = ref('ALL');
 const speciesFilter = ref('ALL');
-const isLoading = ref(false);
 const loadError = ref('');
 const viewMode = ref<'table' | 'grouped'>('table');
 const collapsedAreas = ref<Set<string>>(new Set());
 
 const isFormOpen = ref(false);
-const isSaving = ref(false);
+const isSaving = computed(() => store.saving);
 const formError = ref('');
-const deletingKey = ref<string | null>(null);
 const confirmDeleteKey = ref<string | null>(null);
 
 const emptyForm = () => ({
@@ -30,6 +30,7 @@ const emptyForm = () => ({
   originalSpeciesId: null as string | null,
   areaId: '',
   speciesId: '',
+  depthScopeId: '',
   weightRate: 100,
 });
 
@@ -45,24 +46,13 @@ function countryName(code: string | null) {
 const rowKey = (row: SpeciesInAreaRow) => `${row.areaId}:${row.speciesId}`;
 
 async function loadAll() {
-  isLoading.value = true;
   loadError.value = '';
   try {
-    const [rowsData, areasData, speciesData] = await Promise.all([
-      supabaseSpeciesInAreaRepository.fetchAll(),
-      supabaseFishingAreaRepository.fetchAllAreasAdmin(),
-      supabaseSpeciesRepository.fetchAll(),
-    ]);
-    rows.value = rowsData;
-    areas.value = areasData;
-    species.value = speciesData;
+    await Promise.all([store.fetchAll(), depthScopeStore.fetchAll()]);
   } catch (error) {
-    loadError.value = error instanceof Error ? error.message : 'Không thể tải dữ liệu';
-  } finally {
-    isLoading.value = false;
+    loadError.value = error instanceof Error ? error.message : 'Unable to load data';
   }
 }
-
 const areaFilterOptions = computed(() => {
   const ids = new Set(rows.value.map((row) => row.areaId));
   return areas.value.filter((area) => ids.has(area.id)).sort((a, b) => (a.title ?? '').localeCompare(b.title ?? ''));
@@ -147,6 +137,7 @@ function openEditForm(row: SpeciesInAreaRow) {
     originalSpeciesId: row.speciesId,
     areaId: row.areaId,
     speciesId: row.speciesId,
+    depthScopeId: row.depthScopeId ?? '',
     weightRate: row.weightRate,
   });
   areaSearch.value = '';
@@ -185,30 +176,20 @@ function buildPayload(): SpeciesInAreaPayload | null {
     return null;
   }
 
-  return { areaId: form.areaId, speciesId: form.speciesId, weightRate };
+  return { areaId: form.areaId, speciesId: form.speciesId, weightRate, depthScopeId: form.depthScopeId || null };
 }
 
 async function handleSave() {
   formError.value = '';
   const payload = buildPayload();
   if (!payload) return;
-
-  isSaving.value = true;
   try {
-    if (form.originalAreaId && form.originalSpeciesId) {
-      await supabaseSpeciesInAreaRepository.update(form.originalAreaId, form.originalSpeciesId, payload);
-    } else {
-      await supabaseSpeciesInAreaRepository.create(payload);
-    }
+    await store.save(payload, form.originalAreaId, form.originalSpeciesId);
     closeForm();
-    await loadAll();
   } catch (error) {
-    formError.value = error instanceof Error ? error.message : 'Không thể lưu dữ liệu';
-  } finally {
-    isSaving.value = false;
+    formError.value = error instanceof Error ? error.message : 'Unable to save data';
   }
 }
-
 function askDelete(row: SpeciesInAreaRow) {
   confirmDeleteKey.value = rowKey(row);
 }
@@ -220,19 +201,14 @@ function cancelDelete() {
 async function handleDelete() {
   const row = rows.value.find((item) => rowKey(item) === confirmDeleteKey.value);
   if (!row) return;
-  deletingKey.value = rowKey(row);
   try {
-    await supabaseSpeciesInAreaRepository.delete(row.areaId, row.speciesId);
+    await store.remove(row.areaId, row.speciesId);
     if (form.originalAreaId === row.areaId && form.originalSpeciesId === row.speciesId) closeForm();
     confirmDeleteKey.value = null;
-    await loadAll();
   } catch (error) {
-    loadError.value = error instanceof Error ? error.message : 'Không thể xoá dữ liệu';
-  } finally {
-    deletingKey.value = null;
+    loadError.value = error instanceof Error ? error.message : 'Unable to delete data';
   }
 }
-
 onMounted(loadAll);
 </script>
 
@@ -355,45 +331,7 @@ onMounted(loadAll);
         </div>
       </section>
 
-      <div v-if="isFormOpen" class="absolute inset-0 z-20 bg-black/25 lg:static lg:inset-auto lg:z-auto lg:bg-transparent" @click.self="closeForm">
-        <aside class="ml-auto flex h-full w-full max-w-lg flex-col border-l border-gray-200 bg-white shadow-xl">
-          <div class="flex shrink-0 items-center justify-between border-b border-gray-200 px-5 py-4">
-            <div>
-              <h3 class="m-0 text-base font-extrabold text-[#153221]">{{ form.originalAreaId ? 'Chỉnh sửa cấu hình' : 'Thêm cấu hình' }}</h3>
-              <p class="m-0 mt-1 text-xs text-gray-500">Thông tin trong bảng species_in_area</p>
-            </div>
-            <button type="button" aria-label="Đóng biểu mẫu" class="grid size-8 place-items-center rounded-md text-xl text-gray-500 hover:bg-gray-100" @click="closeForm">&times;</button>
-          </div>
-          <form class="flex-1 space-y-4 overflow-y-auto p-5" @submit.prevent="handleSave">
-            <div v-if="formError" class="rounded-lg border border-red-200 bg-red-50 px-3 py-2 text-sm text-red-700">{{ formError }}</div>
-
-            <div class="flex flex-col gap-1.5">
-              <label class="text-xs font-bold text-gray-600">Bãi câu *</label>
-              <input v-model="areaSearch" type="search" placeholder="Tìm bãi câu..." class="rounded-md border border-gray-300 px-3 py-2 text-sm focus:border-emerald-600 focus:outline-none" />
-              <select v-model="form.areaId" size="6" class="rounded-md border border-gray-300 text-sm focus:border-emerald-600 focus:outline-none">
-                <option v-for="area in filteredAreaOptions" :key="area.id" :value="area.id">{{ area.title || '(Chưa đặt tên)' }} — {{ countryName(area.countryId) }}</option>
-              </select>
-            </div>
-
-            <div class="flex flex-col gap-1.5">
-              <label class="text-xs font-bold text-gray-600">Loài cá *</label>
-              <input v-model="speciesSearch" type="search" placeholder="Tìm loài cá..." class="rounded-md border border-gray-300 px-3 py-2 text-sm focus:border-emerald-600 focus:outline-none" />
-              <select v-model="form.speciesId" size="6" class="rounded-md border border-gray-300 text-sm focus:border-emerald-600 focus:outline-none">
-                <option v-for="item in filteredSpeciesOptions" :key="item.id" :value="item.id">{{ item.name }}<template v-if="item.rarity"> — {{ item.rarity }}</template></option>
-              </select>
-            </div>
-
-            <label class="flex flex-col gap-1.5 text-xs font-bold text-gray-600">Tỉ trọng xuất hiện (weight_rate)
-              <input v-model.number="form.weightRate" type="number" min="0" step="1" class="rounded-md border border-gray-300 px-3 py-2 text-sm font-normal text-gray-800 focus:border-emerald-600 focus:outline-none" />
-              <span class="text-[11px] font-normal text-gray-400">Giá trị càng cao thì loài cá càng dễ xuất hiện tại bãi câu này.</span>
-            </label>
-          </form>
-          <div class="flex shrink-0 items-center justify-end gap-2 border-t border-gray-200 px-5 py-4">
-            <button type="button" class="rounded-lg border border-gray-300 px-4 py-2 text-sm font-bold text-gray-700 hover:bg-gray-100" @click="closeForm">Huỷ</button>
-            <button type="button" :disabled="isSaving" class="rounded-lg bg-[#153221] px-4 py-2 text-sm font-bold text-white hover:bg-emerald-800 disabled:opacity-50" @click="handleSave">{{ isSaving ? 'Đang lưu...' : 'Lưu cấu hình' }}</button>
-          </div>
-        </aside>
-      </div>
+      <SpeciesInAreaForm v-if="isFormOpen" :form="form" :is-saving="isSaving" :error="formError" :areas="areas" :species="species" :depth-scopes="depthScopeStore.items" v-model:area-search="areaSearch" v-model:species-search="speciesSearch" :filtered-area-options="filteredAreaOptions" :filtered-species-options="filteredSpeciesOptions" :country-name="countryName" @close="closeForm" @save="handleSave" />
     </main>
 
     <div v-if="confirmDeleteKey" class="fixed inset-0 z-40 grid place-items-center bg-black/45 p-4">
