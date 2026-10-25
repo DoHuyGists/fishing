@@ -120,7 +120,7 @@ onMounted(() => {
 <template>
   <Modal title="Lưới cá" sub-title="Xử lý sau khi câu">
     <div class="flex h-full flex-col gap-2">
-      <div class="flex min-h-0 grow gap-2">
+      <div class="flex min-h-0 grow flex-col gap-2 md:flex-row">
         <template v-for="(panel, index) in panels" :key="panel.key">
           <section class="flex min-w-0 flex-1 flex-col rounded-lg border border-emerald-900/15 bg-white">
             <div class="flex flex-wrap items-center gap-2 border-b border-emerald-900/10 p-2">
@@ -188,7 +188,7 @@ onMounted(() => {
             </div>
           </section>
 
-          <div v-if="index === 0" class="flex shrink-0 flex-col justify-center items-center gap-2">
+          <div v-if="index === 0" class="flex shrink-0 flex-row flex-wrap items-center justify-center gap-2 md:flex-col">
             <div class="">
               <Hint text="Chọn cá rồi nhấn nút chuyển. Cá còn trong lưới khi kết thúc sẽ được thả." />
             </div>

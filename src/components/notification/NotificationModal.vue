@@ -20,6 +20,7 @@ const auth = useAuthStore();
 const notifications = useNotificationStore();
 const activeTab = ref<NotificationKind>("personal");
 const selected = ref<NotificationRow | null>(null);
+const expandedNotificationId = ref<string | null>(null);
 const readError = ref("");
 
 function loadNotifications() {
@@ -29,6 +30,7 @@ function loadNotifications() {
 
 async function selectNotification(item: NotificationRow) {
   selected.value = item;
+  expandedNotificationId.value = expandedNotificationId.value === item.id ? null : item.id;
   readError.value = "";
   const userId = auth.user?.id;
   if (userId && !item.is_read) {
@@ -56,8 +58,8 @@ onUnmounted(() => {
   <Modal title="Thông báo" sub-title="Tin nhắn dành cho bạn và thông báo hệ thống" :on-refresh="loadNotifications">
     <Tab v-model="currentTabActive" :tabs="tabs" lazy>
       <template #personal>
-        <div class="flex min-h-0 flex-1">
-          <aside class="w-[42%] shrink-0 overflow-y-auto border-r border-gray-200 sm:w-80">
+        <div class="flex min-h-0 flex-1 flex-col sm:flex-row">
+          <aside class="w-full shrink-0 overflow-y-auto sm:w-80 sm:border-r sm:border-gray-200">
             <p v-if="notifications.loading" class="p-5 text-sm text-gray-500">Đang tải thông báo...</p>
             <p v-else-if="!notifications.personal.length" class="p-5 text-sm text-gray-500">Chưa có thông báo nào.</p>
             <button
@@ -66,6 +68,7 @@ onUnmounted(() => {
               type="button"
               class="block w-full border-b border-gray-100 px-4 py-3 text-left hover:bg-emerald-50"
               :class="selected?.id === item.id ? 'bg-emerald-50' : ''"
+              :aria-expanded="expandedNotificationId === item.id"
               @click="selectNotification(item)"
             >
               <span class="flex items-start gap-2"
@@ -79,9 +82,17 @@ onUnmounted(() => {
                   ><span class="mt-1 block text-xs text-gray-500">{{ formatDateTime(item.created_at) }}</span></span
                 ></span
               >
+              <span v-if="expandedNotificationId === item.id" class="mt-3 block border-t border-[#cbd9c6] pt-3 sm:hidden">
+                <span class="mb-2 flex flex-wrap items-center gap-2">
+                  <span class="rounded-full bg-[#f5f9f0] px-2.5 py-1 text-xs font-bold text-[#24352a]">{{ item.type || 'general' }}</span>
+                  <span class="text-xs text-gray-500">{{ formatDateTime(item.created_at) }}</span>
+                </span>
+                <span class="block whitespace-pre-wrap text-sm leading-6 text-gray-700">{{ item.body }}</span>
+                <span v-if="selected?.id === item.id && readError" role="alert" class="mt-3 block rounded-lg bg-red-50 p-3 text-sm text-red-700">{{ readError }}</span>
+              </span>
             </button>
           </aside>
-          <article class="min-w-0 flex-1 overflow-y-auto p-5 sm:p-8">
+          <article class="hidden min-w-0 flex-1 overflow-y-auto p-5 sm:block sm:p-8">
             <div v-if="selected">
               <div class="mb-4 flex flex-wrap items-center gap-2">
                 <span class="rounded-full bg-emerald-50 px-2.5 py-1 text-xs font-bold text-emerald-800">{{
@@ -103,8 +114,8 @@ onUnmounted(() => {
       </template>
 
       <template #system>
-        <div class="flex min-h-0 flex-1">
-          <aside class="w-[42%] shrink-0 overflow-y-auto border-r border-gray-200 sm:w-80">
+        <div class="flex min-h-0 flex-1 flex-col sm:flex-row">
+          <aside class="w-full shrink-0 overflow-y-auto sm:w-80 sm:border-r sm:border-gray-200">
             <p v-if="notifications.loading" class="p-5 text-sm text-gray-500">Đang tải thông báo...</p>
             <p v-else-if="!notifications.system.length" class="p-5 text-sm text-gray-500">Chưa có thông báo nào.</p>
             <button
@@ -113,6 +124,7 @@ onUnmounted(() => {
               type="button"
               class="block w-full border-b border-gray-100 px-4 py-3 text-left hover:bg-emerald-50"
               :class="selected?.id === item.id ? 'bg-emerald-50' : ''"
+              :aria-expanded="expandedNotificationId === item.id"
               @click="selectNotification(item)"
             >
               <span class="flex items-start gap-2"
@@ -126,9 +138,17 @@ onUnmounted(() => {
                   ><span class="mt-1 block text-xs text-gray-500">{{ formatDateTime(item.created_at) }}</span></span
                 ></span
               >
+              <span v-if="expandedNotificationId === item.id" class="mt-3 block border-t border-[#cbd9c6] pt-3 sm:hidden">
+                <span class="mb-2 flex flex-wrap items-center gap-2">
+                  <span class="rounded-full bg-[#f5f9f0] px-2.5 py-1 text-xs font-bold text-[#24352a]">{{ item.type || 'system' }}</span>
+                  <span class="text-xs text-gray-500">{{ formatDateTime(item.created_at) }}</span>
+                </span>
+                <span class="block whitespace-pre-wrap text-sm leading-6 text-gray-700">{{ item.body }}</span>
+                <span v-if="selected?.id === item.id && readError" role="alert" class="mt-3 block rounded-lg bg-red-50 p-3 text-sm text-red-700">{{ readError }}</span>
+              </span>
             </button>
           </aside>
-          <article class="min-w-0 flex-1 overflow-y-auto p-5 sm:p-8">
+          <article class="hidden min-w-0 flex-1 overflow-y-auto p-5 sm:block sm:p-8">
             <div v-if="selected">
               <div class="mb-4 flex flex-wrap items-center gap-2">
                 <span class="rounded-full bg-emerald-50 px-2.5 py-1 text-xs font-bold text-emerald-800">{{

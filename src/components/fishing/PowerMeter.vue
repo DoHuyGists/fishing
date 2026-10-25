@@ -69,28 +69,22 @@ onBeforeUnmount(stopAnimation);
 <template>
   <section class="power-meter p-3 px-3.5 rounded-[15px] border border-[#e3e0d8] bg-[#fffefa]">
     <div class="power-title flex items-center gap-2 text-[#385645]">
-      <span
-        class="grid place-items-center w-[27px] h-[27px] rounded-lg bg-[#f8e6b8] text-[#be7b1d] text-[22px] font-black">↯</span>
       <div class="flex-1">
-        <strong class="block text-[11px]">Thử thách câu cá</strong><small
-          class="block mt-0.5 text-[#879188] text-[9px]">{{ store.canPull ? "Bấm khi vạch nằm trong vùng sáng" :
-            store.castPhase === 'waiting' ? "Đang chờ tín hiệu..." : "Chờ thả cần" }}</small>
+        <small class="block mt-0.5 text-[#879188] text-[9px]">{{ store.canPull ? "Bấm khi vạch nằm trong vùng sáng" :
+          store.castPhase === 'waiting' ? "Đang chờ tín hiệu..." : "Chờ thả cần" }}</small>
       </div>
       <b class="text-[13px] text-[#e29a31]">{{ store.canPull ? `${Math.ceil(timeRemaining / 1000)}s` : "" }}</b>
     </div>
     <div class="power-track relative h-2 my-2.5 overflow-hidden rounded-full bg-[#e6e9df]">
-      <span v-if="challenge && store.canPull" class="absolute z-[1] top-0 bottom-0 bg-[rgba(118,175,83,0.55)]"
-        :style="{ left: `${challenge.target_zone_start * 100}%`, width: `${challenge.target_zone_width * 100}%` }"></span>
-      <i v-if="store.canPull" class="absolute z-[2] top-[-2px] w-1.5 h-3 rounded-[3px] bg-[#e66f44] not-italic"
-        :style="{ left: `calc(${markerPosition * 100}% - 3px)` }"></i>
+      <span v-if="challenge && store.canPull" class="absolute z-[1] top-0 bottom-0 bg-[rgba(118,175,83,0.55)]" :style="{ left: `${challenge.target_zone_start * 100}%`, width: `${challenge.target_zone_width * 100}%` }"></span>
+      <i v-if="store.canPull" class="absolute z-[2] top-[-2px] w-1.5 h-3 rounded-[3px] bg-[#e66f44] not-italic" :style="{ left: `calc(${markerPosition * 100}% - 3px)` }"></i>
     </div>
     <div class="flex justify-between text-[#617363] text-[9px] font-bold">
       <span>Thời gian thử thách</span><b class="text-[#e29a31] text-[13px]">{{ store.canPull ?
         `${Math.ceil(timeRemaining / 1000)} giây` : "--" }}</b>
     </div>
     <div class="relative h-[5px] my-[5px] mb-2.5 overflow-hidden rounded-full bg-[#e6e9df]">
-      <i class="block h-full rounded-[inherit] bg-[#75b865] transition-[width] duration-100 ease-linear not-italic"
-        :style="{ width: challenge && store.canPull ? `${(timeRemaining / challenge.max_duration_ms) * 100}%` : '0%' }"></i>
+      <i class="block h-full rounded-[inherit] bg-[#75b865] transition-[width] duration-100 ease-linear not-italic" :style="{ width: challenge && store.canPull ? `${(timeRemaining / challenge.max_duration_ms) * 100}%` : '0%' }"></i>
     </div>
     <div class="mt-3 flex gap-2">
       <button type="button"

@@ -1,4 +1,5 @@
 import supabase from "../database/connection";
+import { createUuid } from "../utils/uuid";
 
 export interface OpinionFeedbackPayload {
   userId: string;
@@ -85,7 +86,7 @@ class SupabaseFeedbackRepository {
         if (!type) throw new Error("Chỉ hỗ trợ file ảnh hoặc video.");
 
         const safeName = file.name.replace(/[^a-zA-Z0-9._-]/g, "_");
-        const path = `${payload.userId}/${crypto.randomUUID()}-${safeName}`;
+        const path = `${payload.userId}/${createUuid()}-${safeName}`;
         const { error } = await supabase.storage.from("error-feedback").upload(path, file, {
           contentType: file.type,
           upsert: false,

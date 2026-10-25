@@ -15,7 +15,7 @@ const marketStore = useMarketStore();
 const fishToRelease = ref<any | null>(null);
 const searchQuery = ref("");
 const selectedRarity = ref("ALL");
-const groupBySpecies = ref(true);
+const viewMode = ref<"grid" | "list" | "species">("species");
 const expandedSpecies = ref<string | null>(null);
 const currentPage = ref(1);
 const pageSize = 12;
@@ -35,7 +35,7 @@ const groupedCaughtFishes = computed(() => {
 const pageCount = computed(() =>
   Math.max(
     1,
-    Math.ceil((groupBySpecies.value ? groupedCaughtFishes.value.length : filteredCaughtFishes.value.length) / pageSize),
+    Math.ceil((viewMode.value === "species" ? groupedCaughtFishes.value.length : filteredCaughtFishes.value.length) / pageSize),
   ),
 );
 const paginatedCaughtFishes = computed(() => {
@@ -61,7 +61,7 @@ const filteredCaughtFishes = computed(() => {
   });
 });
 
-watch([searchQuery, selectedRarity, groupBySpecies], () => {
+watch([searchQuery, selectedRarity, viewMode], () => {
   currentPage.value = 1;
   expandedSpecies.value = null;
 });
@@ -108,7 +108,7 @@ async function handleSell(priceNum: number) {
 
 function getRarityBadgeClass(rarity: string | null | undefined) {
   switch (rarity) {
-    case "Sách Ä‘ỏ":
+    case "Sách đỏ":
       return "bg-amber-100 text-amber-800 border-amber-300";
     case "Quý hiếm":
       return "bg-purple-100 text-purple-800 border-purple-300";
@@ -136,7 +136,7 @@ async function handleRelease() {
     fishToRelease.value = null;
     toast.success("Đã thả", { title: "Thành công", position: "bottom" });
   } catch (err) {
-    toast.success("Lỗi khi thả", { title: "Không thành công", position: "bottom" });
+    toast.error("Lỗi khi thả cá", { title: "Không thành công", position: "bottom" });
   } finally {
     isReleasing.value = false;
   }
@@ -151,26 +151,41 @@ async function handleRelease() {
   >
     <section class="h-full min-h-0 text-[#263238] flex flex-col overflow-hidden">
       <!-- Header  -->
-      <div class="flex items-center justify-between pb-3">
+      <div class="flex items-center justify-between gap-2 pb-3">
         <div class="flex items-center gap-2">
           <h2 class="m-0 text-base font-bold text-[#263238]">Tổng số cá</h2>
           <span class="px-2 py-0.5 rounded-full bg-[#153221] text-white text-[11px] font-extrabold shadow-xs">
             {{ caughtStore.caughtFishes.length }}
           </span>
         </div>
-        <button
-          type="button"
-          class="px-3 py-1.5 rounded-lg border text-xs font-bold transition-colors cursor-pointer"
-          :class="
-            groupBySpecies
-              ? 'bg-[#153221] text-white border-[#153221]'
-              : 'bg-white text-[#153221] border-emerald-900/20 hover:bg-emerald-50'
-          "
-          :aria-pressed="groupBySpecies"
-          @click="groupBySpecies = !groupBySpecies"
-        >
-          {{ groupBySpecies ? "Đang gom theo loài" : "Gom theo loài" }}
-        </button>
+        <div class="flex items-center gap-2">
+          <div class="flex rounded-lg border border-gray-200 bg-white p-0.5" role="group" aria-label="Chế độ hiển thị">
+            <button
+              type="button"
+              class="rounded-md px-2 py-1.5 text-xs font-bold transition-colors cursor-pointer"
+              :class="viewMode === 'grid' ? 'bg-[#153221] text-white' : 'text-gray-600 hover:bg-gray-100'"
+              :aria-pressed="viewMode === 'grid'"
+              aria-label="Hiển thị dạng lưới"
+              @click="viewMode = 'grid'"
+            >Lưới</button>
+            <button
+              type="button"
+              class="rounded-md px-2 py-1.5 text-xs font-bold transition-colors cursor-pointer"
+              :class="viewMode === 'list' ? 'bg-[#153221] text-white' : 'text-gray-600 hover:bg-gray-100'"
+              :aria-pressed="viewMode === 'list'"
+              aria-label="Hiển thị dạng danh sách"
+              @click="viewMode = 'list'"
+            >Danh sách</button>
+            <button
+              type="button"
+              class="rounded-md px-2 py-1.5 text-xs font-bold transition-colors cursor-pointer"
+              :class="viewMode === 'species' ? 'bg-[#153221] text-white' : 'text-gray-600 hover:bg-gray-100'"
+              :aria-pressed="viewMode === 'species'"
+              aria-label="Gom theo loài"
+              @click="viewMode = 'species'"
+            >Theo loài</button>
+          </div>
+        </div>
       </div>
 
       <!-- Công cụ tìm kiếm -->
@@ -232,7 +247,8 @@ async function handleRelease() {
 
       <!-- Danh sách thẻ cá -->
       <div
-        class="h-0 grow overflow-y-auto pr-1 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 xl:grid-cols-8 gap-3 content-start"
+        class="h-0 grow overflow-y-auto pr-1 gap-3 content-start"
+        :class="viewMode !== 'list' ? 'grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 xl:grid-cols-6' : 'flex flex-col'"
       >
         <div v-if="caughtStore.isLoadingCaught" class="col-span-full text-center text-xs text-gray-500">
           Đang tải danh sách cá...
@@ -244,7 +260,7 @@ async function handleRelease() {
               : "Chưa có con cá nào trong bộ sưu tập"
           }}
         </div>
-        <template v-else-if="groupBySpecies">
+        <template v-else-if="viewMode === 'species'">
           <article
             v-for="group in paginatedFishGroups"
             :key="group.id"
@@ -253,9 +269,9 @@ async function handleRelease() {
             <img
               :src="group.fishes[0].species?.image || '/fish/VN/fish.jpg'"
               :alt="group.fishes[0].species?.name || 'Cá'"
-              class="w-full h-36 object-cover border-b border-gray-200 bg-gray-200"
+              class="object-cover bg-gray-200 w-full h-36 border-b border-gray-200"
             />
-            <div class="p-2">
+            <div class="min-w-0 flex-1 p-2">
               <div class="flex items-start justify-between gap-2">
                 <div class="min-w-0">
                   <h3 class="m-0 truncate font-bold text-xs text-[#263238]">
@@ -328,14 +344,17 @@ async function handleRelease() {
           v-else
           v-for="item in paginatedCaughtFishes"
           :key="item.id"
-          class="min-w-0 p-2 border border-gray-200 hover:border-emerald-300 rounded-xl bg-gray-50/70 hover:bg-emerald-50/30 transition-all flex flex-col gap-2 shadow-sm"
+          class="min-w-0 p-2 border border-gray-200 hover:border-emerald-300 rounded-xl bg-gray-50/70 hover:bg-emerald-50/30 transition-all shadow-sm"
+          :class="viewMode === 'grid' ? 'flex flex-col gap-2' : 'flex items-center gap-3'"
         >
           <img
             :src="item.species?.image || '/fish/VN/fish.jpg'"
             :alt="item.species?.name"
-            class="w-full h-36 rounded-lg object-cover border border-gray-200 bg-gray-200"
+            class="rounded-lg object-cover border border-gray-200 bg-gray-200"
+            :class="viewMode === 'grid' ? 'w-full h-36' : 'w-fit h-20 shrink-0'"
           />
-          <div class="flex flex-1 min-w-0 flex-col gap-2">
+          <div class="flex flex-1 min-w-0 gap-2"
+            :class="viewMode === 'grid' ? 'flex-col' : 'items-center justify-between'">
             <div class="flex-1 min-w-0 flex flex-col gap-0.5">
               <div class="flex items-center justify-between gap-1">
                 <span class="font-bold text-xs truncate text-[#263238]">{{ item.species?.name }}</span>
@@ -386,12 +405,12 @@ async function handleRelease() {
         </div>
       </div>
       <div
-        v-if="(groupBySpecies ? groupedCaughtFishes.length : filteredCaughtFishes.length) > pageSize"
+        v-if="(viewMode === 'species' ? groupedCaughtFishes.length : filteredCaughtFishes.length) > pageSize"
         class="flex items-center justify-between gap-3 border-t border-gray-200 pt-3 mt-3 text-xs"
       >
         <span class="text-gray-500"
           >Trang {{ currentPage }} / {{ pageCount }} ({{
-            groupBySpecies ? `${groupedCaughtFishes.length} loài` : `${filteredCaughtFishes.length} cá`
+            viewMode === 'species' ? `${groupedCaughtFishes.length} loài` : `${filteredCaughtFishes.length} cá`
           }})</span
         >
         <div class="flex gap-2">

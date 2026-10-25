@@ -7,23 +7,25 @@ import { equipmentCategories } from "../../data/equipmentCatalog";
 import type { FishingTool } from "../../stores/fishing";
 import type { EquipmentSet } from "../../stores/equipment";
 import UserTurn from "../stamina/UserTurn.vue";
+import { useUserTurnsStore } from "../../stores/userTurns.ts";
+import { supabaseUserInAreaRepository } from "../../data/supabaseUserInAreaRepository.ts";
+import { useToast } from "../../composables/useToast.ts";
+import { useRouter } from "vue-router";
+import { useWorld2Store } from "../../stores/world2.ts";
+import Modal from "../shared/Modal.vue";
+import { useModalStore } from "../../stores/modal.ts";
 
-const props = defineProps<{
-  anchor: any;
-}>();
-
-const emit = defineEmits<{
-  (e: "close"): void;
-  (e: "confirm", anchor: any): void;
-}>();
-
+const worldStore = useWorld2Store();
 const authStore = useAuthStore();
 const inventoryStore = useInventoryStore();
-
+const userTurnsStore = useUserTurnsStore();
+const router = useRouter();
+const toast = useToast();
 const loading = ref(true);
 const error = ref("");
 const switchingSet = ref(false);
 const selectingItemId = ref<string | null>(null);
+const modalStore = useModalStore()
 
 /* selected item id per slot */
 const selected = ref<Partial<Record<FishingTool, string>>>({});
@@ -221,373 +223,235 @@ const proceedBlockReason = computed(() => {
   return null;
 });
 
-function confirm() {
+async function confirm() {
   if (!canProceed.value) return;
-  emit("confirm", props.anchor);
+
+  try {
+    await userTurnsStore.consumeTurn();
+    await supabaseUserInAreaRepository.setUserEnterArea(worldStore.selectedArea.id);
+  } catch (err) {
+    console.error("Failed to consume turn or enter area:", err);
+    toast.error(err instanceof Error ? err.message : "Không thể trừ lượt câu cá", { title: "Chưa thể vào bãi câu", position: "top" });
+    return;
+  } finally {
+  }
+  
+  router.push({ name: "fishing" });
+  modalStore.close();
 }
 </script>
 
 <template>
-  <Teleport to="body">
-    <Transition
-      enter-active-class="transition-opacity duration-200 ease-out"
-      enter-from-class="opacity-0"
-      leave-active-class="transition-opacity duration-150 ease-in"
-      leave-to-class="opacity-0"
-    >
-      <div
-        class="fixed inset-0 z-[9999] flex items-center justify-center bg-[#24352a]/65 backdrop-blur-md"
-        @click.self="emit('close')"
-      >
-        <div
-          class="flex flex-col w-screen h-screen bg-[#f5f9f0] text-[#24352a] overflow-hidden"
-          role="dialog"
-          aria-modal="true"
-          aria-labelledby="prepare-title"
-        >
-          <!-- Header -->
-          <header class="flex items-center justify-between gap-4 px-7 py-4 bg-[#eaf2e5] border-b border-[#cbd9c6]">
-            <div class="flex items-center gap-3.5">
-              <span class="text-3xl drop-shadow-[0_0_10px_rgba(36,53,42,0.2)] select-none">🎣</span>
-              <div>
-                <h2 id="prepare-title" class="m-0 text-[19px] font-bold text-[#24352a] tracking-tight leading-snug">
-                  Chuẩn bị vào bãi câu
-                </h2>
-                <p class="m-0 mt-0.5 text-[13px] text-[#617565] leading-normal">{{ anchor?.title ?? "" }}</p>
-              </div>
-            </div>
-            <UserTurn />
-            <button
-              type="button"
-              class="flex items-center justify-center w-9 h-9 border-none rounded-xl bg-[#dce9d7] text-[#526a58] hover:bg-[#cbd9c6] hover:text-[#24352a] transition-colors cursor-pointer"
-              aria-label="Đóng"
-              @click="emit('close')"
-            >
-              <svg width="20" height="20" viewBox="0 0 20 20" fill="currentColor">
-                <path
-                  d="M6.28 5.22a.75.75 0 0 0-1.06 1.06L8.94 10l-3.72 3.72a.75.75 0 1 0 1.06 1.06L10 11.06l3.72 3.72a.75.75 0 1 0 1.06-1.06L11.06 10l3.72-3.72a.75.75 0 0 0-1.06-1.06L10 8.94 6.28 5.22Z"
-                />
-              </svg>
-            </button>
-          </header>
+  <Modal :title="worldStore.selectedArea.title">
+    <div class="flex flex-col w-full h-full bg-[#f5f9f0] text-[#24352a] overflow-hidden">
+      <!-- Body -->
+      <div class="flex-1 overflow-y-auto flex flex-col gap-4 pb-1 [&::-webkit-scrollbar]:w-1.5 [&::-webkit-scrollbar-thumb]:bg-[#b7cbb4] [&::-webkit-scrollbar-thumb]:rounded-full [&::-webkit-scrollbar-track]:bg-transparent">
+        <!-- Loading state -->
+        <div v-if="loading" class="flex-1 flex flex-col items-center justify-center gap-3.5 text-[#617565] text-sm">
+          <div class="w-9 h-9 border-[3px] border-[#cbd9c6] border-t-[#526a58] rounded-full animate-spin"></div>
+          <span>Đang tải trang bị…</span>
+        </div>
 
-          <!-- Body -->
-          <div
-            class="flex-1 overflow-y-auto px-7 py-5 flex flex-col gap-4 [&::-webkit-scrollbar]:w-1.5 [&::-webkit-scrollbar-thumb]:bg-[#b7cbb4] [&::-webkit-scrollbar-thumb]:rounded-full [&::-webkit-scrollbar-track]:bg-transparent"
-          >
-            <!-- Loading state -->
-            <div v-if="loading" class="flex-1 flex flex-col items-center justify-center gap-3.5 text-[#617565] text-sm">
-              <div class="w-9 h-9 border-[3px] border-[#cbd9c6] border-t-[#526a58] rounded-full animate-spin"></div>
-              <span>Đang tải trang bị…</span>
-            </div>
+        <!-- Error state -->
+        <div v-else-if="error" class="flex-1 flex flex-col items-center justify-center gap-2.5 text-center">
+          <span class="text-4xl">⚠️</span>
+          <p class="m-0 text-red-400 text-sm">{{ error }}</p>
+        </div>
 
-            <!-- Error state -->
-            <div v-else-if="error" class="flex-1 flex flex-col items-center justify-center gap-2.5 text-center">
-              <span class="text-4xl">⚠️</span>
-              <p class="m-0 text-red-400 text-sm">{{ error }}</p>
-            </div>
-
-            <!-- Content -->
-            <template v-else>
-              <!-- SECTION 1: SELECTED EQUIPMENT (ALWAYS IN USED SET) -->
-              <div
-                class="flex flex-col gap-1.5 bg-[#eaf2e5] border border-[#cbd9c6] rounded-lg p-2 shadow-sm"
-              >
-                <div class="flex items-center justify-between gap-4 border-b border-[#cbd9c6] pb-3">
-                  <div class="flex items-center gap-2.5">
-                    <span class="w-2.5 h-2.5 rounded-full bg-[#526a58] shrink-0"></span>
-                    <div>
-                      <h3 class="m-0 text-[15px] font-bold text-[#24352a] tracking-tight leading-snug">
-                        Trang bị đã chọn
-                      </h3>
-                      <p class="m-0 mt-0.5 text-xs text-[#617565] leading-normal">
-                        Các món đồ chính trong set đang dùng sẽ mang vào bãi câu
-                      </p>
-                    </div>
-                  </div>
-                  <div
-                    class="text-xs font-semibold px-3 py-1 rounded-full border transition-colors"
-                    :class="
-                      allSlotsReady
-                        ? 'bg-[#dce9d7] text-[#344f3b] border-[#b7cbb4]'
-                        : 'bg-amber-100 text-amber-800 border-amber-300'
-                    "
-                  >
-                    {{ readySlotsCount }}/{{ equipmentCategories.length }} ô đã sẵn sàng
-                  </div>
-                </div>
-
-                <div class="grid grid-cols-2 md:grid-cols-3 xl:grid-cols-5 2xl:grid-cols-6 gap-1.5">
-                  <div
-                    v-for="cat in equipmentCategories"
-                    :key="cat.id"
-                    class="rounded-lg bg-[#f5f9f0] border overflow-hidden transition-all duration-200 h-full flex flex-col"
-                    :class="
-                      selected[cat.id]
-                        ? 'border-[#8eaa91] shadow-[inset_0_0_0_1px_rgba(82,106,88,0.12)]'
-                        : 'border-amber-300'
-                    "
-                  >
-                    <div class="flex items-center gap-1.5 px-2 py-1 bg-[#eaf2e5] border-b border-[#cbd9c6]">
-                      <span class="font-semibold text-xs flex-1 text-[#24352a] truncate">{{ cat.name }}</span>
-                      <span
-                        class="text-[10px] font-semibold px-1.5 py-0.5 rounded-full shrink-0"
-                        :class="
-                          selected[cat.id] ? 'bg-[#dce9d7] text-[#344f3b]' : 'bg-amber-100 text-amber-800'
-                        "
-                      >
-                        {{ selected[cat.id] ? "✓ Sẵn sàng" : "✗ Chưa chọn" }}
-                      </span>
-                    </div>
-
-                    <div class="p-1.5 flex-1 flex flex-col justify-center">
-                      <template v-if="selectedVariant(cat.id)">
-                        <div class="flex items-center gap-2 min-w-0">
-                          <div class="w-9 h-9 shrink-0 flex items-center justify-center">
-                            <img
-                              v-if="isImageUrl(selectedVariant(cat.id)!.image || selectedVariant(cat.id)!.icon)"
-                              :src="selectedVariant(cat.id)!.image || selectedVariant(cat.id)!.icon"
-                              alt=""
-                              class="h-9 max-w-full object-contain drop-shadow"
-                            />
-                            <span v-else class="text-2xl select-none">
-                              {{ selectedVariant(cat.id)!.icon || "🎣" }}
-                            </span>
-                          </div>
-                          <div class="flex flex-col gap-0.5 min-w-0">
-                            <span class="font-semibold text-xs text-[#24352a] truncate">{{
-                              selectedVariant(cat.id)!.name
-                            }}</span>
-                            <span class="text-[10px] text-[#617565] line-clamp-1">{{
-                              selectedVariant(cat.id)!.detail
-                            }}</span>
-                          </div>
-                        </div>
-                      </template>
-                      <template v-else>
-                        <div class="flex flex-col items-center justify-center py-2 text-center">
-                          <p class="m-0 text-xs text-[#617565]">Chưa chọn {{ cat.name.toLowerCase() }} nào.</p>
-                        </div>
-                      </template>
-                    </div>
-                  </div>
+        <!-- Content -->
+        <template v-else>
+          <!-- SECTION 1: SELECTED EQUIPMENT (ALWAYS IN USED SET) -->
+          <div class="flex flex-col gap-1.5 bg-[#eaf2e5] border border-[#cbd9c6] rounded-lg p-2 shadow-sm">
+            <div class="flex items-center justify-between gap-4 border-b border-[#cbd9c6] pb-3">
+              <div class="flex items-center gap-2.5">
+                <span class="w-2.5 h-2.5 rounded-full bg-[#526a58] shrink-0"></span>
+                <div>
+                  <h3 class="m-0 text-[15px] font-bold text-[#24352a] tracking-tight leading-snug">
+                    Trang bị đã chọn
+                  </h3>
+                  <p class="m-0 mt-0.5 text-xs text-[#617565] leading-normal">
+                    Các món đồ chính trong set đang dùng sẽ mang vào bãi câu
+                  </p>
                 </div>
               </div>
+              <div class="text-xs font-semibold px-3 py-1 rounded-full border transition-colors" :class="allSlotsReady
+                  ? 'bg-[#dce9d7] text-[#344f3b] border-[#b7cbb4]'
+                  : 'bg-amber-100 text-amber-800 border-amber-300'
+                ">
+                {{ readySlotsCount }}/{{ equipmentCategories.length }} ô đã sẵn sàng
+              </div>
+            </div>
 
-              <!-- SECTION 2: EQUIPMENT SETS LIST & ITEMS IN USED SET -->
-              <div
-                class="flex flex-col gap-1.5 bg-[#eaf2e5] border border-[#cbd9c6] rounded-lg p-2 shadow-sm"
-              >
-                <div class="flex items-center flex-wrap justify-between gap-2 border-b border-[#cbd9c6] pb-1.5">
-                  <div class="flex items-center gap-2.5">
-                    <span class="w-2.5 h-2.5 rounded-full bg-[#8eaa91] shrink-0"></span>
-                    <div>
-                      <h3 class="m-0 text-[15px] font-bold text-[#24352a] tracking-tight leading-snug">
-                        Danh sách set trang bị
-                      </h3>
-                      <p class="m-0 mt-0.5 text-xs text-[#617565] leading-normal">
-                        Bấm để đổi set sử dụng. Chọn trang bị chính trong set để hiển thị ở bảng phía trên.
-                      </p>
-                    </div>
-                  </div>
-                  <div v-if="usedSet" class="flex items-center gap-2">
-                    <span
-                      v-if="!isUsedSetComplete"
-                      class="inline-flex items-center gap-1 px-3 py-1 bg-amber-100 border border-amber-300 text-amber-800 text-xs font-semibold rounded-lg"
-                    >
-                      ⚠️ Set chưa đủ 5 loại
-                    </span>
-                    <span
-                      class="inline-flex items-center gap-1 px-3 py-1 bg-[#dce9d7] border border-[#b7cbb4] text-[#344f3b] text-xs font-semibold rounded-lg"
-                    >
-                      ✓ Đang dùng Set {{ usedSetIndex + 1 }}
-                    </span>
-                  </div>
+            <div class="grid grid-cols-2 md:grid-cols-3 xl:grid-cols-5 2xl:grid-cols-6 gap-1.5">
+              <div v-for="cat in equipmentCategories" :key="cat.id" class="rounded-lg bg-[#f5f9f0] border overflow-hidden transition-all duration-200 h-full flex flex-col" :class="selected[cat.id]
+                  ? 'border-[#8eaa91] shadow-[inset_0_0_0_1px_rgba(82,106,88,0.12)]'
+                  : 'border-amber-300'
+                ">
+                <div class="flex items-center gap-1.5 px-2 py-1 bg-[#eaf2e5] border-b border-[#cbd9c6]">
+                  <span class="font-semibold text-xs flex-1 text-[#24352a] truncate">{{ cat.name }}</span>
+                  <span class="text-[10px] font-semibold px-1.5 py-0.5 rounded-full shrink-0" :class="selected[cat.id] ? 'bg-[#dce9d7] text-[#344f3b]' : 'bg-amber-100 text-amber-800'
+                    ">
+                    {{ selected[cat.id] ? "✓ Sẵn sàng" : "✗ Chưa chọn" }}
+                  </span>
                 </div>
 
-                <!-- Sets Navigation Tabs -->
-                <div v-if="inventoryStore.equipmentSets.length > 0" class="flex flex-wrap gap-1.5">
-                  <button
-                    v-for="(s, idx) in inventoryStore.equipmentSets"
-                    :key="s.id"
-                    type="button"
-                      class="group flex flex-col items-start gap-0.5 px-2.5 py-1 rounded-lg cursor-pointer text-[#405446] transition-all duration-150 border disabled:cursor-not-allowed"
-                    :class="[
-                      s.isUsed
-                        ? '!bg-[#dce9d7] !border-[#8eaa91] !text-[#24352a] shadow-sm cursor-default'
-                        : 'bg-[#f5f9f0] border-[#cbd9c6] hover:bg-white hover:border-[#8eaa91]',
-                      switchingSet && !s.isUsed ? 'opacity-60' : '',
-                    ]"
-                    :disabled="switchingSet"
-                    @click="switchSet(s)"
-                  >
-                    <div class="flex items-center gap-1.5">
-                      <span class="text-[13px] font-bold">Set {{ idx + 1 }}</span>
-                      <span
-                        v-if="s.isUsed"
-                        class="text-[10px] font-semibold px-1.5 py-px rounded-full bg-[#dce9d7] text-[#344f3b]"
-                        >Đang dùng</span
-                      >
-                      <span
-                        v-else
-                        class="text-[10px] font-medium px-1.5 py-px rounded-full bg-[#eaf2e5] text-[#526a58] transition-colors group-hover:bg-[#cbd9c6] group-hover:text-[#24352a] group-hover:font-semibold"
-                        >Đổi sang set này</span
-                      >
-                      <span
-                        v-if="!isSetComplete(s)"
-                        class="text-[10px] font-semibold px-1.5 py-px rounded-md bg-amber-100 border border-amber-300 text-amber-800"
-                        >Thiếu loại</span
-                      >
-                    </div>
-                    <span class="text-[11px] text-[#617565]"> {{ countSetItems(s) }} vật phẩm </span>
-                  </button>
-                </div>
-
-                <!-- Empty state if user has no sets -->
-                <div
-                  v-if="inventoryStore.equipmentSets.length === 0"
-                  class="p-6 text-center text-[13px] text-[#617565] bg-[#f5f9f0] rounded-xl border border-[#cbd9c6]"
-                >
-                  <span>📦 Bạn chưa có set trang bị nào trong kho đồ. Hãy vào Kho đồ để tạo hoặc mua thêm set.</span>
-                </div>
-
-                <!-- Category Items in Currently Used Set -->
-                <div v-else-if="usedSet">
-                  <div class="grid grid-cols-2 md:grid-cols-3 xl:grid-cols-5 2xl:grid-cols-6 gap-1.5">
-                    <div
-                      v-for="cat in equipmentCategories"
-                      :key="cat.id"
-                      class="flex flex-col bg-[#f5f9f0] border border-[#cbd9c6] rounded-md overflow-hidden min-h-[88px]"
-                    >
-                      <!-- Slot Header -->
-                      <div
-                        class="flex items-center justify-between px-1.5 py-1 bg-[#eaf2e5] border-b border-[#cbd9c6]"
-                      >
-                        <div class="flex items-center gap-1.5">
-                          <span class="text-xs font-semibold text-[#24352a]">{{ cat.name }}</span>
-                        </div>
-                        <span class="text-[11px] text-[#617565]"> {{ (usedSet[cat.id] || []).length }} món </span>
+                <div class="p-1.5 flex-1 flex flex-col justify-center">
+                  <template v-if="selectedVariant(cat.id)">
+                    <div class="flex items-center gap-2 min-w-0">
+                      <div class="w-9 h-9 shrink-0 flex items-center justify-center">
+                        <img v-if="isImageUrl(selectedVariant(cat.id)!.image || selectedVariant(cat.id)!.icon)" :src="selectedVariant(cat.id)!.image || selectedVariant(cat.id)!.icon" alt="" class="h-9 max-w-full object-contain drop-shadow" />
+                        <span v-else class="text-2xl select-none">
+                          {{ selectedVariant(cat.id)!.icon || "🎣" }}
+                        </span>
                       </div>
-
-                      <!-- Items list in this category -->
-                      <div
-                        class="flex flex-col gap-1 p-1 max-h-[120px] overflow-y-auto [&::-webkit-scrollbar]:w-1.5 [&::-webkit-scrollbar-thumb]:bg-[#b7cbb4] [&::-webkit-scrollbar-thumb]:rounded-full [&::-webkit-scrollbar-track]:bg-transparent"
-                      >
-                        <template v-if="(usedSet[cat.id] || []).length > 0">
-                          <div
-                            v-for="item in usedSet[cat.id]"
-                            :key="item.id"
-                            class="group flex items-center gap-1 p-1 rounded cursor-pointer transition-all duration-150 border text-left"
-                            :class="[
-                              isItemSelected(cat.id, item.id)
-                                ? '!bg-[#dce9d7] !border-[#8eaa91] shadow-sm'
-                                : 'bg-[#f5f9f0] border-[#cbd9c6] hover:bg-white hover:border-[#8eaa91] hover:-translate-y-0.5',
-                              selectingItemId === String(item.id) ? 'opacity-70 pointer-events-none' : '',
-                            ]"
-                            @click="chooseMainItem(cat.id, item)"
-                          >
-                            <div
-                              class="flex items-center justify-center w-6 h-6 shrink-0 bg-[#eaf2e5] rounded overflow-hidden"
-                            >
-                              <img
-                                v-if="isImageUrl(getItemDisplay(item).iconOrImage)"
-                                :src="getItemDisplay(item).iconOrImage"
-                                :alt="getItemDisplay(item).name"
-                                class="h-5 w-5 object-contain"
-                              />
-                              <span v-else class="text-lg">
-                                {{ getItemDisplay(item).iconOrImage }}
-                              </span>
-                            </div>
-                            <div class="flex-1 min-w-0 flex flex-col gap-0.5">
-                              <div class="flex items-center justify-between gap-1">
-                                <span
-                                  class="text-xs font-semibold text-[#24352a] truncate block"
-                                  :title="getItemDisplay(item).name"
-                                >
-                                  {{ getItemDisplay(item).name }}
-                                </span>
-                                <span
-                                  v-if="isItemSelected(cat.id, item.id)"
-                                  class="text-[9px] font-bold bg-[#dce9d7] text-[#344f3b] px-1 py-px rounded shrink-0"
-                                >
-                                  Chính
-                                </span>
-                              </div>
-                              <span
-                                class="text-[11px] text-[#617565] truncate block"
-                                :title="getItemDisplay(item).detail"
-                              >
-                                {{ getItemDisplay(item).detail || "Trang bị" }}
-                              </span>
-                            </div>
-                            <div class="shrink-0">
-                              <span
-                                v-if="selectingItemId === String(item.id)"
-                                class="inline-block w-3.5 h-3.5 border-2 border-[#cbd9c6] border-t-[#526a58] rounded-full animate-spin"
-                              ></span>
-                              <span
-                                v-else
-                                class="text-[10px] font-semibold px-2 py-0.5 rounded-md transition-all duration-150"
-                                :class="
-                                  isItemSelected(cat.id, item.id)
-                                    ? 'bg-[#cbd9c6] text-[#344f3b]'
-                                    : 'bg-[#eaf2e5] text-[#526a58] group-hover:bg-[#cbd9c6] group-hover:text-[#24352a] group-hover:font-bold'
-                                "
-                              >
-                                {{ isItemSelected(cat.id, item.id) ? "✓ Đang dùng" : "Chọn" }}
-                              </span>
-                            </div>
-                          </div>
-                        </template>
-                        <template v-else>
-                          <div class="flex items-center justify-center py-6 px-2 text-[11px] text-[#617565] italic">
-                            <span class="text-amber-700 font-medium">⚠️ Chưa có đồ</span>
-                          </div>
-                        </template>
+                      <div class="flex flex-col gap-0.5 min-w-0">
+                        <span class="font-semibold text-xs text-[#24352a] truncate">{{
+                          selectedVariant(cat.id)!.name
+                        }}</span>
+                        <span class="text-[10px] text-[#617565] line-clamp-1">{{
+                          selectedVariant(cat.id)!.detail
+                        }}</span>
                       </div>
                     </div>
-                  </div>
+                  </template>
+                  <template v-else>
+                    <div class="flex flex-col items-center justify-center py-2 text-center">
+                      <p class="m-0 text-xs text-[#617565]">Chưa chọn {{ cat.name.toLowerCase() }} nào.</p>
+                    </div>
+                  </template>
                 </div>
               </div>
-            </template>
+            </div>
           </div>
 
-          <!-- Footer -->
-          <footer
-            class="flex items-center justify-between flex-wrap gap-4 px-7 py-3.5 bg-[#eaf2e5] border-t border-[#cbd9c6]"
-          >
-            <div
-              v-if="proceedBlockReason"
-              class="flex items-center gap-2 px-3.5 py-2 bg-amber-100 border border-amber-300 rounded-lg text-amber-800 text-sm leading-snug max-w-[65%]"
-            >
-              <span class="text-base shrink-0">⚠️</span>
-              <span class="font-medium">{{ proceedBlockReason }}</span>
+          <!-- SECTION 2: EQUIPMENT SETS LIST & ITEMS IN USED SET -->
+          <div class="flex flex-col gap-1.5 bg-[#eaf2e5] border border-[#cbd9c6] rounded-lg p-2 shadow-sm">
+            <div class="flex items-center flex-wrap justify-between gap-2 border-b border-[#cbd9c6] pb-1.5">
+              <div class="flex items-center gap-2.5">
+                <span class="w-2.5 h-2.5 rounded-full bg-[#8eaa91] shrink-0"></span>
+                <div>
+                  <h3 class="m-0 text-[15px] font-bold text-[#24352a] tracking-tight leading-snug">
+                    Danh sách set trang bị
+                  </h3>
+                  <p class="m-0 mt-0.5 text-xs text-[#617565] leading-normal">
+                    Bấm để đổi set sử dụng. Chọn trang bị chính trong set để hiển thị ở bảng phía trên.
+                  </p>
+                </div>
+              </div>
+              <div v-if="usedSet" class="flex items-center gap-2">
+                <span v-if="!isUsedSetComplete" class="inline-flex items-center gap-1 px-3 py-1 bg-amber-100 border border-amber-300 text-amber-800 text-xs font-semibold rounded-lg">
+                  ⚠️ Set chưa đủ 5 loại
+                </span>
+                <span class="inline-flex items-center gap-1 px-3 py-1 bg-[#dce9d7] border border-[#b7cbb4] text-[#344f3b] text-xs font-semibold rounded-lg">
+                  ✓ Đang dùng Set {{ usedSetIndex + 1 }}
+                </span>
+              </div>
             </div>
-            <div v-else class="flex-1"></div>
 
-            <div class="flex items-center gap-3 ml-auto">
-              <button
-                type="button"
-                class="inline-flex items-center justify-center gap-2 px-6 py-2.5 border border-[#b7cbb4] rounded-xl text-sm font-bold cursor-pointer transition-all duration-150 active:scale-95 bg-[#f5f9f0] text-[#405446] hover:bg-[#dce9d7]"
-                @click="emit('close')"
-              >
-                Quay lại
-              </button>
-              <button
-                type="button"
-                class="inline-flex items-center justify-center gap-2 px-6 py-2.5 border border-[#344f3b] rounded-xl text-sm font-bold cursor-pointer transition-all duration-150 active:scale-95 bg-[#344f3b] text-[#f5f9f0] shadow-md hover:not-disabled:bg-[#24352a] disabled:opacity-50 disabled:cursor-not-allowed"
-                :disabled="!canProceed"
-                :title="proceedBlockReason || 'Sẵn sàng tiếp tục'"
-                @click="confirm"
-              >
-                <span class="text-base">🚀</span>
-                Tiếp tục
+            <!-- Sets Navigation Tabs -->
+            <div v-if="inventoryStore.equipmentSets.length > 0" class="flex flex-wrap gap-1.5">
+              <button v-for="(s, idx) in inventoryStore.equipmentSets" :key="s.id" type="button" class="group flex flex-col items-start gap-0.5 px-2.5 py-1 rounded-lg cursor-pointer text-[#405446] transition-all duration-150 border disabled:cursor-not-allowed" :class="[
+                s.isUsed
+                  ? '!bg-[#dce9d7] !border-[#8eaa91] !text-[#24352a] shadow-sm cursor-default'
+                  : 'bg-[#f5f9f0] border-[#cbd9c6] hover:bg-white hover:border-[#8eaa91]',
+                switchingSet && !s.isUsed ? 'opacity-60' : '',
+              ]" :disabled="switchingSet" @click="switchSet(s)">
+                <div class="flex items-center gap-1.5">
+                  <span class="text-[13px] font-bold">Set {{ idx + 1 }}</span>
+                  <span v-if="s.isUsed" class="text-[10px] font-semibold px-1.5 py-px rounded-full bg-[#dce9d7] text-[#344f3b]">Đang dùng</span>
+                  <span v-else class="text-[10px] font-medium px-1.5 py-px rounded-full bg-[#eaf2e5] text-[#526a58] transition-colors group-hover:bg-[#cbd9c6] group-hover:text-[#24352a] group-hover:font-semibold">Đổi sang set này</span>
+                  <span v-if="!isSetComplete(s)" class="text-[10px] font-semibold px-1.5 py-px rounded-md bg-amber-100 border border-amber-300 text-amber-800">Thiếu loại</span>
+                </div>
+                <span class="text-[11px] text-[#617565]"> {{ countSetItems(s) }} vật phẩm </span>
               </button>
             </div>
-          </footer>
-        </div>
+
+            <!-- Empty state if user has no sets -->
+            <div v-if="inventoryStore.equipmentSets.length === 0" class="p-6 text-center text-[13px] text-[#617565] bg-[#f5f9f0] rounded-xl border border-[#cbd9c6]">
+              <span>📦 Bạn chưa có set trang bị nào trong kho đồ. Hãy vào Kho đồ để tạo hoặc mua thêm set.</span>
+            </div>
+
+            <!-- Category Items in Currently Used Set -->
+            <div v-else-if="usedSet">
+              <div class="grid grid-cols-2 md:grid-cols-3 xl:grid-cols-5 2xl:grid-cols-6 gap-1.5">
+                <div v-for="cat in equipmentCategories" :key="cat.id" class="flex flex-col bg-[#f5f9f0] border border-[#cbd9c6] rounded-md overflow-hidden min-h-[88px]">
+                  <!-- Slot Header -->
+                  <div class="flex items-center justify-between px-1.5 py-1 bg-[#eaf2e5] border-b border-[#cbd9c6]">
+                    <div class="flex items-center gap-1.5">
+                      <span class="text-xs font-semibold text-[#24352a]">{{ cat.name }}</span>
+                    </div>
+                    <span class="text-[11px] text-[#617565]"> {{ (usedSet[cat.id] || []).length }} món </span>
+                  </div>
+
+                  <!-- Items list in this category -->
+                  <div class="flex flex-col gap-1 p-1 max-h-[120px] overflow-y-auto [&::-webkit-scrollbar]:w-1.5 [&::-webkit-scrollbar-thumb]:bg-[#b7cbb4] [&::-webkit-scrollbar-thumb]:rounded-full [&::-webkit-scrollbar-track]:bg-transparent">
+                    <template v-if="(usedSet[cat.id] || []).length > 0">
+                      <div v-for="item in usedSet[cat.id]" :key="item.id" class="group flex items-center gap-1 p-1 rounded cursor-pointer transition-all duration-150 border text-left" :class="[
+                        isItemSelected(cat.id, item.id)
+                          ? '!bg-[#dce9d7] !border-[#8eaa91] shadow-sm'
+                          : 'bg-[#f5f9f0] border-[#cbd9c6] hover:bg-white hover:border-[#8eaa91] hover:-translate-y-0.5',
+                        selectingItemId === String(item.id) ? 'opacity-70 pointer-events-none' : '',
+                      ]" @click="chooseMainItem(cat.id, item)">
+                        <div class="flex items-center justify-center w-6 h-6 shrink-0 bg-[#eaf2e5] rounded overflow-hidden">
+                          <img v-if="isImageUrl(getItemDisplay(item).iconOrImage)" :src="getItemDisplay(item).iconOrImage" :alt="getItemDisplay(item).name" class="h-5 w-5 object-contain" />
+                          <span v-else class="text-lg">
+                            {{ getItemDisplay(item).iconOrImage }}
+                          </span>
+                        </div>
+                        <div class="flex-1 min-w-0 flex flex-col gap-0.5">
+                          <div class="flex items-center justify-between gap-1">
+                            <span class="text-xs font-semibold text-[#24352a] truncate block" :title="getItemDisplay(item).name">
+                              {{ getItemDisplay(item).name }}
+                            </span>
+                            <span v-if="isItemSelected(cat.id, item.id)" class="text-[9px] font-bold bg-[#dce9d7] text-[#344f3b] px-1 py-px rounded shrink-0">
+                              Chính
+                            </span>
+                          </div>
+                          <span class="text-[11px] text-[#617565] truncate block" :title="getItemDisplay(item).detail">
+                            {{ getItemDisplay(item).detail || "Trang bị" }}
+                          </span>
+                        </div>
+                        <div class="shrink-0">
+                          <span v-if="selectingItemId === String(item.id)" class="inline-block w-3.5 h-3.5 border-2 border-[#cbd9c6] border-t-[#526a58] rounded-full animate-spin"></span>
+                          <span v-else class="text-[10px] font-semibold px-2 py-0.5 rounded-md transition-all duration-150" :class="isItemSelected(cat.id, item.id)
+                              ? 'bg-[#cbd9c6] text-[#344f3b]'
+                              : 'bg-[#eaf2e5] text-[#526a58] group-hover:bg-[#cbd9c6] group-hover:text-[#24352a] group-hover:font-bold'
+                            ">
+                            {{ isItemSelected(cat.id, item.id) ? "✓ Đang dùng" : "Chọn" }}
+                          </span>
+                        </div>
+                      </div>
+                    </template>
+                    <template v-else>
+                      <div class="flex items-center justify-center py-6 px-2 text-[11px] text-[#617565] italic">
+                        <span class="text-amber-700 font-medium">⚠️ Chưa có đồ</span>
+                      </div>
+                    </template>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </template>
       </div>
-    </Transition>
-  </Teleport>
+
+      <!-- Footer -->
+      <footer class="flex items-center justify-between flex-wrap gap-4 px-7 py-3.5 bg-[#eaf2e5] border-t border-[#cbd9c6]">
+        <div v-if="proceedBlockReason" class="flex items-center gap-2 px-3.5 py-2 bg-amber-100 border border-amber-300 rounded-lg text-amber-800 text-sm leading-snug max-w-[65%]">
+          <span class="text-base shrink-0">⚠️</span>
+          <span class="font-medium">{{ proceedBlockReason }}</span>
+        </div>
+        <div v-else class="flex-1"></div>
+
+        <div class="flex items-center gap-3 ml-auto">
+          <button type="button"
+            class="inline-flex items-center justify-center gap-2 px-4 py-2 border border-[#344f3b] rounded-xl text-sm font-bold cursor-pointer transition-all duration-150 active:scale-95 bg-[#344f3b] text-[#f5f9f0] shadow-md hover:not-disabled:bg-[#24352a] disabled:opacity-50 disabled:cursor-not-allowed"
+            :disabled="!canProceed" :title="proceedBlockReason || 'Sẵn sàng tiếp tục'" @click="confirm">
+            <span class="text-base">🚀</span>
+            Tiếp tục
+          </button>
+        </div>
+      </footer>
+    </div>
+  </Modal>
 </template>

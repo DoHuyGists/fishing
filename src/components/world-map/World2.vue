@@ -460,6 +460,7 @@ defineExpose({ reload: loadColors, setView, resetView });
 }
 .world-map-marker__dot {
   position: absolute;
+  touch-action: manipulation;
   width: 10px;
   height: 10px;
   margin: -5px 0 0 -5px;
@@ -468,6 +469,11 @@ defineExpose({ reload: loadColors, setView, resetView });
   border: 1.5px solid #fff;
   background: red;
   cursor: pointer;
+}
+.world-map-marker__dot::before {
+  content: "";
+  position: absolute;
+  inset: -10px;
 }
 .world-map-marker__dot.is-selected {
   background: #22c55e;

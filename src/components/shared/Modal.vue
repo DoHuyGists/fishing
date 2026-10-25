@@ -4,6 +4,7 @@ import { useModalStore } from "../../stores/modal.ts";
 import { useCurrencyStore } from "../../stores/currency.ts";
 import Cash from "../currency/Cash.vue";
 import GuideTour from "./GuideTour.vue";
+import UserTurn from "../stamina/UserTurn.vue";
 
 const {
   title = "",
@@ -67,20 +68,21 @@ onUnmounted(() => {
 </script>
 
 <template>
-  <div class="fixed w-screen h-screen inset-0 z-9999 bg-white flex flex-col">
-    <header class="flex items-center justify-between gap-4 p-2 border-b border-emerald-950/10 bg-[#e7ecda]">
-      <div>
-        <h2 class="m-0 mt-1 text-xl sm:text-2xl font-bold">{{ title }}</h2>
-        <p class="m-0 text-[10px] font-extrabold tracking-[0.14em] uppercase text-emerald-800">{{ subTitle }}</p>
+  <div class="fixed inset-0 z-9999 flex h-[100vh] w-screen flex-col bg-white supports-[height:100dvh]:h-[100dvh]">
+    <header class="flex flex-wrap items-center justify-between gap-x-3 gap-y-2 p-2 border-b border-emerald-950/10 bg-[#e7ecda] sm:flex-nowrap sm:gap-4">
+      <div class="min-w-0 flex-1 sm:flex-none">
+        <h2 class="m-0 mt-1 break-words text-lg font-bold sm:text-2xl">{{ title }}</h2>
+        <p class="m-0 break-words text-[10px] font-extrabold tracking-[0.14em] uppercase text-emerald-800">{{ subTitle }}</p>
       </div>
-      <div>
+      <div class="order-2 ml-auto shrink-0 sm:order-none sm:ml-0">
         <Cash :amount="currencyStore.formattedCash" />
+        <UserTurn />
       </div>
-      <div class="flex items-center gap-2">
+      <div class="order-3 ml-auto flex max-w-full shrink-0 items-center gap-1 sm:order-none sm:ml-0 sm:gap-2">
         <button
           v-if="hasGuideSteps"
           type="button"
-          class="px-3 py-2 rounded-md border border-emerald-900/15 bg-white/70 text-sm font-bold text-emerald-950 hover:bg-white disabled:opacity-50 disabled:cursor-not-allowed"
+          class="px-2 py-2 rounded-md border border-emerald-900/15 bg-white/70 text-xs font-bold text-emerald-950 hover:bg-white disabled:opacity-50 disabled:cursor-not-allowed sm:px-3 sm:text-sm"
           :disabled="isRefreshing"
           @click="handleGuide"
         >
@@ -89,7 +91,7 @@ onUnmounted(() => {
         <button
           v-if="hasRefreshListener"
           type="button"
-          class="px-3 py-2 rounded-md border border-emerald-900/15 bg-white/70 text-sm font-bold text-emerald-950 hover:bg-white disabled:opacity-50 disabled:cursor-not-allowed"
+          class="px-2 py-2 rounded-md border border-emerald-900/15 bg-white/70 text-xs font-bold text-emerald-950 hover:bg-white disabled:opacity-50 disabled:cursor-not-allowed sm:px-3 sm:text-sm"
           :disabled="isRefreshing"
           @click="handleRefresh"
         >
@@ -105,7 +107,7 @@ onUnmounted(() => {
         </button>
       </div>
     </header>
-    <div class="grow h-0 overflow-y-scroll overflow-x-hidden p-2">
+    <div class="min-h-0 flex-1 overflow-y-auto overflow-x-hidden p-2">
       <slot></slot>
     </div>
   </div>

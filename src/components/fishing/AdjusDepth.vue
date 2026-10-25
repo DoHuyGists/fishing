@@ -74,7 +74,7 @@ onBeforeUnmount(() => {
                         <button type="button" class="grid h-9 w-9 place-items-center rounded-full text-2xl text-[#b8ccc4] transition hover:bg-white/10 hover:text-white" aria-label="Đóng bảng điều chỉnh độ sâu" @click="close">×</button>
                     </header>
 
-                    <div class="grid gap-4 p-4 grid-cols-2 sm:grid-cols-[minmax(280px,1.12fr)_minmax(150px,.72fr)_minmax(260px,1fr)] sm:gap-5 sm:p-5">
+                    <div class="grid gap-2 p-2 grid-cols-2 sm:grid-cols-[minmax(280px,1.12fr)_minmax(150px,.72fr)_minmax(260px,1fr)] sm:gap-5 sm:p-5">
                         <section class="water-card" aria-label="Mô phỏng cột nước">
                             <div class="depth-ruler">
                                 <div class="water-column">
@@ -109,34 +109,39 @@ onBeforeUnmount(() => {
                             <p class="m-0 text-center text-[10px] text-[#78958a]">Kéo thanh hoặc dùng phím mũi tên để chỉnh</p>
                         </section>
 
-                        <section class="info-card">
-                            <h3 class="m-0 mb-3 text-[12px] font-bold text-[#d8e9e0]">Thông tin tầng nước</h3>
-                            <ul class="m-0 list-none space-y-2.5 p-0">
-                                <li v-for="waterLayer in FISHING_DEPTH_CONFIG.layers" :key="waterLayer.id" class="flex items-start gap-2.5 rounded-lg px-2 py-1.5" :class="{ 'bg-white/[0.07]': layer.id === waterLayer.id }">
-                                    <span class="mt-1.5 h-2 w-2 shrink-0 rounded-full" :style="{ backgroundColor: waterLayer.color }"></span>
-                                    <span class="min-w-0 text-[10px] leading-[1.45]"><b class="text-[#e4eee8]">{{ waterLayer.label }}</b><span class="ml-1.5 text-[#93aa9f]">{{ waterLayer.minMeters }}–{{ waterLayer.maxMeters }} m</span></span>
-                                </li>
-                            </ul>
-                            <div class="mt-3 border-t border-white/10 pt-3">
-                                <h3 class="m-0 text-[11px] font-bold text-[#d8e9e0]">Cá có thể xuất hiện</h3>
-                                <p v-if="store.isLoadingDepthPreview" class="mb-0 mt-2 flex items-center gap-2 rounded-lg bg-black/10 px-2.5 py-2 text-[10px] text-[#91aaa0]" role="status" aria-live="polite"><span class="h-3 w-3 shrink-0 animate-spin rounded-full border-2 border-[#91aaa0]/30 border-t-[#5ad0b3]" aria-hidden="true"></span>Đang cập nhật danh sách cá ở {{ formattedDepth }} m...</p>
-                                <p v-else-if="store.depthPreviewError" class="mb-0 mt-2 rounded-lg bg-black/10 px-2.5 py-2 text-[10px] leading-relaxed text-[#ffc18b]">{{ store.depthPreviewError }}</p>
-                                <template v-else-if="store.depthPreview">
-                                    <p class="mb-2 mt-1 text-[9px] text-[#91aaa0]">{{ store.depthPreview.total_species }} loài · {{ store.depthPreview.discovered_species }} đã khám phá · {{ store.depthPreview.undiscovered_species }} chưa khám phá</p>
-                                    <ul v-if="store.depthPreview.fishes.length" class="m-0 max-h-36 list-none space-y-1.5 overflow-y-auto p-0">
-                                        <li v-for="fish in store.depthPreview.fishes" :key="fish.species_id" class="flex items-center gap-2 rounded-lg bg-black/10 px-2 py-1.5">
-                                            <img v-if="fish.is_discovered && fish.image" :src="fish.image" :alt="fish.display_name" class="h-8 w-8 shrink-0 rounded-md object-cover" />
-                                            <span v-else class="grid h-8 w-8 shrink-0 place-items-center rounded-md bg-white/10 text-sm text-[#91aaa0]" aria-hidden="true">?</span>
-                                            <span class="min-w-0 flex-1">
-                                                <span class="block truncate text-[10px] font-semibold text-[#d8e9e0]">{{ fish.display_name }}</span>
-                                                <span class="block text-[9px] text-[#91aaa0]">{{ fish.spawn_chance }}% · {{ fish.weight_min != null && fish.weight_max != null ? `${fish.weight_min}–${fish.weight_max} kg` : "Chưa rõ cân nặng" }}</span>
-                                            </span>
-                                            <span v-if="fish.rarity" class="text-[8px] text-[#a9c4b8]">{{ fish.rarity }}</span>
+                        <section class="info-card col-span-2 md:col-span-1">
+                            <div class="grid grid-cols-2 md:grid-cols-1 gap-2">
+                                <div>
+                                    <h3 class="m-0 mb-3 text-[12px] font-bold text-[#d8e9e0]">Thông tin tầng nước</h3>
+                                    <ul class="m-0 list-none space-y-2.5 p-0">
+                                        <li v-for="waterLayer in FISHING_DEPTH_CONFIG.layers" :key="waterLayer.id" class="flex items-start gap-2.5 rounded-lg px-2 py-1.5" :class="{ 'bg-white/[0.07]': layer.id === waterLayer.id }">
+                                            <span class="mt-1.5 h-2 w-2 shrink-0 rounded-full" :style="{ backgroundColor: waterLayer.color }"></span>
+                                            <span class="min-w-0 text-[10px] leading-[1.45]"><b class="text-[#e4eee8]">{{ waterLayer.label }}</b><span class="ml-1.5 text-[#93aa9f]">{{ waterLayer.minMeters }}–{{ waterLayer.maxMeters }} m</span></span>
                                         </li>
                                     </ul>
-                                    <p v-else class="mb-0 mt-2 text-[10px] text-[#91aaa0]">Không có loài cá ở độ sâu này.</p>
-                                </template>
-                                <p v-else class="mb-0 mt-2 rounded-lg bg-black/10 px-2.5 py-2 text-[10px] leading-relaxed text-[#91aaa0]">Chưa có dữ liệu dự đoán ở {{ formattedDepth }} m.</p>
+                                </div>
+                                <div class="md:border-t border-white/10">
+                                    <h3 class="m-0 text-[11px] font-bold text-[#d8e9e0]">Cá có thể xuất hiện</h3>
+                                    <p v-if="store.isLoadingDepthPreview" class="mb-0 mt-2 flex items-center gap-2 rounded-lg bg-black/10 px-2.5 py-2 text-[10px] text-[#91aaa0]" role="status" aria-live="polite"><span
+                                            class="h-3 w-3 shrink-0 animate-spin rounded-full border-2 border-[#91aaa0]/30 border-t-[#5ad0b3]" aria-hidden="true"></span>Đang cập nhật danh sách cá ở {{ formattedDepth }} m...</p>
+                                    <p v-else-if="store.depthPreviewError" class="mb-0 mt-2 rounded-lg bg-black/10 px-2.5 py-2 text-[10px] leading-relaxed text-[#ffc18b]">{{ store.depthPreviewError }}</p>
+                                    <template v-else-if="store.depthPreview">
+                                        <p class="mb-2 mt-1 text-[9px] text-[#91aaa0]">{{ store.depthPreview.total_species }} loài · {{ store.depthPreview.discovered_species }} đã khám phá · {{ store.depthPreview.undiscovered_species }} chưa khám phá</p>
+                                        <ul v-if="store.depthPreview.fishes.length" class="m-0 max-h-36 list-none space-y-1.5 overflow-y-auto p-0">
+                                            <li v-for="fish in store.depthPreview.fishes" :key="fish.species_id" class="flex items-center gap-2 rounded-lg bg-black/10 px-2 py-1.5">
+                                                <img v-if="fish.is_discovered && fish.image" :src="fish.image" :alt="fish.display_name" class="h-8 w-fit shrink-0 rounded-md object-cover" />
+                                                <span v-else class="grid h-8 w-8 shrink-0 place-items-center rounded-md bg-white/10 text-sm text-[#91aaa0]" aria-hidden="true">?</span>
+                                                <span class="min-w-0 flex-1">
+                                                    <span class="block truncate text-[10px] font-semibold text-[#d8e9e0]">{{ fish.display_name }}</span>
+                                                    <span class="block text-[9px] text-[#91aaa0]">{{ fish.spawn_chance }}% · {{ fish.weight_min != null && fish.weight_max != null ? `${fish.weight_min}–${fish.weight_max} kg` : "Chưa rõ cân nặng" }}</span>
+                                                    <span v-if="fish.rarity" class="text-[8px] text-[#a9c4b8]">{{ fish.rarity }}</span>
+                                                </span>
+                                            </li>
+                                        </ul>
+                                        <p v-else class="mb-0 mt-2 text-[10px] text-[#91aaa0]">Không có loài cá ở độ sâu này.</p>
+                                    </template>
+                                    <p v-else class="mb-0 mt-2 rounded-lg bg-black/10 px-2.5 py-2 text-[10px] leading-relaxed text-[#91aaa0]">Chưa có dữ liệu dự đoán ở {{ formattedDepth }} m.</p>
+                                </div>
                             </div>
                         </section>
                     </div>

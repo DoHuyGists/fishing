@@ -7,19 +7,18 @@ import { useMarketStore } from "../../stores/market";
 import { useCaughtStore } from "../../stores/caught";
 import Cash from "../currency/Cash.vue";
 import Modal from "../shared/Modal.vue";
+import { useToast } from "../../composables/useToast";
 
 const authStore = useAuthStore();
 const currencyStore = useCurrencyStore();
 const activeMarketTab = ref<"all" | "my">("all");
+const viewMode = ref<"list" | "grid" | "species">("grid");
+const toast = useToast();
 const marketSearch = ref("");
 const marketRarity = ref("ALL");
 const marketSort = ref<"newest" | "price-asc" | "price-desc">("newest");
 const itemToBuy = ref<MarketListing | null>(null);
 const isBuying = ref(false);
-const buyError = ref("");
-const buySuccess = ref(false);
-const boughtFishName = ref("");
-let buySuccessTimer: ReturnType<typeof setTimeout> | null = null;
 const isCancellingListing = ref(false);
 const marketStore = useMarketStore();
 const caughtStore = useCaughtStore();
@@ -61,38 +60,42 @@ const myMarketListings = computed(() => {
   return marketStore.marketListings.filter((item) => item.user_id === currentUserId);
 });
 
+const groupedListings = computed(() => {
+  const groups = new Map<string, MarketListing[]>();
+  filteredMarketListings.value.forEach((item) => {
+    const groupId = item.caught?.fish?.id || item.caught?.fish?.name || item.id;
+    const group = groups.get(groupId);
+    if (group) group.push(item);
+    else groups.set(groupId, [item]);
+  });
+  return Array.from(groups, ([id, listings]) => ({ id, listings }));
+});
 function confirmBuy(item: MarketListing) {
   itemToBuy.value = item;
-  buyError.value = "";
 }
 
 function cancelBuy() {
   itemToBuy.value = null;
-  buyError.value = "";
 }
 
 async function handleBuyFish() {
   if (!itemToBuy.value) return;
-  const buyerId = authStore.userId;
-  if (!buyerId) {
-    buyError.value = "Bạn chưa đăng nhập";
+  if (!authStore.userId) {
+    toast.error("Bạn chưa đăng nhập", { title: "Không thể mua cá", position: "bottom" });
     return;
   }
 
   isBuying.value = true;
-  buyError.value = "";
-
   try {
-    const speciesMarketId = itemToBuy.value.id;
     const fishName = itemToBuy.value.caught?.fish?.name || "cá";
-    await supabaseMarketRepository.buyFish(speciesMarketId);
+    await supabaseMarketRepository.buyFish(itemToBuy.value.id);
     await marketStore.loadMarketListings();
     await caughtStore.loadCaughtFishes();
     cancelBuy();
-    showBuySuccess(fishName);
+    toast.success(`Mua ${fishName} thành công!`, { title: "Giao dịch thành công", position: "bottom" });
   } catch (err: any) {
     console.error("Lỗi khi mua cá:", err);
-    buyError.value = err.message || "Không thể mua cá. Vui lòng thử lại.";
+    toast.error(err?.message || "Không thể mua cá. Vui lòng thử lại.", { title: "Mua cá thất bại", position: "bottom" });
   } finally {
     isBuying.value = false;
   }
@@ -105,27 +108,14 @@ async function handleCancelListing(item: MarketListing) {
     await supabaseMarketRepository.cancelListing(item.id);
     await marketStore.loadMarketListings();
     await caughtStore.loadCaughtFishes();
+    toast.success("Đã gỡ tin bán cá", { title: "Thành công", position: "bottom" });
   } catch (err) {
     console.error("Lỗi khi gỡ cá:", err);
+    toast.error("Bạn chưa đăng nhập", { title: "Không thể mua cá", position: "bottom" });
   } finally {
     isCancellingListing.value = false;
   }
 }
-
-function showBuySuccess(fishName: string) {
-  boughtFishName.value = fishName;
-  buySuccess.value = true;
-  if (buySuccessTimer) clearTimeout(buySuccessTimer);
-  buySuccessTimer = setTimeout(() => {
-    buySuccess.value = false;
-  }, 2500);
-}
-
-function closeBuySuccess() {
-  buySuccess.value = false;
-  if (buySuccessTimer) clearTimeout(buySuccessTimer);
-}
-
 function formatDate(dateStr: string) {
   if (!dateStr) return "";
   const d = new Date(dateStr);
@@ -237,6 +227,11 @@ onMounted(() => {
           </select>
         </div>
 
+        <div class="ml-auto flex rounded-lg border border-gray-200 bg-white p-0.5" role="group" aria-label="Chế độ hiển thị">
+          <button type="button" class="rounded-md px-2 py-1 text-[11px] font-bold" :class="viewMode === 'list' ? 'bg-[#153221] text-white' : 'text-gray-600 hover:bg-gray-100'" :aria-pressed="viewMode === 'list'" @click="viewMode = 'list'">Danh sách</button>
+          <button type="button" class="rounded-md px-2 py-1 text-[11px] font-bold" :class="viewMode === 'grid' ? 'bg-[#153221] text-white' : 'text-gray-600 hover:bg-gray-100'" :aria-pressed="viewMode === 'grid'" @click="viewMode = 'grid'">Lưới</button>
+          <button type="button" class="rounded-md px-2 py-1 text-[11px] font-bold" :class="viewMode === 'species' ? 'bg-[#153221] text-white' : 'text-gray-600 hover:bg-gray-100'" :aria-pressed="viewMode === 'species'" @click="viewMode = 'species'">Theo loài</button>
+        </div>
         <!-- Sort dropdown -->
         <div class="flex items-center gap-1 text-xs">
           <span class="text-gray-500 font-medium text-[11px]">Sắp xếp:</span>
@@ -274,15 +269,36 @@ onMounted(() => {
             </p>
           </div>
 
-          <div v-else class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-4">
+          <div v-else-if="viewMode === 'species'" class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-4">
+            <section v-for="group in groupedListings" :key="group.id" class="overflow-hidden rounded-xl border border-gray-200 bg-white shadow-sm">
+              <div class="flex items-center justify-between gap-2 border-b border-gray-100 px-3 py-2">
+                <span class="truncate text-xs font-bold">{{ group.listings[0]?.caught?.fish?.name || 'Cá chưa rõ tên' }}</span>
+                <span class="shrink-0 rounded-full bg-emerald-100 px-2 py-0.5 text-[10px] font-bold text-emerald-800">{{ group.listings.length }} tin</span>
+              </div>
+              <div class="space-y-2 p-2">
+                <article v-for="item in group.listings" :key="item.id" class="flex items-center gap-2 rounded-lg border border-gray-100 p-2">
+                  <img :src="item.caught?.fish?.image || '/fish/VN/fish.jpg'" :alt="item.caught?.fish?.name" class="h-12 w-14 shrink-0 rounded object-cover" />
+                  <div class="min-w-0 flex-1">
+                    <div class="truncate text-[11px] text-gray-500">{{ item.caught?.fish?.weight }} kg · {{ formatDate(item.created_at) }}</div>
+                    <div class="text-xs font-bold text-amber-700">{{ item.price.toLocaleString('vi-VN') }} đ</div>
+                  </div>
+                  <button v-if="item.user_id === authStore.userId" type="button" disabled class="rounded bg-gray-100 px-2 py-1 text-[10px] text-gray-400">Đã đăng</button>
+                  <button v-else type="button" class="rounded bg-[#153221] px-2 py-1 text-[10px] font-bold text-white" @click="confirmBuy(item)">Mua</button>
+                </article>
+              </div>
+            </section>
+          </div>
+
+          <div v-else :class="viewMode === 'grid' ? 'grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-4' : 'flex flex-col gap-2'">
             <div
               v-for="item in filteredMarketListings"
               :key="item.id"
-              class="bg-white border border-gray-200 hover:border-emerald-500/50 rounded-xl p-3 shadow-2xs hover:shadow-md transition-all flex flex-col justify-between relative group"
+              class="bg-white border border-gray-200 hover:border-emerald-500/50 rounded-xl p-3 shadow-2xs hover:shadow-md transition-all relative group"
+              :class="viewMode === 'grid' ? 'flex flex-col justify-between' : 'flex items-center gap-3'"
             >
-              <div>
+              <div :class="viewMode === 'list' ? 'flex min-w-0 flex-1 items-center gap-3' : ''">
                 <!-- Header hình cá -->
-                <div class="relative w-full h-32 rounded-lg overflow-hidden bg-gray-100 mb-2 border border-gray-100">
+                <div class="relative rounded-lg overflow-hidden bg-gray-100 mb-2 border border-gray-100" :class="viewMode === 'grid' ? 'w-full h-32' : 'h-20 w-28 shrink-0'">
                   <img
                     :src="item.caught?.fish?.image || '/fish/VN/fish.jpg'"
                     :alt="item.caught?.fish?.name"
@@ -306,7 +322,7 @@ onMounted(() => {
                 </div>
 
                 <!-- Thông tin chi tiết -->
-                <div class="flex flex-col gap-1 mb-3">
+                <div class="flex flex-col gap-1 mb-3" :class="viewMode === 'list' ? 'min-w-0 flex-1' : ''">
                   <h4 class="m-0 font-bold text-sm text-[#263238] truncate">{{ item.caught?.fish?.name }}</h4>
                   <div class="flex items-center gap-2 text-[11px] text-gray-500 font-medium">
                     <span
@@ -323,7 +339,7 @@ onMounted(() => {
               </div>
 
               <!-- Footer Giá & Nút Mua -->
-              <div class="pt-2 border-t border-gray-100 flex items-center justify-between gap-2 mt-auto">
+              <div class="pt-2 border-t border-gray-100 flex items-center justify-between gap-2 mt-auto" :class="viewMode === 'list' ? 'border-t-0 border-l pl-3' : ''">
                 <div class="flex flex-col">
                   <span class="text-[10px] text-gray-400 uppercase font-bold">Giá bán</span>
                   <span class="text-sm font-extrabold text-amber-600">{{ item.price.toLocaleString("vi-VN") }} đ</span>
@@ -361,14 +377,15 @@ onMounted(() => {
             </p>
           </div>
 
-          <div v-else class="grid grid-cols-1 sm:grid-cols-3 md:grid-cols-5 gap-4">
+          <div v-else :class="viewMode === 'grid' ? 'grid grid-cols-1 sm:grid-cols-3 md:grid-cols-5 gap-4' : 'flex flex-col gap-2'">
             <div
               v-for="item in myMarketListings"
               :key="item.id"
-              class="bg-white border border-gray-200 rounded-xl p-3 shadow-2xs flex flex-col justify-between"
+              class="bg-white border border-gray-200 rounded-xl p-3 shadow-2xs"
+              :class="viewMode === 'grid' ? 'flex flex-col justify-between' : 'flex items-center gap-3'"
             >
               <div>
-                <div class="relative w-full h-32 rounded-lg overflow-hidden bg-gray-100 mb-2 border border-gray-100">
+                <div class="relative rounded-lg overflow-hidden bg-gray-100 mb-2 border border-gray-100" :class="viewMode === 'grid' ? 'w-full h-32' : 'h-20 w-28 shrink-0'">
                   <img
                     :src="item.caught?.fish?.image || '/fish/VN/fish.jpg'"
                     :alt="item.caught?.fish?.name"
@@ -462,10 +479,6 @@ onMounted(() => {
         <Cash :amount="LISTED_PRICE + balanceFee + itemToBuy.price" />
       </div>
 
-      <p v-if="buyError" class="mb-3 text-[11px] text-red-500 font-medium bg-red-50 p-2 rounded border border-red-200">
-        {{ buyError }}
-      </p>
-
       <div class="flex justify-center gap-3 mt-4">
         <button
           type="button"
@@ -485,47 +498,4 @@ onMounted(() => {
       </div>
     </div>
   </div>
-
-  <!-- Popup thông báo mua cá thành công -->
-  <Transition name="buy-success">
-    <div
-      v-if="buySuccess"
-      class="fixed top-6 left-1/2 -translate-x-1/2 z-[100] flex items-center gap-2.5 px-5 py-3 rounded-xl bg-emerald-600 text-white shadow-[0_8px_30px_rgba(21,50,33,0.35)] border border-emerald-500 cursor-pointer"
-      @click="closeBuySuccess"
-    >
-      <span class="text-lg">🎉</span>
-      <span class="text-sm font-semibold"
-        >Mua <strong>{{ boughtFishName }}</strong> thành công!</span
-      >
-    </div>
-  </Transition>
 </template>
-
-<style scoped>
-.buy-success-enter-active {
-  animation: buy-success-in 0.4s ease-out;
-}
-.buy-success-leave-active {
-  animation: buy-success-out 0.3s ease-in forwards;
-}
-@keyframes buy-success-in {
-  0% {
-    opacity: 0;
-    transform: translateX(-50%) translateY(-20px) scale(0.95);
-  }
-  100% {
-    opacity: 1;
-    transform: translateX(-50%) translateY(0) scale(1);
-  }
-}
-@keyframes buy-success-out {
-  0% {
-    opacity: 1;
-    transform: translateX(-50%) translateY(0) scale(1);
-  }
-  100% {
-    opacity: 0;
-    transform: translateX(-50%) translateY(-20px) scale(0.95);
-  }
-}
-</style>

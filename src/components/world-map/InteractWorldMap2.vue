@@ -9,17 +9,16 @@ import { useUserInAreaStore } from "../../stores/userInArea.ts";
 import { useAuthStore } from "../../stores/auth.ts";
 import { useDayPhaseStore } from "../../stores/dayPhase.ts";
 import { useToast } from "../../composables/useToast.ts";
-import { supabaseUserInAreaRepository } from "../../data/supabaseUserInAreaRepository";
 import FishingAnchor from "./FishingAnchor.vue";
-import { useUserTurnsStore } from "../../stores/userTurns";
+import { useModalStore } from "../../stores/modal.ts";
 
-const router = useRouter();
+
 const toast = useToast();
 const authStore = useAuthStore();
 const userInAreaStore = useUserInAreaStore();
 const dayPhaseStore = useDayPhaseStore();
 const fishingAreaStore = useFishingAreaStore();
-const userTurnsStore = useUserTurnsStore();
+const modalStore = useModalStore()
 const zoomInfo = ref({ lon: 0, lat: 0, k: 1 });
 const picked = ref<string>("");
 const mapRef = ref<InstanceType<typeof World2> | null>(null);
@@ -82,31 +81,9 @@ function openPrepare(area: any) {
     return;
   }
   pendingArea.value = area;
-  showPrepare.value = true;
+  modalStore.open("prepare");
 }
 
-function closePrepare() {
-  showPrepare.value = false;
-  pendingArea.value = null;
-}
-
-async function onPrepareConfirm(area: any) {
-  if (isEntering.value) return;
-  isEntering.value = true;
-  try {
-    await userTurnsStore.consumeTurn();
-    await supabaseUserInAreaRepository.setUserEnterArea(area.id);
-  } catch (err) {
-    console.error("Failed to consume turn or enter area:", err);
-    toast.error(err instanceof Error ? err.message : "Không thể trừ lượt câu cá", { title: "Chưa thể vào bãi câu", position: "top" });
-    isEntering.value = false;
-    return;
-  } finally {
-    isEntering.value = false;
-  }
-  showPrepare.value = false;
-  router.push({ name: "fishing" });
-}
 interface PickPoint {
   screen: { x: number; y: number }; // px trên canvas
   map: { x: number; y: number }; // toạ độ trong hệ chưa zoom
@@ -151,7 +128,7 @@ const anchor = ref<{ lon: number; lat: number; k: number } | null>(null);
   <div class="grid grid-cols-1 md:grid-cols-[auto_1fr] h-full gap-2">
     <FishingAnchor />
     <div class="flex flex-col gap-2">
-      <div class="w-full h-[70dvh] overflow-hidden grid place-items-center border border-gray-300 rounded-xl">
+      <div class="w-full h-fit overflow-hidden grid place-items-center border border-gray-300 rounded-xl">
         <World2 ref="mapRef" :areas="fishingAreaStore.fishingAreas" :selected-area-id="selectedArea?.id ?? null" :pick-enabled="pickEnabled" :anchor="anchor" @pick="onPick" @zoom="onZoom" @select-area="onSelectArea">
           <template #tooltip>
             <template v-if="anchor"> {{ anchor }} </template>
@@ -164,7 +141,9 @@ const anchor = ref<{ lon: number; lat: number; k: number } | null>(null);
                   ×
                 </button>
               </div>
-              <img :src="dayPhaseStore.currentScenePhace" class="w-full rounded-md" draggable="false" />
+              <div class="overflow-hidden rounded-md">
+                <img :src="dayPhaseStore.currentScenePhace" class="w-full hover:scale-110 duration-200" draggable="false" />
+              </div>
               <button type="button" class="w-full rounded-lg bg-green-500 px-2 py-1.5 font-bold text-white hover:bg-green-600 disabled:opacity-70" :disabled="isEntering" @click="openPrepare(area)">
                 {{ isEntering ? "Đang vào..." : "Đi đến bãi câu" }}
               </button>
@@ -182,8 +161,5 @@ const anchor = ref<{ lon: number; lat: number; k: number } | null>(null);
         <button @click="togglePick" class="border border-gray-300 rounded-md px-3">{{ pickEnabled ? "Tắt xác định vị trí" : "Bật xác định vị trí" }}</button>
       </div>
     </div>
-    <PrepareModal v-if="showPrepare && pendingArea" :anchor="pendingArea" @close="closePrepare" @confirm="onPrepareConfirm" />
-    <!-- <p>Zoom: {{ zoomInfo.k.toFixed(2) }}x | Dịch: {{ zoomInfo.x.toFixed(0) }}, {{ zoomInfo.y.toFixed(0) }}</p> -->
-    <!-- <p>{{ picked }}</p> -->
   </div>
 </template>

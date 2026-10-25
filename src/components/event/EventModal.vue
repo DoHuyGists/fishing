@@ -127,7 +127,7 @@ onMounted(loadSchedules);
 
         <!-- Chi tiết sự kiện -->
         <section class="min-h-0">
-          <article v-if="selectedSchedule" class="mx-auto min-w-3xl p-5 sm:p-8 overflow-y-scroll h-full">
+          <article v-if="selectedSchedule" class="mx-auto p-5 sm:p-8 overflow-y-scroll h-full">
             <img
               v-if="selectedSchedule.eventImage"
               :src="selectedSchedule.eventImage"

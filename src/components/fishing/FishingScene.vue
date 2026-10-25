@@ -837,7 +837,8 @@ function handleClickOnScene(event: MouseEvent) {
     right: -8px;
     bottom: -10%;
     width: 90px;
-    height: min(80vh, 740px);
+    height: auto;
+    aspect-ratio: 254 / 1024;
     pointer-events: none;
     transform-origin: 64% 91%;
     transition: transform 0.28s ease-out;

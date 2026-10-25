@@ -214,10 +214,10 @@ async function executeDelete() {
 
 <template>
   <Modal title="Quản lý bạn bè" sub-title="Kết nối cộng đồng câu cá" :on-refresh="handleRefresh">
-    <div class="w-full space-y-4 pb-10">
+    <div class="w-full min-w-0 space-y-3 pb-6 sm:space-y-4 sm:pb-10">
       <!-- ID Người chơi hiện tại & Banner -->
       <div
-        class="bg-linear-to-r from-[#173223] via-[#1c3f2d] to-[#122b1e] rounded-2xl p-4 sm:p-5 border border-emerald-800/40 shadow-md text-emerald-50 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4"
+        class="bg-linear-to-r from-[#173223] via-[#1c3f2d] to-[#122b1e] rounded-2xl p-3 sm:p-5 border border-emerald-800/40 shadow-md text-emerald-50 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 sm:gap-4"
       >
         <div class="flex items-center gap-3.5 min-w-0">
           <div
@@ -244,10 +244,10 @@ async function executeDelete() {
       </div>
 
       <!-- Thanh điều hướng Tab -->
-      <div class="flex items-center gap-2 border-b border-emerald-900/10 pb-2 overflow-x-auto">
+      <div class="flex items-center gap-2 border-b border-emerald-900/10 pb-2 overflow-x-auto snap-x snap-mandatory scrollbar-thin -mx-2 px-2 sm:mx-0 sm:px-0">
         <button
           type="button"
-          class="flex items-center gap-2 px-4 py-2 rounded-xl text-xs font-bold transition-all cursor-pointer border"
+          class="flex shrink-0 snap-start items-center gap-2 px-3 sm:px-4 py-2 rounded-xl text-xs font-bold transition-all cursor-pointer border"
           :class="
             activeTab === 'friends'
               ? 'bg-[#153221] text-white border-emerald-800 shadow-sm'
@@ -266,7 +266,7 @@ async function executeDelete() {
 
         <button
           type="button"
-          class="flex items-center gap-2 px-4 py-2 rounded-xl text-xs font-bold transition-all cursor-pointer border relative"
+          class="flex shrink-0 snap-start items-center gap-2 px-3 sm:px-4 py-2 rounded-xl text-xs font-bold transition-all cursor-pointer border relative"
           :class="
             activeTab === 'received'
               ? 'bg-[#153221] text-white border-emerald-800 shadow-sm'
@@ -292,7 +292,7 @@ async function executeDelete() {
 
         <button
           type="button"
-          class="flex items-center gap-2 px-4 py-2 rounded-xl text-xs font-bold transition-all cursor-pointer border"
+          class="flex shrink-0 snap-start items-center gap-2 px-3 sm:px-4 py-2 rounded-xl text-xs font-bold transition-all cursor-pointer border"
           :class="
             activeTab === 'sent'
               ? 'bg-[#153221] text-white border-emerald-800 shadow-sm'
@@ -311,7 +311,7 @@ async function executeDelete() {
 
         <button
           type="button"
-          class="flex items-center gap-2 px-4 py-2 rounded-xl text-xs font-bold transition-all cursor-pointer border"
+          class="flex shrink-0 snap-start items-center gap-2 px-3 sm:px-4 py-2 rounded-xl text-xs font-bold transition-all cursor-pointer border"
           :class="
             activeTab === 'discover'
               ? 'bg-[#153221] text-white border-emerald-800 shadow-sm'
@@ -330,7 +330,7 @@ async function executeDelete() {
       </div>
 
       <!-- Ô tìm kiếm & Gửi kết bạn nhanh qua ID -->
-      <div class="grid grid-cols-1 md:grid-cols-2 gap-3">
+      <div class="grid min-w-0 grid-cols-1 gap-2 sm:grid-cols-2 sm:gap-3">
         <!-- Tìm kiếm theo ID trong danh sách -->
         <div class="relative">
           <input
@@ -351,17 +351,17 @@ async function executeDelete() {
         </div>
 
         <!-- Nhập ID và gửi lời mời trực tiếp -->
-        <div class="flex items-center gap-2">
+        <div class="flex min-w-0 items-center gap-2">
           <input
             v-model="directFriendIdInput"
             type="text"
             placeholder="Nhập UUID để kết bạn ngay..."
-            class="flex-1 px-3.5 py-2 rounded-xl border border-emerald-900/20 bg-white/90 text-xs text-gray-800 placeholder-gray-400 focus:outline-none focus:border-emerald-600 focus:ring-1 focus:ring-emerald-600 font-mono"
+            class="min-w-0 flex-1 px-3 py-2 sm:px-3.5 rounded-xl border border-emerald-900/20 bg-white/90 text-xs text-gray-800 placeholder-gray-400 focus:outline-none focus:border-emerald-600 focus:ring-1 focus:ring-emerald-600 font-mono"
             @keydown.enter="handleSendDirectId"
           />
           <button
             type="button"
-            class="px-3.5 py-2 rounded-xl bg-emerald-700 hover:bg-emerald-800 text-white text-xs font-bold transition shadow-sm cursor-pointer whitespace-nowrap disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-1"
+            class="shrink-0 px-2.5 sm:px-3.5 py-2 rounded-xl bg-emerald-700 hover:bg-emerald-800 text-white text-xs font-bold transition shadow-sm cursor-pointer whitespace-nowrap disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-1"
             :disabled="!directFriendIdInput.trim() || friendStore.actionLoadingId === directFriendIdInput.trim()"
             @click="handleSendDirectId"
           >
@@ -419,7 +419,7 @@ async function executeDelete() {
           </button>
         </div>
 
-        <div v-else class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-3">
+        <div v-else class="grid min-w-0 grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-4">
           <div
             v-for="record in filteredFriends"
             :key="record.id"
@@ -477,7 +477,7 @@ async function executeDelete() {
             </div>
 
             <!-- Thời gian kết bạn -->
-            <div class="pt-2 border-t border-gray-100 flex items-center justify-between text-[10px] text-gray-400">
+            <div class="pt-2 border-t border-gray-100 flex flex-wrap items-center justify-between gap-x-2 gap-y-1 text-[10px] text-gray-400">
               <span>Đã kết bạn từ: {{ new Date(record.created_at).toLocaleDateString("vi-VN") }}</span>
               <span class="text-emerald-700 font-semibold">● Bạn bè</span>
             </div>
@@ -545,7 +545,7 @@ async function executeDelete() {
             </div>
 
             <!-- Hành động phản hồi: Đồng ý, Từ chối, Xóa -->
-            <div class="flex items-center gap-2 shrink-0">
+            <div class="flex flex-wrap items-center gap-2 sm:shrink-0">
               <button
                 type="button"
                 class="px-3 py-1.5 rounded-xl bg-emerald-700 hover:bg-emerald-800 text-white text-xs font-bold transition shadow-sm cursor-pointer disabled:opacity-50 flex items-center gap-1"
@@ -652,7 +652,7 @@ async function executeDelete() {
 
       <!-- ================= TAB 4: KHÁM PHÁ & THÊM BẠN ================= -->
       <div v-else-if="activeTab === 'discover'" class="space-y-3">
-        <div class="flex items-center justify-between text-xs text-gray-600 px-1">
+        <div class="flex flex-wrap items-center justify-between gap-x-2 gap-y-1 text-xs text-gray-600 px-1">
           <span>Danh sách người chơi từ hệ thống ({{ filteredPlayers.length }})</span>
           <span class="text-[11px] text-gray-400">Sắp xếp theo cấp độ cao xuống thấp</span>
         </div>
@@ -666,7 +666,7 @@ async function executeDelete() {
           <p class="m-0 text-xs text-gray-500 mt-1">Không có người chơi nào khớp với từ khóa tìm kiếm.</p>
         </div>
 
-        <div v-else class="grid grid-cols-1 md:grid-cols-2 gap-3">
+        <div v-else class="grid min-w-0 grid-cols-1 gap-3 sm:grid-cols-2">
           <div
             v-for="player in filteredPlayers"
             :key="player.id"
@@ -712,7 +712,7 @@ async function executeDelete() {
               </div>
 
               <!-- Trạng thái hoặc Nút kết bạn -->
-              <div class="shrink-0 flex items-center gap-2">
+              <div class="flex shrink-0 items-center gap-2">
                 <!-- Đã là bạn bè -->
                 <span
                   v-if="getRelation(player.id).type === 'ACCEPTED'"
@@ -789,8 +789,8 @@ async function executeDelete() {
             </div>
 
             <!-- Dung lượng túi & Kho cá -->
-            <div class="pt-2 border-t border-gray-100 flex items-center justify-between text-[10px] text-gray-500">
-              <div class="flex items-center gap-3">
+            <div class="pt-2 border-t border-gray-100 flex flex-wrap items-center justify-between gap-x-2 gap-y-1 text-[10px] text-gray-500">
+              <div class="flex flex-wrap items-center gap-x-3 gap-y-1">
                 <span>📦 Túi: {{ player.inventory_capacity }} ô</span>
                 <span>🐟 Kho: {{ player.species_storage_capacity }} ô</span>
               </div>

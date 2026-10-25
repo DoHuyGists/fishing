@@ -8,6 +8,7 @@ import LatestCaughtList from "../caught/LatestCaughtList.vue";
 import { useConfigStore } from "../../stores/config.ts";
 import { useUserTurnsStore } from "../../stores/userTurns";
 import UserTurn from "../stamina/UserTurn.vue";
+import PrepareModal from "./PrepareModal.vue";
 
 const InteractWorldMap2 = defineAsyncComponent(() => import("./InteractWorldMap2.vue"));
 const AccountInfoModal = defineAsyncComponent(() => import("../account/AccountInfoModal.vue"));
@@ -253,6 +254,7 @@ onUnmounted(() => {
           <FriendModal v-if="modalStore.isOpening('friend')" />
           <TeamModal v-if="modalStore.isOpening('team')" />
           <PostProduction v-if="modalStore.isOpening('post-production')" />
+          <PrepareModal v-if="modalStore.isOpening('prepare')" />
         </div>
       </Transition>
     </Teleport>

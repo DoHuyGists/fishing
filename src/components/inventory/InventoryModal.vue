@@ -26,7 +26,7 @@ const guildeSteps = [
 ];
 </script>
 <template>
-  <Modal :guid-steps="guildeSteps">
+  <Modal title="Trang bị" :guid-steps="guildeSteps">
     <InventoryTable />
   </Modal>
 </template>

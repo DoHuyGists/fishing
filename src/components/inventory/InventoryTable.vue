@@ -6,6 +6,7 @@ import type { UserInventory } from "../../data/supabaseUserInventoryRepository";
 import { useEquipmentStore, type Category, type EquipmentSet, type ItemData } from "../../stores/equipment";
 import Cash from "../currency/Cash.vue";
 import { useCurrencyStore } from "../../stores/currency.ts";
+import { useToast } from "../../composables/useToast";
 
 const SLOTS: Category[] = ["rod", "line", "reel", "hook", "bait"];
 const LABELS: Record<Category, string> = {
@@ -28,14 +29,7 @@ const authStore = useAuthStore();
 const inventoryStore = useInventoryStore();
 const equipmentStore = useEquipmentStore();
 const currencyStore = useCurrencyStore();
-
-const notice = ref<{ type: "ok" | "error"; text: string } | null>(null);
-let noticeTimer: ReturnType<typeof setTimeout> | undefined;
-function toast(type: "ok" | "error", text: string) {
-  notice.value = { type, text };
-  clearTimeout(noticeTimer);
-  noticeTimer = setTimeout(() => (notice.value = null), 3500);
-}
+const toast = useToast();
 
 // Trái
 const viewMode = ref<"grid" | "list">("grid");
@@ -63,7 +57,7 @@ async function load() {
   userId.value = authStore.userId ?? null;
   if (!userId.value) {
     loading.value = false;
-    return toast("error", "Bạn cần đăng nhập để xem kho đồ.");
+    return toast.error("Bạn cần đăng nhập để xem kho đồ.");
   }
 
   await inventoryStore.setUserInventory(userId.value);
@@ -117,9 +111,9 @@ async function useSelectedItem() {
     await inventoryStore.useItem(item.id);
     await inventoryStore.setUserInventory(userId.value!);
     selected.value = new Set();
-    toast("ok", "Đã sử dụng vật phẩm.");
+    toast.success("Đã sử dụng vật phẩm.");
   } catch (error) {
-    toast("error", (error as Error).message);
+    toast.error((error as Error).message);
   } finally {
     usingItemId.value = null;
   }
@@ -138,7 +132,7 @@ async function deleteSelected() {
   )
 
   if (isItemInSet) {
-    toast("error", "Có Item được chọn để xóa đang được trang bị")
+    toast.error("Có Item được chọn để xóa đang được trang bị")
     return;
   }
 
@@ -161,7 +155,7 @@ async function deleteSelected() {
 
   modal.value = null
 
-  toast('ok', `Đã xóa ${ids.length} vật phẩm.`)
+  toast.success(`Đã xóa ${ids.length} vật phẩm.`)
 }
 
 const filteredSets = computed(() => {
@@ -196,9 +190,9 @@ const isCompatible = (i: UserInventory) => !active.value || i.data.category === 
 const isInActiveSlot = (i: UserInventory) => !!activeSet.value && !!active.value && activeSet.value[active.value.slot].some((x) => x.id === i.id);
 
 function pickItem(i: UserInventory) {
-  if (!active.value || !activeSet.value) return toast("ok", "Chọn một ô trong set bên phải trước, rồi bấm vật phẩm.");
+  if (!active.value || !activeSet.value) return toast.info("Chọn một ô trong set bên phải trước, rồi bấm vật phẩm.");
   if (i.data.category !== active.value.slot)
-    return toast("error", `Ô này chỉ nhận vật phẩm loại "${LABELS[active.value.slot]}".`);
+    return toast.error(`Ô này chỉ nhận vật phẩm loại "${LABELS[active.value.slot]}".`);
   const list = activeSet.value[active.value.slot];
   // @ts-ignore
   if (list.some((x) => x.id === i.id)) return;
@@ -216,7 +210,7 @@ async function saveSet(set: EquipmentSet) {
 
   savedSnapshot.value = { ...savedSnapshot.value, [set.id]: snapshotOf(set) }
 
-  toast('ok', 'Đã lưu set.')
+  toast.success('Đã lưu set.')
 }
 
 async function buySet() {
@@ -224,9 +218,9 @@ async function buySet() {
     busy.value = true
     await equipmentStore.buySet();
     await inventoryStore.setEquipmentSet();
-    toast('ok', 'Đã thêm set mới.')
+    toast.success('Đã thêm set mới.')
   } catch (error) {
-    toast('error', (error as Error).message) 
+    toast.error((error as Error).message) 
   }finally {
     busy.value = false
     setSearch.value = ''
@@ -237,7 +231,7 @@ async function buySet() {
 function handleUpdateSetUsed(event: Event, setId: string) {
   if ((event.target as HTMLInputElement).value == "on") {
     equipmentStore.chooseSet(userId.value!, setId);
-    toast('ok', 'Cập nhật thành công.')
+    toast.success('Cập nhật thành công.')
   }
 }
 
@@ -250,15 +244,7 @@ function hasRpc() {
 </script>
 
 <template>
-  <section class="relative mx-auto w-full h-full flex flex-col p-4 text-slate-800">
-    <!-- Toast -->
-    <div v-if="notice" role="status" :class="[
-      'fixed right-4 top-4 z-50 rounded-md px-4 py-2 text-sm shadow-lg',
-      notice.type === 'ok' ? 'bg-teal-700 text-white' : 'bg-red-600 text-white',
-    ]">
-      {{ notice.text }}
-    </div>
-
+  <section class="w-full h-full text-slate-800">
     <div v-if="loading" class="py-24 text-center text-sm text-slate-500">Đang tải kho đồ…</div>
 
     <div v-else class="grid grid-cols-1 gap-6 lg:grid-cols-2">
@@ -393,7 +379,7 @@ function hasRpc() {
             class="w-full rounded-md border border-slate-300 px-3 py-2 text-sm outline-none focus:border-teal-600 focus:ring-2 focus:ring-teal-100" />
         </header>
 
-        <div class="flex-1 space-y-4 p-4">
+        <div class="flex-1 space-y-4 overflow-y-scroll p-4">
           <p v-if="pagedSets.length === 0" class="py-12 text-center text-sm text-slate-500">
             {{
               inventoryStore.equipmentSets.length === 0

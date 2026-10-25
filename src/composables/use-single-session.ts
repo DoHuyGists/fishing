@@ -3,6 +3,7 @@
 import { ref, watch, onUnmounted} from 'vue';
 import { RealtimeChannel } from '@supabase/supabase-js';
 import supabase from "../database/connection";
+import { createUuid } from "../utils/uuid";
 
 export interface ActiveSession {
   user_id: string;
@@ -18,7 +19,7 @@ export function useSingleSession(userId: string) {
   // Phân loại nguồn xung đột: 'SAME_BROWSER' (cùng trình duyệt) hay 'CROSS_BROWSER' (khác trình duyệt)
   const conflictType = ref<'SAME_BROWSER' | 'CROSS_BROWSER' | null>(null);
 
-  const currentSessionId = crypto.randomUUID();
+  const currentSessionId = createUuid();
   let realtimeChannel: RealtimeChannel | null = null;
   let broadcastChannel: BroadcastChannel | null = null;
 

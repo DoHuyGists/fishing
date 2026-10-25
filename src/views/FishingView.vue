@@ -14,7 +14,7 @@ import { useEquipmentStore } from "../stores/equipment";
 const authStore = useAuthStore();
 const equipmentStore = useEquipmentStore();
 const { user } = storeToRefs(authStore);
-const equipmentCollapsed = ref(false);
+const equipmentCollapsed = ref(true);
 
 function toggleEquipment() {
   equipmentCollapsed.value = !equipmentCollapsed.value;
@@ -59,7 +59,7 @@ onBeforeUnmount(() => {
 
 <template>
   <main class="w-full h-screen overflow-hidden touch-none overscroll-none bg-[#193224] text-[#e9f4e8]">
-    <div class="grid grid-rows-[minmax(0,1fr)_auto] w-full h-full">
+    <div class="grid grid-rows-[minmax(0,1fr)_auto] w-full h-dvh">
       <FishingScene />
       <section class="control-deck">
         <div class="side-panel">
