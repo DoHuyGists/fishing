@@ -19,6 +19,7 @@ type ModalName =
     | "post-production"
     | "shop"
     | "prepare"
+    | "badge"
     ;
 
 export const useModalStore = defineStore("Modal", {

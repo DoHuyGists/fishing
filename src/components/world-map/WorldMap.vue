@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { defineAsyncComponent, onMounted, onUnmounted, ref } from "vue";
+import { defineAsyncComponent, onMounted, onUnmounted, ref, watch } from "vue";
 import { useAuthStore } from "../../stores/auth.ts";
 import { useCaughtStore } from "../../stores/caught.ts";
 import { useModalStore } from "../../stores/modal.ts";
@@ -24,6 +24,7 @@ const RedeemCode = defineAsyncComponent(() => import("../redeem-code/RedeemCode.
 const NotificationModal = defineAsyncComponent(() => import("../notification/NotificationModal.vue"));
 const CaughtModal = defineAsyncComponent(() => import("../caught/CaughtModal.vue"));
 const FactionSelectModal = defineAsyncComponent(() => import("../faction/FactionSelectModal.vue"));
+const Achievement = defineAsyncComponent(() => import("../badge/Achievement.vue"));
 const FriendModal = defineAsyncComponent(() => import("../friend/FriendModal.vue"));
 const TeamModal = defineAsyncComponent(() => import("../team/TeamModal.vue"));
 const PostProduction = defineAsyncComponent(() => import("../fishing-post-production/PostProduction.vue"));
@@ -36,6 +37,10 @@ const configStore = useConfigStore();
 const userTurnsStore = useUserTurnsStore();
 
 const hasNewNotification = ref(false);
+
+const MAP_VISIBLE_STORAGE_KEY = "worldMap2Visible";
+const isMapVisible = ref(localStorage.getItem(MAP_VISIBLE_STORAGE_KEY) !== "false");
+watch(isMapVisible, (value) => localStorage.setItem(MAP_VISIBLE_STORAGE_KEY, String(value)));
 
 onMounted(() => {
   void userTurnsStore.fetchStatus().then(() => userTurnsStore.startCountdown());
@@ -64,7 +69,14 @@ onUnmounted(() => {
     <main class="grid flex-1 grid-cols-1 gap-2 md:grid-cols-2">
       <!-- Khung Bản đồ trung tâm -->
       <div class="">
-        <InteractWorldMap2 />
+        <button
+          type="button"
+          class="mb-2 px-3 py-1.5 rounded-xl border border-[#cbd9c6] bg-[#f5f9f0] text-[#24352a] font-bold text-xs cursor-pointer"
+          @click="isMapVisible = !isMapVisible"
+        >
+          {{ isMapVisible ? "🙈 Ẩn bản đồ" : "🗺️ Hiện bản đồ" }}
+        </button>
+        <InteractWorldMap2 v-if="isMapVisible" />
       </div>
       <div class="">
         <div class="flex items-center flex-wrap gap-2">
@@ -224,6 +236,15 @@ onUnmounted(() => {
             <span class="text-sm" aria-hidden="true">🎣</span>
             <span>Lập đội</span>
           </button>
+
+          <button
+            type="button"
+            class="flex items-center gap-1.5 px-3 py-1.5 bg-[#153221] hover:bg-[#1a3e29] border border-gray-300 text-white rounded-xl shadow-sm font-bold text-xs cursor-pointer transition-colors"
+            @click="modalStore.open('badge')"
+          >
+            <span class="text-sm" aria-hidden="true">🏆</span>
+            <span>Huy hiệu</span>
+          </button>
         </div>
 
         <LatestCaughtList />
@@ -253,6 +274,7 @@ onUnmounted(() => {
           <FactionSelectModal v-if="modalStore.isOpening('faction')" />
           <FriendModal v-if="modalStore.isOpening('friend')" />
           <TeamModal v-if="modalStore.isOpening('team')" />
+          <Achievement v-if="modalStore.isOpening('badge')" />
           <PostProduction v-if="modalStore.isOpening('post-production')" />
           <PrepareModal v-if="modalStore.isOpening('prepare')" />
         </div>

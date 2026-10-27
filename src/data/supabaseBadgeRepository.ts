@@ -1,36 +1,29 @@
 import supabase from "../database/connection";
 
-export interface Badge {
-  id: string;
+export interface UserBadgeStatus {
+  badge_id: string;
   name: string;
   description: string | null;
-  icon_url: string | null;
-}
-
-export interface UserBadge {
-  badge_id: string;
+  icon_url?: string | null;
+  type: string | null;
+  reward: Record<string, number> | null;
+  is_earned: boolean;
   quantity: number;
-  earned_at: string;
+  earned_at: string | null;
+  is_claim: boolean;
+  can_claim: boolean;
 }
 
 class SupabaseBadgeRepository {
-  async fetchBadges(): Promise<Badge[]> {
-    const { data, error } = await supabase
-      .from("badges")
-      .select("id, name, description, icon_url")
-      .order("name", { ascending: true });
+  async fetchUserBadgesStatus(): Promise<UserBadgeStatus[]> {
+    const { data, error } = await supabase.rpc("get_user_badges_status");
     if (error) throw new Error(error.message);
     return data ?? [];
   }
 
-  async fetchUserBadges(userId: string): Promise<UserBadge[]> {
-    if (!userId) return [];
-    const { data, error } = await supabase
-      .from("user_badges")
-      .select("badge_id, quantity, earned_at")
-      .eq("user_id", userId);
+  async claimBadgeReward(badgeId: string): Promise<void> {
+    const { error } = await supabase.rpc("claim_badge_reward", { p_badge_id: badgeId });
     if (error) throw new Error(error.message);
-    return data ?? [];
   }
 }
 

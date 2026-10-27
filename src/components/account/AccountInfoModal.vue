@@ -2,15 +2,12 @@
 import { onMounted, ref } from "vue";
 import { useAuthStore } from "../../stores/auth";
 import { useUserProfileStore } from "../../stores/userProfile";
-import { useBadgesStore } from "../../stores/badges";
 import Modal from "../shared/Modal.vue";
-import Achievement from "./Achievement.vue";
 import UserProfile from "./UserProfile.vue";
 import { useRouter } from "vue-router";
 
 const authStore = useAuthStore();
 const userProfileStore = useUserProfileStore();
-const badgesStore = useBadgesStore();
 const router = useRouter();
 const showSignOutConfirm = ref(false);
 const isSigningOut = ref(false);
@@ -21,7 +18,6 @@ function loadProfile() {
   if (!userId) return;
 
   userProfileStore.fetchProfile(userId);
-  badgesStore.fetchForUser(userId, true);
 }
 
 onMounted(loadProfile);
@@ -72,10 +68,7 @@ async function signOut() {
         </div>
       </div>
 
-      <div v-else class="grid grid-cols-1 md:grid-cols-2">
-        <UserProfile @sign-out="showSignOutConfirm = true; signOutError = ''" />
-        <Achievement />
-      </div>
+      <UserProfile v-else @sign-out="showSignOutConfirm = true; signOutError = ''" />
     </div>
   </Modal>
 
