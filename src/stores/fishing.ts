@@ -5,7 +5,7 @@ import { supabaseFishRepository, type AreaSpeciesDiaryResponse, type FishDepthPr
 import { supabaseUserInAreaRepository } from "../data/supabaseUserInAreaRepository";
 import supabase from "../database/connection";
 import { supabaseFishingAreaRepository } from "../data/supabaseFishingAreaRepository";
-import { FISHING_DEPTH_CONFIG } from "../data/fishingDepth";
+import { buildDepthConfig, DEPTH_STEP_METERS } from "../data/fishingDepth";
 export type FishingTool = "rod" | "line" | "reel" | "hook" | "bait";
 export type CastPhase = "idle" | "casting" | "waiting" | "bite" | "submitting" | "caught" | "lost";
 export type FishingChallenge = {
@@ -133,6 +133,7 @@ export const useFishingStore = defineStore("fishing", {
     canCast: (s) => s.castPhase === "idle" || s.castPhase === "lost",
     canReelIn: (s) => ["casting", "waiting", "bite"].includes(s.castPhase),
     canAdjustDepth: (s) => s.castPhase === "idle" || s.castPhase === "lost",
+    depthConfig: (s) => buildDepthConfig(s.currentArea?.maxDepth),
   },
   actions: {
     async initializeFishingArea(areaId: string) {
@@ -143,6 +144,7 @@ export const useFishingStore = defineStore("fishing", {
     async fetchCurrentArea(areaId: string) {
       try {
         this.currentArea = await supabaseFishingAreaRepository.fetchOneAreas(areaId);
+        this.appliedDepthMeters = Math.min(this.appliedDepthMeters, this.depthConfig.maxMeters);
       } catch (err) {
         console.log(err);
       }
@@ -301,14 +303,16 @@ export const useFishingStore = defineStore("fishing", {
     },
     applyDepth(depth: number) {
       if (!this.canAdjustDepth) return false;
-      const step = FISHING_DEPTH_CONFIG.stepMeters;
-      this.appliedDepthMeters = Math.max(0, Math.min(FISHING_DEPTH_CONFIG.maxMeters, Math.round(depth / step) * step));
+      const step = DEPTH_STEP_METERS;
+      this.appliedDepthMeters = Math.max(0, Math.min(this.depthConfig.maxMeters, Math.round(depth / step) * step));
       return true;
     },
     openDepthAdjuster() {
+      if (!this.canAdjustDepth) return;
       this.depthAdjusterOpen = true;
     },
     async selectVariant(category: FishingTool, variantId: string) {
+      if (!this.canAdjustDepth) return;
       const previous = this.equipmentLoadout[category];
       this.equipmentLoadout[category] = variantId;
       try {

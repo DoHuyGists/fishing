@@ -16,8 +16,7 @@ const undiscoveredFishes = computed(() => store.areaSpeciesDiary?.fishes.filter(
           role="dialog" aria-modal="true">
           <header class="flex justify-between px-5 pt-[19px] pb-3 border-b border-[rgba(223,241,207,0.14)]">
             <div>
-              <p class="m-0 text-[#e8bd62] text-[10px] font-black tracking-[0.16em] uppercase">Sổ tay bãi câu</p>
-              <h2 class="m-0 mt-1.5 text-xl">Cá trong hồ</h2>
+              <h2 class="m-0 text-xl">Cá trong hồ</h2>
             </div>
             <button type="button"
               class="w-[29px] h-[29px] border-0 rounded-full bg-[rgba(235,243,219,0.13)] text-white cursor-pointer text-[22px] leading-none"
@@ -53,13 +52,13 @@ const undiscoveredFishes = computed(() => store.areaSpeciesDiary?.fishes.filter(
 
               <div class="max-h-[min(55vh,420px)] space-y-4 overflow-y-auto pr-1">
                 <section v-if="discoveredFishes.length">
-                  <h3 class="mb-2 text-xs font-bold uppercase tracking-wide text-[#c7e6a5]">Đã khám phá</h3>
+                  <div class="mb-2 text-xs font-bold uppercase tracking-wide text-[#c7e6a5]">Đã khám phá</div>
                   <ul class="m-0 space-y-2 p-0">
                     <li v-for="fish in discoveredFishes" :key="fish.species_id" class="flex gap-3 rounded-xl border border-white/10 bg-white/[0.05] p-2.5">
-                      <img :src="fish.image || '/fish/VN/fish.jpg'" :alt="fish.display_name" class="h-14 w-14 shrink-0 rounded-lg bg-black/20 object-cover" />
+                      <img :src="fish.image || '/fish/VN/fish.jpg'" :alt="fish.display_name" class="h-14 shrink-0 rounded-lg bg-black/20 object-cover" />
                       <div class="min-w-0 flex-1">
                         <p class="m-0 font-semibold">{{ fish.display_name || fish.name }}</p>
-                        <p class="mt-1 text-[10px] text-[#e8bd62]">{{ fish.rarity || 'Chưa rõ độ hiếm' }}</p>
+                        <p class="m-0 text-[10px] text-[#e8bd62]">{{ fish.rarity || 'Chưa rõ độ hiếm' }}</p>
                         <p v-if="fish.information" class="mb-0 mt-1 text-xs leading-relaxed text-[#b7cfb9]">{{ fish.information }}</p>
                         <p v-if="fish.weight_min != null || fish.weight_max != null" class="mb-0 mt-1 text-[10px] text-[#b7cfb9]">
                           Cân nặng: {{ fish.weight_min ?? '?' }}–{{ fish.weight_max ?? '?' }} kg

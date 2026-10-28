@@ -99,7 +99,7 @@ class SupabaseFishingAreaRepository {
     }));
   }
   async fetchOneAreas(areaId: string): Promise<any> {
-    const { data, error } = await supabase.from("fishing_areas").select("id, country_id, x, y, title, location, scene_path, fishing_boundary").eq("id", areaId).maybeSingle();
+    const { data, error } = await supabase.from("fishing_areas").select("id, country_id, x, y, title, location, scene_path, fishing_boundary, max_depth").eq("id", areaId).maybeSingle();
 
     if (error) throw new Error(error.message);
 
@@ -114,6 +114,7 @@ class SupabaseFishingAreaRepository {
       location: data.location,
       scenePath: data.scene_path,
       fishingBoundary: data.fishing_boundary,
+      maxDepth: data.max_depth == null ? null : Number(data.max_depth),
     };
   }
 }

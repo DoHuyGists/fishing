@@ -6,6 +6,8 @@ export interface TabItem {
   key: string
   /** Tiêu đề hiển thị trên tab. */
   label: string
+  /** Đường dẫn icon hiển thị bên trái tiêu đề. */
+  icon?: string
   /** Vô hiệu hóa tab. */
   disabled?: boolean
   /** Số hoặc chữ nhỏ hiển thị cạnh tiêu đề (vd: số thông báo). */
@@ -120,6 +122,13 @@ async function onKeydown(e: KeyboardEvent, index: number) {
         @click="select(tab)"
         @keydown="onKeydown($event, index)"
       >
+        <img
+          v-if="tab.icon"
+          :src="tab.icon"
+          alt=""
+          aria-hidden="true"
+          class="h-4 w-4 shrink-0 object-contain"
+        />
         <!-- Slot tùy biến tiêu đề: <template #label="{ tab, active }"> -->
         <slot name="label" :tab="tab" :active="tab.key === activeKey">
           {{ tab.label }}

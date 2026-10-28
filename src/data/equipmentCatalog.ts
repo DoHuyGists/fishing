@@ -5,6 +5,7 @@ export interface EquipmentVariant {
   name: string;
   detail: string;
   icon: string;
+  image?: string | null;
   rodMaxWeight?: number;
   lineMaxWeight?: number;
   reelDurability?: number;
@@ -12,12 +13,12 @@ export interface EquipmentVariant {
   baitName?: string;
 }
 
-export const equipmentCategories: { id: FishingTool; name: string; }[] = [
-  { id: "rod", name: "Cần câu"},
-  { id: "line", name: "Dây câu"},
-  { id: "reel", name: "Cuộn câu"},
-  { id: "hook", name: "Móc câu"},
-  { id: "bait", name: "Mồi câu"},
+export const equipmentCategories: { id: FishingTool; name: string; icon: string}[] = [
+  { id: "rod", name: "Cần câu", icon: "/icons/items/rod.svg"},
+  { id: "line", name: "Dây câu", icon: "/icons/items/line.svg"},
+  { id: "reel", name: "Cuộn câu", icon: "/icons/items/reel.svg"},
+  { id: "hook", name: "Móc câu", icon: "/icons/items/hook.svg"},
+  { id: "bait", name: "Mồi câu", icon: "/icons/items/bait.svg"},
 ];
 
 // Seed data used only to bootstrap a brand-new user's row in Supabase; live data always comes from the DB afterwards.

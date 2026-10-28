@@ -63,8 +63,7 @@ onBeforeUnmount(() => {
       <FishingScene />
       <section class="control-deck">
         <div class="side-panel">
-          <div class="equipment-heading flex justify-between items-center mx-[3px]">
-            <span class="text-[#f1e6b7] text-[11px] font-black tracking-[0.08em] uppercase">Trang bị</span>
+          <div class="flex justify-between items-center mx-[3px]">
             <button
               type="button"
               class="equipment-toggle"
@@ -175,10 +174,6 @@ onBeforeUnmount(() => {
 
   .side-panel {
     padding: 9px;
-  }
-
-  .equipment-heading {
-    margin-bottom: 7px;
   }
 
   .equipment-toggle {

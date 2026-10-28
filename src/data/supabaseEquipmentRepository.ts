@@ -28,6 +28,7 @@ class SupabaseEquipmentRepository {
           name: item.name ?? "",
           detail: item.detail ?? item.information ?? "",
           icon: item.icon ?? item.image ?? "❔",
+          image: item.image ?? null,
         };
       });
 

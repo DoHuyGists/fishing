@@ -2,6 +2,7 @@
 import { computed, onBeforeUnmount, onMounted, ref, watch } from "vue";
 import { isPointInWater } from "../../data/fishingMap";
 import { useFishingStore } from "../../stores/fishing";
+import { useEquipmentStore } from "../../stores/equipment";
 import { onBeforeRouteLeave, useRouter } from "vue-router";
 import ZoneWeather from "./ZoneWeather.vue";
 import { supabaseUserInAreaRepository } from "../../data/supabaseUserInAreaRepository";
@@ -23,6 +24,7 @@ const waterBoundaryPoints = computed(() => waterBoundary.value.map(({ x, y }) =>
 const router = useRouter();
 const dayPhaseStore = useDayPhaseStore();
 const fishingStore = useFishingStore();
+const equipmentStore = useEquipmentStore();
 const isLeaving = ref(false);
 const showExitConfirmation = ref(false);
 const userInAreaStore = useUserInAreaStore();
@@ -79,6 +81,12 @@ const rodLineOffset = {
 const ripple = ref(false);
 const invalidTap = ref(false);
 const castClass = computed(() => `phase-${fishingStore.castPhase}`);
+const selectedRodImage = computed(() => {
+  const selectedRod = equipmentStore.variants.rod.find(
+    (rod) => rod.id === fishingStore.equipmentLoadout.rod,
+  );
+  return selectedRod?.image || "/fishing-rob.png";
+});
 const linePath = computed(() => {
   const { x, y } = fishingStore.baitPosition;
   const endX = x + biteOffset.value.x;
@@ -233,13 +241,6 @@ function handleClickOnScene(event: MouseEvent) {
         </div>
       </div>
       <div class="flex gap-1 justify-end flex-wrap">
-        <button type="button" class="guide-button" @click.stop="fishingStore.openLakeGuide">Cá trong hồ</button>
-        <button type="button" class="players-button" @click.stop="fishingStore.openPlayers">
-          Người câu <b>{{ fishingStore.nearbyPlayers.length }}</b>
-        </button>
-        <button type="button" class="bag-button" @click.stop="fishingStore.openBag">
-          Túi cá <b>{{ fishingStore.inventory.length }}</b>
-        </button>
         <label v-if="environment == 'Development'" class="select-none cursor-pointer">Dev mode <input
             v-model="isDevMode" type="checkbox" /> </label>
       </div>
@@ -263,7 +264,7 @@ function handleClickOnScene(event: MouseEvent) {
       <span></span>
     </div>
     <div class="rod-holder" :class="castClass" aria-hidden="true">
-      <img src="/fishing-rob.png" alt="" class="fishing-rod" />
+      <img :src="selectedRodImage" alt="" class="fishing-rod" />
       <span ref="rodLineAnchor" class="rod-line-anchor"></span>
     </div>
     <div class="bite-alert" :class="{ visible: fishingStore.castPhase === 'bite' }">! CÁ CẮN CÂU !</div>
@@ -402,56 +403,6 @@ function handleClickOnScene(event: MouseEvent) {
   height: 3px;
   border-radius: 50%;
   background: #d6dfd8;
-}
-
-.bag-button {
-  padding: 10px 12px;
-  border: 1px solid rgba(255, 255, 255, 0.2);
-  border-radius: 12px;
-  background: rgba(17, 38, 27, 0.72);
-  box-shadow: 0 6px 18px rgba(9, 20, 14, 0.16);
-  color: white;
-  cursor: pointer;
-  font-size: 11px;
-  font-weight: 800;
-  backdrop-filter: blur(10px);
-}
-
-.players-button {
-  padding: 10px 12px;
-  border: 1px solid rgba(255, 255, 255, 0.2);
-  border-radius: 12px;
-  background: rgba(17, 38, 27, 0.72);
-  box-shadow: 0 6px 18px rgba(9, 20, 14, 0.16);
-  color: white;
-  cursor: pointer;
-  font-size: 11px;
-  font-weight: 800;
-  backdrop-filter: blur(10px);
-}
-
-.players-button b {
-  display: inline-grid;
-  place-items: center;
-  min-width: 17px;
-  height: 17px;
-  margin-left: 4px;
-  border-radius: 50%;
-  background: #78c6b1;
-  color: #173c31;
-  font-size: 10px;
-}
-
-.bag-button b {
-  display: inline-grid;
-  place-items: center;
-  min-width: 17px;
-  height: 17px;
-  margin-left: 4px;
-  border-radius: 50%;
-  background: #eebd55;
-  color: #244635;
-  font-size: 10px;
 }
 
 .scene-instruction {
@@ -596,7 +547,7 @@ function handleClickOnScene(event: MouseEvent) {
 .fishing-rod {
   width: 100%;
   height: 100%;
-  object-fit: contain;
+  object-fit: cover;
   object-position: bottom;
   mix-blend-mode: multiply;
   filter: drop-shadow(-5px 7px 5px rgba(0, 0, 0, 0.25));
@@ -801,19 +752,6 @@ function handleClickOnScene(event: MouseEvent) {
     transform: scale(1.65);
     opacity: 0.45;
   }
-}
-
-.guide-button {
-  padding: 10px 12px;
-  border: 1px solid rgba(255, 255, 255, 0.2);
-  border-radius: 12px;
-  background: rgba(17, 38, 27, 0.72);
-  box-shadow: 0 6px 18px rgba(9, 20, 14, 0.16);
-  color: white;
-  cursor: pointer;
-  font-size: 11px;
-  font-weight: 800;
-  backdrop-filter: blur(10px);
 }
 
 @media (max-width: 620px) {

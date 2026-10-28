@@ -15,9 +15,7 @@ const store = useFishingStore();
           role="dialog" aria-modal="true" aria-labelledby="players-title">
           <header class="flex justify-between px-5 pt-[19px] pb-3 border-b border-[rgba(223,241,207,0.14)]">
             <div>
-              <p class="m-0 text-[#e8bd62] text-[10px] font-black tracking-[0.16em] uppercase">Cùng bãi câu</p>
-              <h2 id="players-title" class="mt-1.5 mb-0 text-xl">Người chơi đang câu ({{ store.nearbyPlayers.length }})
-              </h2>
+              <h2 id="players-title" class="m-0 text-xl">Người chơi đang câu ({{ store.nearbyPlayers.length }})</h2>
             </div>
             <button type="button"
               class="w-[29px] h-[29px] border-0 rounded-full bg-[rgba(235,243,219,0.13)] text-white cursor-pointer text-[22px] leading-none"

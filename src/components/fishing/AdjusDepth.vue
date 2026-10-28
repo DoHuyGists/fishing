@@ -1,13 +1,14 @@
 <script setup lang="ts">
 import { computed, onBeforeUnmount, onMounted, ref, watch } from "vue";
-import { FISHING_DEPTH_CONFIG, getDepthLayer } from "../../data/fishingDepth";
+import { getDepthLayer } from "../../data/fishingDepth";
 import { useFishingStore } from "../../stores/fishing";
 
 const store = useFishingStore();
+const depthConfig = computed(() => store.depthConfig);
 const draftDepth = ref(store.appliedDepthMeters);
 const depth = computed(() => Number(draftDepth.value));
-const layer = computed(() => getDepthLayer(depth.value));
-const depthPercent = computed(() => (depth.value / FISHING_DEPTH_CONFIG.maxMeters) * 100);
+const layer = computed(() => getDepthLayer(depth.value, depthConfig.value));
+const depthPercent = computed(() => (depth.value / depthConfig.value.maxMeters) * 100);
 const formattedDepth = computed(() => new Intl.NumberFormat("vi-VN", { maximumFractionDigits: 1 }).format(depth.value));
 const errorMessage = ref("");
 let depthPreviewTimeout: ReturnType<typeof setTimeout> | undefined;
@@ -34,6 +35,10 @@ watch(() => store.depthAdjusterOpen, (isOpen) => {
         store.isLoadingDepthPreview = false;
     }
 });
+
+watch(() => store.canAdjustDepth, (canAdjust) => {
+    if (!canAdjust) close();
+}, { immediate: true });
 
 watch(depth, (castDepth) => {
     if (store.depthAdjusterOpen) scheduleDepthPreview(castDepth);
@@ -67,7 +72,7 @@ onBeforeUnmount(() => {
 <template>
     <Teleport to="body">
         <Transition name="depth-dialog">
-            <div v-if="store.depthAdjusterOpen" class="fixed inset-0 z-[45] grid place-items-center overflow-y-auto bg-[rgba(3,15,11,0.78)] p-3 backdrop-blur-[7px] sm:p-5" @click.self="close">
+            <div v-if="store.depthAdjusterOpen && store.canAdjustDepth" class="fixed inset-0 z-[45] grid place-items-center overflow-y-auto bg-[rgba(3,15,11,0.78)] p-3 backdrop-blur-[7px] sm:p-5" @click.self="close">
                 <section class="depth-panel w-[min(980px,100%)] overflow-hidden rounded-[22px] border border-[#315b4d] bg-[#071f1a] text-[#e8f2ed] shadow-[0_28px_90px_rgba(0,0,0,0.58)]" role="dialog" aria-modal="true" aria-labelledby="depth-title">
                     <header class="flex items-center justify-between border-b border-white/10 px-5 py-3.5 sm:px-6">
                         <h2 id="depth-title" class="m-0 flex items-center gap-2.5 text-base font-bold"><span class="text-[#5ad0b3]" aria-hidden="true">≋</span>Điều chỉnh độ sâu</h2>
@@ -81,12 +86,12 @@ onBeforeUnmount(() => {
                                     <div class="water-surface"><span></span></div>
                                     <div class="fishing-line" :style="{ height: `${depthPercent}%` }"></div>
                                     <div class="bait-marker" :style="{ top: `${depthPercent}%` }" aria-label="Mồi câu ở độ sâu đã chọn">●</div>
-                                    <span v-for="tick in FISHING_DEPTH_CONFIG.ticksMeters" :key="tick" class="depth-tick" :class="{
+                                    <span                                     v-for="tick in depthConfig.ticksMeters" :key="tick" class="depth-tick" :class="{
                                         'surface-depth-tick': tick === 0,
-                                        'bottom-depth-tick': tick === FISHING_DEPTH_CONFIG.maxMeters,
-                                    }" :style="{ top: `${(tick / FISHING_DEPTH_CONFIG.maxMeters) * 100}%` }">{{ tick }} m</span>
+                                                                            'bottom-depth-tick': tick === depthConfig.maxMeters,
+                                                                        }" :style="{ top: `${(tick / depthConfig.maxMeters) * 100}%` }">{{ tick }} m</span>
                                 </div>
-                                <div class="depth-labels" aria-hidden="true"><span>0 m<small>Mặt nước</small></span><span>10 m<small>Tầng giữa</small></span><span>20 m<small>Tầng sâu</small></span><span>30 m<small>Đáy hồ</small></span></div>
+                                                                    <div class="depth-labels" aria-hidden="true"><span v-for="(tick, i) in depthConfig.ticksMeters" :key="tick">{{ tick }} m<small>{{ ['Mặt nước', 'Tầng giữa', 'Tầng sâu', 'Đáy hồ'][i] }}</small></span></div>
                             </div>
                         </section>
 
@@ -100,10 +105,10 @@ onBeforeUnmount(() => {
                             </div>
                             <div class="slider-layout">
                                 <div class="vertical-slider-wrap">
-                                    <input v-model.number="draftDepth" class="vertical-slider" type="range" min="0" :max="FISHING_DEPTH_CONFIG.maxMeters" :step="FISHING_DEPTH_CONFIG.stepMeters" aria-label="Độ sâu mồi câu" :aria-valuetext="`${formattedDepth} mét`" orient="vertical" />
+                                    <input v-model.number="draftDepth" class="vertical-slider" type="range" min="0" :max="depthConfig.maxMeters" :step="depthConfig.stepMeters" aria-label="Độ sâu mồi câu" :aria-valuetext="`${formattedDepth} mét`" orient="vertical" />
                                 </div>
                                 <div class="quick-stops">
-                                    <button v-for="stop in FISHING_DEPTH_CONFIG.quickStopsMeters" :key="stop" type="button" :aria-pressed="depth === stop" :class="{ active: depth === stop }" @click="draftDepth = stop">{{ stop }} m</button>
+                                    <button v-for="stop in depthConfig.quickStopsMeters" :key="stop" type="button" :aria-pressed="depth === stop" :class="{ active: depth === stop }" @click="draftDepth = stop">{{ stop }} m</button>
                                 </div>
                             </div>
                             <p class="m-0 text-center text-[10px] text-[#78958a]">Kéo thanh hoặc dùng phím mũi tên để chỉnh</p>
@@ -114,22 +119,22 @@ onBeforeUnmount(() => {
                                 <div>
                                     <h3 class="m-0 mb-3 text-[12px] font-bold text-[#d8e9e0]">Thông tin tầng nước</h3>
                                     <ul class="m-0 list-none space-y-2.5 p-0">
-                                        <li v-for="waterLayer in FISHING_DEPTH_CONFIG.layers" :key="waterLayer.id" class="flex items-start gap-2.5 rounded-lg px-2 py-1.5" :class="{ 'bg-white/[0.07]': layer.id === waterLayer.id }">
+                                        <li v-for="waterLayer in depthConfig.layers" :key="waterLayer.id" class="flex items-start gap-2.5 rounded-lg px-2 py-1.5" :class="{ 'bg-white/[0.07]': layer.id === waterLayer.id }">
                                             <span class="mt-1.5 h-2 w-2 shrink-0 rounded-full" :style="{ backgroundColor: waterLayer.color }"></span>
                                             <span class="min-w-0 text-[10px] leading-[1.45]"><b class="text-[#e4eee8]">{{ waterLayer.label }}</b><span class="ml-1.5 text-[#93aa9f]">{{ waterLayer.minMeters }}–{{ waterLayer.maxMeters }} m</span></span>
                                         </li>
                                     </ul>
                                 </div>
-                                <div class="md:border-t border-white/10">
+                                <div class="md:border-t md:pt-2 border-white/10">
                                     <h3 class="m-0 text-[11px] font-bold text-[#d8e9e0]">Cá có thể xuất hiện</h3>
                                     <p v-if="store.isLoadingDepthPreview" class="mb-0 mt-2 flex items-center gap-2 rounded-lg bg-black/10 px-2.5 py-2 text-[10px] text-[#91aaa0]" role="status" aria-live="polite"><span
                                             class="h-3 w-3 shrink-0 animate-spin rounded-full border-2 border-[#91aaa0]/30 border-t-[#5ad0b3]" aria-hidden="true"></span>Đang cập nhật danh sách cá ở {{ formattedDepth }} m...</p>
                                     <p v-else-if="store.depthPreviewError" class="mb-0 mt-2 rounded-lg bg-black/10 px-2.5 py-2 text-[10px] leading-relaxed text-[#ffc18b]">{{ store.depthPreviewError }}</p>
                                     <template v-else-if="store.depthPreview">
                                         <p class="mb-2 mt-1 text-[9px] text-[#91aaa0]">{{ store.depthPreview.total_species }} loài · {{ store.depthPreview.discovered_species }} đã khám phá · {{ store.depthPreview.undiscovered_species }} chưa khám phá</p>
-                                        <ul v-if="store.depthPreview.fishes.length" class="m-0 max-h-36 list-none space-y-1.5 overflow-y-auto p-0">
+                                        <ul v-if="store.depthPreview.fishes.length" class="m-0 list-none space-y-1.5 overflow-y-auto p-0">
                                             <li v-for="fish in store.depthPreview.fishes" :key="fish.species_id" class="flex items-center gap-2 rounded-lg bg-black/10 px-2 py-1.5">
-                                                <img v-if="fish.is_discovered && fish.image" :src="fish.image" :alt="fish.display_name" class="h-8 w-fit shrink-0 rounded-md object-cover" />
+                                                <img v-if="fish.is_discovered && fish.image" :src="fish.image" :alt="fish.display_name" class="h-8 w-fit shrink-0 rounded-md object-cover" draggable="false"/>
                                                 <span v-else class="grid h-8 w-8 shrink-0 place-items-center rounded-md bg-white/10 text-sm text-[#91aaa0]" aria-hidden="true">?</span>
                                                 <span class="min-w-0 flex-1">
                                                     <span class="block truncate text-[10px] font-semibold text-[#d8e9e0]">{{ fish.display_name }}</span>
@@ -149,7 +154,7 @@ onBeforeUnmount(() => {
                     <footer class="flex flex-wrap items-center justify-between gap-3 border-t border-white/10 px-4 py-3 sm:px-5">
                         <p v-if="errorMessage" class="m-0 text-[11px] text-[#ffc18b]" role="status">{{ errorMessage }}</p>
                         <p v-else-if="!store.canAdjustDepth" class="m-0 text-[11px] text-[#d5c994]">Hãy thu mồi về trước khi áp dụng thay đổi.</p>
-                        <span v-else class="text-[10px] text-[#78958a]">Độ sâu đã lưu: {{ store.appliedDepthMeters }} m · Chưa ảnh hưởng kết quả câu cá.</span>
+                        <span v-else class="text-[10px] text-[#78958a]">Độ sâu đã lưu: {{ store.appliedDepthMeters }} m</span>
                         <div class="ml-auto flex gap-2">
                             <button type="button" class="rounded-xl border border-white/15 px-4 py-2 text-[11px] font-semibold text-[#c1d3ca] transition hover:bg-white/[0.07]" @click="close">Hủy</button>
                             <button type="button" class="rounded-xl bg-gradient-to-r from-[#3f9d70] to-[#59bb79] px-5 py-2 text-[11px] font-extrabold text-white shadow-lg shadow-emerald-950/30 transition hover:brightness-110 disabled:cursor-not-allowed disabled:opacity-45"

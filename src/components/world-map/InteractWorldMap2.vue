@@ -125,7 +125,7 @@ const anchor = ref<{ lon: number; lat: number; k: number } | null>(null);
 </script>
 
 <template>
-  <div class="grid grid-cols-1 md:grid-cols-[auto_1fr] h-full gap-2">
+  <div class="grid grid-cols-1 md:grid-cols-[auto_1fr] h-fit gap-2">
     <FishingAnchor />
     <div class="flex flex-col gap-2">
       <div class="w-full h-fit overflow-hidden grid place-items-center border border-gray-300 rounded-xl">
