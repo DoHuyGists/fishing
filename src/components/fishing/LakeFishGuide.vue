@@ -55,7 +55,7 @@ const undiscoveredFishes = computed(() => store.areaSpeciesDiary?.fishes.filter(
                   <div class="mb-2 text-xs font-bold uppercase tracking-wide text-[#c7e6a5]">Đã khám phá</div>
                   <ul class="m-0 space-y-2 p-0">
                     <li v-for="fish in discoveredFishes" :key="fish.species_id" class="flex gap-3 rounded-xl border border-white/10 bg-white/[0.05] p-2.5">
-                      <img :src="fish.image || '/fish/VN/fish.jpg'" :alt="fish.display_name" class="h-14 shrink-0 rounded-lg bg-black/20 object-cover" />
+                      <img :src="fish.image || '/fish/VN/fish.jpg'" :alt="fish.display_name" class="h-14 shrink-0 rounded-lg bg-black/20 object-cover" draggable="false"/>
                       <div class="min-w-0 flex-1">
                         <p class="m-0 font-semibold">{{ fish.display_name || fish.name }}</p>
                         <p class="m-0 text-[10px] text-[#e8bd62]">{{ fish.rarity || 'Chưa rõ độ hiếm' }}</p>

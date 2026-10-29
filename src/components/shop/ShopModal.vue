@@ -13,6 +13,7 @@ const search = ref("");
 const selectedClassification = ref("ALL");
 const selectedCategory = ref("ALL");
 const sort = ref<"name" | "price-asc" | "price-desc">("name");
+const viewMode = ref<"list" | "grid" | "group">("grid");
 const selectedItemId = ref<string | null>(null);
 const quantity = ref(1);
 const busy = ref(false);
@@ -30,6 +31,19 @@ const filteredItems = computed(() => {
     (selectedCategory.value === "ALL" || item.category === selectedCategory.value)
   );
   return result.sort((a,b) => sort.value === "price-asc" ? a.price-b.price : sort.value === "price-desc" ? b.price-a.price : a.name.localeCompare(b.name,"vi"));
+});
+const displayGroups = computed(() => {
+  if (viewMode.value !== "group") return [{ category: "", items: filteredItems.value }];
+
+  const groups = new Map<string, typeof filteredItems.value>();
+  for (const item of filteredItems.value) {
+    const category = item.category?.trim() || "Khác";
+    const items = groups.get(category) ?? [];
+    items.push(item);
+    groups.set(category, items);
+  }
+
+  return [...groups].map(([category, items]) => ({ category, items })).sort((a, b) => a.category.localeCompare(b.category, "vi"));
 });
 const selectedItem = computed(() => inventoryStore.shopItems.find(item => item.id === selectedItemId.value) ?? null);
 const totalPrice = computed(() => (selectedItem.value?.price ?? 0) * quantity.value);
@@ -67,26 +81,38 @@ async function buyItem() {
           <select v-model="selectedClassification" class="rounded-lg border border-[#cbd9c6] bg-white px-3 py-2 text-sm"><option value="ALL">Mọi nhóm vật phẩm</option><option v-for="value in classifications" :key="value" :value="value">{{ value }}</option></select>
           <select v-model="selectedCategory" class="rounded-lg border border-[#cbd9c6] bg-white px-3 py-2 text-sm"><option value="ALL">Mọi loại vật phẩm</option><option v-for="value in categories" :key="value" :value="value">{{ value }}</option></select>
           <select v-model="sort" class="rounded-lg border border-[#cbd9c6] bg-white px-3 py-2 text-sm"><option value="name">Tên A–Z</option><option value="price-asc">Giá thấp đến cao</option><option value="price-desc">Giá cao đến thấp</option></select>
+          <div class="flex items-center justify-end gap-1 border-t border-[#cbd9c6]/70 pt-2 sm:col-span-2 xl:col-span-4" role="group" aria-label="Chế độ hiển thị">
+            <button type="button" class="rounded-md px-3 py-1.5 text-xs font-bold transition" :class="viewMode === 'list' ? 'bg-[#24352a] text-white' : 'text-[#24352a] hover:bg-white'" :aria-pressed="viewMode === 'list'" @click="viewMode = 'list'">Danh sách</button>
+            <button type="button" class="rounded-md px-3 py-1.5 text-xs font-bold transition" :class="viewMode === 'grid' ? 'bg-[#24352a] text-white' : 'text-[#24352a] hover:bg-white'" :aria-pressed="viewMode === 'grid'" @click="viewMode = 'grid'">Lưới</button>
+            <button type="button" class="rounded-md px-3 py-1.5 text-xs font-bold transition" :class="viewMode === 'group' ? 'bg-[#24352a] text-white' : 'text-[#24352a] hover:bg-white'" :aria-pressed="viewMode === 'group'" @click="viewMode = 'group'">Nhóm</button>
+          </div>
         </div>
         <p v-if="inventoryStore.shopLoading" class="py-16 text-center text-sm text-emerald-900/60">Đang tải vật phẩm...</p>
         <div v-else-if="!filteredItems.length" class="rounded-xl border border-dashed border-[#cbd9c6] py-16 text-center text-sm text-emerald-900/60">Không tìm thấy vật phẩm phù hợp.</div>
-        <div v-else class="grid grid-cols-2 gap-3 sm:grid-cols-3 xl:grid-cols-4">
-          <button v-for="item in filteredItems" :key="item.id" type="button" class="group overflow-hidden rounded-xl border bg-white text-left shadow-sm transition hover:-translate-y-0.5 hover:shadow-md" :class="selectedItemId === item.id ? 'border-emerald-700 ring-2 ring-emerald-700/20' : 'border-[#cbd9c6]'" @click="selectItem(item.id)">
-            <div class="grid h-32 min-w-0 place-items-center overflow-hidden bg-[#f5f9f0]">
-              <img v-if="item.image" :src="item.image" :alt="item.name" loading="lazy" class="block max-h-full max-w-full cursor-zoom-in object-contain p-2" @click.stop="openImagePreview($event, item.image, item.name)" />
-              <span v-else class="text-5xl">{{ item.icon || '🎁' }}</span>
+        <div v-else class="space-y-5">
+          <section v-for="group in displayGroups" :key="group.category || 'all-items'">
+            <h3 v-if="viewMode === 'group'" class="mb-2 mt-0 flex items-center gap-2 border-b border-[#cbd9c6] pb-2 text-sm font-extrabold uppercase tracking-wide text-emerald-900">
+              {{ group.category }} <span class="rounded-full bg-emerald-100 px-2 py-0.5 text-[10px]">{{ group.items.length }}</span>
+            </h3>
+            <div :class="viewMode === 'list' ? 'flex flex-col gap-3' : 'grid grid-cols-1 gap-3 sm:grid-cols-2'">
+              <button v-for="item in group.items" :key="item.id" type="button" class="group flex w-full min-w-0 overflow-hidden rounded-xl border bg-white text-left shadow-sm transition hover:-translate-y-0.5 hover:shadow-md" :class="selectedItemId === item.id ? 'border-emerald-700 ring-2 ring-emerald-700/20' : 'border-[#cbd9c6]'" @click="selectItem(item.id)">
+                <div class="grid h-28 w-24 shrink-0 place-items-center overflow-hidden bg-[#f5f9f0] sm:h-32 sm:w-28">
+                  <img v-if="item.image" :src="item.image" :alt="item.name" loading="lazy" class="block h-full w-full cursor-zoom-in object-contain p-2" :class="{ 'scale-[2.5]': item.category?.trim().toLocaleLowerCase() === 'hook' }" @click.stop="openImagePreview($event, item.image, item.name)" />
+                  <span v-else class="text-5xl">{{ item.icon || '🎁' }}</span>
+                </div>
+                <div class="flex min-w-0 flex-1 flex-col p-3">
+                  <p v-if="item.classification" class="m-0 text-[10px] font-bold uppercase tracking-wide text-emerald-800">{{ item.classification }}</p>
+                  <h3 class="m-0 truncate text-sm font-extrabold" :title="item.name">{{ item.name }}</h3>
+                  <p class="m-0 mt-1 line-clamp-2 text-xs text-emerald-950/65">{{ item.information }}</p>
+                  <div class="mt-auto flex items-center justify-between gap-1 border-t border-[#cbd9c6]/70 pt-2 text-xs">
+                    <span class="rounded bg-emerald-50 px-1.5 py-0.5 text-emerald-900">{{ item.category || 'Vật phẩm' }}</span>
+                    <strong class="whitespace-nowrap text-amber-700">{{ item.price.toLocaleString('vi-VN') }} đ</strong>
+                  </div>
+                  <p v-if="item.quantity != null" class="m-0 mt-1 text-[10px] text-emerald-950/55">Còn {{ item.quantity.toLocaleString('vi-VN') }}</p>
+                </div>
+              </button>
             </div>
-            <div class="p-3">
-              <p v-if="item.classification" class="m-0 text-[10px] font-bold uppercase tracking-wide text-emerald-800">{{ item.classification }}</p>
-              <h3 class="m-0 truncate text-sm font-extrabold" :title="item.name">{{ item.name }}</h3>
-              <p class="mt-1 line-clamp-2 min-h-8 text-xs text-emerald-950/65">{{ item.information }}</p>
-              <div class="mt-2 flex items-center justify-between gap-1 border-t border-[#cbd9c6]/70 pt-2 text-xs">
-                <span class="rounded bg-emerald-50 px-1.5 py-0.5 text-emerald-900">{{ item.category || 'Vật phẩm' }}</span>
-                <strong class="whitespace-nowrap text-amber-700">{{ item.price.toLocaleString('vi-VN') }} đ</strong>
-              </div>
-              <p v-if="item.quantity != null" class="mb-0 mt-1 text-[10px] text-emerald-950/55">Còn {{ item.quantity.toLocaleString('vi-VN') }}</p>
-            </div>
-          </button>
+          </section>
         </div>
       </section>
       <aside class="h-fit rounded-xl border border-[#cbd9c6] bg-[#f5f9f0] p-4 lg:sticky lg:top-0">
