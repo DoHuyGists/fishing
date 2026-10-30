@@ -66,6 +66,17 @@ class SupabaseFeedbackRepository {
     if (!data) throw new Error("Không tìm thấy báo lỗi để cập nhật hoặc bạn không có quyền cập nhật.");
   }
 
+  async createErrorFeedbackSignedUrls(paths: string[]): Promise<Record<string, string>> {
+    const results = await Promise.all(
+      paths.map(async (path) => {
+        const { data, error } = await supabase.storage.from("error-feedback").createSignedUrl(path, 60 * 60);
+        if (error) throw new Error(error.message);
+        return [path, data.signedUrl] as const;
+      }),
+    );
+    return Object.fromEntries(results);
+  }
+
   async createOpinionFeedback(payload: OpinionFeedbackPayload) {
     const { error } = await supabase.from("feedback").insert({
       user_id: payload.userId,

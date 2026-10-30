@@ -12,9 +12,49 @@ export interface NotificationRow {
   is_read: boolean;
 }
 
-type NotificationKind = "personal" | "system";
+export type NotificationKind = "personal" | "system";
+
+export interface AdminNotificationRow {
+  id: string;
+  title: string;
+  body: string;
+  type: string | null;
+  data: Record<string, unknown> | null;
+  created_at: string;
+  user_id?: string;
+  expires_at?: string | null;
+  is_read?: boolean;
+}
+
+export type AdminNotificationPayload = Partial<Record<string, string | null>>;
+
+const adminTable = (kind: NotificationKind) => (kind === "system" ? "system_notifications" : "personal_notifications");
 
 class SupabaseNotificationRepository {
+  async fetchAdminNotifications(kind: NotificationKind): Promise<AdminNotificationRow[]> {
+    const columns =
+      kind === "system"
+        ? "id,title,body,type,data,created_at,expires_at"
+        : "id,user_id,title,body,type,data,is_read,created_at";
+    const { data, error } = await supabase
+      .from(adminTable(kind))
+      .select(columns)
+      .order("created_at", { ascending: false });
+    if (error) throw new Error(error.message);
+    return (data ?? []) as unknown as AdminNotificationRow[];
+  }
+
+  async saveAdminNotification(kind: NotificationKind, id: string | null, payload: AdminNotificationPayload) {
+    const table = supabase.from(adminTable(kind));
+    const { error } = id ? await table.update(payload).eq("id", id) : await table.insert(payload);
+    if (error) throw new Error(error.message);
+  }
+
+  async deleteAdminNotification(kind: NotificationKind, id: string) {
+    const { error } = await supabase.from(adminTable(kind)).delete().eq("id", id);
+    if (error) throw new Error(error.message);
+  }
+
   async fetchNotifications(userId: string): Promise<{ personal: NotificationRow[]; system: NotificationRow[] }> {
     const now = new Date().toISOString();
     const [personalResult, systemResult, readsResult] = await Promise.all([
