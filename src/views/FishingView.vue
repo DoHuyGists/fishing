@@ -1,13 +1,13 @@
 <script setup lang="ts">
 import { storeToRefs } from "pinia";
 import { onBeforeUnmount, onMounted, ref, watch } from "vue";
-import EquipmentMenu from "../components/fishing/EquipmentMenu.vue";
-import CatchDialog from "../components/fishing/CatchDialog.vue";
-import FishingBag from "../components/fishing/FishingBag.vue";
-import FishingPlayers from "../components/fishing/FishingPlayers.vue";
-import FishingScene from "../components/fishing/FishingScene.vue";
-import LakeFishGuide from "../components/fishing/LakeFishGuide.vue";
-import PowerMeter from "../components/fishing/PowerMeter.vue";
+import EquipmentMenu from "../components/player/fishing/EquipmentMenu.vue";
+import CatchDialog from "../components/player/fishing/CatchDialog.vue";
+import FishingBag from "../components/player/fishing/FishingBag.vue";
+import FishingPlayers from "../components/player/fishing/FishingPlayers.vue";
+import FishingScene from "../components/player/fishing/FishingScene.vue";
+import LakeFishGuide from "../components/player/fishing/LakeFishGuide.vue";
+import PowerMeter from "../components/player/fishing/PowerMeter.vue";
 import { useAuthStore } from "../stores/auth";
 import { useEquipmentStore } from "../stores/equipment";
 

@@ -1,6 +1,6 @@
 ﻿<script lang="ts" setup>
 import { onMounted } from "vue";
-import EventThumbnail from "../../event/EventThumbnail.vue";
+import EventThumbnail from "../../player/event/EventThumbnail.vue";
 import EventScheduleForm from "./EventScheduleForm.vue";
 import { useAdminEventScheduleStore } from "./admin-event-schedule-store";
 

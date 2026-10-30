@@ -128,7 +128,9 @@ onBeforeUnmount(() => activeTimers.forEach(clearTimeout));
             >{{ icons[toast.variant] }}</span
           >
           <div class="min-w-0 flex-1">
-            <strong v-if="toast.title" class="mb-1 block text-sm font-bold leading-snug tracking-[0.01em]">{{ toast.title }}</strong>
+            <strong v-if="toast.title" class="mb-1 block text-sm font-bold leading-snug tracking-[0.01em]">{{
+              toast.title
+            }}</strong>
             <p class="m-0 break-words text-sm leading-relaxed text-[#526354]">{{ toast.message }}</p>
             <button
               v-if="toast.action"

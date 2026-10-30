@@ -1,7 +1,7 @@
 <script lang="ts" setup>
 import { computed, ref, watch } from "vue";
 import { mapData } from "../../../data/map.ts";
-import InteractWorldMap2 from "../../world-map/InteractWorldMap2.vue";
+import InteractWorldMap2 from "../../player/world-map/InteractWorldMap2.vue";
 import { useAdminFishingAreaStore } from "./admin-fishing-area-store.ts";
 import FishingAreaManagementForm from "./FishingAreaManagementForm.vue";
 import { useWorld2Store } from "../../../stores/world2.ts";

@@ -1,5 +1,5 @@
 import { defineStore } from "pinia";
-import type { Reward } from "../components/spin-wheel/SpinWheel.vue";
+import type { Reward } from "../components/player/spin-wheel/SpinWheel.vue";
 import { supabaseUserInventoryRepository } from "../data/supabaseUserInventoryRepository.ts";
 import { supabaseItemRepository } from "../data/supabaseItemRepository.ts";
 
