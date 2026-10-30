@@ -120,7 +120,9 @@ watch(
     </div>
 
     <!-- Toolbar -->
-    <div class="px-6 py-3 bg-gray-50 border-b border-gray-200 flex flex-wrap items-center gap-3 shrink-0">
+    <div
+      v-if="!adminFishingAreaStore.isFormOpen"
+      class="px-6 py-3 bg-gray-50 border-b border-gray-200 flex flex-wrap items-center gap-3 shrink-0">
       <div class="relative flex-1 min-w-55">
         <input
           v-model="search"
@@ -281,11 +283,8 @@ watch(
           </table>
         </div>
       </div>
-      <div v-else class="flex gap-2 p-2">
-        <div class="flex-1 min-w-0">
-          <InteractWorldMap2 />
-        </div>
-
+      <div v-else class="grid grid-cols-2 gap-2 p-2 w-full">
+        <InteractWorldMap2 />
         <!-- Form panel -->
         <FishingAreaManagementForm />
       </div>
