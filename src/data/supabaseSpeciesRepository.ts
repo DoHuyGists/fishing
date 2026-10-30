@@ -15,7 +15,7 @@ export interface SpeciesRow {
   base_catch_rate: number | null;
 }
 
-export type SpeciesPayload = Omit<SpeciesRow, "id" | "created_at">;
+export type SpeciesPayload = Omit<SpeciesRow, "id" | "created_at" | "3d"> & Partial<Pick<SpeciesRow, "3d">>;
 
 class SupabaseSpeciesRepository {
   async fetchAll(): Promise<SpeciesRow[]> {

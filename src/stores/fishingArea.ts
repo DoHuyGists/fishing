@@ -6,8 +6,6 @@ export interface FishingArea {
   created_at: string; // timestamp with time zone (ISO string)
   country_id: string; // text
   is_available: boolean; // boolean
-  x: number; // double precision
-  y: number; // double precision
   title: string | null; // text null
   location: any | null; // jsonb null (có thể thay bằng type cụ thể nếu bạn có cấu trúc JSON rõ ràng)
   scene_path: string | null; // text null

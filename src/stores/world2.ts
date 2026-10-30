@@ -23,6 +23,8 @@ export const useWorld2Store = defineStore("world2", {
     anchorable: true,
     selectedCoordinate: null as { x: number; y: number } | null,
     selectedCountry: null as { id: string; title: string } | null,
+    pickedLocation: null as Location | null,
+    pickVersion: 0,
     showAnchorSelectButton: false,
   }),
   getters: {},
@@ -33,6 +35,13 @@ export const useWorld2Store = defineStore("world2", {
       this.anchorable = true;
       this.selectedCountry = null;
       this.selectedCoordinate = null;
+      this.pickedLocation = null;
+    },
+
+    // pickVersion tăng mỗi lần người dùng click chọn để form phân biệt với việc set từ code
+    setPickedLocation(location: Location | null, byUser = false) {
+      this.pickedLocation = location;
+      if (byUser) this.pickVersion++;
     },
 
     disabledInteraction() {

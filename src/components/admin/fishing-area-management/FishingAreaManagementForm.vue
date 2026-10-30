@@ -1,18 +1,62 @@
 
 
 <script lang="ts" setup>
-import { computed, onMounted, ref, watch } from "vue";
+import { computed, onMounted, onUnmounted, ref, watch } from "vue";
 import { mapData } from "../../../data/map.ts";
 import type { FishingAreaPayload } from "../../../data/supabaseFishingAreaRepository.ts";
-import { useWorldStore } from "../../../stores/world.ts";
+import { useWorld2Store } from "../../../stores/world2.ts";
+import { useAdminZoneStore } from "../zone-management/admin-zone-store.ts";
 import { useAdminFishingAreaStore } from "./admin-fishing-area-store.ts";
 
-const worldStore = useWorldStore();
+const worldStore = useWorld2Store();
+const zoneStore = useAdminZoneStore();
 const fishingAreaStore = useAdminFishingAreaStore();
 const adminFishingAreaStore = fishingAreaStore;
 const isSaving = ref(false);
 const formError = ref("");
+const isBoundaryPickerOpen = ref(false);
+const boundaryDraft = ref<Array<{ x: number; y: number }>>([]);
+const sceneImageError = ref(false);
+const sceneImageUrl = computed(() => {
+  const scenePath = adminFishingAreaStore.target?.scenePath?.trim().replace(/\\/g, "/").replace(/\/+$/, "");
+  return scenePath ? `${scenePath}/day.png` : "";
+});
 
+function openBoundaryPicker() {
+  const currentBoundary = adminFishingAreaStore.target?.fishingBoundary;
+  const hasValidBoundary =
+    Array.isArray(currentBoundary) &&
+    currentBoundary.length > 0 &&
+    currentBoundary.every(
+      (point) => point && typeof point.x === "number" && typeof point.y === "number",
+    );
+
+  boundaryDraft.value = hasValidBoundary
+    ? currentBoundary.map(({ x, y }) => ({ x, y }))
+    : [
+        { x: 0, y: 100 },
+        { x: 0, y: 100 },
+      ];
+  sceneImageError.value = false;
+  isBoundaryPickerOpen.value = true;
+}
+
+function addBoundaryPoint(event: MouseEvent) {
+  const image = event.currentTarget as HTMLImageElement;
+  const bounds = image.getBoundingClientRect();
+  const point = {
+    x: ((event.clientX - bounds.left) / bounds.width) * 100,
+    y: ((event.clientY - bounds.top) / bounds.height) * 100,
+  };
+  const insertIndex = boundaryDraft.value.length - 2;
+  boundaryDraft.value.splice(insertIndex, 0, point);
+}
+
+function finishBoundarySelection() {
+  if (!adminFishingAreaStore.target) return;
+  adminFishingAreaStore.target.fishingBoundary = boundaryDraft.value.map(({ x, y }) => ({ x, y }));
+  isBoundaryPickerOpen.value = false;
+}
 
 function buildPayload(): FishingAreaPayload | null {
   if(!adminFishingAreaStore.target) return null;
@@ -23,11 +67,9 @@ function buildPayload(): FishingAreaPayload | null {
   }
 
   let location: any = null;
-  try {
-    // location = JSON.parse(adminFishingAreaStore.target.location);
-    location = adminFishingAreaStore.target.location;
-  } catch {
-    formError.value = "Location không đúng định dạng JSON";
+  location = adminFishingAreaStore.target.location;
+  if (typeof location?.lon !== "number" || typeof location?.lat !== "number" || typeof location?.k !== "number") {
+    formError.value = "Vui lòng chọn vị trí trên bản đồ";
     return null;
   }
 
@@ -47,11 +89,18 @@ function buildPayload(): FishingAreaPayload | null {
     return null;
   }
 
+  const rawDepth = adminFishingAreaStore.target.maxDepth as number | string | null;
+  const maxDepth = rawDepth === null || rawDepth === "" ? null : Number(rawDepth);
+  if (maxDepth !== null && (!Number.isFinite(maxDepth) || maxDepth < 0)) {
+    formError.value = "Độ sâu tối đa phải là số không âm";
+    return null;
+  }
+
   return {
+    zoneId: adminFishingAreaStore.target.zoneId || null,
+    maxDepth,
     countryId: adminFishingAreaStore.target.countryId,
     isAvailable: adminFishingAreaStore.target.isAvailable,
-    x: Number(adminFishingAreaStore.target.x),
-    y: Number(adminFishingAreaStore.target.y),
     title: adminFishingAreaStore.target.title?.trim() || null,
     location,
     scenePath: adminFishingAreaStore.target.scenePath?.trim() || null,
@@ -89,48 +138,33 @@ const countryOptions = computed(() =>
     .sort((a, b) => a.name.localeCompare(b.name)),
 );
 
-// Đồng bộ từ bản đồ vào form tạo
+// Đồng bộ từ bản đồ vào form (chỉ lấy lon, lat, k)
 watch(
-  [
-    () => worldStore.selectedCoordinate, 
-    () => worldStore.zoom, 
-    () => worldStore.pan,
-    () => worldStore.selectedCountry
-  ],
-  ([newSelectedLocation, newZoom, newPan, newCountry]) => {
-    if(!adminFishingAreaStore.target) return;
-
-    if(adminFishingAreaStore.isFormLock === false){
-      if(worldStore.isAnchorMode && newSelectedLocation && newCountry){
-        const X = Math.round(newSelectedLocation.x);
-        const Y = Math.round(newSelectedLocation.y);
-        adminFishingAreaStore.target.x = X;
-        adminFishingAreaStore.target.y = Y;
-        adminFishingAreaStore.target.countryId = newCountry.id;
-        adminFishingAreaStore.target.title = `${newCountry.title} - ${X}:${Y}`;
-        adminFishingAreaStore.target.scenePath = `/area/${newCountry.id}/${X}.${Y}`;
-        adminFishingAreaStore.target.fishingBoundary = []
-      }
-      if(worldStore.didDrag || worldStore.isZooming){
-        adminFishingAreaStore.target.location = {
-          zoom: newZoom,
-          pan: newPan
-        };
-      }
-    }
-  }, {deep: true}
+  () => worldStore.pickVersion,
+  () => {
+    const picked = worldStore.pickedLocation;
+    if (!adminFishingAreaStore.target || adminFishingAreaStore.isFormLock !== false) return;
+    if (!worldStore.isAnchorMode || !picked) return;
+    adminFishingAreaStore.target.location = { k: picked.k, lat: picked.lat, lon: picked.lon };
+  },
 );
 
 // Đồng bộ từ form cập nhật ra bản đồ
-watch([
-  ()=>adminFishingAreaStore.target,
-], 
-([area])=>{
-  if(area != null && adminFishingAreaStore.isUpdate){
-   worldStore.setWorldSelectedCoordinate({x: area.x, y: area.y});
-   worldStore.handleMoveToArea(area);
-  }
-}, {deep:true, immediate: true})
+watch(
+  () => (adminFishingAreaStore.isUpdate ? adminFishingAreaStore.target?.id : null),
+  () => {
+    const area = adminFishingAreaStore.target;
+    if (!area || !adminFishingAreaStore.isUpdate) return;
+    const loc = area.location;
+    if (typeof loc?.lon === "number" && typeof loc?.lat === "number" && typeof loc?.k === "number") {
+      worldStore.setPickedLocation({ k: loc.k, lat: loc.lat, lon: loc.lon });
+      worldStore.handleMoveToArea(area);
+    } else {
+      worldStore.setPickedLocation(null);
+    }
+  },
+  { immediate: true },
+);
 
 watch(()=>adminFishingAreaStore.isFormLock, (isFormLock)=>{
   if(isFormLock){
@@ -143,7 +177,13 @@ watch(()=>adminFishingAreaStore.isFormLock, (isFormLock)=>{
 
 onMounted(()=>{
   worldStore.showAnchorSelectButton = true;
+  if (!zoneStore.items.length) zoneStore.fetchAll();
 })
+
+onUnmounted(() => {
+  worldStore.showAnchorSelectButton = false;
+  worldStore.resetDefault();
+});
 
 </script>
 
@@ -196,27 +236,31 @@ onMounted(()=>{
       </select>
     </div>
 
-    <div class="grid grid-cols-2 gap-3">
-      <div class="flex flex-col gap-1.5">
-        <label class="text-[11px] font-bold text-gray-500 uppercase">Toạ độ X</label>
-        <input
-          v-model.number="adminFishingAreaStore.target.x"
-          type="number"
-          step="any"
-          class="px-3 py-1.5 border border-gray-300 rounded-lg text-xs focus:outline-none focus:border-emerald-500"
-          :disabled="adminFishingAreaStore.isFormLock"
-        />
-      </div>
-      <div class="flex flex-col gap-1.5">
-        <label class="text-[11px] font-bold text-gray-500 uppercase">Toạ độ Y</label>
-        <input
-          v-model.number="adminFishingAreaStore.target.y"
-          type="number"
-          step="any"
-          class="px-3 py-1.5 border border-gray-300 rounded-lg text-xs focus:outline-none focus:border-emerald-500"
-          :disabled="adminFishingAreaStore.isFormLock"
-        />
-      </div>
+    <div class="flex flex-col gap-1.5">
+      <label class="text-[11px] font-bold text-gray-500 uppercase">Vùng (zone)</label>
+      <select
+        v-model="adminFishingAreaStore.target.zoneId"
+        class="px-3 py-1.5 border border-gray-300 rounded-lg text-xs bg-white focus:outline-none focus:border-emerald-500"
+        :disabled="adminFishingAreaStore.isFormLock"
+      >
+        <option :value="null">-- Không chọn --</option>
+        <option v-for="zone in zoneStore.items" :key="zone.id" :value="zone.id">
+          {{ zone.name }} ({{ zone.code }})
+        </option>
+      </select>
+    </div>
+
+    <div class="flex flex-col gap-1.5">
+      <label class="text-[11px] font-bold text-gray-500 uppercase">Độ sâu tối đa (max_depth)</label>
+      <input
+        v-model.number="adminFishingAreaStore.target.maxDepth"
+        type="number"
+        min="0"
+        step="any"
+        placeholder="Ví dụ: 50"
+        :disabled="adminFishingAreaStore.isFormLock"
+        class="px-3 py-1.5 border border-gray-300 rounded-lg text-xs focus:outline-none focus:border-emerald-500"
+      />
     </div>
 
     <label class="flex items-center gap-2 text-xs font-medium text-gray-700 cursor-pointer select-none">
@@ -233,6 +277,15 @@ onMounted(()=>{
         class="px-3 py-1.5 border border-gray-300 rounded-lg text-xs focus:outline-none focus:border-emerald-500"
         :disabled="adminFishingAreaStore.isFormLock"
       />
+      <button
+        v-if="adminFishingAreaStore.target.scenePath?.trim()"
+        type="button"
+        @click="openBoundaryPicker"
+        :disabled="adminFishingAreaStore.isFormLock"
+        class="self-start px-3 py-1.5 rounded-lg border border-[#cbd9c6] bg-[#f5f9f0] text-[#24352a] text-xs font-bold hover:bg-[#eaf2e3] cursor-pointer transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+      >
+        Thiết lập vùng câu
+      </button>
     </div>
 
     <div class="flex flex-col gap-1.5">
@@ -240,7 +293,7 @@ onMounted(()=>{
       <textarea
         :value="JSON.stringify(adminFishingAreaStore.target.location ?? [], null, 2)"
         rows="7"
-        placeholder='{"x": 0, "y": 0, "zoom": 1}'
+        placeholder='{"k": 25, "lat": 10.82302, "lon": 106.62965}'
         class="px-3 py-1.5 border border-gray-300 rounded-lg text-xs font-mono focus:outline-none focus:border-emerald-500 resize-none"
         disabled
       ></textarea>
@@ -280,4 +333,87 @@ onMounted(()=>{
     </div>
   </div>
 </div>
+
+<Teleport to="body">
+  <div
+    v-if="isBoundaryPickerOpen"
+    class="fixed inset-0 z-[60] grid place-items-center bg-black/70 p-3 backdrop-blur-sm sm:p-5"
+    @click.self="isBoundaryPickerOpen = false"
+    @keydown.esc="isBoundaryPickerOpen = false"
+  >
+    <section
+      role="dialog"
+      aria-modal="true"
+      aria-labelledby="fishing-boundary-picker-title"
+      class="flex max-h-full w-full max-w-5xl flex-col overflow-hidden rounded-xl border border-[#cbd9c6] bg-[#f5f9f0] text-[#24352a] shadow-2xl"
+    >
+      <header class="flex items-center justify-between gap-3 border-b border-[#cbd9c6] px-4 py-3 sm:px-5">
+        <div>
+          <h2 id="fishing-boundary-picker-title" class="m-0 text-sm font-extrabold">Thiết lập vùng câu</h2>
+          <p class="m-0 mt-1 text-xs text-gray-600">Nhấn vào ảnh để thêm các điểm giới hạn vùng câu.</p>
+        </div>
+        <button
+          type="button"
+          @click="isBoundaryPickerOpen = false"
+          aria-label="Đóng"
+          class="text-xl leading-none text-gray-500 hover:text-gray-800"
+        >
+          &times;
+        </button>
+      </header>
+
+      <div class="flex min-h-0 flex-1 items-center justify-center overflow-auto p-3 sm:p-5">
+        <p v-if="sceneImageError" class="rounded-lg border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-700">
+          Không thể tải ảnh cảnh: {{ sceneImageUrl }}
+        </p>
+        <div v-else class="relative inline-block max-h-full max-w-full">
+          <img
+            :src="sceneImageUrl"
+            :alt="`Cảnh câu ${sceneImageUrl}`"
+            draggable="false"
+            @click="addBoundaryPoint"
+            @error="sceneImageError = true"
+            class="block max-h-[70vh] max-w-full cursor-crosshair select-none"
+          />
+          <svg
+            class="pointer-events-none absolute inset-0 h-full w-full"
+            viewBox="0 0 100 100"
+            preserveAspectRatio="none"
+            aria-hidden="true"
+          >
+            <polygon
+              :points="boundaryDraft.map(({ x, y }) => `${x},${y}`).join(' ')"
+              fill="rgba(34, 197, 94, 0.18)"
+              stroke="rgb(252, 143, 1)"
+              stroke-width="0.6"
+              stroke-dasharray="2 1"
+              vector-effect="non-scaling-stroke"
+            />
+          </svg>
+        </div>
+      </div>
+
+      <footer class="flex items-center justify-between gap-3 border-t border-[#cbd9c6] px-4 py-3 sm:px-5">
+        <span class="text-xs text-gray-600">{{ boundaryDraft.length }} điểm</span>
+        <div class="flex gap-2">
+          <button
+            type="button"
+            @click="isBoundaryPickerOpen = false"
+            class="rounded-lg border border-gray-300 bg-white px-3 py-2 text-xs font-bold text-gray-700 hover:bg-gray-100"
+          >
+            Huỷ
+          </button>
+          <button
+            type="button"
+            @click="finishBoundarySelection"
+            :disabled="sceneImageError"
+            class="rounded-lg bg-[#153221] px-3 py-2 text-xs font-bold text-white hover:bg-emerald-800 disabled:cursor-not-allowed disabled:opacity-50"
+          >
+            Hoàn tất
+          </button>
+        </div>
+      </footer>
+    </section>
+  </div>
+</Teleport>
 </template>

@@ -39,7 +39,6 @@ const currentBookEntries = computed<DiaryFishEntry[]>(() => {
       location: selectedCountry.value!.code,
       status: "Chưa khám phá",
       image: null,
-      "3d": null,
     },
     isCaught: false,
   }));

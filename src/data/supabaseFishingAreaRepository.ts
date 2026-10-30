@@ -5,23 +5,23 @@ export interface FishingAreaRow {
   createdAt: string;
   countryId: string;
   isAvailable: boolean;
-  x: number;
-  y: number;
   title: string | null;
   location: any;
   scenePath: string | null;
   fishingBoundary: any[];
+  zoneId: string | null;
+  maxDepth: number | null;
 }
 
 export interface FishingAreaPayload {
   countryId: string;
   isAvailable: boolean;
-  x: number;
-  y: number;
   title: string | null;
   location: any;
   scenePath: string | null;
   fishingBoundary: any[];
+  zoneId: string | null;
+  maxDepth: number | null;
 }
 
 function mapRow(row: any): FishingAreaRow {
@@ -30,12 +30,12 @@ function mapRow(row: any): FishingAreaRow {
     createdAt: row.created_at,
     countryId: row.country_id,
     isAvailable: row.is_available,
-    x: row.x,
-    y: row.y,
     title: row.title,
     location: row.location,
     scenePath: row.scene_path,
     fishingBoundary: row.fishing_boundary ?? [],
+    zoneId: row.zone_id ?? null,
+    maxDepth: row.max_depth == null ? null : Number(row.max_depth),
   };
 }
 
@@ -43,12 +43,12 @@ function toDbPayload(payload: FishingAreaPayload) {
   return {
     country_id: payload.countryId,
     is_available: payload.isAvailable,
-    x: payload.x,
-    y: payload.y,
     title: payload.title,
     location: payload.location,
     scene_path: payload.scenePath,
     fishing_boundary: payload.fishingBoundary,
+    zone_id: payload.zoneId,
+    max_depth: payload.maxDepth,
   };
 }
 
@@ -80,9 +80,8 @@ class SupabaseFishingAreaRepository {
     const { error } = await supabase.from("fishing_areas").delete().eq("id", id);
     if (error) throw new Error(error.message);
   }
-
   async fetchAreas(): Promise<any[]> {
-    const { data, error } = await supabase.from("fishing_areas").select("id, country_id, x, y, title, location, scene_path").eq("is_available", true).order("y", { ascending: true });
+    const { data, error } = await supabase.from("fishing_areas").select("id, country_id, title, location, scene_path").eq("is_available", true);
 
     if (error) throw new Error(error.message);
 
@@ -90,8 +89,6 @@ class SupabaseFishingAreaRepository {
 
     return data.map((x) => ({
       id: x.id,
-      x: x.x,
-      y: x.y,
       title: x.title,
       countryId: x.country_id,
       location: x.location,
@@ -99,7 +96,7 @@ class SupabaseFishingAreaRepository {
     }));
   }
   async fetchOneAreas(areaId: string): Promise<any> {
-    const { data, error } = await supabase.from("fishing_areas").select("id, country_id, x, y, title, location, scene_path, fishing_boundary, max_depth").eq("id", areaId).maybeSingle();
+    const { data, error } = await supabase.from("fishing_areas").select("id, country_id, title, location, scene_path, fishing_boundary, max_depth").eq("id", areaId).maybeSingle();
 
     if (error) throw new Error(error.message);
 
@@ -107,8 +104,6 @@ class SupabaseFishingAreaRepository {
 
     return {
       id: data.id,
-      x: data.x,
-      y: data.y,
       title: data.title,
       countryId: data.country_id,
       location: data.location,

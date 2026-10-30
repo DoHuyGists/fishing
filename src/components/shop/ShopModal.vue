@@ -97,7 +97,7 @@ async function buyItem() {
             <div :class="viewMode === 'list' ? 'flex flex-col gap-3' : 'grid grid-cols-1 gap-3 sm:grid-cols-2'">
               <button v-for="item in group.items" :key="item.id" type="button" class="group flex w-full min-w-0 overflow-hidden rounded-xl border bg-white text-left shadow-sm transition hover:-translate-y-0.5 hover:shadow-md" :class="selectedItemId === item.id ? 'border-emerald-700 ring-2 ring-emerald-700/20' : 'border-[#cbd9c6]'" @click="selectItem(item.id)">
                 <div class="grid h-28 w-24 shrink-0 place-items-center overflow-hidden bg-[#f5f9f0] sm:h-32 sm:w-28">
-                  <img v-if="item.image" :src="item.image" :alt="item.name" loading="lazy" class="block h-full w-full cursor-zoom-in object-contain p-2" :class="{ 'scale-[2.5]': item.category?.trim().toLocaleLowerCase() === 'hook' }" @click.stop="openImagePreview($event, item.image, item.name)" />
+                  <img v-if="item.image" :src="item.image" :alt="item.name" loading="lazy" class="block h-full w-full cursor-zoom-in object-contain p-2" :class="{ 'scale-[2.5]': item.category?.trim().toLocaleLowerCase() === 'hook' }" @click.stop="openImagePreview($event, item.image, item.name)" draggable="false"/>
                   <span v-else class="text-5xl">{{ item.icon || '🎁' }}</span>
                 </div>
                 <div class="flex min-w-0 flex-1 flex-col p-3">

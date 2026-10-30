@@ -8,7 +8,7 @@ export interface Species {
   status: string | null;
   name: string;
   image: string | null;
-  "3d": string | null;
+  "3d"?: string | null;
 }
 
 export interface CaughtDiary {

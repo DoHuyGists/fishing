@@ -420,9 +420,8 @@ defineExpose({ reload: loadColors, setView, resetView });
       </div>
     </div>
     <div v-if="tip.visible" class="world-map-tip" :style="{ transform: `translate(${tip.x}px, ${tip.y}px)` }">
-      <div class="world-map-tip__body">
-        <slot name="tooltip" />
-      </div>
+      <span class="world-map-tip__pulse" />
+      <span class="world-map-tip__dot" />
     </div>
   </div>
 </template>
@@ -505,14 +504,20 @@ defineExpose({ reload: loadColors, setView, resetView });
   transform: translate(-50%, -16px);
   width: 200px;
 }
-.world-map-tip__body {
-  /* căn giữa ngang, nằm phía trên điểm 10px */
-  transform: translate(-50%, calc(-100% - 10px));
-  padding: 6px 10px;
-  border-radius: 6px;
-  background: #1f2937;
-  color: #fff;
-  font-size: 13px;
-  white-space: nowrap;
+.world-map-tip__dot,
+.world-map-tip__pulse {
+  position: absolute;
+  width: 12px;
+  height: 12px;
+  margin: -6px 0 0 -6px;
+  border-radius: 50%;
+}
+.world-map-tip__dot {
+  border: 2px solid #fff;
+  background: #2563eb;
+}
+.world-map-tip__pulse {
+  background: #2563eb;
+  animation: world-map-pulse 1.5s ease-out infinite;
 }
 </style>

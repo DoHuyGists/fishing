@@ -9,18 +9,6 @@ import { supabaseUserInAreaRepository } from "../../data/supabaseUserInAreaRepos
 import { useDayPhaseStore } from "../../stores/dayPhase.ts";
 import { useUserInAreaStore } from "../../stores/userInArea.ts";
 
-const environment = import.meta.env.VITE_ENVIRONTMENT;
-
-//
-const isDevMode = ref(false);
-const waterBoundary = ref<any[]>([
-  { x: 0, y: 100 },
-  { x: 100, y: 100 },
-  { x: 0, y: 100 },
-]);
-const waterBoundaryPoints = computed(() => waterBoundary.value.map(({ x, y }) => `${x},${y}`).join(" "));
-//
-
 const router = useRouter();
 const dayPhaseStore = useDayPhaseStore();
 const fishingStore = useFishingStore();
@@ -179,16 +167,6 @@ const timeLabel = computed(() =>
   now.value.toLocaleTimeString("vi-VN", { hour: "2-digit", minute: "2-digit", second: "2-digit" }),
 );
 
-function makeBoundary(event: MouseEvent) {
-  const scene = event.currentTarget as HTMLElement;
-  const bounds = scene.getBoundingClientRect();
-  const x = ((event.clientX - bounds.left) / bounds.width) * 100;
-  const y = ((event.clientY - bounds.top) / bounds.height) * 100;
-  const insertIndex = waterBoundary.value.length - 2;
-  waterBoundary.value.splice(insertIndex, 0, { x, y });
-  console.log(waterBoundary.value);
-}
-
 function castAt(event: MouseEvent) {
   const scene = event.currentTarget as HTMLElement;
   const bounds = scene.getBoundingClientRect();
@@ -205,20 +183,12 @@ function castAt(event: MouseEvent) {
   window.setTimeout(() => (ripple.value = false), 900);
 }
 
-function handleClickOnScene(event: MouseEvent) {
-  if (isDevMode.value) {
-    makeBoundary(event);
-  } else {
-    castAt(event);
-  }
-}
-
 </script>
 
 <template>
   <section class="fishing-scene" @contextmenu.prevent="">
     <img :src="dayPhaseStore.currentScenePhace" alt="Ao câu trong rừng" class="pond-image" draggable="false" ref="sceneElement"
-      @click="handleClickOnScene" />
+      @click="castAt" />
     <div class="scene-shade"></div>
     <div class="absolute top-2 left-2 text-white flex justify-between items-start">
       <div class="flex flex-col gap-2">
@@ -240,18 +210,10 @@ function handleClickOnScene(event: MouseEvent) {
           </button>
         </div>
       </div>
-      <div class="flex gap-1 justify-end flex-wrap">
-        <label v-if="environment == 'Development'" class="select-none cursor-pointer">Dev mode <input
-            v-model="isDevMode" type="checkbox" /> </label>
-      </div>
     </div>
 
     <!-- <div class="scene-instruction">Chạm mặt hồ để vung cần đến điểm đó</div> -->
     <div class="water-glow"></div>
-    <svg v-if="isDevMode" class="water-boundary-debug" viewBox="0 0 100 100" preserveAspectRatio="none"
-      aria-hidden="true">
-      <polygon :points="waterBoundaryPoints" />
-    </svg>
     <div v-if="invalidTap" class="invalid-tap">Chọn phần mặt nước</div>
     <div v-if="ripple" class="ripple"
       :style="{ left: `${fishingStore.baitPosition.x}%`, top: `${fishingStore.baitPosition.y}%` }"></div>
@@ -430,25 +392,6 @@ function handleClickOnScene(event: MouseEvent) {
   border-radius: 50%;
   background: radial-gradient(ellipse, rgba(225, 242, 187, 0.28), transparent 68%);
   pointer-events: none;
-}
-
-.water-boundary-debug {
-  position: absolute;
-  z-index: 2;
-  inset: 0;
-  width: 100%;
-  height: 100%;
-  overflow: visible;
-  pointer-events: none;
-}
-
-.water-boundary-debug polygon {
-  fill: none;
-  /* fill: rgba(255, 255, 255, 0.219); */
-  stroke: rgb(252, 143, 1);
-  stroke-width: 0.6;
-  stroke-dasharray: 10 6;
-  vector-effect: non-scaling-stroke;
 }
 
 .invalid-tap {

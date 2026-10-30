@@ -1,14 +1,14 @@
 <script lang="ts" setup>
 import { computed, ref, watch } from "vue";
 import { mapData } from "../../../data/map.ts";
-import InteractWorldMap from "../../world-map/InteractWorldMap.vue";
+import InteractWorldMap2 from "../../world-map/InteractWorldMap2.vue";
 import { useAdminFishingAreaStore } from "./admin-fishing-area-store.ts";
 import FishingAreaManagementForm from "./FishingAreaManagementForm.vue";
-import { useWorldStore } from "../../../stores/world.ts";
+import { useWorld2Store } from "../../../stores/world2.ts";
 
 const emit = defineEmits(["close"]);
 const adminFishingAreaStore = useAdminFishingAreaStore();
-const worldStore = useWorldStore();
+const worldStore = useWorld2Store();
 const search = ref("");
 const countryFilter = ref("ALL");
 const availabilityFilter = ref<"ALL" | "AVAILABLE" | "UNAVAILABLE">("ALL");
@@ -229,7 +229,6 @@ watch(
               <tr>
                 <th class="px-4 py-2.5">Tên</th>
                 <th class="px-4 py-2.5">Quốc gia</th>
-                <th class="px-4 py-2.5">Toạ độ (x, y)</th>
                 <th class="px-4 py-2.5">Đường dẫn cảnh</th>
                 <th class="px-4 py-2.5">Vùng câu</th>
                 <th class="px-4 py-2.5">Trạng thái</th>
@@ -241,7 +240,6 @@ watch(
               <tr v-for="area in filteredAreas" :key="area.id" class="border-t border-gray-100 hover:bg-emerald-50/40">
                 <td class="px-4 py-2.5 font-semibold text-gray-800">{{ area.title || "(Chưa đặt tên)" }}</td>
                 <td class="px-4 py-2.5 text-gray-600">{{ countryName(area.countryId) }}</td>
-                <td class="px-4 py-2.5 text-gray-600">{{ area.x }}, {{ area.y }}</td>
                 <td class="px-4 py-2.5 text-gray-500 truncate max-w-45" :title="area.scenePath || ''">
                   {{ area.scenePath || "—" }}
                 </td>
@@ -284,7 +282,9 @@ watch(
         </div>
       </div>
       <div v-else class="flex gap-2 p-2">
-        <!-- <InteractWorldMap /> -->
+        <div class="flex-1 min-w-0">
+          <InteractWorldMap2 />
+        </div>
 
         <!-- Form panel -->
         <FishingAreaManagementForm />

@@ -23,7 +23,6 @@ const emptyForm = () => ({
 	location: '',
 	status: 'normal',
 	image: '',
-	model3d: '',
 	rarity: '',
 	weightMin: null as number | null,
 	weightMax: null as number | null,
@@ -38,7 +37,7 @@ const rarityOptions = computed(() => [...new Set(species.value.map((item) => ite
 const filteredSpecies = computed(() => {
 	const keyword = search.value.trim().toLocaleLowerCase();
 	return species.value.filter((item) => {
-		const matchesSearch = !keyword || [item.name, item.location, item.status, item.rarity, item.information, item.image, item['3d']]
+		const matchesSearch = !keyword || [item.name, item.location, item.status, item.rarity, item.information, item.image]
 			.some((value) => value?.toLocaleLowerCase().includes(keyword));
 		const matchesStatus = statusFilter.value === 'ALL' || item.status === statusFilter.value;
 		const matchesRarity = rarityFilter.value === 'ALL' || item.rarity === rarityFilter.value;
@@ -72,7 +71,6 @@ function openEditForm(item: SpeciesRow) {
 		location: item.location ?? '',
 		status: item.status ?? '',
 		image: item.image ?? '',
-		model3d: item['3d'] ?? '',
 		rarity: item.rarity ?? '',
 		weightMin: item.weight_min,
 		weightMax: item.weight_max,
@@ -126,7 +124,6 @@ function buildPayload(): SpeciesPayload | null {
 		location: form.location.trim() || null,
 		status: form.status.trim() || null,
 		image: form.image.trim() || null,
-		'3d': form.model3d.trim() || null,
 		rarity: form.rarity.trim() || null,
 		weight_min: weightMin,
 		weight_max: weightMax,
@@ -247,7 +244,6 @@ onMounted(loadSpecies);
 										<div class="min-w-0">
 											<div class="truncate font-bold text-gray-800" :title="item.name">{{ item.name }}</div>
 											<div class="mt-1 max-w-[22rem] truncate text-xs text-gray-500" :title="item.information || ''">{{ item.information || 'Chưa có mô tả' }}</div>
-											<div v-if="item['3d']" class="mt-1 truncate text-[10px] text-emerald-700" :title="item['3d']">3D: {{ item['3d'] }}</div>
 										</div>
 									</div>
 								</td>
@@ -304,9 +300,6 @@ onMounted(loadSpecies);
 							</label>
 							<label class="flex flex-col gap-1.5 text-xs font-bold text-gray-600 sm:col-span-2">Đường dẫn hình ảnh
 								<input v-model="form.image" type="text" placeholder="https://... hoặc đường dẫn asset" class="rounded-md border border-gray-300 px-3 py-2 text-sm font-normal text-gray-800 focus:border-emerald-600 focus:outline-none" />
-							</label>
-							<label class="flex flex-col gap-1.5 text-xs font-bold text-gray-600 sm:col-span-2">Đường dẫn mô hình 3D
-								<input v-model="form.model3d" type="text" placeholder="Đường dẫn model 3D" class="rounded-md border border-gray-300 px-3 py-2 text-sm font-normal text-gray-800 focus:border-emerald-600 focus:outline-none" />
 							</label>
 							<label class="flex flex-col gap-1.5 text-xs font-bold text-gray-600 sm:col-span-2">Thông tin
 								<textarea v-model="form.information" rows="5" class="resize-y rounded-md border border-gray-300 px-3 py-2 text-sm font-normal text-gray-800 focus:border-emerald-600 focus:outline-none"></textarea>
