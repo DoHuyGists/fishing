@@ -1,0 +1,2 @@
+[*.{js,ts,vue,json,html,css,md}]
+charset = utf-8
