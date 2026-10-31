@@ -27,9 +27,6 @@ const switchingSet = ref(false);
 const selectingItemId = ref<string | null>(null);
 const modalStore = useModalStore();
 
-/* selected item id per slot */
-const selected = ref<Partial<Record<FishingTool, string>>>({});
-
 /** Currently used set (the only set in use, identified by is_used flag) */
 const usedSet = computed(() => {
   return inventoryStore.equipmentSets.find((s) => s.isUsed) ?? inventoryStore.equipmentSets[0] ?? null;
@@ -41,35 +38,11 @@ const usedSetIndex = computed(() => {
   return idx >= 0 ? idx : 0;
 });
 
-/** Clear any selected equipment that does not belong to the active set */
-function validateSelectedItems(set?: EquipmentSet | null) {
-  if (!set) {
-    selected.value = {};
-    return;
-  }
-  for (const cat of equipmentCategories) {
-    const currentSelectedId = selected.value[cat.id];
-    if (currentSelectedId) {
-      const existsInSet = (set[cat.id] as any[])?.some((item) => String(item.id) === String(currentSelectedId));
-      if (!existsInSet) {
-        delete selected.value[cat.id];
-      }
-    }
-  }
-}
-
 onMounted(async () => {
   loading.value = true;
   error.value = "";
   try {
-    const [sel] = await Promise.all([
-      supabaseEquipmentRepository.fetchSelected(authStore.userId),
-      inventoryStore.setEquipmentSet(),
-    ]);
-    selected.value = sel;
-
-    // Các trang bị được chọn sẽ luôn nằm trong set đang dùng
-    validateSelectedItems(usedSet.value);
+    await inventoryStore.setEquipmentSet();
   } catch (err: any) {
     error.value = err?.message ?? "Không thể tải trang bị";
   } finally {
@@ -99,30 +72,14 @@ function getItemDisplay(item: any) {
   return { name, detail, iconOrImage };
 }
 
-/** Find the selected variant info for a given tool slot strictly within the used set */
-function selectedVariant(
-  tool: FishingTool,
-): { id: string; name: string; detail: string; icon: string; image?: string } | undefined {
-  const id = selected.value[tool];
-  if (!id || !usedSet.value) return undefined;
-
-  const list = usedSet.value[tool] as any[];
-  if (!Array.isArray(list)) return undefined;
-
-  const found = list.find((it) => String(it.id) === String(id));
-  if (!found) return undefined;
-
-  return {
-    id: String(found.id),
-    name: found.name ?? found.data?.name ?? "Trang bị",
-    detail: found.detail ?? found.information ?? found.data?.detail ?? "",
-    icon: found.icon ?? found.image ?? found.data?.image ?? "❔",
-    image: found.image ?? found.data?.image,
-  };
+function isItemSelected(tool: FishingTool, itemId: string | number): boolean {
+  const items = usedSet.value?.[tool];
+  return Array.isArray(items) && items.some((item) => String(item.id) === String(itemId) && item.is_used === true);
 }
 
-function isItemSelected(tool: FishingTool, itemId: string | number): boolean {
-  return String(selected.value[tool]) === String(itemId);
+function isSlotReady(tool: FishingTool): boolean {
+  const items = usedSet.value?.[tool];
+  return Array.isArray(items) && items.some((item) => item.is_used === true);
 }
 
 function countSetItems(s: EquipmentSet): number {
@@ -133,7 +90,6 @@ function countSetItems(s: EquipmentSet): number {
 
 /**
  * Đổi set: Chỉ 1 set được sử dụng.
- * Việc đổi set sẽ clear các trang bị đã chọn không nằm trong set vừa được đổi.
  */
 async function switchSet(targetSet: EquipmentSet) {
   if (targetSet.isUsed || switchingSet.value) return;
@@ -144,8 +100,6 @@ async function switchSet(targetSet: EquipmentSet) {
       await supabaseEquipmentRepository.updateCurrentUsedSet(authStore.userId, targetSet.id);
       await inventoryStore.setEquipmentSet();
     }
-    // Clear các trang bị đã chọn không nằm trong set mới đổi
-    validateSelectedItems(usedSet.value);
   } catch (err: any) {
     error.value = err?.message ?? "Không thể đổi set trang bị";
   } finally {
@@ -158,13 +112,17 @@ async function chooseMainItem(tool: FishingTool, item: any) {
   if (selectingItemId.value) return;
   const itemId = String(item.id);
 
-  if (String(selected.value[tool]) === itemId) return;
+  if (isItemSelected(tool, itemId)) return;
 
   selectingItemId.value = itemId;
   try {
-    // Call supabaseEquipmentRepository.selectItem (L74)
     await supabaseEquipmentRepository.selectItem(itemId);
-    selected.value[tool] = itemId;
+    const items = usedSet.value?.[tool];
+    if (Array.isArray(items)) {
+      for (const candidate of items) {
+        candidate.is_used = String(candidate.id) === itemId;
+      }
+    }
   } catch (err: any) {
     console.error("Lỗi khi chọn item chính:", err);
   } finally {
@@ -172,9 +130,7 @@ async function chooseMainItem(tool: FishingTool, item: any) {
   }
 }
 
-const readySlotsCount = computed(() => equipmentCategories.filter((cat) => !!selected.value[cat.id]).length);
-
-const allSlotsReady = computed(() => equipmentCategories.every((cat) => !!selected.value[cat.id]));
+const allSlotsReady = computed(() => equipmentCategories.every((cat) => isSlotReady(cat.id)));
 
 /** Kiểm tra set có ít nhất 1 item cho mỗi loại trang bị hay không */
 function isSetComplete(s?: EquipmentSet | null): boolean {
@@ -199,9 +155,9 @@ const missingCategoriesInSet = computed(() => {
     .map((cat) => cat.name);
 });
 
-/** Danh sách các ô trang bị chính chưa được chọn */
-const missingSelectedSlots = computed(() => {
-  return equipmentCategories.filter((cat) => !selected.value[cat.id]).map((cat) => cat.name);
+/** Danh sách loại trang bị chưa có món được đánh dấu đang dùng */
+const missingUsedSlots = computed(() => {
+  return equipmentCategories.filter((cat) => !isSlotReady(cat.id)).map((cat) => cat.name);
 });
 
 /** Điều kiện cho phép tiếp tục: Không lỗi/loading, set đủ mỗi loại >= 1 item, và đã chọn đủ 5/5 trang bị */
@@ -218,7 +174,7 @@ const proceedBlockReason = computed(() => {
     return `Set đang chọn thiếu loại: ${missingCategoriesInSet.value.join(", ")} (cần có ít nhất 1 món mỗi loại).`;
   }
   if (!allSlotsReady.value) {
-    return `Chưa chọn đủ 5/5 trang bị chính (còn thiếu: ${missingSelectedSlots.value.join(", ")}).`;
+    return `Chưa chọn đủ 5/5 trang bị chính (còn thiếu: ${missingUsedSlots.value.join(", ")}).`;
   }
   return null;
 });
@@ -265,86 +221,7 @@ async function confirm() {
 
         <!-- Content -->
         <template v-else>
-          <!-- SECTION 1: SELECTED EQUIPMENT (ALWAYS IN USED SET) -->
-          <div class="flex flex-col gap-1.5 bg-[#eaf2e5] border border-[#cbd9c6] rounded-lg p-2 shadow-sm">
-            <div class="flex items-center justify-between gap-4 border-b border-[#cbd9c6] pb-3">
-              <div class="flex items-center gap-2.5">
-                <span class="w-2.5 h-2.5 rounded-full bg-[#526a58] shrink-0"></span>
-                <div>
-                  <h3 class="m-0 text-[15px] font-bold text-[#24352a] tracking-tight leading-snug">Trang bị đã chọn</h3>
-                  <p class="m-0 mt-0.5 text-xs text-[#617565] leading-normal">
-                    Các món đồ chính trong set đang dùng sẽ mang vào bãi câu
-                  </p>
-                </div>
-              </div>
-              <div
-                class="text-xs font-semibold px-3 py-1 rounded-full border transition-colors"
-                :class="
-                  allSlotsReady
-                    ? 'bg-[#dce9d7] text-[#344f3b] border-[#b7cbb4]'
-                    : 'bg-amber-100 text-amber-800 border-amber-300'
-                "
-              >
-                {{ readySlotsCount }}/{{ equipmentCategories.length }} ô đã sẵn sàng
-              </div>
-            </div>
-
-            <div class="grid grid-cols-2 md:grid-cols-3 xl:grid-cols-5 2xl:grid-cols-6 gap-1.5">
-              <div
-                v-for="cat in equipmentCategories"
-                :key="cat.id"
-                class="rounded-lg bg-[#f5f9f0] border overflow-hidden transition-all duration-200 h-full flex flex-col"
-                :class="
-                  selected[cat.id]
-                    ? 'border-[#8eaa91] shadow-[inset_0_0_0_1px_rgba(82,106,88,0.12)]'
-                    : 'border-amber-300'
-                "
-              >
-                <div class="flex items-center gap-1.5 px-2 py-1 bg-[#eaf2e5] border-b border-[#cbd9c6]">
-                  <span class="font-semibold text-xs flex-1 text-[#24352a] truncate">{{ cat.name }}</span>
-                  <span
-                    class="text-[10px] font-semibold px-1.5 py-0.5 rounded-full shrink-0"
-                    :class="selected[cat.id] ? 'bg-[#dce9d7] text-[#344f3b]' : 'bg-amber-100 text-amber-800'"
-                  >
-                    {{ selected[cat.id] ? "✓ Sẵn sàng" : "✗ Chưa chọn" }}
-                  </span>
-                </div>
-
-                <div class="p-1.5 flex-1 flex flex-col justify-center">
-                  <template v-if="selectedVariant(cat.id)">
-                    <div class="flex items-center gap-2 min-w-0">
-                      <div class="w-9 h-9 shrink-0 flex items-center justify-center">
-                        <img
-                          v-if="isImageUrl(selectedVariant(cat.id)!.image || selectedVariant(cat.id)!.icon)"
-                          :src="selectedVariant(cat.id)!.image || selectedVariant(cat.id)!.icon"
-                          alt=""
-                          class="h-9 max-w-full object-contain drop-shadow"
-                        />
-                        <span v-else class="text-2xl select-none">
-                          {{ selectedVariant(cat.id)!.icon || "🎣" }}
-                        </span>
-                      </div>
-                      <div class="flex flex-col gap-0.5 min-w-0">
-                        <span class="font-semibold text-xs text-[#24352a] truncate">{{
-                          selectedVariant(cat.id)!.name
-                        }}</span>
-                        <span class="text-[10px] text-[#617565] line-clamp-1">{{
-                          selectedVariant(cat.id)!.detail
-                        }}</span>
-                      </div>
-                    </div>
-                  </template>
-                  <template v-else>
-                    <div class="flex flex-col items-center justify-center py-2 text-center">
-                      <p class="m-0 text-xs text-[#617565]">Chưa chọn {{ cat.name.toLowerCase() }} nào.</p>
-                    </div>
-                  </template>
-                </div>
-              </div>
-            </div>
-          </div>
-
-          <!-- SECTION 2: EQUIPMENT SETS LIST & ITEMS IN USED SET -->
+          <!-- EQUIPMENT SETS LIST & ITEMS IN USED SET -->
           <div class="flex flex-col gap-1.5 bg-[#eaf2e5] border border-[#cbd9c6] rounded-lg p-2 shadow-sm">
             <div class="flex items-center flex-wrap justify-between gap-2 border-b border-[#cbd9c6] pb-1.5">
               <div class="flex items-center gap-2.5">
@@ -354,7 +231,7 @@ async function confirm() {
                     Danh sách set trang bị
                   </h3>
                   <p class="m-0 mt-0.5 text-xs text-[#617565] leading-normal">
-                    Bấm để đổi set sử dụng. Chọn trang bị chính trong set để hiển thị ở bảng phía trên.
+                    Bấm để đổi set sử dụng. Chọn trang bị muốn dùng trong từng loại.
                   </p>
                 </div>
               </div>

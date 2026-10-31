@@ -68,25 +68,28 @@ class SupabaseEquipmentRepository {
   }
 
   async UpdateSet(userId: string, set: EquipmentSet) {
-    const { error } = await supabase.from("user_equipments").update({ rod: set.rod, line: set.line, reel: set.reel, hook: set.hook, bait: set.bait }).eq("id", set.id).eq("user_id", userId);
+    const inventoryItems = (items: { inventory_id?: string }[]) =>
+      items.map((item) => {
+        if (!item.inventory_id) throw new Error("Vật phẩm trong set không có inventory_id.");
+        return { inventory_id: item.inventory_id, is_used: false };
+      });
+    const { error } = await supabase
+      .from("user_equipments")
+      .update({
+        rod: inventoryItems(set.rod),
+        line: inventoryItems(set.line),
+        reel: inventoryItems(set.reel),
+        hook: inventoryItems(set.hook),
+        bait: inventoryItems(set.bait),
+      })
+      .eq("id", set.id)
+      .eq("user_id", userId);
     if (error) throw new Error(error.message);
   }
 
   async selectItem(itemId: string) {
     const { error } = await supabase.rpc("select_current_fishing_item", { item_id: itemId });
     if (error) throw new Error(error.message);
-  }
-
-  async fetchSelected(userId: string): Promise<Partial<Record<FishingTool, string>>> {
-    const { data, error } = await supabase.from("user_equipment_selected").select("rod, line, reel, hook, bait").eq("user_id", userId).maybeSingle<Record<FishingTool, { id?: string } | null>>();
-    if (error) throw new Error(error.message);
-    const result: Partial<Record<FishingTool, string>> = {};
-    if (!data) return result;
-    for (const tool of Object.keys(COLUMN_BY_TOOL) as FishingTool[]) {
-      const id = data[tool]?.id;
-      if (id) result[tool] = id;
-    }
-    return result;
   }
 
   async updateCurrentUsedSet(userId: string, setId: string) {

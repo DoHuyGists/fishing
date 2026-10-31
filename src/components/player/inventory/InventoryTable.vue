@@ -22,6 +22,7 @@ const SETS_PER_PAGE = 3;
 const userId = ref<string | null>(null);
 const loading = ref(true);
 const savedSnapshot = ref<Record<string, string>>({});
+const savedSetInventoryIds = ref<Record<string, string[]>>({});
 const savingId = ref<string | null>(null);
 const busy = ref(false);
 const usingItemId = ref<string | null>(null);
@@ -51,6 +52,11 @@ const itemName = (d: ItemData, fallbackId = "") =>
 const snapshotOf = (s: EquipmentSet) => JSON.stringify(SLOTS.map((k) => s[k]));
 const isDirty = (s: EquipmentSet) => snapshotOf(s) !== savedSnapshot.value[s.id];
 
+function inventoryIdsInSet(set: EquipmentSet) {
+  return SLOTS.flatMap((slot) =>
+    set[slot].flatMap((item) => (typeof item.inventory_id === "string" ? [item.inventory_id] : []))
+  );
+}
 
 async function load() {
   loading.value = true;
@@ -63,6 +69,9 @@ async function load() {
   await inventoryStore.setUserInventory(userId.value);
   await inventoryStore.setEquipmentSet();
   savedSnapshot.value = Object.fromEntries(inventoryStore.equipmentSets.map((s) => [s.id, snapshotOf(s)]));
+  savedSetInventoryIds.value = Object.fromEntries(
+    inventoryStore.equipmentSets.map((set) => [set.id, inventoryIdsInSet(set)])
+  );
   loading.value = false;
 }
 onMounted(load);
@@ -122,40 +131,29 @@ async function useSelectedItem() {
 async function deleteSelected() {
   if (!userId.value || selected.value.size === 0) return
   const ids = [...selected.value]
-
-  const isItemInSet = inventoryStore.equipmentSets.some(x =>
-    x.bait.some(x => ids.includes(x.id)) ||
-    x.reel.some(x => ids.includes(x.id)) ||
-    x.hook.some(x => ids.includes(x.id)) ||
-    x.rod.some(x => ids.includes(x.id)) ||
-    x.line.some(x => ids.includes(x.id))
+  const selectedIds = new Set(ids)
+  const isItemInSet = inventoryStore.equipmentSets.some((set) =>
+    inventoryIdsInSet(set).some((id) => selectedIds.has(id)) ||
+    (savedSetInventoryIds.value[set.id] ?? []).some((id) => selectedIds.has(id))
   )
 
   if (isItemInSet) {
-    toast.error("Có Item được chọn để xóa đang được trang bị")
+    toast.error("Không thể xóa vật phẩm đang có trong set. Hãy gỡ vật phẩm và lưu set trước.")
     return;
   }
 
   busy.value = true;
-
-
-  await inventoryStore.removeItem(userId.value, ids);
-
-  busy.value = false
-
-  inventoryStore.items = inventoryStore.items.filter((i) => !selected.value.has(i.id))
-
-  // Gỡ các item đã xóa khỏi set (chưa lưu, set sẽ hiện trạng thái "chưa lưu")
-
-  const gone = new Set(ids)
-
-  inventoryStore.equipmentSets.forEach((s) => SLOTS.forEach((k) => (s[k] = s[k].filter((x) => !gone.has(x.id)))))
-
-  selected.value = new Set()
-
-  modal.value = null
-
-  toast.success(`Đã xóa ${ids.length} vật phẩm.`)
+  try {
+    await inventoryStore.removeItem(userId.value, ids);
+    inventoryStore.items = inventoryStore.items.filter((item) => !selectedIds.has(item.id));
+    selected.value = new Set();
+    modal.value = null;
+    toast.success(`Đã xóa ${ids.length} vật phẩm.`);
+  } catch (error) {
+    toast.error((error as Error).message);
+  } finally {
+    busy.value = false;
+  }
 }
 
 const filteredSets = computed(() => {
@@ -187,7 +185,8 @@ function toggleActive(setId: string, slot: Category) {
 }
 const isActiveSlot = (setId: string, slot: Category) => active.value?.setId === setId && active.value?.slot === slot;
 const isCompatible = (i: UserInventory) => !active.value || i.data.category === active.value.slot;
-const isInActiveSlot = (i: UserInventory) => !!activeSet.value && !!active.value && activeSet.value[active.value.slot].some((x) => x.id === i.id);
+const isInActiveSlot = (i: UserInventory) =>
+  !!activeSet.value && !!active.value && activeSet.value[active.value.slot].some((x) => x.inventory_id === i.id);
 
 function pickItem(i: UserInventory) {
   if (!active.value || !activeSet.value) return toast.info("Chọn một ô trong set bên phải trước, rồi bấm vật phẩm.");
@@ -195,22 +194,32 @@ function pickItem(i: UserInventory) {
     return toast.error(`Ô này chỉ nhận vật phẩm loại "${LABELS[active.value.slot]}".`);
   const list = activeSet.value[active.value.slot];
   // @ts-ignore
-  if (list.some((x) => x.id === i.id)) return;
-  list.push({ ...i.data, id: i.id });
+  if (list.some((x) => x.inventory_id === i.id)) return;
+  list.push({
+    ...i.data,
+    id: typeof i.data.id === "string" ? i.data.id : i.id,
+    inventory_id: i.id,
+  });
 }
-function removeFromSet(set: EquipmentSet, slot: Category, inventoryId: string) {
-  set[slot] = set[slot].filter((x) => x.id !== inventoryId);
+function removeFromSet(set: EquipmentSet, slot: Category, item: EquipmentSet[Category][number]) {
+  set[slot] = set[slot].filter((x) => x !== item);
 }
 
 async function saveSet(set: EquipmentSet) {
   if (!userId.value) return
   savingId.value = set.id;
-  await equipmentStore.saveSet(userId.value, set);
-  savingId.value = null;
+  try {
+    await equipmentStore.saveSet(userId.value, set);
 
-  savedSnapshot.value = { ...savedSnapshot.value, [set.id]: snapshotOf(set) }
+    savedSnapshot.value = { ...savedSnapshot.value, [set.id]: snapshotOf(set) }
+    savedSetInventoryIds.value = { ...savedSetInventoryIds.value, [set.id]: inventoryIdsInSet(set) }
 
-  toast.success('Đã lưu set.')
+    toast.success('Đã lưu set.')
+  } catch (error) {
+    toast.error((error as Error).message);
+  } finally {
+    savingId.value = null;
+  }
 }
 
 async function buySet() {
@@ -430,7 +439,7 @@ function hasRpc() {
                     <span class="truncate" :title="itemName(eq, eq.id)">{{ itemName(eq, eq.id) }}</span>
                     <button type="button"
                       class="shrink-0 rounded px-1 text-slate-500 hover:bg-red-100 hover:text-red-600"
-                      :aria-label="`Gỡ ${itemName(eq, eq.id)} khỏi set`" @click.stop="removeFromSet(set, slot, eq.id)">
+                      :aria-label="`Gỡ ${itemName(eq, eq.id)} khỏi set`" @click.stop="removeFromSet(set, slot, eq)">
                       ✕
                     </button>
                   </li>
@@ -474,7 +483,7 @@ function hasRpc() {
         <template v-else>
           <h3 class="text-base font-semibold">Xóa {{ selected.size }} vật phẩm?</h3>
           <p class="mt-2 text-sm text-slate-600">
-            Vật phẩm sẽ bị xóa khỏi kho và gỡ khỏi các set đang dùng. Không thể hoàn tác.
+            Không thể xóa vật phẩm đang có trong set. Hãy gỡ vật phẩm và lưu set trước khi xóa.
           </p>
         </template>
 

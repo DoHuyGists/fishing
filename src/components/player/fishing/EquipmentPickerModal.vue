@@ -38,8 +38,17 @@ function imageSource(variant: EquipmentVariant) {
   return variant.image || (isImageIcon(variant.icon) ? variant.icon : null);
 }
 
-function pick(variant: EquipmentVariant) {
-  store.selectVariant(activeTab.value as FishingTool, variant.id);
+async function pick(variant: EquipmentVariant) {
+  const tool = activeTab.value as FishingTool;
+  const selected = await store.selectVariant(tool, variant.id);
+  if (!selected) return;
+  for (const option of equipmentStore.variants[tool]) {
+    option.is_used = option.id === variant.id;
+  }
+}
+
+function isSelected(variant: EquipmentVariant) {
+  return variant.is_used === true;
 }
 
 function onKeydown(event: KeyboardEvent) {
@@ -109,9 +118,9 @@ onBeforeUnmount(() => window.removeEventListener("keydown", onKeydown));
                     class="relative flex min-h-[150px] w-full items-center gap-3 overflow-hidden rounded-xl border border-[#cbd9c6] bg-white p-3 text-left transition hover:bg-[#eef8e9]"
                     :class="{
                       'border-2 border-[#2f8f4e] bg-[#eef8e9] shadow-[0_0_0_2px_#b9dba7]':
-                        variant.id === store.equipmentLoadout[tab.key as FishingTool],
+                        isSelected(variant),
                     }"
-                    :aria-pressed="variant.id === store.equipmentLoadout[tab.key as FishingTool]"
+                    :aria-pressed="isSelected(variant)"
                     @click="pick(variant)"
                   >
                     <span class="grid h-32 w-20 flex-none place-items-center overflow-hidden text-3xl">
@@ -125,7 +134,7 @@ onBeforeUnmount(() => window.removeEventListener("keydown", onKeydown));
                     </span>
                     <span class="flex min-w-0 flex-1 flex-col leading-tight">
                       <span
-                        v-if="variant.id === store.equipmentLoadout[tab.key as FishingTool]"
+                        v-if="isSelected(variant)"
                         class="mb-1 flex items-center gap-1 text-[10px] font-extrabold uppercase tracking-wide text-[#24733d]"
                       >
                         <span class="grid h-4 w-4 place-items-center rounded-full bg-[#2f8f4e] text-white">✓</span>
@@ -138,7 +147,7 @@ onBeforeUnmount(() => window.removeEventListener("keydown", onKeydown));
                       </small>
                     </span>
                     <span
-                      v-if="variant.id === store.equipmentLoadout[tab.key as FishingTool]"
+                      v-if="isSelected(variant)"
                       class="absolute right-2 top-2 rounded-full bg-[#2f8f4e] px-2 py-1 text-[9px] font-extrabold text-white"
                     >
                       ĐÃ CHỌN

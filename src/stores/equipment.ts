@@ -15,6 +15,8 @@ export interface ItemData {
 
 interface EquipItem extends ItemData {
   id: string;
+  inventory_id?: string;
+  is_used?: boolean;
 }
 
 export interface EquipmentSet {
@@ -46,7 +48,11 @@ export const useEquipmentStore = defineStore("equipment", {
         this.variants = await supabaseEquipmentRepository.fetchEquipment();
         this.userId = userId;
         this.loaded = true;
-        const selected = await supabaseEquipmentRepository.fetchSelected(userId);
+        const selected: Partial<Record<FishingTool, string>> = {};
+        for (const tool of Object.keys(this.variants) as FishingTool[]) {
+          const usedVariant = this.variants[tool].find((variant) => variant.is_used);
+          if (usedVariant) selected[tool] = usedVariant.id;
+        }
         Object.assign(useFishingStore().equipmentLoadout, selected);
       } catch (err) {
         this.error = err instanceof Error ? err.message : "Không thể tải trang bị từ máy chủ";

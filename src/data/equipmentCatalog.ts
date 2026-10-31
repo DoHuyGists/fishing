@@ -6,6 +6,7 @@ export interface EquipmentVariant {
   detail: string;
   icon: string;
   image?: string | null;
+  is_used?: boolean;
   rodMaxWeight?: number;
   lineMaxWeight?: number;
   reelDurability?: number;

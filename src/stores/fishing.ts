@@ -337,15 +337,17 @@ export const useFishingStore = defineStore("fishing", {
       if (!this.canAdjustLakeDepth) return;
       this.depthAdjusterOpen = true;
     },
-    async selectVariant(category: FishingTool, variantId: string) {
-      if (!this.canAdjustDepth) return;
+    async selectVariant(category: FishingTool, variantId: string): Promise<boolean> {
+      if (!this.canAdjustDepth) return false;
       const previous = this.equipmentLoadout[category];
       this.equipmentLoadout[category] = variantId;
       try {
         await supabaseEquipmentRepository.selectItem(variantId);
+        return true;
       } catch (err) {
         this.equipmentLoadout[category] = previous;
         console.error("Lỗi khi chọn trang bị:", err);
+        return false;
       }
     },
     async castTo(x: number, y: number) {
