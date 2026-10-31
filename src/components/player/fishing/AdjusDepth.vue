@@ -80,7 +80,7 @@ onBeforeUnmount(() => {
   <Teleport to="body">
     <Transition name="depth-dialog">
       <div
-        v-if="store.depthAdjusterOpen && store.canAdjustDepth"
+        v-if="store.depthAdjusterOpen && store.canAdjustLakeDepth"
         class="fixed inset-0 z-[45] grid place-items-center overflow-y-auto bg-[rgba(3,15,11,0.78)] p-3 backdrop-blur-[7px] sm:p-5"
         @click.self="close"
       >

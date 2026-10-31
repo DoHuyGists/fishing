@@ -133,6 +133,9 @@ onBeforeUnmount(() => window.removeEventListener("keydown", onKeydown));
                       </span>
                       <strong class="text-xs font-bold">{{ variant.name }}</strong>
                       <small class="text-[10px] text-[#4b5f50]">{{ variant.detail }}</small>
+                      <small v-if="activeTab === 'bait'" class="mt-1 text-[10px] font-semibold text-[#24733d]">
+                        Số lượng: {{ variant.quantity ?? 0 }}
+                      </small>
                     </span>
                     <span
                       v-if="variant.id === store.equipmentLoadout[tab.key as FishingTool]"

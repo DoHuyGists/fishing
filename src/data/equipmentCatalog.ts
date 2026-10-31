@@ -11,6 +11,7 @@ export interface EquipmentVariant {
   reelDurability?: number;
   hookStrength?: number;
   baitName?: string;
+  quantity?: number | null;
 }
 
 export const equipmentCategories: { id: FishingTool; name: string; icon: string}[] = [

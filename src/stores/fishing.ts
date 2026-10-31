@@ -117,6 +117,9 @@ export const useFishingStore = defineStore("fishing", {
     inventory: [] as CaughtFish[],
     currentArea: {} as any,
     currentAreaId: null as string | null,
+    isLoadingCurrentArea: false,
+    currentAreaLoadError: "",
+    currentAreaRequestId: 0,
     appliedDepthMeters: 0,
     depthAdjusterOpen: false,
     depthPreview: null as FishDepthPreviewResponse | null,
@@ -133,20 +136,43 @@ export const useFishingStore = defineStore("fishing", {
     canCast: (s) => s.castPhase === "idle" || s.castPhase === "lost",
     canReelIn: (s) => ["casting", "waiting", "bite"].includes(s.castPhase),
     canAdjustDepth: (s) => s.castPhase === "idle" || s.castPhase === "lost",
+    canAdjustLakeDepth: (s) =>
+      (s.castPhase === "idle" || s.castPhase === "lost") &&
+      !s.isLoadingCurrentArea &&
+      s.currentArea?.id === s.currentAreaId,
     depthConfig: (s) => buildDepthConfig(s.currentArea?.maxDepth),
   },
   actions: {
     async initializeFishingArea(areaId: string) {
       if (!areaId) return;
       this.currentAreaId = areaId;
-      await Promise.all([this.fetchCurrentArea(areaId), this.fetchCaughtFishes(areaId), this.fetchPlayersInArea(areaId)]);
+      this.currentArea = {};
+      this.isLoadingCurrentArea = true;
+      this.currentAreaLoadError = "";
+      this.depthAdjusterOpen = false;
+      const requestId = ++this.currentAreaRequestId;
+      await Promise.all([
+        this.fetchCurrentArea(areaId, requestId),
+        this.fetchCaughtFishes(areaId),
+        this.fetchPlayersInArea(areaId),
+      ]);
     },
-    async fetchCurrentArea(areaId: string) {
+    async fetchCurrentArea(areaId: string, requestId?: number) {
+      const activeRequestId = requestId ?? ++this.currentAreaRequestId;
+      this.isLoadingCurrentArea = true;
+      this.currentAreaLoadError = "";
       try {
-        this.currentArea = await supabaseFishingAreaRepository.fetchOneAreas(areaId);
+        const area = await supabaseFishingAreaRepository.fetchOneAreas(areaId);
+        if (activeRequestId !== this.currentAreaRequestId || areaId !== this.currentAreaId) return;
+        this.currentArea = area ?? {};
+        if (!area) this.currentAreaLoadError = "Không tìm thấy thông tin hồ câu.";
         this.appliedDepthMeters = Math.min(this.appliedDepthMeters, this.depthConfig.maxMeters);
       } catch (err) {
-        console.log(err);
+        if (activeRequestId !== this.currentAreaRequestId) return;
+        this.currentAreaLoadError = err instanceof Error ? err.message : "Không thể tải thông tin hồ.";
+        console.error("Lỗi khi tải thông tin hồ câu:", err);
+      } finally {
+        if (activeRequestId === this.currentAreaRequestId) this.isLoadingCurrentArea = false;
       }
     },
     async fetchDepthPreview(castDepth: number) {
@@ -308,7 +334,7 @@ export const useFishingStore = defineStore("fishing", {
       return true;
     },
     openDepthAdjuster() {
-      if (!this.canAdjustDepth) return;
+      if (!this.canAdjustLakeDepth) return;
       this.depthAdjusterOpen = true;
     },
     async selectVariant(category: FishingTool, variantId: string) {

@@ -1,14 +1,15 @@
-
-
 <script lang="ts" setup>
 import { computed, onMounted, onUnmounted, ref, watch } from "vue";
 import { mapData } from "../../../data/map.ts";
 import type { FishingAreaPayload } from "../../../data/supabaseFishingAreaRepository.ts";
 import { useWorld2Store } from "../../../stores/world2.ts";
+import { useToast } from "../../../composables/useToast.ts";
 import { useAdminZoneStore } from "../zone-management/admin-zone-store.ts";
 import { useAdminFishingAreaStore } from "./admin-fishing-area-store.ts";
+import FishingBoundaryPickerModal from "./FishingBoundaryPickerModal.vue";
 
 const worldStore = useWorld2Store();
+const toast = useToast();
 const zoneStore = useAdminZoneStore();
 const fishingAreaStore = useAdminFishingAreaStore();
 const adminFishingAreaStore = fishingAreaStore;
@@ -16,20 +17,25 @@ const isSaving = ref(false);
 const formError = ref("");
 const isBoundaryPickerOpen = ref(false);
 const boundaryDraft = ref<Array<{ x: number; y: number }>>([]);
-const sceneImageError = ref(false);
 const sceneImageUrl = computed(() => {
   const scenePath = adminFishingAreaStore.target?.scenePath?.trim().replace(/\\/g, "/").replace(/\/+$/, "");
   return scenePath ? `${scenePath}/day.png` : "";
 });
+
+function toggleAnchorMode() {
+  if (!worldStore.anchorable) {
+    toast.info("Mở khóa form để thao tác", { title: "Nhắc nhở", position: "bottom", duration: 2000 });
+    return;
+  }
+  worldStore.toggleAnchorMode();
+}
 
 function openBoundaryPicker() {
   const currentBoundary = adminFishingAreaStore.target?.fishingBoundary;
   const hasValidBoundary =
     Array.isArray(currentBoundary) &&
     currentBoundary.length > 0 &&
-    currentBoundary.every(
-      (point) => point && typeof point.x === "number" && typeof point.y === "number",
-    );
+    currentBoundary.every((point) => point && typeof point.x === "number" && typeof point.y === "number");
 
   boundaryDraft.value = hasValidBoundary
     ? currentBoundary.map(({ x, y }) => ({ x, y }))
@@ -37,29 +43,17 @@ function openBoundaryPicker() {
         { x: 0, y: 100 },
         { x: 0, y: 100 },
       ];
-  sceneImageError.value = false;
   isBoundaryPickerOpen.value = true;
 }
 
-function addBoundaryPoint(event: MouseEvent) {
-  const image = event.currentTarget as HTMLImageElement;
-  const bounds = image.getBoundingClientRect();
-  const point = {
-    x: ((event.clientX - bounds.left) / bounds.width) * 100,
-    y: ((event.clientY - bounds.top) / bounds.height) * 100,
-  };
-  const insertIndex = boundaryDraft.value.length - 2;
-  boundaryDraft.value.splice(insertIndex, 0, point);
-}
-
-function finishBoundarySelection() {
+function finishBoundarySelection(boundary: Array<{ x: number; y: number }>) {
   if (!adminFishingAreaStore.target) return;
-  adminFishingAreaStore.target.fishingBoundary = boundaryDraft.value.map(({ x, y }) => ({ x, y }));
+  adminFishingAreaStore.target.fishingBoundary = boundary.map(({ x, y }) => ({ x, y }));
   isBoundaryPickerOpen.value = false;
 }
 
 function buildPayload(): FishingAreaPayload | null {
-  if(!adminFishingAreaStore.target) return null;
+  if (!adminFishingAreaStore.target) return null;
 
   if (!adminFishingAreaStore.target.countryId) {
     formError.value = "Vui lòng chọn quốc gia";
@@ -109,7 +103,7 @@ function buildPayload(): FishingAreaPayload | null {
 }
 
 async function handleSave() {
-  if(!adminFishingAreaStore.target) return;
+  if (!adminFishingAreaStore.target) return;
   formError.value = "";
   const payload = buildPayload();
   if (!payload) return;
@@ -125,7 +119,6 @@ async function handleSave() {
 
     // Clear
     worldStore.resetDefault();
-
   } catch (err) {
     formError.value = err instanceof Error ? err.message : "Không thể lưu bãi câu";
   } finally {
@@ -166,254 +159,198 @@ watch(
   { immediate: true },
 );
 
-watch(()=>adminFishingAreaStore.isFormLock, (isFormLock)=>{
-  if(isFormLock){
-    worldStore.disabledInteraction();
-  }else{
-    worldStore.enableInteraction();
-  }
-}, {immediate: true})
+watch(
+  () => adminFishingAreaStore.isFormLock,
+  (isFormLock) => {
+    if (isFormLock) {
+      worldStore.disabledInteraction();
+    } else {
+      worldStore.enableInteraction();
+    }
+  },
+  { immediate: true },
+);
 
-
-onMounted(()=>{
+onMounted(() => {
   worldStore.showAnchorSelectButton = true;
   if (!zoneStore.items.length) zoneStore.fetchAll();
-})
+});
 
 onUnmounted(() => {
   worldStore.showAnchorSelectButton = false;
   worldStore.resetDefault();
 });
-
 </script>
 
 <template>
-<div v-if="adminFishingAreaStore.isFormOpen && adminFishingAreaStore.target" class="w-full sm:w-105 shrink-0 border-l border-gray-200 bg-white overflow-y-auto">
-  <div class="p-5 flex flex-col gap-4">
-    <div class="flex items-center justify-between">
-      <h3 class="m-0 text-sm font-extrabold text-[#153221]">
-        {{ adminFishingAreaStore.isUpdate ? "Chỉnh sửa bãi câu" : "Thêm bãi câu mới" }}
-      </h3>
-      <button
-        type="button"
-        @click="adminFishingAreaStore.closeForm"
-        class="text-gray-400 hover:text-gray-700 cursor-pointer text-lg leading-none"
-      >
-        &times;
-      </button>
-    </div>
-
-    <div v-if="formError" class="px-3 py-2 rounded-lg bg-red-50 border border-red-200 text-red-600 text-xs">
-      {{ formError }}
-    </div>
-
-    <div v-if="adminFishingAreaStore.isUpdate" class="text-xs">
-      <button v-if="adminFishingAreaStore.isFormLock" @click="adminFishingAreaStore.isFormLock = false" type="button">🔒 Đang khóa</button>
-      <button v-else @click="adminFishingAreaStore.isFormLock = true" type="button">🔒 Đã mở khóa</button>
-    </div>
-
-    <div class="flex flex-col gap-1.5">
-      <label class="text-[11px] font-bold text-gray-500 uppercase">Tên bãi câu</label>
-      <input
-        v-model="adminFishingAreaStore.target.title"
-        type="text"
-        placeholder="Ví dụ: Hồ Xanh"
-        :disabled="adminFishingAreaStore.isFormLock"
-        class="px-3 py-1.5 border border-gray-300 rounded-lg text-xs focus:outline-none focus:border-emerald-500"
-      />
-    </div>
-
-    <div class="flex flex-col gap-1.5">
-      <label class="text-[11px] font-bold text-gray-500 uppercase">Quốc gia</label>
-      <select
-        v-model="adminFishingAreaStore.target.countryId"
-        class="px-3 py-1.5 border border-gray-300 rounded-lg text-xs bg-white focus:outline-none focus:border-emerald-500"
-        :disabled="adminFishingAreaStore.isFormLock"
-      >
-        <option v-for="option in countryOptions" :key="option.code" :value="option.code">
-          {{ option.name }}
-        </option>
-      </select>
-    </div>
-
-    <div class="flex flex-col gap-1.5">
-      <label class="text-[11px] font-bold text-gray-500 uppercase">Vùng (zone)</label>
-      <select
-        v-model="adminFishingAreaStore.target.zoneId"
-        class="px-3 py-1.5 border border-gray-300 rounded-lg text-xs bg-white focus:outline-none focus:border-emerald-500"
-        :disabled="adminFishingAreaStore.isFormLock"
-      >
-        <option :value="null">-- Không chọn --</option>
-        <option v-for="zone in zoneStore.items" :key="zone.id" :value="zone.id">
-          {{ zone.name }} ({{ zone.code }})
-        </option>
-      </select>
-    </div>
-
-    <div class="flex flex-col gap-1.5">
-      <label class="text-[11px] font-bold text-gray-500 uppercase">Độ sâu tối đa (max_depth)</label>
-      <input
-        v-model.number="adminFishingAreaStore.target.maxDepth"
-        type="number"
-        min="0"
-        step="any"
-        placeholder="Ví dụ: 50"
-        :disabled="adminFishingAreaStore.isFormLock"
-        class="px-3 py-1.5 border border-gray-300 rounded-lg text-xs focus:outline-none focus:border-emerald-500"
-      />
-    </div>
-
-    <label class="flex items-center gap-2 text-xs font-medium text-gray-700 cursor-pointer select-none">
-      <input v-model="adminFishingAreaStore.target.isAvailable" type="checkbox" class="w-4 h-4 accent-emerald-700" :disabled="adminFishingAreaStore.isFormLock"/>
-      Kích hoạt (hiển thị trên bản đồ)
-    </label>
-
-    <div class="flex flex-col gap-1.5">
-      <label class="text-[11px] font-bold text-gray-500 uppercase">Đường dẫn cảnh (scene_path)</label>
-      <input
-        v-model="adminFishingAreaStore.target.scenePath"
-        type="text"
-        placeholder="area/VN/770.400"
-        class="px-3 py-1.5 border border-gray-300 rounded-lg text-xs focus:outline-none focus:border-emerald-500"
-        :disabled="adminFishingAreaStore.isFormLock"
-      />
-      <button
-        v-if="adminFishingAreaStore.target.scenePath?.trim()"
-        type="button"
-        @click="openBoundaryPicker"
-        :disabled="adminFishingAreaStore.isFormLock"
-        class="self-start px-3 py-1.5 rounded-lg border border-[#cbd9c6] bg-[#f5f9f0] text-[#24352a] text-xs font-bold hover:bg-[#eaf2e3] cursor-pointer transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
-      >
-        Thiết lập vùng câu
-      </button>
-    </div>
-
-    <div class="flex flex-col gap-1.5">
-      <label class="text-[11px] font-bold text-gray-500 uppercase">Location (JSON, không bắt buộc)</label>
-      <textarea
-        :value="JSON.stringify(adminFishingAreaStore.target.location ?? [], null, 2)"
-        rows="7"
-        placeholder='{"k": 25, "lat": 10.82302, "lon": 106.62965}'
-        class="px-3 py-1.5 border border-gray-300 rounded-lg text-xs font-mono focus:outline-none focus:border-emerald-500 resize-none"
-        disabled
-      ></textarea>
-    </div>
-
-    <div class="flex flex-col gap-1.5">
-      <label class="text-[11px] font-bold text-gray-500 uppercase">Vùng câu (fishing_boundary, JSON)</label>
-      <textarea
-        :value="JSON.stringify(adminFishingAreaStore.target.fishingBoundary ?? [], null, 2)"
-        rows="7"
-        placeholder='[{"x": 0, "y": 0}, {"x": 10, "y": 0}]'
-        class="px-3 py-1.5 border border-gray-300 rounded-lg text-xs font-mono focus:outline-none focus:border-emerald-500 resize-none"
-        disabled
-      ></textarea>
-      <p class="text-[11px] text-gray-400">
-        Dán mảng các object dạng {{ '{ "x": number, "y": number }' }} tạo thành vòng cung giới hạn phạm vi quăng
-        mồi.
-      </p>
-    </div>
-
-    <div class="flex items-center gap-2 pt-2 border-t border-gray-100">
-      <button
-        type="button"
-        @click="handleSave"
-        :disabled="isSaving"
-        class="flex-1 px-3 py-2 rounded-lg bg-[#153221] hover:bg-emerald-800 text-white text-xs font-bold cursor-pointer transition-colors disabled:opacity-50"
-      >
-        {{ isSaving ? "Đang lưu..." : "Lưu" }}
-      </button>
-      <button
-        type="button"
-        @click="adminFishingAreaStore.closeForm"
-        class="px-3 py-2 rounded-lg border border-gray-300 hover:bg-gray-100 text-gray-700 text-xs font-bold cursor-pointer transition-colors"
-      >
-        Huỷ
-      </button>
-    </div>
-  </div>
-</div>
-
-<Teleport to="body">
   <div
-    v-if="isBoundaryPickerOpen"
-    class="fixed inset-0 z-[60] grid place-items-center bg-black/70 p-3 backdrop-blur-sm sm:p-5"
-    @click.self="isBoundaryPickerOpen = false"
-    @keydown.esc="isBoundaryPickerOpen = false"
+    v-if="adminFishingAreaStore.isFormOpen && adminFishingAreaStore.target"
+    class="w-full shrink-0 border-l border-gray-200 bg-white overflow-y-auto"
   >
-    <section
-      role="dialog"
-      aria-modal="true"
-      aria-labelledby="fishing-boundary-picker-title"
-      class="flex max-h-full w-full max-w-5xl flex-col overflow-hidden rounded-xl border border-[#cbd9c6] bg-[#f5f9f0] text-[#24352a] shadow-2xl"
-    >
-      <header class="flex items-center justify-between gap-3 border-b border-[#cbd9c6] px-4 py-3 sm:px-5">
-        <div>
-          <h2 id="fishing-boundary-picker-title" class="m-0 text-sm font-extrabold">Thiết lập vùng câu</h2>
-          <p class="m-0 mt-1 text-xs text-gray-600">Nhấn vào ảnh để thêm các điểm giới hạn vùng câu.</p>
-        </div>
+    <div class="p-5 flex flex-col gap-4">
+      <div class="flex items-center justify-between">
+        <h3 class="m-0 text-sm font-extrabold text-[#153221]">
+          {{ adminFishingAreaStore.isUpdate ? "Chỉnh sửa bãi câu" : "Thêm bãi câu mới" }}
+        </h3>
         <button
           type="button"
-          @click="isBoundaryPickerOpen = false"
-          aria-label="Đóng"
-          class="text-xl leading-none text-gray-500 hover:text-gray-800"
+          @click="adminFishingAreaStore.closeForm"
+          class="text-gray-400 hover:text-gray-700 cursor-pointer text-lg leading-none"
         >
           &times;
         </button>
-      </header>
-
-      <div class="flex min-h-0 flex-1 items-center justify-center overflow-auto p-3 sm:p-5">
-        <p v-if="sceneImageError" class="rounded-lg border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-700">
-          Không thể tải ảnh cảnh: {{ sceneImageUrl }}
-        </p>
-        <div v-else class="relative inline-block max-h-full max-w-full">
-          <img
-            :src="sceneImageUrl"
-            :alt="`Cảnh câu ${sceneImageUrl}`"
-            draggable="false"
-            @click="addBoundaryPoint"
-            @error="sceneImageError = true"
-            class="block max-h-[70vh] max-w-full cursor-crosshair select-none"
-          />
-          <svg
-            class="pointer-events-none absolute inset-0 h-full w-full"
-            viewBox="0 0 100 100"
-            preserveAspectRatio="none"
-            aria-hidden="true"
-          >
-            <polygon
-              :points="boundaryDraft.map(({ x, y }) => `${x},${y}`).join(' ')"
-              fill="rgba(34, 197, 94, 0.18)"
-              stroke="rgb(252, 143, 1)"
-              stroke-width="0.6"
-              stroke-dasharray="2 1"
-              vector-effect="non-scaling-stroke"
-            />
-          </svg>
-        </div>
       </div>
 
-      <footer class="flex items-center justify-between gap-3 border-t border-[#cbd9c6] px-4 py-3 sm:px-5">
-        <span class="text-xs text-gray-600">{{ boundaryDraft.length }} điểm</span>
-        <div class="flex gap-2">
+      <div v-if="formError" class="px-3 py-2 rounded-lg bg-red-50 border border-red-200 text-red-600 text-xs">
+        {{ formError }}
+      </div>
+
+      <div v-if="adminFishingAreaStore.isUpdate" class="text-xs">
+        <button v-if="adminFishingAreaStore.isFormLock" @click="adminFishingAreaStore.isFormLock = false" type="button">
+          🔒 Đang khóa
+        </button>
+        <button v-else @click="adminFishingAreaStore.isFormLock = true" type="button">🔒 Đã mở khóa</button>
+      </div>
+
+      <div class="flex flex-col gap-1.5">
+        <label class="text-[11px] font-bold text-gray-500 uppercase">Tên bãi câu</label>
+        <input
+          v-model="adminFishingAreaStore.target.title"
+          type="text"
+          placeholder="Ví dụ: Hồ Xanh"
+          :disabled="adminFishingAreaStore.isFormLock"
+          class="px-3 py-1.5 border border-gray-300 rounded-lg text-xs focus:outline-none focus:border-emerald-500"
+        />
+      </div>
+
+      <div class="flex flex-col gap-1.5">
+        <label class="text-[11px] font-bold text-gray-500 uppercase">Quốc gia</label>
+        <select
+          v-model="adminFishingAreaStore.target.countryId"
+          class="px-3 py-1.5 border border-gray-300 rounded-lg text-xs bg-white focus:outline-none focus:border-emerald-500"
+          :disabled="adminFishingAreaStore.isFormLock"
+        >
+          <option v-for="option in countryOptions" :key="option.code" :value="option.code">
+            {{ option.name }}
+          </option>
+        </select>
+      </div>
+
+      <div class="flex flex-col gap-1.5">
+        <label class="text-[11px] font-bold text-gray-500 uppercase">Vùng</label>
+        <select
+          v-model="adminFishingAreaStore.target.zoneId"
+          class="px-3 py-1.5 border border-gray-300 rounded-lg text-xs bg-white focus:outline-none focus:border-emerald-500"
+          :disabled="adminFishingAreaStore.isFormLock"
+        >
+          <option :value="null">-- Không chọn --</option>
+          <option v-for="zone in zoneStore.items" :key="zone.id" :value="zone.id">
+            {{ zone.name }} ({{ zone.code }})
+          </option>
+        </select>
+      </div>
+
+      <div class="flex flex-col gap-1.5">
+        <label class="text-[11px] font-bold text-gray-500 uppercase">Độ sâu tối đa (max_depth)</label>
+        <input
+          v-model.number="adminFishingAreaStore.target.maxDepth"
+          type="number"
+          min="0"
+          step="any"
+          placeholder="Ví dụ: 50"
+          :disabled="adminFishingAreaStore.isFormLock"
+          class="px-3 py-1.5 border border-gray-300 rounded-lg text-xs focus:outline-none focus:border-emerald-500"
+        />
+      </div>
+
+      <label class="flex items-center gap-2 text-xs font-medium text-gray-700 cursor-pointer select-none">
+        <input
+          v-model="adminFishingAreaStore.target.isAvailable"
+          type="checkbox"
+          class="w-4 h-4 accent-emerald-700"
+          :disabled="adminFishingAreaStore.isFormLock"
+        />
+        Kích hoạt (hiển thị trên bản đồ)
+      </label>
+
+      <div class="flex flex-col gap-1.5">
+        <div class="flex items-center justify-between gap-2">
+          <label class="text-[11px] font-bold text-gray-500 uppercase">Location</label>
           <button
             type="button"
-            @click="isBoundaryPickerOpen = false"
-            class="rounded-lg border border-gray-300 bg-white px-3 py-2 text-xs font-bold text-gray-700 hover:bg-gray-100"
+            @click="toggleAnchorMode"
+            class="shrink-0 rounded-lg border border-[#cbd9c6] bg-[#f5f9f0] px-3 py-1.5 text-xs font-bold text-[#24352a] transition-colors hover:bg-[#eaf2e3]"
           >
-            Huỷ
-          </button>
-          <button
-            type="button"
-            @click="finishBoundarySelection"
-            :disabled="sceneImageError"
-            class="rounded-lg bg-[#153221] px-3 py-2 text-xs font-bold text-white hover:bg-emerald-800 disabled:cursor-not-allowed disabled:opacity-50"
-          >
-            Hoàn tất
+            {{ worldStore.isAnchorMode ? "Tắt xác định vị trí" : "Bật xác định vị trí" }}
           </button>
         </div>
-      </footer>
-    </section>
+        <textarea
+          :value="JSON.stringify(adminFishingAreaStore.target.location ?? [], null, 2)"
+          rows="7"
+          placeholder='{"k": 25, "lat": 10.82302, "lon": 106.62965}'
+          class="px-3 py-1.5 border border-gray-300 rounded-lg text-xs font-mono focus:outline-none focus:border-emerald-500 resize-none"
+          disabled
+        ></textarea>
+      </div>
+
+      <div class="flex flex-col gap-1.5">
+        <label class="text-[11px] font-bold text-gray-500 uppercase">Đường dẫn cảnh</label>
+        <input
+          v-model="adminFishingAreaStore.target.scenePath"
+          type="text"
+          placeholder="area/VN/770.400"
+          class="px-3 py-1.5 border border-gray-300 rounded-lg text-xs focus:outline-none focus:border-emerald-500"
+          :disabled="adminFishingAreaStore.isFormLock"
+        />
+      </div>
+
+      <div class="flex flex-col gap-1.5">
+        <div class="flex items-center justify-between gap-2">
+          <label class="text-[11px] font-bold text-gray-500 uppercase">Vùng câu</label>
+          <button
+            v-if="adminFishingAreaStore.target.scenePath?.trim()"
+            type="button"
+            @click="openBoundaryPicker"
+            :disabled="adminFishingAreaStore.isFormLock"
+            class="self-start px-3 py-1.5 rounded-lg border border-[#cbd9c6] bg-[#f5f9f0] text-[#24352a] text-xs font-bold hover:bg-[#eaf2e3] cursor-pointer transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+          >
+            Thiết lập vùng câu
+          </button>
+        </div>
+        <textarea
+          :value="JSON.stringify(adminFishingAreaStore.target.fishingBoundary ?? [], null, 2)"
+          rows="7"
+          placeholder='[{"x": 0, "y": 0}, {"x": 10, "y": 0}]'
+          class="px-3 py-1.5 border border-gray-300 rounded-lg text-xs font-mono focus:outline-none focus:border-emerald-500 resize-none"
+          disabled
+        ></textarea>
+      </div>
+
+      <div class="flex items-center gap-2 pt-2 border-t border-gray-100">
+        <button
+          type="button"
+          @click="handleSave"
+          :disabled="isSaving"
+          class="flex-1 px-3 py-2 rounded-lg bg-[#153221] hover:bg-emerald-800 text-white text-xs font-bold cursor-pointer transition-colors disabled:opacity-50"
+        >
+          {{ isSaving ? "Đang lưu..." : "Lưu" }}
+        </button>
+        <button
+          type="button"
+          @click="adminFishingAreaStore.closeForm"
+          class="px-3 py-2 rounded-lg border border-gray-300 hover:bg-gray-100 text-gray-700 text-xs font-bold cursor-pointer transition-colors"
+        >
+          Huỷ
+        </button>
+      </div>
+    </div>
   </div>
-</Teleport>
+
+  <FishingBoundaryPickerModal
+    v-if="isBoundaryPickerOpen"
+    :scene-image-url="sceneImageUrl"
+    :initial-boundary="boundaryDraft"
+    @close="isBoundaryPickerOpen = false"
+    @complete="finishBoundarySelection"
+  />
 </template>

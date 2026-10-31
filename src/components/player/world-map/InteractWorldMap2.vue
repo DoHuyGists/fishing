@@ -22,7 +22,6 @@ const zoomInfo = ref({ lon: 0, lat: 0, k: 1 });
 const picked = ref<string>("");
 const mapRef = ref<InstanceType<typeof World2> | null>(null);
 const pickEnabled = computed(() => worldStore.isAnchorMode);
-const isAdminMode = computed(() => worldStore.showAnchorSelectButton);
 const anchor = computed(() => worldStore.pickedLocation);
 const worldStore = useWorld2Store();
 const selectedArea = computed(() => (worldStore.selectedArea?.id ? worldStore.selectedArea : null));
@@ -157,7 +156,6 @@ function zoomTo(k: number) {
                 />
               </div>
               <button
-                v-if="!isAdminMode"
                 type="button"
                 class="w-full rounded-lg bg-green-500 px-2 py-1.5 font-bold text-white hover:bg-green-600 disabled:opacity-70"
                 :disabled="isEntering"
@@ -174,11 +172,6 @@ function zoomTo(k: number) {
         <button @click="zoomTo(6)" class="border border-gray-300 rounded-md px-3">6x</button>
         <button @click="zoomTo(12)" class="border border-gray-300 rounded-md px-3">12x</button>
         <button @click="zoomTo(24)" class="border border-gray-300 rounded-md px-3">24x</button>
-      </div>
-      <div class="flex gap-2">
-        <button @click="togglePick" class="border border-gray-300 rounded-md px-3">
-          {{ pickEnabled ? "Tắt xác định vị trí" : "Bật xác định vị trí" }}
-        </button>
       </div>
     </div>
   </div>

@@ -12,6 +12,15 @@ function openPicker() {
   pickerOpen.value = true;
 }
 
+function openDepthAdjuster() {
+  if (!store.canAdjustDepth || store.isLoadingCurrentArea || !store.currentAreaId) return;
+  if (!store.canAdjustLakeDepth) {
+    void store.fetchCurrentArea(store.currentAreaId);
+    return;
+  }
+  store.openDepthAdjuster();
+}
+
 watch(
   () => store.canAdjustDepth,
   (canAdjust) => {
@@ -35,11 +44,18 @@ watch(
     <button
       type="button"
       class="flex items-center gap-2 rounded-xl border border-[#cbd9c6] bg-[#f5f9f0] px-3 py-2 text-[11px] font-bold text-[#24352a] transition hover:border-[#70a77e] hover:bg-[#eaf5e8]"
-      :disabled="!store.canAdjustDepth"
-      @click="store.openDepthAdjuster()"
+      :disabled="!store.canAdjustDepth || !store.currentAreaId || store.isLoadingCurrentArea"
+      :title="store.currentAreaLoadError || undefined"
+      @click="openDepthAdjuster"
     >
       <span aria-hidden="true" class="text-base text-[#398d80]">≋</span>
-      Điều chỉnh độ sâu
+      {{
+        store.isLoadingCurrentArea
+          ? "Đang tải thông tin hồ..."
+          : store.currentAreaLoadError
+            ? "Tải lại độ sâu hồ"
+            : "Điều chỉnh độ sâu"
+      }}
     </button>
     <AdjusDepth />
     <button
