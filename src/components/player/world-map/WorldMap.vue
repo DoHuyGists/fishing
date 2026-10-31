@@ -28,6 +28,8 @@ const CaughtModal = defineAsyncComponent(() => import("../caught/CaughtModal.vue
 const FactionSelectModal = defineAsyncComponent(() => import("../faction/FactionSelectModal.vue"));
 const Achievement = defineAsyncComponent(() => import("../badge/Achievement.vue"));
 const FriendModal = defineAsyncComponent(() => import("../friend/FriendModal.vue"));
+const WorkBenchModal = defineAsyncComponent(() => import("../work-bench/WorkBenchModal.vue"));
+const LeaderboardModal = defineAsyncComponent(() => import("../leaderboard/LeaderboardModal.vue"));
 const TeamModal = defineAsyncComponent(() => import("../team/TeamModal.vue"));
 const PostProduction = defineAsyncComponent(() => import("../fishing-post-production/PostProduction.vue"));
 
@@ -256,6 +258,24 @@ onUnmounted(() => {
             <span class="text-sm" aria-hidden="true">🏆</span>
             <span>Huy hiệu</span>
           </button>
+
+          <button
+            type="button"
+            class="flex items-center gap-1.5 px-3 py-1.5 rounded-xl border border-[#cbd9c6] bg-[#f5f9f0] text-[#24352a] shadow-sm font-bold text-xs cursor-pointer transition-colors hover:border-[#70a77e] hover:bg-[#eaf5e8]"
+            @click="modalStore.open('work-bench')"
+          >
+            <span class="text-sm" aria-hidden="true">🛠️</span>
+            <span>Chế tạo</span>
+          </button>
+
+          <button
+            type="button"
+            class="flex items-center gap-1.5 px-3 py-1.5 rounded-xl border border-[#cbd9c6] bg-[#f5f9f0] text-[#24352a] shadow-sm font-bold text-xs cursor-pointer transition-colors hover:border-[#70a77e] hover:bg-[#eaf5e8]"
+            @click="modalStore.open('leaderboard')"
+          >
+            <span class="text-sm" aria-hidden="true">📊</span>
+            <span>Xếp hạng</span>
+          </button>
         </div>
 
         <LatestCaughtList />
@@ -286,6 +306,8 @@ onUnmounted(() => {
           <FriendModal v-if="modalStore.isOpening('friend')" />
           <TeamModal v-if="modalStore.isOpening('team')" />
           <Achievement v-if="modalStore.isOpening('badge')" />
+          <WorkBenchModal v-if="modalStore.isOpening('work-bench')" />
+          <LeaderboardModal v-if="modalStore.isOpening('leaderboard')" />
           <PostProduction v-if="modalStore.isOpening('post-production')" />
           <PrepareModal v-if="modalStore.isOpening('prepare')" />
         </div>
