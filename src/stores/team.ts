@@ -7,6 +7,7 @@ import {
   type UserTeamMember,
   type TeamStatus,
   type TeamJoinType,
+  type UserTeamInvite,
 } from "../data/supabaseTeamRepository";
 
 // Module-level: không đưa vào Pinia state để tránh serialize warning
@@ -20,6 +21,8 @@ export const useTeamStore = defineStore("team", {
     myTeam: null as UserTeam | null,
     /** Thành viên của myTeam */
     myTeamMembers: [] as UserTeamMember[],
+    /** Lời mời vào tổ đội đang chờ của user */
+    myInvites: [] as UserTeamInvite[],
     loading: false,
     actionLoading: false,
     error: "",
@@ -37,11 +40,13 @@ export const useTeamStore = defineStore("team", {
       this.loading = true;
       this.error = "";
       try {
-        const [teams, myTeamData] = await Promise.all([
+        const [teams, myTeamData, myInvites] = await Promise.all([
           supabaseTeamRepository.fetchTeams(),
           supabaseTeamRepository.fetchMyTeam(userId),
+          supabaseTeamRepository.fetchMyInvites(userId),
         ]);
         this.teams = teams;
+        this.myInvites = myInvites;
         this.myTeam = myTeamData?.team ?? null;
         this.myTeamMembers = myTeamData?.members ?? [];
       } catch (err) {
@@ -68,6 +73,11 @@ export const useTeamStore = defineStore("team", {
         .on(
           "postgres_changes",
           { event: "*", schema: "public", table: "user_team_members" },
+          () => { this.loadData(userId); }
+        )
+        .on(
+          "postgres_changes",
+          { event: "*", schema: "public", table: "user_team_invite" },
           () => { this.loadData(userId); }
         )
         .subscribe();
@@ -175,6 +185,54 @@ export const useTeamStore = defineStore("team", {
         return true;
       } catch (err) {
         this.error = err instanceof Error ? err.message : "Không thể đóng nhóm";
+        return false;
+      } finally {
+        this.actionLoading = false;
+      }
+    },
+
+    async closeAndLeaveTeam(userId: string): Promise<boolean> {
+      if (!this.myTeam) return false;
+      this.actionLoading = true;
+      this.error = "";
+      try {
+        const teamId = this.myTeam.id;
+        await supabaseTeamRepository.closeTeam(teamId);
+        await supabaseTeamRepository.leaveTeam(teamId);
+        await this.loadData(userId);
+        return true;
+      } catch (err) {
+        this.error = err instanceof Error ? err.message : "Không thể rời và đóng nhóm";
+        return false;
+      } finally {
+        this.actionLoading = false;
+      }
+    },
+
+    async inviteUser(userId: string, inviteeId: string): Promise<boolean> {
+      if (!this.myTeam || this.myTeam.leader_id !== userId) return false;
+      this.actionLoading = true;
+      this.error = "";
+      try {
+        await supabaseTeamRepository.inviteUser(this.myTeam.id, userId, inviteeId);
+        return true;
+      } catch (err) {
+        this.error = err instanceof Error ? err.message : "Không thể gửi lời mời";
+        return false;
+      } finally {
+        this.actionLoading = false;
+      }
+    },
+
+    async respondInvite(userId: string, inviteId: string, accept: boolean): Promise<boolean> {
+      this.actionLoading = true;
+      this.error = "";
+      try {
+        await supabaseTeamRepository.respondInvite(inviteId, accept);
+        await this.loadData(userId);
+        return true;
+      } catch (err) {
+        this.error = err instanceof Error ? err.message : "Không thể xử lý lời mời";
         return false;
       } finally {
         this.actionLoading = false;

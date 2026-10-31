@@ -26,7 +26,65 @@ export interface UserTeamMember {
   user_profile: Pick<UserProfile, "id" | "level" | "experience_point"> | null;
 }
 
+export type TeamInviteStatus = "PENDING" | "ACCEPTED" | "DECLINED";
+
+export interface UserTeamInvite {
+  id: string;
+  team_id: string;
+  inviter_id: string;
+  invitee_id: string;
+  status: TeamInviteStatus;
+  created_at: string;
+  team: Pick<UserTeam, "id" | "name" | "description" | "max_members" | "status"> | null;
+}
+
 class SupabaseTeamRepository {
+  /** Trưởng nhóm mời người chơi theo id */
+  async inviteUser(teamId: string, inviterId: string, inviteeId: string): Promise<void> {
+    const { data: profile, error: profileError } = await supabase
+      .from("user_profile")
+      .select("id")
+      .eq("id", inviteeId)
+      .maybeSingle();
+    if (profileError) throw new Error(profileError.message || "Không thể kiểm tra người chơi");
+    if (!profile) throw new Error("Không tìm thấy người chơi với ID này");
+
+    const { error } = await supabase
+      .from("user_team_invite")
+      .insert({ team_id: teamId, inviter_id: inviterId, invitee_id: inviteeId });
+    if (error) {
+      if (error.code === "23505") throw new Error("Người chơi này đã được mời vào tổ đội");
+      throw new Error(error.message || "Không thể gửi lời mời");
+    }
+  }
+
+  /** Lời mời đang chờ gửi đến người chơi */
+  async fetchMyInvites(userId: string): Promise<UserTeamInvite[]> {
+    const { data, error } = await supabase
+      .from("user_team_invite")
+      .select("*")
+      .eq("invitee_id", userId)
+      .eq("status", "PENDING")
+      .order("created_at", { ascending: false });
+    if (error) throw new Error(error.message || "Không thể tải lời mời");
+    const invites = data ?? [];
+    if (invites.length === 0) return [];
+
+    const { data: teams, error: teamError } = await supabase
+      .from("user_teams")
+      .select("id, name, description, max_members, status")
+      .in("id", [...new Set(invites.map((invite) => invite.team_id))]);
+    if (teamError) throw new Error(teamError.message || "Không thể tải thông tin tổ đội");
+    const teamById = new Map((teams ?? []).map((team) => [team.id, team]));
+
+    return invites.map((invite) => ({ ...invite, team: teamById.get(invite.team_id) ?? null })) as UserTeamInvite[];
+  }
+
+  async respondInvite(inviteId: string, accept: boolean): Promise<void> {
+    const { error } = await supabase.rpc("respond_team_invite", { p_invite_id: inviteId, p_accept: accept });
+    if (error) throw new Error(error.message || "Không thể xử lý lời mời");
+  }
+
   /** Lấy danh sách nhóm theo status (mặc định OPEN + FULL để hiển thị) */
   async fetchTeams(statuses: TeamStatus[] = ["OPEN", "FULL", "FISHING"]): Promise<UserTeam[]> {
     const { data, error } = await supabase

@@ -1,5 +1,5 @@
 <script lang="ts" setup>
-import { computed, onMounted, onUnmounted, ref } from "vue";
+import { computed, onMounted, ref } from "vue";
 import Modal from "../../shared/Modal.vue";
 import { useTeamStore } from "../../../stores/team.ts";
 import { useAuthStore } from "../../../stores/auth.ts";
@@ -7,7 +7,7 @@ import { useFriendStore } from "../../../stores/friend.ts";
 import type { TeamJoinType, TeamStatus } from "../../../data/supabaseTeamRepository.ts";
 import TeamListSidebar from "./TeamListSidebar.vue";
 import MyTeamPanel from "./MyTeamPanel.vue";
-import InteractWorldMap2 from "../world-map/InteractWorldMap2.vue";
+import TwoOptionsModal from "../../shared/TwoOptionsModal.vue";
 
 // ─── Store ────────────────────────────────────────────────────────────────────
 const authStore = useAuthStore();
@@ -131,19 +131,29 @@ async function handleJoin(teamId: string) {
   if (ok) view.value = "room";
 }
 
+async function handleInvite(inviteeId: string, done: (ok: boolean) => void) {
+  done(await teamStore.inviteUser(userId.value, inviteeId));
+}
+
 // ─── Leave (leader có option chuyển quyền hoặc hủy nhóm) ─────────────────────
+const showLeaveConfirm = ref(false);
 const showLeaveOptions = ref(false);
 const transferTargetId = ref("");
 
-async function handleLeave() {
+function handleLeave() {
+  showLeaveConfirm.value = true;
+}
+
+async function confirmLeave() {
+  showLeaveConfirm.value = false;
   if (isLeader.value && otherMembers.value.length > 0) {
     showLeaveOptions.value = true;
     return;
   }
   // member rời / leader rời nhóm 1 mình → close + leave
   if (isLeader.value && otherMembers.value.length === 0) {
-    await teamStore.closeTeam(userId.value);
-    view.value = "room";
+    const ok = await teamStore.closeAndLeaveTeam(userId.value);
+    if (ok) view.value = "room";
     return;
   }
   await teamStore.leaveTeam(userId.value);
@@ -179,7 +189,14 @@ const showKickConfirm = ref(false);
 const kickTargetId = ref("");
 
 // ─── Close team (leader đóng nhóm) ───────────────────────────────────────────
-async function handleClose() {
+const showCloseConfirm = ref(false);
+
+function handleClose() {
+  showCloseConfirm.value = true;
+}
+
+async function confirmClose() {
+  showCloseConfirm.value = false;
   const ok = await teamStore.closeTeam(userId.value);
   if (ok) view.value = "room";
 }
@@ -214,12 +231,7 @@ const statusClass: Record<string, string> = {
 // ─── Lifecycle ───────────────────────────────────────────────────────────────
 onMounted(async () => {
   await Promise.all([teamStore.loadData(userId.value), friendStore.loadData(userId.value)]);
-  teamStore.subscribeRealtime(userId.value);
   view.value = "room";
-});
-
-onUnmounted(() => {
-  teamStore.unsubscribeRealtime();
 });
 </script>
 
@@ -255,9 +267,12 @@ onUnmounted(() => {
           <MyTeamPanel
             :team="teamStore.myTeam"
             :members="teamStore.myTeamMembers"
+            :invites="teamStore.myInvites"
             :user-id="userId"
             :is-leader="isLeader"
             :action-loading="teamStore.actionLoading"
+            @invite="handleInvite"
+            @respond-invite="(inviteId, accept) => teamStore.respondInvite(userId, inviteId, accept)"
             @create="view = 'create'"
             @edit="openEditForm"
             @close="handleClose"
@@ -275,7 +290,6 @@ onUnmounted(() => {
               }
             "
           />
-          <InteractWorldMap2 />
         </div>
       </div>
 
@@ -616,6 +630,40 @@ onUnmounted(() => {
     <!-- OVERLAY: Leader rời → chọn chuyển quyền / hủy nhóm    -->
     <!-- ════════════════════════════════════════════════════════ -->
     <Teleport to="body">
+      <!-- OVERLAY: Confirm close team -->
+      <TwoOptionsModal
+        v-if="showCloseConfirm"
+        title="Xác nhận hủy nhóm?"
+        message="Nhóm sẽ bị đóng và các thành viên không thể tiếp tục tham gia."
+        first-text="Quay lại"
+        second-text="Xác nhận hủy"
+        :first-disabled="teamStore.actionLoading"
+        :second-disabled="teamStore.actionLoading"
+        :on-first="() => (showCloseConfirm = false)"
+        :on-second="confirmClose"
+        :on-dismiss="() => (showCloseConfirm = false)"
+      />
+
+      <!-- OVERLAY: Confirm leaving team -->
+      <TwoOptionsModal
+        v-if="showLeaveConfirm"
+        title="Xác nhận rời nhóm?"
+        first-text="Quay lại"
+        second-text="Tiếp tục"
+        :first-disabled="teamStore.actionLoading"
+        :second-disabled="teamStore.actionLoading"
+        :on-first="() => (showLeaveConfirm = false)"
+        :on-second="confirmLeave"
+        :on-dismiss="() => (showLeaveConfirm = false)"
+      >
+        <p class="mb-2 text-[0.95rem] leading-normal text-[#374151]">
+          Bạn sẽ rời khỏi nhóm hiện tại.
+          <template v-if="isLeader && otherMembers.length > 0">
+            Tiếp theo, bạn có thể chuyển quyền trưởng nhóm hoặc hủy nhóm.
+          </template>
+        </p>
+      </TwoOptionsModal>
+
       <div
         v-if="showLeaveOptions"
         class="fixed inset-0 z-[10000] bg-black/45 flex items-center justify-center p-4"
@@ -703,44 +751,31 @@ onUnmounted(() => {
       </div>
 
       <!-- OVERLAY: Confirm kick -->
-      <div
+      <TwoOptionsModal
         v-if="showKickConfirm"
-        class="fixed inset-0 z-[10000] bg-black/45 flex items-center justify-center p-4"
-        style="animation: fadeIn 0.18s ease"
-        @click.self="
-          showKickConfirm = false;
-          kickTargetId = '';
+        title="Xác nhận xóa thành viên?"
+        :first-disabled="teamStore.actionLoading"
+        :second-disabled="teamStore.actionLoading"
+        first-text="Hủy"
+        second-text="Xóa thành viên"
+        :on-first="
+          () => {
+            showKickConfirm = false;
+            kickTargetId = '';
+          }
+        "
+        :on-second="() => handleKick(kickTargetId)"
+        :on-dismiss="
+          () => {
+            showKickConfirm = false;
+            kickTargetId = '';
+          }
         "
       >
-        <div
-          class="bg-white rounded-2xl px-6 py-7 max-w-[380px] w-full shadow-[0_20px_60px_rgba(0,0,0,0.22)]"
-          style="animation: slideUp 0.2s ease"
-        >
-          <h4 class="m-0 mb-2 text-[1.05rem] font-extrabold text-[#1a3a1a]">Xác nhận xóa thành viên?</h4>
-          <p class="m-0 mb-4 text-[0.88rem] text-[#445544]">
-            Thành viên <strong class="font-mono">{{ kickTargetId.slice(0, 8) }}…</strong> sẽ bị đưa khỏi tổ đội.
-          </p>
-          <div class="flex gap-2 mt-4">
-            <button
-              class="flex-1 inline-flex items-center justify-center px-4 py-2 rounded-lg text-[0.87rem] font-bold bg-[#fde8e8] text-[#c0392b] border border-[#f5b7b1] cursor-pointer hover:bg-[#fbd4d4] disabled:opacity-55 disabled:cursor-not-allowed transition-colors"
-              :disabled="teamStore.actionLoading"
-              @click="handleKick(kickTargetId)"
-            >
-              Xóa thành viên
-            </button>
-            <button
-              class="flex-1 inline-flex items-center justify-center px-4 py-2 rounded-lg text-[0.87rem] font-bold bg-transparent text-[#556655] border border-[#c0d8b8] cursor-pointer hover:bg-[#f0f7ec] transition-colors"
-              :disabled="teamStore.actionLoading"
-              @click="
-                showKickConfirm = false;
-                kickTargetId = '';
-              "
-            >
-              Hủy
-            </button>
-          </div>
-        </div>
-      </div>
+        <p class="mb-2 text-[0.95rem] leading-normal text-[#374151]">
+          Thành viên <strong class="font-mono">{{ kickTargetId.slice(0, 8) }}…</strong> sẽ bị đưa khỏi tổ đội.
+        </p>
+      </TwoOptionsModal>
     </Teleport>
   </Modal>
 </template>

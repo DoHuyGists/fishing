@@ -6,6 +6,7 @@ import { useEquipmentStore } from "../../../stores/equipment.ts";
 import { onBeforeRouteLeave, useRouter } from "vue-router";
 import DayPhaseClock from "./DayPhaseClock.vue";
 import { supabaseUserInAreaRepository } from "../../../data/supabaseUserInAreaRepository.ts";
+import { supabaseFishRepository } from "../../../data/supabaseFishRepository.ts";
 import { useDayPhaseStore } from "../../../stores/dayPhase.ts";
 import { useUserInAreaStore } from "../../../stores/userInArea.ts";
 
@@ -37,7 +38,11 @@ onBeforeRouteLeave(async (to) => {
   if (to.name !== "fishing" && !isLeaving.value) {
     isLeaving.value = true;
     try {
-      await supabaseUserInAreaRepository.setUserLeaveArea();
+      if (tripCaughtCount.value > 0) {
+        await supabaseUserInAreaRepository.setUserLeaveArea();
+      } else {
+        await supabaseFishRepository.completeFishing();
+      }
     } catch (err) {
       console.error("Lỗi khi cập nhật trạng thái rời bãi câu:", err);
     } finally {

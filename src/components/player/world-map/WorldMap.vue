@@ -7,7 +7,9 @@ import { useNotificationStore } from "../../../stores/notification.ts";
 import LatestCaughtList from "../caught/LatestCaughtList.vue";
 import { useConfigStore } from "../../../stores/config.ts";
 import { useUserTurnsStore } from "../../../stores/userTurns.ts";
+import { useTeamStore } from "../../../stores/team.ts";
 import UserTurn from "../stamina/UserTurn.vue";
+import TeamMembersSticky from "../team/TeamMembersSticky.vue";
 import PrepareModal from "./PrepareModal.vue";
 
 const InteractWorldMap2 = defineAsyncComponent(() => import("./InteractWorldMap2.vue"));
@@ -35,6 +37,7 @@ const modalStore = useModalStore();
 const notificationStore = useNotificationStore();
 const configStore = useConfigStore();
 const userTurnsStore = useUserTurnsStore();
+const teamStore = useTeamStore();
 
 const hasNewNotification = ref(false);
 
@@ -46,6 +49,8 @@ onMounted(() => {
   void userTurnsStore.fetchStatus().then(() => userTurnsStore.startCountdown());
   if (authStore.userId) {
     caughtStore.loadCaughtFishes();
+    void teamStore.loadData(authStore.userId);
+    teamStore.subscribeRealtime(authStore.userId);
     notificationStore.subscribeToNewNotifications(authStore.userId, () => {
       hasNewNotification.value = true;
     });
@@ -54,12 +59,18 @@ onMounted(() => {
 
 onUnmounted(() => {
   void notificationStore.unsubscribeFromNewNotifications();
+  teamStore.unsubscribeRealtime();
   userTurnsStore.stopCountdown();
 });
 </script>
 
 <template>
   <div class="w-screen min-h-screen p-3 relative flex flex-col gap-2 overflow-x-hidden">
+    <TeamMembersSticky
+      v-if="configStore.showTeam && teamStore.myTeamMembers.length"
+      :members="teamStore.myTeamMembers"
+      @open-team="modalStore.open('team')"
+    />
     <header
       class="flex flex-wrap items-center justify-between gap-3 rounded-xl border border-[#cbd9c6] bg-[#f5f9f0] px-4 py-2.5 text-[#24352a]"
     >
@@ -82,7 +93,7 @@ onUnmounted(() => {
         <div class="flex items-center flex-wrap gap-2">
           <button
             type="button"
-            class="flex items-center gap-1.5 px-3 py-1.5 bg-[#153221] hover:bg-[#1a3e29] border border-gray-300 text-white rounded-xl shadow-sm font-bold text-xs cursor-pointer transition-colors"
+            class="flex items-center gap-1.5 px-3 py-1.5 rounded-xl border border-[#cbd9c6] bg-[#f5f9f0] text-[#24352a] shadow-sm font-bold text-xs cursor-pointer transition-colors hover:border-[#70a77e] hover:bg-[#eaf5e8]"
             @click="modalStore.open('account')"
           >
             <span class="text-sm">⚙️</span>
@@ -91,7 +102,7 @@ onUnmounted(() => {
 
           <button
             type="button"
-            class="flex items-center gap-1.5 px-3 py-1.5 bg-[#153221] hover:bg-[#1a3e29] border border-gray-300 text-white rounded-xl shadow-sm font-bold text-xs cursor-pointer transition-colors"
+            class="flex items-center gap-1.5 px-3 py-1.5 rounded-xl border border-[#cbd9c6] bg-[#f5f9f0] text-[#24352a] shadow-sm font-bold text-xs cursor-pointer transition-colors hover:border-[#70a77e] hover:bg-[#eaf5e8]"
             @click="modalStore.open('market')"
           >
             <span class="text-sm">🏪</span>
@@ -100,7 +111,7 @@ onUnmounted(() => {
 
           <button
             type="button"
-            class="flex items-center gap-1.5 px-3 py-1.5 bg-[#153221] hover:bg-[#1a3e29] border border-gray-300 text-white rounded-xl shadow-sm font-bold text-xs cursor-pointer transition-colors"
+            class="flex items-center gap-1.5 px-3 py-1.5 rounded-xl border border-[#cbd9c6] bg-[#f5f9f0] text-[#24352a] shadow-sm font-bold text-xs cursor-pointer transition-colors hover:border-[#70a77e] hover:bg-[#eaf5e8]"
             @click="modalStore.open('shop')"
           >
             <span class="text-sm" aria-hidden="true">🎁</span>
@@ -110,7 +121,7 @@ onUnmounted(() => {
           <!-- Nhật ký -->
           <button
             type="button"
-            class="flex items-center gap-1.5 px-3 py-1.5 bg-[#153221] hover:bg-[#1a3e29] border border-gray-300 text-white rounded-xl shadow-sm font-bold text-xs cursor-pointer transition-colors"
+            class="flex items-center gap-1.5 px-3 py-1.5 rounded-xl border border-[#cbd9c6] bg-[#f5f9f0] text-[#24352a] shadow-sm font-bold text-xs cursor-pointer transition-colors hover:border-[#70a77e] hover:bg-[#eaf5e8]"
             @click="modalStore.open('diary')"
           >
             <span class="text-sm">📖</span>
@@ -120,7 +131,7 @@ onUnmounted(() => {
           <!-- Gacha -->
           <button
             type="button"
-            class="flex items-center gap-1.5 px-3 py-1.5 bg-[#153221] hover:bg-[#1a3e29] border border-gray-300 text-white rounded-xl shadow-sm font-bold text-xs cursor-pointer transition-colors"
+            class="flex items-center gap-1.5 px-3 py-1.5 rounded-xl border border-[#cbd9c6] bg-[#f5f9f0] text-[#24352a] shadow-sm font-bold text-xs cursor-pointer transition-colors hover:border-[#70a77e] hover:bg-[#eaf5e8]"
             @click="modalStore.open('gacha')"
           >
             <span class="text-sm">🎁</span>
@@ -130,7 +141,7 @@ onUnmounted(() => {
           <!-- Túi đồ -->
           <button
             type="button"
-            class="flex items-center gap-1.5 px-3 py-1.5 bg-[#153221] hover:bg-[#1a3e29] border border-gray-300 text-white rounded-xl shadow-sm font-bold text-xs cursor-pointer transition-colors"
+            class="flex items-center gap-1.5 px-3 py-1.5 rounded-xl border border-[#cbd9c6] bg-[#f5f9f0] text-[#24352a] shadow-sm font-bold text-xs cursor-pointer transition-colors hover:border-[#70a77e] hover:bg-[#eaf5e8]"
             @click="modalStore.open('inventory')"
           >
             <span class="text-sm">📦</span>
@@ -140,7 +151,7 @@ onUnmounted(() => {
           <!-- Feedback -->
           <button
             type="button"
-            class="flex items-center gap-1.5 px-3 py-1.5 bg-[#153221] hover:bg-[#1a3e29] border border-gray-300 text-white rounded-xl shadow-sm font-bold text-xs cursor-pointer transition-colors"
+            class="flex items-center gap-1.5 px-3 py-1.5 rounded-xl border border-[#cbd9c6] bg-[#f5f9f0] text-[#24352a] shadow-sm font-bold text-xs cursor-pointer transition-colors hover:border-[#70a77e] hover:bg-[#eaf5e8]"
             @click="modalStore.open('feedback')"
           >
             <span class="text-sm">📄</span>
@@ -150,7 +161,7 @@ onUnmounted(() => {
           <!-- Mission -->
           <button
             type="button"
-            class="flex items-center gap-1.5 px-3 py-1.5 bg-[#153221] hover:bg-[#1a3e29] border border-gray-300 text-white rounded-xl shadow-sm font-bold text-xs cursor-pointer transition-colors"
+            class="flex items-center gap-1.5 px-3 py-1.5 rounded-xl border border-[#cbd9c6] bg-[#f5f9f0] text-[#24352a] shadow-sm font-bold text-xs cursor-pointer transition-colors hover:border-[#70a77e] hover:bg-[#eaf5e8]"
             @click="modalStore.open('mission')"
           >
             <span class="text-sm">📄</span>
@@ -160,7 +171,7 @@ onUnmounted(() => {
           <!-- Event -->
           <button
             type="button"
-            class="flex items-center gap-1.5 px-3 py-1.5 bg-[#153221] hover:bg-[#1a3e29] border border-gray-300 text-white rounded-xl shadow-sm font-bold text-xs cursor-pointer transition-colors"
+            class="flex items-center gap-1.5 px-3 py-1.5 rounded-xl border border-[#cbd9c6] bg-[#f5f9f0] text-[#24352a] shadow-sm font-bold text-xs cursor-pointer transition-colors hover:border-[#70a77e] hover:bg-[#eaf5e8]"
             @click="modalStore.open('event')"
           >
             <span class="text-sm">📄</span>
@@ -169,7 +180,7 @@ onUnmounted(() => {
 
           <button
             type="button"
-            class="flex items-center gap-1.5 px-3 py-1.5 bg-[#153221] hover:bg-[#1a3e29] border border-gray-300 text-white rounded-xl shadow-sm font-bold text-xs cursor-pointer transition-colors"
+            class="flex items-center gap-1.5 px-3 py-1.5 rounded-xl border border-[#cbd9c6] bg-[#f5f9f0] text-[#24352a] shadow-sm font-bold text-xs cursor-pointer transition-colors hover:border-[#70a77e] hover:bg-[#eaf5e8]"
             @click="modalStore.open('caught')"
           >
             <span class="text-sm" aria-hidden="true">🐟</span>
@@ -178,7 +189,7 @@ onUnmounted(() => {
 
           <button
             type="button"
-            class="flex items-center gap-1.5 px-3 py-1.5 bg-[#153221] hover:bg-[#1a3e29] border border-gray-300 text-white rounded-xl shadow-sm font-bold text-xs cursor-pointer transition-colors"
+            class="flex items-center gap-1.5 px-3 py-1.5 rounded-xl border border-[#cbd9c6] bg-[#f5f9f0] text-[#24352a] shadow-sm font-bold text-xs cursor-pointer transition-colors hover:border-[#70a77e] hover:bg-[#eaf5e8]"
             @click="modalStore.open('post-production')"
           >
             <span class="text-sm" aria-hidden="true">🕸️</span>
@@ -188,7 +199,7 @@ onUnmounted(() => {
           <!-- Redeem code -->
           <button
             type="button"
-            class="flex items-center gap-1.5 px-3 py-1.5 bg-[#153221] hover:bg-[#1a3e29] border border-gray-300 text-white rounded-xl shadow-sm font-bold text-xs cursor-pointer transition-colors"
+            class="flex items-center gap-1.5 px-3 py-1.5 rounded-xl border border-[#cbd9c6] bg-[#f5f9f0] text-[#24352a] shadow-sm font-bold text-xs cursor-pointer transition-colors hover:border-[#70a77e] hover:bg-[#eaf5e8]"
             @click="modalStore.open('redeem')"
           >
             <span class="text-sm" aria-hidden="true">🎁</span>
@@ -197,7 +208,7 @@ onUnmounted(() => {
 
           <button
             type="button"
-            class="flex items-center gap-1.5 px-3 py-1.5 bg-[#153221] hover:bg-[#1a3e29] border border-gray-300 text-white rounded-xl shadow-sm font-bold text-xs cursor-pointer transition-colors"
+            class="flex items-center gap-1.5 px-3 py-1.5 rounded-xl border border-[#cbd9c6] bg-[#f5f9f0] text-[#24352a] shadow-sm font-bold text-xs cursor-pointer transition-colors hover:border-[#70a77e] hover:bg-[#eaf5e8]"
             @click="
               hasNewNotification = false;
               modalStore.open('notifications');
@@ -211,7 +222,7 @@ onUnmounted(() => {
           <button
             v-if="configStore.showFaction"
             type="button"
-            class="flex items-center gap-1.5 px-3 py-1.5 bg-[#153221] hover:bg-[#1a3e29] border border-gray-300 text-white rounded-xl shadow-sm font-bold text-xs cursor-pointer transition-colors"
+            class="flex items-center gap-1.5 px-3 py-1.5 rounded-xl border border-[#cbd9c6] bg-[#f5f9f0] text-[#24352a] shadow-sm font-bold text-xs cursor-pointer transition-colors hover:border-[#70a77e] hover:bg-[#eaf5e8]"
             @click="modalStore.open('faction')"
           >
             <span class="text-sm" aria-hidden="true">🛡️</span>
@@ -220,7 +231,7 @@ onUnmounted(() => {
 
           <button
             type="button"
-            class="flex items-center gap-1.5 px-3 py-1.5 bg-[#153221] hover:bg-[#1a3e29] border border-gray-300 text-white rounded-xl shadow-sm font-bold text-xs cursor-pointer transition-colors"
+            class="flex items-center gap-1.5 px-3 py-1.5 rounded-xl border border-[#cbd9c6] bg-[#f5f9f0] text-[#24352a] shadow-sm font-bold text-xs cursor-pointer transition-colors hover:border-[#70a77e] hover:bg-[#eaf5e8]"
             @click="modalStore.open('friend')"
           >
             <span class="text-sm" aria-hidden="true">👥</span>
@@ -230,7 +241,7 @@ onUnmounted(() => {
           <button
             v-if="configStore.showTeam"
             type="button"
-            class="flex items-center gap-1.5 px-3 py-1.5 bg-[#153221] hover:bg-[#1a3e29] border border-gray-300 text-white rounded-xl shadow-sm font-bold text-xs cursor-pointer transition-colors"
+            class="flex items-center gap-1.5 px-3 py-1.5 rounded-xl border border-[#cbd9c6] bg-[#f5f9f0] text-[#24352a] shadow-sm font-bold text-xs cursor-pointer transition-colors hover:border-[#70a77e] hover:bg-[#eaf5e8]"
             @click="modalStore.open('team')"
           >
             <span class="text-sm" aria-hidden="true">🎣</span>
@@ -239,7 +250,7 @@ onUnmounted(() => {
 
           <button
             type="button"
-            class="flex items-center gap-1.5 px-3 py-1.5 bg-[#153221] hover:bg-[#1a3e29] border border-gray-300 text-white rounded-xl shadow-sm font-bold text-xs cursor-pointer transition-colors"
+            class="flex items-center gap-1.5 px-3 py-1.5 rounded-xl border border-[#cbd9c6] bg-[#f5f9f0] text-[#24352a] shadow-sm font-bold text-xs cursor-pointer transition-colors hover:border-[#70a77e] hover:bg-[#eaf5e8]"
             @click="modalStore.open('badge')"
           >
             <span class="text-sm" aria-hidden="true">🏆</span>
