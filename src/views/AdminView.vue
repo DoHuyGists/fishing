@@ -14,6 +14,7 @@ type ModuleKey =
   | "event"
   | "schedule"
   | "redeemCode"
+  | "hourMission"
   | "notifications";
 
 interface AdminModule {
@@ -28,6 +29,7 @@ const moduleComponents = {
   area: defineAsyncComponent(() => import("../components/admin/fishing-area-management/FishingAreaManagement.vue")),
   item: defineAsyncComponent(() => import("../components/admin/item-management/ItemManagement.vue")),
   redeemCode: defineAsyncComponent(() => import("../components/admin/redeem-management/RedeemCodeManagement.vue")),
+  hourMission: defineAsyncComponent(() => import("../components/admin/mission-management/HourMissionManagementModal.vue")),
   notifications: defineAsyncComponent(() => import("../components/admin/notification-management/NotificationManagement.vue")),
   species: defineAsyncComponent(
     () => import("../components/admin/species-management/SpeciesManagementModal.vue"),
@@ -76,6 +78,13 @@ const groups: ModuleGroup[] = [
         label: "Mã đổi thưởng",
         desc: "Tạo mã nhận xu, đặt hạn dùng và bật hoặc tắt mã.",
         component: moduleComponents.redeemCode,
+      },
+      {
+        key: "hourMission",
+        icon: "⏰",
+        label: "Nhiệm vụ giờ",
+        desc: "Quản lý nhiệm vụ câu cá theo khung giờ và phần thưởng.",
+        component: moduleComponents.hourMission,
       },
       {
         key: "notifications",

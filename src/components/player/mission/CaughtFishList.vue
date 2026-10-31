@@ -15,7 +15,7 @@ const emit = defineEmits<{
   toggle: [caught: CaughtFish];
 }>();
 
-const viewMode = ref<ViewMode>("list");
+const viewMode = ref<ViewMode>("grid");
 const expandedSpecies = reactive(new Set<string>());
 
 const groupedBySpecies = computed(() => {

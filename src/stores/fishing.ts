@@ -1,5 +1,6 @@
 import { defineStore } from "pinia";
 import { useAuthStore } from "./auth";
+import { useEquipmentStore } from "./equipment";
 import { supabaseEquipmentRepository } from "../data/supabaseEquipmentRepository";
 import { supabaseFishRepository, type AreaSpeciesDiaryResponse, type FishDepthPreviewResponse } from "../data/supabaseFishRepository";
 import { supabaseUserInAreaRepository } from "../data/supabaseUserInAreaRepository";
@@ -358,6 +359,12 @@ export const useFishingStore = defineStore("fishing", {
       const areaId = this.currentAreaId;
       if (!areaId) {
         this.rejectCast("Không tìm thấy bãi câu. Hãy thử vào lại khu vực.");
+        return;
+      }
+
+      const bait = useEquipmentStore().variants.bait?.find((variant) => variant.id === this.equipmentLoadout.bait);
+      if (!bait || (bait.quantity ?? 0) < 1) {
+        this.rejectCast("Bạn đã hết mồi. Hãy chọn hoặc mua thêm mồi để quăng.");
         return;
       }
 

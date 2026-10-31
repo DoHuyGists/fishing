@@ -1,11 +1,11 @@
 ﻿<script setup lang="ts">
 import { computed, onBeforeUnmount, onMounted, ref, watch } from "vue";
-import { useZoneStore } from "../../../stores/zone";
+import { useWeatherStore } from "../../../stores/weather";
 import { utcToLocalMs } from "../../../utils/time";
 
 const props = defineProps<{ areaId: string | null | undefined }>();
 
-const zoneStore = useZoneStore();
+const weatherStore = useWeatherStore();
 const open = ref(false);
 const nowMs = ref(Date.now());
 let timer: number | undefined;
@@ -64,7 +64,7 @@ const WEATHER_ICON: Record<string, string> = {
 //   CASH_BONUS: { label: "Tiền thưởng", icon: "✨" },
 // };
 
-const weather = computed(() => zoneStore.weather);
+const weather = computed(() => weatherStore.weather);
 const rarityLabel = computed(() => RARITY_LABEL[weather.value?.rarity_tier ?? ""] ?? weather.value?.rarity_tier ?? "");
 const weatherIcon = computed(() => (weather.value ? (WEATHER_ICON[weather.value.code] ?? "🌤️") : "🌤️"));
 
@@ -77,7 +77,7 @@ const weatherIcon = computed(() => (weather.value ? (WEATHER_ICON[weather.value.
 // }
 
 const modifiers = computed(() =>
-  zoneStore.modifiers.map((modifier) => {
+  weatherStore.modifiers.map((modifier) => {
     return {
       code: modifier.code,
       label: modifier?.name,
@@ -90,7 +90,7 @@ const modifiers = computed(() =>
 );
 
 const remainingMs = computed(() => {
-  const exp = zoneStore.zone?.weather_expires_at;
+  const exp = weatherStore.zone?.weather_expires_at;
   const ms = exp ? utcToLocalMs(exp) - nowMs.value : 0;
   return Number.isFinite(ms) ? Math.max(0, ms) : 0;
 });
@@ -101,7 +101,7 @@ const countdown = computed(() => {
   return `${m}:${s}`;
 });
 const progress = computed(() => {
-  const z = zoneStore.zone;
+  const z = weatherStore.zone;
   if (!z?.weather_expires_at || !z.weather_updated_at) return 0;
   const start = utcToLocalMs(z.weather_updated_at);
   const end = utcToLocalMs(z.weather_expires_at);
@@ -114,8 +114,8 @@ const hasWeather = computed(() => !!weather.value);
 watch(
   () => props.areaId,
   (id) => {
-    if (id) zoneStore.init(id);
-    else zoneStore.reset();
+    if (id) weatherStore.init(id);
+    else weatherStore.reset();
   },
   { immediate: true },
 );
@@ -124,16 +124,16 @@ onMounted(() => {
   timer = window.setInterval(() => {
     nowMs.value = Date.now();
     // Hết hạn mà server chưa đổi thời tiết: thử tải lại mỗi 10 giây
-    const exp = zoneStore.zone?.weather_expires_at;
+    const exp = weatherStore.zone?.weather_expires_at;
     if (exp && props.areaId && utcToLocalMs(exp) <= nowMs.value && nowMs.value - lastRefetch >= 10000) {
       lastRefetch = nowMs.value;
-      zoneStore.refresh();
+      weatherStore.refresh();
     }
   }, 1000);
 });
 onBeforeUnmount(() => {
   if (timer) window.clearInterval(timer);
-  zoneStore.reset();
+  weatherStore.reset();
 });
 </script>
 
@@ -145,7 +145,7 @@ onBeforeUnmount(() => {
   >
     <span class="text-sm leading-none">{{ hasWeather ? weatherIcon : "🌤️" }}</span>
     <span>{{ hasWeather ? weather?.name : "Thời tiết" }}</span>
-    <span v-if="hasWeather && zoneStore.zone?.weather_expires_at" class="tabular-nums text-emerald-700">{{
+    <span v-if="hasWeather && weatherStore.zone?.weather_expires_at" class="tabular-nums text-emerald-700">{{
       countdown
     }}</span>
   </button>
@@ -203,12 +203,13 @@ onBeforeUnmount(() => {
                   :src="weather.image"
                   :alt="weather.name"
                   class="h-3/4 w-3/4 object-contain"
+                  draggable="false"
                 />
                 <span v-else>{{ weatherIcon }}</span>
               </div>
               <div class="min-w-0">
                 <div class="text-[10px] font-bold uppercase tracking-widest text-emerald-800">
-                  {{ zoneStore.zone?.name ?? "—" }}
+                  {{ weatherStore.zone?.name ?? "—" }}
                 </div>
                 <div class="truncate text-xl font-bold leading-tight">
                   {{ hasWeather ? weather?.name : "Trời quang đãng" }}
@@ -220,7 +221,7 @@ onBeforeUnmount(() => {
                 >
               </div>
               <div
-                v-if="hasWeather && zoneStore.zone?.weather_expires_at"
+                v-if="hasWeather && weatherStore.zone?.weather_expires_at"
                 class="ml-auto hidden w-fit shrink-0 sm:block"
               >
                 <div class="flex items-baseline justify-between text-xs gap-2 text-emerald-800">
@@ -236,18 +237,18 @@ onBeforeUnmount(() => {
               </div>
             </div>
 
-            <div v-if="zoneStore.loading && !zoneStore.zone" class="px-5 py-8 text-center text-sm text-emerald-800">
+            <div v-if="weatherStore.loading && !weatherStore.zone" class="px-5 py-8 text-center text-sm text-emerald-800">
               Đang tải...
             </div>
-            <div v-else-if="zoneStore.error" class="px-5 py-8 text-center text-sm text-red-600">
-              {{ zoneStore.error }}
+            <div v-else-if="weatherStore.error" class="px-5 py-8 text-center text-sm text-red-600">
+              {{ weatherStore.error }}
             </div>
-            <div v-else-if="!zoneStore.zone" class="px-5 py-8 text-center text-sm text-emerald-800">
+            <div v-else-if="!weatherStore.zone" class="px-5 py-8 text-center text-sm text-emerald-800">
               Khu vực này chưa có dữ liệu môi trường.
             </div>
 
             <template v-else>
-              <div v-if="hasWeather && zoneStore.zone.weather_expires_at" class="px-5 pt-3 sm:hidden">
+              <div v-if="hasWeather && weatherStore.zone?.weather_expires_at" class="px-5 pt-3 sm:hidden">
                 <div class="flex items-baseline justify-between text-xs text-emerald-800">
                   <span>Còn lại</span>
                   <b class="tabular-nums text-emerald-900">{{ countdown }}</b>

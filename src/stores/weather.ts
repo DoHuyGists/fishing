@@ -1,10 +1,10 @@
-﻿import { defineStore } from "pinia";
+import { defineStore } from "pinia";
 import type { RealtimeChannel } from "@supabase/supabase-js";
 import { supabaseZoneRepository, type ZoneWeatherRow } from "../data/supabaseZoneRepository";
 
 let channel: RealtimeChannel | null = null;
 
-export const useZoneStore = defineStore("zones", {
+export const useWeatherStore = defineStore("weather", {
   state: () => ({
     zone: null as ZoneWeatherRow | null,
     loading: false,
@@ -64,5 +64,3 @@ export const useZoneStore = defineStore("zones", {
     },
   },
 });
-
-

@@ -4,7 +4,7 @@ import { isPointInWater } from "../../../data/fishingMap.ts";
 import { useFishingStore } from "../../../stores/fishing.ts";
 import { useEquipmentStore } from "../../../stores/equipment.ts";
 import { onBeforeRouteLeave, useRouter } from "vue-router";
-import ZoneWeather from "./ZoneWeather.vue";
+import DayPhaseClock from "./DayPhaseClock.vue";
 import { supabaseUserInAreaRepository } from "../../../data/supabaseUserInAreaRepository.ts";
 import { useDayPhaseStore } from "../../../stores/dayPhase.ts";
 import { useUserInAreaStore } from "../../../stores/userInArea.ts";
@@ -131,8 +131,6 @@ watch(
   },
 );
 
-const now = ref(new Date());
-let clockTimer: number | undefined;
 let rodPositionFrame: number | undefined;
 
 function updateRodPosition() {
@@ -152,12 +150,10 @@ function trackRodPosition() {
 }
 
 onMounted(() => {
-  clockTimer = window.setInterval(() => (now.value = new Date()), 1000);
   trackRodPosition();
   window.addEventListener("resize", updateRodPosition);
 });
 onBeforeUnmount(() => {
-  if (clockTimer) window.clearInterval(clockTimer);
   if (rodPositionFrame) window.cancelAnimationFrame(rodPositionFrame);
   if (biteMotionFrame !== undefined) window.cancelAnimationFrame(biteMotionFrame);
   window.removeEventListener("resize", updateRodPosition);
@@ -166,10 +162,6 @@ onBeforeUnmount(() => {
     realtimeSubscription = null;
   }
 });
-
-const timeLabel = computed(() =>
-  now.value.toLocaleTimeString("vi-VN", { hour: "2-digit", minute: "2-digit", second: "2-digit" }),
-);
 
 function castAt(event: MouseEvent) {
   const scene = event.currentTarget as HTMLElement;
@@ -201,16 +193,7 @@ function castAt(event: MouseEvent) {
     <div class="scene-shade"></div>
     <div class="absolute top-2 left-2 text-white flex justify-between items-start">
       <div class="flex flex-col gap-2">
-        <div class="location">
-          <div class="w-10 h-10 overflow-hidden">
-            <img :src="dayPhaseStore.currentPhase.icon" :alt="dayPhaseStore.currentPhase.label" class="location-icon" />
-          </div>
-          <div>
-            <strong>{{ timeLabel }}</strong>
-            <small>{{ dayPhaseStore.currentPhase.label }}</small>
-            <ZoneWeather :area-id="userInAreaStore.userInArea?.area_id as string | null" />
-          </div>
-        </div>
+        <DayPhaseClock :area-id="userInAreaStore.userInArea?.area_id" />
         <div class="backdrop-blur-2xl h-fit w-fit rounded p-1">
           <button
             type="button"
@@ -338,49 +321,12 @@ function castAt(event: MouseEvent) {
   pointer-events: none;
 }
 
-.location,
 .weather,
 .scene-status {
   backdrop-filter: blur(10px);
   background: rgba(17, 38, 27, 0.72);
   border: 1px solid rgba(255, 255, 255, 0.2);
   box-shadow: 0 6px 18px rgba(9, 20, 14, 0.16);
-}
-
-.location {
-  display: flex;
-  align-items: center;
-  gap: 10px;
-  padding: 9px 15px 9px 10px;
-  border-radius: 13px;
-}
-
-.location-icon {
-  display: grid;
-  place-items: center;
-  border-radius: 9px;
-  transform: scale(2);
-  transform-origin: top;
-  object-fit: cover;
-  background: #eebd55;
-  color: #244635;
-  font-size: 21px;
-}
-
-.location strong,
-.location small {
-  display: block;
-  line-height: 1.15;
-}
-
-.location strong {
-  font-size: 14px;
-}
-
-.location small {
-  margin-top: 3px;
-  color: #d9e6dc;
-  font-size: 10px;
 }
 
 .weather {
