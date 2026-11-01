@@ -40,6 +40,16 @@ export interface ShopItem {
   rpc: string | null;
 }
 
+export interface Item {
+  id: string;
+  category: string | null;
+  name: string;
+  information: string;
+  image: string | null;
+  icon: string | null;
+  price: number;
+}
+
 export interface ItemPayload {
   category: string | null;
   name: string;
@@ -54,6 +64,13 @@ export interface ItemPayload {
 }
 
 class SupabaseItemRepository {
+  async fetchByIds(ids: string[]): Promise<Item[]> {
+    if (!ids.length) return [];
+    const { data, error } = await supabase.from("items").select("id,category,name,information,image,icon,price").in("id", ids);
+    if (error) throw new Error(error.message);
+    return data.map((item) => ({ ...item, price: Number(item.price) }));
+  }
+
   async fetchShopItems(): Promise<ShopItem[]> {
     const { data, error } = await supabase.from("items").select("id,category,classification,name,information,image,icon,quantity,price,rpc").eq("isDisabled", false).order("classification").order("name");
     if (error) throw new Error(error.message);
