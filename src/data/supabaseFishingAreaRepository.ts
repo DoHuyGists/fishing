@@ -1,4 +1,10 @@
 import supabase from "../database/connection";
+import type { RealtimeChannel } from "@supabase/supabase-js";
+
+export interface FishingSessionRow {
+  id: string;
+  status: string;
+}
 
 export interface FishingAreaRow {
   id: string;
@@ -53,6 +59,29 @@ function toDbPayload(payload: FishingAreaPayload) {
 }
 
 class SupabaseFishingAreaRepository {
+  subscribeToFishingSession(sessionId: string, onBite: (session: FishingSessionRow) => void): RealtimeChannel {
+    return supabase
+      .channel(`fishing_session_${sessionId}`)
+      .on(
+        "postgres_changes",
+        {
+          event: "UPDATE",
+          schema: "public",
+          table: "fishing_sessions",
+          filter: `id=eq.${sessionId}`,
+        },
+        (payload) => {
+          const session = payload.new as FishingSessionRow;
+          if (session.id === sessionId && session.status === "BITE") onBite(session);
+        },
+      )
+      .subscribe();
+  }
+
+  async unsubscribe(channel: RealtimeChannel): Promise<void> {
+    await supabase.removeChannel(channel);
+  }
+
   async fetchAllAreasAdmin(): Promise<FishingAreaRow[]> {
     const { data, error } = await supabase.from("fishing_areas").select("*").order("created_at", { ascending: false });
 

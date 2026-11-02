@@ -22,6 +22,8 @@ type ModalName =
     | "badge"
     | "work-bench"
     | "leaderboard"
+    | "attendance"
+    | "donation"
     ;
 
 export const useModalStore = defineStore("Modal", {

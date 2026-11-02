@@ -27,6 +27,15 @@ export interface Blueprint {
 }
 
 class SupabaseBlueprintRepository {
+  async craft(blueprintId: string, quantity: number): Promise<unknown> {
+    const { data, error } = await supabase.rpc("craft_blueprint", {
+      p_blueprint_id: blueprintId,
+      p_quantity: quantity,
+    });
+    if (error) throw new Error(error.message);
+    return data;
+  }
+
   async fetchAll(): Promise<Blueprint[]> {
     const { data, error } = await supabase.from("blueprint").select("id,result_item_id,result_quantity,required_materials,gold_cost").order("created_at");
     if (error) throw new Error(error.message);

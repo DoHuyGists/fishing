@@ -21,5 +21,8 @@ export const useBlueprintStore = defineStore("blueprint", {
         this.loading = false;
       }
     },
+    async craft(blueprintId: string, quantity: number) {
+      return supabaseBlueprintRepository.craft(blueprintId, quantity);
+    },
   },
 });

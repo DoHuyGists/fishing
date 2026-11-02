@@ -383,7 +383,7 @@ export const useFishingStore = defineStore("fishing", {
         if (error) throw error;
 
         const response = data as unknown as CastRodResponse;
-        if (!response || typeof response.session_id !== "string" || !Number.isFinite(response.wait_time_ms) || response.wait_time_ms < 0 || !isFishingChallenge(response.challenge)) {
+        if (!response || typeof response.session_id !== "string" || !isFishingChallenge(response.challenge)) {
           throw new Error("Invalid cast response");
         }
 
@@ -392,11 +392,6 @@ export const useFishingStore = defineStore("fishing", {
         this.isCasting = false;
         this.castPhase = "waiting";
         this.castMessage = "Mồi đã chạm nước. Đang chờ tín hiệu...";
-        window.setTimeout(() => {
-          if (requestId !== this.castRequestId || !this.sessionId) return;
-          this.castPhase = "bite";
-          this.castMessage = "Tín hiệu! Bấm đúng lúc để móc cá.";
-        }, response.wait_time_ms);
       } catch {
         if (requestId !== this.castRequestId) return;
         this.sessionId = null;
@@ -405,6 +400,11 @@ export const useFishingStore = defineStore("fishing", {
         this.castPhase = "lost";
         this.castMessage = "Không thể kết nối. Hãy thử thả cần lại.";
       }
+    },
+    startChallengeForSession(sessionId: string) {
+      if (this.sessionId !== sessionId || !this.challenge || this.castPhase !== "waiting") return;
+      this.castPhase = "bite";
+      this.castMessage = "Tín hiệu! Bấm đúng lúc để móc cá.";
     },
     reelInBait() {
       if (!this.canReelIn) return;

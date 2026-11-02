@@ -49,6 +49,21 @@ const materials = computed(() => (selectedBlueprint.value?.requiredMaterials ?? 
 })));
 const canCraft = computed(() => Boolean(selectedBlueprint.value && materials.value.every((material) => material.owned >= material.required)));
 
+async function craftSelectedBlueprint() {
+  if (!selectedBlueprint.value || !canCraft.value || isLoading.value) return;
+
+  isLoading.value = true;
+  errorMessage.value = "";
+  try {
+    await blueprintStore.craft(selectedBlueprint.value.id, craftQuantity.value);
+    if (authStore.userId) await inventoryStore.setUserInventory(authStore.userId);
+  } catch (error) {
+    errorMessage.value = error instanceof Error ? error.message : "Không thể chế tạo vật phẩm.";
+  } finally {
+    isLoading.value = false;
+  }
+}
+
 function selectBlueprint(blueprint: Blueprint) {
   selectedBlueprintId.value = blueprint.id;
   craftQuantity.value = 1;
@@ -148,7 +163,7 @@ const guideSteps = [
               <p v-if="!materials.length" class="col-span-full py-5 text-center text-xs opacity-60">Bản vẽ này chưa khai báo nguyên liệu.</p>
             </div>
             <p class="mt-4 text-center text-xs font-semibold" :class="canCraft ? 'text-emerald-700' : 'text-red-600'">{{ canCraft ? `Đủ nguyên liệu · ${selectedBlueprint.goldCost * craftQuantity} vàng` : "Không đủ nguyên liệu để chế tạo số lượng đã chọn" }}</p>
-            <button type="button" class="mt-3 w-full rounded-md bg-emerald-700 px-4 py-2 text-sm font-bold text-white disabled:cursor-not-allowed disabled:opacity-50" :disabled="!canCraft">Chế tạo</button>
+            <button type="button" class="mt-3 w-full rounded-md bg-emerald-700 px-4 py-2 text-sm font-bold text-white disabled:cursor-not-allowed disabled:opacity-50" :disabled="!canCraft || isLoading" @click="craftSelectedBlueprint">{{ isLoading ? "Đang chế tạo..." : "Chế tạo" }}</button>
           </template>
           <div v-else class="grid h-full min-h-64 place-items-center text-center text-sm opacity-60">Chọn một bản vẽ để xem công thức chế tạo.</div>
         </section>

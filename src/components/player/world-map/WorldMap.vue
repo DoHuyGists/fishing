@@ -32,6 +32,8 @@ const WorkBenchModal = defineAsyncComponent(() => import("../work-bench/WorkBenc
 const LeaderboardModal = defineAsyncComponent(() => import("../leaderboard/LeaderboardModal.vue"));
 const TeamModal = defineAsyncComponent(() => import("../team/TeamModal.vue"));
 const PostProduction = defineAsyncComponent(() => import("../fishing-post-production/PostProduction.vue"));
+const AttendanceModal = defineAsyncComponent(() => import("../attendance/AttendanceModal.vue"));
+const DonationModal = defineAsyncComponent(() => import("../donation/DonationModal.vue"));
 
 const authStore = useAuthStore();
 const caughtStore = useCaughtStore();
@@ -170,6 +172,16 @@ onUnmounted(() => {
             <span>Nhiệm vụ</span>
           </button>
 
+          <!-- Attendance -->
+          <button
+            type="button"
+            class="flex items-center gap-1.5 px-3 py-1.5 rounded-xl border border-[#cbd9c6] bg-[#f5f9f0] text-[#24352a] shadow-sm font-bold text-xs cursor-pointer transition-colors hover:border-[#70a77e] hover:bg-[#eaf5e8]"
+            @click="modalStore.open('attendance')"
+          >
+            <span class="text-sm" aria-hidden="true">📅</span>
+            <span>Điểm danh</span>
+          </button>
+
           <!-- Event -->
           <button
             type="button"
@@ -276,6 +288,15 @@ onUnmounted(() => {
             <span class="text-sm" aria-hidden="true">📊</span>
             <span>Xếp hạng</span>
           </button>
+
+          <button
+            type="button"
+            class="flex items-center gap-1.5 px-3 py-1.5 rounded-xl border border-[#cbd9c6] bg-[#f5f9f0] text-[#24352a] shadow-sm font-bold text-xs cursor-pointer transition-colors hover:border-[#70a77e] hover:bg-[#eaf5e8]"
+            @click="modalStore.open('donation')"
+          >
+            <span aria-hidden="true">💚</span>
+            <span>Ủng hộ</span>
+          </button>
         </div>
 
         <LatestCaughtList />
@@ -308,6 +329,8 @@ onUnmounted(() => {
           <Achievement v-if="modalStore.isOpening('badge')" />
           <WorkBenchModal v-if="modalStore.isOpening('work-bench')" />
           <LeaderboardModal v-if="modalStore.isOpening('leaderboard')" />
+          <AttendanceModal v-if="modalStore.isOpening('attendance')" />
+          <DonationModal v-if="modalStore.isOpening('donation')" />
           <PostProduction v-if="modalStore.isOpening('post-production')" />
           <PrepareModal v-if="modalStore.isOpening('prepare')" />
         </div>

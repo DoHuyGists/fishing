@@ -7,6 +7,8 @@ import { onBeforeRouteLeave, useRouter } from "vue-router";
 import DayPhaseClock from "./DayPhaseClock.vue";
 import { supabaseUserInAreaRepository } from "../../../data/supabaseUserInAreaRepository.ts";
 import { supabaseFishRepository } from "../../../data/supabaseFishRepository.ts";
+import { supabaseFishingAreaRepository } from "../../../data/supabaseFishingAreaRepository.ts";
+import type { RealtimeChannel } from "@supabase/supabase-js";
 import { useDayPhaseStore } from "../../../stores/dayPhase.ts";
 import { useUserInAreaStore } from "../../../stores/userInArea.ts";
 
@@ -19,6 +21,30 @@ const showExitConfirmation = ref(false);
 const userInAreaStore = useUserInAreaStore();
 const tripCaughtCount = ref(0);
 let realtimeSubscription: ReturnType<typeof supabaseUserInAreaRepository.subscribeToAreaUsers> | null = null;
+let fishingSessionSubscription: RealtimeChannel | null = null;
+let subscribedSessionId: string | null = null;
+let handledBiteSessionId: string | null = null;
+
+watch(
+  () => fishingStore.sessionId,
+  (sessionId) => {
+    if (fishingSessionSubscription) {
+      void supabaseFishingAreaRepository.unsubscribe(fishingSessionSubscription);
+      fishingSessionSubscription = null;
+    }
+    subscribedSessionId = sessionId;
+    handledBiteSessionId = null;
+    if (!sessionId) return;
+
+    const activeSessionId = sessionId;
+    fishingSessionSubscription = supabaseFishingAreaRepository.subscribeToFishingSession(activeSessionId, (session) => {
+      if (subscribedSessionId !== activeSessionId || handledBiteSessionId === activeSessionId) return;
+      handledBiteSessionId = activeSessionId;
+      fishingStore.startChallengeForSession(session.id);
+    });
+  },
+  { immediate: true },
+);
 
 watch(
   () => fishingStore.castPhase,
@@ -165,6 +191,10 @@ onBeforeUnmount(() => {
   if (realtimeSubscription) {
     supabaseUserInAreaRepository.unsubscribe(realtimeSubscription);
     realtimeSubscription = null;
+  }
+  if (fishingSessionSubscription) {
+    void supabaseFishingAreaRepository.unsubscribe(fishingSessionSubscription);
+    fishingSessionSubscription = null;
   }
 });
 
