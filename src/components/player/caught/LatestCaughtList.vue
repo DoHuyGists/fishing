@@ -1,60 +1,12 @@
 <script lang="ts" setup>
-import { computed, onMounted, ref } from "vue";
-import { supabaseFishRepository } from "../../../data/supabaseFishRepository.ts";
-import { useMarketStore } from "../../../stores/market.ts";
-import { useAuthStore } from "../../../stores/auth.ts";
+import { computed} from "vue";
+
 import { useCaughtStore } from "../../../stores/caught.ts";
-import FishSellConfirm from "./FishSellConfirm.vue";
-import FishReleaseConfirm from "./FishReleaseConfirm.vue";
-const marketStore = useMarketStore();
-const fishToSell = ref<any | null>(null);
-const fishToRelease = ref<any | null>(null);
-const isSellingFish = ref(false);
-const isReleasingFish = ref(false);
-const fishActionError = ref("");
-const authStore = useAuthStore();
+
 const caughtStore = useCaughtStore();
 
 const recentCaughtFishes = computed(() => caughtStore.inNetFishes);
 
-function openSellConfirm(fish: any) {
-  fishToSell.value = fish;
-  fishActionError.value = "";
-}
-
-async function sellFish(price: number) {
-  if (!fishToSell.value) return;
-  if (!authStore.userId) {
-    fishActionError.value = "Bạn chưa đăng nhập.";
-    return;
-  }
-  isSellingFish.value = true;
-  fishActionError.value = "";
-  try {
-    await supabaseFishRepository.listFishOnMarket(fishToSell.value.id, price);
-    caughtStore.caughtFishes = caughtStore.caughtFishes.filter((fish) => fish.id !== fishToSell.value.id);
-    await marketStore.loadMarketListings();
-    fishToSell.value = null;
-  } catch (error: any) {
-    fishActionError.value = error.message || "Không thể đăng bán cá. Vui lòng thử lại.";
-  } finally {
-    isSellingFish.value = false;
-  }
-}
-
-async function releaseFish() {
-  if (!fishToRelease.value) return;
-  isReleasingFish.value = true;
-  try {
-    await supabaseFishRepository.deleteCaughtFish(fishToRelease.value.id);
-    caughtStore.caughtFishes = caughtStore.caughtFishes.filter((fish) => fish.id !== fishToRelease.value.id);
-    fishToRelease.value = null;
-  } catch (error) {
-    console.error("Không thể thả cá:", error);
-  } finally {
-    isReleasingFish.value = false;
-  }
-}
 </script>
 <template>
   <section class="mt-3 w-full max-w-sm rounded-xl border border-emerald-900/15 bg-white/95 p-3 shadow-sm">
@@ -81,6 +33,7 @@ async function releaseFish() {
           :src="fish.species?.image || '/fish/VN/fish.jpg'"
           :alt="fish.species?.name || 'Cá'"
           class="h-10 w-1/3 shrink-0 rounded-md object-cover"
+          draggable="false"
         />
         <div class="min-w-0 flex-1">
           <p class="m-0 truncate text-xs font-bold text-gray-800">{{ fish.species?.name || "Cá chưa rõ tên" }}</p>
@@ -89,38 +42,7 @@ async function releaseFish() {
             {{ fish.created_at ? new Date(fish.created_at).toLocaleDateString("vi-VN") : "" }}
           </p>
         </div>
-        <div class="flex shrink-0 flex-col gap-1">
-          <span class="text-center text-[10px] font-semibold text-emerald-800">#{{ index + 1 }}</span>
-          <button
-            type="button"
-            class="rounded-md border border-emerald-200 bg-emerald-50 px-2 py-1 text-[10px] font-bold text-emerald-800 hover:bg-emerald-100"
-            @click="openSellConfirm(fish)"
-          >
-            Bán
-          </button>
-          <button
-            type="button"
-            class="rounded-md border border-red-200 bg-red-50 px-2 py-1 text-[10px] font-bold text-red-700 hover:bg-red-100"
-            @click="fishToRelease = fish"
-          >
-            Thả
-          </button>
-        </div>
       </li>
     </ul>
   </section>
-
-  <FishSellConfirm
-    :fish="fishToSell"
-    :is-loading="isSellingFish"
-    :error="fishActionError"
-    @cancel="fishToSell = null"
-    @confirm="sellFish"
-  />
-  <FishReleaseConfirm
-    :fish="fishToRelease"
-    :is-loading="isReleasingFish"
-    @cancel="fishToRelease = null"
-    @confirm="releaseFish"
-  />
 </template>

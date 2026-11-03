@@ -43,8 +43,11 @@ watch(
         Chọn trang bị
       </button>
       <EquipmentPickerModal :open="pickerOpen && store.canAdjustDepth" @close="pickerOpen = false" />
-      <button type="button" class="flex items-center gap-2 rounded-xl border border-[#cbd9c6] bg-[#f5f9f0] px-3 py-2 text-[11px] font-bold text-[#24352a] transition hover:border-[#70a77e] hover:bg-[#eaf5e8]" :disabled="!store.canAdjustDepth || !store.currentAreaId || store.isLoadingCurrentArea"
+      <button type="button" class="relative flex items-center gap-2 rounded-xl border border-[#cbd9c6] bg-[#f5f9f0] px-3 py-2 text-[11px] font-bold text-[#24352a] transition hover:border-[#70a77e] hover:bg-[#eaf5e8]" :disabled="!store.canAdjustDepth || !store.currentAreaId || store.isLoadingCurrentArea"
         :title="store.currentAreaLoadError || undefined" @click="openDepthAdjuster">
+        <span class="absolute -top-2 right-2 rounded-full border border-[#cbd9c6] bg-white px-1.5 py-0.5 text-[9px] font-bold leading-none text-[#24352a] shadow-sm" aria-label="Độ sâu đã chọn">
+          {{ store.appliedDepthMeters }} m
+        </span>
         <span aria-hidden="true" class="text-base text-[#398d80]">≋</span>
         {{
           store.isLoadingCurrentArea
@@ -55,21 +58,24 @@ watch(
         }}
       </button>
       <AdjusDepth />
-      <button type="button" class="flex items-center gap-2 rounded-xl border border-[#cbd9c6] bg-[#f5f9f0] px-3 py-2 text-[11px] font-bold text-[#24352a] transition hover:border-[#70a77e] hover:bg-[#eaf5e8]" @click="store.openBag">
-        <span aria-hidden="true" class="text-base">🐟</span>
+      <button type="button" class="relative flex items-center gap-2 rounded-xl border border-[#cbd9c6] bg-[#f5f9f0] px-3 py-2 text-[11px] font-bold text-[#24352a] transition hover:border-[#70a77e] hover:bg-[#eaf5e8]" @click="store.openBag">
+        <span aria-hidden="true" class="text-base">🕸️</span>
         Túi cá
-        <b class="grid min-w-[17px] h-[17px] place-items-center rounded-full bg-[#eebd55] px-1 text-[10px] text-[#244635]">
+        <b class="absolute -top-2 right-2 grid h-[17px] min-w-[17px] place-items-center rounded-full border border-[#cbd9c6] bg-white px-1 text-[9px] font-bold leading-none text-[#24352a] shadow-sm" aria-label="Số cá trong túi">
           {{ store.inventory.length }}
         </b>
       </button>
-      <button type="button" class="flex items-center gap-2 rounded-xl border border-[#cbd9c6] bg-[#f5f9f0] px-3 py-2 text-[11px] font-bold text-[#24352a] transition hover:border-[#70a77e] hover:bg-[#eaf5e8]" @click="store.openLakeGuide">
+      <button type="button" class="relative flex items-center gap-2 rounded-xl border border-[#cbd9c6] bg-[#f5f9f0] px-3 py-2 text-[11px] font-bold text-[#24352a] transition hover:border-[#70a77e] hover:bg-[#eaf5e8]" @click="store.openLakeGuide">
         <span aria-hidden="true" class="text-base">🐠</span>
         Cá trong hồ
+        <b class="absolute -top-2 right-2 grid h-[17px] min-w-[17px] place-items-center rounded-full border border-[#cbd9c6] bg-white px-1 text-[9px] font-bold leading-none text-[#24352a] shadow-sm" aria-label="Số loài cá trong hồ">
+          {{ store.areaSpeciesDiary?.fishes.length ?? 0 }}
+        </b>
       </button>
-      <button type="button" class="flex items-center gap-2 rounded-xl border border-[#cbd9c6] bg-[#f5f9f0] px-3 py-2 text-[11px] font-bold text-[#24352a] transition hover:border-[#70a77e] hover:bg-[#eaf5e8]" @click="store.openPlayers">
+      <button type="button" class="relative flex items-center gap-2 rounded-xl border border-[#cbd9c6] bg-[#f5f9f0] px-3 py-2 text-[11px] font-bold text-[#24352a] transition hover:border-[#70a77e] hover:bg-[#eaf5e8]" @click="store.openPlayers">
         <span aria-hidden="true" class="text-base">👥</span>
         Người câu
-        <b class="grid min-w-[17px] h-[17px] place-items-center rounded-full bg-[#78c6b1] px-1 text-[10px] text-[#173c31]">
+        <b class="absolute -top-2 right-2 grid h-[17px] min-w-[17px] place-items-center rounded-full border border-[#cbd9c6] bg-white px-1 text-[9px] font-bold leading-none text-[#24352a] shadow-sm" aria-label="Số người câu gần đây">
           {{ store.nearbyPlayers.length }}
         </b>
       </button>

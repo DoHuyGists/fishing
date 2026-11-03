@@ -21,7 +21,6 @@ export type CaughtFish = {
   weight: string;
   length?: string;
   image: string;
-  model3d?: string;
   createdAt?: string;
   isShiny?: boolean;
   variantType: "NORMAL" | "GOLDEN" | "MUTATED";
@@ -310,7 +309,6 @@ export const useFishingStore = defineStore("fishing", {
             weight: `${row.weight} kg`,
             variantType: row.variant_type,
             image: species?.image ?? "/fish/VN/fish.jpg",
-            model3d: species?.["3d"] ?? undefined,
             createdAt: row.created_at ?? undefined,
             isShiny: row.is_shiny
           };
@@ -445,7 +443,6 @@ export const useFishingStore = defineStore("fishing", {
             name: response.caught.name,
             weight: `${response.caught.weight} kg`,
             image: response.caught.image ?? "/fish/VN/fish.jpg",
-            model3d: response.caught.model_3d ?? undefined,
             isShiny: response.caught.is_shiny,
             variantType: response.caught.variant_type,
             starRating: response.caught.star_rating,
