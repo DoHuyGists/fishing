@@ -5,6 +5,7 @@ import { useCurrencyStore } from "../../stores/currency.ts";
 import Cash from "../player/currency/Cash.vue";
 import GuideTour from "./GuideTour.vue";
 import UserTurn from "../player/stamina/UserTurn.vue";
+import Shells from "../player/currency/Shells.vue";
 
 const {
   title = "",
@@ -78,8 +79,9 @@ onUnmounted(() => {
           {{ subTitle }}
         </p>
       </div>
-      <div class="order-2 ml-auto shrink-0 sm:order-none sm:ml-0">
+      <div class="flex flex-col md:flex-row md:gap-2 order-2 ml-auto shrink-0 sm:order-none sm:ml-0">
         <Cash :amount="currencyStore.formattedCash" />
+        <Shells :amount="currencyStore.formattedCash" />
         <UserTurn />
       </div>
       <div class="order-3 ml-auto flex max-w-full shrink-0 items-center gap-1 sm:order-none sm:ml-0 sm:gap-2">

@@ -6,6 +6,7 @@ export interface CurrencyRow {
   created_at: string;
   user_id: string;
   cash: number;
+  shells: number;
 }
 
 class SupabaseCurrencyRepository {
@@ -17,6 +18,26 @@ class SupabaseCurrencyRepository {
     }
 
     return data;
+  }
+
+  async buyFishingPass(): Promise<void> {
+    const { error } = await supabase.rpc("purchase_fishing_pass");
+    if (error) throw new Error(error.message);
+  }
+
+  async claimDailyReward(): Promise<{ success: boolean; message?: string; item?: any; next_claim_daily_reward_at?: string }> {
+    const { data, error } = await supabase.rpc("claim_daily_reward");
+    if (error) throw new Error(error.message);
+    return data;
+  }
+
+  async getNextDailyRewardAt(): Promise<string | null> {
+    const { data, error } = await supabase
+      .from("user_flag")
+      .select("next_claim_daily_reward_at")
+      .maybeSingle();
+    if (error) throw new Error(error.message);
+    return data?.next_claim_daily_reward_at ?? null;
   }
 
   /**

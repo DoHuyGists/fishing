@@ -1,42 +1,24 @@
 <script setup lang="ts">
-import { computed, ref } from "vue";
+import { computed, onMounted, onUnmounted, ref } from "vue";
 import Modal from "../../shared/Modal.vue";
 import Tab from "../../shared/Tab.vue";
+import { useCurrencyStore } from "../../../stores/currency.ts";
+import { supabaseCurrencyRepository } from "../../../data/supabaseCurrencyRepository.ts";
+import { useToast } from "../../../composables/useToast.ts";
+import FishingPassPurchaseModal from "./FishingPassPurchaseModal.vue";
+import FishingPassRewards from "./FishingPassRewards.vue";
 
-type Reward = {
-  name: string;
-  icon: string;
-  amount?: number;
-};
-
-type HourReward = {
-  hour: number;
-  reward: Reward;
-  claimed: boolean;
-};
-
-type MonthReward = {
-  day: number;
-  freeReward: Reward;
-  passReward: Reward;
-  freeClaimed: boolean;
-  passClaimed: boolean;
-  unlocked: boolean;
-};
+type Reward = { name: string; icon: string; amount?: number };
+type MonthReward = { day: number; freeReward: Reward; passReward: Reward; freeClaimed: boolean; passClaimed: boolean; unlocked: boolean };
 
 const tabs = [
-  { key: "hourly", label: "Điểm danh theo giờ" },
   { key: "daily", label: "Điểm danh ngày" },
+  { key: "monthly", label: "Điểm danh tháng" },
 ];
-const activeTab = ref("hourly");
-
-// Mock data for trying the attendance UI before connecting it to a repository.
-const hourlyRewards = ref<HourReward[]>([
-  { hour: 7, reward: { name: "Mồi câu", icon: "🪱", amount: 5 }, claimed: true },
-  { hour: 8, reward: { name: "Xu", icon: "🪙", amount: 250 }, claimed: false },
-  { hour: 9, reward: { name: "Phao may mắn", icon: "🎈", amount: 1 }, claimed: false },
-]);
-
+const activeTab = ref("daily");
+const currencyStore = useCurrencyStore();
+const toast = useToast();
+const showPassConfirm = ref(false);
 const mockItems: Reward[] = [
   { name: "Mồi câu", icon: "🪱", amount: 3 },
   { name: "Xu", icon: "🪙", amount: 150 },
@@ -45,34 +27,81 @@ const mockItems: Reward[] = [
   { name: "Phao may mắn", icon: "🎈", amount: 1 },
 ];
 
-const currentDay = 12;
-const monthRewards = ref<MonthReward[]>(
-  Array.from({ length: 30 }, (_, index) => {
-    const day = index + 1;
-    return {
-      day,
-      freeReward: mockItems[(day - 1) % mockItems.length],
-      passReward: mockItems[(day + 1) % mockItems.length],
-      freeClaimed: day < currentDay,
-      passClaimed: day < currentDay && day % 3 === 0,
-      unlocked: day <= currentDay,
+const now = ref(new Date());
+let clockInterval: ReturnType<typeof setInterval> | undefined;
+const dateKey = (date: Date) => `${date.getFullYear()}-${date.getMonth() + 1}-${date.getDate()}`;
+const todayKey = computed(() => dateKey(now.value));
+const currentDay = computed(() => now.value.getDate());
+const daysInMonth = computed(() => new Date(now.value.getFullYear(), now.value.getMonth() + 1, 0).getDate());
+const currentMonthLabel = computed(() => now.value.toLocaleDateString("vi-VN", { month: "long", year: "numeric" }));
+
+const dailyReward = ref<{ date: string; reward: Reward } | null>(null);
+const dailyRewardToday = computed(() => dailyReward.value?.date === todayKey.value ? dailyReward.value.reward : null);
+const nextClaimDailyRewardAt = ref<Date | null>(null);
+const isClaimingDailyReward = ref(false);
+const canClaimDailyReward = computed(() => !nextClaimDailyRewardAt.value || now.value >= nextClaimDailyRewardAt.value);
+const monthRewards = ref<MonthReward[]>([]);
+const claimedMonth = ref("");
+
+function resetForDateChange() {
+  const monthKey = `${now.value.getFullYear()}-${now.value.getMonth() + 1}`;
+  if (claimedMonth.value !== monthKey) {
+    claimedMonth.value = monthKey;
+    monthRewards.value = Array.from({ length: daysInMonth.value }, (_, index) => {
+      const day = index + 1;
+      return {
+        day,
+        freeReward: mockItems[(day - 1) % mockItems.length],
+        passReward: mockItems[(day + 1) % mockItems.length],
+        freeClaimed: false,
+        passClaimed: false,
+        unlocked: day <= currentDay.value,
+      };
+    });
+  } else {
+    monthRewards.value.forEach((entry) => { entry.unlocked = entry.day <= currentDay.value; });
+  }
+}
+
+onMounted(async () => {
+  resetForDateChange();
+  try {
+    const nextClaimAt = await supabaseCurrencyRepository.getNextDailyRewardAt();
+    nextClaimDailyRewardAt.value = nextClaimAt ? new Date(nextClaimAt) : null;
+  } catch (err) {
+    toast.error(err instanceof Error ? err.message : "Không thể tải trạng thái điểm danh.", { title: "Tải thất bại", position: "bottom" });
+  }
+  clockInterval = setInterval(() => {
+    now.value = new Date();
+    resetForDateChange();
+  }, 30_000);
+});
+onUnmounted(() => { if (clockInterval) clearInterval(clockInterval); });
+
+async function claimDailyReward() {
+  if (!canClaimDailyReward.value || isClaimingDailyReward.value) return;
+  isClaimingDailyReward.value = true;
+  try {
+    const result = await supabaseCurrencyRepository.claimDailyReward();
+    if (!result?.success) throw new Error(result?.message || "Không thể nhận phần thưởng hôm nay.");
+    const item = result.item ?? {};
+    dailyReward.value = {
+      date: todayKey.value,
+      reward: {
+        name: item.name ?? item.item_name ?? "Phần thưởng hằng ngày",
+        icon: item.icon ?? "🎁",
+        amount: item.amount ?? item.quantity,
+      },
     };
-  }),
-);
-
-const randomDailyReward = ref<Reward | null>(null);
-const claimedHourlyCount = computed(() => hourlyRewards.value.filter((entry) => entry.claimed).length);
-
-function claimHourly(entry: HourReward) {
-  if (entry.claimed) return;
-  entry.claimed = true;
+    nextClaimDailyRewardAt.value = result.next_claim_daily_reward_at ? new Date(result.next_claim_daily_reward_at) : new Date(Date.now() + 24 * 60 * 60 * 1000);
+    await currencyStore.fetchCurrency();
+    toast.success("Đã nhận phần thưởng điểm danh!", { title: "Thành công", position: "bottom" });
+  } catch (err) {
+    toast.error(err instanceof Error ? err.message : "Không thể nhận phần thưởng. Vui lòng thử lại.", { title: "Nhận thưởng thất bại", position: "bottom" });
+  } finally {
+    isClaimingDailyReward.value = false;
+  }
 }
-
-function claimDailyReward() {
-  if (randomDailyReward.value) return;
-  randomDailyReward.value = mockItems[Math.floor(Math.random() * mockItems.length)];
-}
-
 function claimMonthReward(day: MonthReward, lane: "free" | "pass") {
   if (!day.unlocked) return;
   if (lane === "free") day.freeClaimed = true;
@@ -81,131 +110,44 @@ function claimMonthReward(day: MonthReward, lane: "free" | "pass") {
 </script>
 
 <template>
-  <Modal title="Điểm danh" sub-title="Quà mỗi giờ, mỗi ngày và mỗi tháng">
+  <Modal title="Điểm danh" sub-title="Quà mỗi ngày và mỗi tháng">
     <div class="mx-auto max-w-6xl">
       <Tab v-model="activeTab" :tabs="tabs" aria-label="Loại điểm danh">
-        <template #hourly>
-          <section class="space-y-5">
-            <div class="flex flex-wrap items-end justify-between gap-2">
-              <div>
-                <h3 class="m-0 text-lg font-extrabold text-[#24352a]">Khung giờ hôm nay</h3>
-                <p class="mb-0 mt-1 text-sm text-emerald-900/65">Đăng nhập vào các mốc 7h, 8h và 9h để nhận quà.</p>
-              </div>
-              <span class="rounded-full bg-[#f5f9f0] px-3 py-1 text-xs font-bold text-[#24352a]">
-                Đã nhận {{ claimedHourlyCount }}/{{ hourlyRewards.length }}
-              </span>
-            </div>
-
-            <div class="grid gap-3 sm:grid-cols-3">
-              <article
-                v-for="entry in hourlyRewards"
-                :key="entry.hour"
-                class="rounded-2xl border border-[#cbd9c6] bg-[#f5f9f0] p-4 shadow-sm"
-              >
-                <div class="flex items-center justify-between">
-                  <span class="rounded-lg bg-white px-3 py-1 text-sm font-black text-[#24352a]">{{ entry.hour }}:00</span>
-                  <span v-if="entry.claimed" class="text-xs font-bold text-emerald-700">Đã nhận ✓</span>
-                  <span v-else class="text-xs font-bold text-amber-700">Chưa nhận</span>
-                </div>
-                <div class="my-6 text-center">
-                  <div class="text-5xl" aria-hidden="true">{{ entry.reward.icon }}</div>
-                  <p class="mb-0 mt-2 font-extrabold text-[#24352a]">{{ entry.reward.name }}</p>
-                  <p class="mb-0 mt-1 text-sm text-emerald-900/65">×{{ entry.reward.amount }}</p>
-                </div>
-                <button
-                  type="button"
-                  class="w-full rounded-xl px-4 py-2.5 text-sm font-extrabold transition"
-                  :class="entry.claimed ? 'cursor-default bg-white text-emerald-800' : 'bg-emerald-700 text-white hover:bg-emerald-800'"
-                  :disabled="entry.claimed"
-                  @click="claimHourly(entry)"
-                >
-                  {{ entry.claimed ? "Đã nhận" : "Nhận quà" }}
-                </button>
-              </article>
-            </div>
-          </section>
-        </template>
-
         <template #daily>
           <section class="space-y-5">
             <div class="flex flex-wrap items-center justify-between gap-3 rounded-2xl border border-[#cbd9c6] bg-[#f5f9f0] p-4 sm:p-5">
               <div>
                 <h3 class="m-0 text-lg font-extrabold text-[#24352a]">Quà điểm danh ngày</h3>
-                <p class="mb-0 mt-1 text-sm text-emerald-900/65">Mỗi ngày nhận ngẫu nhiên một vật phẩm.</p>
+                <p class="mb-0 mt-1 text-sm text-emerald-900/65">Mỗi ngày chỉ nhận một phần thưởng. Phần thưởng mới được mở khi sang ngày tiếp theo.</p>
               </div>
-              <button
-                type="button"
-                class="rounded-xl bg-emerald-700 px-5 py-2.5 text-sm font-extrabold text-white hover:bg-emerald-800 disabled:cursor-default disabled:bg-emerald-900/40"
-                :disabled="!!randomDailyReward"
-                @click="claimDailyReward"
-              >
-                {{ randomDailyReward ? "Đã điểm danh hôm nay" : "Điểm danh nhận quà" }}
+              <button type="button" class="rounded-xl bg-emerald-700 px-5 py-2.5 text-sm font-extrabold text-white hover:bg-emerald-800 disabled:cursor-default disabled:bg-emerald-900/40" :disabled="!canClaimDailyReward || isClaimingDailyReward" @click="claimDailyReward">
+                {{ isClaimingDailyReward ? "Đang xử lý..." : canClaimDailyReward ? "Nhận thưởng" : "Chưa đến giờ nhận thưởng" }}
               </button>
             </div>
-
-            <div v-if="randomDailyReward" class="flex items-center gap-4 rounded-2xl border border-amber-300 bg-amber-50 p-4" role="status">
-              <span class="text-4xl" aria-hidden="true">{{ randomDailyReward.icon }}</span>
+            <div v-if="dailyRewardToday" class="flex items-center gap-4 rounded-2xl border border-amber-300 bg-amber-50 p-4" role="status">
+              <span class="text-4xl" aria-hidden="true">{{ dailyRewardToday.icon }}</span>
               <div>
                 <p class="m-0 text-xs font-bold uppercase tracking-wide text-amber-800">Bạn nhận được</p>
-                <p class="mb-0 mt-1 font-extrabold text-[#24352a]">{{ randomDailyReward.name }}<span v-if="randomDailyReward.amount"> ×{{ randomDailyReward.amount }}</span></p>
+                <p class="mb-0 mt-1 font-extrabold text-[#24352a]">{{ dailyRewardToday.name }}<span v-if="dailyRewardToday.amount"> ×{{ dailyRewardToday.amount }}</span></p>
               </div>
             </div>
+          </section>
+        </template>
 
-            <div class="rounded-2xl border border-[#cbd9c6] bg-white p-3 sm:p-5">
-              <div class="mb-4 flex flex-wrap items-center justify-between gap-2">
-                <div>
-                  <h3 class="m-0 text-lg font-extrabold text-[#24352a]">Thẻ điểm danh tháng 11</h3>
-                  <p class="mb-0 mt-1 text-xs text-emerald-900/60">Mở khóa quà theo tiến độ điểm danh trong tháng.</p>
-                </div>
-                <span class="rounded-full bg-[#f5f9f0] px-3 py-1 text-xs font-bold text-[#24352a]">Ngày {{ currentDay }}/30</span>
+        <template #monthly>
+          <section class="space-y-4">
+            <div class="flex flex-wrap items-center justify-between gap-2">
+              <div>
+                <h3 class="m-0 text-lg font-extrabold text-[#24352a]">Thẻ điểm danh {{ currentMonthLabel }}</h3>
+                <p class="mb-0 mt-1 text-sm text-emerald-900/60">Hàng Fishing Pass cần mua pass để mở khóa; hàng miễn phí nhận theo từng ngày.</p>
               </div>
-
-              <div class="grid grid-cols-[3.25rem_repeat(5,minmax(4.5rem,1fr))] gap-1.5 sm:grid-cols-[5rem_repeat(6,minmax(0,1fr))] sm:gap-2">
-                <div class="flex items-center justify-center rounded-lg bg-amber-100 px-1 py-2 text-center text-[10px] font-black uppercase leading-tight text-amber-900 sm:text-xs">
-                  Fishing<br class="sm:hidden" /> Pass
-                </div>
-                <div
-                  v-for="day in monthRewards"
-                  :key="`pass-${day.day}`"
-                  class="min-w-0 rounded-lg border p-1 text-center sm:p-2"
-                  :class="day.unlocked ? 'border-amber-200 bg-amber-50' : 'border-slate-200 bg-slate-50 opacity-60'"
-                >
-                  <span class="block text-[9px] font-bold text-amber-900/75 sm:text-[10px]">{{ day.day }}</span>
-                  <span class="my-1 block text-xl sm:text-2xl" :aria-label="day.passReward.name">{{ day.passReward.icon }}</span>
-                  <button
-                    type="button"
-                    class="w-full rounded-md px-1 py-1 text-[9px] font-extrabold leading-tight sm:text-[10px]"
-                    :class="day.passClaimed ? 'bg-white text-amber-800' : day.unlocked ? 'bg-amber-600 text-white hover:bg-amber-700' : 'bg-slate-200 text-slate-500'"
-                    :disabled="!day.unlocked || day.passClaimed"
-                    @click="claimMonthReward(day, 'pass')"
-                  >{{ day.passClaimed ? "Đã nhận" : day.unlocked ? "Nhận" : "Khóa" }}</button>
-                </div>
-
-                <div class="flex items-center justify-center rounded-lg bg-emerald-100 px-1 py-2 text-center text-[10px] font-black uppercase leading-tight text-emerald-900 sm:text-xs">
-                  Miễn<br class="sm:hidden" /> phí
-                </div>
-                <div
-                  v-for="day in monthRewards"
-                  :key="`free-${day.day}`"
-                  class="min-w-0 rounded-lg border p-1 text-center sm:p-2"
-                  :class="day.unlocked ? 'border-emerald-200 bg-[#f5f9f0]' : 'border-slate-200 bg-slate-50 opacity-60'"
-                >
-                  <span class="block text-[9px] font-bold text-emerald-900/75 sm:text-[10px]">{{ day.day }}</span>
-                  <span class="my-1 block text-xl sm:text-2xl" :aria-label="day.freeReward.name">{{ day.freeReward.icon }}</span>
-                  <button
-                    type="button"
-                    class="w-full rounded-md px-1 py-1 text-[9px] font-extrabold leading-tight sm:text-[10px]"
-                    :class="day.freeClaimed ? 'bg-white text-emerald-800' : day.unlocked ? 'bg-emerald-700 text-white hover:bg-emerald-800' : 'bg-slate-200 text-slate-500'"
-                    :disabled="!day.unlocked || day.freeClaimed"
-                    @click="claimMonthReward(day, 'free')"
-                  >{{ day.freeClaimed ? "Đã nhận" : day.unlocked ? "Nhận" : "Khóa" }}</button>
-                </div>
-              </div>
-              <p class="mb-0 mt-3 text-xs text-emerald-900/60">Hàng Fishing Pass yêu cầu sở hữu pass tháng; hàng Miễn phí dành cho tất cả người chơi. (Mock giao diện)</p>
+              <span class="rounded-full bg-[#f5f9f0] px-3 py-1 text-xs font-bold text-[#24352a]">Ngày {{ currentDay }}/{{ daysInMonth }}</span>
             </div>
+            <FishingPassRewards v-model:show-pass-confirm="showPassConfirm" :month-rewards="monthRewards" @claim="claimMonthReward($event, 'free')" />
           </section>
         </template>
       </Tab>
     </div>
   </Modal>
+  <FishingPassPurchaseModal v-if="showPassConfirm" @close="showPassConfirm = false" />
 </template>

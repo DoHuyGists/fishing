@@ -13,7 +13,7 @@ const fmtPrice = computed(() => props.amount != undefined && props.amount != 0 ?
 
 </script>
 <template>
-    <span class="flex gap-2 items-center">
+    <span class="flex gap-2 items-center bg-white rounded-full px-2">
         <div v-if="props.amount != undefined">{{ fmtPrice }}</div>
         <img src="/currency/cash.svg" :width="props.size" alt="Cash" draggable="false">
     </span>

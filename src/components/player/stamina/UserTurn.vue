@@ -5,7 +5,7 @@ const userTurnsStore = useUserTurnsStore();
 </script>
 
 <template>
-  <div class="flex flex-wrap items-center gap-1 text-sm text-[#24352a]" aria-live="polite">
+  <div class="flex flex-wrap items-center gap-1 text-sm bg-white rounded-full px-2" aria-live="polite">
     <span class="font-bold">
       {{ userTurnsStore.status?.turns ?? "—" }} / {{ userTurnsStore.status?.max_turns ?? "—" }}
     </span>
