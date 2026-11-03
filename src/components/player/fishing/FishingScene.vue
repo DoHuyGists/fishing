@@ -81,8 +81,8 @@ onBeforeRouteLeave(async (to) => {
 watch(
   () => userInAreaStore.userInArea?.area_id,
   (areaId) => {
-    if (areaId) {
-      fishingStore.initializeFishingArea(areaId as string);
+    if (areaId && areaId !== fishingStore.currentAreaId) {
+      void fishingStore.initializeFishingArea(areaId);
     }
   },
 );
@@ -199,11 +199,17 @@ onBeforeUnmount(() => {
 });
 
 function castAt(event: MouseEvent) {
+  if (!fishingStore.canCast) {
+    fishingStore.castTo(fishingStore.baitPosition.x, fishingStore.baitPosition.y);
+    return;
+  }
+
   const scene = event.currentTarget as HTMLElement;
   const bounds = scene.getBoundingClientRect();
   const x = ((event.clientX - bounds.left) / bounds.width) * 100;
   const y = ((event.clientY - bounds.top) / bounds.height) * 100;
-  if (!isPointInWater({ x, y }, fishingStore.currentArea.fishingBoundary)) {
+  const boundary = fishingStore.currentArea?.fishingBoundary;
+  if (Array.isArray(boundary) && boundary.length >= 3 && !isPointInWater({ x, y }, boundary)) {
     invalidTap.value = true;
     fishingStore.rejectCast();
     window.setTimeout(() => (invalidTap.value = false), 520);

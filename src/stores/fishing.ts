@@ -140,12 +140,15 @@ export const useFishingStore = defineStore("fishing", {
     canAdjustLakeDepth: (s) =>
       (s.castPhase === "idle" || s.castPhase === "lost") &&
       !s.isLoadingCurrentArea &&
-      s.currentArea?.id === s.currentAreaId,
+      s.currentArea?.id === s.currentAreaId &&
+      Array.isArray(s.currentArea?.fishingBoundary) &&
+      s.currentArea.fishingBoundary.length >= 3,
     depthConfig: (s) => buildDepthConfig(s.currentArea?.maxDepth),
   },
   actions: {
     async initializeFishingArea(areaId: string) {
       if (!areaId) return;
+      if (areaId === this.currentAreaId && this.currentArea?.id === areaId && !this.currentAreaLoadError) return;
       this.currentAreaId = areaId;
       this.currentArea = {};
       this.isLoadingCurrentArea = true;
@@ -335,7 +338,7 @@ export const useFishingStore = defineStore("fishing", {
       return true;
     },
     openDepthAdjuster() {
-      if (!this.canAdjustLakeDepth) return;
+      if (!this.canAdjustDepth || !this.canAdjustLakeDepth) return;
       this.depthAdjusterOpen = true;
     },
     async selectVariant(category: FishingTool, variantId: string): Promise<boolean> {

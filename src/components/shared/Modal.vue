@@ -81,7 +81,7 @@ onUnmounted(() => {
       </div>
       <div class="flex flex-col md:flex-row md:gap-2 order-2 ml-auto shrink-0 sm:order-none sm:ml-0">
         <Cash :amount="currencyStore.formattedCash" />
-        <Shells :amount="currencyStore.formattedCash" />
+        <Shells :amount="currencyStore.formattedShells" />
         <UserTurn />
       </div>
       <div class="order-3 ml-auto flex max-w-full shrink-0 items-center gap-1 sm:order-none sm:ml-0 sm:gap-2">

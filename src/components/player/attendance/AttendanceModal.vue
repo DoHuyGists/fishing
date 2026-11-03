@@ -7,6 +7,8 @@ import { supabaseCurrencyRepository } from "../../../data/supabaseCurrencyReposi
 import { useToast } from "../../../composables/useToast.ts";
 import FishingPassPurchaseModal from "./FishingPassPurchaseModal.vue";
 import FishingPassRewards from "./FishingPassRewards.vue";
+import DailyAttendance from "./DailyAttendance.vue";
+import { useFishingPassStore } from "../../../stores/fishingPass";
 
 type Reward = { name: string; icon: string; amount?: number };
 type MonthReward = { day: number; freeReward: Reward; passReward: Reward; freeClaimed: boolean; passClaimed: boolean; unlocked: boolean };
@@ -19,13 +21,7 @@ const activeTab = ref("daily");
 const currencyStore = useCurrencyStore();
 const toast = useToast();
 const showPassConfirm = ref(false);
-const mockItems: Reward[] = [
-  { name: "Mồi câu", icon: "🪱", amount: 3 },
-  { name: "Xu", icon: "🪙", amount: 150 },
-  { name: "Năng lượng", icon: "⚡", amount: 2 },
-  { name: "Rương ngư cụ", icon: "🎁", amount: 1 },
-  { name: "Phao may mắn", icon: "🎈", amount: 1 },
-];
+const fishingPassStore = useFishingPassStore();
 
 const now = ref(new Date());
 let clockInterval: ReturnType<typeof setInterval> | undefined;
@@ -39,32 +35,14 @@ const dailyReward = ref<{ date: string; reward: Reward } | null>(null);
 const dailyRewardToday = computed(() => dailyReward.value?.date === todayKey.value ? dailyReward.value.reward : null);
 const nextClaimDailyRewardAt = ref<Date | null>(null);
 const isClaimingDailyReward = ref(false);
-const canClaimDailyReward = computed(() => !nextClaimDailyRewardAt.value || now.value >= nextClaimDailyRewardAt.value);
-const monthRewards = ref<MonthReward[]>([]);
-const claimedMonth = ref("");
-
-function resetForDateChange() {
-  const monthKey = `${now.value.getFullYear()}-${now.value.getMonth() + 1}`;
-  if (claimedMonth.value !== monthKey) {
-    claimedMonth.value = monthKey;
-    monthRewards.value = Array.from({ length: daysInMonth.value }, (_, index) => {
-      const day = index + 1;
-      return {
-        day,
-        freeReward: mockItems[(day - 1) % mockItems.length],
-        passReward: mockItems[(day + 1) % mockItems.length],
-        freeClaimed: false,
-        passClaimed: false,
-        unlocked: day <= currentDay.value,
-      };
-    });
-  } else {
-    monthRewards.value.forEach((entry) => { entry.unlocked = entry.day <= currentDay.value; });
-  }
-}
+const monthRewards = computed(() => [] as MonthReward[]);
 
 onMounted(async () => {
-  resetForDateChange();
+  try {
+    await fishingPassStore.fetchCurrentPass();
+  } catch {
+    // The store exposes the loading error in the pass panel.
+  }
   try {
     const nextClaimAt = await supabaseCurrencyRepository.getNextDailyRewardAt();
     nextClaimDailyRewardAt.value = nextClaimAt ? new Date(nextClaimAt) : null;
@@ -73,13 +51,12 @@ onMounted(async () => {
   }
   clockInterval = setInterval(() => {
     now.value = new Date();
-    resetForDateChange();
   }, 30_000);
 });
 onUnmounted(() => { if (clockInterval) clearInterval(clockInterval); });
 
 async function claimDailyReward() {
-  if (!canClaimDailyReward.value || isClaimingDailyReward.value) return;
+  if ((nextClaimDailyRewardAt.value && now.value < nextClaimDailyRewardAt.value) || isClaimingDailyReward.value) return;
   isClaimingDailyReward.value = true;
   try {
     const result = await supabaseCurrencyRepository.claimDailyReward();
@@ -102,11 +79,7 @@ async function claimDailyReward() {
     isClaimingDailyReward.value = false;
   }
 }
-function claimMonthReward(day: MonthReward, lane: "free" | "pass") {
-  if (!day.unlocked) return;
-  if (lane === "free") day.freeClaimed = true;
-  else day.passClaimed = true;
-}
+function claimMonthReward(_day: MonthReward, _lane: "free" | "pass") { /* Claims require a server-side reward endpoint. */ }
 </script>
 
 <template>
@@ -114,24 +87,7 @@ function claimMonthReward(day: MonthReward, lane: "free" | "pass") {
     <div class="mx-auto max-w-6xl">
       <Tab v-model="activeTab" :tabs="tabs" aria-label="Loại điểm danh">
         <template #daily>
-          <section class="space-y-5">
-            <div class="flex flex-wrap items-center justify-between gap-3 rounded-2xl border border-[#cbd9c6] bg-[#f5f9f0] p-4 sm:p-5">
-              <div>
-                <h3 class="m-0 text-lg font-extrabold text-[#24352a]">Quà điểm danh ngày</h3>
-                <p class="mb-0 mt-1 text-sm text-emerald-900/65">Mỗi ngày chỉ nhận một phần thưởng. Phần thưởng mới được mở khi sang ngày tiếp theo.</p>
-              </div>
-              <button type="button" class="rounded-xl bg-emerald-700 px-5 py-2.5 text-sm font-extrabold text-white hover:bg-emerald-800 disabled:cursor-default disabled:bg-emerald-900/40" :disabled="!canClaimDailyReward || isClaimingDailyReward" @click="claimDailyReward">
-                {{ isClaimingDailyReward ? "Đang xử lý..." : canClaimDailyReward ? "Nhận thưởng" : "Chưa đến giờ nhận thưởng" }}
-              </button>
-            </div>
-            <div v-if="dailyRewardToday" class="flex items-center gap-4 rounded-2xl border border-amber-300 bg-amber-50 p-4" role="status">
-              <span class="text-4xl" aria-hidden="true">{{ dailyRewardToday.icon }}</span>
-              <div>
-                <p class="m-0 text-xs font-bold uppercase tracking-wide text-amber-800">Bạn nhận được</p>
-                <p class="mb-0 mt-1 font-extrabold text-[#24352a]">{{ dailyRewardToday.name }}<span v-if="dailyRewardToday.amount"> ×{{ dailyRewardToday.amount }}</span></p>
-              </div>
-            </div>
-          </section>
+          <DailyAttendance :reward="dailyRewardToday" :next-claim-at="nextClaimDailyRewardAt" :is-claiming="isClaimingDailyReward" @claim="claimDailyReward" />
         </template>
 
         <template #monthly>
