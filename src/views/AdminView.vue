@@ -1,4 +1,4 @@
-﻿<script lang="ts" setup>
+<script lang="ts" setup>
 import { computed, defineAsyncComponent, ref } from "vue";
 
 type ModuleKey =
@@ -15,6 +15,8 @@ type ModuleKey =
   | "schedule"
   | "redeemCode"
   | "hourMission"
+  | "dailyMissionRewards"
+  | "dailyMissionTemplates"
   | "notifications"
   | "fishingPass"
   | "fishingPassRewards";
@@ -28,6 +30,12 @@ interface AdminModule {
 }
 
 const moduleComponents = {
+  dailyMissionRewards: defineAsyncComponent(
+    () => import("../components/admin/daily-mission-rewards-management/DailyMissionRewardManagementModal.vue"),
+  ),
+  dailyMissionTemplates: defineAsyncComponent(
+    () => import("../components/admin/daily-mission-templates-management/DailyMissionTemplateManagementModal.vue"),
+  ),
   area: defineAsyncComponent(() => import("../components/admin/fishing-area-management/FishingAreaManagement.vue")),
   item: defineAsyncComponent(() => import("../components/admin/item-management/ItemsManagementModal.vue")),
   redeemCode: defineAsyncComponent(() => import("../components/admin/redeem-management/RedeemCodeManagement.vue")),
@@ -105,6 +113,20 @@ const groups: ModuleGroup[] = [
         label: "Nhiệm vụ giờ",
         desc: "Quản lý nhiệm vụ câu cá theo khung giờ và phần thưởng.",
         component: moduleComponents.hourMission,
+      },
+      {
+        key: "dailyMissionTemplates",
+        icon: "📋",
+        label: "Mẫu nhiệm vụ hằng ngày",
+        desc: "Quản lý mục tiêu, điểm, độ khó và cấu hình nhiệm vụ hằng ngày.",
+        component: moduleComponents.dailyMissionTemplates,
+      },
+      {
+        key: "dailyMissionRewards",
+        icon: "🎁",
+        label: "Phần thưởng nhiệm vụ hằng ngày",
+        desc: "Thiết lập mốc điểm và phần thưởng nhiệm vụ hằng ngày.",
+        component: moduleComponents.dailyMissionRewards,
       },
       {
         key: "notifications",
@@ -233,13 +255,15 @@ const close = () => {
 <template>
   <div class="min-h-screen bg-slate-50 text-slate-800 lg:flex">
     <!-- Sidebar -->
-    <aside class="hidden lg:flex lg:w-64 lg:shrink-0 flex-col bg-[#153221] text-emerald-50">
-      <div class="px-6 py-5 border-b border-white/10">
+    <aside
+      class="hidden lg:sticky lg:top-0 lg:flex lg:h-dvh lg:w-64 lg:shrink-0 lg:self-start flex-col overflow-hidden bg-[#153221] text-emerald-50"
+    >
+      <div class="shrink-0 px-6 py-5 border-b border-white/10">
         <p class="text-lg font-extrabold leading-tight">Quản trị</p>
         <p class="text-xs text-emerald-200/70 mt-0.5">Hệ thống câu cá</p>
       </div>
 
-      <nav class="flex-1 overflow-y-auto px-3 py-4 space-y-5" aria-label="Điều hướng quản trị">
+      <nav class="min-h-0 flex-1 overflow-y-auto overscroll-contain px-3 py-4 space-y-5" aria-label="Điều hướng quản trị">
         <section v-for="group in groups" :key="group.title">
           <h2 class="px-3 mb-1.5 text-xs font-semibold text-emerald-200/60">{{ group.title }}</h2>
           <ul class="space-y-0.5">
