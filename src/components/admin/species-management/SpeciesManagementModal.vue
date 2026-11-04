@@ -1,4 +1,5 @@
 <script lang="ts" setup>
+import AdminModal from "../AdminModal.vue";
 import { computed, onMounted, ref } from "vue";
 import type { SpeciesRow } from "../../../data/supabaseSpeciesRepository";
 import { useAdminSpeciesStore } from "./admin-species-store.ts";
@@ -76,31 +77,12 @@ onMounted(() => speciesStore.fetchAll());
 </script>
 
 <template>
-  <div class="fixed inset-0 z-50 flex flex-col bg-gray-50">
-    <header
-      class="flex shrink-0 items-center justify-between gap-4 border-b border-emerald-900 bg-[#153221] px-5 py-4 text-white md:px-7"
-    >
-      <div class="flex min-w-0 items-center gap-3">
-        <div
-          class="grid size-10 shrink-0 place-items-center rounded-lg border border-emerald-400/30 bg-emerald-800 text-xl"
-        >
-          🐟
-        </div>
-        <div class="min-w-0">
-          <h2 class="m-0 text-lg font-extrabold">Quản lý loài cá</h2>
-          <p class="m-0 text-xs text-emerald-200">{{ speciesStore.species.length }} loài trong danh mục</p>
-        </div>
-      </div>
-      <button
-        type="button"
-        title="Đóng"
-        aria-label="Đóng"
-        class="grid size-9 shrink-0 place-items-center rounded-lg border border-emerald-600 bg-emerald-900/50 text-xl hover:bg-emerald-800"
-        @click="emit('close')"
-      >
-        &times;
-      </button>
-    </header>
+  <AdminModal
+    title="Quản lý loài cá"
+    icon="🐟"
+    @close="emit('close')"
+  >
+    <template #subtitle>{{ speciesStore.species.length }} loài trong danh mục</template>
 
     <div class="flex shrink-0 flex-wrap items-center gap-3 border-b border-gray-200 bg-white px-5 py-3 md:px-7">
       <div class="relative min-w-55 flex-1">
@@ -166,10 +148,10 @@ onMounted(() => speciesStore.fetchAll());
     </div>
 
     <main class="relative flex min-h-0 flex-1">
-      <section class="min-w-0 flex-1 overflow-auto p-4 md:p-6">
+      <section class="flex min-h-0 min-w-0 flex-1 flex-col overflow-hidden p-4 md:p-6">
         <div
           v-if="speciesStore.error"
-          class="mb-4 flex items-center justify-between gap-3 rounded-lg border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-700"
+          class="mb-4 flex shrink-0 items-center justify-between gap-3 rounded-lg border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-700"
         >
           <span>{{ speciesStore.error }}</span>
           <button type="button" class="font-bold underline" @click="speciesStore.fetchAll">Thử lại</button>
@@ -186,7 +168,7 @@ onMounted(() => speciesStore.fetchAll());
             {{ speciesStore.species.length ? "Không tìm thấy loài cá phù hợp." : "Chưa có loài cá nào." }}
           </div>
         </div>
-        <div v-else class="rounded-lg border border-gray-200 bg-white shadow-sm">
+        <div v-else class="min-h-0 flex-1 overflow-auto rounded-lg border border-gray-200 bg-white shadow-sm">
           <table class="w-full min-w-[1050px] border-collapse text-left text-sm">
             <thead class="text-[11px] uppercase text-gray-600">
               <tr>
@@ -301,5 +283,5 @@ onMounted(() => speciesStore.fetchAll());
         </div>
       </div>
     </div>
-  </div>
+  </AdminModal>
 </template>

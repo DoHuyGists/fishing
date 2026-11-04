@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import AdminModal from "../AdminModal.vue";
 import { onMounted, onUnmounted } from "vue";
 import TwoOptionsModal from "../../shared/TwoOptionsModal.vue";
 import DailyMissionRewardForm from "./DailyMissionRewardForm.vue";
@@ -15,17 +16,13 @@ onUnmounted(() => { store.isFormOpen = false; store.confirmDeleteId = null; });
 </script>
 
 <template>
-  <div class="fixed inset-0 z-50 flex flex-col bg-gray-50 text-[#24352a]" role="dialog" aria-modal="true" aria-label="Quản lý phần thưởng hằng ngày">
-    <header class="flex shrink-0 items-center justify-between gap-3 border-b border-emerald-900 bg-[#153221] px-5 py-2.5 text-white md:px-7">
-      <div class="flex min-w-0 items-center gap-3">
-        <span class="grid size-9 shrink-0 place-items-center rounded-lg border border-emerald-500/50 bg-emerald-800 text-xl" aria-hidden="true">🎁</span>
-        <div class="min-w-0">
-          <div class="text-base font-bold leading-tight">Quản lý phần thưởng hằng ngày</div>
-          <div class="mt-0.5 text-xs font-medium leading-tight text-emerald-200">{{ store.items.length }} mốc thưởng trong danh sách</div>
-        </div>
-      </div>
-      <button type="button" aria-label="Đóng" :disabled="store.isSaving || store.isDeleting" class="grid size-8 shrink-0 place-items-center rounded-lg border border-emerald-500/70 bg-emerald-900/50 text-lg hover:bg-emerald-800 focus-visible:outline-2 focus-visible:outline-emerald-300 disabled:opacity-50" @click="close">&times;</button>
-    </header>
+  <AdminModal
+    title="Quản lý phần thưởng hằng ngày"
+    icon="🎁"
+    :close-disabled="store.isSaving || store.isDeleting"
+    @close="close"
+  >
+    <template #subtitle>{{ store.items.length }} mốc thưởng trong danh sách</template>
     <div class="flex shrink-0 flex-wrap items-center gap-3 border-b border-gray-200 bg-white px-5 py-3 md:px-7">
       <input v-model="store.search" type="search" aria-label="Tìm kiếm" placeholder="Tìm theo mốc điểm..." class="min-w-48 flex-1 rounded-lg border border-slate-300 bg-gray-50 px-3 py-2.5 text-sm placeholder:text-slate-400 focus:border-emerald-600 focus:outline-none focus:ring-2 focus:ring-emerald-600/15" />
       <label class="flex items-center gap-2 text-sm text-slate-600">
@@ -73,5 +70,5 @@ onUnmounted(() => { store.isFormOpen = false; store.confirmDeleteId = null; });
       <div>Bản ghi sẽ bị xoá vĩnh viễn.</div>
       <div v-if="store.loadError" role="alert" class="mt-2 text-red-700">{{ store.loadError }}</div>
     </TwoOptionsModal>
-  </div>
+  </AdminModal>
 </template>

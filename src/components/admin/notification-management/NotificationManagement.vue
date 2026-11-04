@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import AdminModal from "../AdminModal.vue";
 import { onMounted } from "vue";
 import NotificationForm from "./NotificationForm.vue";
 import { useAdminNotificationStore } from "./admin-notification-store";
@@ -13,30 +14,12 @@ onMounted(() => store.fetchRows());
 </script>
 
 <template>
-  <div class="fixed inset-0 z-50 flex flex-col bg-gray-50">
-    <header
-      class="flex shrink-0 items-center justify-between gap-4 border-b border-emerald-900 bg-[#153221] px-5 py-4 text-white md:px-7"
-    >
-      <div class="flex min-w-0 items-center gap-3">
-        <div
-          class="grid size-10 shrink-0 place-items-center rounded-lg border border-emerald-400/30 bg-emerald-800 text-xl"
-        >
-          🔔
-        </div>
-        <div>
-          <h2 class="m-0 text-lg font-extrabold">Quản lý thông báo</h2>
-          <p class="m-0 text-xs text-emerald-200">{{ store.rows.length }} thông báo</p>
-        </div>
-      </div>
-      <button
-        type="button"
-        aria-label="Đóng"
-        class="grid size-9 place-items-center rounded-lg border border-emerald-600 bg-emerald-900/50 text-xl hover:bg-emerald-800"
-        @click="emit('close')"
-      >
-        &times;
-      </button>
-    </header>
+  <AdminModal
+    title="Quản lý thông báo"
+    icon="🔔"
+    @close="emit('close')"
+  >
+    <template #subtitle>{{ store.rows.length }} thông báo</template>
     <div class="flex shrink-0 flex-wrap items-center gap-3 border-b border-gray-200 bg-white px-5 py-3 md:px-7">
       <div class="flex rounded-lg bg-gray-100 p-1">
         <button
@@ -167,5 +150,5 @@ onMounted(() => store.fetchRows());
         </div>
       </div>
     </div>
-  </div>
+  </AdminModal>
 </template>

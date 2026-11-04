@@ -1,4 +1,5 @@
 <script lang="ts" setup>
+import AdminModal from "./AdminModal.vue";
 import { computed, reactive, ref } from "vue";
 
 export interface CrudOption {
@@ -131,17 +132,12 @@ async function confirmDelete() {
 </script>
 
 <template>
-  <div class="fixed inset-0 z-50 flex flex-col bg-white">
-    <div class="px-6 py-4 bg-[#153221] text-white flex items-center justify-between border-b border-emerald-800 shrink-0">
-      <div class="flex items-center gap-3">
-        <div class="w-10 h-10 rounded-xl bg-emerald-700/60 border border-emerald-500/40 grid place-items-center text-xl">{{ icon }}</div>
-        <div>
-          <h2 class="m-0 text-lg font-extrabold tracking-wide">{{ title }}</h2>
-          <p class="m-0 text-xs text-emerald-200">{{ subtitle }}</p>
-        </div>
-      </div>
-      <button type="button" class="w-8 h-8 rounded-full border border-emerald-600/50 bg-emerald-900/50 text-white hover:bg-emerald-800 font-bold text-lg cursor-pointer" @click="emit('close')">&times;</button>
-    </div>
+  <AdminModal
+    :title="title"
+    :icon="icon"
+    :subtitle="subtitle"
+    @close="emit('close')"
+  >
 
     <div class="px-6 py-3 bg-gray-50 border-b border-gray-200 flex items-center gap-3 shrink-0">
       <input v-model="search" type="text" placeholder="Tìm kiếm..." class="flex-1 px-3 py-1.5 text-xs border border-gray-300 rounded-lg bg-white focus:outline-none" />
@@ -205,5 +201,5 @@ async function confirmDelete() {
         </div>
       </form>
     </div>
-  </div>
+  </AdminModal>
 </template>

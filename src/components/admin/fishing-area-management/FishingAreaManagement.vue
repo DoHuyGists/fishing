@@ -1,4 +1,5 @@
 <script lang="ts" setup>
+import AdminModal from "../AdminModal.vue";
 import { computed, ref, watch } from "vue";
 import { mapData } from "../../../data/map.ts";
 import InteractWorldMap2 from "../../player/world-map/InteractWorldMap.vue";
@@ -93,31 +94,12 @@ watch(
 </script>
 
 <template>
-  <div class="fixed inset-0 z-50 flex flex-col bg-white">
-    <!-- Header -->
-    <div
-      class="px-6 py-4 bg-[#153221] text-white flex items-center justify-between border-b border-emerald-800 shrink-0"
-    >
-      <div class="flex items-center gap-3">
-        <div
-          class="w-10 h-10 rounded-xl bg-emerald-700/60 border border-emerald-500/40 grid place-items-center text-xl shadow-inner"
-        >
-          🗺️
-        </div>
-        <div>
-          <h2 class="m-0 text-lg font-extrabold tracking-wide">Quản lý bãi câu</h2>
-          <p class="m-0 text-xs text-emerald-200">Thêm, sửa, xoá và tìm kiếm bãi câu (fishing_areas)</p>
-        </div>
-      </div>
-
-      <button
-        type="button"
-        class="w-8 h-8 rounded-full border border-emerald-600/50 bg-emerald-900/50 text-white hover:bg-emerald-800 font-bold text-lg flex items-center justify-center cursor-pointer transition-colors"
-        @click="emit('close')"
-      >
-        &times;
-      </button>
-    </div>
+  <AdminModal
+    title="Quản lý bãi câu"
+    icon="🗺️"
+    subtitle="Thêm, sửa, xoá và tìm kiếm bãi câu (fishing_areas)"
+    @close="emit('close')"
+  >
 
     <!-- Toolbar -->
     <div
@@ -315,5 +297,5 @@ watch(
         </div>
       </div>
     </div>
-  </div>
+  </AdminModal>
 </template>

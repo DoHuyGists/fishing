@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import AdminModal from "../AdminModal.vue";
 import { onMounted } from "vue";
 import { useFeedbackListStore } from "../../../stores/feedbackList";
 
@@ -12,39 +13,22 @@ function formatDate(value: string) {
 </script>
 
 <template>
-  <div
-    class="fixed inset-0 z-[10000] flex items-center justify-center bg-slate-950/50 p-1 sm:p-2"
-    @click.self="emit('close')"
+  <AdminModal
+    title="Danh sách góp ý"
+    subtitle="Các phản hồi được gửi từ người chơi."
+    :z-index="10000"
+    @close="emit('close')"
   >
-    <section
-      role="dialog"
-      aria-modal="true"
-      aria-labelledby="feedback-list-title"
-      class="flex h-full max-h-full w-full max-w-none flex-col overflow-hidden rounded-xl bg-white shadow-2xl"
-    >
-      <header class="flex items-center justify-between border-b border-slate-200 px-5 py-4 sm:px-6">
-        <div>
-          <h2 id="feedback-list-title" class="text-lg font-bold text-[#153221]">Danh sách góp ý</h2>
-          <p class="text-sm text-slate-500">Các phản hồi được gửi từ người chơi.</p>
-        </div>
-        <div class="flex gap-2">
-          <button
-            type="button"
-            class="rounded-lg border border-slate-300 px-3 py-2 text-sm hover:bg-slate-50"
-            :disabled="store.loading"
-            @click="store.fetchOpinionFeedback()"
-          >
-            Tải lại</button
-          ><button
-            type="button"
-            aria-label="Đóng"
-            class="h-9 w-9 rounded-full text-2xl leading-none hover:bg-slate-100"
-            @click="emit('close')"
-          >
-            &times;
-          </button>
-        </div>
-      </header>
+    <div class="flex shrink-0 justify-end border-b border-[#cbd9c6] bg-white px-4 py-3 sm:px-6">
+      <button
+        type="button"
+        class="rounded-lg border border-slate-300 px-3 py-2 text-sm hover:bg-slate-50"
+        :disabled="store.loading"
+        @click="store.fetchOpinionFeedback()"
+      >
+        Tải lại
+      </button>
+    </div>
       <div class="min-h-0 flex-1 overflow-auto p-4 sm:p-6">
         <p v-if="store.error" role="alert" class="mb-4 rounded-lg bg-red-50 px-4 py-3 text-sm text-red-700">
           {{ store.error }}
@@ -77,6 +61,5 @@ function formatDate(value: string) {
           </article>
         </div>
       </div>
-    </section>
-  </div>
+  </AdminModal>
 </template>

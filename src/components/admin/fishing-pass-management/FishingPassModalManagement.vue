@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import AdminModal from "../AdminModal.vue";
 import { computed, ref } from "vue";
 import { useAdminFishingPassStore } from "./admin-fishing-pass-store";
 import type { FishingPass, FishingPassPayload } from "./fishing-pass-admin";
@@ -30,12 +31,12 @@ store.fetchAll();
 </script>
 
 <template>
-  <div class="fixed inset-0 z-50 flex bg-black/50" @keydown.esc="emit('close')">
-    <section class="flex h-full w-full flex-col overflow-hidden bg-[#f5f9f0] text-[#24352a] shadow-2xl" role="dialog" aria-modal="true" aria-labelledby="fishing-pass-title">
-      <header class="flex items-center justify-between bg-[#153221] px-5 py-4 text-white sm:px-7">
-        <div><h2 id="fishing-pass-title" class="text-lg font-bold">Quản lý vé câu</h2><p class="text-sm text-emerald-100/80">Tạo và quản lý thời hạn, giá vé câu.</p></div>
-        <button type="button" aria-label="Đóng" class="rounded-lg px-3 py-1 text-2xl hover:bg-white/10" @click="emit('close')">&times;</button>
-      </header>
+  <AdminModal
+    title="Quản lý vé câu"
+    subtitle="Tạo và quản lý thời hạn, giá vé câu."
+    @close="emit('close')"
+    @keydown.esc="emit('close')"
+  >
       <div v-if="formOpen" class="overflow-y-auto p-5 sm:p-7">
         <h3 class="mb-4 text-base font-bold">{{ editing ? 'Sửa vé câu' : 'Tạo vé câu' }}</h3>
         <p v-if="store.error" class="mb-3 rounded-lg bg-red-50 p-3 text-sm text-red-700">{{ store.error }}</p>
@@ -60,9 +61,8 @@ store.fetchAll();
           </div>
         </div>
       </template>
-    </section>
     <div v-if="deleting" class="fixed inset-0 z-[60] grid place-items-center bg-black/45 p-4">
       <div class="w-full max-w-sm rounded-xl bg-white p-5 shadow-xl"><h3 class="font-bold">Xác nhận xoá vé</h3><p class="my-3 text-sm text-slate-600">Bạn có chắc muốn xoá “{{ deleting.name }}”?</p><div class="flex justify-end gap-2"><button type="button" class="rounded-lg border px-3 py-2 text-sm" @click="deleting = null">Huỷ</button><button type="button" class="rounded-lg bg-red-700 px-3 py-2 text-sm font-semibold text-white" @click="confirmRemove">Xoá vé</button></div></div>
     </div>
-  </div>
+  </AdminModal>
 </template>

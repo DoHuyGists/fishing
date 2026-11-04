@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import AdminModal from "../AdminModal.vue";
 import { computed, onMounted, ref } from "vue";
 import { useDepthScopeStore } from "./admin-depth-scope-store.ts";
 import DepthScopeForm from "./DepthScopeForm.vue";
@@ -39,21 +40,11 @@ onMounted(() => store.fetchAll());
 </script>
 
 <template>
-  <section class="fixed inset-0 z-50 flex flex-col bg-[#f5f9f0] text-[#24352a]">
-    <header class="flex shrink-0 items-center justify-between border-b border-[#cbd9c6] bg-white px-5 py-4 sm:px-8">
-      <div>
-        <h2 class="m-0 text-xl font-bold">Quản lý phạm vi độ sâu</h2>
-        <p class="m-0 mt-1 text-sm text-gray-500">Tạo và cấu hình các khoảng độ sâu dùng trong trò chơi.</p>
-      </div>
-      <button
-        type="button"
-        aria-label="Đóng"
-        class="rounded-lg px-3 py-2 text-2xl leading-none text-gray-500 hover:bg-[#f5f9f0]"
-        @click="emit('close')"
-      >
-        &times;
-      </button>
-    </header>
+  <AdminModal
+    title="Quản lý phạm vi độ sâu"
+    subtitle="Tạo và cấu hình các khoảng độ sâu dùng trong trò chơi."
+    @close="emit('close')"
+  >
 
     <div class="flex shrink-0 flex-wrap items-center gap-3 border-b border-[#cbd9c6] bg-white px-5 py-3 sm:px-8">
       <input
@@ -170,5 +161,5 @@ onMounted(() => store.fetchAll());
         </div>
       </div>
     </div>
-  </section>
+  </AdminModal>
 </template>

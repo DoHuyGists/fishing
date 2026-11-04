@@ -1,4 +1,5 @@
 <script lang="ts" setup>
+import AdminModal from "../AdminModal.vue";
 import { onMounted } from "vue";
 import { storeToRefs } from "pinia";
 import type { AdminItemRow } from "../../../data/supabaseItemRepository";
@@ -21,31 +22,12 @@ onMounted(loadItems);
 </script>
 
 <template>
-  <div class="fixed inset-0 z-50 flex flex-col bg-gray-50">
-    <header
-      class="flex shrink-0 items-center justify-between gap-4 border-b border-emerald-900 bg-[#153221] px-5 py-4 text-white md:px-7"
-    >
-      <div class="flex min-w-0 items-center gap-3">
-        <div
-          class="grid size-10 shrink-0 place-items-center rounded-lg border border-emerald-400/30 bg-emerald-800 text-xl"
-        >
-          🎒
-        </div>
-        <div class="min-w-0">
-          <h2 class="m-0 text-lg font-extrabold">Quản lý vật phẩm</h2>
-          <p class="m-0 text-xs text-emerald-200">{{ items.length }} vật phẩm trong danh mục</p>
-        </div>
-      </div>
-      <button
-        type="button"
-        title="Đóng"
-        aria-label="Đóng"
-        class="grid size-9 shrink-0 place-items-center rounded-lg border border-emerald-600 bg-emerald-900/50 text-xl hover:bg-emerald-800"
-        @click="emit('close')"
-      >
-        &times;
-      </button>
-    </header>
+  <AdminModal
+    title="Quản lý vật phẩm"
+    icon="🎒"
+    @close="emit('close')"
+  >
+    <template #subtitle>{{ items.length }} vật phẩm trong danh mục</template>
 
     <div class="flex shrink-0 flex-wrap items-center gap-3 border-b border-gray-200 bg-white px-5 py-3 md:px-7">
       <div class="min-w-55 flex-1">
@@ -270,5 +252,5 @@ onMounted(loadItems);
         </div>
       </div>
     </div>
-  </div>
+  </AdminModal>
 </template>
