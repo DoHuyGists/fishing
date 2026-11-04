@@ -4,8 +4,11 @@ import { useMissionStore } from "../../../stores/mission.ts";
 import { useCaughtStore, type CaughtFish } from "../../../stores/caught.ts";
 import { useToast } from "../../../composables/useToast.ts";
 import Modal from "../../shared/Modal.vue";
+import Tab from "../../shared/Tab.vue";
+import type { TabItem } from "../../shared/Tab.vue";
 import CaughtFishList from "./CaughtFishList.vue";
 import MissionList from "./MissionList.vue";
+import DailyMission from "./DailyMission.vue";
 
 const missionStore = useMissionStore();
 const caughtStore = useCaughtStore();
@@ -17,6 +20,11 @@ const isRefreshing = ref(false);
 const isClaiming = ref(false);
 const statusMessage = ref("");
 const statusIsError = ref(false);
+const activeTab = ref("hourly");
+const tabs: TabItem[] = [
+  { key: "hourly", label: "Nhiệm vụ theo giờ" },
+  { key: "daily", label: "Nhiệm vụ hằng ngày" },
+];
 
 const selectedMission = computed(
   () => missionStore.missions.find((mission) => mission.id === selectedMissionId.value) ?? null,
@@ -115,35 +123,42 @@ onMounted(() => void loadMissionData(true));
 </script>
 
 <template>
-  <Modal title="Bảng nhiệm vụ" sub-title="Nhiệm vụ theo giờ" :on-refresh="loadMissionData">
-    <div v-if="isLoading || isRefreshing" class="h-full grid place-items-center text-sm text-emerald-900/70">
-      Đang tải cá và nhiệm vụ...
-    </div>
-    <div
-      v-else
-      class="grid grid-rows-[minmax(0,1fr)_minmax(0,1fr)] md:grid-rows-1 md:grid-cols-[minmax(0,1fr)_minmax(0,1fr)] h-full flex-1"
-    >
-      <CaughtFishList
-        :caught-fishes="caughtStore.caughtFishes"
-        :selected-caught-ids="selectedCaughtIds"
-        :required-fish-counts="requiredFishCounts"
-        :selected-fish-counts="selectedFishCounts"
-        @toggle="toggleCaught"
-      />
-      <MissionList
-        :missions="missionStore.missions"
-        :selected-mission="selectedMission"
-        :selected-mission-id="selectedMissionId"
-        :selected-caught-ids="selectedCaughtIds"
-        :required-fish-counts="requiredFishCounts"
-        :selected-fish-counts="selectedFishCounts"
-        :status-message="statusMessage"
-        :status-is-error="statusIsError"
-        :is-mission-complete="isMissionComplete"
-        :is-claiming="isClaiming"
-        @select="selectMission"
-        @claim="claimMission"
-      />
-    </div>
+  <Modal title="Bảng nhiệm vụ" sub-title="Nhiệm vụ theo giờ và hằng ngày" :on-refresh="loadMissionData">
+    <Tab v-model="activeTab" :tabs="tabs" aria-label="Loại nhiệm vụ" lazy>
+      <template #hourly>
+        <div v-if="isLoading || isRefreshing" class="grid h-full place-items-center text-sm text-emerald-900/70">
+          Đang tải cá và nhiệm vụ...
+        </div>
+        <div
+          v-else
+          class="grid grid-rows-[minmax(0,1fr)_minmax(0,1fr)] md:grid-rows-1 md:grid-cols-[minmax(0,1fr)_minmax(0,1fr)] h-full flex-1"
+        >
+          <CaughtFishList
+            :caught-fishes="caughtStore.caughtFishes"
+            :selected-caught-ids="selectedCaughtIds"
+            :required-fish-counts="requiredFishCounts"
+            :selected-fish-counts="selectedFishCounts"
+            @toggle="toggleCaught"
+          />
+          <MissionList
+            :missions="missionStore.missions"
+            :selected-mission="selectedMission"
+            :selected-mission-id="selectedMissionId"
+            :selected-caught-ids="selectedCaughtIds"
+            :required-fish-counts="requiredFishCounts"
+            :selected-fish-counts="selectedFishCounts"
+            :status-message="statusMessage"
+            :status-is-error="statusIsError"
+            :is-mission-complete="isMissionComplete"
+            :is-claiming="isClaiming"
+            @select="selectMission"
+            @claim="claimMission"
+          />
+        </div>
+      </template>
+      <template #daily>
+        <DailyMission />
+      </template>
+    </Tab>
   </Modal>
 </template>

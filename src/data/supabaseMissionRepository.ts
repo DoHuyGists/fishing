@@ -25,7 +25,47 @@ export interface HourMission {
   cash: number;
 }
 
+export interface DailyMission {
+  id: string;
+  template_id: string;
+  code: string;
+  name: string;
+  description: string;
+  event_type: string;
+  difficulty: string;
+  target_value: number;
+  current_value: number;
+  mission_points: number;
+  config: Record<string, unknown>;
+  is_completed: boolean;
+  completed_at: string | null;
+}
+
+export interface DailyMissionReward {
+  id: string;
+  required_points: number;
+  reward_data: unknown[];
+  is_unlocked: boolean;
+  is_claimed: boolean;
+  can_claim: boolean;
+}
+
+export interface DailyMissionData {
+  mission_date: string;
+  total_points: number;
+  mission_count: number;
+  missions: DailyMission[];
+  rewards: DailyMissionReward[];
+}
+
 class SupabaseMissionRepository {
+  async fetchDailyMissions(): Promise<DailyMissionData> {
+    const { data, error } = await supabase.rpc("get_daily_missions");
+    if (error) throw new Error(error.message);
+    if (!data) throw new Error("Không có dữ liệu nhiệm vụ hằng ngày.");
+    return data as DailyMissionData;
+  }
+
   async fetchMission(): Promise<HourMission[]> {
     const { data, error } = await supabase.rpc("get_current_hour_missions");
 

@@ -8,7 +8,10 @@ import LatestCaughtList from "../caught/LatestCaughtList.vue";
 import { useConfigStore } from "../../../stores/config.ts";
 import { useUserTurnsStore } from "../../../stores/userTurns.ts";
 import { useTeamStore } from "../../../stores/team.ts";
+import { useCurrencyStore } from "../../../stores/currency.ts";
 import UserTurn from "../stamina/UserTurn.vue";
+import Cash from "../currency/Cash.vue";
+import Shells from "../currency/Shells.vue";
 import TeamMembersSticky from "../team/TeamMembersSticky.vue";
 import PrepareModal from "./PrepareModal.vue";
 
@@ -42,6 +45,7 @@ const notificationStore = useNotificationStore();
 const configStore = useConfigStore();
 const userTurnsStore = useUserTurnsStore();
 const teamStore = useTeamStore();
+const currencyStore = useCurrencyStore();
 
 const hasNewNotification = ref(false);
 
@@ -79,7 +83,11 @@ onUnmounted(() => {
       class="flex flex-wrap items-center justify-between gap-3 rounded-xl border border-[#cbd9c6] bg-[#f5f9f0] px-4 py-2.5 text-[#24352a]"
     >
       <span class="font-bold">Bản đồ thế giới</span>
-      <UserTurn />
+      <div class="flex flex-wrap items-center justify-end gap-2">
+        <Cash :amount="currencyStore.formattedCash" />
+        <Shells :amount="currencyStore.formattedShells" />
+        <UserTurn />
+      </div>
     </header>
     <main class="grid flex-1 grid-cols-1 gap-2 md:grid-cols-2">
       <!-- Khung Bản đồ trung tâm -->
