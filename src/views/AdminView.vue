@@ -31,24 +31,40 @@ const moduleComponents = {
   area: defineAsyncComponent(() => import("../components/admin/fishing-area-management/FishingAreaManagement.vue")),
   item: defineAsyncComponent(() => import("../components/admin/item-management/ItemManagement.vue")),
   redeemCode: defineAsyncComponent(() => import("../components/admin/redeem-management/RedeemCodeManagement.vue")),
-  hourMission: defineAsyncComponent(() => import("../components/admin/mission-management/HourMissionManagementModal.vue")),
-  notifications: defineAsyncComponent(() => import("../components/admin/notification-management/NotificationManagement.vue")),
-  fishingPass: defineAsyncComponent(() => import("../components/admin/fishing-pass-management/FishingPassModalManagement.vue")),
-  fishingPassRewards: defineAsyncComponent(() => import("../components/admin/fishing-pass-rewards-management/FishingPassRewardsModal.vue")),
-  species: defineAsyncComponent(
-    () => import("../components/admin/species-management/SpeciesManagementModal.vue"),
+  hourMission: defineAsyncComponent(
+    () => import("../components/admin/mission-management/HourMissionManagementModal.vue"),
   ),
-  speciesInArea: defineAsyncComponent(() => import("../components/admin/species-in-area-management/SpeciesInAreaManagement.vue")),
+  notifications: defineAsyncComponent(
+    () => import("../components/admin/notification-management/NotificationManagement.vue"),
+  ),
+  fishingPass: defineAsyncComponent(
+    () => import("../components/admin/fishing-pass-management/FishingPassModalManagement.vue"),
+  ),
+  fishingPassRewards: defineAsyncComponent(
+    () => import("../components/admin/fishing-pass-rewards-management/FishingPassRewardsModaManagement.vue"),
+  ),
+  species: defineAsyncComponent(() => import("../components/admin/species-management/SpeciesManagementModal.vue")),
+  speciesInArea: defineAsyncComponent(
+    () => import("../components/admin/species-in-area-management/SpeciesInAreaManagement.vue"),
+  ),
   zone: defineAsyncComponent(() => import("../components/admin/zone-management/ZoneManagement.vue")),
   weather: defineAsyncComponent(() => import("../components/admin/weather-management/WeatherManagement.vue")),
-  zoneWeather: defineAsyncComponent(() => import("../components/admin/zone-weather-management/ZoneWeatherManagement.vue")),
+  zoneWeather: defineAsyncComponent(
+    () => import("../components/admin/zone-weather-management/ZoneWeatherManagement.vue"),
+  ),
   modifier: defineAsyncComponent(() => import("../components/admin/modifier-management/ModifierManagement.vue")),
-  weatherModifier: defineAsyncComponent(() => import("../components/admin/weather-modifier-management/WeatherModifierManagement.vue")),
+  weatherModifier: defineAsyncComponent(
+    () => import("../components/admin/weather-modifier-management/WeatherModifierManagement.vue"),
+  ),
   event: defineAsyncComponent(() => import("../components/admin/event-management/EventManagement.vue")),
-  schedule: defineAsyncComponent(() => import("../components/admin/event-schedule-management/EventScheduleManagement.vue")),
+  schedule: defineAsyncComponent(
+    () => import("../components/admin/event-schedule-management/EventScheduleManagement.vue"),
+  ),
 };
 
-const FeedbackListModal = defineAsyncComponent(() => import("../components/admin/feedback-management/FeedbackListModal.vue"));
+const FeedbackListModal = defineAsyncComponent(
+  () => import("../components/admin/feedback-management/FeedbackListModal.vue"),
+);
 const ErrorFeedbackManagementModal = defineAsyncComponent(
   () => import("../components/admin/feedback-management/ErrorFeedbackManagementModal.vue"),
 );

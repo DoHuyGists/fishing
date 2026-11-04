@@ -30,8 +30,8 @@ store.fetchAll();
 </script>
 
 <template>
-  <div class="fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-3 sm:p-6" @keydown.esc="emit('close')">
-    <section class="flex max-h-[92vh] w-full max-w-6xl flex-col overflow-hidden rounded-2xl bg-[#f5f9f0] text-[#24352a] shadow-2xl" role="dialog" aria-modal="true" aria-labelledby="fishing-pass-title">
+  <div class="fixed inset-0 z-50 flex bg-black/50" @keydown.esc="emit('close')">
+    <section class="flex h-full w-full flex-col overflow-hidden bg-[#f5f9f0] text-[#24352a] shadow-2xl" role="dialog" aria-modal="true" aria-labelledby="fishing-pass-title">
       <header class="flex items-center justify-between bg-[#153221] px-5 py-4 text-white sm:px-7">
         <div><h2 id="fishing-pass-title" class="text-lg font-bold">Quản lý vé câu</h2><p class="text-sm text-emerald-100/80">Tạo và quản lý thời hạn, giá vé câu.</p></div>
         <button type="button" aria-label="Đóng" class="rounded-lg px-3 py-1 text-2xl hover:bg-white/10" @click="emit('close')">&times;</button>
