@@ -15,7 +15,9 @@ type ModuleKey =
   | "schedule"
   | "redeemCode"
   | "hourMission"
-  | "notifications";
+  | "notifications"
+  | "fishingPass"
+  | "fishingPassRewards";
 
 interface AdminModule {
   key: ModuleKey;
@@ -31,6 +33,8 @@ const moduleComponents = {
   redeemCode: defineAsyncComponent(() => import("../components/admin/redeem-management/RedeemCodeManagement.vue")),
   hourMission: defineAsyncComponent(() => import("../components/admin/mission-management/HourMissionManagementModal.vue")),
   notifications: defineAsyncComponent(() => import("../components/admin/notification-management/NotificationManagement.vue")),
+  fishingPass: defineAsyncComponent(() => import("../components/admin/fishing-pass-management/FishingPassModalManagement.vue")),
+  fishingPassRewards: defineAsyncComponent(() => import("../components/admin/fishing-pass-rewards-management/FishingPassRewardsModal.vue")),
   species: defineAsyncComponent(
     () => import("../components/admin/species-management/SpeciesManagementModal.vue"),
   ),
@@ -92,6 +96,20 @@ const groups: ModuleGroup[] = [
         label: "Thông báo",
         desc: "Tạo và quản lý thông báo cá nhân, thông báo hệ thống.",
         component: moduleComponents.notifications,
+      },
+      {
+        key: "fishingPass",
+        icon: "🎫",
+        label: "Vé câu",
+        desc: "Quản lý giá, thời hạn và trạng thái vé câu.",
+        component: moduleComponents.fishingPass,
+      },
+      {
+        key: "fishingPassRewards",
+        icon: "🎁",
+        label: "Phần thưởng vé câu",
+        desc: "Thiết lập vật phẩm FREE và PREMIUM theo từng ngày của vé.",
+        component: moduleComponents.fishingPassRewards,
       },
       {
         key: "species",
