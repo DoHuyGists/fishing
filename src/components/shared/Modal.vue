@@ -12,11 +12,13 @@ const {
   subTitle = "",
   guidSteps = [],
   onRefresh = undefined,
+  showCountData = true,
 } = defineProps<{
   title?: string;
   subTitle?: string;
   guidSteps?: any[];
   onRefresh?: () => void;
+  showCountData?: boolean
 }>();
 const hasRefreshListener = onRefresh != undefined;
 const hasGuideSteps = guidSteps.length != 0;
@@ -79,7 +81,7 @@ onUnmounted(() => {
           {{ subTitle }}
         </p>
       </div>
-      <div class="flex flex-col md:flex-row md:gap-2 order-2 ml-auto shrink-0 sm:order-none sm:ml-0">
+      <div v-if="showCountData" class="flex flex-col md:flex-row md:gap-2 order-2 ml-auto shrink-0 sm:order-none sm:ml-0">
         <Cash :amount="currencyStore.formattedCash" />
         <Shells :amount="currencyStore.formattedShells" />
         <UserTurn />

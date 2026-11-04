@@ -1,25 +1,92 @@
 <template>
-  <Modal title="Ủng hộ nhà phát triển" sub-title="Quyên góp tự nguyện">
-    <main class="mx-auto flex w-full max-w-xl flex-col items-center gap-5 py-4 text-center text-[#24352a]">
-      <p class="max-w-lg text-sm leading-6 sm:text-base">
-        Đây là khoản quyên góp tự nguyện để hỗ trợ nhà phát triển duy trì server và tiếp tục nâng cấp game. Khoản ủng hộ này không phải là giao dịch mua bán và không thể hoàn lại.
-      </p>
-
-      <div class="rounded-2xl border border-[#cbd9c6] bg-[#f5f9f0] p-4 shadow-sm">
-        <img
-          :src="donationQrUrl"
-          alt="Mã QR quyên góp"
-          class="mx-auto aspect-square w-64 max-w-full rounded-lg object-contain sm:w-72"
-        />
+  <Modal title="Ủng hộ phát triển" :show-count-data="false">
+    <main class="mx-auto w-full max-w-3xl space-y-6 px-2 py-5 text-[#24352a] sm:py-8">
+      <div class="space-y-2 text-center">
+        <h3 class="text-xl font-bold sm:text-2xl">Cùng duy trì và phát triển game</h3>
+        <p class="mx-auto max-w-xl text-sm leading-6 sm:text-base">
+          Sự ủng hộ của bạn giúp nhà phát triển duy trì máy chủ và tiếp tục nâng cấp game.
+          Mọi khoản đóng góp đều hoàn toàn tự nguyện, với số tiền do bạn lựa chọn.
+        </p>
       </div>
 
-      <p class="text-sm font-semibold">Quét mã QR bằng ứng dụng ngân hàng để ủng hộ.</p>
+      <div class="grid items-start gap-5 rounded-2xl border border-[#cbd9c6] bg-[#f5f9f0] p-3 sm:grid-cols-2 sm:p-5">
+        <div class="min-w-0 space-y-4">
+        <figure class="min-w-0 overflow-hidden rounded-xl border border-[#cbd9c6] bg-white">
+          <div v-if="!qrFailed" class="p-4">
+            <img :src="donationQrUrl" alt="Mã QR ủng hộ nhà phát triển, chủ tài khoản DO HUY, số tài khoản 060319966989" class="mx-auto h-auto w-full max-w-sm object-contain" draggable="false" @error="qrFailed = true" />
+          </div>
+          <p v-else role="alert" class="px-5 py-12 text-center text-sm leading-6">
+            Không tải được mã QR. Bạn hãy đóng và mở lại cửa sổ để thử lại.
+          </p>
+        </figure>
+
+          <dl class="space-y-3 rounded-xl border border-[#cbd9c6] bg-white p-4 text-sm">
+            <div class="flex flex-wrap items-baseline justify-between gap-x-3 gap-y-1">
+              <dt class="text-[#52634f]">Chủ tài khoản</dt>
+              <dd class="font-bold">DO HUY</dd>
+            </div>
+            <div class="flex flex-wrap items-baseline justify-between gap-x-3 gap-y-1">
+              <dt class="text-[#52634f]">Ngân hàng</dt>
+              <dd class="font-semibold">Sacombank</dd>
+            </div>
+            <div class="border-t border-[#cbd9c6] pt-3">
+              <dt class="text-[#52634f]">Số tài khoản</dt>
+              <dd class="mt-2 flex flex-wrap items-center justify-between gap-2">
+                <span class="select-all text-lg font-bold tracking-wide tabular-nums">{{ donationAccountNumber }}</span>
+                <button type="button" aria-label="Sao chép số tài khoản" @click="copyAccountNumber"
+                  class="inline-flex min-h-11 items-center justify-center gap-2 rounded-lg border border-[#cbd9c6] bg-[#f5f9f0] px-3 text-sm font-semibold transition hover:bg-[#e6efdf] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#24352a]">
+                  <svg aria-hidden="true" class="h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+                    <rect x="9" y="9" width="12" height="12" rx="2" />
+                    <path d="M5 15H4a1 1 0 0 1-1-1V4a1 1 0 0 1 1-1h10a1 1 0 0 1 1 1v1" />
+                  </svg>
+                  Sao chép
+                </button>
+              </dd>
+            </div>
+          </dl>
+          <a v-if="!qrFailed" :href="donationQrUrl" download="Sacombank_060319966989_DoHuy.png"
+            class="inline-flex min-h-11 w-full items-center justify-center rounded-xl bg-[#24352a] px-4 py-3 text-sm font-semibold text-white transition hover:bg-[#36513f] focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-[#24352a]">
+            Tải ảnh QR
+          </a>
+        </div>
+
+        <section aria-labelledby="donation-instructions" class="min-w-0 rounded-xl border border-[#cbd9c6] bg-white p-4 sm:p-5">
+          <h3 id="donation-instructions" class="text-lg font-bold">Cách ủng hộ</h3>
+          <ol class="mt-4 list-decimal space-y-4 pl-5 text-sm leading-6 marker:font-semibold marker:text-[#52634f]">
+            <li>Mở ứng dụng ngân hàng và quét mã QR trong cửa sổ này.</li>
+            <li>Nếu đang dùng điện thoại, tải ảnh QR rồi chọn ảnh trong mục quét QR của ứng dụng ngân hàng.</li>
+            <li>Kiểm tra thông tin người nhận, nhập số tiền bạn muốn ủng hộ rồi xác nhận chuyển khoản.</li>
+          </ol>
+        </section>
+      </div>
+
+      <div class="space-y-2 text-center text-sm leading-6">
+        <p class="font-semibold">Cảm ơn bạn đã đồng hành cùng game!</p>
+        <p class="text-[#52634f]">
+          Đây là khoản ủng hộ tự nguyện, không phải giao dịch mua bán và không thể hoàn lại.
+          Vui lòng kiểm tra kỹ thông tin trước khi chuyển khoản.
+        </p>
+      </div>
     </main>
   </Modal>
 </template>
 
 <script lang="ts" setup>
+import { ref } from "vue";
 import Modal from "../../shared/Modal.vue";
+import { useToast } from "../../../composables/useToast.ts";
 
-const donationQrUrl = "/donation/qr.png";
+const donationQrUrl = `${import.meta.env.BASE_URL}Sacombank_060319966989_DoHuy.png`;
+const donationAccountNumber = "060319966989";
+const qrFailed = ref(false);
+const toast = useToast();
+
+async function copyAccountNumber() {
+  try {
+    await navigator.clipboard.writeText(donationAccountNumber);
+    toast.success("Đã sao chép số tài khoản");
+  } catch {
+    toast.error("Không thể sao chép. Bạn hãy sao chép số tài khoản thủ công.");
+  }
+}
 </script>
