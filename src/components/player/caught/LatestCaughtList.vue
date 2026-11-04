@@ -16,7 +16,7 @@ const recentCaughtFishes = computed(() => caughtStore.inNetFishes);
     </div>
     <p
       v-if="caughtStore.isLoadingCaught && !recentCaughtFishes.length"
-      class="m-0 py-3 text-center text-xs text-gray-500"
+      class="m-0 py-3 text-center text-xs text-gray-500"``
     >
       Đang tải danh sách cá...
     </p>
