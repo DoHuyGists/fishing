@@ -2,13 +2,13 @@
 import { computed, onMounted, onUnmounted, ref, watch } from "vue";
 import { mapData } from "../../../data/map.ts";
 import type { FishingAreaPayload } from "../../../data/supabaseFishingAreaRepository.ts";
-import { useWorld2Store } from "../../../stores/world2.ts";
+import { useWorldStore } from "../../../stores/worldMap.ts";
 import { useToast } from "../../../composables/useToast.ts";
 import { useAdminZoneStore } from "../zone-management/admin-zone-store.ts";
 import { useAdminFishingAreaStore } from "./admin-fishing-area-store.ts";
 import FishingBoundaryPickerModal from "./FishingBoundaryPickerModal.vue";
 
-const worldStore = useWorld2Store();
+const worldStore = useWorldStore();
 const toast = useToast();
 const zoneStore = useAdminZoneStore();
 const fishingAreaStore = useAdminFishingAreaStore();

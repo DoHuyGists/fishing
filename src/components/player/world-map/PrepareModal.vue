@@ -11,11 +11,11 @@ import { useUserTurnsStore } from "../../../stores/userTurns.ts";
 import { supabaseUserInAreaRepository } from "../../../data/supabaseUserInAreaRepository.ts";
 import { useToast } from "../../../composables/useToast.ts";
 import { useRouter } from "vue-router";
-import { useWorld2Store } from "../../../stores/world2.ts";
+import { useWorldStore } from "../../../stores/worldMap.ts";
 import Modal from "../../shared/Modal.vue";
 import { useModalStore } from "../../../stores/modal.ts";
 
-const worldStore = useWorld2Store();
+const worldStore = useWorldStore();
 const authStore = useAuthStore();
 const inventoryStore = useInventoryStore();
 const userTurnsStore = useUserTurnsStore();

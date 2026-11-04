@@ -3,7 +3,7 @@ import {
   supabaseFeedbackRepository,
   type ErrorFeedbackRow,
   type ErrorFeedbackStatus,
-} from "../data/supabaseFeedbackRepository";
+} from "../../../data/supabaseFeedbackRepository";
 
 export const useErrorFeedbackManagementStore = defineStore("error-feedback-management", {
   state: () => ({

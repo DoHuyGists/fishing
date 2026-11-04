@@ -1,10 +1,10 @@
 <script lang="ts" setup>
 import { computed, onMounted } from "vue";
 import { useFishingAreaStore } from "../../../stores/fishingArea";
-import { useWorld2Store } from "../../../stores/world2";
+import { useWorldStore } from "../../../stores/worldMap";
 const fishingAreaStore = useFishingAreaStore();
 const anchors = computed(() => fishingAreaStore.fishingAreas);
-const worldStore = useWorld2Store();
+const worldStore = useWorldStore();
 onMounted(() => {
   fishingAreaStore.fetchArea();
 });

@@ -1,7 +1,7 @@
 <script lang="ts" setup>
 import { reactive, ref, watch } from "vue";
 import type { SpeciesPayload, SpeciesRow } from "../../../data/supabaseSpeciesRepository";
-import { useAdminSpeciesStore } from "./species-store";
+import { useAdminSpeciesStore } from "./admin-species-store";
 
 const props = defineProps<{
   species: SpeciesRow | null;

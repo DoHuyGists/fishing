@@ -1,14 +1,14 @@
 <script lang="ts" setup>
 import { computed, ref, watch } from "vue";
 import { mapData } from "../../../data/map.ts";
-import InteractWorldMap2 from "../../player/world-map/InteractWorldMap2.vue";
+import InteractWorldMap2 from "../../player/world-map/InteractWorldMap.vue";
 import { useAdminFishingAreaStore } from "./admin-fishing-area-store.ts";
 import FishingAreaManagementForm from "./FishingAreaManagementForm.vue";
-import { useWorld2Store } from "../../../stores/world2.ts";
+import { useWorldStore } from "../../../stores/worldMap.ts";
 
 const emit = defineEmits(["close"]);
 const adminFishingAreaStore = useAdminFishingAreaStore();
-const worldStore = useWorld2Store();
+const worldStore = useWorldStore();
 const search = ref("");
 const countryFilter = ref("ALL");
 const availabilityFilter = ref<"ALL" | "AVAILABLE" | "UNAVAILABLE">("ALL");
@@ -122,7 +122,8 @@ watch(
     <!-- Toolbar -->
     <div
       v-if="!adminFishingAreaStore.isFormOpen"
-      class="px-6 py-3 bg-gray-50 border-b border-gray-200 flex flex-wrap items-center gap-3 shrink-0">
+      class="px-6 py-3 bg-gray-50 border-b border-gray-200 flex flex-wrap items-center gap-3 shrink-0"
+    >
       <div class="relative flex-1 min-w-55">
         <input
           v-model="search"

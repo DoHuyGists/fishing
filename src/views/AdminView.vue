@@ -29,7 +29,7 @@ interface AdminModule {
 
 const moduleComponents = {
   area: defineAsyncComponent(() => import("../components/admin/fishing-area-management/FishingAreaManagement.vue")),
-  item: defineAsyncComponent(() => import("../components/admin/item-management/ItemManagement.vue")),
+  item: defineAsyncComponent(() => import("../components/admin/item-management/ItemsManagementModal.vue")),
   redeemCode: defineAsyncComponent(() => import("../components/admin/redeem-management/RedeemCodeManagement.vue")),
   hourMission: defineAsyncComponent(
     () => import("../components/admin/mission-management/HourMissionManagementModal.vue"),

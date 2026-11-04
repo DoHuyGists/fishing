@@ -6,12 +6,12 @@ interface Location {
   lat: number;
 }
 
-const MAP_VIEW_STORAGE_KEY = "world2MapView";
+const MAP_VIEW_STORAGE_KEY = "worldMapView";
 export const MIN_ZOOM = 1;
 export const MAX_ZOOM = 40;
 export const ZOOM_STEP = 1;
 
-export const useWorld2Store = defineStore("world2", {
+export const useWorldStore = defineStore("worldMap", {
   state: () => ({
     selectedArea: {} as any,
     k: 1,

@@ -1,9 +1,7 @@
 ﻿<script lang="ts" setup>
 import { computed, nextTick, onMounted, ref, watch } from "vue";
-import { useWorld2Store } from "../../../stores/world2.ts";
-import { useRouter } from "vue-router";
-import World2 from "./World2.vue";
-import PrepareModal from "./PrepareModal.vue";
+import { useWorldStore } from "../../../stores/worldMap.ts";
+import WorldMap from "./WorldMap.vue";
 import { useFishingAreaStore } from "../../../stores/fishingArea.ts";
 import { useUserInAreaStore } from "../../../stores/userInArea.ts";
 import { useAuthStore } from "../../../stores/auth.ts";
@@ -20,13 +18,12 @@ const fishingAreaStore = useFishingAreaStore();
 const modalStore = useModalStore();
 const zoomInfo = ref({ lon: 0, lat: 0, k: 1 });
 const picked = ref<string>("");
-const mapRef = ref<InstanceType<typeof World2> | null>(null);
+const mapRef = ref<InstanceType<typeof WorldMap> | null>(null);
 const pickEnabled = computed(() => worldStore.isAnchorMode);
 const anchor = computed(() => worldStore.pickedLocation);
-const worldStore = useWorld2Store();
+const worldStore = useWorldStore();
 const selectedArea = computed(() => (worldStore.selectedArea?.id ? worldStore.selectedArea : null));
 const pendingArea = ref<any | null>(null);
-const showPrepare = ref(false);
 const isEntering = ref(false);
 
 onMounted(async () => {
@@ -130,7 +127,7 @@ function zoomTo(k: number) {
     <FishingAnchor />
     <div class="flex flex-col gap-2">
       <div class="w-full h-fit overflow-hidden grid place-items-center border border-gray-300 rounded-xl">
-        <World2
+        <WorldMap
           ref="mapRef"
           :areas="fishingAreaStore.fishingAreas"
           :selected-area-id="selectedArea?.id ?? null"
@@ -165,7 +162,7 @@ function zoomTo(k: number) {
               </button>
             </div>
           </template>
-        </World2>
+        </WorldMap>
       </div>
       <div class="flex gap-2">
         <button @click="zoomTo(3)" class="border border-gray-300 rounded-md px-3">3x</button>
