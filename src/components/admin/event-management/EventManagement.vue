@@ -77,10 +77,10 @@ onMounted(() => store.loadEvents());
     </div>
 
     <main class="relative flex min-h-0 flex-1">
-      <section class="min-w-0 flex-1 overflow-auto p-4 md:p-6">
+      <section class="flex min-h-0 min-w-0 flex-1 flex-col overflow-hidden p-4 md:p-6">
         <div
           v-if="store.loadError"
-          class="mb-4 flex items-center justify-between gap-3 rounded-lg border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-700"
+          class="mb-4 flex shrink-0 items-center justify-between gap-3 rounded-lg border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-700"
         >
           <span>{{ store.loadError }}</span>
           <button type="button" class="font-bold underline" @click="store.loadEvents()">Thử lại</button>
@@ -97,7 +97,7 @@ onMounted(() => store.loadEvents());
             >{{ store.events.length ? "Không tìm thấy sự kiện phù hợp." : "Chưa có sự kiện nào." }}
           </div>
         </div>
-        <div v-else class="rounded-lg border border-gray-200 bg-white shadow-sm">
+        <div v-else class="min-h-0 flex-1 overflow-auto rounded-lg border border-gray-200 bg-white shadow-sm">
           <table class="w-full min-w-[950px] border-collapse text-left text-sm">
             <thead class="text-[11px] uppercase text-gray-600">
               <tr>

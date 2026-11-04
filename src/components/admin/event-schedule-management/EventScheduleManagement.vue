@@ -89,17 +89,17 @@ onMounted(() => store.loadAll());
     </div>
 
     <main class="relative flex min-h-0 flex-1">
-      <section class="min-w-0 flex-1 overflow-auto p-4 md:p-6">
+      <section class="flex min-h-0 min-w-0 flex-1 flex-col overflow-hidden p-4 md:p-6">
         <div
           v-if="store.loadError"
-          class="mb-4 flex items-center justify-between gap-3 rounded-lg border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-700"
+          class="mb-4 flex shrink-0 items-center justify-between gap-3 rounded-lg border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-700"
         >
           <span>{{ store.loadError }}</span>
           <button type="button" class="font-bold underline" @click="store.loadAll()">Thử lại</button>
         </div>
         <div
           v-if="!store.isLoading && !store.events.length"
-          class="mb-4 rounded-lg border border-amber-200 bg-amber-50 px-4 py-3 text-sm text-amber-700"
+          class="mb-4 shrink-0 rounded-lg border border-amber-200 bg-amber-50 px-4 py-3 text-sm text-amber-700"
         >
           Chưa có sự kiện nào. Vui lòng tạo sự kiện trước khi thêm lịch.
         </div>
@@ -115,7 +115,7 @@ onMounted(() => store.loadAll());
             >{{ store.schedules.length ? "Không tìm thấy lịch phù hợp." : "Chưa có lịch sự kiện nào." }}
           </div>
         </div>
-        <div v-else class="rounded-lg border border-gray-200 bg-white shadow-sm">
+        <div v-else class="min-h-0 flex-1 overflow-auto rounded-lg border border-gray-200 bg-white shadow-sm">
           <table class="w-full min-w-[1000px] border-collapse text-left text-sm">
             <thead class="text-[11px] uppercase text-gray-600">
               <tr>

@@ -145,36 +145,38 @@ async function confirmDelete() {
       <button type="button" class="px-3 py-1.5 rounded-lg bg-[#153221] hover:bg-emerald-800 text-white text-xs font-bold cursor-pointer" @click="openForm()">+ Thêm mới</button>
     </div>
 
-    <div v-if="error || actionError" class="mx-6 mt-3 px-3 py-2 text-xs rounded-lg bg-red-50 border border-red-200 text-red-700">{{ error || actionError }}</div>
+    <div v-if="error || actionError" class="mx-6 mt-3 shrink-0 px-3 py-2 text-xs rounded-lg bg-red-50 border border-red-200 text-red-700">{{ error || actionError }}</div>
 
-    <div class="flex-1 overflow-auto px-6 py-4">
+    <div class="flex min-h-0 min-w-0 flex-1 flex-col overflow-hidden px-6 py-4">
       <div v-if="loading" class="text-sm text-gray-500">Đang tải...</div>
-      <table v-else class="w-full text-xs border-collapse">
-        <thead>
-          <tr class="bg-gray-100 text-left text-gray-600">
-            <th v-for="c in columns" :key="c.key" class="px-3 py-2 font-bold border-b border-gray-200">{{ c.label }}</th>
-            <th class="px-3 py-2 border-b border-gray-200 w-40"></th>
-          </tr>
-        </thead>
-        <tbody>
-          <tr v-for="r in filtered" :key="r.item.id" class="hover:bg-gray-50 border-b border-gray-100">
-            <td v-for="(cell, i) in r.cells" :key="i" class="px-3 py-2 text-gray-700">{{ cell }}</td>
-            <td class="px-3 py-2 text-right whitespace-nowrap">
-              <template v-if="confirmDeleteId === r.item.id">
-                <button type="button" class="px-2 py-1 rounded bg-red-600 text-white font-bold cursor-pointer" @click="confirmDelete">Xác nhận</button>
-                <button type="button" class="ml-1 px-2 py-1 rounded border border-gray-300 cursor-pointer" @click="confirmDeleteId = null">Huỷ</button>
-              </template>
-              <template v-else>
-                <button type="button" class="px-2 py-1 rounded border border-gray-300 hover:bg-gray-100 font-bold cursor-pointer" @click="openForm(r.item)">Sửa</button>
-                <button type="button" class="ml-1 px-2 py-1 rounded border border-red-300 text-red-600 hover:bg-red-50 font-bold cursor-pointer" @click="confirmDeleteId = r.item.id">Xoá</button>
-              </template>
-            </td>
-          </tr>
-          <tr v-if="!filtered.length">
-            <td :colspan="columns.length + 1" class="px-3 py-6 text-center text-gray-400">Không có dữ liệu</td>
-          </tr>
-        </tbody>
-      </table>
+      <div v-else class="min-h-0 flex-1 overflow-auto">
+        <table class="w-full text-xs border-collapse">
+          <thead>
+            <tr class="bg-gray-100 text-left text-gray-600">
+              <th v-for="c in columns" :key="c.key" class="sticky top-0 z-10 bg-gray-100 px-3 py-2 font-bold border-b border-gray-200">{{ c.label }}</th>
+              <th class="sticky top-0 z-10 bg-gray-100 px-3 py-2 border-b border-gray-200 w-40"></th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr v-for="r in filtered" :key="r.item.id" class="hover:bg-gray-50 border-b border-gray-100">
+              <td v-for="(cell, i) in r.cells" :key="i" class="px-3 py-2 text-gray-700">{{ cell }}</td>
+              <td class="px-3 py-2 text-right whitespace-nowrap">
+                <template v-if="confirmDeleteId === r.item.id">
+                  <button type="button" class="px-2 py-1 rounded bg-red-600 text-white font-bold cursor-pointer" @click="confirmDelete">Xác nhận</button>
+                  <button type="button" class="ml-1 px-2 py-1 rounded border border-gray-300 cursor-pointer" @click="confirmDeleteId = null">Huỷ</button>
+                </template>
+                <template v-else>
+                  <button type="button" class="px-2 py-1 rounded border border-gray-300 hover:bg-gray-100 font-bold cursor-pointer" @click="openForm(r.item)">Sửa</button>
+                  <button type="button" class="ml-1 px-2 py-1 rounded border border-red-300 text-red-600 hover:bg-red-50 font-bold cursor-pointer" @click="confirmDeleteId = r.item.id">Xoá</button>
+                </template>
+              </td>
+            </tr>
+            <tr v-if="!filtered.length">
+              <td :colspan="columns.length + 1" class="px-3 py-6 text-center text-gray-400">Không có dữ liệu</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
     </div>
 
     <div v-if="isOpen" class="fixed inset-0 z-60 bg-black/40 grid place-items-center p-4">
