@@ -102,7 +102,7 @@ onUnmounted(() => {
         <InteractWorldMap2 v-if="isMapVisible" />
       </div>
       <div class="">
-        <div class="flex items-center flex-wrap gap-2">
+        <div class="flex items-center flex-wrap gap-x-2 gap-y-4 pt-2 [&_button:disabled]:relative [&_button:disabled]:cursor-not-allowed [&_button:disabled]:opacity-60">
           <button
             type="button"
             class="flex items-center gap-1.5 px-3 py-1.5 rounded-xl border border-[#cbd9c6] bg-[#f5f9f0] text-[#24352a] shadow-sm font-bold text-xs cursor-pointer transition-colors hover:border-[#70a77e] hover:bg-[#eaf5e8]"
@@ -115,10 +115,12 @@ onUnmounted(() => {
           <button
             type="button"
             class="flex items-center gap-1.5 px-3 py-1.5 rounded-xl border border-[#cbd9c6] bg-[#f5f9f0] text-[#24352a] shadow-sm font-bold text-xs cursor-pointer transition-colors hover:border-[#70a77e] hover:bg-[#eaf5e8]"
+            :disabled="!configStore.isUnlocked('market')"
             @click="modalStore.open('market')"
           >
             <span class="text-sm">🏪</span>
             <span>Chợ cá</span>
+            <span v-if="!configStore.isUnlocked('market')" class="absolute -top-2 -right-1 whitespace-nowrap rounded-full border border-[#cbd9c6] bg-[#f5f9f0] px-1.5 py-0.5 text-[9px] leading-none text-[#24352a] shadow-sm">🔒 Cấp {{ configStore.requiredLevel('market') }}</span>
           </button>
 
           <button
@@ -144,10 +146,12 @@ onUnmounted(() => {
           <button
             type="button"
             class="flex items-center gap-1.5 px-3 py-1.5 rounded-xl border border-[#cbd9c6] bg-[#f5f9f0] text-[#24352a] shadow-sm font-bold text-xs cursor-pointer transition-colors hover:border-[#70a77e] hover:bg-[#eaf5e8]"
+            :disabled="!configStore.isUnlocked('gacha')"
             @click="modalStore.open('gacha')"
           >
             <span class="text-sm">🎁</span>
             <span>Gacha</span>
+            <span v-if="!configStore.isUnlocked('gacha')" class="absolute -top-2 -right-1 whitespace-nowrap rounded-full border border-[#cbd9c6] bg-[#f5f9f0] px-1.5 py-0.5 text-[9px] leading-none text-[#24352a] shadow-sm">🔒 Cấp {{ configStore.requiredLevel('gacha') }}</span>
           </button>
 
           <!-- Túi đồ -->
@@ -194,10 +198,12 @@ onUnmounted(() => {
           <button
             type="button"
             class="flex items-center gap-1.5 px-3 py-1.5 rounded-xl border border-[#cbd9c6] bg-[#f5f9f0] text-[#24352a] shadow-sm font-bold text-xs cursor-pointer transition-colors hover:border-[#70a77e] hover:bg-[#eaf5e8]"
+            :disabled="!configStore.isUnlocked('event')"
             @click="modalStore.open('event')"
           >
             <span class="text-sm">📄</span>
             <span>Sự kiện</span>
+            <span v-if="!configStore.isUnlocked('event')" class="absolute -top-2 -right-1 whitespace-nowrap rounded-full border border-[#cbd9c6] bg-[#f5f9f0] px-1.5 py-0.5 text-[9px] leading-none text-[#24352a] shadow-sm">🔒 Cấp {{ configStore.requiredLevel('event') }}</span>
           </button>
 
           <button
@@ -212,10 +218,12 @@ onUnmounted(() => {
           <button
             type="button"
             class="flex items-center gap-1.5 px-3 py-1.5 rounded-xl border border-[#cbd9c6] bg-[#f5f9f0] text-[#24352a] shadow-sm font-bold text-xs cursor-pointer transition-colors hover:border-[#70a77e] hover:bg-[#eaf5e8]"
+            :disabled="!configStore.isUnlocked('post-production')"
             @click="modalStore.open('post-production')"
           >
             <span class="text-sm" aria-hidden="true">🕸️</span>
             <span>Lưới cá</span>
+            <span v-if="!configStore.isUnlocked('post-production')" class="absolute -top-2 -right-1 whitespace-nowrap rounded-full border border-[#cbd9c6] bg-[#f5f9f0] px-1.5 py-0.5 text-[9px] leading-none text-[#24352a] shadow-sm">🔒 Cấp {{ configStore.requiredLevel('post-production') }}</span>
           </button>
 
           <!-- Redeem code -->
@@ -242,68 +250,80 @@ onUnmounted(() => {
           </button>
 
           <button
-            v-if="configStore.showFaction"
             type="button"
             class="flex items-center gap-1.5 px-3 py-1.5 rounded-xl border border-[#cbd9c6] bg-[#f5f9f0] text-[#24352a] shadow-sm font-bold text-xs cursor-pointer transition-colors hover:border-[#70a77e] hover:bg-[#eaf5e8]"
+            :disabled="!configStore.isUnlocked('faction')"
             @click="modalStore.open('faction')"
           >
             <span class="text-sm" aria-hidden="true">🛡️</span>
             <span>Phe phái</span>
+            <span v-if="!configStore.isUnlocked('faction')" class="absolute -top-2 -right-1 whitespace-nowrap rounded-full border border-[#cbd9c6] bg-[#f5f9f0] px-1.5 py-0.5 text-[9px] leading-none text-[#24352a] shadow-sm">🔒 Cấp {{ configStore.requiredLevel('faction') }}</span>
           </button>
 
           <button
             type="button"
             class="flex items-center gap-1.5 px-3 py-1.5 rounded-xl border border-[#cbd9c6] bg-[#f5f9f0] text-[#24352a] shadow-sm font-bold text-xs cursor-pointer transition-colors hover:border-[#70a77e] hover:bg-[#eaf5e8]"
+            :disabled="!configStore.isUnlocked('friend')"
             @click="modalStore.open('friend')"
           >
             <span class="text-sm" aria-hidden="true">👥</span>
             <span>Bạn bè</span>
+            <span v-if="!configStore.isUnlocked('friend')" class="absolute -top-2 -right-1 whitespace-nowrap rounded-full border border-[#cbd9c6] bg-[#f5f9f0] px-1.5 py-0.5 text-[9px] leading-none text-[#24352a] shadow-sm">🔒 Cấp {{ configStore.requiredLevel('friend') }}</span>
           </button>
 
           <button
-            v-if="configStore.showTeam"
             type="button"
             class="flex items-center gap-1.5 px-3 py-1.5 rounded-xl border border-[#cbd9c6] bg-[#f5f9f0] text-[#24352a] shadow-sm font-bold text-xs cursor-pointer transition-colors hover:border-[#70a77e] hover:bg-[#eaf5e8]"
+            :disabled="!configStore.isUnlocked('team')"
             @click="modalStore.open('team')"
           >
             <span class="text-sm" aria-hidden="true">🎣</span>
             <span>Lập đội</span>
+            <span v-if="!configStore.isUnlocked('team')" class="absolute -top-2 -right-1 whitespace-nowrap rounded-full border border-[#cbd9c6] bg-[#f5f9f0] px-1.5 py-0.5 text-[9px] leading-none text-[#24352a] shadow-sm">🔒 Cấp {{ configStore.requiredLevel('team') }}</span>
           </button>
 
           <button
             type="button"
             class="flex items-center gap-1.5 px-3 py-1.5 rounded-xl border border-[#cbd9c6] bg-[#f5f9f0] text-[#24352a] shadow-sm font-bold text-xs cursor-pointer transition-colors hover:border-[#70a77e] hover:bg-[#eaf5e8]"
+            :disabled="!configStore.isUnlocked('badge')"
             @click="modalStore.open('badge')"
           >
             <span class="text-sm" aria-hidden="true">🏆</span>
             <span>Huy hiệu</span>
+            <span v-if="!configStore.isUnlocked('badge')" class="absolute -top-2 -right-1 whitespace-nowrap rounded-full border border-[#cbd9c6] bg-[#f5f9f0] px-1.5 py-0.5 text-[9px] leading-none text-[#24352a] shadow-sm">🔒 Cấp {{ configStore.requiredLevel('badge') }}</span>
           </button>
 
           <button
             type="button"
             class="flex items-center gap-1.5 px-3 py-1.5 rounded-xl border border-[#cbd9c6] bg-[#f5f9f0] text-[#24352a] shadow-sm font-bold text-xs cursor-pointer transition-colors hover:border-[#70a77e] hover:bg-[#eaf5e8]"
+            :disabled="!configStore.isUnlocked('work-bench')"
             @click="modalStore.open('work-bench')"
           >
             <span class="text-sm" aria-hidden="true">🛠️</span>
             <span>Chế tạo</span>
+            <span v-if="!configStore.isUnlocked('work-bench')" class="absolute -top-2 -right-1 whitespace-nowrap rounded-full border border-[#cbd9c6] bg-[#f5f9f0] px-1.5 py-0.5 text-[9px] leading-none text-[#24352a] shadow-sm">🔒 Cấp {{ configStore.requiredLevel('work-bench') }}</span>
           </button>
 
           <button
             type="button"
             class="flex items-center gap-1.5 px-3 py-1.5 rounded-xl border border-[#cbd9c6] bg-[#f5f9f0] text-[#24352a] shadow-sm font-bold text-xs cursor-pointer transition-colors hover:border-[#70a77e] hover:bg-[#eaf5e8]"
+            :disabled="!configStore.isUnlocked('leaderboard')"
             @click="modalStore.open('leaderboard')"
           >
             <span class="text-sm" aria-hidden="true">📊</span>
             <span>Xếp hạng</span>
+            <span v-if="!configStore.isUnlocked('leaderboard')" class="absolute -top-2 -right-1 whitespace-nowrap rounded-full border border-[#cbd9c6] bg-[#f5f9f0] px-1.5 py-0.5 text-[9px] leading-none text-[#24352a] shadow-sm">🔒 Cấp {{ configStore.requiredLevel('leaderboard') }}</span>
           </button>
 
           <button
             type="button"
             class="flex items-center gap-1.5 px-3 py-1.5 rounded-xl border border-[#cbd9c6] bg-[#f5f9f0] text-[#24352a] shadow-sm font-bold text-xs cursor-pointer transition-colors hover:border-[#70a77e] hover:bg-[#eaf5e8]"
+            :disabled="!configStore.isUnlocked('donation')"
             @click="modalStore.open('donation')"
           >
             <span aria-hidden="true">💚</span>
             <span>Ủng hộ</span>
+            <span v-if="!configStore.isUnlocked('donation')" class="absolute -top-2 -right-1 whitespace-nowrap rounded-full border border-[#cbd9c6] bg-[#f5f9f0] px-1.5 py-0.5 text-[9px] leading-none text-[#24352a] shadow-sm">🔒 Cấp {{ configStore.requiredLevel('donation') }}</span>
           </button>
         </div>
 
@@ -320,26 +340,26 @@ onUnmounted(() => {
       >
         <div v-if="modalStore.isModalOpening">
           <AccountInfoModal v-if="modalStore.isOpening('account')" />
-          <MarketWindow v-if="modalStore.isOpening('market')" />
+          <MarketWindow v-if="configStore.isUnlocked('market') && modalStore.isOpening('market')" />
           <ShopModal v-if="modalStore.isOpening('shop')" />
           <CatchDiaryModal v-if="modalStore.isOpening('diary')" />
-          <SpinWheelModal v-if="modalStore.isOpening('gacha')" />
+          <SpinWheelModal v-if="configStore.isUnlocked('gacha') && modalStore.isOpening('gacha')" />
           <InventoryModal v-if="modalStore.isOpening('inventory')" />
           <Feedbackmodal v-if="modalStore.isOpening('feedback')" />
           <MissionModal v-if="modalStore.isOpening('mission')" />
-          <EventModal v-if="modalStore.isOpening('event')" />
+          <EventModal v-if="configStore.isUnlocked('event') && modalStore.isOpening('event')" />
           <RedeemCode v-if="modalStore.isOpening('redeem')" />
           <NotificationModal v-if="modalStore.isOpening('notifications')" />
           <CaughtModal v-if="modalStore.isOpening('caught')" />
-          <FactionSelectModal v-if="modalStore.isOpening('faction')" />
-          <FriendModal v-if="modalStore.isOpening('friend')" />
-          <TeamModal v-if="modalStore.isOpening('team')" />
-          <Achievement v-if="modalStore.isOpening('badge')" />
-          <WorkBenchModal v-if="modalStore.isOpening('work-bench')" />
-          <LeaderboardModal v-if="modalStore.isOpening('leaderboard')" />
+          <FactionSelectModal v-if="configStore.isUnlocked('faction') && modalStore.isOpening('faction')" />
+          <FriendModal v-if="configStore.isUnlocked('friend') && modalStore.isOpening('friend')" />
+          <TeamModal v-if="configStore.isUnlocked('team') && modalStore.isOpening('team')" />
+          <Achievement v-if="configStore.isUnlocked('badge') && modalStore.isOpening('badge')" />
+          <WorkBenchModal v-if="configStore.isUnlocked('work-bench') && modalStore.isOpening('work-bench')" />
+          <LeaderboardModal v-if="configStore.isUnlocked('leaderboard') && modalStore.isOpening('leaderboard')" />
           <AttendanceModal v-if="modalStore.isOpening('attendance')" />
-          <DonationModal v-if="modalStore.isOpening('donation')" />
-          <PostProduction v-if="modalStore.isOpening('post-production')" />
+          <DonationModal v-if="configStore.isUnlocked('donation') && modalStore.isOpening('donation')" />
+          <PostProduction v-if="configStore.isUnlocked('post-production') && modalStore.isOpening('post-production')" />
           <PrepareModal v-if="modalStore.isOpening('prepare')" />
         </div>
       </Transition>

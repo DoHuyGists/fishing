@@ -1,4 +1,4 @@
-﻿<script lang="ts" setup>
+<script lang="ts" setup>
 import { computed, onMounted, ref } from "vue";
 import { useAuthStore } from "../../../stores/auth.ts";
 import { useCurrencyStore } from "../../../stores/currency.ts";
@@ -6,6 +6,7 @@ import { useUserProfileStore } from "../../../stores/userProfile.ts";
 import { useCountryStore } from "../../../stores/country.ts";
 import Cash from "../currency/Cash.vue";
 import TwoOptionsModal from "../../shared/TwoOptionsModal.vue";
+import { formatDateTime } from "../../../utils/time.ts";
 
 defineEmits<{ signOut: [] }>();
 
@@ -30,9 +31,16 @@ const countryCooldownDaysRemaining = computed(() => {
 const canChangeCountry = computed(
   () => !userProfileStore.profile?.country_id || countryCooldownDaysRemaining.value === 0,
 );
+const displayedCountryId = computed(() => selectedCountryId.value || userProfileStore.profile?.country_id);
 const selectedCountry = computed(() =>
-  countryStore.countries.find((country) => country.id === selectedCountryId.value),
+  countryStore.countries.find((country) => country.id === displayedCountryId.value),
 );
+const joinedDate = computed(() => {
+  const value = userProfileStore.profile?.created_at || authStore.user?.created_at;
+  if (!value) return "Chưa có thông tin";
+  const date = new Date(value);
+  return Number.isNaN(date.getTime()) ? "Chưa có thông tin" : formatDateTime(date);
+});
 const filteredCountries = computed(() => {
   const query = countrySearch.value.trim().toLocaleLowerCase();
   return query
@@ -50,6 +58,7 @@ async function updateCountry() {
   try {
     await userProfileStore.updateCountry(userId, selectedCountryId.value);
     showCountryConfirm.value = false;
+    selectedCountryId.value = "";
   } catch {
     countryError.value = userProfileStore.error || "Không thể cập nhật quốc gia. Vui lòng thử lại.";
   } finally {
@@ -198,7 +207,7 @@ const userInitial = computed(() => {
                   v-for="country in filteredCountries"
                   :key="country.id"
                   role="option"
-                  :aria-selected="country.id === selectedCountryId"
+                  :aria-selected="country.id === displayedCountryId"
                 >
                   <button
                     type="button"
@@ -237,11 +246,8 @@ const userInitial = computed(() => {
           </div>
         </div>
         <div class="flex justify-between items-center px-3.5 py-2.5">
-          <span class="text-gray-500 font-medium">Số dư hiện tại</span>
-          <Cash :amount="currencyStore.formattedCash" />
-        </div>
-        <div class="flex justify-between items-center px-3.5 py-2.5">
           <span class="text-gray-500 font-medium">Ngày tham gia</span>
+          <span class="font-semibold text-[#24352a]">{{ joinedDate }}</span>
         </div>
       </div>
     </div>

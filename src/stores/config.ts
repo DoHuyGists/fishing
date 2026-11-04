@@ -1,27 +1,33 @@
 import { defineStore } from "pinia";
 import type { UserProfile } from "../data/supabaseUserProfileRepository";
 
-const REQUIRE_LEVEL = {
-    faction : 1,
-    team: 1,
-}
+export const REQUIRE_LEVEL = {
+    market: 1,
+    leaderboard: 2,
+    gacha: 1,
+    event: 1,
+    team: 2,
+    "work-bench": 1,
+    faction: 2,
+    donation: 1,
+} as const;
 
 export const useConfigStore = defineStore("Config", {
-    state: ()=> ({
-        showFaction: false,
-        showTeam: false,
-    }),
+    state: () => ({ level: 0 }),
     getters: {
-        isShowFactionView: (state) => state.showFaction
+        requiredLevel: () => (feature: string) =>
+            REQUIRE_LEVEL[feature as keyof typeof REQUIRE_LEVEL] ?? 1,
+        isUnlocked(): (feature: string) => boolean {
+            return (feature) => this.level >= this.requiredLevel(feature);
+        },
+        showFaction(): boolean { return this.isUnlocked("faction"); },
+        showTeam(): boolean { return this.isUnlocked("team"); },
+        showDonation(): boolean { return this.isUnlocked("donation"); },
+        isShowFactionView(): boolean { return this.showFaction; },
     },
     actions: {
-        loadConfig(userProfile: UserProfile){
-            if(userProfile.level > REQUIRE_LEVEL.faction) {
-                this.showFaction = true;
-            }
-            if(userProfile.level > REQUIRE_LEVEL.team) {
-                this.showTeam = true;
-            }
+        loadConfig(userProfile: Pick<UserProfile, "level"> | null) {
+            this.level = userProfile?.level ?? 0;
         }
     }
 })

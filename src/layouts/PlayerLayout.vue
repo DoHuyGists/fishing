@@ -70,11 +70,9 @@ watch(
 );
 
 watch(
-  () => authStore.profile,
+  () => userProfileStore.profile?.level,
   (userProfile) => {
-    if (userProfile != null) {
-      configStore.loadConfig(userProfile);
-    }
+    configStore.loadConfig(userProfile == null ? null : { level: userProfile });
   },
   { immediate: true },
 );
