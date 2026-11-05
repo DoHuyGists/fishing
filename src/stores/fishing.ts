@@ -7,6 +7,8 @@ import { supabaseUserInAreaRepository } from "../data/supabaseUserInAreaReposito
 import supabase from "../database/connection";
 import { supabaseFishingAreaRepository } from "../data/supabaseFishingAreaRepository";
 import { buildDepthConfig, DEPTH_STEP_METERS } from "../data/fishingDepth";
+import { createTensionFight, isTensionChallenge, stepTensionFight, tensionMaxTicks,
+  type TensionChallenge, type TensionFight, type TensionInput, type TensionSubmission } from "../data/tensionChallenge";
 export type FishingTool = "rod" | "line" | "reel" | "hook" | "bait";
 export type CastPhase = "idle" | "casting" | "waiting" | "bite" | "submitting" | "caught" | "lost";
 export type FishingChallenge = {
@@ -42,7 +44,7 @@ export type FishingPlayer = {
 type CastRodResponse = {
   session_id: string;
   wait_time_ms: number;
-  challenge: FishingChallenge;
+  server_time_ms: number;
 };
 
 type SubmitChallengeResponse = {
@@ -109,6 +111,14 @@ export const useFishingStore = defineStore("fishing", {
     } as Record<FishingTool, string>,
     sessionId: null as string | null,
     challenge: null as FishingChallenge | null,
+    tensionChallenge: null as TensionChallenge | null,
+    tensionFight: null as TensionFight | null,
+    tensionInputs: [] as TensionInput[],
+    tensionReeling: false,
+    tensionStartedAt: null as number | null,
+    isStartingTensionChallenge: false,
+    serverClockOffset: 0,
+    isLoadingChallenge: false,
     castRequestId: 0,
     playersOpen: false,
     selectedPlayer: null as FishingPlayer | null,
@@ -134,7 +144,7 @@ export const useFishingStore = defineStore("fishing", {
   getters: {
     canPull: (s) => s.castPhase === "bite",
     canCast: (s) => s.castPhase === "idle" || s.castPhase === "lost",
-    canReelIn: (s) => ["casting", "waiting", "bite"].includes(s.castPhase),
+    canReelIn: (s) => ["casting", "waiting", "bite"].includes(s.castPhase) && (!s.tensionChallenge || s.tensionStartedAt === null),
     canAdjustDepth: (s) => s.castPhase === "idle" || s.castPhase === "lost",
     canAdjustLakeDepth: (s) =>
       (s.castPhase === "idle" || s.castPhase === "lost") &&
@@ -373,23 +383,24 @@ export const useFishingStore = defineStore("fishing", {
       this.baitPosition = { x, y };
       this.catchDialogOpen = false;
       this.challenge = null;
+      this.resetTensionChallenge();
       this.sessionId = null;
       this.isCasting = true;
       this.castPhase = "casting";
       this.castMessage = "Đang kết nối với bãi câu...";
 
       try {
-        const { data, error } = await withTimeout(supabase.rpc("cast_rod", { p_area_id: areaId, p_cast_depth: this.appliedDepthMeters }), RPC_TIMEOUT_MS);
+        const data = await withTimeout(supabaseFishingAreaRepository.castRod(areaId, this.appliedDepthMeters), RPC_TIMEOUT_MS);
         if (requestId !== this.castRequestId) return;
-        if (error) throw error;
 
         const response = data as unknown as CastRodResponse;
-        if (!response || typeof response.session_id !== "string" || !isFishingChallenge(response.challenge)) {
+        if (!response || typeof response.session_id !== "string") {
           throw new Error("Invalid cast response");
         }
 
         this.sessionId = response.session_id;
-        this.challenge = response.challenge;
+        this.serverClockOffset = Number.isSafeInteger(response.server_time_ms)
+          ? response.server_time_ms - performance.now() : Date.now() - performance.now();
         this.isCasting = false;
         this.castPhase = "waiting";
         this.castMessage = "Mồi đã chạm nước. Đang chờ tín hiệu...";
@@ -402,39 +413,139 @@ export const useFishingStore = defineStore("fishing", {
         this.castMessage = "Không thể kết nối. Hãy thử thả cần lại.";
       }
     },
-    startChallengeForSession(sessionId: string) {
-      if (this.sessionId !== sessionId || !this.challenge || this.castPhase !== "waiting") return;
-      this.castPhase = "bite";
-      this.castMessage = "Tín hiệu! Bấm đúng lúc để móc cá.";
+    async startChallengeForSession(sessionId: string) {
+      if (this.sessionId !== sessionId || this.castPhase !== "waiting" || this.isLoadingChallenge) return;
+      const requestId = this.castRequestId;
+      this.isLoadingChallenge = true;
+      this.castMessage = "Cá cắn câu! Đang tải thử thách...";
+      try {
+        const session = await withTimeout(supabaseFishingAreaRepository.fetchSessionChallenge(sessionId), RPC_TIMEOUT_MS);
+        if (requestId !== this.castRequestId || this.sessionId !== sessionId) return;
+        if (session.status !== "BITE") throw new Error("Session is not ready");
+        const challenge = session.challenge_data;
+        if (isTensionChallenge(challenge) && challenge.sessionId === sessionId) {
+          this.tensionChallenge = challenge;
+          this.tensionFight = createTensionFight(challenge);
+          this.tensionInputs = [];
+          this.tensionReeling = false;
+          // The scheduled bite time is not the beginning of the playable fight.
+          this.tensionStartedAt = null;
+          this.castMessage = "Cá lớn cắn câu! Giữ nút hoặc Space khi sẵn sàng để bắt đầu.";
+        } else if (isFishingChallenge(challenge)) {
+          this.challenge = challenge;
+          this.castMessage = "Tín hiệu! Bấm đúng lúc để móc cá.";
+        } else throw new Error("Invalid challenge data");
+        this.castPhase = "bite";
+      } catch {
+        if (requestId !== this.castRequestId) return;
+        this.sessionId = null;
+        this.challenge = null;
+        this.resetTensionChallenge();
+        this.castPhase = "lost";
+        this.castMessage = "Không thể tải thử thách. Hãy thả cần lại.";
+      } finally {
+        if (requestId === this.castRequestId) this.isLoadingChallenge = false;
+      }
+    },
+    resetTensionChallenge() {
+      this.tensionChallenge = null;
+      this.tensionFight = null;
+      this.tensionInputs = [];
+      this.tensionReeling = false;
+      this.tensionStartedAt = null;
+      this.isStartingTensionChallenge = false;
+      this.isLoadingChallenge = false;
+    },
+    async beginTensionChallenge() {
+      const sessionId = this.sessionId;
+      if (!sessionId || !this.tensionChallenge || this.castPhase !== "bite" ||
+        this.tensionStartedAt !== null || this.isStartingTensionChallenge) return;
+      const requestId = this.castRequestId;
+      this.isStartingTensionChallenge = true;
+      this.castMessage = "Đang bắt đầu đấu sức với cá...";
+      try {
+        const response = await withTimeout(supabaseFishingAreaRepository.startTensionChallenge(sessionId), RPC_TIMEOUT_MS);
+        if (requestId !== this.castRequestId || this.sessionId !== sessionId) return;
+        const challenge = response.challenge_data;
+        if (!isTensionChallenge(challenge) || challenge.sessionId !== sessionId ||
+          challenge.activatedAt !== challenge.startedAt || !Number.isSafeInteger(response.server_time_ms)) {
+          throw new Error("Invalid activated challenge");
+        }
+        this.tensionChallenge = challenge;
+        this.tensionFight = createTensionFight(challenge);
+        this.tensionInputs = this.tensionReeling ? [{ tick: 0, reeling: true }] : [];
+        // Refresh the clock at activation, not at cast. Time spent waiting for BITE
+        // and loading the challenge must never be replayed as released inputs.
+        this.serverClockOffset = response.server_time_ms - performance.now();
+        this.tensionStartedAt = challenge.startedAt - this.serverClockOffset;
+        this.castMessage = "Giữ và thả để điều chỉnh lực căng.";
+      } catch (err) {
+        if (requestId !== this.castRequestId || this.sessionId !== sessionId) return;
+        console.error("Không thể bắt đầu thử thách lực căng:", err);
+        this.sessionId = null;
+        this.resetTensionChallenge();
+        this.castPhase = "lost";
+        this.castMessage = "Không thể bắt đầu thử thách hoặc phiên đã hết hạn. Hãy thả cần lại.";
+      } finally {
+        if (requestId === this.castRequestId) this.isStartingTensionChallenge = false;
+      }
+    },
+    advanceTensionFight(now = performance.now()) {
+      const challenge = this.tensionChallenge;
+      const fight = this.tensionFight;
+      if (!challenge || !fight || this.castPhase !== "bite" || this.tensionStartedAt === null) return;
+      const targetTick = Math.min(tensionMaxTicks(challenge), Math.floor(((now - this.tensionStartedAt) * challenge.config.tickRate) / 1000));
+      while (fight.tick < targetTick && fight.result === "fighting") {
+        stepTensionFight(challenge, fight, this.tensionReeling);
+      }
+      if (fight.result !== "fighting") {
+        void this.submitTensionChallenge({ sessionId: challenge.sessionId, inputs: this.tensionInputs.map((input) => ({ ...input })),
+          totalTicks: fight.tick, claimedResult: fight.result });
+      }
+    },
+    setTensionReeling(reeling: boolean) {
+      if (this.tensionChallenge && this.castPhase === "bite" && this.tensionStartedAt === null) {
+        this.tensionReeling = reeling;
+        if (reeling) void this.beginTensionChallenge();
+        return;
+      }
+      this.advanceTensionFight();
+      const fight = this.tensionFight;
+      if (this.castPhase !== "bite" || !fight || fight.result !== "fighting" || this.tensionReeling === reeling) return;
+      this.tensionReeling = reeling;
+      if (this.tensionInputs.at(-1)?.tick === fight.tick) this.tensionInputs.pop();
+      if ((this.tensionInputs.at(-1)?.reeling ?? false) !== reeling) this.tensionInputs.push({ tick: fight.tick, reeling });
     },
     reelInBait() {
       if (!this.canReelIn) return;
+      this.resetCast();
+    },
+    resetCast() {
       this.castRequestId += 1;
       this.sessionId = null;
       this.challenge = null;
+      this.resetTensionChallenge();
       this.isCasting = false;
       this.castPhase = "idle";
       this.castMessage = "Sẵn sàng thả câu";
     },
     async submitChallenge(isSuccess: boolean, timeSpentMs: number) {
       if (!this.sessionId || !this.challenge || this.castPhase !== "bite") return;
-
       const sessionId = this.sessionId;
+      await this.finishChallenge(() => supabaseFishingAreaRepository.submitChallenge(sessionId, isSuccess, Math.max(0, Math.round(timeSpentMs))));
+    },
+    async submitTensionChallenge(payload: TensionSubmission) {
+      if (!this.tensionChallenge || this.tensionStartedAt === null || payload.sessionId !== this.sessionId || this.castPhase !== "bite") return;
+      await this.finishChallenge(() => supabaseFishingAreaRepository.submitTensionChallenge(payload));
+    },
+    async finishChallenge(submit: () => Promise<unknown>) {
       const requestId = this.castRequestId;
       this.castPhase = "submitting";
       this.castMessage = "Đang xác nhận kết quả...";
 
       try {
-        const { data, error } = await withTimeout(
-          supabase.rpc("submit_challenge", {
-            p_session_id: sessionId,
-            p_success: isSuccess,
-            p_time_spent_ms: Math.max(0, Math.round(timeSpentMs)),
-          }),
-          RPC_TIMEOUT_MS,
-        );
+        const data = await withTimeout(submit(), RPC_TIMEOUT_MS);
         if (requestId !== this.castRequestId) return;
-        if (error) throw error;
 
         const response = data as unknown as SubmitChallengeResponse;
         if (response?.success && response.caught) {
@@ -457,10 +568,12 @@ export const useFishingStore = defineStore("fishing", {
         }
         this.sessionId = null;
         this.challenge = null;
+        this.resetTensionChallenge();
       } catch {
         if (requestId !== this.castRequestId) return;
         this.sessionId = null;
         this.challenge = null;
+        this.resetTensionChallenge();
         this.castPhase = "lost";
         this.castMessage = "Không thể xác nhận kết quả. Hãy thử lại.";
       }
@@ -470,6 +583,7 @@ export const useFishingStore = defineStore("fishing", {
       this.castRequestId += 1;
       this.sessionId = null;
       this.challenge = null;
+      this.resetTensionChallenge();
       this.castPhase = "idle";
       this.castMessage = "Chạm mặt hồ để câu tiếp";
     },

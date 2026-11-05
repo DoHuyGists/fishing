@@ -40,7 +40,7 @@ watch(
     fishingSessionSubscription = supabaseFishingAreaRepository.subscribeToFishingSession(activeSessionId, (session) => {
       if (subscribedSessionId !== activeSessionId || handledBiteSessionId === activeSessionId) return;
       handledBiteSessionId = activeSessionId;
-      fishingStore.startChallengeForSession(session.id);
+      void fishingStore.startChallengeForSession(session.id);
     });
   },
   { immediate: true },
@@ -185,6 +185,7 @@ onMounted(() => {
   window.addEventListener("resize", updateRodPosition);
 });
 onBeforeUnmount(() => {
+  fishingStore.resetCast();
   if (rodPositionFrame) window.cancelAnimationFrame(rodPositionFrame);
   if (biteMotionFrame !== undefined) window.cancelAnimationFrame(biteMotionFrame);
   window.removeEventListener("resize", updateRodPosition);

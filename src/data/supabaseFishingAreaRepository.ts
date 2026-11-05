@@ -1,5 +1,6 @@
 import supabase from "../database/connection";
 import type { RealtimeChannel } from "@supabase/supabase-js";
+import type { TensionSubmission } from "./tensionChallenge";
 
 export interface FishingSessionRow {
   id: string;
@@ -59,6 +60,39 @@ function toDbPayload(payload: FishingAreaPayload) {
 }
 
 class SupabaseFishingAreaRepository {
+  async castRod(areaId: string, castDepth: number) {
+    const { data, error } = await supabase.rpc("cast_rod", { p_area_id: areaId, p_cast_depth: castDepth });
+    if (error) throw new Error(error.message);
+    return data;
+  }
+
+  async fetchSessionChallenge(sessionId: string) {
+    const { data, error } = await supabase.from("fishing_sessions")
+      .select("id, status, challenge_data").eq("id", sessionId).single();
+    if (error) throw new Error(error.message);
+    return data as { id: string; status: string; challenge_data: unknown };
+  }
+
+  async submitChallenge(sessionId: string, success: boolean, timeSpentMs: number) {
+    const { data, error } = await supabase.rpc("submit_challenge", {
+      p_session_id: sessionId, p_success: success, p_time_spent_ms: timeSpentMs,
+    });
+    if (error) throw new Error(error.message);
+    return data;
+  }
+
+  async startTensionChallenge(sessionId: string) {
+    const { data, error } = await supabase.rpc("start_tension_challenge", { p_session_id: sessionId });
+    if (error) throw new Error(error.message);
+    return data as { challenge_data: unknown; server_time_ms: number };
+  }
+
+  async submitTensionChallenge(payload: TensionSubmission) {
+    const { data, error } = await supabase.rpc("submit_tension_challenge", { p_payload: payload });
+    if (error) throw new Error(error.message);
+    return data;
+  }
+
   subscribeToFishingSession(sessionId: string, onBite: (session: FishingSessionRow) => void): RealtimeChannel {
     return supabase
       .channel(`fishing_session_${sessionId}`)
@@ -75,7 +109,14 @@ class SupabaseFishingAreaRepository {
           if (session.id === sessionId && session.status === "BITE") onBite(session);
         },
       )
-      .subscribe();
+      .subscribe((status) => {
+        // Recover a BITE update that happened before subscription or reconnect.
+        if (status === "SUBSCRIBED") {
+          void this.fetchSessionChallenge(sessionId).then((session) => {
+            if (session.status === "BITE") onBite(session);
+          }).catch((error) => console.error("Không thể kiểm tra phiên câu cá:", error));
+        }
+      });
   }
 
   async unsubscribe(channel: RealtimeChannel): Promise<void> {

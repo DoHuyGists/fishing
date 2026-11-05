@@ -14,6 +14,7 @@ import Cash from "../currency/Cash.vue";
 import Shells from "../currency/Shells.vue";
 import TeamMembersSticky from "../team/TeamMembersSticky.vue";
 import PrepareModal from "./PrepareModal.vue";
+import Fishingfightdemo from "../fishing/Fishingfightdemo.vue";
 
 const InteractWorldMap2 = defineAsyncComponent(() => import("./InteractWorldMap.vue"));
 const AccountInfoModal = defineAsyncComponent(() => import("../account/AccountInfoModal.vue"));
@@ -330,6 +331,8 @@ onUnmounted(() => {
         <LatestCaughtList />
       </div>
     </main>
+
+    <Fishingfightdemo/>
 
     <Teleport to="body">
       <Transition

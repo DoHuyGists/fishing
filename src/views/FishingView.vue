@@ -9,10 +9,13 @@ import FishingScene from "../components/player/fishing/FishingScene.vue";
 import LakeFishGuide from "../components/player/fishing/LakeFishGuide.vue";
 import Loading from "../components/Loading.vue";
 import PowerMeter from "../components/player/fishing/PowerMeter.vue";
+import FishingFight from "../components/player/fishing/Fishingfightdemo.vue";
+import { useFishingStore } from "../stores/fishing";
 import { useAuthStore } from "../stores/auth";
 import { useEquipmentStore } from "../stores/equipment";
 
 const authStore = useAuthStore();
+const fishingStore = useFishingStore();
 const equipmentStore = useEquipmentStore();
 const { user } = storeToRefs(authStore);
 const { error: equipmentError, loaded: equipmentLoaded, userId: equipmentUserId } = storeToRefs(equipmentStore);
@@ -102,7 +105,8 @@ onBeforeUnmount(() => {
             <EquipmentMenu />
           </div>
         </div>
-        <PowerMeter />
+        <FishingFight v-if="fishingStore.tensionChallenge" />
+        <PowerMeter v-else />
       </section>
     </div>
     <CatchDialog />

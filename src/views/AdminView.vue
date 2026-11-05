@@ -1,5 +1,9 @@
 <script lang="ts" setup>
 import { computed, defineAsyncComponent, ref } from "vue";
+import { useAdminGuideStore } from "../stores/adminGuide";
+
+const guideStore = useAdminGuideStore();
+const AdminGuideModal = defineAsyncComponent(() => import("../components/admin/guide/AdminGuideModal.vue"));
 
 type ModuleKey =
   | "zone"
@@ -296,7 +300,16 @@ const close = () => {
           <p class="text-sm text-slate-500">Chọn một mục để quản lý dữ liệu.</p>
         </div>
 
-        <div class="flex w-full flex-col gap-3 sm:w-auto sm:flex-row sm:items-center">
+        <div class="flex w-full flex-col gap-3 sm:w-auto sm:flex-row sm:flex-wrap sm:items-center sm:justify-end">
+          <button
+            type="button"
+            class="rounded-lg border border-[#cbd9c6] bg-[#f5f9f0] px-4 py-2 text-sm font-semibold text-[#24352a] hover:bg-emerald-100 focus-visible:outline-2 focus-visible:outline-emerald-600"
+            aria-haspopup="dialog"
+            :aria-expanded="guideStore.isOpen"
+            @click="guideStore.open"
+          >
+            📘 Hướng dẫn quản trị
+          </button>
           <button
             type="button"
             class="rounded-lg bg-emerald-700 px-4 py-2 text-sm font-semibold text-white hover:bg-emerald-800 focus-visible:outline-2 focus-visible:outline-emerald-600"
@@ -362,6 +375,7 @@ const close = () => {
     </main>
 
     <!-- Module dialogs (giữ nguyên cơ chế @close của từng component) -->
+    <AdminGuideModal v-if="guideStore.isOpen" @close="guideStore.close" />
     <component :is="activeComponent" v-if="activeComponent" @close="close" />
     <FeedbackListModal v-if="feedbackModal === 'opinion'" @close="feedbackModal = null" />
     <ErrorFeedbackManagementModal v-if="feedbackModal === 'errors'" @close="feedbackModal = null" />
