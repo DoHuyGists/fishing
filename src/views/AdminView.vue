@@ -8,6 +8,7 @@ const DashboarModal = defineAsyncComponent(() => import("../components/admin/mon
 const monitorOpen = ref(false);
 
 type ModuleKey =
+  | "skill"
   | "zone"
   | "weather"
   | "zoneWeather"
@@ -36,6 +37,7 @@ interface AdminModule {
 }
 
 const moduleComponents = {
+  skill: defineAsyncComponent(() => import("../components/admin/skils-management/SkillManagementModal.vue")),
   dailyMissionRewards: defineAsyncComponent(
     () => import("../components/admin/daily-mission-rewards-management/DailyMissionRewardManagementModal.vue"),
   ),
@@ -92,6 +94,13 @@ const groups: ModuleGroup[] = [
   {
     title: "Dữ liệu trò chơi",
     modules: [
+      {
+        key: "skill",
+        icon: "✨",
+        label: "Kỹ năng",
+        desc: "Quản lý kỹ năng, cấp tối đa và hiệu ứng mỗi cấp.",
+        component: moduleComponents.skill,
+      },
       {
         key: "area",
         icon: "🗺️",
