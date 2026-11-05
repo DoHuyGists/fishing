@@ -24,6 +24,7 @@ type ModalName =
     | "leaderboard"
     | "attendance"
     | "donation"
+    | "skill"
     ;
 
 export const useModalStore = defineStore("Modal", {

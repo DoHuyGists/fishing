@@ -14,7 +14,7 @@ import Cash from "../currency/Cash.vue";
 import Shells from "../currency/Shells.vue";
 import TeamMembersSticky from "../team/TeamMembersSticky.vue";
 import PrepareModal from "./PrepareModal.vue";
-import Fishingfightdemo from "../fishing-challenge/TensionChallenge.vue/index.js";
+import Fishingfightdemo from "../fishing-challenge/TensionChallenge.vue";
 
 const InteractWorldMap2 = defineAsyncComponent(() => import("./InteractWorldMap.vue"));
 const AccountInfoModal = defineAsyncComponent(() => import("../account/AccountInfoModal.vue"));
@@ -38,6 +38,7 @@ const TeamModal = defineAsyncComponent(() => import("../team/TeamModal.vue"));
 const PostProduction = defineAsyncComponent(() => import("../fishing-post-production/PostProduction.vue"));
 const AttendanceModal = defineAsyncComponent(() => import("../attendance/AttendanceModal.vue"));
 const DonationModal = defineAsyncComponent(() => import("../donation/DonationModal.vue"));
+const SkillModal = defineAsyncComponent(() => import("../skill/SkillModal.vue"));
 
 const authStore = useAuthStore();
 const caughtStore = useCaughtStore();
@@ -173,6 +174,15 @@ onUnmounted(() => {
           >
             <span class="text-sm">📦</span>
             <span>Túi đồ</span>
+          </button>
+
+          <button
+            type="button"
+            class="flex items-center gap-1.5 px-3 py-1.5 rounded-xl border border-[#cbd9c6] bg-[#f5f9f0] text-[#24352a] shadow-sm font-bold text-xs cursor-pointer transition-colors hover:border-[#70a77e] hover:bg-[#eaf5e8]"
+            @click="modalStore.open('skill')"
+          >
+            <span class="text-sm" aria-hidden="true">✨</span>
+            <span>Kỹ năng</span>
           </button>
 
           <!-- Feedback -->
@@ -394,6 +404,7 @@ onUnmounted(() => {
           <CatchDiaryModal v-if="modalStore.isOpening('diary')" />
           <SpinWheelModal v-if="configStore.isUnlocked('gacha') && modalStore.isOpening('gacha')" />
           <InventoryModal v-if="modalStore.isOpening('inventory')" />
+          <SkillModal v-if="modalStore.isOpening('skill')" />
           <Feedbackmodal v-if="modalStore.isOpening('feedback')" />
           <MissionModal v-if="modalStore.isOpening('mission')" />
           <EventModal v-if="configStore.isUnlocked('event') && modalStore.isOpening('event')" />
