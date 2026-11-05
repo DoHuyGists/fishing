@@ -3,6 +3,7 @@ import supabase from "../database/connection";
 export interface UserProfile {
   id: string;
   experience_point: number;
+  skill_points: number;
   level: number;
   inventory_capacity: number;
   species_storage_capacity: number;

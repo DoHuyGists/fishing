@@ -2,7 +2,9 @@
 import { onMounted, onUnmounted, ref, watch } from "vue";
 import { useModalStore } from "../../stores/modal.ts";
 import { useCurrencyStore } from "../../stores/currency.ts";
+import { useUserProfileStore } from "../../stores/userProfile.ts";
 import Cash from "../player/currency/Cash.vue";
+import SkillPoints from "../player/currency/SkillPoints.vue";
 import GuideTour from "./GuideTour.vue";
 import UserTurn from "../player/stamina/UserTurn.vue";
 import Shells from "../player/currency/Shells.vue";
@@ -24,6 +26,7 @@ const hasRefreshListener = onRefresh != undefined;
 const hasGuideSteps = guidSteps.length != 0;
 
 const currencyStore = useCurrencyStore();
+const userProfileStore = useUserProfileStore();
 const modalStore = useModalStore();
 const REFRESH_COOLDOWN = 5;
 const isRefreshing = ref<boolean>(false);
@@ -84,6 +87,7 @@ onUnmounted(() => {
       <div v-if="showCountData" class="flex flex-col md:flex-row md:gap-2 order-2 ml-auto shrink-0 sm:order-none sm:ml-0">
         <Cash :amount="currencyStore.formattedCash" />
         <Shells :amount="currencyStore.formattedShells" />
+        <SkillPoints :amount="userProfileStore.skillPoints" />
         <UserTurn />
       </div>
       <div class="order-3 ml-auto flex max-w-full shrink-0 items-center gap-1 sm:order-none sm:ml-0 sm:gap-2">

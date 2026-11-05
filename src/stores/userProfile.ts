@@ -10,6 +10,7 @@ export const useUserProfileStore = defineStore("userProfile", {
   getters: {
     level: (state) => state.profile?.level ?? 0,
     experiencePoint: (state) => state.profile?.experience_point ?? 0,
+    skillPoints: (state) => state.profile?.skill_points ?? 0,
     inventoryCapacity: (state) => state.profile?.inventory_capacity ?? 0,
     speciesStorageCapacity: (state) => state.profile?.species_storage_capacity ?? 0,
   },

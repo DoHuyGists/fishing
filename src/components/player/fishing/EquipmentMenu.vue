@@ -36,8 +36,8 @@ watch(
 </script>
 
 <template>
-  <div class="flex justify-between">
-    <div class="flex flex-wrap gap-2" aria-label="Dụng cụ câu cá">
+  <div class="flex items-start justify-between gap-2">
+    <div class="equipment-actions flex flex-wrap items-start gap-2" aria-label="Dụng cụ câu cá">
       <button type="button" class="flex items-center gap-2 rounded-xl border border-[#cbd9c6] bg-[#f5f9f0] px-3 py-2 text-[11px] font-bold text-[#24352a] transition hover:border-[#70a77e] hover:bg-[#eaf5e8]" :disabled="!store.canAdjustDepth" @click="openPicker">
         <span aria-hidden="true" class="text-base">🎣</span>
         Chọn trang bị
@@ -80,12 +80,20 @@ watch(
         </b>
       </button>
     </div>
-    <div class="flex items-center gap-2 rounded-xl border border-[#cbd9c6] bg-[#f5f9f0] px-3 py-2 text-[11px] text-[#24352a]" aria-label="Mồi đang chọn">
-      <img :src="selectedBait?.image ?? ''" class="w-10" alt="">
-      <div class="flex flex-col">
+    <div class="flex shrink-0 items-center gap-2 rounded-lg border border-[#cbd9c6] bg-[#f5f9f0] px-2 py-1 text-[11px] leading-3 text-[#24352a]" aria-label="Mồi đang chọn">
+      <img :src="selectedBait?.image ?? ''" class="size-6 object-contain" alt="">
+      <div class="flex flex-col gap-0.5">
         <span class="font-bold">{{ selectedBait?.name ?? "Chưa chọn mồi" }}</span>
         <span class="text-[#4b5f50]">Còn: {{ selectedBait?.quantity ?? 0 }}</span>
       </div>
     </div>
   </div>
 </template>
+
+<style scoped>
+.equipment-actions > button {
+  min-height: 28px;
+  padding-block: 3px;
+  border-radius: 8px;
+}
+</style>

@@ -13,18 +13,18 @@ onUnmounted(() => { store.closeForm(); store.cancelDelete(); });
 
 <template>
   <AdminModal title="Quản lý kỹ năng" subtitle="Cấu hình kỹ năng, giới hạn cấp và hiệu ứng mỗi cấp." icon="✨" :close-disabled="store.busy" @close="emit('close')">
-    <div class="flex flex-wrap gap-3 border-b border-[#cbd9c6] bg-white p-4">
+    <div class="flex shrink-0 flex-wrap gap-3 border-b border-[#cbd9c6] bg-white p-4">
       <input v-model="store.search" type="search" aria-label="Tìm kỹ năng" placeholder="Tìm theo mã, tên hoặc mô tả..." class="min-w-0 flex-1 rounded-lg border border-[#cbd9c6] px-3 py-2 text-sm" />
       <button type="button" :disabled="store.busy" class="rounded-lg border border-[#cbd9c6] px-3 py-2 text-sm disabled:opacity-50" @click="store.fetchAll">{{ store.loading ? 'Đang tải...' : 'Làm mới' }}</button>
       <button type="button" :disabled="store.busy" class="rounded-lg bg-[#24352a] px-4 py-2 text-sm font-bold text-white disabled:opacity-50" @click="store.openForm()">+ Thêm kỹ năng</button>
     </div>
-    <main class="min-h-0 flex-1 overflow-auto p-4 sm:p-6">
-      <p v-if="store.error && !store.deleteTarget" role="alert" class="rounded-lg border border-red-200 bg-red-50 p-3 text-sm text-red-700">{{ store.error }}</p>
+    <main class="flex min-h-0 min-w-0 flex-1 flex-col overflow-hidden p-4 sm:p-6">
+      <p v-if="store.error && !store.deleteTarget" role="alert" class="shrink-0 rounded-lg border border-red-200 bg-red-50 p-3 text-sm text-red-700">{{ store.error }}</p>
       <p v-if="store.loading && !store.items.length" role="status" class="py-10 text-center text-sm">Đang tải danh sách kỹ năng...</p>
       <p v-else-if="!store.filteredItems.length && !store.error" class="py-10 text-center text-sm">{{ store.search ? 'Không tìm thấy kỹ năng phù hợp.' : 'Chưa có kỹ năng nào.' }}</p>
-      <div v-else-if="store.filteredItems.length" class="overflow-x-auto rounded-xl border border-[#cbd9c6] bg-white">
+      <div v-else-if="store.filteredItems.length" class="min-h-0 min-w-0 flex-1 overflow-auto rounded-xl border border-[#cbd9c6] bg-white">
         <table class="w-full min-w-[800px] text-left text-sm">
-          <thead class="bg-[#f5f9f0]"><tr>
+          <thead class="sticky top-0 z-10 bg-[#f5f9f0]"><tr>
             <th class="p-3">Thứ tự</th><th class="p-3">Mã</th><th class="p-3">Kỹ năng</th><th class="p-3">Cấp tối đa</th><th class="p-3">Trạng thái</th><th class="p-3 text-right">Thao tác</th>
           </tr></thead>
           <tbody>

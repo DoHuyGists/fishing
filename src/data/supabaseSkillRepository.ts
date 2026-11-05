@@ -17,6 +17,18 @@ export interface UserSkill {
   level: number;
 }
 
+export interface UpgradeSkillResult {
+  success: true;
+  skill_id: string;
+  skill_code: string;
+  skill_name: string;
+  previous_level: number;
+  current_level: number;
+  max_level: number;
+  remaining_skill_points: number;
+  effects: Record<string, unknown>;
+}
+
 export type SkillPayload = Omit<Skill, "id">;
 
 class SupabaseSkillRepository {
@@ -58,12 +70,13 @@ class SupabaseSkillRepository {
     return data ?? [];
   }
 
-  async upgradeSkill(skillId: string): Promise<void> {
+  async upgradeSkill(skillId: string): Promise<UpgradeSkillResult> {
     const { data, error } = await supabase.rpc("upgrade_skill", { p_skill_id: skillId });
     if (error) throw new Error(error.message);
-    if (data === false || data?.success === false) {
+    if (data?.success !== true) {
       throw new Error(data?.message || "Không thể nâng cấp kỹ năng.");
     }
+    return data as UpgradeSkillResult;
   }
 }
 

@@ -9,6 +9,7 @@ import { computed, watch } from 'vue'
  * Vùng: [0 → safeMin) chùng · [safeMin → safeMax] an toàn · (safeMax → max) nguy hiểm · >= max đứt
  */
 const props = defineProps({
+  compact: { type: Boolean, default: false },
   tension: { type: Number, default: 0 },
   max: { type: Number, default: 100 },
   safeMin: { type: Number, default: 35 },
@@ -58,7 +59,8 @@ const vibration = computed(() => {
 
 <template>
   <div
-    class="w-full min-w-0 select-none rounded-2xl bg-[#0E2A33] px-4 py-3 text-[#E8F1EE]"
+    class="w-full min-w-0 select-none rounded-md bg-[#0E2A33] text-[#E8F1EE]"
+    :class="compact ? 'px-2 py-1.5' : 'px-4 py-3'"
     role="meter"
     aria-label="Lực căng dây câu"
     :aria-valuenow="Math.round(tension)"
@@ -66,18 +68,18 @@ const vibration = computed(() => {
     :aria-valuemax="max"
     :aria-valuetext="zoneInfo.label"
   >
-    <div class="mb-1 flex items-center justify-between gap-3">
-      <span class="inline-flex items-center gap-1.5 rounded-full bg-white/5 px-2 py-1 text-[11px] font-semibold" :class="zoneInfo.text">
+    <div class="flex items-center justify-between gap-3" :class="compact ? 'mb-1 leading-none' : 'mb-1'">
+      <span class="inline-flex items-center gap-1.5 rounded-full bg-white/5 px-2 text-[11px] font-semibold" :class="[zoneInfo.text, compact ? 'py-0' : 'py-1']">
         <span aria-hidden="true" class="size-1.5 rounded-full" :class="zoneInfo.knob" />
         {{ zoneInfo.label }}
       </span>
-      <span class="text-xl font-bold leading-none tabular-nums" :class="zoneInfo.text" aria-hidden="true">
+      <span class="font-bold leading-none tabular-nums" :class="[zoneInfo.text, compact ? 'text-sm' : 'text-xl']" aria-hidden="true">
         {{ Math.round(position) }}<span class="ml-0.5 text-xs font-normal text-[#E8F1EE]/50">%</span>
       </span>
     </div>
 
     <!-- Dây câu -->
-    <svg viewBox="0 0 300 16" class="mb-1 h-4 w-full overflow-visible" preserveAspectRatio="none" aria-hidden="true">
+    <svg v-if="!compact" viewBox="0 0 300 16" class="mb-1 h-4 w-full overflow-visible" preserveAspectRatio="none" aria-hidden="true">
       <path
         :d="linePath"
         fill="none"
@@ -90,7 +92,7 @@ const vibration = computed(() => {
     </svg>
 
     <!-- Thanh chỉ số -->
-    <div class="relative h-6">
+    <div class="relative" :class="compact ? 'h-5' : 'h-6'">
       <div class="absolute inset-0 flex overflow-hidden rounded-lg">
         <div class="bg-sky-900/70" :style="{ width: safeStart + '%' }" />
         <div class="bg-emerald-500/80" :style="{ width: safeEnd - safeStart + '%' }" />
@@ -105,13 +107,13 @@ const vibration = computed(() => {
 
       <!-- Con trỏ -->
       <div
-        class="absolute -inset-y-1.5 w-1.5 -translate-x-1/2 rounded-full shadow-[0_0_0_2px_#0E2A33] transition-[left] duration-75 ease-linear"
-        :class="[zoneInfo.knob, zone === 'danger' ? 'knob-shake' : '']"
+        class="absolute -translate-x-1/2 rounded-full shadow-[0_0_0_2px_#0E2A33] transition-[left] duration-75 ease-linear"
+        :class="[zoneInfo.knob, zone === 'danger' ? 'knob-shake' : '', compact ? '-inset-y-1 w-1' : '-inset-y-1.5 w-1.5']"
         :style="{ left: position + '%' }"
       />
     </div>
 
-    <div class="relative mt-2 h-4 text-[#E8F1EE]/40" aria-hidden="true">
+    <div v-if="!compact" class="relative mt-2 h-4 text-[#E8F1EE]/40" aria-hidden="true">
       <span class="absolute left-0" title="Dây chùng">
         <svg viewBox="0 0 24 16" class="h-4 w-5" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"><path d="M2 3c1 12 19 12 20 0" /></svg>
       </span>

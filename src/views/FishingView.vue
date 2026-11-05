@@ -88,7 +88,7 @@ onBeforeUnmount(() => {
   <main v-else class="w-full h-screen overflow-hidden touch-none overscroll-none bg-[#193224] text-[#e9f4e8]">
     <div class="grid grid-rows-[minmax(0,1fr)_auto] w-full h-dvh">
       <FishingScene />
-      <section class="control-deck" :class="{ 'control-deck--tension': fishingStore.tensionChallenge }">
+      <section class="control-deck p-2" :class="{ 'control-deck--tension': fishingStore.tensionChallenge }">
         <div class="side-panel">
           <div class="flex justify-between items-center mx-[3px]">
             <button
@@ -121,8 +121,7 @@ onBeforeUnmount(() => {
   z-index: 5;
   display: grid;
   grid-template-columns: minmax(0, 1fr) 272px;
-  gap: 13px;
-  padding: 14px clamp(14px, 4vw, 58px) clamp(14px, 3vh, 28px);
+  gap: 8px;
   background: linear-gradient(180deg, #1b3929, #11251a);
   box-shadow: 0 -8px 24px rgba(3, 13, 7, 0.25);
 }
@@ -134,7 +133,7 @@ onBeforeUnmount(() => {
 
 .side-panel {
   min-width: 0;
-  padding: 11px 13px 13px;
+  padding: 6px 13px;
   border: 1px solid rgba(225, 246, 214, 0.23);
   border-radius: 16px;
   background: linear-gradient(135deg, rgba(16, 42, 27, 0.89), rgba(27, 61, 41, 0.82));
@@ -203,12 +202,12 @@ onBeforeUnmount(() => {
   .control-deck,
   .control-deck--tension {
     grid-template-columns: 1fr;
-    gap: 8px;
-    padding: 9px 12px 12px;
+    gap: 4px;
+    padding: 5px 12px 6px;
   }
 
   .side-panel {
-    padding: 9px;
+    padding: 4px 9px;
   }
 
   .equipment-toggle {

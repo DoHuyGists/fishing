@@ -457,6 +457,7 @@ export const useFishingStore = defineStore("fishing", {
       this.isLoadingChallenge = false;
     },
     async beginTensionChallenge() {
+      this.advanceTensionFight();
       const sessionId = this.sessionId;
       if (!sessionId || !this.tensionChallenge || this.castPhase !== "bite" ||
         this.tensionStartedAt !== null || this.isStartingTensionChallenge) return;
@@ -493,7 +494,17 @@ export const useFishingStore = defineStore("fishing", {
     advanceTensionFight(now = performance.now()) {
       const challenge = this.tensionChallenge;
       const fight = this.tensionFight;
-      if (!challenge || !fight || this.castPhase !== "bite" || this.tensionStartedAt === null) return;
+      if (!challenge || !fight || this.castPhase !== "bite") return;
+      if (this.tensionStartedAt === null) {
+        // The server also limits how long the player can wait before activation.
+        if (now + this.serverClockOffset >= challenge.expiresAt) {
+          // Invalidate any activation request still in flight as well.
+          this.resetCast();
+          this.castPhase = "lost";
+          this.castMessage = "Đã hết thời gian bắt đầu thử thách. Cá đã thoát!";
+        }
+        return;
+      }
       const targetTick = Math.min(tensionMaxTicks(challenge), Math.floor(((now - this.tensionStartedAt) * challenge.config.tickRate) / 1000));
       while (fight.tick < targetTick && fight.result === "fighting") {
         stepTensionFight(challenge, fight, this.tensionReeling);
@@ -504,12 +515,12 @@ export const useFishingStore = defineStore("fishing", {
       }
     },
     setTensionReeling(reeling: boolean) {
+      this.advanceTensionFight();
       if (this.tensionChallenge && this.castPhase === "bite" && this.tensionStartedAt === null) {
         this.tensionReeling = reeling;
         if (reeling) void this.beginTensionChallenge();
         return;
       }
-      this.advanceTensionFight();
       const fight = this.tensionFight;
       if (this.castPhase !== "bite" || !fight || fight.result !== "fighting" || this.tensionReeling === reeling) return;
       this.tensionReeling = reeling;
