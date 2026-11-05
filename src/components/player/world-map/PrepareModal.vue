@@ -1,5 +1,5 @@
 <script lang="ts" setup>
-import { ref, computed, onMounted } from "vue";
+import { ref, computed, onMounted, watch } from "vue";
 import { useAuthStore } from "../../../stores/auth.ts";
 import { useInventoryStore } from "../../../stores/inventory.ts";
 import { supabaseEquipmentRepository } from "../../../data/supabaseEquipmentRepository.ts";
@@ -14,6 +14,8 @@ import { useRouter } from "vue-router";
 import { useWorldStore } from "../../../stores/worldMap.ts";
 import Modal from "../../shared/Modal.vue";
 import { useModalStore } from "../../../stores/modal.ts";
+import WeatherSection from "../fishing/WeatherSection.vue";
+import { useDiaryStore } from "../../../stores/diary.ts";
 
 const worldStore = useWorldStore();
 const authStore = useAuthStore();
@@ -26,6 +28,15 @@ const error = ref("");
 const switchingSet = ref(false);
 const selectingItemId = ref<string | null>(null);
 const modalStore = useModalStore();
+const diaryStore = useDiaryStore();
+
+watch(
+  () => [worldStore.selectedArea.id, authStore.userId] as const,
+  ([areaId, userId]) => {
+    void diaryStore.loadDiscoveredAreaSpecies(areaId, userId);
+  },
+  { immediate: true },
+);
 
 /** Currently used set (the only set in use, identified by is_used flag) */
 const usedSet = computed(() => {
@@ -207,6 +218,70 @@ async function confirm() {
       <div
         class="flex-1 overflow-y-auto flex flex-col gap-4 pb-1 [&::-webkit-scrollbar]:w-1.5 [&::-webkit-scrollbar-thumb]:bg-[#b7cbb4] [&::-webkit-scrollbar-thumb]:rounded-full [&::-webkit-scrollbar-track]:bg-transparent"
       >
+        <WeatherSection :area-id="worldStore.selectedArea.id" inline />
+
+        <section
+          aria-label="Cá trong hồ"
+          class="shrink-0 overflow-hidden rounded-lg border border-[#cbd9c6] bg-[#f5f9f0] shadow-sm"
+        >
+          <header class="flex flex-wrap items-center justify-between gap-2 border-b border-[#cbd9c6] bg-[#eaf2e5] p-3">
+            <div>
+              <h3 class="m-0 text-[15px] font-bold text-[#24352a]">Cá trong hồ</h3>
+              <p class="m-0 mt-0.5 text-xs text-[#617565]">Các loài bạn đã câu thành công.</p>
+            </div>
+            <span
+              v-if="!diaryStore.isLoadingAreaSpecies && !diaryStore.areaSpeciesError"
+              class="text-xs font-semibold text-[#526a58]"
+            >
+              {{ diaryStore.discoveredAreaSpecies.length }} loài đã khám phá
+            </span>
+          </header>
+          <p v-if="diaryStore.isLoadingAreaSpecies" class="m-0 p-4 text-center text-sm text-[#617565]" role="status">
+            Đang tải danh sách cá…
+          </p>
+          <div v-else-if="diaryStore.areaSpeciesError" class="p-4 text-center" role="alert">
+            <p class="m-0 text-sm text-red-600">Không thể tải danh sách cá trong hồ.</p>
+            <button
+              type="button"
+              class="mt-2 rounded-lg border border-[#cbd9c6] bg-[#eaf2e5] px-3 py-1.5 text-xs font-semibold text-[#24352a] hover:bg-white"
+              @click="diaryStore.loadDiscoveredAreaSpecies(worldStore.selectedArea.id, authStore.userId)"
+            >
+              Thử lại
+            </button>
+          </div>
+          <ul
+            v-else-if="diaryStore.discoveredAreaSpecies.length"
+            class="m-0 grid list-none grid-cols-1 gap-2 p-3 sm:grid-cols-2 xl:grid-cols-3"
+          >
+            <li
+              v-for="fish in diaryStore.discoveredAreaSpecies"
+              :key="fish.id"
+              class="flex items-start gap-3 rounded-lg border border-[#cbd9c6] bg-white/70 p-2.5"
+            >
+              <img
+                :src="fish.image || '/fish/VN/fish.jpg'"
+                :alt="fish.name"
+                class="h-14 w-16 shrink-0 rounded-md bg-[#eaf2e5] object-contain"
+                loading="lazy"
+                draggable="false"
+              />
+              <div class="min-w-0 flex-1">
+                <p class="m-0 break-words text-sm font-semibold text-[#24352a]">{{ fish.name }}</p>
+                <p v-if="fish.rarity" class="m-0 mt-0.5 text-xs text-[#526a58]">{{ fish.rarity }}</p>
+                <p v-if="fish.information" class="m-0 mt-1 text-xs leading-relaxed text-[#617565]">
+                  {{ fish.information }}
+                </p>
+                <p v-if="fish.weight_min != null || fish.weight_max != null" class="m-0 mt-1 text-xs text-[#617565]">
+                  Cân nặng: {{ fish.weight_min ?? "?" }}–{{ fish.weight_max ?? "?" }} kg
+                </p>
+              </div>
+            </li>
+          </ul>
+          <p v-else class="m-0 p-4 text-center text-sm text-[#617565]">
+            Bạn chưa khám phá được loài cá nào trong hồ này.
+          </p>
+        </section>
+
         <!-- Loading state -->
         <div v-if="loading" class="flex-1 flex flex-col items-center justify-center gap-3.5 text-[#617565] text-sm">
           <div class="w-9 h-9 border-[3px] border-[#cbd9c6] border-t-[#526a58] rounded-full animate-spin"></div>

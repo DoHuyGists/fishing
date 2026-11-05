@@ -1,5 +1,6 @@
 import { defineStore } from "pinia";
 import { supabaseDiaryRepository, type Species, type CaughtDiary } from "../data/supabaseDiaryRepository";
+import { supabaseSpeciesInAreaRepository, type AreaSpecies } from "../data/supabaseSpeciesInAreaRepository";
 
 export interface DiaryFishEntry {
   species: Species;
@@ -16,6 +17,10 @@ export const useDiaryStore = defineStore("diary", {
     selectedLocationName: null as string | null,
     isLoading: false,
     error: null as string | null,
+    discoveredAreaSpecies: [] as AreaSpecies[],
+    isLoadingAreaSpecies: false,
+    areaSpeciesError: "",
+    areaSpeciesRequestId: 0,
   }),
 
   getters: {
@@ -64,6 +69,32 @@ export const useDiaryStore = defineStore("diary", {
   },
 
   actions: {
+    async loadDiscoveredAreaSpecies(areaId: string | null | undefined, userId: string | null | undefined) {
+      const requestId = ++this.areaSpeciesRequestId;
+      this.discoveredAreaSpecies = [];
+      this.areaSpeciesError = "";
+      this.isLoadingAreaSpecies = false;
+      if (!areaId || !userId) return;
+
+      this.isLoadingAreaSpecies = true;
+      try {
+        const [species, caught] = await Promise.all([
+          supabaseSpeciesInAreaRepository.fetchSpeciesByAreaId(areaId),
+          supabaseDiaryRepository.fetchCaughtDiary(userId),
+        ]);
+        if (requestId !== this.areaSpeciesRequestId) return;
+
+        const caughtIds = new Set(caught.map((entry) => entry.species_id));
+        const discovered = species.filter((fish) => caughtIds.has(fish.id));
+        this.discoveredAreaSpecies = [...new Map(discovered.map((fish) => [fish.id, fish])).values()];
+      } catch (err) {
+        if (requestId !== this.areaSpeciesRequestId) return;
+        this.areaSpeciesError = err instanceof Error ? err.message : "Không thể tải danh sách cá trong hồ.";
+      } finally {
+        if (requestId === this.areaSpeciesRequestId) this.isLoadingAreaSpecies = false;
+      }
+    },
+
     async initDiary(userId?: string) {
       this.isLoading = true;
       this.error = null;

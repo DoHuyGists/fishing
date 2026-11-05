@@ -16,7 +16,7 @@ const props = withDefaults(defineProps<{
     size?: number,
     amount?: number | string,
 }>(), {
-    size: 30
+    size: 25
 })
 
 const formattedAmount = computed(() => Number(props.amount ?? 0).toLocaleString("vi-VN"))

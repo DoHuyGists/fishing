@@ -9,9 +9,11 @@ import { useConfigStore } from "../../../stores/config.ts";
 import { useUserTurnsStore } from "../../../stores/userTurns.ts";
 import { useTeamStore } from "../../../stores/team.ts";
 import { useCurrencyStore } from "../../../stores/currency.ts";
+import { useUserProfileStore } from "../../../stores/userProfile.ts";
 import UserTurn from "../stamina/UserTurn.vue";
 import Cash from "../currency/Cash.vue";
 import Shells from "../currency/Shells.vue";
+import SkillPoints from "../currency/SkillPoints.vue";
 import TeamMembersSticky from "../team/TeamMembersSticky.vue";
 import PrepareModal from "./PrepareModal.vue";
 import Fishingfightdemo from "../fishing-challenge/TensionChallenge.vue";
@@ -48,6 +50,7 @@ const configStore = useConfigStore();
 const userTurnsStore = useUserTurnsStore();
 const teamStore = useTeamStore();
 const currencyStore = useCurrencyStore();
+const userProfileStore = useUserProfileStore();
 
 const hasNewNotification = ref(false);
 
@@ -88,6 +91,7 @@ onUnmounted(() => {
       <div class="flex flex-wrap items-center justify-end gap-2">
         <Cash :amount="currencyStore.formattedCash" />
         <Shells :amount="currencyStore.formattedShells" />
+        <SkillPoints :amount="userProfileStore.skillPoints" />
         <UserTurn />
       </div>
     </header>

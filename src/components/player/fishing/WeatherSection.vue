@@ -1,9 +1,11 @@
-﻿<script setup lang="ts">
+<script setup lang="ts">
 import { computed, onBeforeUnmount, onMounted, ref, watch } from "vue";
 import { useWeatherStore } from "../../../stores/weather";
 import { utcToLocalMs } from "../../../utils/time";
 
-const props = defineProps<{ areaId: string | null | undefined }>();
+const props = withDefaults(defineProps<{ areaId: string | null | undefined; inline?: boolean }>(), {
+  inline: false,
+});
 
 const weatherStore = useWeatherStore();
 const open = ref(false);
@@ -82,7 +84,7 @@ const modifiers = computed(() =>
       code: modifier.code,
       label: modifier?.name,
       icon: modifier.value >= 0 ? "🟢" : "🔴",
-      text: `${modifier.value >= 0 ? "+" : "-"}${Number(modifier.value.toFixed(2))}${modifier.unit == "PERCENT" ? "%" : ""}`,
+      text: `${modifier.value >= 0 ? "+" : ""}${Number(modifier.value.toFixed(2))}${modifier.unit == "PERCENT" ? "%" : ""}`,
       positive: modifier.value >= 0,
       width: Math.min(100, Math.abs(modifier.value)),
     };
@@ -139,6 +141,7 @@ onBeforeUnmount(() => {
 
 <template>
   <button
+    v-if="!inline"
     type="button"
     class="inline-flex w-fit items-center gap-1.5 rounded-full border border-emerald-700/30 bg-emerald-50 px-2.5 py-1 text-xs font-semibold text-emerald-900 hover:bg-emerald-100"
     @click.stop="open = true"
@@ -150,7 +153,7 @@ onBeforeUnmount(() => {
     }}</span>
   </button>
 
-  <Teleport to="body">
+  <Teleport to="body" :disabled="inline">
     <Transition
       enter-active-class="transition-opacity duration-200"
       leave-active-class="transition-opacity duration-200"
@@ -158,18 +161,22 @@ onBeforeUnmount(() => {
       leave-to-class="opacity-0"
     >
       <div
-        v-if="open"
-        class="fixed inset-0 z-1000 grid place-items-center bg-emerald-950/60 p-4"
+        v-if="inline || open"
+        :class="inline ? 'w-full shrink-0' : 'fixed inset-0 z-1000 grid place-items-center bg-emerald-950/60 p-4'"
         @click.self="open = false"
         @contextmenu.prevent
       >
         <div
-          class="relative flex max-h-[90vh] w-[min(720px,100%)] flex-col overflow-hidden rounded-xl border border-emerald-900/15 bg-white text-emerald-950"
-          role="dialog"
-          aria-modal="true"
+          class="relative flex flex-col overflow-hidden rounded-xl border"
+          :class="inline
+            ? 'w-full border-[#cbd9c6] bg-[#f5f9f0] text-[#24352a] shadow-sm'
+            : 'max-h-[90vh] w-[min(720px,100%)] border-emerald-900/15 bg-white text-emerald-950'"
+          :role="inline ? 'region' : 'dialog'"
+          :aria-modal="inline ? undefined : true"
+          aria-label="Thời tiết khu vực"
         >
           <!-- Placeholder video thời tiết làm nền: gán WEATHER_VIDEO[code] để bật -->
-          <div class="pointer-events-none absolute inset-0" aria-hidden="true">
+          <div v-if="!inline" class="pointer-events-none absolute inset-0" aria-hidden="true">
             <video
               v-if="videoSrc"
               :key="videoSrc"
@@ -185,6 +192,7 @@ onBeforeUnmount(() => {
           </div>
 
           <button
+            v-if="!inline"
             type="button"
             class="absolute right-3 top-3 z-10 h-8 w-8 rounded-full border border-emerald-900/15 bg-white/80 leading-none text-emerald-950 hover:bg-white"
             aria-label="Đóng"
@@ -194,7 +202,11 @@ onBeforeUnmount(() => {
           </button>
 
           <div class="relative flex min-h-0 flex-1 flex-col">
-            <div class="flex items-center gap-4 border-b border-emerald-900/10 px-5 py-4 pr-14">
+            <div
+              v-if="!inline || (weatherStore.zone && !weatherStore.error)"
+              class="flex items-center gap-4 border-b border-emerald-900/10"
+              :class="inline ? 'flex-wrap bg-[#eaf2e5] px-3 py-3 sm:flex-nowrap' : 'px-5 py-4 pr-14'"
+            >
               <div
                 class="grid h-16 w-16 shrink-0 place-items-center rounded-full border border-emerald-700/30 bg-emerald-100 text-3xl"
               >
@@ -212,7 +224,7 @@ onBeforeUnmount(() => {
                   {{ weatherStore.zone?.name ?? "—" }}
                 </div>
                 <div class="truncate text-xl font-bold leading-tight">
-                  {{ hasWeather ? weather?.name : "Trời quang đãng" }}
+                  {{ hasWeather ? weather?.name : "Chưa có thông tin thời tiết" }}
                 </div>
                 <span
                   v-if="hasWeather"
@@ -222,7 +234,7 @@ onBeforeUnmount(() => {
               </div>
               <div
                 v-if="hasWeather && weatherStore.zone?.weather_expires_at"
-                class="ml-auto hidden w-fit shrink-0 sm:block"
+                class="ml-auto hidden w-fit min-w-0 sm:block"
               >
                 <div class="flex items-baseline justify-between text-xs gap-2 text-emerald-800">
                   <span>Thời tiết {{ weather?.name }} kết thúc sau: </span>
@@ -261,7 +273,7 @@ onBeforeUnmount(() => {
                 </div>
               </div>
 
-              <div class="min-h-0 flex-1 overflow-y-auto px-5 py-4">
+              <div :class="inline ? 'px-3 py-3' : 'min-h-0 flex-1 overflow-y-auto px-5 py-4'">
                 <div
                   class="mb-2 flex items-baseline justify-between text-[11px] font-bold uppercase tracking-widest text-emerald-800"
                 >
@@ -271,7 +283,8 @@ onBeforeUnmount(() => {
                 <TransitionGroup
                   v-if="hasWeather && modifiers.length"
                   tag="ul"
-                  class="m-0 list-none gap-2 p-0 flex flex-col"
+                  class="m-0 list-none gap-2 p-0"
+                  :class="inline ? 'grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3' : 'flex flex-col'"
                   enter-active-class="transition-opacity duration-300"
                   enter-from-class="opacity-0"
                 >
@@ -283,8 +296,8 @@ onBeforeUnmount(() => {
                     <span class="text-base leading-none">{{ m.icon }}</span>
                     <div class="min-w-0 flex-1">
                       <div class="flex items-baseline justify-between gap-2 text-xs">
-                        <span class="truncate">{{ m.label }}</span>
-                        <b :class="m.positive ? 'text-emerald-700' : 'text-red-600'" class="tabular-nums">{{
+                        <span :class="inline ? 'break-words' : 'truncate'">{{ m.label }}</span>
+                        <b :class="m.positive ? 'text-emerald-700' : 'text-red-600'" class="shrink-0 tabular-nums">{{
                           m.text
                         }}</b>
                       </div>

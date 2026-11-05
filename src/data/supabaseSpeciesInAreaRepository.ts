@@ -1,4 +1,7 @@
 import supabase from "../database/connection";
+import type { SpeciesRow } from "./supabaseSpeciesRepository";
+
+export type AreaSpecies = Pick<SpeciesRow, "id" | "name" | "image" | "rarity" | "information" | "weight_min" | "weight_max">;
 
 export interface SpeciesInAreaRow {
   id: string;
@@ -36,6 +39,17 @@ function mapRow(row: any): SpeciesInAreaRow {
 }
 
 class SupabaseSpeciesInAreaRepository {
+  async fetchSpeciesByAreaId(areaId: string): Promise<AreaSpecies[]> {
+    const { data, error } = await supabase
+      .from("species_in_area")
+      .select("species:species!inner(id, name, image, rarity, information, weight_min, weight_max)")
+      .eq("area_id", areaId);
+
+    if (error) throw new Error(error.message);
+    const rows = (data ?? []) as unknown as { species: AreaSpecies }[];
+    return rows.map((row) => row.species);
+  }
+
   async fetchAll(): Promise<SpeciesInAreaRow[]> {
     const { data, error } = await supabase.from("species_in_area").select(SELECT_QUERY).order("weight_rate", { ascending: false });
     if (error) throw new Error(error.message);
