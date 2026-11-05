@@ -58,7 +58,7 @@ const vibration = computed(() => {
 
 <template>
   <div
-    class="w-full max-w-xl select-none rounded-xl bg-[#0E2A33] p-4 text-[#E8F1EE] shadow-lg ring-1 ring-white/10"
+    class="w-full min-w-0 select-none rounded-2xl bg-[#0E2A33] px-4 py-3 text-[#E8F1EE]"
     role="meter"
     aria-label="Lực căng dây câu"
     :aria-valuenow="Math.round(tension)"
@@ -66,11 +66,13 @@ const vibration = computed(() => {
     :aria-valuemax="max"
     :aria-valuetext="zoneInfo.label"
   >
-    <div class="mb-2 flex items-baseline justify-between">
-      <span class="text-sm font-medium text-[#E8F1EE]/70">Lực căng dây</span>
-      <span class="text-sm font-semibold tabular-nums" :class="zoneInfo.text">
+    <div class="mb-1 flex items-center justify-between gap-3">
+      <span class="inline-flex items-center gap-1.5 rounded-full bg-white/5 px-2 py-1 text-[11px] font-semibold" :class="zoneInfo.text">
+        <span aria-hidden="true" class="size-1.5 rounded-full" :class="zoneInfo.knob" />
         {{ zoneInfo.label }}
-        <span class="ml-1 text-[#E8F1EE]/60">{{ Math.round(position) }}%</span>
+      </span>
+      <span class="text-xl font-bold leading-none tabular-nums" :class="zoneInfo.text" aria-hidden="true">
+        {{ Math.round(position) }}<span class="ml-0.5 text-xs font-normal text-[#E8F1EE]/50">%</span>
       </span>
     </div>
 
@@ -88,8 +90,8 @@ const vibration = computed(() => {
     </svg>
 
     <!-- Thanh chỉ số -->
-    <div class="relative h-7">
-      <div class="absolute inset-0 flex overflow-hidden rounded-md">
+    <div class="relative h-6">
+      <div class="absolute inset-0 flex overflow-hidden rounded-lg">
         <div class="bg-sky-900/70" :style="{ width: safeStart + '%' }" />
         <div class="bg-emerald-500/80" :style="{ width: safeEnd - safeStart + '%' }" />
         <div
@@ -109,10 +111,16 @@ const vibration = computed(() => {
       />
     </div>
 
-    <div class="mt-2 flex justify-between text-xs text-[#E8F1EE]/50">
-      <span>Chùng</span>
-      <span class="text-emerald-300/80">Vùng an toàn</span>
-      <span>Đứt</span>
+    <div class="relative mt-2 h-4 text-[#E8F1EE]/40" aria-hidden="true">
+      <span class="absolute left-0" title="Dây chùng">
+        <svg viewBox="0 0 24 16" class="h-4 w-5" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"><path d="M2 3c1 12 19 12 20 0" /></svg>
+      </span>
+      <span class="absolute -translate-x-1/2 text-emerald-300/80" :style="{ left: (safeStart + safeEnd) / 2 + '%' }" title="Giữ vạch trong vùng xanh">
+        <svg viewBox="0 0 20 20" class="size-4" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="10" cy="10" r="7" /><path d="m6.5 10 2.3 2.3 4.7-4.6" /></svg>
+      </span>
+      <span class="absolute right-0" title="Nguy cơ đứt dây">
+        <svg viewBox="0 0 20 20" class="size-4" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="m11 2-7 9h5l-1 7 8-10h-5l1-6Z" /></svg>
+      </span>
     </div>
   </div>
 </template>

@@ -8,8 +8,8 @@ import FishingPlayers from "../components/player/fishing/FishingPlayers.vue";
 import FishingScene from "../components/player/fishing/FishingScene.vue";
 import LakeFishGuide from "../components/player/fishing/LakeFishGuide.vue";
 import Loading from "../components/Loading.vue";
-import PowerMeter from "../components/player/fishing/PowerMeter.vue";
-import FishingFight from "../components/player/fishing/Fishingfightdemo.vue";
+import CatchChallenge from "../components/player/fishing-challenge/CatchChallenge.vue";
+import TensionChallenge from "../components/player/fishing-challenge/TensionChallenge.vue";
 import { useFishingStore } from "../stores/fishing";
 import { useAuthStore } from "../stores/auth";
 import { useEquipmentStore } from "../stores/equipment";
@@ -20,8 +20,8 @@ const equipmentStore = useEquipmentStore();
 const { user } = storeToRefs(authStore);
 const { error: equipmentError, loaded: equipmentLoaded, userId: equipmentUserId } = storeToRefs(equipmentStore);
 const equipmentCollapsed = ref(true);
-const isSetupReady = computed(
-  () => Boolean(user.value && equipmentLoaded.value && equipmentUserId.value === user.value.id),
+const isSetupReady = computed(() =>
+  Boolean(user.value && equipmentLoaded.value && equipmentUserId.value === user.value.id),
 );
 
 function toggleEquipment() {
@@ -88,7 +88,7 @@ onBeforeUnmount(() => {
   <main v-else class="w-full h-screen overflow-hidden touch-none overscroll-none bg-[#193224] text-[#e9f4e8]">
     <div class="grid grid-rows-[minmax(0,1fr)_auto] w-full h-dvh">
       <FishingScene />
-      <section class="control-deck">
+      <section class="control-deck" :class="{ 'control-deck--tension': fishingStore.tensionChallenge }">
         <div class="side-panel">
           <div class="flex justify-between items-center mx-[3px]">
             <button
@@ -105,8 +105,8 @@ onBeforeUnmount(() => {
             <EquipmentMenu />
           </div>
         </div>
-        <FishingFight v-if="fishingStore.tensionChallenge" />
-        <PowerMeter v-else />
+        <TensionChallenge v-if="fishingStore.tensionChallenge" />
+        <CatchChallenge v-else />
       </section>
     </div>
     <CatchDialog />
@@ -127,7 +127,13 @@ onBeforeUnmount(() => {
   box-shadow: 0 -8px 24px rgba(3, 13, 7, 0.25);
 }
 
+.control-deck--tension {
+  grid-template-columns: minmax(0, 1fr) clamp(360px, 38vw, 480px);
+  align-items: start;
+}
+
 .side-panel {
+  min-width: 0;
   padding: 11px 13px 13px;
   border: 1px solid rgba(225, 246, 214, 0.23);
   border-radius: 16px;
@@ -194,7 +200,8 @@ onBeforeUnmount(() => {
 }
 
 @media (max-width: 720px) {
-  .control-deck {
+  .control-deck,
+  .control-deck--tension {
     grid-template-columns: 1fr;
     gap: 8px;
     padding: 9px 12px 12px;

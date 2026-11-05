@@ -14,7 +14,7 @@ import Cash from "../currency/Cash.vue";
 import Shells from "../currency/Shells.vue";
 import TeamMembersSticky from "../team/TeamMembersSticky.vue";
 import PrepareModal from "./PrepareModal.vue";
-import Fishingfightdemo from "../fishing/Fishingfightdemo.vue";
+import Fishingfightdemo from "../fishing-challenge/TensionChallenge.vue/index.js";
 
 const InteractWorldMap2 = defineAsyncComponent(() => import("./InteractWorldMap.vue"));
 const AccountInfoModal = defineAsyncComponent(() => import("../account/AccountInfoModal.vue"));
@@ -103,7 +103,9 @@ onUnmounted(() => {
         <InteractWorldMap2 v-if="isMapVisible" />
       </div>
       <div class="">
-        <div class="flex items-center flex-wrap gap-x-2 gap-y-4 pt-2 [&_button:disabled]:relative [&_button:disabled]:cursor-not-allowed [&_button:disabled]:opacity-60">
+        <div
+          class="flex items-center flex-wrap gap-x-2 gap-y-4 pt-2 [&_button:disabled]:relative [&_button:disabled]:cursor-not-allowed [&_button:disabled]:opacity-60"
+        >
           <button
             type="button"
             class="flex items-center gap-1.5 px-3 py-1.5 rounded-xl border border-[#cbd9c6] bg-[#f5f9f0] text-[#24352a] shadow-sm font-bold text-xs cursor-pointer transition-colors hover:border-[#70a77e] hover:bg-[#eaf5e8]"
@@ -121,7 +123,11 @@ onUnmounted(() => {
           >
             <span class="text-sm">🏪</span>
             <span>Chợ cá</span>
-            <span v-if="!configStore.isUnlocked('market')" class="absolute -top-2 -right-1 whitespace-nowrap rounded-full border border-[#cbd9c6] bg-[#f5f9f0] px-1.5 py-0.5 text-[9px] leading-none text-[#24352a] shadow-sm">🔒 Cấp {{ configStore.requiredLevel('market') }}</span>
+            <span
+              v-if="!configStore.isUnlocked('market')"
+              class="absolute -top-2 -right-1 whitespace-nowrap rounded-full border border-[#cbd9c6] bg-[#f5f9f0] px-1.5 py-0.5 text-[9px] leading-none text-[#24352a] shadow-sm"
+              >🔒 Cấp {{ configStore.requiredLevel("market") }}</span
+            >
           </button>
 
           <button
@@ -152,7 +158,11 @@ onUnmounted(() => {
           >
             <span class="text-sm">🎁</span>
             <span>Gacha</span>
-            <span v-if="!configStore.isUnlocked('gacha')" class="absolute -top-2 -right-1 whitespace-nowrap rounded-full border border-[#cbd9c6] bg-[#f5f9f0] px-1.5 py-0.5 text-[9px] leading-none text-[#24352a] shadow-sm">🔒 Cấp {{ configStore.requiredLevel('gacha') }}</span>
+            <span
+              v-if="!configStore.isUnlocked('gacha')"
+              class="absolute -top-2 -right-1 whitespace-nowrap rounded-full border border-[#cbd9c6] bg-[#f5f9f0] px-1.5 py-0.5 text-[9px] leading-none text-[#24352a] shadow-sm"
+              >🔒 Cấp {{ configStore.requiredLevel("gacha") }}</span
+            >
           </button>
 
           <!-- Túi đồ -->
@@ -204,7 +214,11 @@ onUnmounted(() => {
           >
             <span class="text-sm">📄</span>
             <span>Sự kiện</span>
-            <span v-if="!configStore.isUnlocked('event')" class="absolute -top-2 -right-1 whitespace-nowrap rounded-full border border-[#cbd9c6] bg-[#f5f9f0] px-1.5 py-0.5 text-[9px] leading-none text-[#24352a] shadow-sm">🔒 Cấp {{ configStore.requiredLevel('event') }}</span>
+            <span
+              v-if="!configStore.isUnlocked('event')"
+              class="absolute -top-2 -right-1 whitespace-nowrap rounded-full border border-[#cbd9c6] bg-[#f5f9f0] px-1.5 py-0.5 text-[9px] leading-none text-[#24352a] shadow-sm"
+              >🔒 Cấp {{ configStore.requiredLevel("event") }}</span
+            >
           </button>
 
           <button
@@ -224,7 +238,11 @@ onUnmounted(() => {
           >
             <span class="text-sm" aria-hidden="true">🕸️</span>
             <span>Lưới cá</span>
-            <span v-if="!configStore.isUnlocked('post-production')" class="absolute -top-2 -right-1 whitespace-nowrap rounded-full border border-[#cbd9c6] bg-[#f5f9f0] px-1.5 py-0.5 text-[9px] leading-none text-[#24352a] shadow-sm">🔒 Cấp {{ configStore.requiredLevel('post-production') }}</span>
+            <span
+              v-if="!configStore.isUnlocked('post-production')"
+              class="absolute -top-2 -right-1 whitespace-nowrap rounded-full border border-[#cbd9c6] bg-[#f5f9f0] px-1.5 py-0.5 text-[9px] leading-none text-[#24352a] shadow-sm"
+              >🔒 Cấp {{ configStore.requiredLevel("post-production") }}</span
+            >
           </button>
 
           <!-- Redeem code -->
@@ -258,7 +276,11 @@ onUnmounted(() => {
           >
             <span class="text-sm" aria-hidden="true">🛡️</span>
             <span>Phe phái</span>
-            <span v-if="!configStore.isUnlocked('faction')" class="absolute -top-2 -right-1 whitespace-nowrap rounded-full border border-[#cbd9c6] bg-[#f5f9f0] px-1.5 py-0.5 text-[9px] leading-none text-[#24352a] shadow-sm">🔒 Cấp {{ configStore.requiredLevel('faction') }}</span>
+            <span
+              v-if="!configStore.isUnlocked('faction')"
+              class="absolute -top-2 -right-1 whitespace-nowrap rounded-full border border-[#cbd9c6] bg-[#f5f9f0] px-1.5 py-0.5 text-[9px] leading-none text-[#24352a] shadow-sm"
+              >🔒 Cấp {{ configStore.requiredLevel("faction") }}</span
+            >
           </button>
 
           <button
@@ -269,7 +291,11 @@ onUnmounted(() => {
           >
             <span class="text-sm" aria-hidden="true">👥</span>
             <span>Bạn bè</span>
-            <span v-if="!configStore.isUnlocked('friend')" class="absolute -top-2 -right-1 whitespace-nowrap rounded-full border border-[#cbd9c6] bg-[#f5f9f0] px-1.5 py-0.5 text-[9px] leading-none text-[#24352a] shadow-sm">🔒 Cấp {{ configStore.requiredLevel('friend') }}</span>
+            <span
+              v-if="!configStore.isUnlocked('friend')"
+              class="absolute -top-2 -right-1 whitespace-nowrap rounded-full border border-[#cbd9c6] bg-[#f5f9f0] px-1.5 py-0.5 text-[9px] leading-none text-[#24352a] shadow-sm"
+              >🔒 Cấp {{ configStore.requiredLevel("friend") }}</span
+            >
           </button>
 
           <button
@@ -280,7 +306,11 @@ onUnmounted(() => {
           >
             <span class="text-sm" aria-hidden="true">🎣</span>
             <span>Lập đội</span>
-            <span v-if="!configStore.isUnlocked('team')" class="absolute -top-2 -right-1 whitespace-nowrap rounded-full border border-[#cbd9c6] bg-[#f5f9f0] px-1.5 py-0.5 text-[9px] leading-none text-[#24352a] shadow-sm">🔒 Cấp {{ configStore.requiredLevel('team') }}</span>
+            <span
+              v-if="!configStore.isUnlocked('team')"
+              class="absolute -top-2 -right-1 whitespace-nowrap rounded-full border border-[#cbd9c6] bg-[#f5f9f0] px-1.5 py-0.5 text-[9px] leading-none text-[#24352a] shadow-sm"
+              >🔒 Cấp {{ configStore.requiredLevel("team") }}</span
+            >
           </button>
 
           <button
@@ -291,7 +321,11 @@ onUnmounted(() => {
           >
             <span class="text-sm" aria-hidden="true">🏆</span>
             <span>Huy hiệu</span>
-            <span v-if="!configStore.isUnlocked('badge')" class="absolute -top-2 -right-1 whitespace-nowrap rounded-full border border-[#cbd9c6] bg-[#f5f9f0] px-1.5 py-0.5 text-[9px] leading-none text-[#24352a] shadow-sm">🔒 Cấp {{ configStore.requiredLevel('badge') }}</span>
+            <span
+              v-if="!configStore.isUnlocked('badge')"
+              class="absolute -top-2 -right-1 whitespace-nowrap rounded-full border border-[#cbd9c6] bg-[#f5f9f0] px-1.5 py-0.5 text-[9px] leading-none text-[#24352a] shadow-sm"
+              >🔒 Cấp {{ configStore.requiredLevel("badge") }}</span
+            >
           </button>
 
           <button
@@ -302,7 +336,11 @@ onUnmounted(() => {
           >
             <span class="text-sm" aria-hidden="true">🛠️</span>
             <span>Chế tạo</span>
-            <span v-if="!configStore.isUnlocked('work-bench')" class="absolute -top-2 -right-1 whitespace-nowrap rounded-full border border-[#cbd9c6] bg-[#f5f9f0] px-1.5 py-0.5 text-[9px] leading-none text-[#24352a] shadow-sm">🔒 Cấp {{ configStore.requiredLevel('work-bench') }}</span>
+            <span
+              v-if="!configStore.isUnlocked('work-bench')"
+              class="absolute -top-2 -right-1 whitespace-nowrap rounded-full border border-[#cbd9c6] bg-[#f5f9f0] px-1.5 py-0.5 text-[9px] leading-none text-[#24352a] shadow-sm"
+              >🔒 Cấp {{ configStore.requiredLevel("work-bench") }}</span
+            >
           </button>
 
           <button
@@ -313,7 +351,11 @@ onUnmounted(() => {
           >
             <span class="text-sm" aria-hidden="true">📊</span>
             <span>Xếp hạng</span>
-            <span v-if="!configStore.isUnlocked('leaderboard')" class="absolute -top-2 -right-1 whitespace-nowrap rounded-full border border-[#cbd9c6] bg-[#f5f9f0] px-1.5 py-0.5 text-[9px] leading-none text-[#24352a] shadow-sm">🔒 Cấp {{ configStore.requiredLevel('leaderboard') }}</span>
+            <span
+              v-if="!configStore.isUnlocked('leaderboard')"
+              class="absolute -top-2 -right-1 whitespace-nowrap rounded-full border border-[#cbd9c6] bg-[#f5f9f0] px-1.5 py-0.5 text-[9px] leading-none text-[#24352a] shadow-sm"
+              >🔒 Cấp {{ configStore.requiredLevel("leaderboard") }}</span
+            >
           </button>
 
           <button
@@ -324,7 +366,11 @@ onUnmounted(() => {
           >
             <span aria-hidden="true">💚</span>
             <span>Ủng hộ</span>
-            <span v-if="!configStore.isUnlocked('donation')" class="absolute -top-2 -right-1 whitespace-nowrap rounded-full border border-[#cbd9c6] bg-[#f5f9f0] px-1.5 py-0.5 text-[9px] leading-none text-[#24352a] shadow-sm">🔒 Cấp {{ configStore.requiredLevel('donation') }}</span>
+            <span
+              v-if="!configStore.isUnlocked('donation')"
+              class="absolute -top-2 -right-1 whitespace-nowrap rounded-full border border-[#cbd9c6] bg-[#f5f9f0] px-1.5 py-0.5 text-[9px] leading-none text-[#24352a] shadow-sm"
+              >🔒 Cấp {{ configStore.requiredLevel("donation") }}</span
+            >
           </button>
         </div>
 
@@ -332,7 +378,7 @@ onUnmounted(() => {
       </div>
     </main>
 
-    <Fishingfightdemo/>
+    <Fishingfightdemo />
 
     <Teleport to="body">
       <Transition
