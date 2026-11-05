@@ -5,6 +5,7 @@ import type { ChartData } from "chart.js";
 import {
   supabaseAdminMonitorRepository,
   type MonitorAreaRow,
+  type MonitorCurrencyRow,
   type MonitorPlayerChange,
   type MonitorRealtimeStatus,
 } from "../../../data/supabaseAdminMonitorRepository";
@@ -25,10 +26,18 @@ export const useAdminMonitorStore = defineStore("admin-monitor", () => {
   const error = ref("");
   const lastUpdatedAt = ref<string | null>(null);
   const realtimeStatus = ref<MonitorRealtimeStatus>("disconnected");
+  const activeReport = ref("areas");
+  const currencies = ref<MonitorCurrencyRow[]>([]);
+  const currencyLoading = ref(false);
+  const currencyError = ref("");
+  const currencyUpdatedAt = ref<string | null>(null);
 
   let channel: RealtimeChannel | null = null;
   let pollTimer: ReturnType<typeof setInterval> | null = null;
   let refreshTimer: ReturnType<typeof setTimeout> | null = null;
+  let currencyRefreshTimer: ReturnType<typeof setTimeout> | null = null;
+  let currencyRefreshQueued = false;
+  let currencyRequestVersion = 0;
   let monitoring = false;
   let refreshQueued = false;
   let requestVersion = 0;
@@ -82,6 +91,36 @@ export const useAdminMonitorStore = defineStore("admin-monitor", () => {
     disconnected: "Realtime đã ngắt · tải lại mỗi 30 giây",
     error: "Realtime gián đoạn · tải lại mỗi 30 giây",
   })[realtimeStatus.value]);
+  const currencyUpdatedLabel = computed(() => currencyUpdatedAt.value
+    ? new Date(currencyUpdatedAt.value).toLocaleTimeString("vi-VN")
+    : "Chưa có dữ liệu");
+  const reportLoading = computed(() => loading.value || currencyLoading.value);
+  const currencyWallets = computed(() => currencies.value.map((wallet) => ({
+    id: wallet.id,
+    userId: wallet.user_id,
+    cash: BigInt(wallet.cash),
+    shells: BigInt(wallet.shells),
+  })));
+  const emptyWalletCount = computed(() => currencyWallets.value.filter((wallet) => wallet.cash === 0n && wallet.shells === 0n).length);
+  const currencyReport = computed(() => ([
+    { key: "cash", label: "Tiền", unit: "xu", icon: "/currency/cash.svg" },
+    { key: "shells", label: "Vỏ sò", unit: "vỏ sò", icon: "/currency/shells.svg" },
+  ] as const).map((currency) => {
+    const holders = currencyWallets.value.filter((wallet) => wallet[currency.key] > 0n);
+    return {
+      ...currency,
+      total: currencyWallets.value.reduce((sum, wallet) => sum + wallet[currency.key], 0n),
+      holderCount: holders.length,
+      topHolders: holders.sort((a, b) => {
+        const difference = b[currency.key] - a[currency.key];
+        return difference > 0n ? 1 : difference < 0n ? -1 : a.userId.localeCompare(b.userId);
+      }).slice(0, 10).map((wallet) => ({
+        id: wallet.id,
+        userId: wallet.userId,
+        balance: wallet[currency.key],
+      })),
+    };
+  }));
 
   function applyPlayerChange(change: MonitorPlayerChange) {
     if (change.areaId === null) delete activePlayers.value[change.id];
@@ -99,11 +138,11 @@ export const useAdminMonitorStore = defineStore("admin-monitor", () => {
     if (!monitoring || refreshTimer !== null) return;
     refreshTimer = setTimeout(() => {
       refreshTimer = null;
-      void refresh();
+      void refreshAreaReport();
     }, 500);
   }
 
-  async function refresh() {
+  async function refreshAreaReport() {
     if (loading.value) {
       refreshQueued = true;
       return;
@@ -138,6 +177,52 @@ export const useAdminMonitorStore = defineStore("admin-monitor", () => {
     }
   }
 
+  function scheduleCurrencyRefresh() {
+    if (!monitoring || currencyRefreshTimer !== null) return;
+    currencyRefreshTimer = setTimeout(() => {
+      currencyRefreshTimer = null;
+      void refreshCurrencyReport();
+    }, 500);
+  }
+
+  async function refreshCurrencyReport() {
+    if (currencyLoading.value) {
+      currencyRefreshQueued = true;
+      return;
+    }
+    const version = ++currencyRequestVersion;
+    currencyLoading.value = true;
+    currencyError.value = "";
+    try {
+      const wallets = await supabaseAdminMonitorRepository.fetchCurrencies();
+      if (version !== currencyRequestVersion) return;
+      currencies.value = wallets;
+      currencyUpdatedAt.value = new Date().toISOString();
+    } catch (cause) {
+      if (version === currencyRequestVersion) {
+        currencyError.value = cause instanceof Error ? cause.message : "Không thể tải báo cáo tiền tệ thế giới.";
+      }
+    } finally {
+      if (version === currencyRequestVersion) {
+        currencyLoading.value = false;
+        if (currencyRefreshQueued) {
+          currencyRefreshQueued = false;
+          scheduleCurrencyRefresh();
+        }
+      }
+    }
+  }
+
+  function handleCurrencyRefresh() {
+    // A change during a paginated snapshot requires another complete snapshot.
+    if (currencyLoading.value) currencyRefreshQueued = true;
+    else scheduleCurrencyRefresh();
+  }
+
+  async function refresh() {
+    await Promise.all([refreshAreaReport(), refreshCurrencyReport()]);
+  }
+
   function start() {
     if (monitoring) return;
     monitoring = true;
@@ -147,6 +232,9 @@ export const useAdminMonitorStore = defineStore("admin-monitor", () => {
     channel = supabaseAdminMonitorRepository.subscribe({
       onPlayerChange: (change) => {
         if (isCurrentSubscription()) handlePlayerChange(change);
+      },
+      onCurrencyRefresh: () => {
+        if (isCurrentSubscription()) handleCurrencyRefresh();
       },
       onRefresh: () => {
         if (isCurrentSubscription()) scheduleRefresh();
@@ -164,17 +252,22 @@ export const useAdminMonitorStore = defineStore("admin-monitor", () => {
     monitoring = false;
     monitoringVersion++;
     requestVersion++;
+    currencyRequestVersion++;
     realtimeStatus.value = "disconnected";
     pendingPlayerChanges = [];
     loading.value = false;
     refreshQueued = false;
+    currencyLoading.value = false;
+    currencyRefreshQueued = false;
     if (pollTimer !== null) clearInterval(pollTimer);
     if (refreshTimer !== null) clearTimeout(refreshTimer);
+    if (currencyRefreshTimer !== null) clearTimeout(currencyRefreshTimer);
     pollTimer = null;
     refreshTimer = null;
+    currencyRefreshTimer = null;
     if (channel) {
       void supabaseAdminMonitorRepository.unsubscribe(channel).catch((cause) => {
-        console.error("Không thể ngắt cập nhật báo cáo bãi câu:", cause);
+        console.error("Không thể ngắt cập nhật báo cáo giám sát:", cause);
       });
       channel = null;
     }
@@ -184,6 +277,8 @@ export const useAdminMonitorStore = defineStore("admin-monitor", () => {
     areas, activePlayers, playerCounts, loading, error, lastUpdatedAt, lastUpdatedLabel, totalPlayers, areaReport,
     realtimeStatus, realtimeLabel,
     occupiedAreas, busiestCount, busiestAreas, chartData, chartHeight,
+    activeReport, currencies, currencyLoading, currencyError, currencyUpdatedAt, currencyUpdatedLabel,
+    reportLoading, emptyWalletCount, currencyReport,
     start, stop, refresh,
   };
 });

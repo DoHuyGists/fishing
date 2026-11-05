@@ -13,6 +13,13 @@ export interface MonitorPlayerRow {
   area_id: string;
 }
 
+export interface MonitorCurrencyRow {
+  id: string;
+  user_id: string;
+  cash: string;
+  shells: string;
+}
+
 interface MonitorPresenceRow {
   id: string;
   area_id: string | null;
@@ -28,6 +35,7 @@ export type MonitorRealtimeStatus = "connecting" | "connected" | "disconnected" 
 
 interface MonitorSubscriptionHandlers {
   onPlayerChange: (change: MonitorPlayerChange) => void;
+  onCurrencyRefresh: () => void;
   onRefresh: () => void;
   onStatus: (status: MonitorRealtimeStatus) => void;
 }
@@ -65,6 +73,21 @@ class SupabaseAdminMonitorRepository {
     }
   }
 
+  async fetchCurrencies(): Promise<MonitorCurrencyRow[]> {
+    const wallets: MonitorCurrencyRow[] = [];
+    for (let offset = 0; ; offset += PAGE_SIZE) {
+      const { data, error } = await supabase
+        .from("currency")
+        // Read bigint as text so JSON parsing cannot round large balances.
+        .select("id, user_id, cash::text, shells::text")
+        .order("id")
+        .range(offset, offset + PAGE_SIZE - 1);
+      if (error) throw new Error(error.message);
+      wallets.push(...(data ?? []));
+      if (!data || data.length < PAGE_SIZE) return wallets;
+    }
+  }
+
   subscribe(handlers: MonitorSubscriptionHandlers): RealtimeChannel {
     return supabase
       .channel("admin-monitor")
@@ -81,11 +104,14 @@ class SupabaseAdminMonitorRepository {
         });
       })
       .on("postgres_changes", { event: "*", schema: "public", table: "fishing_areas" }, handlers.onRefresh)
+      // Refetch text balances instead of using potentially rounded Realtime numbers.
+      .on("postgres_changes", { event: "*", schema: "public", table: "currency" }, handlers.onCurrencyRefresh)
       .subscribe((status) => {
         if (status === "SUBSCRIBED") {
           handlers.onStatus("connected");
           // Fetch again after connecting or reconnecting to cover missed changes.
           handlers.onRefresh();
+          handlers.onCurrencyRefresh();
         } else if (status === "CHANNEL_ERROR" || status === "TIMED_OUT") {
           handlers.onStatus("error");
         } else if (status === "CLOSED") {
