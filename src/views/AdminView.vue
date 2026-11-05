@@ -4,6 +4,8 @@ import { useAdminGuideStore } from "../stores/adminGuide";
 
 const guideStore = useAdminGuideStore();
 const AdminGuideModal = defineAsyncComponent(() => import("../components/admin/guide/AdminGuideModal.vue"));
+const DashboarModal = defineAsyncComponent(() => import("../components/admin/monitor/DashboarModal.vue"));
+const monitorOpen = ref(false);
 
 type ModuleKey =
   | "zone"
@@ -305,6 +307,15 @@ const close = () => {
             type="button"
             class="rounded-lg border border-[#cbd9c6] bg-[#f5f9f0] px-4 py-2 text-sm font-semibold text-[#24352a] hover:bg-emerald-100 focus-visible:outline-2 focus-visible:outline-emerald-600"
             aria-haspopup="dialog"
+            :aria-expanded="monitorOpen"
+            @click="monitorOpen = true"
+          >
+            📊 Giám sát bãi câu
+          </button>
+          <button
+            type="button"
+            class="rounded-lg border border-[#cbd9c6] bg-[#f5f9f0] px-4 py-2 text-sm font-semibold text-[#24352a] hover:bg-emerald-100 focus-visible:outline-2 focus-visible:outline-emerald-600"
+            aria-haspopup="dialog"
             :aria-expanded="guideStore.isOpen"
             @click="guideStore.open"
           >
@@ -375,6 +386,7 @@ const close = () => {
     </main>
 
     <!-- Module dialogs (giữ nguyên cơ chế @close của từng component) -->
+    <DashboarModal v-if="monitorOpen" @close="monitorOpen = false" />
     <AdminGuideModal v-if="guideStore.isOpen" @close="guideStore.close" />
     <component :is="activeComponent" v-if="activeComponent" @close="close" />
     <FeedbackListModal v-if="feedbackModal === 'opinion'" @close="feedbackModal = null" />
