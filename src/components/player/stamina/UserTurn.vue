@@ -15,7 +15,7 @@ const userTurnsStore = useUserTurnsStore();
 </script>
 
 <template>
-  <button type="button" class="flex flex-wrap items-center gap-1 text-sm bg-white rounded-full px-2 cursor-pointer" aria-live="polite" aria-label="Thông tin về lượt câu" @click.stop="showInformation">
+  <button type="button" class="flex flex-wrap items-center gap-1 bg-white rounded-full px-2 cursor-pointer" aria-live="polite" aria-label="Thông tin về lượt câu" @click.stop="showInformation">
     <span class="font-bold">
       {{ userTurnsStore.status?.turns ?? "—" }} / {{ userTurnsStore.status?.max_turns ?? "—" }}
     </span>

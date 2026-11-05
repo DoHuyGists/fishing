@@ -1,5 +1,5 @@
 import { computed, ref, watch } from "vue";
-import { defineStore } from "pinia";
+import { acceptHMRUpdate, defineStore } from "pinia";
 import { supabaseSkillRepository, type Skill, type UserSkill } from "../data/supabaseSkillRepository";
 import { useAuthStore } from "./auth";
 import { useUserProfileStore } from "./userProfile";
@@ -65,7 +65,7 @@ export const useSkillStore = defineStore("skill", () => {
         effects: formatEffects(skill.effect_per_level ?? {}),
         currentEffects: formatEffects(currentEffects.value[skill.id] ?? {}),
       };
-    });
+    }).sort((a, b) => b.level - a.level);
   });
 
   const learnedCount = computed(() => skillCards.value.filter((skill) => skill.level > 0).length);
@@ -133,5 +133,11 @@ export const useSkillStore = defineStore("skill", () => {
     }
   }
 
-  return { skillCards, learnedCount, totalLevels, remainingSkillPoints, loading, upgradingId, error, upgradeError, fetchSkills, upgradeSkill };
+  return { skills, userSkills, currentEffects, skillCards, learnedCount, totalLevels, remainingSkillPoints, loading, upgradingId, error, upgradeError, fetchSkills, upgradeSkill };
 });
+
+if (import.meta.hot) {
+  import.meta.hot.accept(acceptHMRUpdate(useSkillStore, import.meta.hot));
+}
+
+export type SkillCard = ReturnType<typeof useSkillStore>["skillCards"][number];
