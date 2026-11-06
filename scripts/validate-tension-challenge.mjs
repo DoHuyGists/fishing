@@ -5,6 +5,7 @@ import assert from 'node:assert/strict';
 import ts from 'typescript';
 import { createPinia, defineStore, setActivePinia } from 'pinia';
 import { createTensionFight, stepTensionFight, isTensionChallenge } from '../src/data/tensionChallenge.ts';
+import { validateEquipmentMechanics } from './validate-equipment-mechanics.mjs';
 process.on('uncaughtException', async (e) => {
  console.error({message:e.message,code:e.code,position:e.position,where:e.where,detail:e.detail,stack:e.stack});
  await db.close();
@@ -25,7 +26,7 @@ CREATE TABLE public.fishing_sessions (
  star_rating integer, cast_depth numeric, bite_at timestamptz, status text DEFAULT 'WAITING'
 );
 CREATE TABLE public.species (id uuid PRIMARY KEY, name text, rarity text, weight_min numeric, weight_max numeric,
- active_time text, bait_match_number bigint, experience_point integer, image text);
+ active_time text, bait_match_number bigint, experience_point integer, image text, base_catch_rate numeric DEFAULT 1);
 CREATE TABLE public.user_profile (id uuid PRIMARY KEY, level integer, experience_point integer);
 CREATE TABLE public.user_inventory (id uuid PRIMARY KEY, user_id uuid, data jsonb);
 CREATE TABLE public.user_equipments (id uuid PRIMARY KEY, user_id uuid, is_used boolean, created_at timestamptz DEFAULT now(),
@@ -35,19 +36,35 @@ CREATE TABLE public.caught (id uuid PRIMARY KEY DEFAULT gen_random_uuid(), user_
 CREATE TABLE public.user_in_area (user_id uuid, session_id uuid);
 CREATE TABLE public.species_in_area (species_id uuid, area_id uuid, weight_rate numeric, depth_scope_id uuid);
 CREATE TABLE public.depth_scope (id uuid PRIMARY KEY, min_depth numeric, max_depth numeric, peak_depth numeric, curve_power numeric);
+CREATE TABLE public.countries (id uuid PRIMARY KEY DEFAULT gen_random_uuid(), code text UNIQUE, default_timezone text);
+CREATE TABLE public.fishing_areas (id uuid PRIMARY KEY, country_id text, timezone text);
+INSERT INTO countries (code,default_timezone) VALUES ('VN','Asia/Ho_Chi_Minh');
+INSERT INTO fishing_areas VALUES ('${areaId}','VN',NULL);
 INSERT INTO user_profile VALUES ('${uid}',1,0);
-INSERT INTO species VALUES ('${speciesId}', 'Test fish', 'RARE', 1, 2, 'ALL', 1, 100, null);
+INSERT INTO species (id,name,rarity,weight_min,weight_max,active_time,bait_match_number,experience_point,image) VALUES ('${speciesId}', 'Test fish', 'RARE', 1, 2, 'ALL', 1, 100, null);
 INSERT INTO species_in_area VALUES ('${speciesId}', '${areaId}', 1, null);
-INSERT INTO user_inventory VALUES ('44444444-4444-4444-8444-444444444444', '${uid}', '{"quantity":1000}');
-INSERT INTO user_inventory VALUES ('55555555-5555-4555-8555-555555555555', '${uid}', '{"strength":1000}');
+INSERT INTO user_inventory VALUES ('44444444-4444-4444-8444-444444444444', '${uid}', '{"quantity":1000,"fish_type":["TEST"]}');
+INSERT INTO user_inventory VALUES ('55555555-5555-4555-8555-555555555555', '${uid}', '{"catch_rate":1}');
+INSERT INTO user_inventory VALUES
+ ('77777777-7777-4777-8777-777777777777', '${uid}', '{"max_weight":100}'),
+ ('88888888-8888-4888-8888-888888888888', '${uid}', '{"pull_strength":80}'),
+ ('99999999-9999-4999-8999-999999999999', '${uid}', '{"durability":100}');
 INSERT INTO user_equipments (id,user_id,is_used,bait,hook) VALUES (gen_random_uuid(),'${uid}',true,
  '[{"inventory_id":"44444444-4444-4444-8444-444444444444","is_used":true}]',
  '[{"inventory_id":"55555555-5555-4555-8555-555555555555","is_used":true}]');
 SELECT set_config('app.user_id','${uid}',false);
 `);
+await db.exec(await readFile(new URL('./supabase/migrations/equipment_mechanics.sql', import.meta.url), 'utf8'));
+await db.exec(`
+UPDATE species SET fish_type='TEST',strength=40,alertness=0,burst_multiplier=1.5;
+UPDATE user_equipments SET
+ rod='[{"inventory_id":"77777777-7777-4777-8777-777777777777","is_used":true}]',
+ reel='[{"inventory_id":"88888888-8888-4888-8888-888888888888","is_used":true}]',
+ line='[{"inventory_id":"99999999-9999-4999-8999-999999999999","is_used":true}]';
+`);
 await db.exec(await readFile(new URL('./supabase/rpc/submit_challenge.sql', import.meta.url), 'utf8'));
 await db.exec(await readFile(new URL('./supabase/rpc/submit_tension_challenge.sql', import.meta.url), 'utf8'));
-await db.exec('CREATE FUNCTION public.cast_rod(p_area_id UUID,p_cast_depth NUMERIC) RETURNS JSONB LANGUAGE plpgsql AS $cast$' + await readFile(new URL('./supabase/rpc/cast_rod.sql', import.meta.url),'utf8') + '$cast$;');
+await db.exec('CREATE FUNCTION public.cast_rod(p_area_id UUID,p_cast_depth NUMERIC) RETURNS JSONB LANGUAGE plpgsql SECURITY DEFINER SET search_path=public AS $cast$' + await readFile(new URL('./supabase/rpc/cast_rod.sql', import.meta.url),'utf8') + '$cast$;');
 const query = async (sql, args=[]) => (await db.query(sql,args)).rows;
 const rejects = async (sql,args=[]) => assert.rejects(query(sql,args));
 const cast = (await query('SELECT cast_rod($1,0) AS result',[areaId]))[0].result;
@@ -81,7 +98,8 @@ await rejects('SELECT start_tension_challenge($1)',[cast.session_id]);
 
 // Regression using the reported seed: replaying just three seconds of network
 // or scheduler delay with released input used to finish the fight immediately.
-const reported={...c,seed:49897141};
+const reported={...c,seed:49897141,config:{...c.config,startTension:30,releaseRate:-28,fishPullMultiplier:0.7},
+ fish:{...c.fish,baseStrength:1,basePull:10,pullAmplitude:8,burstChance:0.55,burstMin:25,burstMax:60}};
 const reportedFight=createTensionFight(reported);
 while(reportedFight.result==='fighting') stepTensionFight(reported,reportedFight,false);
 assert.equal(reportedFight.result,'escaped');assert.equal(reportedFight.tick,182);
@@ -189,26 +207,27 @@ for (const rarity of ['EPIC','LEGENDARY']) {
  const cast=(await query('SELECT cast_rod($1,0) AS r',[areaId]))[0].r;
  const challenge=(await query('SELECT challenge_data AS c FROM fishing_sessions WHERE id=$1',[cast.session_id]))[0].c;
  assert.equal(challenge.type,'tension-challenge');
- assert.equal(challenge.fish.baseStrength,rarity==='EPIC'?1.1:1.2);
+ assert(challenge.fish.baseStrength >= 0.75 && challenge.fish.baseStrength <= 1.25);
 }
 
-// Normal fish retain the original challenge and old RPC, including empty hooks.
+// Every rarity now uses tension. Keep the old RPC for already-created sessions and other features.
 await db.exec("UPDATE species SET rarity='COMMON'");
 for(let i=0;i<15;i++) {
  const cast=(await query('SELECT cast_rod($1,0) AS r',[areaId]))[0].r;
  const s=(await query('SELECT * FROM fishing_sessions WHERE id=$1',[cast.session_id]))[0];
- if(!s.is_shiny) {assert.equal(s.challenge_data.type,undefined); assert.equal(s.challenge_data.max_duration_ms,5000);}
+ assert(isTensionChallenge(s.challenge_data)); assert.equal(s.challenge_data.max_duration_ms,undefined);
 }
 const oldId=crypto.randomUUID();
 await query(`INSERT INTO fishing_sessions(id,user_id,species_id,area_id,challenge_data,bite_at,expires_at,status,secret_weight)
  VALUES($1,$2,$3,$4,'{"max_duration_ms":5000}',now()-interval '1 second',now()+interval '1 minute','BITE',1)`,[oldId,uid,speciesId,areaId]);
 assert.equal((await query('SELECT submit_challenge($1,true,1000) AS r',[oldId]))[0].r.success,true);
 await rejects('SELECT submit_challenge($1,true,1000)',[oldId]);
-await query("UPDATE user_inventory SET data='{\"strength\":0}' WHERE id='55555555-5555-4555-8555-555555555555'");
+await db.exec('UPDATE species SET alertness=1');
 const emptyCast=(await query('SELECT cast_rod($1,0) AS r',[areaId]))[0].r;
 const emptySession=(await query('SELECT species_id,challenge_data FROM fishing_sessions WHERE id=$1',[emptyCast.session_id]))[0];
 assert.equal(emptySession.species_id,null);
-assert.equal(emptySession.challenge_data.max_duration_ms,5000);
+assert(isTensionChallenge(emptySession.challenge_data));
+await db.exec('UPDATE species SET alertness=0');
 
 // Exercise the actual Pinia actions with repository and clock boundaries mocked.
 let clock=0, fetchCount=0, startCount=0, oldSubmits=0, lastTensionSubmission;
@@ -244,13 +263,12 @@ new Function('require','module','exports','window','performance',output)(
 setActivePinia(createPinia());
 const store=storeModule.exports.useFishingStore();store.currentAreaId=areaId;
 await store.castTo(50,50);
-assert.equal(store.challenge,null);assert.equal(store.tensionChallenge,null);assert.equal(store.castPhase,'waiting');
+assert.equal(store.tensionChallenge,null);assert.equal(store.castPhase,'waiting');
 const start=store.startChallengeForSession(c.sessionId);
 await store.startChallengeForSession(c.sessionId);
 await start;
 assert.equal(fetchCount,1);assert.equal(store.castPhase,'bite');assert.equal(store.tensionStartedAt,null);
-assert.equal(store.challenge,null);assert.equal(store.tensionChallenge.seed,c.seed);
-await store.submitChallenge(true,1000);assert.equal(oldSubmits,0);
+assert.equal(store.tensionChallenge.seed,c.seed);assert.equal(oldSubmits,0);
 clock=30000;store.advanceTensionFight();
 assert.equal(store.tensionFight.tick,0);assert.equal(store.tensionFight.result,'fighting');
 assert.equal(startCount,0);assert.equal(lastTensionSubmission,undefined);
@@ -276,9 +294,11 @@ const stale=store.startChallengeForSession(c.sessionId);store.reelInBait();
 resolveFetch(fetched);await stale;
 assert.equal(store.castPhase,'idle');assert.equal(store.tensionChallenge,null);
 repo.fetchSessionChallenge=async()=>({...fetched,challenge_data:legacy});
+const startsBeforeLegacy=startCount;
 await store.castTo(50,50);await store.startChallengeForSession(c.sessionId);
-assert.equal(store.challenge.bar_speed,1.1);await store.submitChallenge(false,5000);
-assert.equal(oldSubmits,1);assert.equal(store.castPhase,'lost');
+assert.equal(store.castPhase,'lost');assert.equal(store.sessionId,null);
+assert.equal(store.tensionChallenge,null);assert.equal(startCount,startsBeforeLegacy);
+assert.equal(oldSubmits,0);
 
 // Releasing during the activation request must remain released when it arrives.
 repo.fetchSessionChallenge=async()=>fetched;
@@ -299,5 +319,14 @@ assert.equal(store.castPhase,'idle');
 resolveActivation(activationResponse());await new Promise(setImmediate);
 assert.equal(store.castPhase,'idle');assert.equal(store.tensionChallenge,null);
 assert.equal(store.isStartingTensionChallenge,false);
+// A predetermined server failure resolves without starting/submitting a fight.
+repo.startTensionChallenge=async()=>({resolution:{success:false,result:'HOOK_MISSED',message:'Móc trượt!'},server_time_ms:1000000+clock});
+store.resetCast();await store.castTo(50,50);await store.startChallengeForSession(c.sessionId);
+await store.beginTensionChallenge();
+assert.equal(store.castPhase,'lost');assert.equal(store.castMessage,'Móc trượt!');
+assert.equal(store.tensionChallenge,null);assert.equal(store.tensionStartedAt,null);
+assert.equal(oldSubmits,0);
 console.log(JSON.stringify({comparisons,outcomes:[...outcomes,'timeout'],checks:'SQL deployment, cast routing, late BITE readiness, activation authorization/expiry/idempotency, pending input release/cancellation, exact replay parity, malformed inputs, unfinished/oversized replay, rewards/XP, bait once, claimed result mismatch, replay rejection, authorization, speedhack, private helper grants, legacy RPC'},null,2));
+const equipmentChecks=await validateEquipmentMechanics({db,query,rejects,uid,speciesId,areaId,play,policies});
+console.log(JSON.stringify({equipmentChecks},null,2));
 await db.close();

@@ -13,13 +13,13 @@ type GuideEntry = {
 export const tensionGuideBaseline: Pick<TensionChallenge, "config" | "fish"> = {
   config: {
     tickRate: 60, safeMin: 35, safeMax: 70, maxTension: 100,
-    startTension: 30, startDistance: 100, reelRate: 24, releaseRate: -28,
-    reelSpeed: 7, slackEscapeSeconds: 2.5, slackThresholdRatio: 0.5,
-    slackDistanceRate: 2, fishPullMultiplier: 0.7, minimumStrength: 0.4,
+    startTension: 50, startDistance: 70, reelRate: 24, releaseRate: -48,
+    reelSpeed: 6, slackEscapeSeconds: 2.5, slackThresholdRatio: 0.5,
+    slackDistanceRate: 2, fishPullMultiplier: 1, minimumStrength: 0.4,
   },
   fish: {
     id: "ID loài cá của session", baseStrength: 1, burstChance: 0.55,
-    burstMin: 25, burstMax: 60, staminaDrain: 0.05, basePull: 10,
+    burstMin: 10, burstMax: 20, staminaDrain: 0.05, basePull: 32,
     pullAmplitude: 8, pullPeriodTicks: 126, burstMinTicks: 24, burstMaxTicks: 84,
   },
 };
@@ -57,7 +57,7 @@ export const configGuide = {
   startTension: {
     name: "Lực căng ban đầu", unit: "điểm lực căng",
     meaning: "Vị trí lực căng khi ván đấu bắt đầu.",
-    mechanism: "Mốc hiện tại 30 thấp hơn safeMin = 35, nên người chơi phải thu dây để bắt đầu kéo cá gần.",
+    mechanism: "RPC rules v2 đặt lực ban đầu bằng 50% ngưỡng đứt dây, nằm sẵn trong vùng xanh 35%–70%.",
     tuning: "Đặt trong vùng xanh để người mới nhập cuộc nhẹ nhàng. Đặt quá gần ngưỡng đứt làm cú giật đầu rất nguy hiểm.",
     example: "30 → 40: bắt đầu sẵn trong vùng xanh 35–70, cá có thể mệt ngay từ đầu.",
   },
@@ -129,7 +129,7 @@ export const configGuide = {
 export const fishGuide = {
   id: {
     name: "Mã loài cá", unit: "chuỗi ID",
-    meaning: "Xác định loài cá được chọn cho session, hiện lấy từ v_selected_species_id.",
+    meaning: "Xác định loài cá được chọn cho session; không tự tăng độ khó.",
     mechanism: "Dùng để nhận diện. Các phép tính sức kéo đọc những chỉ số khác trong fish; riêng ID không tự tăng độ khó.",
     tuning: "Nếu muốn từng loài có sức khác nhau, server cần lấy chỉ số tương ứng trước khi tạo challenge.",
     example: "Hai ID khác nhau nhưng cùng các tham số và seed sẽ có cùng diễn biến mô phỏng khi thao tác giống nhau.",
@@ -137,9 +137,9 @@ export const fishGuide = {
   baseStrength: {
     name: "Sức mạnh riêng của cá", unit: "hệ số",
     meaning: "Nhân toàn bộ lực kéo nền và cú giật của con cá.",
-    mechanism: "Cấu hình hiện tại: RARE = 1, EPIC = 1,1, LEGENDARY = 1,2. Cá Shiny dùng độ hiếm của loài để lấy hệ số này.",
+    mechanism: "RPC rules v2 lấy sức hiệu lực S từ species.strength, khối lượng và hiệu ứng, rồi chia cho 40. Rarity điều chỉnh nhịp đấu, không nhân thêm sức cá.",
     tuning: "Tăng để thể hiện cá khỏe hơn; cần xem cùng burstMax và releaseRate để người chơi còn khoảng xử lý.",
-    example: "Lực thô 60, hệ số vào dây 0,7: RARE tạo 42 điểm/giây; LEGENDARY tạo 50,4 khi còn khỏe.",
+    example: "Sức hiệu lực 40 cho baseStrength = 1; sức 48 cho 1,2. Với lực thô 60, hệ số vào dây 1 và đầy thể lực, lực vào dây lần lượt là 60 và 72 điểm/giây.",
   },
   burstChance: {
     name: "Xác suất xuất hiện cú giật", unit: "xác suất 0–1",
@@ -218,23 +218,23 @@ function preset(id: string, icon: string, title: string, audience: string, reaso
 }
 
 export const tensionGuidePresets = [
-  preset("baseline", "🎣", "Cá hiếm tiêu chuẩn", "Mốc hiện tại của RPC cho RARE",
-    "Giữ cấu hình gốc làm mốc so sánh trước khi thay đổi độ khó.",
+  preset("baseline", "🎣", "Cá hiếm tiêu chuẩn", "Ví dụ rules v2: cá sức 40, dây 100, máy 80",
+    "Cá RARE ở khối lượng trung tâm, hệ số giật 1,5; dây chịu 100 và máy có pull_strength = 80. Session thật thay đổi theo cá, trang bị và hiệu ứng.",
     "Giữ lực trong vùng xanh để cá mệt, đồng thời chừa khoảng đệm cho cú giật kế tiếp."),
   preset("beginner", "🌱", "Người mới làm quen", "Gợi ý cho bãi câu hướng dẫn",
     "Vào ván sẵn trong vùng xanh, cú giật ít và nhẹ hơn; thêm thời gian xử lý khi dây quá chùng.",
     "Nếu người mới vẫn hay thua ngay đầu ván, kiểm tra lực giật và khoảng đệm trước khi tăng tốc kéo cá.",
     { safeMin: 30, safeMax: 75, startTension: 40, reelSpeed: 8, slackEscapeSeconds: 3, minimumStrength: 0.3 },
-    { baseStrength: 0.85, burstChance: 0.35, burstMax: 45, staminaDrain: 0.07 }),
+    { baseStrength: 0.85, burstChance: 0.35, burstMax: 15, staminaDrain: 0.07 }),
   preset("legendary", "👑", "Cá huyền thoại", "Gợi ý tăng sức, giới hạn độ dài cú giật",
-    "Cá khỏe hơn 20% so với RARE. Giới hạn cú giật còn 1,1 giây và lực giật tối đa 55 để người chơi còn khoảng xử lý.",
+    "Ví dụ tăng sức hiệu lực 20% và giới hạn cú giật còn 1,1 giây, với lực giật cộng thêm tối đa 25. Đây là cấu hình gợi ý, không phải hệ số tự động theo rarity.",
     "Ưu tiên thử nhiều seed có chuỗi giật liên tiếp. Tránh cùng lúc tăng sức cá, lực giật và thời lượng giật quá mạnh.",
     { startTension: 40, reelSpeed: 6.5 },
-    { baseStrength: 1.2, burstMax: 55, burstMaxTicks: 66 }),
+    { baseStrength: 1.2, burstMax: 25, burstMaxTicks: 66 }),
   preset("equipment", "⚙️", "Nâng cấp máy câu", "Gợi ý thể hiện lợi ích trang bị",
-    "Giữ sức cá như cũ, tăng tốc kéo gần và khả năng hạ lực căng khi nhả dây.",
-    "Nhả -34 giúp hạ lực nhanh hơn khi cá kéo nhẹ, nhưng cũng dễ làm dây quá chùng nếu thả lâu.",
-    { reelSpeed: 9, releaseRate: -34 }),
+    "Giữ sức cá và thao tác nhả như cũ, tăng pull_strength từ 80 lên 140 để tốc độ thu tăng từ 6 lên 9 m/giây khi S = 40.",
+    "Máy tăng tốc độ thu khoảng cách; ngưỡng đứt vẫn do dây quyết định, cần giữ lực trong vùng xanh.",
+    { reelSpeed: 9 }),
 ];
 
 export function formatGuideNumber(value: string | number) {

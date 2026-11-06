@@ -25,6 +25,22 @@ BEGIN
     END IF;
     IF v_now > v_session.expires_at THEN RAISE EXCEPTION 'Session expired'; END IF;
 
+    -- Resolve no-fish, missed hooks and overloaded rods before starting a fight.
+    -- These outcomes live in a private table, not client-readable challenge data.
+    IF EXISTS (SELECT 1 FROM public.fishing_session_mechanics
+        WHERE session_id = p_session_id AND failure_reason IS NOT NULL) THEN
+        RETURN jsonb_build_object('resolution', public.resolve_fishing_challenge(p_session_id, FALSE, 0),
+            'server_time_ms', FLOOR(EXTRACT(EPOCH FROM clock_timestamp()) * 1000)::BIGINT);
+    END IF;
+
+    -- Resolve no-fish, missed hooks and overloaded rods before starting a fight.
+    -- These outcomes live in a private table, not client-readable challenge data.
+    IF EXISTS (SELECT 1 FROM public.fishing_session_mechanics
+        WHERE session_id = p_session_id AND failure_reason IS NOT NULL) THEN
+        RETURN jsonb_build_object('resolution', public.resolve_fishing_challenge(p_session_id, FALSE, 0),
+            'server_time_ms', FLOOR(EXTRACT(EPOCH FROM clock_timestamp()) * 1000)::BIGINT);
+    END IF;
+
     -- Retry/reconnect must return the same start time, never restart the fight.
     IF NOT (v_session.challenge_data ? 'activatedAt') THEN
         v_duration_ms := (v_session.challenge_data->>'expiresAt')::BIGINT
@@ -242,6 +258,15 @@ BEGIN
     END IF;
     -- claimedResult is only diagnostic. The replay decides rewards and XP.
     v_response := public.resolve_fishing_challenge(v_session_id, v_verified->>'result' = 'won', (v_total_ticks * 1000) / v_rate);
+    IF v_session.species_id IS NOT NULL AND v_response->>'result' = 'FISH_ESCAPED' THEN
+        v_response := v_response || jsonb_build_object(
+            'result', CASE v_verified->>'result' WHEN 'snapped' THEN 'LINE_SNAPPED'
+                WHEN 'timeout' THEN 'TIMEOUT' ELSE 'FISH_ESCAPED' END,
+            'message', CASE v_verified->>'result'
+                WHEN 'snapped' THEN 'Dây câu đã đứt vì lực căng vượt ngưỡng chịu lực.'
+                WHEN 'timeout' THEN 'Hết thời gian kéo cá về bờ.'
+                ELSE 'Dây quá chùng, cá đã thoát.' END);
+    END IF;
     RETURN v_response || jsonb_build_object('verifiedResult', v_verified->>'result', 'claimedResultMatched', v_claimed = v_verified->>'result');
 END;
 $function$;

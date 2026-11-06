@@ -161,7 +161,7 @@ const zones = {
             <button v-for="filter in filters" :key="filter.key" type="button" class="guide-button" :class="{ 'selected-button': guide.section === filter.key }" :aria-pressed="guide.section === filter.key" @click="guide.section = filter.key">{{ filter.label }}</button>
             <span class="ml-auto text-xs text-slate-600" role="status">{{ guide.filteredEntries.length }} chỉ số</span>
           </div>
-          <p class="text-xs text-slate-600">Giá trị bên dưới là mốc gốc trong RPC cho cá RARE; các cấu hình gợi ý nằm ở tab Ví dụ cân bằng.</p>
+          <p class="text-xs text-slate-600">Giá trị bên dưới minh họa rules v2: cá RARE có sức hiệu lực 40, dây chịu 100, máy có pull_strength = 80, hệ số giật 1,5. Session thật dùng chỉ số cá và bộ đồ lúc thả câu.</p>
         </div>
         <div class="grid items-start gap-3 lg:grid-cols-2">
           <section v-for="entry in guide.filteredEntries" :key="`${entry.section}.${entry.key}`" class="guide-card">

@@ -6,6 +6,7 @@ const getPreset = (id: string) => tensionGuidePresets.find((preset) => preset.id
 export const useAdminGuideStore = defineStore("adminGuide", {
   state: () => ({
     isOpen: false,
+    topic: "tension",
     activeTab: "mechanics",
     keyword: "",
     section: "all" as "all" | GuideSection,

@@ -8,7 +8,6 @@ import FishingPlayers from "../components/player/fishing/FishingPlayers.vue";
 import FishingScene from "../components/player/fishing/FishingScene.vue";
 import LakeFishGuide from "../components/player/fishing/LakeFishGuide.vue";
 import Loading from "../components/Loading.vue";
-import CatchChallenge from "../components/player/fishing-challenge/CatchChallenge.vue";
 import TensionChallenge from "../components/player/fishing-challenge/TensionChallenge.vue";
 import { useFishingStore } from "../stores/fishing";
 import { useAuthStore } from "../stores/auth";
@@ -106,7 +105,17 @@ onBeforeUnmount(() => {
           </div>
         </div>
         <TensionChallenge v-if="fishingStore.tensionChallenge" />
-        <CatchChallenge v-else />
+        <section v-else aria-label="Trạng thái câu cá" class="flex flex-col gap-3 rounded-[15px] border border-[#cbd9c6] bg-[#f5f9f0] p-3 text-[#24352a]">
+          <p role="status" class="text-xs">{{ fishingStore.castMessage }}</p>
+          <button
+            type="button"
+            class="rounded-[10px] border border-[#cbd9c6] bg-white px-3 py-2 text-xs font-bold enabled:hover:bg-[#e2ecdc] disabled:cursor-not-allowed disabled:opacity-45"
+            :disabled="!fishingStore.canReelIn"
+            @click="fishingStore.reelInBait"
+          >
+            Thu mồi
+          </button>
+        </section>
       </section>
     </div>
     <CatchDialog />
@@ -169,33 +178,6 @@ onBeforeUnmount(() => {
 
 .control-deck :deep(.tool small) {
   color: #aebfaa;
-}
-
-.control-deck :deep(.power-meter) {
-  border-color: rgba(225, 246, 214, 0.23);
-  background: linear-gradient(135deg, rgba(16, 42, 27, 0.92), rgba(27, 61, 41, 0.84));
-}
-
-.control-deck :deep(.power-title) {
-  color: #eaf4e8;
-}
-
-.control-deck :deep(.power-title small) {
-  color: #b8cab5;
-}
-
-.control-deck :deep(.power-track) {
-  background: #daefc92e;
-}
-
-.control-deck :deep(.cast-button) {
-  background: #d49c42;
-  box-shadow: 0 4px 0 #9e6929;
-  color: #1e3528;
-}
-
-.control-deck :deep(.cast-button:active) {
-  box-shadow: 0 1px 0 #9e6929;
 }
 
 @media (max-width: 720px) {

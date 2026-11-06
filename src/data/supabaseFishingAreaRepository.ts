@@ -84,7 +84,7 @@ class SupabaseFishingAreaRepository {
   async startTensionChallenge(sessionId: string) {
     const { data, error } = await supabase.rpc("start_tension_challenge", { p_session_id: sessionId });
     if (error) throw new Error(error.message);
-    return data as { challenge_data: unknown; server_time_ms: number };
+    return data as { challenge_data?: unknown; resolution?: unknown; server_time_ms: number };
   }
 
   async submitTensionChallenge(payload: TensionSubmission) {

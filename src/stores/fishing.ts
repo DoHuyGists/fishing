@@ -11,12 +11,6 @@ import { createTensionFight, isTensionChallenge, stepTensionFight, tensionMaxTic
   type TensionChallenge, type TensionFight, type TensionInput, type TensionSubmission } from "../data/tensionChallenge";
 export type FishingTool = "rod" | "line" | "reel" | "hook" | "bait";
 export type CastPhase = "idle" | "casting" | "waiting" | "bite" | "submitting" | "caught" | "lost";
-export type FishingChallenge = {
-  target_zone_start: number;
-  target_zone_width: number;
-  bar_speed: number;
-  max_duration_ms: number;
-};
 export type CaughtFish = {
   id: string | number;
   name: string;
@@ -76,22 +70,6 @@ function withTimeout<T>(request: PromiseLike<T>, timeoutMs: number): Promise<T> 
   });
 }
 
-function isFishingChallenge(value: unknown): value is FishingChallenge {
-  if (!value || typeof value !== "object") return false;
-  const challenge = value as FishingChallenge;
-  return (
-    Number.isFinite(challenge.target_zone_start) &&
-    Number.isFinite(challenge.target_zone_width) &&
-    Number.isFinite(challenge.bar_speed) &&
-    Number.isFinite(challenge.max_duration_ms) &&
-    challenge.target_zone_start >= 0 &&
-    challenge.target_zone_width > 0 &&
-    challenge.target_zone_start + challenge.target_zone_width <= 1 &&
-    challenge.bar_speed > 0 &&
-    challenge.max_duration_ms > 0
-  );
-}
-
 export const useFishingStore = defineStore("fishing", {
   state: () => ({
     selectedTool: "rod" as FishingTool,
@@ -110,7 +88,6 @@ export const useFishingStore = defineStore("fishing", {
       bait: "bait-worm",
     } as Record<FishingTool, string>,
     sessionId: null as string | null,
-    challenge: null as FishingChallenge | null,
     tensionChallenge: null as TensionChallenge | null,
     tensionFight: null as TensionFight | null,
     tensionInputs: [] as TensionInput[],
@@ -142,7 +119,6 @@ export const useFishingStore = defineStore("fishing", {
     areaSpeciesDiaryRequestId: 0,
   }),
   getters: {
-    canPull: (s) => s.castPhase === "bite",
     canCast: (s) => s.castPhase === "idle" || s.castPhase === "lost",
     canReelIn: (s) => ["casting", "waiting", "bite"].includes(s.castPhase) && (!s.tensionChallenge || s.tensionStartedAt === null),
     canAdjustDepth: (s) => s.castPhase === "idle" || s.castPhase === "lost",
@@ -382,7 +358,6 @@ export const useFishingStore = defineStore("fishing", {
       const requestId = ++this.castRequestId;
       this.baitPosition = { x, y };
       this.catchDialogOpen = false;
-      this.challenge = null;
       this.resetTensionChallenge();
       this.sessionId = null;
       this.isCasting = true;
@@ -407,7 +382,6 @@ export const useFishingStore = defineStore("fishing", {
       } catch {
         if (requestId !== this.castRequestId) return;
         this.sessionId = null;
-        this.challenge = null;
         this.isCasting = false;
         this.castPhase = "lost";
         this.castMessage = "Không thể kết nối. Hãy thử thả cần lại.";
@@ -423,23 +397,20 @@ export const useFishingStore = defineStore("fishing", {
         if (requestId !== this.castRequestId || this.sessionId !== sessionId) return;
         if (session.status !== "BITE") throw new Error("Session is not ready");
         const challenge = session.challenge_data;
-        if (isTensionChallenge(challenge) && challenge.sessionId === sessionId) {
-          this.tensionChallenge = challenge;
-          this.tensionFight = createTensionFight(challenge);
-          this.tensionInputs = [];
-          this.tensionReeling = false;
-          // The scheduled bite time is not the beginning of the playable fight.
-          this.tensionStartedAt = null;
-          this.castMessage = "Cá lớn cắn câu! Giữ nút hoặc Space khi sẵn sàng để bắt đầu.";
-        } else if (isFishingChallenge(challenge)) {
-          this.challenge = challenge;
-          this.castMessage = "Tín hiệu! Bấm đúng lúc để móc cá.";
-        } else throw new Error("Invalid challenge data");
+        if (!isTensionChallenge(challenge) || challenge.sessionId !== sessionId) {
+          throw new Error("Invalid tension challenge data");
+        }
+        this.tensionChallenge = challenge;
+        this.tensionFight = createTensionFight(challenge);
+        this.tensionInputs = [];
+        this.tensionReeling = false;
+        // The scheduled bite time is not the beginning of the playable fight.
+        this.tensionStartedAt = null;
+        this.castMessage = "Có tín hiệu! Giữ nút hoặc Space khi sẵn sàng để thu dây.";
         this.castPhase = "bite";
       } catch {
         if (requestId !== this.castRequestId) return;
         this.sessionId = null;
-        this.challenge = null;
         this.resetTensionChallenge();
         this.castPhase = "lost";
         this.castMessage = "Không thể tải thử thách. Hãy thả cần lại.";
@@ -467,6 +438,10 @@ export const useFishingStore = defineStore("fishing", {
       try {
         const response = await withTimeout(supabaseFishingAreaRepository.startTensionChallenge(sessionId), RPC_TIMEOUT_MS);
         if (requestId !== this.castRequestId || this.sessionId !== sessionId) return;
+        if (response.resolution) {
+          await this.finishChallenge(async () => response.resolution);
+          return;
+        }
         const challenge = response.challenge_data;
         if (!isTensionChallenge(challenge) || challenge.sessionId !== sessionId ||
           challenge.activatedAt !== challenge.startedAt || !Number.isSafeInteger(response.server_time_ms)) {
@@ -534,16 +509,10 @@ export const useFishingStore = defineStore("fishing", {
     resetCast() {
       this.castRequestId += 1;
       this.sessionId = null;
-      this.challenge = null;
       this.resetTensionChallenge();
       this.isCasting = false;
       this.castPhase = "idle";
       this.castMessage = "Sẵn sàng thả câu";
-    },
-    async submitChallenge(isSuccess: boolean, timeSpentMs: number) {
-      if (!this.sessionId || !this.challenge || this.castPhase !== "bite") return;
-      const sessionId = this.sessionId;
-      await this.finishChallenge(() => supabaseFishingAreaRepository.submitChallenge(sessionId, isSuccess, Math.max(0, Math.round(timeSpentMs))));
     },
     async submitTensionChallenge(payload: TensionSubmission) {
       if (!this.tensionChallenge || this.tensionStartedAt === null || payload.sessionId !== this.sessionId || this.castPhase !== "bite") return;
@@ -578,12 +547,10 @@ export const useFishingStore = defineStore("fishing", {
           this.castMessage = response?.message || "Cá đã thoát. Hãy thử lại!";
         }
         this.sessionId = null;
-        this.challenge = null;
         this.resetTensionChallenge();
       } catch {
         if (requestId !== this.castRequestId) return;
         this.sessionId = null;
-        this.challenge = null;
         this.resetTensionChallenge();
         this.castPhase = "lost";
         this.castMessage = "Không thể xác nhận kết quả. Hãy thử lại.";
@@ -593,7 +560,6 @@ export const useFishingStore = defineStore("fishing", {
       this.catchDialogOpen = false;
       this.castRequestId += 1;
       this.sessionId = null;
-      this.challenge = null;
       this.resetTensionChallenge();
       this.castPhase = "idle";
       this.castMessage = "Chạm mặt hồ để câu tiếp";

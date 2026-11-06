@@ -1,4 +1,4 @@
--- Run this entire file in the SQL editor before submit_tension_challenge.sql.
+-- Deploy equipment_mechanics.sql first, then this file, then submit_tension_challenge.sql.
 -- Only the two validated RPC wrappers may call the shared reward function.
 CREATE OR REPLACE FUNCTION public.resolve_fishing_challenge(
     p_session_id UUID, p_success BOOLEAN, p_time_spent_ms INTEGER
@@ -22,9 +22,10 @@ DECLARE
     v_initial_level INT;
     v_levels_gained INT := 0;
 
-    v_equipment_id UUID;
+    v_mechanics public.fishing_session_mechanics%ROWTYPE;
+    v_has_mechanics BOOLEAN;
     v_bait_inventory_id UUID;
-    v_bait JSONB;
+    v_failure_reason TEXT;
     v_bait_data JSONB;
     v_bait_quantity NUMERIC;
     v_caught_id UUID;
@@ -69,58 +70,41 @@ BEGIN
     -- 1.1. Trừ số lượng mồi khi submit challenge
     -- =====================================================
 
-    SELECT
-        ue.id,
-        (bait_item.value->>'inventory_id')::UUID
-    INTO
-        v_equipment_id,
-        v_bait_inventory_id
-    FROM public.user_equipments ue
+    SELECT * INTO v_mechanics FROM public.fishing_session_mechanics
+    WHERE session_id = p_session_id FOR UPDATE;
+    v_has_mechanics := FOUND;
+    IF v_has_mechanics THEN
+        -- Freeze inventory identity at cast time, even if the player switches sets.
+        v_bait_inventory_id := (v_mechanics.equipment_snapshot#>>'{items,bait,inventory_id}')::UUID;
+        v_failure_reason := v_mechanics.failure_reason;
+    ELSE
+        -- Compatibility for sessions created before rules v2.
+        SELECT (bait_item.value->>'inventory_id')::UUID INTO v_bait_inventory_id
+        FROM public.user_equipments ue
+        CROSS JOIN LATERAL jsonb_array_elements(COALESCE(ue.bait, '[]'::JSONB)) AS bait_item(value)
+        WHERE ue.user_id = v_user_id AND ue.is_used = TRUE
+          AND bait_item.value->'is_used' = 'true'::JSONB
+        ORDER BY ue.created_at DESC, ue.id DESC LIMIT 1 FOR UPDATE OF ue;
+    END IF;
 
-    CROSS JOIN LATERAL jsonb_array_elements(
-        COALESCE(ue.bait, '[]'::JSONB)
-    ) AS bait_item(value)
-
-    WHERE ue.user_id = v_user_id
-      AND ue.is_used = TRUE
-      AND bait_item.value->'is_used' = 'true'::JSONB
-
-    LIMIT 1
-    FOR UPDATE OF ue;
-
-    IF FOUND AND v_bait_inventory_id IS NOT NULL THEN
-
-        -- Khóa inventory để tránh trừ số lượng đồng thời.
-        SELECT data
-        INTO v_bait_data
-        FROM public.user_inventory
-        WHERE id = v_bait_inventory_id
-          AND user_id = v_user_id
-        FOR UPDATE;
-
-        IF FOUND
-           AND v_bait_data ? 'quantity'
-           AND NULLIF(v_bait_data->>'quantity', '') IS NOT NULL
-           AND (v_bait_data->>'quantity') ~ '^[0-9]+(\.[0-9]+)?$'
-        THEN
-
-            v_bait_quantity :=
-                (v_bait_data->>'quantity')::NUMERIC;
-
-            -- Chỉ trừ khi quantity lớn hơn 0.
-            IF v_bait_quantity > 0 THEN
-
-                UPDATE public.user_inventory
-                SET data = jsonb_set(
-                    v_bait_data,
-                    '{quantity}',
-                    to_jsonb(v_bait_quantity - 1),
-                    FALSE
-                )
-                WHERE id = v_bait_inventory_id
-                  AND user_id = v_user_id;
-
+    IF NOT v_has_mechanics OR NOT v_mechanics.bait_consumed THEN
+        SELECT data INTO v_bait_data FROM public.user_inventory
+        WHERE id = v_bait_inventory_id AND user_id = v_user_id FOR UPDATE;
+        IF FOUND AND jsonb_typeof(v_bait_data->'quantity') = 'number' THEN
+            v_bait_quantity := (v_bait_data->>'quantity')::NUMERIC;
+        END IF;
+        IF v_bait_quantity >= 1 AND trunc(v_bait_quantity) = v_bait_quantity THEN
+            UPDATE public.user_inventory SET data = jsonb_set(data, '{quantity}', to_jsonb(v_bait_quantity - 1))
+            WHERE id = v_bait_inventory_id AND user_id = v_user_id;
+            IF v_has_mechanics THEN
+                UPDATE public.fishing_session_mechanics SET bait_consumed = TRUE WHERE session_id = p_session_id;
             END IF;
+        ELSIF v_has_mechanics THEN
+            -- Concurrent casts cannot earn fish from the same last unit of bait.
+            UPDATE public.fishing_sessions SET status = 'FAILED' WHERE id = p_session_id;
+            RETURN jsonb_build_object('success', FALSE, 'caught_fish', FALSE,
+                'result', 'BAIT_UNAVAILABLE', 'message', 'Mồi của lượt câu này đã hết hoặc không còn trong túi.',
+                'session_id', p_session_id);
         END IF;
     END IF;
 
@@ -148,7 +132,11 @@ BEGIN
     -- 3. Kiểm tra anti-speedhack
     -- =====================================================
 
-    IF p_time_spent_ms < 300 AND p_success = TRUE THEN
+    -- Tension already verifies simulated time and the complete input replay.
+    -- A fast reel may legitimately finish in under 300 ms; retain the old
+    -- minimum only for legacy timing challenges.
+    IF p_time_spent_ms < 300 AND p_success = TRUE
+       AND v_session.challenge_data->>'type' IS DISTINCT FROM 'tension-challenge' THEN
         UPDATE public.fishing_sessions
         SET status = 'FAILED'
         WHERE id = p_session_id;
@@ -171,6 +159,23 @@ BEGIN
     -- Không thêm vào caught.
     -- Không cộng XP.
     -- =====================================================
+
+    -- Server-owned decisions are fixed at cast, never rerolled at submit.
+    IF v_has_mechanics AND v_failure_reason IS NULL AND
+       (v_session.secret_weight > (v_mechanics.equipment_snapshot#>>'{effective,max_weight}')::NUMERIC) THEN
+        v_failure_reason := 'ROD_OVERWEIGHT';
+    END IF;
+    IF v_failure_reason IS NOT NULL THEN
+        UPDATE public.fishing_sessions SET status = 'FAILED' WHERE id = p_session_id;
+        RETURN jsonb_build_object('success', FALSE, 'caught_fish', FALSE,
+            'result', v_failure_reason,
+            'message', CASE v_failure_reason
+                WHEN 'NO_FISH' THEN 'Không có cá phù hợp ở độ sâu và khung giờ này.'
+                WHEN 'HOOK_MISSED' THEN 'Móc trượt! Thử đổi mồi hoặc nâng cấp lưỡi câu.'
+                WHEN 'ROD_OVERWEIGHT' THEN 'Cá vượt tải trọng của cần và đã xổng mất.'
+                ELSE 'Cá đã thoát.' END,
+            'session_id', p_session_id);
+    END IF;
 
     IF v_session.species_id IS NULL THEN
         UPDATE public.fishing_sessions
