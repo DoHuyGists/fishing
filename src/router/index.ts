@@ -69,7 +69,7 @@ router.beforeEach(async (to) => {
     return { name: "login" };
   } else if (userId != null) {
     const fishingArea = await supabaseUserInAreaRepository.getCurrentUserArea(userId);
-    if (fishingArea.status == null) {
+    if (fishingArea?.status !== "enter") {
       if (to.name == "fishing") {
         return { name: "home" };
       }

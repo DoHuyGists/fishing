@@ -249,6 +249,7 @@ const imports={
  pinia:{defineStore},
  './auth':{useAuthStore:()=>({userId:uid})},
  './equipment':{useEquipmentStore:()=>({variants:{bait:[{id:'bait-worm',quantity:10}]}})},
+ './userInArea':{}, './dayPhase':{},
  '../data/supabaseEquipmentRepository':{}, '../data/supabaseFishRepository':{}, '../data/supabaseUserInAreaRepository':{},
  '../database/connection':{default:{}}, '../data/supabaseFishingAreaRepository':{supabaseFishingAreaRepository:repo},
  '../data/fishingDepth':{buildDepthConfig:()=>({maxMeters:100}),DEPTH_STEP_METERS:1},
@@ -262,6 +263,7 @@ new Function('require','module','exports','window','performance',output)(
  storeModule,storeModule.exports,{setTimeout,clearTimeout},{now:()=>clock});
 setActivePinia(createPinia());
 const store=storeModule.exports.useFishingStore();store.currentAreaId=areaId;
+store.sessionReady=true;
 await store.castTo(50,50);
 assert.equal(store.tensionChallenge,null);assert.equal(store.castPhase,'waiting');
 const start=store.startChallengeForSession(c.sessionId);

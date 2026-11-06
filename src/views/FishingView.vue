@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import { storeToRefs } from "pinia";
-import { computed, onBeforeUnmount, onMounted, ref, watch } from "vue";
+import { onBeforeUnmount, onMounted, ref, watch } from "vue";
+import { onBeforeRouteLeave, useRouter } from "vue-router";
 import EquipmentMenu from "../components/player/fishing/EquipmentMenu.vue";
 import CatchDialog from "../components/player/fishing/CatchDialog.vue";
 import FishingBag from "../components/player/fishing/FishingBag.vue";
@@ -14,30 +15,37 @@ import { useAuthStore } from "../stores/auth";
 import { useEquipmentStore } from "../stores/equipment";
 
 const authStore = useAuthStore();
+const router = useRouter();
 const fishingStore = useFishingStore();
 const equipmentStore = useEquipmentStore();
 const { user } = storeToRefs(authStore);
-const { error: equipmentError, loaded: equipmentLoaded, userId: equipmentUserId } = storeToRefs(equipmentStore);
+const { sessionReady, sessionError } = storeToRefs(fishingStore);
 const equipmentCollapsed = ref(true);
-const isSetupReady = computed(() =>
-  Boolean(user.value && equipmentLoaded.value && equipmentUserId.value === user.value.id),
-);
 
 function toggleEquipment() {
   equipmentCollapsed.value = !equipmentCollapsed.value;
 }
 
 function retrySetup() {
-  if (user.value) void equipmentStore.fetchEquipment(user.value.id);
+  if (user.value) void fishingStore.initializeSession(user.value.id);
 }
 
 watch(
-  user,
-  (current) => {
-    if (current) void equipmentStore.fetchEquipment(current.id);
+  () => user.value?.id,
+  (userId) => {
+    if (userId) void fishingStore.initializeSession(userId);
+    else {
+      fishingStore.resetSession();
+      equipmentStore.reset();
+    }
   },
   { immediate: true },
 );
+
+onBeforeRouteLeave(async (to) => {
+  if (to.name === "fishing" || !user.value) return true;
+  return fishingStore.leaveFishingArea();
+});
 
 function preventZoomShortcut(event: KeyboardEvent) {
   if ((event.ctrlKey || event.metaKey) && ["+", "=", "-", "0"].includes(event.key)) event.preventDefault();
@@ -60,6 +68,8 @@ onMounted(() => {
 });
 
 onBeforeUnmount(() => {
+  fishingStore.resetSession();
+  equipmentStore.reset();
   window.removeEventListener("keydown", preventZoomShortcut);
   window.removeEventListener("wheel", preventZoomWheel);
   document.removeEventListener("gesturestart", preventGesture);
@@ -69,19 +79,27 @@ onBeforeUnmount(() => {
 </script>
 
 <template>
-  <Loading v-if="!isSetupReady && !equipmentError" text="Đang chuẩn bị dữ liệu câu cá" />
+  <Loading v-if="!sessionReady && !sessionError" text="Đang chuẩn bị dữ liệu câu cá" />
   <section
-    v-else-if="!isSetupReady"
+    v-else-if="!sessionReady"
     class="flex min-h-screen flex-col items-center justify-center gap-4 bg-[#f5f9f0] px-6 text-center text-[#24352a]"
     role="alert"
   >
-    <p>Không thể tải dữ liệu trang bị: {{ equipmentError }}</p>
+    <p>Không thể chuẩn bị phiên câu: {{ sessionError }}</p>
     <button
       type="button"
       class="rounded-lg border border-[#cbd9c6] bg-white px-4 py-2 font-medium hover:bg-[#f5f9f0]"
       @click="retrySetup"
     >
       Thử lại
+    </button>
+    <button
+      type="button"
+      class="rounded-lg border border-[#cbd9c6] bg-white px-4 py-2 font-medium hover:bg-[#f5f9f0] disabled:opacity-50"
+      :disabled="fishingStore.isLeavingArea"
+      @click="router.push({ name: 'home' })"
+    >
+      Quay lại bản đồ
     </button>
   </section>
   <main v-else class="w-full h-screen overflow-hidden touch-none overscroll-none bg-[#193224] text-[#e9f4e8]">
@@ -123,6 +141,9 @@ onBeforeUnmount(() => {
     <FishingPlayers />
     <LakeFishGuide />
   </main>
+  <p v-if="!sessionReady && fishingStore.leaveAreaError" role="alert" class="fixed bottom-4 left-4 right-4 z-50 rounded-lg bg-[#f5f9f0] p-3 text-center text-red-700">
+    {{ fishingStore.leaveAreaError }}
+  </p>
 </template>
 
 <style scoped>

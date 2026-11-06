@@ -31,6 +31,8 @@ export interface EquipmentSet {
   isUsed: boolean;
 }
 
+let pendingRequest: { userId: string; requestId: number; promise: Promise<void> } | null = null;
+
 export const useEquipmentStore = defineStore("equipment", {
   state: () => ({
     variants: defaultEquipmentVariants as Record<FishingTool, EquipmentVariant[]>,
@@ -38,33 +40,56 @@ export const useEquipmentStore = defineStore("equipment", {
     loading: false,
     loaded: false,
     error: "",
+    requestId: 0,
   }),
   actions: {
-    async fetchEquipment(userId: string) {
-      if (this.loading || (this.loaded && this.userId === userId)) return;
+    syncLoadout() {
+      const selected: Partial<Record<FishingTool, string>> = {};
+      for (const tool of Object.keys(this.variants) as FishingTool[]) {
+        const usedVariant = this.variants[tool].find((variant) => variant.is_used);
+        if (usedVariant) selected[tool] = usedVariant.id;
+      }
+      Object.assign(useFishingStore().equipmentLoadout, selected);
+    },
+    async fetchEquipment(userId: string, force = false) {
+      if (pendingRequest?.userId === userId && pendingRequest.requestId === this.requestId) {
+        const requestId = this.requestId;
+        await pendingRequest.promise;
+        if (requestId === this.requestId && this.loaded && this.userId === userId) this.syncLoadout();
+        return;
+      }
+      if (!force && this.loaded && this.userId === userId) {
+        this.syncLoadout();
+        return;
+      }
+      const requestId = ++this.requestId;
       this.loading = true;
       this.error = "";
-      try {
-        this.variants = await supabaseEquipmentRepository.fetchEquipment();
-        this.userId = userId;
-        this.loaded = true;
-        const selected: Partial<Record<FishingTool, string>> = {};
-        for (const tool of Object.keys(this.variants) as FishingTool[]) {
-          const usedVariant = this.variants[tool].find((variant) => variant.is_used);
-          if (usedVariant) selected[tool] = usedVariant.id;
+      const promise = (async () => {
+        try {
+          const variants = await supabaseEquipmentRepository.fetchEquipment();
+          if (requestId !== this.requestId) return;
+          this.variants = variants;
+          this.userId = userId;
+          this.loaded = true;
+          this.syncLoadout();
+        } catch (err) {
+          if (requestId !== this.requestId) return;
+          this.loaded = false;
+          this.error = err instanceof Error ? err.message : "Không thể tải trang bị từ máy chủ";
+        } finally {
+          if (requestId === this.requestId) this.loading = false;
         }
-        Object.assign(useFishingStore().equipmentLoadout, selected);
-      } catch (err) {
-        this.error = err instanceof Error ? err.message : "Không thể tải trang bị từ máy chủ";
-      } finally {
-        this.loading = false;
-      }
+      })();
+      pendingRequest = { userId, requestId, promise };
+      await promise;
+      if (pendingRequest?.promise === promise) pendingRequest = null;
     },
     reset() {
-      this.variants = defaultEquipmentVariants;
-      this.userId = null;
-      this.loaded = false;
-      this.error = "";
+      const requestId = this.requestId + 1;
+      this.$reset();
+      this.requestId = requestId;
+      pendingRequest = null;
     },
     normalize(row: any): EquipmentSet {
       return {

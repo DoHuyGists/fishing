@@ -3,10 +3,8 @@ import { computed, onBeforeUnmount, onMounted, ref, watch } from "vue";
 import { isPointInWater } from "../../../data/fishingMap.ts";
 import { useFishingStore } from "../../../stores/fishing.ts";
 import { useEquipmentStore } from "../../../stores/equipment.ts";
-import { onBeforeRouteLeave, useRouter } from "vue-router";
+import { useRouter } from "vue-router";
 import DayPhaseClock from "./DayPhaseClock.vue";
-import { supabaseUserInAreaRepository } from "../../../data/supabaseUserInAreaRepository.ts";
-import { supabaseFishRepository } from "../../../data/supabaseFishRepository.ts";
 import { supabaseFishingAreaRepository } from "../../../data/supabaseFishingAreaRepository.ts";
 import type { RealtimeChannel } from "@supabase/supabase-js";
 import { useDayPhaseStore } from "../../../stores/dayPhase.ts";
@@ -16,11 +14,10 @@ const router = useRouter();
 const dayPhaseStore = useDayPhaseStore();
 const fishingStore = useFishingStore();
 const equipmentStore = useEquipmentStore();
-const isLeaving = ref(false);
+const isLeaving = computed(() => fishingStore.isLeavingArea);
 const showExitConfirmation = ref(false);
 const userInAreaStore = useUserInAreaStore();
-const tripCaughtCount = ref(0);
-let realtimeSubscription: ReturnType<typeof supabaseUserInAreaRepository.subscribeToAreaUsers> | null = null;
+const tripCaughtCount = computed(() => fishingStore.inventory.length);
 let fishingSessionSubscription: RealtimeChannel | null = null;
 let subscribedSessionId: string | null = null;
 let handledBiteSessionId: string | null = null;
@@ -46,44 +43,14 @@ watch(
   { immediate: true },
 );
 
-watch(
-  () => fishingStore.castPhase,
-  (phase) => {
-    if (phase === "caught") tripCaughtCount.value++;
-  },
-);
-
 function handleBackToMap() {
-  showExitConfirmation.value = false;
-  router.push({ name: "home" });
+  void router.push({ name: "home" });
 }
 
-// 2. Quản lý toàn bộ việc rời bãi câu ở Router Guard
-onBeforeRouteLeave(async (to) => {
-  // Nếu chuyển sang trang khác "fishing" và chưa xử lý rời bãi
-  if (to.name !== "fishing" && !isLeaving.value) {
-    isLeaving.value = true;
-    try {
-      if (tripCaughtCount.value > 0) {
-        await supabaseUserInAreaRepository.setUserLeaveArea();
-      } else {
-        await supabaseFishRepository.completeFishing();
-      }
-    } catch (err) {
-      console.error("Lỗi khi cập nhật trạng thái rời bãi câu:", err);
-    } finally {
-      isLeaving.value = false;
-    }
-  }
-  return true;
-});
-
 watch(
-  () => userInAreaStore.userInArea?.area_id,
-  (areaId) => {
-    if (areaId && areaId !== fishingStore.currentAreaId) {
-      void fishingStore.initializeFishingArea(areaId);
-    }
+  () => fishingStore.leaveAreaError,
+  (error) => {
+    if (error) showExitConfirmation.value = true;
   },
 );
 
@@ -92,6 +59,7 @@ watch(
   (newArea) => {
     dayPhaseStore.setCurrentScenePhase(newArea);
   },
+  { immediate: true },
 );
 
 const sceneElement = ref<HTMLElement | null>(null);
@@ -185,14 +153,10 @@ onMounted(() => {
   window.addEventListener("resize", updateRodPosition);
 });
 onBeforeUnmount(() => {
-  fishingStore.resetCast();
+  subscribedSessionId = null;
   if (rodPositionFrame) window.cancelAnimationFrame(rodPositionFrame);
   if (biteMotionFrame !== undefined) window.cancelAnimationFrame(biteMotionFrame);
   window.removeEventListener("resize", updateRodPosition);
-  if (realtimeSubscription) {
-    supabaseUserInAreaRepository.unsubscribe(realtimeSubscription);
-    realtimeSubscription = null;
-  }
   if (fishingSessionSubscription) {
     void supabaseFishingAreaRepository.unsubscribe(fishingSessionSubscription);
     fishingSessionSubscription = null;
@@ -301,8 +265,11 @@ function castAt(event: MouseEvent) {
           >
             <h2 id="confirm-exit-title" class="m-0 text-lg font-bold text-[#e8bd62]">Kết thúc chuyến câu?</h2>
             <p class="my-4 text-sm text-[#c8dccb] leading-relaxed">
-              Chuyến này bạn đã câu được <strong class="text-white">{{ tripCaughtCount }}</strong> con cá. Bạn có chắc
+              Giỏ cá hiện có <strong class="text-white">{{ tripCaughtCount }}</strong> con cá. Bạn có chắc
               chắn muốn quay lại bản đồ không?
+            </p>
+            <p v-if="fishingStore.leaveAreaError" role="alert" class="my-3 text-sm text-red-300">
+              {{ fishingStore.leaveAreaError }}
             </p>
             <div class="flex justify-center gap-3 mt-5">
               <button

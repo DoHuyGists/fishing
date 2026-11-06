@@ -12,6 +12,7 @@ import { useUserInAreaStore } from "../stores/userInArea";
 import TwoOptionsModal from "../components/shared/TwoOptionsModal.vue";
 import { useConfigStore } from "../stores/config.ts";
 import { useUserProfileStore } from "../stores/userProfile";
+import { useFishingStore } from "../stores/fishing";
 
 const router = useRouter();
 const authStore = useAuthStore();
@@ -19,6 +20,7 @@ const currencyStore = useCurrencyStore();
 const userInAreaStore = useUserInAreaStore();
 const configStore = useConfigStore();
 const userProfileStore = useUserProfileStore();
+const fishingStore = useFishingStore();
 let currencyChannel: RealtimeChannel | null = null;
 let userInAreaChannel: ReturnType<typeof supabaseUserInAreaRepository.subscribeToAreaUsers> | null = null;
 
@@ -59,10 +61,12 @@ onBeforeUnmount(() => {
 watch(
   () => userInAreaStore.userInArea,
   (session) => {
+    // The route guard owns navigation while it finishes the trip.
+    if (fishingStore.isLeavingArea || fishingStore.hasLeftArea) return;
     if (session) {
-      if (session.status == "enter") {
+      if (session.status == "enter" && router.currentRoute.value.name !== "fishing" && router.currentRoute.value.name !== "admin") {
         router.replace({ name: "fishing" });
-      } else if (session.status == null) {
+      } else if (session.status == null && router.currentRoute.value.name === "fishing") {
         router.replace({ name: "home" });
       }
     }

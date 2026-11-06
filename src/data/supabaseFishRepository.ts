@@ -124,7 +124,7 @@ class SupabaseFishRepository {
   }
 
   async fetchFishingInventory(areaId: string): Promise<FishingInventoryRow[]> {
-    const { data, error } = await supabase.rpc('get_caught_in_area ', {
+    const { data, error } = await supabase.rpc('get_caught_in_area', {
       p_area_id: areaId
     });
     if (error) throw new Error(error.message);

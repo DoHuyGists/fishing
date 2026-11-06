@@ -7,7 +7,7 @@ export type UserInAreaRow = {
   area_id: string | null;
   user_id: string;
   updated_at: string;
-  status: string;
+  status: string | null;
 };
 
 export type UserTurnStatus = {
@@ -44,7 +44,7 @@ class SupabaseUserInAreaRepository {
     const { error } = await supabase.rpc('user_leave_area');
 
     if (error) {
-      console.error(error);
+      throw new Error(error.message);
     }
   }
 
@@ -91,7 +91,7 @@ class SupabaseUserInAreaRepository {
     await supabase.removeChannel(channel);
   }
 
-  async getCurrentUserArea(userId: string) : Promise<UserInAreaRow> {
+  async getCurrentUserArea(userId: string) : Promise<UserInAreaRow | null> {
     const { data, error } = await supabase.from("user_in_area").select("*").eq("user_id", userId).maybeSingle();
 
     if (error) {

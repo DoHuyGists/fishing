@@ -26,6 +26,10 @@ export const useDayPhaseStore = defineStore("DayPhase", {
     },
     actions: {
         setCurrentScenePhase(fishingArea: any){
+            if (!fishingArea?.scenePath) {
+                this.currentScenePhace = "";
+                return;
+            }
             switch (this.currentPhase.key) {
                 case "dawn":
                     this.currentScenePhace = `${fishingArea.scenePath}/dawn.png`;

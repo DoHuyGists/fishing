@@ -1,6 +1,6 @@
 <script lang="ts" setup>
 import { computed, onMounted, onUnmounted, ref, watch } from "vue";
-import { mapData } from "../../../data/map.ts";
+import { useCountryStore } from "../../../stores/country.ts";
 import type { FishingAreaPayload } from "../../../data/supabaseFishingAreaRepository.ts";
 import { useWorldStore } from "../../../stores/worldMap.ts";
 import { useToast } from "../../../composables/useToast.ts";
@@ -9,6 +9,7 @@ import { useAdminFishingAreaStore } from "./admin-fishing-area-store.ts";
 import FishingBoundaryPickerModal from "./FishingBoundaryPickerModal.vue";
 
 const worldStore = useWorldStore();
+const countryStore = useCountryStore();
 const toast = useToast();
 const zoneStore = useAdminZoneStore();
 const fishingAreaStore = useAdminFishingAreaStore();
@@ -125,11 +126,6 @@ async function handleSave() {
     isSaving.value = false;
   }
 }
-const countryOptions = computed(() =>
-  Object.entries(mapData)
-    .map(([code, info]) => ({ code, name: (info as any).name }))
-    .sort((a, b) => a.name.localeCompare(b.name)),
-);
 
 // Đồng bộ từ bản đồ vào form (chỉ lấy lon, lat, k)
 watch(
@@ -173,6 +169,7 @@ watch(
 
 onMounted(() => {
   worldStore.showAnchorSelectButton = true;
+  countryStore.fetchCountries();
   if (!zoneStore.items.length) zoneStore.fetchAll();
 });
 
@@ -230,7 +227,8 @@ onUnmounted(() => {
           class="px-3 py-1.5 border border-gray-300 rounded-lg text-xs bg-white focus:outline-none focus:border-emerald-500"
           :disabled="adminFishingAreaStore.isFormLock"
         >
-          <option v-for="option in countryOptions" :key="option.code" :value="option.code">
+          <option disabled value="">-- Chọn quốc gia --</option>
+          <option v-for="option in countryStore.countries" :key="option.id" :value="option.id">
             {{ option.name }}
           </option>
         </select>

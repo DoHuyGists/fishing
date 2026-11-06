@@ -18,11 +18,10 @@ function openPicker() {
   pickerOpen.value = true;
 }
 
-function openDepthAdjuster() {
+async function openDepthAdjuster() {
   if (!store.canAdjustDepth || store.isLoadingCurrentArea || !store.currentAreaId) return;
   if (!store.canAdjustLakeDepth) {
-    void store.fetchCurrentArea(store.currentAreaId);
-    return;
+    await store.fetchCurrentArea(store.currentAreaId);
   }
   store.openDepthAdjuster();
 }

@@ -65,7 +65,7 @@ export const useAdminFishingAreaStore = defineStore("AdminFishingArea", {
     emptyForm(): FishingAreaRow {
       return {
         id: "",
-        countryId: "UNKNOWN",
+        countryId: "",
         isAvailable: false,
         title: "",
         scenePath: "",

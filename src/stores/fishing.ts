@@ -1,6 +1,8 @@
 import { defineStore } from "pinia";
 import { useAuthStore } from "./auth";
 import { useEquipmentStore } from "./equipment";
+import { useUserInAreaStore } from "./userInArea";
+import { useDayPhaseStore } from "./dayPhase";
 import { supabaseEquipmentRepository } from "../data/supabaseEquipmentRepository";
 import { supabaseFishRepository, type AreaSpeciesDiaryResponse, type FishDepthPreviewResponse } from "../data/supabaseFishRepository";
 import { supabaseUserInAreaRepository } from "../data/supabaseUserInAreaRepository";
@@ -72,6 +74,16 @@ function withTimeout<T>(request: PromiseLike<T>, timeoutMs: number): Promise<T> 
 
 export const useFishingStore = defineStore("fishing", {
   state: () => ({
+    sessionReady: false,
+    sessionError: "",
+    sessionRequestId: 0,
+    isLeavingArea: false,
+    hasLeftArea: false,
+    leaveAreaError: "",
+    isReleasingFish: false,
+    inventoryRequestId: 0,
+    playersRequestId: 0,
+    inventoryError: "",
     selectedTool: "rod" as FishingTool,
     castPhase: "idle" as CastPhase,
     baitPosition: { x: 56, y: 60 },
@@ -119,18 +131,89 @@ export const useFishingStore = defineStore("fishing", {
     areaSpeciesDiaryRequestId: 0,
   }),
   getters: {
-    canCast: (s) => s.castPhase === "idle" || s.castPhase === "lost",
-    canReelIn: (s) => ["casting", "waiting", "bite"].includes(s.castPhase) && (!s.tensionChallenge || s.tensionStartedAt === null),
-    canAdjustDepth: (s) => s.castPhase === "idle" || s.castPhase === "lost",
+    canCast: (s) => s.sessionReady && !s.isLeavingArea && !s.hasLeftArea && (s.castPhase === "idle" || s.castPhase === "lost"),
+    canReelIn: (s) => !s.isLeavingArea && !s.hasLeftArea && ["casting", "waiting", "bite"].includes(s.castPhase) && (!s.tensionChallenge || s.tensionStartedAt === null),
+    canAdjustDepth: (s) => s.sessionReady && !s.isLeavingArea && !s.hasLeftArea && (s.castPhase === "idle" || s.castPhase === "lost"),
     canAdjustLakeDepth: (s) =>
+      s.sessionReady && !s.isLeavingArea && !s.hasLeftArea &&
       (s.castPhase === "idle" || s.castPhase === "lost") &&
       !s.isLoadingCurrentArea &&
-      s.currentArea?.id === s.currentAreaId &&
-      Array.isArray(s.currentArea?.fishingBoundary) &&
-      s.currentArea.fishingBoundary.length >= 3,
+      Boolean(s.currentAreaId) && s.currentArea?.id === s.currentAreaId,
     depthConfig: (s) => buildDepthConfig(s.currentArea?.maxDepth),
   },
   actions: {
+    resetSession() {
+      // Keep generations increasing so late responses cannot match a later visit.
+      const generations = {
+        sessionRequestId: this.sessionRequestId + 1,
+        castRequestId: this.castRequestId + 1,
+        currentAreaRequestId: this.currentAreaRequestId + 1,
+        depthPreviewRequestId: this.depthPreviewRequestId + 1,
+        areaSpeciesDiaryRequestId: this.areaSpeciesDiaryRequestId + 1,
+        inventoryRequestId: this.inventoryRequestId + 1,
+        playersRequestId: this.playersRequestId + 1,
+      };
+      this.$reset();
+      Object.assign(this, generations);
+      useDayPhaseStore().$reset();
+    },
+    async initializeSession(userId: string) {
+      this.resetSession();
+      const requestId = this.sessionRequestId;
+      try {
+        const [area] = await Promise.all([
+          useUserInAreaStore().setCurrentUserInArea(userId),
+          useEquipmentStore().fetchEquipment(userId, true),
+        ]);
+        if (requestId !== this.sessionRequestId) return;
+        if (useEquipmentStore().error) throw new Error(useEquipmentStore().error);
+        if (area?.status !== "enter" || !area.area_id) throw new Error("Bạn chưa ở trong bãi câu.");
+        await this.initializeFishingArea(area.area_id);
+        if (requestId !== this.sessionRequestId) return;
+        if (this.currentAreaLoadError) throw new Error(this.currentAreaLoadError);
+        if (this.inventoryError) throw new Error(this.inventoryError);
+        useDayPhaseStore().setCurrentScenePhase(this.currentArea);
+        this.sessionReady = true;
+      } catch (err) {
+        if (requestId !== this.sessionRequestId) return;
+        this.sessionError = err instanceof Error ? err.message : "Không thể chuẩn bị phiên câu.";
+      }
+    },
+    async leaveFishingArea(): Promise<boolean> {
+      if (this.hasLeftArea) return true;
+      if (this.isLeavingArea) return false;
+      this.leaveAreaError = "";
+      if (this.isCasting || this.castPhase === "submitting" || this.isStartingTensionChallenge || this.isReleasingFish) {
+        this.leaveAreaError = "Đang xử lý lượt câu hoặc thả cá. Vui lòng thử lại sau giây lát.";
+        return false;
+      }
+      this.isLeavingArea = true;
+      const requestId = this.sessionRequestId;
+      try {
+        // Read the actual bag, including fish restored after a reload or released.
+        const area = await useUserInAreaStore().setCurrentUserInArea(useAuthStore().userId);
+        if (requestId !== this.sessionRequestId) return false;
+        if (area?.status === "enter") {
+          if (!area.area_id) throw new Error("Không tìm thấy bãi câu hiện tại.");
+          const fishes = await supabaseFishRepository.fetchFishingInventory(area.area_id);
+          if (requestId !== this.sessionRequestId) return false;
+          if (fishes.length > 0) await supabaseUserInAreaRepository.setUserLeaveArea();
+          else await supabaseFishRepository.completeFishing();
+        }
+        if (requestId !== this.sessionRequestId) return false;
+        this.hasLeftArea = true;
+        this.resetCast();
+        // Refresh membership explicitly; navigation must not depend on Realtime.
+        await useUserInAreaStore().setCurrentUserInArea(useAuthStore().userId);
+        return requestId === this.sessionRequestId;
+      } catch (err) {
+        if (requestId !== this.sessionRequestId) return false;
+        this.leaveAreaError = err instanceof Error ? err.message : "Không thể kết thúc chuyến câu. Vui lòng thử lại.";
+        return false;
+      } finally {
+        if (requestId === this.sessionRequestId) this.isLeavingArea = false;
+      }
+    },
     async initializeFishingArea(areaId: string) {
       if (!areaId) return;
       if (areaId === this.currentAreaId && this.currentArea?.id === areaId && !this.currentAreaLoadError) return;
@@ -200,9 +283,11 @@ export const useFishingStore = defineStore("fishing", {
       const targetAreaId = areaId || this.currentAreaId;
       if (!targetAreaId) return;
 
+      const requestId = ++this.playersRequestId;
       this.isLoadingPlayers = true;
       try {
         const rows = await supabaseUserInAreaRepository.fetchUsersInArea(targetAreaId);
+        if (requestId !== this.playersRequestId || targetAreaId !== this.currentAreaId) return;
         if (!rows.length) {
           this.nearbyPlayers = [];
           return;
@@ -214,6 +299,7 @@ export const useFishingStore = defineStore("fishing", {
 
         const { data: catches, error: catchesError } = await supabase.from("caught").select("user_id, weight, species(name)").in("user_id", userIds);
         if (catchesError) throw catchesError;
+        if (requestId !== this.playersRequestId || targetAreaId !== this.currentAreaId) return;
 
         const playerStats = new Map<string, { count: number; bestWeight: number; bestFishName: string }>();
         userIds.forEach((uid) => {
@@ -281,12 +367,15 @@ export const useFishingStore = defineStore("fishing", {
       } catch (err) {
         console.error("Lỗi khi tải danh sách người chơi trong khu vực:", err);
       } finally {
-        this.isLoadingPlayers = false;
+        if (requestId === this.playersRequestId) this.isLoadingPlayers = false;
       }
     },
     async fetchCaughtFishes(areaId: string) {
+      const requestId = ++this.inventoryRequestId;
+      this.inventoryError = "";
       try {
         const rows = await supabaseFishRepository.fetchFishingInventory(areaId);
+        if (requestId !== this.inventoryRequestId || areaId !== this.currentAreaId) return;
         this.inventory = rows.map((row) => {
           const species = Array.isArray(row.species) ? row.species[0] : row.species;
           return {
@@ -300,16 +389,26 @@ export const useFishingStore = defineStore("fishing", {
           };
         });
       } catch (err) {
+        if (requestId !== this.inventoryRequestId) return;
+        this.inventoryError = err instanceof Error ? err.message : "Không thể tải giỏ cá.";
         console.error("Lỗi khi tải danh sách cá trong túi:", err);
       }
     },
     async releaseFish(caughtId: string | number) {
+      if (this.isLeavingArea || this.hasLeftArea || this.isReleasingFish) return;
+      const requestId = this.sessionRequestId;
+      this.isReleasingFish = true;
+      this.inventoryRequestId++;
       try {
         await supabaseFishRepository.deleteCaughtFish(String(caughtId));
+        if (requestId !== this.sessionRequestId) return;
+        this.inventoryRequestId++;
         this.inventory = this.inventory.filter((item) => item.id !== caughtId);
       } catch (err) {
         console.error("Lỗi khi thả cá khỏi túi:", err);
         throw err;
+      } finally {
+        if (requestId === this.sessionRequestId) this.isReleasingFish = false;
       }
     },
     selectTool(tool: FishingTool) {
@@ -327,12 +426,14 @@ export const useFishingStore = defineStore("fishing", {
     },
     async selectVariant(category: FishingTool, variantId: string): Promise<boolean> {
       if (!this.canAdjustDepth) return false;
+      const requestId = this.sessionRequestId;
       const previous = this.equipmentLoadout[category];
       this.equipmentLoadout[category] = variantId;
       try {
         await supabaseEquipmentRepository.selectItem(variantId);
-        return true;
+        return requestId === this.sessionRequestId;
       } catch (err) {
+        if (requestId !== this.sessionRequestId) return false;
         this.equipmentLoadout[category] = previous;
         console.error("Lỗi khi chọn trang bị:", err);
         return false;
@@ -388,6 +489,7 @@ export const useFishingStore = defineStore("fishing", {
       }
     },
     async startChallengeForSession(sessionId: string) {
+      if (this.isLeavingArea || this.hasLeftArea) return;
       if (this.sessionId !== sessionId || this.castPhase !== "waiting" || this.isLoadingChallenge) return;
       const requestId = this.castRequestId;
       this.isLoadingChallenge = true;
@@ -428,6 +530,7 @@ export const useFishingStore = defineStore("fishing", {
       this.isLoadingChallenge = false;
     },
     async beginTensionChallenge() {
+      if (this.isLeavingArea || this.hasLeftArea) return;
       this.advanceTensionFight();
       const sessionId = this.sessionId;
       if (!sessionId || !this.tensionChallenge || this.castPhase !== "bite" ||
@@ -519,6 +622,7 @@ export const useFishingStore = defineStore("fishing", {
       await this.finishChallenge(() => supabaseFishingAreaRepository.submitTensionChallenge(payload));
     },
     async finishChallenge(submit: () => Promise<unknown>) {
+      if (this.isLeavingArea || this.hasLeftArea) return;
       const requestId = this.castRequestId;
       this.castPhase = "submitting";
       this.castMessage = "Đang xác nhận kết quả...";
@@ -539,6 +643,7 @@ export const useFishingStore = defineStore("fishing", {
             starRating: response.caught.star_rating,
           };
           this.inventory.unshift(caught);
+          this.inventoryRequestId++;
           this.catchDialogOpen = true;
           this.castPhase = "caught";
           this.castMessage = "Bạn đã câu được cá!";

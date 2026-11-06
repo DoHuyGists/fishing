@@ -9,33 +9,45 @@ export const useWeatherStore = defineStore("weather", {
     zone: null as ZoneWeatherRow | null,
     loading: false,
     error: "",
+    requestId: 0,
   }),
   getters: {
     weather: (state) => state.zone?.weather ?? null,
     modifiers: (state) => state.zone?.weather_active_modifiers ?? [],
   },
   actions: {
-    async load(areaId: string) {
+    async load(areaId: string, activeRequestId?: number) {
+      const requestId = activeRequestId ?? ++this.requestId;
       this.loading = true;
       this.error = "";
       try {
-        this.zone = await supabaseZoneRepository.fetchZoneByAreaId(areaId);
+        const zone = await supabaseZoneRepository.fetchZoneByAreaId(areaId);
+        if (requestId !== this.requestId) return;
+        this.zone = zone;
+        return zone;
       } catch (err) {
+        if (requestId !== this.requestId) return;
         this.error = err instanceof Error ? err.message : "Không thể tải thông tin môi trường";
       } finally {
-        this.loading = false;
+        if (requestId === this.requestId) this.loading = false;
       }
     },
 
     async init(areaId: string) {
+      const requestId = ++this.requestId;
+      this.zone = null;
       await this.stop();
-      await this.load(areaId);
-      if (!this.zone) return;
-      const zoneId = this.zone.id;
+      if (requestId !== this.requestId) return;
+      const zone = await this.load(areaId, requestId);
+      if (requestId !== this.requestId || !zone) return;
+      const zoneId = zone.id;
       channel = supabaseZoneRepository.subscribeToZone(zoneId, async () => {
+        if (requestId !== this.requestId) return;
         try {
-          this.zone = await supabaseZoneRepository.fetchZoneById(zoneId);
+          const zone = await supabaseZoneRepository.fetchZoneById(zoneId);
+          if (requestId === this.requestId) this.zone = zone;
         } catch (err) {
+          if (requestId !== this.requestId) return;
           this.error = err instanceof Error ? err.message : "Không thể cập nhật môi trường";
         }
       });
@@ -43,24 +55,28 @@ export const useWeatherStore = defineStore("weather", {
 
     async refresh() {
       if (!this.zone) return;
+      const requestId = this.requestId;
       try {
-        this.zone = await supabaseZoneRepository.fetchZoneById(this.zone.id);
+        const zone = await supabaseZoneRepository.fetchZoneById(this.zone.id);
+        if (requestId === this.requestId) this.zone = zone;
       } catch (err) {
+        if (requestId !== this.requestId) return;
         this.error = err instanceof Error ? err.message : "Không thể cập nhật môi trường";
       }
     },
 
     async stop() {
-      if (channel) {
-        await supabaseZoneRepository.unsubscribe(channel);
-        channel = null;
-      }
+      const previousChannel = channel;
+      channel = null;
+      if (previousChannel) await supabaseZoneRepository.unsubscribe(previousChannel);
     },
 
     async reset() {
-      await this.stop();
+      this.requestId++;
       this.zone = null;
+      this.loading = false;
       this.error = "";
+      await this.stop();
     },
   },
 });

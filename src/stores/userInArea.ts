@@ -3,14 +3,18 @@ import { supabaseUserInAreaRepository, type UserInAreaRow } from "../data/supaba
 
 export const useUserInAreaStore = defineStore("UserInArea", {
     state: ()=> ({
-        userInArea: null as null | UserInAreaRow
+        userInArea: null as null | UserInAreaRow,
+        requestId: 0,
     }),
     getters: {
         canEnterFishingArea: (state) => state.userInArea?.status == null,
     },
     actions: {
         async setCurrentUserInArea(userId: string){
-            this.userInArea = await supabaseUserInAreaRepository.getCurrentUserArea(userId);
+            const requestId = ++this.requestId;
+            const area = await supabaseUserInAreaRepository.getCurrentUserArea(userId);
+            if (requestId === this.requestId) this.userInArea = area;
+            return area;
         }
     }
 })
