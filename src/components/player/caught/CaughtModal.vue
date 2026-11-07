@@ -1,5 +1,5 @@
-﻿<script lang="ts" setup>
-import { computed, ref, watch } from "vue";
+<script lang="ts" setup>
+import { computed, onMounted, ref, watch } from "vue";
 import { useCaughtStore, type CaughtFish } from "../../../stores/caught.ts";
 import { supabaseFishRepository } from "../../../data/supabaseFishRepository.ts";
 import { useMarketStore } from "../../../stores/market.ts";
@@ -11,6 +11,7 @@ import { useToast } from "../../../composables/useToast.ts";
 import { formatDateTime } from "../../../utils/time.ts";
 const worldStore = useWorldStore();
 const caughtStore = useCaughtStore();
+onMounted(() => { void caughtStore.loadCaughtFishes(); });
 const marketStore = useMarketStore();
 const fishToRelease = ref<any | null>(null);
 const searchQuery = ref("");
@@ -319,12 +320,14 @@ async function handleRelease() {
                     <span class="shrink-0">{{ formatDateTime(fish.created_at) }}</span>
                   </div>
                   <button
+                    v-if="fish.origin"
                     type="button"
                     class="mt-1 cursor-pointer text-left hover:underline"
                     @click="worldStore.handleMoveToArea(fish.origin)"
                   >
                     {{ fish.origin.country }} - {{ fish.origin.name }}
                   </button>
+                  <span v-else class="mt-1 block text-emerald-700">Nguồn: Nuôi tại ao</span>
                   <div class="mt-2 flex gap-2">
                     <button
                       type="button"
@@ -386,11 +389,13 @@ async function handleRelease() {
                 </span>
                 <span class="text-xs px-1.5 py-1">{{ item.variant_type }}</span>
                 <div
+                  v-if="item.origin"
                   @click="worldStore.handleMoveToArea(item.origin)"
                   class="text-xs mt-1 cursor-pointer hover:underline"
                 >
                   {{ item.origin.country }} - {{ item.origin.name }}
                 </div>
+                <div v-else class="mt-1 text-xs text-emerald-700">Nguồn: Nuôi tại ao</div>
               </div>
             </div>
             <div class="flex gap-2 shrink-0">

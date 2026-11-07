@@ -1,7 +1,14 @@
-import type { Pond, PondStatus } from '../../../stores/fishfarm'
-
-export const statusLabel: Record<PondStatus, string> = { ok: 'Ổn định', warn: 'Cần theo dõi', alert: 'Cần xử lý' }
-export const statusChip: Record<PondStatus, string> = {
-  ok: 'bg-emerald-100 text-emerald-800', warn: 'bg-amber-100 text-amber-800', alert: 'bg-red-100 text-red-800',
+export function formatDuration(seconds: number): string {
+  if (seconds <= 0) return 'Đã đến giờ'
+  const minutes = Math.ceil(seconds / 60)
+  if (minutes < 60) return `${minutes} phút`
+  const hours = Math.floor(minutes / 60), rest = minutes % 60
+  if (hours < 24) return `${hours} giờ${rest ? ` ${rest} phút` : ''}`
+  return `${Math.floor(hours / 24)} ngày${hours % 24 ? ` ${hours % 24} giờ` : ''}`
 }
-export const progressOf = (p: Pond) => !p.fishCount ? 'Hồ trống' : p.growth >= 100 ? 'Sẵn sàng thu hoạch' : p.fullness <= 0 ? 'Cá đói · Ngừng lớn' : p.fullness < 30 ? 'Cá đói · Lớn chậm' : 'Đang lớn'
+
+export function fishImageUrl(image: string | null): string {
+  if (!image) return `${import.meta.env.BASE_URL}fish/VN/Carp.png`
+  if (/^(https?:|data:|blob:)/i.test(image)) return image
+  return `${import.meta.env.BASE_URL}${image.replace(/^\//, '')}`
+}

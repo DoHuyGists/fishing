@@ -1,114 +1,183 @@
 <script setup lang="ts">
-import { computed, onBeforeUnmount, onMounted } from 'vue'
-import { storeToRefs } from 'pinia'
-import { useFishfarmStore, oxygenOf, growthRateOf, canFeed } from '../../../stores/fishfarm'
+import { computed, ref, watch } from 'vue'
+import { useAquacultureStore } from '../../../stores/aquaculture'
+import { useCurrencyStore } from '../../../stores/currency'
+import { useModalStore } from '../../../stores/modal'
+import { batchProgress, type AquacultureBatch } from '../../../data/aquaculture'
+import TwoOptionsModal from '../../shared/TwoOptionsModal.vue'
+import AquacultureStockForm from './AquacultureStockForm.vue'
 import FishPond from './FishPond.vue'
-import { progressOf } from './pondPresentation'
+import { formatDuration } from './pondPresentation'
 
-const farm = useFishfarmStore()
-const { pond } = storeToRefs(farm)
-const feedLabel = computed(() => pond.value.feedCooldown > 0
-  ? `Đợi ${Math.ceil(pond.value.feedCooldown / farm.speed)} giây`
-  : pond.value.fullness > 65 ? 'Cá còn no' : 'Cho ăn · +35 độ no')
-
-let simulationTimer: ReturnType<typeof setInterval> | null = null
-onMounted(() => {
-  let previous = performance.now()
-  simulationTimer = setInterval(() => {
-    const current = performance.now()
-    if (!document.hidden && (!farm.paused || pond.value.effect)) {
-      farm.tick((current - previous) / 1000)
-    }
-    previous = current
-  }, 1000)
-})
-
-onBeforeUnmount(() => {
-  if (simulationTimer !== null) clearInterval(simulationTimer)
-})
+defineProps<{ paused?: boolean }>()
+const farm = useAquacultureStore()
+const currency = useCurrencyStore()
+const modal = useModalStore()
+const foodId = ref('')
+const chosenFood = computed(() => farm.foodOptions.find(f => f.inventoryId === foodId.value && !!f.inventoryId))
+const confirmation = ref<{ kind: 'buy' | 'sell' | 'transfer' | 'release'; ids: string[]; message: string; detail: string } | null>(null)
+watch(() => farm.selectedBatchId, () => { foodId.value = '' })
+watch(() => farm.ownerId, () => { confirmation.value = null; foodId.value = '' })
+function remaining(batch: AquacultureBatch) {
+  return batch.status === 'ready' ? 'Có thể thu hoạch'
+    : Date.parse(batch.ready_at) <= farm.now ? 'Đang cập nhật trưởng thành…' : 'Còn ' + formatDuration((Date.parse(batch.ready_at) - farm.now) / 1000)
+}
+function ask(kind: 'buy' | 'sell' | 'transfer' | 'release') {
+  if (!farm.canMutate) return
+  const ids = [...farm.selectedFishIds]
+  const special = farm.selectedFish.filter(f => f.is_super_special).length
+  confirmation.value = {
+    kind, ids,
+    message: kind === 'buy' ? 'Mua thêm một ao với 300 vỏ sò?'
+      : kind === 'sell' ? 'Bán ' + ids.length + ' cá đã chọn, nhận ' + farm.selectionCash.toLocaleString('vi-VN') + ' xu?'
+      : kind === 'transfer' ? 'Chuyển ' + ids.length + ' cá đã chọn vào kho cá?'
+      : 'Thả ' + ids.length + ' cá đã chọn để giải phóng chỗ?',
+    detail: kind === 'buy' ? 'Ao mới có sức chứa 100 điểm. Mỗi người sở hữu tối đa 5 ao.'
+      : (special ? 'Bạn đang chọn ' + special + ' cá siêu đặc biệt. ' : '')
+        + (kind === 'release' ? 'Cá rời ao vĩnh viễn, không hoàn tiền giống.' : 'Cá sẽ rời ao sau khi xác nhận.'),
+  }
+}
+async function confirm() {
+  const action = confirmation.value
+  confirmation.value = null
+  if (!action) return
+  if (action.kind === 'buy') await farm.buyPond()
+  else await farm.actOnFish(action.kind, action.ids)
+}
 </script>
 
 <template>
-  <div class="fishfarm flex h-full min-h-0 flex-col overflow-hidden rounded-2xl border border-[#cbd9c6] bg-[#f5f9f0] text-[#24352a]">
-    <header class="flex shrink-0 flex-wrap items-center justify-between gap-3 border-b border-[#cbd9c6] px-4 py-3">
-      <span class="inline-flex items-center gap-2 text-sm font-semibold">
-        <span class="h-2 w-2 rounded-full" :class="farm.paused ? 'bg-stone-400' : 'bg-emerald-500'" />
-        {{ farm.paused ? 'Đã tạm dừng' : 'Ao cá đang phát triển' }}
-      </span>
-      <div class="flex gap-2">
-        <button type="button" class="control-button" :aria-pressed="farm.paused" @click="farm.togglePause()">
-          {{ farm.paused ? 'Tiếp tục' : 'Tạm dừng' }}
-        </button>
-        <button type="button" class="control-button" :aria-label="`Tốc độ hiện tại ${farm.speed} lần. Nhấn để đổi tốc độ`" @click="farm.toggleSpeed()">
-          Tốc độ ×{{ farm.speed }}
-        </button>
+  <div class="fishfarm min-h-full rounded-2xl border border-[#cbd9c6] bg-[#f5f9f0] text-[#24352a]" :aria-busy="farm.busy || farm.loading">
+    <header class="flex flex-wrap items-center justify-between gap-3 border-b border-[#cbd9c6] p-4">
+      <div>
+        <h1 class="m-0 text-base font-bold">Một góc bình yên, một mùa cá mới</h1>
+        <p class="m-0 mt-1 text-xs text-stone-600">Cá vẫn lớn khi bạn đi câu hoặc thoát game. Chăm sóc là phần thưởng thêm.</p>
       </div>
+      <span class="text-xs font-semibold text-emerald-800">{{ farm.farm?.ponds.length ?? 0 }} / 5 ao · Kho cá còn {{ farm.storageAvailable }} chỗ</span>
     </header>
 
-    <div class="farm-workspace min-h-0 flex-1">
-      <main class="pond-area" aria-label="Ao nuôi cá">
-        <FishPond :pond="pond" :paused="farm.paused" />
-      </main>
-
-      <aside class="care-panel" aria-label="Chăm sóc ao cá">
-        <div class="border-b border-[#cbd9c6] p-4">
-          <p class="m-0 text-xs font-bold uppercase tracking-wider text-emerald-700">Chăm sóc ao cá</p>
-          <h2 class="mb-0 mt-2 text-lg font-semibold">{{ pond.name }} · {{ pond.species }}</h2>
-        </div>
-        <div class="care-body space-y-4 p-4">
-          <div class="space-y-3 rounded-xl border border-[#cbd9c6] bg-[#f5f9f0] p-3">
-            <p class="m-0 text-xs font-bold">Lứa {{ pond.cycle }} <span class="mx-1 text-stone-400">/</span> {{ progressOf(pond) }}</p>
-            <template v-if="pond.fishCount">
-              <div v-for="meter in [{ label: 'Độ no', value: pond.fullness }, { label: 'Tăng trưởng', value: pond.growth }]" :key="meter.label"><div class="mb-1.5 flex justify-between text-[11px]"><span>{{ meter.label }}</span><b>{{ Math.floor(meter.value) }}%</b></div><div class="h-2 overflow-hidden rounded-full bg-[#dfe8d8]" role="progressbar" :aria-label="meter.label" :aria-valuenow="Math.floor(meter.value)" :aria-valuemin="0" :aria-valuemax="100"><div class="meter-fill h-full rounded-full" :class="meter.label === 'Độ no' && meter.value < 30 ? 'bg-amber-500' : 'bg-emerald-600'" :style="{ width: meter.value + '%' }" /></div></div>
-              <p class="m-0 text-[11px] leading-relaxed text-stone-600">Độ no giảm 1 điểm/giây mô phỏng. Dưới 30: lớn chậm; về 0: ngừng lớn. Cá đủ lớn sẽ chờ bạn thu hoạch.</p><p v-if="oxygenOf(pond) < 5" class="m-0 rounded-lg bg-amber-100/70 p-2 text-[11px] font-medium text-amber-900">Thiếu oxy làm cá lớn chậm. Bật sục khí để cải thiện.</p>
-            </template>
-            <p v-else class="m-0 text-xs">Hồ đã thu hoạch. Thả cá miễn phí để bắt đầu lứa mới.</p>
-          </div>
-          <div v-if="farm.lastHarvest?.pondName === pond.name" class="rounded-xl bg-amber-50 p-3 text-xs leading-relaxed text-amber-900">Lần thu gần nhất: {{ farm.lastHarvest.fishCount.toLocaleString('vi-VN') }} con · {{ farm.lastHarvest.kg.toLocaleString('vi-VN') }} kg · +{{ farm.lastHarvest.coins.toLocaleString('vi-VN') }} xu thử.</div>
-          <div><h3 class="mb-2 mt-0 text-[10px] font-bold uppercase tracking-[0.12em] text-stone-500">Thông tin ao nuôi</h3>
-            <dl class="pond-details grid grid-cols-2 gap-2 text-xs">
-              <div><dt>Số lượng</dt><dd>{{ pond.fishCount.toLocaleString('vi-VN') }} con</dd></div><div><dt>Trọng lượng TB</dt><dd>{{ pond.fishCount ? pond.avgWeightG + ' g' : '—' }}</dd></div>
-              <div><dt>Nhiệt độ</dt><dd>{{ pond.tempC }} °C</dd></div><div><dt>pH</dt><dd>{{ pond.ph }}</dd></div>
-              <div><dt>Oxy hòa tan</dt><dd :class="oxygenOf(pond) < 5 ? 'text-amber-700' : 'text-emerald-700'">{{ oxygenOf(pond) }} mg/L</dd></div><div><dt>Thu hoạch sau</dt><dd>{{ !pond.fishCount ? 'Chưa thả cá' : pond.growth >= 100 ? 'Ngay bây giờ' : growthRateOf(pond) === 0 ? 'Cần cho ăn' : `~${Math.ceil((100 - pond.growth) / growthRateOf(pond) / farm.speed)} giây` }}</dd></div>
-              <div><dt>Cho ăn lần cuối</dt><dd>{{ pond.lastFed }}</dd></div><div><dt>Máy sục khí</dt><dd>{{ pond.aerator ? 'Đang bật' : 'Đang tắt' }}</dd></div>
-            </dl>
-          </div>
-        </div>
-        <div class="care-actions grid shrink-0 gap-2 border-t border-[#cbd9c6] bg-white p-4">
-          <button v-if="pond.fishCount && pond.growth < 100" type="button" class="care-action bg-emerald-700 text-white hover:bg-emerald-800" :disabled="farm.paused || !canFeed(pond)" @click="farm.feed()">{{ feedLabel }}</button>
-          <button v-if="pond.fishCount" type="button" class="care-action bg-amber-200 text-amber-950 hover:bg-amber-300" :disabled="farm.paused || pond.growth < 100" @click="farm.harvest()">{{ pond.growth >= 100 ? 'Thu hoạch · Nhận xu thử' : 'Cá đang lớn · Chưa thể thu' }}</button>
-          <button v-else type="button" class="care-action bg-emerald-700 text-white hover:bg-emerald-800" :disabled="farm.paused" @click="farm.restock()">Thả lứa mới · Miễn phí</button>
-          <button type="button" class="care-action border border-[#cbd9c6] bg-[#f5f9f0] hover:bg-[#e8f0e0]" :aria-pressed="pond.aerator" @click="farm.toggleAerator()">{{ pond.aerator ? 'Tắt sục khí' : 'Bật sục khí' }}</button>
-        </div>
-      </aside>
+    <div v-if="farm.error" class="mx-4 mt-4 flex flex-wrap items-center gap-3 rounded-xl border border-red-200 bg-red-50 p-3 text-xs text-red-800" role="alert">
+      <span class="min-w-0 flex-1">{{ farm.error }}</span>
+      <button v-if="farm.pending" type="button" class="action-button" :disabled="farm.busy || farm.loading" @click="farm.retryPending()">Thử lại thao tác</button>
+      <button v-else type="button" class="action-button" :disabled="farm.busy || farm.loading" @click="farm.refresh(true)">Tải lại</button>
     </div>
+    <p v-if="farm.notice" class="mx-4 mt-4 rounded-xl bg-emerald-100 p-3 text-xs text-emerald-900" role="status">{{ farm.notice }}</p>
+    <p v-if="!farm.farm" class="p-8 text-center text-sm text-stone-500">{{ farm.loading ? 'Đang mở nông trại của bạn…' : 'Chưa tải được nông trại.' }}</p>
 
-    <footer class="flex shrink-0 flex-wrap items-center justify-between gap-x-4 gap-y-1 border-t border-[#cbd9c6] px-4 py-2 text-[11px] text-stone-500">
-      <span>Bản chơi thử cục bộ · Tải lại trang sẽ bắt đầu lại.</span>
-      <span class="font-semibold text-emerald-800">{{ farm.demoCoins.toLocaleString('vi-VN') }} xu thử · Đã thu {{ farm.harvestedBatches }} lứa / {{ farm.harvestedKg.toLocaleString('vi-VN') }} kg</span>
-      <p class="sr-only" role="status" aria-live="polite">{{ farm.announcement }}</p>
-    </footer>
+    <template v-else>
+      <nav class="flex flex-wrap gap-2 p-4 pb-0" aria-label="Chọn ao cá">
+        <button v-for="pond in farm.farm.ponds" :key="pond.id" type="button" class="pond-tab" :class="{ 'pond-tab-active': pond.id === farm.selectedPondId }" :aria-pressed="pond.id === farm.selectedPondId" :disabled="farm.busy" @click="farm.selectPond(pond.id)">
+          <b>{{ pond.name }}</b><span class="mt-1 block text-[11px] opacity-75">{{ pond.fish.length }} cá · {{ pond.used_capacity }}/{{ pond.capacity }} điểm</span>
+        </button>
+        <button v-if="farm.farm.pond_slot < 5" type="button" class="pond-tab border-dashed" :disabled="!farm.canMutate || currency.shells < 300" @click="ask('buy')">
+          <b>+ Mua ao</b><span class="mt-1 block text-[11px]">300 vỏ sò</span>
+        </button>
+      </nav>
+      <p v-if="farm.farm.pond_slot < 5 && currency.shells < 300" class="mx-4 mb-0 mt-2 text-xs text-stone-500">Cần 300 vỏ sò để mở thêm ao.</p>
+
+      <div v-if="farm.activePond" class="farm-workspace">
+        <main class="min-w-0 space-y-4">
+          <div class="pond-area rounded-2xl p-4 sm:p-6">
+            <FishPond :pond="farm.activePond" :swimmers="farm.pondSwimmers" :paused="paused" />
+          </div>
+
+          <section class="rounded-xl border border-[#cbd9c6] bg-white p-4">
+            <div class="mb-3 flex items-center justify-between gap-2"><h2 class="m-0 text-sm font-bold">Các lứa trong ao</h2><span class="text-xs text-stone-500">Chọn một lứa để chăm hoặc thu cá</span></div>
+            <p v-if="!farm.activePond.batches.length" class="m-0 text-xs text-stone-500">Ao trống. Chọn loài bạn đã câu được để bắt đầu.</p>
+            <div class="grid gap-2 sm:grid-cols-2">
+              <button v-for="(batch, index) in farm.activePond.batches" :key="batch.id" type="button" class="batch-card" :class="{ 'batch-card-active': batch.id === farm.selectedBatchId }" :aria-pressed="batch.id === farm.selectedBatchId" :disabled="farm.busy" @click="farm.selectBatch(batch.id)">
+                <div class="flex justify-between gap-2"><b>{{ farm.speciesName(batch.species_id) }}</b><span class="shrink-0 text-[10px]">Lứa {{ index + 1 }}</span></div>
+                <p class="mb-2 mt-1 text-[11px] text-stone-500">{{ batch.mode === 'simple' ? 'Thong thả' : 'Chăm chút' }} · {{ farm.activePond.fish.filter(f => f.batch_id === batch.id).length }} cá</p>
+                <div class="h-1.5 overflow-hidden rounded-full bg-[#dfe8d8]"><div class="h-full bg-emerald-600" :style="{ width: batchProgress(batch, farm.now) + '%' }" /></div>
+                <p class="mb-0 mt-2 text-[11px]" :class="batch.status === 'ready' ? 'font-semibold text-emerald-700' : 'text-stone-600'">{{ remaining(batch) }}</p>
+              </button>
+            </div>
+          </section>
+
+          <details v-if="farm.records.length" class="rounded-xl border border-[#cbd9c6] bg-white p-4">
+            <summary class="cursor-pointer text-sm font-bold">Thành quả nuôi cá</summary>
+            <div class="mt-3 grid gap-2 sm:grid-cols-2">
+              <div v-for="record in farm.records" :key="record.species_id" class="rounded-lg bg-[#f5f9f0] p-3 text-xs">
+                <b>{{ farm.speciesName(record.species_id) }}</b>
+                <p class="mb-0 mt-1 text-stone-600">{{ record.matured_fish }} cá trưởng thành · Kỷ lục {{ record.best_weight_kg }} kg · {{ record.super_special_fish }} cá đặc biệt</p>
+              </div>
+            </div>
+          </details>
+        </main>
+
+        <aside class="min-w-0 space-y-4" aria-label="Quản lý ao cá">
+          <AquacultureStockForm />
+          <section v-if="farm.activePond.batches.some(b => b.mode === 'advanced' && b.status === 'growing')" class="panel space-y-3">
+            <h2 class="m-0 text-sm font-bold">Chăm ao</h2>
+            <p class="m-0 text-xs text-stone-500">Tăng chất lượng cho các lứa chăm chút đang lớn. Hai việc dùng chung lượt chăm ao.</p>
+            <div class="grid grid-cols-2 gap-2">
+              <button type="button" class="action-button" :disabled="!farm.canCare" @click="farm.care('water')">Thay nước · +10%<span class="block text-[10px] font-normal">Chờ 4 giờ</span></button>
+              <button type="button" class="action-button" :disabled="!farm.canCare" @click="farm.care('oxygen')">Sục khí · +3%<span class="block text-[10px] font-normal">Chờ 1 giờ</span></button>
+            </div>
+            <p v-if="Date.parse(farm.activePond.care_available_at) > farm.now" class="m-0 text-xs text-amber-800">Lượt chăm tiếp theo sau {{ formatDuration((Date.parse(farm.activePond.care_available_at) - farm.now) / 1000) }}.</p>
+          </section>
+
+          <section v-if="farm.activeBatch" class="panel space-y-3">
+            <div class="flex flex-wrap items-center justify-between gap-2"><h2 class="m-0 text-sm font-bold">{{ farm.speciesName(farm.activeBatch.species_id) }}</h2><span class="text-xs text-emerald-700">{{ remaining(farm.activeBatch) }}</span></div>
+            <p class="m-0 text-xs text-stone-500">{{ farm.batchFish.length }} / {{ farm.activeBatch.initial_fish_count }} cá còn trong lứa · {{ farm.activeBatch.mode === 'simple' ? 'Thong thả' : 'Chăm chút' }}</p>
+            <div v-if="farm.activeBatch.mode === 'advanced'" class="space-y-2 rounded-lg bg-[#f5f9f0] p-3 text-xs">
+              <div class="flex justify-between"><span>Chất lượng</span><b>{{ Math.round(farm.activeBatch.quality_score * 100) }}%</b></div>
+              <div class="h-1.5 overflow-hidden rounded-full bg-[#dfe8d8]"><div class="h-full bg-emerald-600" :style="{ width: (farm.activeBatch.quality_score * 100) + '%' }" /></div>
+              <template v-if="farm.activeBatch.status === 'growing'">
+                <label class="block">Thức ăn cho lứa này
+                  <select v-model="foodId" class="mt-1 w-full rounded-lg border border-[#cbd9c6] bg-white p-2" :disabled="!farm.canFeed">
+                    <option value="">Chọn thức ăn trong túi</option>
+                    <option v-for="food in farm.foodOptions" :key="food.itemId + ':' + food.inventoryId" :value="food.inventoryId" :disabled="!food.inventoryId || food.owned < food.needed">
+                      {{ food.name }} · Cần {{ food.needed }} / Có {{ food.owned }} · +{{ Math.round(food.gain * 100) }}%
+                    </option>
+                  </select>
+                </label>
+                <button type="button" class="action-button w-full" :disabled="!farm.canFeed || !chosenFood || chosenFood.owned < chosenFood.needed" @click="farm.feed(foodId)">Cho ăn{{ chosenFood ? ' · Dùng ' + chosenFood.needed + ' phần' : '' }}</button>
+                <p v-if="Date.parse(farm.activeBatch.feed_available_at) > farm.now" class="m-0 text-amber-800">Cho ăn tiếp sau {{ formatDuration((Date.parse(farm.activeBatch.feed_available_at) - farm.now) / 1000) }}.</p>
+                <button type="button" class="text-emerald-700 underline" :disabled="farm.busy" @click="modal.open('shop')">Mua thức ăn tại cửa hàng</button>
+              </template>
+            </div>
+
+            <div class="flex flex-wrap items-center justify-between gap-2 text-xs">
+              <b>Từng cá trong lứa</b><button type="button" class="text-emerald-700 underline disabled:opacity-50" :disabled="!farm.canMutate" @click="farm.selectOrdinaryReadyFish()">Chọn cá thường đã lớn</button>
+            </div>
+            <div class="space-y-1.5">
+              <label v-for="fish in farm.pagedFish" :key="fish.id" class="flex cursor-pointer items-center gap-2 rounded-lg border p-2 text-xs" :class="fish.is_super_special ? 'border-amber-300 bg-amber-50' : 'border-[#cbd9c6]'">
+                <input type="checkbox" :checked="farm.selectedFishIds.includes(fish.id)" :disabled="!farm.canMutate || (!farm.selectedFishIds.includes(fish.id) && farm.selectedFishIds.length >= 500)" @change="farm.toggleFish(fish.id)" />
+                <span class="min-w-0 flex-1"><b>{{ fish.status === 'ready' ? fish.weight_kg + ' kg · ' + fish.star_rating + '★' : 'Cá đang lớn' }}</b><span v-if="fish.is_super_special" class="ml-1 text-amber-800">✦ Siêu đặc biệt</span><span class="mt-0.5 block text-[10px] text-stone-400">#{{ fish.id.slice(0, 8) }} · {{ fish.capacity }} điểm</span></span>
+              </label>
+            </div>
+            <div v-if="farm.fishPages > 1" class="flex items-center justify-between text-xs">
+              <button type="button" class="action-button" :disabled="farm.fishPage <= 1 || farm.busy" @click="farm.fishPage--">Trước</button><span>{{ farm.fishPage }} / {{ farm.fishPages }}</span><button type="button" class="action-button" :disabled="farm.fishPage >= farm.fishPages || farm.busy" @click="farm.fishPage++">Sau</button>
+            </div>
+            <div class="space-y-2 border-t border-[#cbd9c6] pt-3">
+              <p class="m-0 text-xs">Đã chọn {{ farm.selectedFishIds.length }} cá <button v-if="farm.selectedFishIds.length" type="button" class="ml-2 text-stone-500 underline" :disabled="!farm.canMutate" @click="farm.selectedFishIds = []">Bỏ chọn</button></p>
+              <button type="button" class="action-button primary w-full" :disabled="!farm.canMutate || !farm.selectionReady" @click="ask('sell')">Bán · {{ farm.selectionCash.toLocaleString('vi-VN') }} xu</button>
+              <button type="button" class="action-button w-full" :disabled="!farm.canMutate || !farm.selectionReady || farm.selectedFishIds.length > farm.storageAvailable" @click="ask('transfer')">Chuyển vào kho cá · Còn {{ farm.storageAvailable }} chỗ</button>
+              <button type="button" class="w-full py-1 text-xs text-red-700 underline disabled:opacity-40" :disabled="!farm.canMutate || !farm.selectedFishIds.length" @click="ask('release')">Thả cá đã chọn · Không hoàn tiền</button>
+            </div>
+          </section>
+        </aside>
+      </div>
+    </template>
+    <p v-if="farm.busy" class="mx-4 pb-3 text-xs text-emerald-700" role="status">Đang xử lý thao tác…</p>
+    <TwoOptionsModal v-if="confirmation" title="Xác nhận thao tác" :message="confirmation.message" :sub-text="confirmation.detail" second-text="Xác nhận" :first-disabled="farm.busy" :second-disabled="!farm.canMutate" :on-first="() => confirmation = null" :on-second="confirm" :on-dismiss="() => confirmation = null" />
   </div>
 </template>
 
 <style scoped>
-.farm-workspace { display: grid; grid-template-columns: minmax(0, 1fr) 340px; overflow-y: auto; }
-.pond-area { display: flex; min-width: 0; min-height: 420px; padding: 24px; background: #dce8cd; }
-.care-panel { display: flex; min-height: 0; flex-direction: column; border-left: 1px solid #cbd9c6; background: #fbfcf8; }
-.care-body { min-height: 0; flex: 1; overflow-y: auto; }
-.control-button { border: 1px solid #cbd9c6; border-radius: 8px; padding: 8px 12px; background: white; font-size: 12px; }
-.control-button:hover { background: #e8f0e0; }
-button:focus-visible { outline: 2px solid #347552; outline-offset: 3px; }
-.pond-details > div { border: 1px solid #e1e8da; border-radius: 9px; padding: 9px; background: white; }
-.pond-details dt { margin-bottom: 5px; font-size: 11px; color: #7b8275; }
-.pond-details dd { font-size: 12px; font-weight: 600; }
-.care-action { border-radius: 9px; padding: 10px 12px; font-size: 12px; font-weight: 600; }
-.care-action:disabled { cursor: not-allowed; opacity: .5; }
-@media (max-width: 899px) {
-  .farm-workspace { display: block; }
-  .pond-area { height: clamp(380px, 50vh, 560px); min-height: 380px; padding: 16px; }
-  .care-panel { border-top: 1px solid #cbd9c6; border-left: 0; }
-  .care-body { order: 2; overflow-y: visible; }
-  .care-actions { order: 1; }
-}
+.farm-workspace { display: grid; grid-template-columns: minmax(0, 1fr) 370px; align-items: start; gap: 20px; padding: 20px; }
+.pond-area { display: grid; min-height: clamp(400px, 50vh, 540px); background: #dce8cd; }
+.panel { padding: 16px; border: 1px solid #cbd9c6; border-radius: 12px; background: white; }
+.pond-tab { min-width: 100px; border: 1px solid #cbd9c6; border-radius: 12px; padding: 10px 12px; background: white; text-align: left; font-size: 12px; }
+.pond-tab-active { border-color: #347552; background: #dcebd6; box-shadow: inset 0 0 0 1px #347552; }
+.batch-card { border: 1px solid #cbd9c6; border-radius: 10px; padding: 12px; text-align: left; font-size: 12px; }
+.batch-card-active { border-color: #347552; background: #f5f9f0; box-shadow: inset 0 0 0 1px #347552; }
+.action-button { border: 1px solid #cbd9c6; border-radius: 8px; padding: 8px 10px; background: #f5f9f0; font-size: 12px; font-weight: 600; }
+.action-button:hover { background: #e8f0e0; }
+.action-button.primary { border-color: #047857; background: #047857; color: white; }
+button { cursor: pointer; }
+button:disabled { cursor: not-allowed; opacity: .45; }
+button:focus-visible, summary:focus-visible { outline: 2px solid #347552; outline-offset: 3px; }
+@media (max-width: 1023px) { .farm-workspace { grid-template-columns: 1fr; padding: 16px; } }
 </style>

@@ -24,7 +24,7 @@ export interface CaughtFish {
     y: number;
     location: { x: number; y: number }[];
     isAvailable: boolean;
-  };
+  } | null;
 }
 
 const authStore = useAuthStore();
@@ -55,7 +55,8 @@ export const useCaughtStore = defineStore("Caught", {
       if (!userId) return;
       this.isLoadingCaught = true;
       try {
-        this.caughtFishes = await supabaseFishRepository.fetchAllCaughtFishes();
+        const fishes = await supabaseFishRepository.fetchAllCaughtFishes(userId);
+        if (authStore.user?.id === userId) this.caughtFishes = fishes;
       } catch (err) {
         console.error("Lỗi khi tải danh sách cá:", err);
       } finally {

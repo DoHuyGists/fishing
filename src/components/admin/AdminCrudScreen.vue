@@ -12,6 +12,11 @@ export interface CrudField {
   type: "text" | "number" | "select" | "datetime" | "json";
   required?: boolean;
   readonly?: boolean;
+  immutable?: boolean;
+  defaultValue?: string | number | boolean;
+  min?: number;
+  max?: number;
+  step?: number;
   options?: CrudOption[];
 }
 export interface CrudColumn {
@@ -67,7 +72,12 @@ function toLocalInput(iso: string | null) {
 function readonlyDisplay(field: CrudField) {
   const v = form[field.key];
   if (field.type === "datetime") return v ? new Date(v).toLocaleString("vi-VN") : "";
+  if (field.type === "select") return field.options?.find(o => o.value === String(v))?.label ?? v ?? "";
   return v ?? "";
+}
+
+function isReadonly(field: CrudField) {
+  return field.readonly || (field.immutable && editingId.value !== null);
 }
 
 function openForm(item?: any) {
@@ -75,12 +85,12 @@ function openForm(item?: any) {
   editingId.value = item?.id ?? null;
   for (const key of Object.keys(form)) delete form[key];
   for (const f of props.fields) {
-    const raw = item ? item[f.key] : undefined;
+    const raw = item ? item[f.key] : f.defaultValue;
     if (f.readonly) form[f.key] = raw ?? "";
     else if (f.type === "datetime") form[f.key] = toLocalInput(raw ?? null);
     else if (f.type === "json") form[f.key] = JSON.stringify(raw ?? {}, null, 2);
     else if (f.type === "number") form[f.key] = raw ?? null;
-    else form[f.key] = raw ?? "";
+    else form[f.key] = typeof raw === "boolean" ? String(raw) : raw ?? "";
   }
   isOpen.value = true;
 }
@@ -88,7 +98,7 @@ function openForm(item?: any) {
 function buildPayload(): Record<string, unknown> {
   const payload: Record<string, unknown> = {};
   for (const f of props.fields) {
-    if (f.readonly) continue;
+    if (isReadonly(f)) continue;
     const v = form[f.key];
     const empty = v === null || v === undefined || v === "";
     if (f.required && empty) throw new Error(`Vui lòng nhập "${f.label}"`);
@@ -184,14 +194,14 @@ async function confirmDelete() {
         <div class="px-5 py-3 border-b border-gray-200 font-extrabold text-sm">{{ editingId ? "Cập nhật" : "Thêm mới" }} - {{ title }}</div>
         <div class="p-5 overflow-auto flex flex-col gap-3">
           <label v-for="f in fields" :key="f.key" class="flex flex-col gap-1 text-xs font-bold text-gray-600">
-            <span>{{ f.label }}<span v-if="f.required && !f.readonly" class="text-red-500"> *</span></span>
-            <input v-if="f.readonly" :value="readonlyDisplay(f)" disabled class="px-2 py-1.5 border border-gray-200 rounded-lg bg-gray-100 text-gray-500 font-normal" />
+            <span>{{ f.label }}<span v-if="f.required && !isReadonly(f)" class="text-red-500"> *</span></span>
+            <input v-if="isReadonly(f)" :value="readonlyDisplay(f)" disabled class="px-2 py-1.5 border border-gray-200 rounded-lg bg-gray-100 text-gray-500 font-normal" />
             <select v-else-if="f.type === 'select'" v-model="form[f.key]" class="px-2 py-1.5 border border-gray-300 rounded-lg font-normal bg-white">
               <option value="">-- Chọn --</option>
               <option v-for="o in f.options" :key="o.value" :value="o.value">{{ o.label }}</option>
             </select>
             <textarea v-else-if="f.type === 'json'" v-model="form[f.key]" rows="5" class="px-2 py-1.5 border border-gray-300 rounded-lg font-mono font-normal"></textarea>
-            <input v-else-if="f.type === 'number'" v-model.number="form[f.key]" type="number" step="any" class="px-2 py-1.5 border border-gray-300 rounded-lg font-normal" />
+            <input v-else-if="f.type === 'number'" v-model.number="form[f.key]" type="number" :min="f.min" :max="f.max" :step="f.step ?? 'any'" class="px-2 py-1.5 border border-gray-300 rounded-lg font-normal" />
             <input v-else-if="f.type === 'datetime'" v-model="form[f.key]" type="datetime-local" class="px-2 py-1.5 border border-gray-300 rounded-lg font-normal" />
             <input v-else v-model="form[f.key]" type="text" class="px-2 py-1.5 border border-gray-300 rounded-lg font-normal" />
           </label>

@@ -26,7 +26,7 @@ export type CaughtRow = {
     y: number;
     location: { x: number; y: number }[];
     isAvailable: boolean;
-  }
+  } | null
 };
 
 export type FishingInventoryRow = {
@@ -119,7 +119,7 @@ class SupabaseFishRepository {
       variant_type: row.variant_type,
       status: row.status,
       species: { id: row.species.id, name: row.species.name, weight: Number(row.weight), image: row.species.image, rarity: row.species.rarity },
-      origin: { id: row.origin.id, country: row.origin.country, name: row.origin.name, x: row.origin.x, y: row.origin.y, location: row.origin.location, isAvailable: row.origin.is_available },
+      origin: row.origin ? { id: row.origin.id, country: row.origin.country, name: row.origin.name, x: row.origin.x, y: row.origin.y, location: row.origin.location, isAvailable: row.origin.is_available } : null,
     }));
   }
 
@@ -132,16 +132,24 @@ class SupabaseFishRepository {
     return (data ?? []) as unknown as FishingInventoryRow[];
   }
 
-  async fetchAllCaughtFishes(): Promise<CaughtRow[]> {
-    const { data, error } = await supabase.rpc("get_caught_in_home");
+  async fetchAllCaughtFishes(userId?: string): Promise<CaughtRow[]> {
+    const [{ data, error }, farmFish] = await Promise.all([
+      supabase.rpc("get_caught_in_home"),
+      userId ? this.fetchFarmFishInHome(userId) : Promise.resolve([]),
+    ]);
 
     if (error) throw new Error(error.message);
 
-    return (data ?? []).map((row: any) => {
+    // Older home RPCs may INNER JOIN fishing areas and omit farm transfers.
+    // Merge owned stored fish without an area, preserving existing RPC rows.
+    const existingIds = new Set((data ?? []).map((row: any) => row.id));
+    const rows = [...farmFish.filter(row => !existingIds.has(row.id)), ...(data ?? [])];
+    return rows.map((row: any) => {
       return {
         id: row.id,
         created_at: row.created_at,
         user_id: row.user_id,
+        species_id: row.species_id ?? row.species.id,
         weight: Number(row.weight),
         is_shiny: row.is_shiny,
         variant_type: row.variant_type,
@@ -153,7 +161,7 @@ class SupabaseFishRepository {
           image: row.species.image,
           rarity: row.species.rarity,
         },
-        origin: {
+        origin: row.origin ? {
           id: row.origin.id,
           country: row.origin.country,
           name: row.origin.name,
@@ -161,9 +169,22 @@ class SupabaseFishRepository {
           y: row.origin.y,
           location: row.origin.location,
           isAvailable: row.origin.is_available
-        }
+        } : null
       };
     });
+  }
+
+  private async fetchFarmFishInHome(userId: string): Promise<any[]> {
+    const rows: any[] = [];
+    for (let offset = 0; ; offset += 500) {
+      const { data, error } = await supabase.from("caught")
+        .select("id, created_at, user_id, species_id, weight, is_shiny, variant_type, status, species(id, name, image, rarity)")
+        .eq("user_id", userId).eq("status", "normal").is("area_id", null)
+        .order("id").range(offset, offset + 499);
+      if (error) throw new Error(error.message);
+      rows.push(...(data ?? []));
+      if (!data || data.length < 500) return rows;
+    }
   }
 
   async deleteCaughtFish(caughtId: string): Promise<void> {

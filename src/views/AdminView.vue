@@ -19,6 +19,8 @@ type ModuleKey =
   | "item"
   | "species"
   | "speciesInArea"
+  | "aquacultureSpecies"
+  | "aquacultureFood"
   | "event"
   | "schedule"
   | "redeemCode"
@@ -38,6 +40,8 @@ interface AdminModule {
 }
 
 const moduleComponents = {
+  aquacultureSpecies: defineAsyncComponent(() => import("../components/admin/aquaculture-species-management/AquacultureSpeciesManagement.vue")),
+  aquacultureFood: defineAsyncComponent(() => import("../components/admin/aquaculture-food-management/AquacultureFoodManagement.vue")),
   skill: defineAsyncComponent(() => import("../components/admin/skils-management/SkillManagementModal.vue")),
   dailyMissionRewards: defineAsyncComponent(
     () => import("../components/admin/daily-mission-rewards-management/DailyMissionRewardManagementModal.vue"),
@@ -95,6 +99,13 @@ interface ModuleGroup {
 }
 
 const groups: ModuleGroup[] = [
+  {
+    title: "Nuôi cá",
+    modules: [
+      { key: "aquacultureSpecies", icon: "🐟", label: "Cấu hình loài nuôi", desc: "Sức chứa, thời gian nuôi, giá giống, giá bán và tỷ lệ cá đặc biệt.", component: moduleComponents.aquacultureSpecies },
+      { key: "aquacultureFood", icon: "🌾", label: "Thức ăn theo loài", desc: "Liên kết vật phẩm thức ăn và mức tăng chất lượng cho từng loài.", component: moduleComponents.aquacultureFood },
+    ],
+  },
   {
     title: "Dữ liệu trò chơi",
     modules: [
