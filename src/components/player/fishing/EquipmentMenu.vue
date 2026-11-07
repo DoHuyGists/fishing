@@ -43,7 +43,8 @@ watch(
       </button>
       <EquipmentPickerModal :open="pickerOpen && store.canAdjustDepth" @close="pickerOpen = false" />
       <button type="button" class="relative flex items-center gap-2 rounded-xl border border-[#cbd9c6] bg-[#f5f9f0] px-3 py-2 text-[11px] font-bold text-[#24352a] transition hover:border-[#70a77e] hover:bg-[#eaf5e8]" :disabled="!store.canAdjustDepth || !store.currentAreaId || store.isLoadingCurrentArea"
-        :title="store.currentAreaLoadError || undefined" @click="openDepthAdjuster">
+        :title="!store.canAdjustDepth ? 'Không thể điều chỉnh độ sâu lúc này' : store.currentAreaLoadError || undefined"
+        :aria-label="!store.canAdjustDepth ? 'Điều chỉnh độ sâu đang bị khóa' : undefined" @click="openDepthAdjuster">
         <span class="absolute -top-2 right-2 rounded-full border border-[#cbd9c6] bg-white px-1.5 py-0.5 text-[9px] font-bold leading-none text-[#24352a] shadow-sm" aria-label="Độ sâu đã chọn">
           {{ store.appliedDepthMeters }} m
         </span>
@@ -55,6 +56,15 @@ watch(
               ? "Tải lại độ sâu hồ"
               : "Điều chỉnh độ sâu"
         }}
+        <span v-if="!store.canAdjustDepth" class="depth-lock-overlay pointer-events-none absolute inset-0 flex items-center justify-center rounded-[inherit]" aria-hidden="true">
+          <span class="flex size-6 items-center justify-center rounded-full border border-[#cbd9c6] bg-[#f5f9f0] text-[#24352a] shadow-sm">
+            <svg class="size-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <rect x="5" y="10" width="14" height="11" rx="2" />
+              <path d="M8 10V7a4 4 0 0 1 8 0v3" />
+              <path d="M12 14v3" />
+            </svg>
+          </span>
+        </span>
       </button>
       <AdjusDepth />
       <button type="button" class="relative flex items-center gap-2 rounded-xl border border-[#cbd9c6] bg-[#f5f9f0] px-3 py-2 text-[11px] font-bold text-[#24352a] transition hover:border-[#70a77e] hover:bg-[#eaf5e8]" @click="store.openBag">
@@ -90,6 +100,14 @@ watch(
 </template>
 
 <style scoped>
+.depth-lock-overlay {
+  background: repeating-linear-gradient(
+    135deg,
+    rgb(203 217 198 / 85%) 0 5px,
+    rgb(245 249 240 / 75%) 5px 10px
+  );
+}
+
 .equipment-actions > button {
   min-height: 28px;
   padding-block: 3px;
