@@ -3,6 +3,7 @@ import { defineStore } from "pinia";
 type ModalName =
     null |
     "account" |
+    "fishing-settings" |
     "market" |
     "diary" |
     "gacha" |
@@ -25,6 +26,7 @@ type ModalName =
     | "attendance"
     | "donation"
     | "skill"
+    | "aquaculture"
     ;
 
 export const useModalStore = defineStore("Modal", {

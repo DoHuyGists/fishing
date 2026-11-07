@@ -41,6 +41,7 @@ const PostProduction = defineAsyncComponent(() => import("../fishing-post-produc
 const AttendanceModal = defineAsyncComponent(() => import("../attendance/AttendanceModal.vue"));
 const DonationModal = defineAsyncComponent(() => import("../donation/DonationModal.vue"));
 const SkillModal = defineAsyncComponent(() => import("../skill/SkillModal.vue"));
+const AquacultureModal = defineAsyncComponent(() => import("../aquaculture/AquacultureModal.vue"));
 
 const authStore = useAuthStore();
 const caughtStore = useCaughtStore();
@@ -264,6 +265,15 @@ onUnmounted(() => {
               >
             </button>
   
+            <button
+              type="button"
+              class="flex items-center gap-1.5 px-3 py-1.5 rounded-xl border border-[#cbd9c6] bg-[#f5f9f0] text-[#24352a] shadow-sm font-bold text-xs cursor-pointer transition-colors hover:border-[#70a77e] hover:bg-[#eaf5e8]"
+              @click="modalStore.open('aquaculture')"
+            >
+              <span class="text-sm" aria-hidden="true">🐠</span>
+              <span>Nông trại cá</span>
+            </button>
+
             <!-- Redeem code -->
             <button
               type="button"
@@ -411,6 +421,7 @@ onUnmounted(() => {
           <SpinWheelModal v-if="configStore.isUnlocked('gacha') && modalStore.isOpening('gacha')" />
           <InventoryModal v-if="modalStore.isOpening('inventory')" />
           <SkillModal v-if="modalStore.isOpening('skill')" />
+          <AquacultureModal v-if="modalStore.isOpening('aquaculture')" />
           <Feedbackmodal v-if="modalStore.isOpening('feedback')" />
           <MissionModal v-if="modalStore.isOpening('mission')" />
           <EventModal v-if="configStore.isUnlocked('event') && modalStore.isOpening('event')" />
