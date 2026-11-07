@@ -10,6 +10,7 @@ const monitorOpen = ref(false);
 type ModuleKey =
   | "skill"
   | "zone"
+  | "depthScope"
   | "weather"
   | "zoneWeather"
   | "weatherModifier"
@@ -76,6 +77,9 @@ const moduleComponents = {
   schedule: defineAsyncComponent(
     () => import("../components/admin/event-schedule-management/EventScheduleManagement.vue"),
   ),
+  depthScope: defineAsyncComponent(
+    () => import("../components/admin/depth-scope-management/DepthScopeManagementModal.vue"),
+  ),
 };
 
 const FeedbackListModal = defineAsyncComponent(
@@ -107,6 +111,13 @@ const groups: ModuleGroup[] = [
         label: "Bãi câu",
         desc: "Thêm, sửa và xoá các bãi câu trong game.",
         component: moduleComponents.area,
+      },
+      {
+        key: "depthScope",
+        icon: "🗺️",
+        label: "Độ sâu",
+        desc: "Thêm, sửa và xoá các độ sâu cá ở.",
+        component: moduleComponents.depthScope,
       },
       {
         key: "item",
