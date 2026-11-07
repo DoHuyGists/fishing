@@ -1,6 +1,33 @@
 import { defineStore } from "pinia";
 import { supabaseDepthScopeRepository, type DepthScopePayload, type DepthScopeRow } from "../../../data/supabaseDepthScopeRepository";
 
+function buildDepthCurve({ minDepth, maxDepth, peakDepth, curvePower }: DepthScopeRow) {
+  if (
+    ![minDepth, maxDepth, peakDepth, curvePower].every(Number.isFinite) ||
+    minDepth < 0 || maxDepth <= minDepth ||
+    peakDepth < minDepth || peakDepth > maxDepth || curvePower <= 0
+  ) return null;
+
+  const peakPosition = (peakDepth - minDepth) / (maxDepth - minDepth);
+  // Include the exact peak so narrow or asymmetric curves always reach factor 1.
+  const positions = [...new Set([
+    ...Array.from({ length: 101 }, (_, index) => index / 100),
+    peakPosition,
+  ])].sort((a, b) => a - b);
+  const points = positions.map((position) => {
+    // Match preview_fish_by_depth, including its power curves at boundary peaks.
+    const base = peakPosition === 0 ? 1 - position
+      : peakPosition === 1 ? position
+      : Math.sin(Math.PI / 2 * (position <= peakPosition
+        ? position / peakPosition
+        : (1 - position) / (1 - peakPosition)));
+    const factor = Math.pow(Math.min(1, Math.max(0, base)), curvePower);
+    return `${(24 + position * 160).toFixed(2)},${(66 - factor * 56).toFixed(2)}`;
+  }).join(" ");
+
+  return { points, peakX: 24 + peakPosition * 160 };
+}
+
 export const useDepthScopeStore = defineStore("depthScope", {
   state: () => ({
     items: [] as DepthScopeRow[],
@@ -11,6 +38,9 @@ export const useDepthScopeStore = defineStore("depthScope", {
     editingId: null as string | null,
     draft: null as DepthScopePayload | null,
   }),
+  getters: {
+    itemsWithCurves: (state) => state.items.map((item) => ({ ...item, curve: buildDepthCurve(item) })),
+  },
   actions: {
     async fetchAll() {
       this.loading = true;

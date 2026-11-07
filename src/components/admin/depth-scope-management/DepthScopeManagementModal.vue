@@ -12,7 +12,7 @@ const deleting = ref(false);
 const actionError = ref("");
 const filteredItems = computed(() => {
   const keyword = search.value.trim().toLocaleLowerCase();
-  return store.items.filter(
+  return store.itemsWithCurves.filter(
     (item) =>
       !keyword || item.code.toLocaleLowerCase().includes(keyword) || item.name.toLocaleLowerCase().includes(keyword),
   );
@@ -87,7 +87,7 @@ onMounted(() => store.fetchAll());
         {{ search ? "Không tìm thấy phạm vi phù hợp." : "Chưa có phạm vi độ sâu nào." }}
       </div>
       <div v-else class="overflow-x-auto rounded-xl border border-[#cbd9c6] bg-white shadow-sm">
-        <table class="w-full min-w-[850px] border-collapse text-left text-sm">
+        <table class="w-full min-w-[1070px] border-collapse text-left text-sm">
           <thead class="bg-[#f5f9f0] text-xs uppercase tracking-wide text-gray-600">
             <tr>
               <th class="px-4 py-3">Mã</th>
@@ -96,6 +96,7 @@ onMounted(() => store.fetchAll());
               <th class="px-4 py-3">Đỉnh</th>
               <th class="px-4 py-3">Max</th>
               <th class="px-4 py-3">Độ cong</th>
+              <th class="px-4 py-3">Đường cong</th>
               <th class="px-4 py-3">Cập nhật</th>
               <th class="px-4 py-3 text-right">Thao tác</th>
             </tr>
@@ -108,6 +109,30 @@ onMounted(() => store.fetchAll());
               <td class="px-4 py-3">{{ item.peakDepth.toFixed(2) }}</td>
               <td class="px-4 py-3">{{ item.maxDepth.toFixed(2) }}</td>
               <td class="px-4 py-3">{{ item.curvePower.toFixed(2) }}</td>
+              <td class="px-4 py-3">
+                <svg
+                  v-if="item.curve"
+                  viewBox="0 0 208 94"
+                  role="img"
+                  :aria-label="`Đường cong ${item.name}: từ ${item.minDepth} đến ${item.maxDepth} mét, đỉnh ${item.peakDepth} mét, độ cong ${item.curvePower}`"
+                  class="h-[94px] w-52 rounded-lg border border-[#cbd9c6] bg-[#f5f9f0] text-[#24352a]"
+                >
+                  <title>Hệ số phù hợp theo độ sâu (0–1), đỉnh {{ item.peakDepth.toFixed(2) }}m.</title>
+                  <path d="M24 10H184 M24 38H184" fill="none" stroke="#cbd9c6" stroke-dasharray="3 3" />
+                  <path d="M24 10V66H184" fill="none" stroke="#cbd9c6" />
+                  <line :x1="item.curve.peakX" y1="10" :x2="item.curve.peakX" y2="66" stroke="#cbd9c6" stroke-dasharray="3 3" />
+                  <polyline :points="item.curve.points" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round" stroke-linecap="round" />
+                  <circle :cx="item.curve.peakX" cy="10" r="3" fill="currentColor" />
+                  <g fill="currentColor" font-size="9">
+                    <text x="17" y="13" text-anchor="end">1</text>
+                    <text x="17" y="69" text-anchor="end">0</text>
+                    <text x="24" y="80" text-anchor="middle">{{ item.minDepth.toFixed(2) }}</text>
+                    <text x="184" y="80" text-anchor="middle">{{ item.maxDepth.toFixed(2) }}</text>
+                    <text x="104" y="90" text-anchor="middle">Độ sâu (m)</text>
+                  </g>
+                </svg>
+                <span v-else class="text-xs text-gray-500">Thông số không hợp lệ</span>
+              </td>
               <td class="px-4 py-3 text-gray-500">{{ formatDate(item.updatedAt) }}</td>
               <td class="px-4 py-3">
                 <div class="flex justify-end gap-2">
