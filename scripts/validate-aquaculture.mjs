@@ -5,6 +5,7 @@ import { beforeEach, test } from 'node:test'
 import { readFile } from 'node:fs/promises'
 import ts from 'typescript'
 import { createPinia, defineStore, setActivePinia } from 'pinia'
+import { readonly, ref } from 'vue'
 import * as mechanics from '../src/data/aquaculture.ts'
 import { createUuid } from '../src/utils/uuid.ts'
 
@@ -15,6 +16,7 @@ const storage = new Map()
 globalThis.sessionStorage = { getItem: k => storage.get(k) ?? null, setItem: (k, v) => storage.set(k, v), removeItem: k => storage.delete(k) }
 class AquacultureRpcError extends Error { constructor(message, uncertain) { super(message); this.uncertain = uncertain } }
 const imports = {
+  vue: { readonly, ref },
   pinia: { defineStore }, './auth': { useAuthStore: () => auth }, './currency': { useCurrencyStore: () => wallet },
   './inventory': { useInventoryStore: () => inventoryStore }, './userProfile': { useUserProfileStore: () => profileStore },
   '../data/supabaseAquacultureRepository': { AquacultureRpcError, supabaseAquacultureRepository: repository },
@@ -34,6 +36,8 @@ async function load(path) {
   new Function('require', 'module', 'exports', code)(id => { assert(id in imports, 'Unexpected dependency: ' + id); return imports[id] }, module, module.exports)
   return module.exports
 }
+const { useToast } = await load('src/composables/useToast.ts')
+imports['../composables/useToast'] = { useToast }
 const { useAquacultureStore } = await load('src/stores/aquaculture.ts')
 const rulesModule = await load('src/components/admin/aquaculture-species-management/admin-aquaculture-species-store.ts')
 imports['../aquaculture-species-management/admin-aquaculture-species-store'] = rulesModule
@@ -61,6 +65,8 @@ function fixture() {
 const deferred = () => { let resolve, reject; const promise = new Promise((a, b) => { resolve = a; reject = b }); return { promise, resolve, reject } }
 let snapshot, executeCalls, fetchCalls
 beforeEach(() => {
+  const toast = useToast()
+  toast.toasts.value.forEach(item => toast.dismiss(item.id))
   setActivePinia(createPinia()); storage.clear(); auth.user = { id: 'owner-1' }; wallet.cash = 10000; wallet.shells = 900
   snapshot = fixture(); executeCalls = []; fetchCalls = 0
   repository.fetchFarm = async () => { fetchCalls++; return structuredClone(snapshot) }
@@ -125,11 +131,14 @@ test('lost response retains exactly the same request and survives a page/session
   const store = await ready()
   repository.execute = async (...args) => { executeCalls.push(args); throw new AquacultureRpcError('Network error', true) }
   assert.equal(await store.buyPond(), false)
+  assert.equal(useToast().toasts.value.at(-1).variant, 'error')
+  assert.match(useToast().toasts.value.at(-1).message, /Thử lại thao tác/)
   const original = structuredClone(executeCalls[0]); assert.equal(store.canMutate, false)
   store.resetSession('owner-1'); await store.refresh(true)
   assert.equal(store.pending.requestId, original[2])
   repository.execute = async (...args) => { executeCalls.push(args); return {} }
   assert.equal(await store.retryPending(), true)
+  assert.equal(useToast().toasts.value.at(-1).variant, 'success')
   assert.deepEqual(executeCalls[1], original); assert.equal(storage.size, 0)
 })
 test('definitive rejection clears pending, while refresh failure after success never retries a committed action', async () => {
@@ -140,8 +149,24 @@ test('definitive rejection clears pending, while refresh failure after success n
   repository.fetchFarm = async () => { throw new Error('Offline') }
   assert.equal(await store.buyPond(), true); assert.equal(store.pending, null)
   assert.equal(store.needsRefresh, true); assert.match(store.error, /thành công/)
+  assert.deepEqual(useToast().toasts.value.slice(-2).map(item => item.variant), ['success', 'error'])
   assert.equal(await store.retryPending(), false); assert.equal(executeCalls.length, 1)
 })
+test('repeated background failures show one toast until recovery, and later failures notify again', async () => {
+  const store = await ready()
+  const fetchFarm = repository.fetchFarm
+  repository.fetchFarm = async () => { throw new Error('Offline') }
+  assert.equal(await store.refresh(), false)
+  assert.equal(await store.refresh(), false)
+  assert.equal(useToast().toasts.value.length, 1)
+  assert.equal(store.needsRefresh, true)
+  repository.fetchFarm = fetchFarm
+  assert.equal(await store.refresh(), true)
+  repository.fetchFarm = async () => { throw new Error('Offline') }
+  assert.equal(await store.refresh(), false)
+  assert.equal(useToast().toasts.value.length, 2)
+})
+
 test('responses for an old account cannot overwrite the new account or its loading state', async () => {
   const store = useAquacultureStore(), old = deferred()
   repository.fetchFarm = () => old.promise

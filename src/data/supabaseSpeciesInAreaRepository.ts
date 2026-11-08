@@ -12,6 +12,7 @@ export interface SpeciesInAreaRow {
   areaTitle: string | null;
   areaCountryId: string | null;
   speciesName: string | null;
+  speciesImage: string | null;
   speciesRarity: string | null;
 }
 
@@ -22,7 +23,7 @@ export interface SpeciesInAreaPayload {
   depthScopeId: string | null;
 }
 
-const SELECT_QUERY = "*, area:fishing_areas(id, title, country_id), species:species(id, name, rarity)";
+const SELECT_QUERY = "*, area:fishing_areas(id, title, country_id), species:species(id, name, image, rarity)";
 
 function mapRow(row: any): SpeciesInAreaRow {
   return {
@@ -34,6 +35,7 @@ function mapRow(row: any): SpeciesInAreaRow {
     areaTitle: row.area?.title ?? null,
     areaCountryId: row.area?.country_id ?? null,
     speciesName: row.species?.name ?? null,
+    speciesImage: row.species?.image ?? null,
     speciesRarity: row.species?.rarity ?? null,
   };
 }

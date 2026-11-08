@@ -1,4 +1,4 @@
-﻿<script lang="ts" setup>
+<script lang="ts" setup>
 import { computed, nextTick, onMounted, ref, watch } from "vue";
 import { useWorldStore } from "../../../stores/worldMap.ts";
 import WorldMap from "./WorldMap.vue";
@@ -9,9 +9,13 @@ import { useDayPhaseStore } from "../../../stores/dayPhase.ts";
 import { useToast } from "../../../composables/useToast.ts";
 import FishingAnchor from "./FishingAnchor.vue";
 import { useModalStore } from "../../../stores/modal.ts";
+import { useCountryStore } from "../../../stores/country.ts";
+
+const props = withDefaults(defineProps<{ fogEnabled?: boolean }>(), { fogEnabled: true });
 
 const toast = useToast();
 const authStore = useAuthStore();
+const countryStore = useCountryStore();
 const userInAreaStore = useUserInAreaStore();
 const dayPhaseStore = useDayPhaseStore();
 const fishingAreaStore = useFishingAreaStore();
@@ -25,6 +29,14 @@ const worldStore = useWorldStore();
 const selectedArea = computed(() => (worldStore.selectedArea?.id ? worldStore.selectedArea : null));
 const pendingArea = ref<any | null>(null);
 const isEntering = ref(false);
+
+watch(
+  () => [props.fogEnabled, authStore.user?.id ?? null] as const,
+  ([enabled, playerId], _, onCleanup) => {
+    if (enabled) onCleanup(countryStore.watchUnlockedCountries(playerId));
+  },
+  { immediate: true },
+);
 
 onMounted(async () => {
   // Khôi phục vị trí đã lưu trước đó rồi đưa bản đồ tới đó ngay
@@ -133,6 +145,7 @@ function zoomTo(k: number) {
           :selected-area-id="selectedArea?.id ?? null"
           :pick-enabled="pickEnabled"
           :anchor="anchor"
+          :unlocked-country-ids="fogEnabled ? countryStore.unlockedWorldMapCountryIds : null"
           @pick="onPick"
           @zoom="onZoom"
           @select-area="onSelectArea"
@@ -164,6 +177,15 @@ function zoomTo(k: number) {
           </template>
         </WorldMap>
       </div>
+      <p v-if="fogEnabled && countryStore.unlockedError" class="text-xs text-red-700" role="alert">
+        {{ countryStore.unlockedError }}
+        <button type="button" class="ml-1 underline cursor-pointer" @click="countryStore.fetchMyUnlockedCountries()">
+          Thử lại
+        </button>
+      </p>
+      <p v-else-if="fogEnabled && countryStore.isLoadingUnlocked" class="text-xs text-[#24352a]" role="status">
+        Đang tải quốc gia đã mở khóa...
+      </p>
       <div class="flex gap-2">
         <button @click="zoomTo(3)" class="border border-gray-300 rounded-md px-3">3x</button>
         <button @click="zoomTo(6)" class="border border-gray-300 rounded-md px-3">6x</button>

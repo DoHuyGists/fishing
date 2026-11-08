@@ -25,7 +25,7 @@ watch(
   },
 );
 
-const unlockedCountries = computed<Country[]>(() => countryStore.countries);
+const unlockedCountries = computed<Country[]>(() => countryStore.unlockedCountries);
 
 const currentBookEntries = computed<DiaryFishEntry[]>(() => {
   if (!selectedCountry.value) return [];

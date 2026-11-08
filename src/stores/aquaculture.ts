@@ -13,6 +13,7 @@ import {
   type PondSwimmer, type FarmFoodOption,
 } from '../data/aquaculture'
 import { createUuid } from '../utils/uuid'
+import { useToast } from '../composables/useToast'
 
 interface PendingAction { action: FarmAction; params: Record<string, unknown>; requestId: string }
 const actions: FarmAction[] = ['purchase_pond_slot', 'stock_aquaculture_batch', 'feed_aquaculture_batch',
@@ -38,9 +39,9 @@ function errorMessage(error: unknown): string {
   const translations: Record<string, string> = {
     'Not enough room in fish storage': 'Kho cá không đủ chỗ. Hãy dọn kho hoặc chọn ít cá hơn.',
     'Maximum of 5 ponds reached': 'Bạn đã sở hữu tối đa 5 ao.',
-    'Insufficient or invalid wallet balance': 'Số dư không đủ hoặc chưa hợp lệ. Hãy kiểm tra lại xu và vỏ sò.',
+    'Insufficient or invalid wallet balance': 'Số dư không đủ hoặc chưa hợp lệ. Hãy kiểm tra lại tiền và vỏ sò.',
     'Catch this species at least once before farming it': 'Hãy câu được loài này ít nhất một lần trước khi nuôi.',
-    'Total fish capacity must be strictly less than pond capacity': 'Ao không đủ chỗ. Tổng điểm cá phải nhỏ hơn sức chứa ao.',
+    'Total fish capacity must be strictly less than pond capacity': 'Ao không đủ chỗ. Tổng sức chứa cá phải nhỏ hơn sức chứa ao.',
     'Every selected fish must belong to you and be ready': 'Một số cá chưa trưởng thành hoặc đã rời ao. Hãy tải lại nông trại.',
     'Not enough food for the batch': 'Không đủ thức ăn trong chồng vật phẩm đã chọn.',
     'Pond care is on cooldown': 'Ao vẫn đang trong thời gian chờ chăm sóc.',
@@ -58,7 +59,7 @@ export const useAquacultureStore = defineStore('AquaculturePlayer', {
     storedFishCount: 0, storageCapacity: 0,
     selectedPondId: '', selectedBatchId: '', selectedFishIds: [] as string[], fishPage: 1,
     loading: false, busy: false, needsRefresh: false,
-    error: '', notice: '', pending: null as PendingAction | null,
+    error: '', pending: null as PendingAction | null,
     now: Date.now(), serverOffset: 0, lastRefreshAt: 0,
   }),
   getters: {
@@ -110,6 +111,11 @@ export const useAquacultureStore = defineStore('AquaculturePlayer', {
     },
   },
   actions: {
+    notifyError(message: string) {
+      if (this.error === message) return
+      this.error = message
+      useToast().error(message, { title: 'Nông trại cá', position: 'bottom', duration: 8000 })
+    },
     resetSession(userId = '') {
       const epoch = this.epoch + 1
       this.$reset(); this.epoch = epoch; this.ownerId = userId
@@ -173,7 +179,10 @@ export const useAquacultureStore = defineStore('AquaculturePlayer', {
         if (!this.pending) this.error = ''
         return true
       } catch (error) {
-        if (this.epoch === epoch) { this.error = errorMessage(error); this.needsRefresh = true }
+        if (this.epoch === epoch) {
+          this.needsRefresh = true
+          if (!duringAction) this.notifyError(errorMessage(error))
+        }
         return false
       } finally {
         if (this.epoch === epoch) { this.loading = false; this.lastRefreshAt = Date.now() }
@@ -189,7 +198,7 @@ export const useAquacultureStore = defineStore('AquaculturePlayer', {
       const request = retry ? this.pending : { action, params, requestId: createUuid() }
       if (!request) return false
       const owner = this.ownerId, epoch = this.epoch
-      this.pending = request; this.busy = true; this.error = ''; this.notice = ''
+      this.pending = request; this.busy = true; this.error = ''
       rememberRequest(owner, request)
       try {
         const result = await repository.execute(request.action, request.params, request.requestId)
@@ -199,25 +208,26 @@ export const useAquacultureStore = defineStore('AquaculturePlayer', {
         if (result.pond_id && request.action === 'purchase_pond_slot') this.selectedPondId = result.pond_id
         if (result.batch_id && request.action === 'stock_aquaculture_batch') this.selectedBatchId = result.batch_id
         this.selectedFishIds = []
-        this.notice = request.action === 'sell_aquaculture_fish'
-          ? `Đã bán cá, nhận ${Number(result.cash_earned ?? 0).toLocaleString('vi-VN')} xu.`
+        const notice = request.action === 'sell_aquaculture_fish'
+          ? `Đã bán cá, nhận ${Number(result.cash_earned ?? 0).toLocaleString('vi-VN')} tiền.`
           : request.action === 'transfer_aquaculture_fish' ? 'Đã chuyển cá vào kho cá của bạn.'
           : request.action === 'release_aquaculture_fish' ? 'Đã thả cá và giải phóng sức chứa ao.'
           : request.action === 'purchase_pond_slot' ? 'Đã mua ao mới với 300 vỏ sò.'
           : request.action === 'stock_aquaculture_batch' ? 'Đã thả lứa cá mới. Cá vẫn lớn khi bạn rời nông trại.'
           : 'Đã chăm sóc, chất lượng lứa cá được tăng thêm.'
+        useToast().success(notice, { title: 'Nông trại cá', position: 'bottom' })
         this.needsRefresh = true
         const refreshed = await this.refresh(true, true)
         if (this.epoch !== epoch) return true
-        if (!refreshed) this.error = 'Thao tác đã thành công. Hãy làm mới để cập nhật dữ liệu.'
+        if (!refreshed) this.notifyError('Thao tác đã thành công. Hãy làm mới để cập nhật dữ liệu.')
         return true
       } catch (error) {
         if (this.epoch === epoch) {
           const uncertain = !(error instanceof AquacultureRpcError) || error.uncertain
           if (!uncertain) { this.pending = null; rememberRequest(owner, null) }
-          this.error = uncertain
+          this.notifyError(uncertain
             ? 'Chưa nhận được kết quả từ máy chủ. Nhấn “Thử lại thao tác” để kiểm tra bằng cùng mã yêu cầu, tránh trừ tiền hai lần.'
-            : errorMessage(error)
+            : errorMessage(error))
         }
         return false
       } finally { if (this.epoch === epoch) this.busy = false }
@@ -226,7 +236,7 @@ export const useAquacultureStore = defineStore('AquaculturePlayer', {
     buyPond() { return this.perform('purchase_pond_slot', {}) },
     stock(speciesId: string, quantity: number, mode: CareMode) {
       if (!Number.isInteger(quantity) || quantity < 1 || quantity > this.maxStock(speciesId)) {
-        this.error = 'Số lượng cá vượt sức chứa còn lại hoặc số xu hiện có.'; return Promise.resolve(false)
+        this.notifyError('Số lượng cá vượt sức chứa còn lại hoặc số dư hiện có.'); return Promise.resolve(false)
       }
       return this.perform('stock_aquaculture_batch', { p_pond_id: this.selectedPondId, p_species_id: speciesId, p_quantity: quantity, p_mode: mode })
     },

@@ -1,5 +1,7 @@
 import { defineStore } from "pinia";
 import { supabaseCountryRepository } from "../data/supabaseCountryRepository";
+import { getWorldMapCountryId } from "../data/worldMapCountries";
+import { useAuthStore } from "./auth";
 
 export interface Country {
   id: string; // uuid
@@ -15,9 +17,16 @@ export const useCountryStore = defineStore("Country", {
     countries: [] as Country[],
     isLoading: false,
     loaded: false,
+    unlockedCountries: [] as Country[],
+    unlockedPlayerId: null as string | null,
+    unlockedRequest: 0,
+    isLoadingUnlocked: false,
+    unlockedError: "",
   }),
   getters: {
-    // for computed
+    unlockedWorldMapCountryIds: (state): string[] => state.unlockedCountries
+      .map((country) => getWorldMapCountryId(country.code))
+      .filter((id): id is string => id !== null),
   },
   actions: {
     async fetchCountries(force = false) {
@@ -32,15 +41,34 @@ export const useCountryStore = defineStore("Country", {
         this.isLoading = false;
       }
     },
-    async fetchMyUnlockedCountries() {
-      this.isLoading = true;
+    async fetchMyUnlockedCountries(playerId = useAuthStore().user?.id ?? null) {
+      const request = ++this.unlockedRequest;
+      if (this.unlockedPlayerId !== playerId || !playerId) this.unlockedCountries = [];
+      this.unlockedPlayerId = playerId;
+      this.unlockedError = "";
+      this.isLoadingUnlocked = Boolean(playerId);
+      if (!playerId) return;
+
+      const isCurrentRequest = () => request === this.unlockedRequest
+        && useAuthStore().user?.id === playerId;
       try {
-        this.countries = await supabaseCountryRepository.fetchMyUnlockedCountries();
+        const countries = await supabaseCountryRepository.fetchMyUnlockedCountries(playerId);
+        if (isCurrentRequest()) this.unlockedCountries = countries;
       } catch (error) {
-        console.error("Failed to fetch unlocked countries:", error);
+        if (isCurrentRequest()) {
+          this.unlockedError = "Không thể tải quốc gia đã mở khóa. Vui lòng thử lại.";
+          console.error("Failed to fetch unlocked countries:", error);
+        }
       } finally {
-        this.isLoading = false;
+        if (isCurrentRequest()) this.isLoadingUnlocked = false;
       }
+    },
+    watchUnlockedCountries(playerId: string | null): () => void {
+      void this.fetchMyUnlockedCountries(playerId);
+      if (!playerId) return () => {};
+      return supabaseCountryRepository.subscribeToUnlockedCountries(playerId, () => {
+        if (useAuthStore().user?.id === playerId) void this.fetchMyUnlockedCountries(playerId);
+      });
     },
   },
 });

@@ -18,7 +18,7 @@ const search = ref("");
 const areaFilter = ref("ALL");
 const speciesFilter = ref("ALL");
 const loadError = ref("");
-const viewMode = ref<"table" | "grouped">("table");
+const viewMode = ref<"table" | "grouped">("grouped");
 const collapsedAreas = ref<Set<string>>(new Set());
 
 const isFormOpen = ref(false);
@@ -368,8 +368,15 @@ onMounted(loadAll);
                 :key="rowKey(row)"
                 class="flex min-w-52 flex-1 items-center gap-3 rounded-lg border border-gray-200 bg-gray-50/60 px-3 py-2.5"
               >
-                <div class="grid size-9 shrink-0 place-items-center rounded-md border border-gray-200 bg-white text-lg">
-                  🐟
+                <div class="grid size-12 shrink-0 place-items-center overflow-hidden rounded-md border border-[#cbd9c6] bg-[#f5f9f0]">
+                  <img
+                    v-if="row.speciesImage"
+                    :src="row.speciesImage"
+                    :alt="row.speciesName || 'Ảnh cá'"
+                    loading="lazy"
+                    class="size-full object-contain p-1"
+                  />
+                  <span v-else class="text-center text-[10px] text-[#24352a]">Chưa có ảnh</span>
                 </div>
                 <div class="min-w-0 flex-1">
                   <div class="truncate text-sm font-bold text-gray-800" :title="row.speciesName || ''">

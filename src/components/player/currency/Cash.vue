@@ -15,16 +15,30 @@ function showInformation() {
 const props = withDefaults(defineProps<{
     size?: number,
     amount?: number | string,
+    interactive?: boolean,
 }>(), {
-    size: 30
+    size: 30,
+    interactive: true,
 })
 
 const fmtPrice = computed(() => props.amount != undefined && props.amount != 0 ? props.amount.toLocaleString("vi-VN") : 0)
+function handleClick(event: MouseEvent) {
+    if (!props.interactive) return
+    event.stopPropagation()
+    showInformation()
+}
 
 </script>
 <template>
-    <button type="button" class="flex gap-2 items-center bg-white rounded-full px-2 cursor-pointer" aria-label="Thông tin về tiền" @click.stop="showInformation">
-        <div v-if="props.amount != undefined">{{ fmtPrice }}</div>
+    <component
+        :is="props.interactive ? 'button' : 'span'"
+        :type="props.interactive ? 'button' : undefined"
+        class="gap-2 items-center bg-white rounded-full px-2"
+        :class="props.interactive ? 'flex cursor-pointer' : 'inline-flex text-[#24352a]'"
+        :aria-label="props.interactive ? 'Thông tin về tiền' : undefined"
+        @click="handleClick"
+    >
+        <span v-if="props.amount != undefined">{{ fmtPrice }}</span>
         <img src="/currency/cash.svg" :width="props.size" alt="Cash" draggable="false">
-    </button>
+    </component>
 </template>

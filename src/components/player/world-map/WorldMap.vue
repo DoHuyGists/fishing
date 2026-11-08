@@ -1,10 +1,11 @@
 <script setup lang="ts">
-import { onBeforeUnmount, onMounted, ref, watch } from "vue";
+import { computed, onBeforeUnmount, onMounted, ref, watch } from "vue";
 import * as d3 from "d3";
 import * as topojson from "topojson-client";
 import type { GeometryCollection, Topology } from "topojson-specification";
 import world from "world-atlas/countries-110m.json";
 import supabase from "../../../database/connection";
+import { createWorldMapCloudTexture } from "../../../utils/worldMapClouds";
 
 interface CountryValueRow {
   country_id: number;
@@ -56,6 +57,7 @@ const props = withDefaults(
     areas?: AreaPoint[]; // các bãi câu hiển thị dưới dạng chấm đỏ
     selectedAreaId?: string | null;
     pickEnabled?: boolean; // bật/tắt chọn vị trí bằng click
+    unlockedCountryIds?: string[] | null; // null = xem toàn bộ bản đồ
   }>(),
   {
     seaColor: "#cfe8f3",
@@ -65,6 +67,7 @@ const props = withDefaults(
     areas: () => [],
     selectedAreaId: null,
     pickEnabled: false,
+    unlockedCountryIds: null,
   },
 );
 
@@ -167,10 +170,14 @@ function onClick(event: MouseEvent) {
 // Dữ liệu bản đồ (tải một lần)
 const topo = world as unknown as Topology<{ countries: GeometryCollection }>;
 const countries = topojson.feature(topo, topo.objects.countries).features;
+const unlockedCountryIds = computed(() => new Set(props.unlockedCountryIds ?? []));
 
 // Trạng thái vẽ (không cần reactive, tránh Vue theo dõi dư thừa)
 const colors = new Map<string, string>(); // id nước ("004", "704"...) -> màu
 let ctx: CanvasRenderingContext2D | null = null;
+let cloudTexture: HTMLCanvasElement | null = null;
+let cloudLayer: HTMLCanvasElement | null = null;
+let cloudLayerDirty = true;
 let path: d3.GeoPath<any, d3.GeoPermissibleObjects> | null = null;
 let width = 0;
 let height = 0;
@@ -194,6 +201,92 @@ let projection: d3.GeoProjection | null = null;
 const relief = new Image();
 relief.src = "/HYP_HR_SR_OB_DR.jpg"; // đặt ảnh trong thư mục public/
 relief.onload = () => draw();
+
+function updateCloudLayer() {
+  if (!cloudLayerDirty || props.unlockedCountryIds === null) return;
+  const size = 2048;
+  const mask = document.createElement("canvas");
+  mask.width = size;
+  mask.height = size / 2;
+  const maskContext = mask.getContext("2d");
+  if (!maskContext) return;
+
+  const cloudProjection = d3.geoEquirectangular().fitSize([size, size / 2], { type: "Sphere" });
+  const maskPath = d3.geoPath(cloudProjection, maskContext);
+  const isUnlocked = (feature: (typeof countries)[number]) => feature.id != null
+    && unlockedCountryIds.value.has(String(feature.id));
+  const locked = countries.filter((feature) => !isUnlocked(feature));
+  const unlocked = countries.filter(isUnlocked);
+
+  // Merge neighboring locked countries visually, with a soft atmospheric edge.
+  maskContext.filter = "blur(5px)";
+  maskContext.fillStyle = "#ffffff";
+  maskContext.beginPath();
+  maskPath({ type: "FeatureCollection", features: locked });
+  maskContext.fill();
+  maskContext.filter = "none";
+
+  cloudTexture ??= createWorldMapCloudTexture();
+  if (cloudTexture) {
+    const texture = cloudTexture.getContext("2d")?.getImageData(0, 0, cloudTexture.width, cloudTexture.height);
+    if (texture) {
+      const coverage = maskContext.getImageData(0, 0, size, size / 2);
+      for (let y = 0; y < mask.height; y++) {
+        for (let x = 0; x < size; x++) {
+          const alpha = (y * size + x) * 4 + 3;
+          const opacity = coverage.data[alpha] / 255;
+          if (opacity === 0 || opacity === 1) continue;
+          // Use the cloud relief to break the contour into uneven, feathered wisps.
+          const sample = ((y % cloudTexture.height) * cloudTexture.width + x % cloudTexture.width) * 4;
+          const edge = ((texture.data[sample] - 190) / 65 - 0.5) * 0.34;
+          coverage.data[alpha] = Math.max(0, Math.min(1, (opacity - 0.2 + edge) * 1.65)) * 255;
+        }
+      }
+      maskContext.putImageData(coverage, 0, 0);
+    }
+  }
+  const cloudCanvas = document.createElement("canvas");
+  cloudCanvas.width = size;
+  cloudCanvas.height = size / 2;
+  const clouds = cloudCanvas.getContext("2d");
+  if (!clouds) return;
+  clouds.fillStyle = (cloudTexture && clouds.createPattern(cloudTexture, "repeat")) ?? "#f4f7f9";
+  clouds.fillRect(0, 0, size, size / 2);
+  clouds.globalCompositeOperation = "destination-in";
+  clouds.drawImage(mask, 0, 0);
+
+  cloudLayer ??= document.createElement("canvas");
+  cloudLayer.width = size;
+  cloudLayer.height = size / 2;
+  const layer = cloudLayer.getContext("2d");
+  if (!layer) return;
+  // A low, diffuse shadow lifts the clouds above the terrain without a dark outline.
+  layer.shadowColor = "rgba(37, 58, 74, 0.20)";
+  layer.shadowBlur = 9;
+  layer.shadowOffsetX = 2;
+  layer.shadowOffsetY = 4;
+  layer.drawImage(cloudCanvas, 0, 0);
+  layer.shadowColor = "transparent";
+  layer.shadowBlur = layer.shadowOffsetX = layer.shadowOffsetY = 0;
+
+  // Feather towards locked territory, then erase exact unlocked polygons, including shadows.
+  // A single path avoids repeated blur/stroke seams between neighboring unlocked countries.
+  const clearPath = d3.geoPath(cloudProjection, layer);
+  layer.globalCompositeOperation = "destination-out";
+  layer.filter = "blur(1.2px)";
+  layer.lineWidth = 1.5;
+  layer.strokeStyle = layer.fillStyle = "#ffffff";
+  layer.beginPath();
+  clearPath({ type: "FeatureCollection", features: unlocked });
+  layer.fill();
+  layer.stroke();
+  layer.filter = "none";
+  layer.beginPath();
+  clearPath({ type: "FeatureCollection", features: unlocked });
+  layer.fill();
+  layer.globalCompositeOperation = "source-over";
+  cloudLayerDirty = false;
+}
 
 function setupCanvas() {
   const canvas = canvasRef.value;
@@ -238,7 +331,7 @@ function draw() {
   ctx.fillStyle = props.seaColor;
   ctx.fill();
 
-  if (projection && relief.complete) {
+  if (projection && relief.complete && relief.naturalWidth > 0) {
     const [x0, y0] = projection([-180, 90])!;
     const [x1, y1] = projection([180, -90])!;
     ctx.imageSmoothingQuality = "high";
@@ -259,6 +352,15 @@ function draw() {
       ctx.globalAlpha = 1;
     }
     ctx.stroke();
+  }
+
+  if (props.unlockedCountryIds !== null && projection) {
+    updateCloudLayer();
+    if (cloudLayer) {
+      const [[x0, y0], [x1, y1]] = path.bounds({ type: "Sphere" });
+      ctx.imageSmoothingQuality = "high";
+      ctx.drawImage(cloudLayer, x0, y0, x1 - x0, y1 - y0);
+    }
   }
 
   ctx.restore();
@@ -343,6 +445,7 @@ onMounted(() => {
 });
 
 onBeforeUnmount(() => {
+  cloudLayer = cloudTexture = null;
   resizeObserver?.disconnect();
   viewport?.removeEventListener("resize", resizeMap);
   if (canvasRef.value) d3.select(canvasRef.value).on(".zoom", null);
@@ -382,6 +485,10 @@ function updateMarkers() {
 }
 
 watch(() => props.areas, updateMarkers, { deep: true });
+watch(() => props.unlockedCountryIds, () => {
+  cloudLayerDirty = true;
+  draw();
+}, { deep: true });
 
 // Đổi màu qua props thì vẽ lại
 watch(() => [props.seaColor, props.landColor, props.borderColor], draw);

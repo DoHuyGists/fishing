@@ -1,17 +1,8 @@
 import { defineStore } from "pinia";
-import { supabaseFishingAreaRepository } from "../data/supabaseFishingAreaRepository";
+import { supabaseFishingAreaRepository, type FishingAreaRow } from "../data/supabaseFishingAreaRepository";
+import { useCountryStore } from "./country";
 
-export interface FishingArea {
-  id: string; // uuid
-  created_at: string; // timestamp with time zone (ISO string)
-  country_id: string; // text
-  is_available: boolean; // boolean
-  title: string | null; // text null
-  location: any | null; // jsonb null (có thể thay bằng type cụ thể nếu bạn có cấu trúc JSON rõ ràng)
-  scene_path: string | null; // text null
-  fishing_boundary: any; // jsonb (mặc định là mảng '[]'::jsonb, có thể định nghĩa kiểu cụ thể như Array<any>)
-  zone_id: string | null; // uuid null
-}
+export type FishingArea = Pick<FishingAreaRow, "id" | "countryId" | "title" | "location" | "scenePath">;
 
 export const useFishingAreaStore = defineStore("fishing_areas", {
   state: () => ({
@@ -20,6 +11,29 @@ export const useFishingAreaStore = defineStore("fishing_areas", {
     loaded: false,
     error: "",
   }),
+  getters: {
+    areasByCountry(state) {
+      const countries = new Map(useCountryStore().countries.map((country) => [country.id, country.name]));
+      const groups = new Map<string, { id: string; name: string; areas: FishingArea[] }>();
+
+      for (const area of state.fishingAreas) {
+        const countryId = countries.has(area.countryId) ? area.countryId : "";
+        let group = groups.get(countryId);
+        if (!group) {
+          group = { id: countryId, name: countries.get(countryId) ?? "Chưa xác định quốc gia", areas: [] };
+          groups.set(countryId, group);
+        }
+        group.areas.push(area);
+      }
+
+      return [...groups.values()]
+        .sort((a, b) => a.name.localeCompare(b.name, "vi"))
+        .map((group) => ({
+          ...group,
+          areas: group.areas.sort((a, b) => (a.title ?? "").localeCompare(b.title ?? "", "vi")),
+        }));
+    },
+  },
   actions: {
     async fetchArea() {
       if (this.loading) return;
