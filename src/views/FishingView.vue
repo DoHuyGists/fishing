@@ -13,8 +13,6 @@ import TensionChallenge from "../components/player/fishing-challenge/TensionChal
 import { useFishingStore } from "../stores/fishing";
 import { useAuthStore } from "../stores/auth";
 import { useEquipmentStore } from "../stores/equipment";
-import Modal from "../components/shared/Modal.vue";
-import { useModalStore } from "../stores/modal";
 import { useUserSettingStore } from "../stores/userSetting";
 import { useFishingBackgroundSoundStore } from "../stores/fishingBackgroundSound";
 
@@ -22,12 +20,12 @@ const authStore = useAuthStore();
 const router = useRouter();
 const fishingStore = useFishingStore();
 const equipmentStore = useEquipmentStore();
-const modalStore = useModalStore();
 const userSettingStore = useUserSettingStore();
 const backgroundSoundStore = useFishingBackgroundSoundStore();
 const { user } = storeToRefs(authStore);
 const { sessionReady, sessionError } = storeToRefs(fishingStore);
 const equipmentCollapsed = ref(true);
+const settingsOpen = ref(false);
 
 function toggleEquipment() {
   equipmentCollapsed.value = !equipmentCollapsed.value;
@@ -87,7 +85,6 @@ onMounted(() => {
 
 onBeforeUnmount(() => {
   backgroundSoundStore.stop();
-  if (modalStore.isOpening("fishing-settings")) modalStore.close();
   fishingStore.resetSession();
   equipmentStore.reset();
   window.removeEventListener("keydown", preventZoomShortcut);
@@ -123,6 +120,14 @@ onBeforeUnmount(() => {
     </button>
   </section>
   <main v-else class="w-full h-screen overflow-hidden touch-none overscroll-none bg-[#193224] text-[#e9f4e8]">
+    <button
+      type="button"
+      class="fixed right-3 top-3 z-20 rounded-lg border border-[#cbd9c6] bg-[#f5f9f0] px-3 py-1.5 text-xs font-bold text-[#24352a] hover:bg-[#e2ecdc]"
+      aria-haspopup="dialog"
+      @click="settingsOpen = true"
+    >
+      Cài đặt
+    </button>
     <div class="grid grid-rows-[minmax(0,1fr)_auto] w-full h-dvh">
       <FishingScene />
       <section class="control-deck p-2" :class="{ 'control-deck--tension': fishingStore.tensionChallenge }">
@@ -136,14 +141,6 @@ onBeforeUnmount(() => {
               @click="toggleEquipment"
             >
               {{ equipmentCollapsed ? "Mở" : "Thu gọn" }}
-            </button>
-            <button
-              type="button"
-              class="ml-auto rounded-lg border border-[#cbd9c6] bg-[#f5f9f0] px-3 py-1.5 text-xs font-bold text-[#24352a] hover:bg-[#e2ecdc]"
-              aria-haspopup="dialog"
-              @click="modalStore.open('fishing-settings')"
-            >
-              Cài đặt
             </button>
           </div>
           <div id="equipment-menu" :class="{ 'equipment-menu-collapsed': equipmentCollapsed }">
@@ -169,11 +166,30 @@ onBeforeUnmount(() => {
     <FishingPlayers />
     <LakeFishGuide />
     <Teleport to="body">
-      <Modal v-if="modalStore.isOpening('fishing-settings')" title="Cài đặt câu cá" :show-count-data="false">
-        <section class="mx-auto max-w-lg rounded-xl border border-[#cbd9c6] bg-[#f5f9f0] p-4 text-[#24352a]">
+      <div
+        v-if="settingsOpen"
+        class="fixed inset-0 z-[31] grid place-items-center bg-[rgba(4,17,11,0.72)] p-5 backdrop-blur-[7px]"
+        @click.self="settingsOpen = false"
+        @keydown.esc.stop="settingsOpen = false"
+      >
+        <section
+          role="dialog"
+          aria-modal="true"
+          aria-labelledby="fishing-settings-title"
+          class="max-h-[85dvh] w-full max-w-lg overflow-y-auto rounded-xl border border-[#cbd9c6] bg-[#f5f9f0] p-4 text-[#24352a]"
+        >
+          <header class="mb-4 flex items-center justify-between gap-4 border-b pb-2">
+            <dib id="fishing-settings-title" class="text-lg font-bold">Cài đặt câu cá</dib>
+            <button
+              type="button"
+              class="flex size-8 shrink-0 items-center justify-center rounded-full border border-[#cbd9c6] text-2xl leading-none hover:bg-[#e2ecdc]"
+              aria-label="Đóng cài đặt"
+              @click="settingsOpen = false"
+            >&times;</button>
+          </header>
           <div class="flex items-center justify-between gap-4">
             <div>
-              <h3 id="fishing-sound-label" class="font-bold">Âm thanh nền</h3>
+              <div id="fishing-sound-label" class="font-bold text-xl">Âm thanh nền</div>
               <p class="mt-1 text-sm">Tiếng chim ngẫu nhiên với khoảng nghỉ giữa các lượt phát.</p>
             </div>
             <button
@@ -199,7 +215,7 @@ onBeforeUnmount(() => {
             </button>
           </div>
         </section>
-      </Modal>
+      </div>
     </Teleport>
   </main>
   <p v-if="!sessionReady && fishingStore.leaveAreaError" role="alert" class="fixed bottom-4 left-4 right-4 z-50 rounded-lg bg-[#f5f9f0] p-3 text-center text-red-700">

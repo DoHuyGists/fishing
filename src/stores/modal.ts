@@ -3,7 +3,6 @@ import { defineStore } from "pinia";
 type ModalName =
     null |
     "account" |
-    "fishing-settings" |
     "market" |
     "diary" |
     "gacha" |

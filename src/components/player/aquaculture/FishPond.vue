@@ -27,7 +27,10 @@ defineProps<{
           <span v-for="(fish, i) in swimmers" :key="fish.id" class="fish absolute block" :class="{ 'special-fish': fish.special }"
             :style="{ '--fish-width': (68 + fish.progress * .4) + 'px', top: (15 + i * 19) + '%', animationDuration: (150 + i * 20) + 's', animationDelay: -(i * 43) + 's' }">
             <img :src="fishImageUrl(fish.image)" alt="" class="fish-image" decoding="async" draggable="false" />
-            <span v-if="fish.special" class="special-sparkle">✦</span>
+            <template v-if="fish.special">
+              <span class="special-sparkle">✦</span>
+              <span class="special-sparkle special-sparkle-small">✧</span>
+            </template>
           </span>
         </div>
         <div class="lily-pad lily-one" aria-hidden="true" /><div class="lily-pad lily-two" aria-hidden="true" />
@@ -64,9 +67,14 @@ defineProps<{
 .swimming-area { container-type: inline-size; }
 .fish { left: 0; width: var(--fish-width); mix-blend-mode: multiply; opacity: .9; animation: swim linear infinite; will-change: transform; }
 .fish-image { display: block; width: 100%; height: auto; pointer-events: none; user-select: none; }
-.special-fish { filter: drop-shadow(0 0 7px #ffe87c); }
-.special-sparkle { position: absolute; right: 25%; top: 8%; color: #ffe45e; font-size: 22px; }
-.motion-paused .fish { animation-play-state: paused; }
+.special-fish { mix-blend-mode: normal; opacity: 1; isolation: isolate; }
+.special-fish::before { content: ''; position: absolute; z-index: -1; inset: -35% -18%; border-radius: 50%; background: radial-gradient(ellipse, #fff7bdcc 0%, #ffdf6e80 32%, #ffe78a00 70%); animation: golden-glow 5s ease-in-out infinite; }
+.special-fish .fish-image { filter: brightness(1.15) saturate(1.15) drop-shadow(0 0 3px #fff6c5) drop-shadow(0 0 9px #ffd45b); }
+.special-sparkle { position: absolute; right: 20%; top: -18%; color: #fffbe6; font-size: 24px; line-height: 1; text-shadow: 0 0 3px #fff, 0 0 8px #ffcf45; animation: golden-sparkle 4s ease-in-out infinite; }
+.special-sparkle-small { right: auto; left: 15%; top: 55%; font-size: 17px; animation-delay: -2s; }
+.motion-paused .fish, .motion-paused .special-fish::before, .motion-paused .special-sparkle { animation-play-state: paused; }
+@keyframes golden-glow { 0%, 100% { opacity: .65; transform: scale(.92); } 50% { opacity: 1; transform: scale(1.08); } }
+@keyframes golden-sparkle { 0%, 100% { opacity: .5; transform: scale(.8) rotate(-10deg); } 50% { opacity: 1; transform: scale(1.15) rotate(10deg); } }
 @keyframes swim { 0% { transform: translateX(0) scaleX(-1); } 49% { transform: translateX(max(0px, calc(100cqw - var(--fish-width)))) scaleX(-1); } 50% { transform: translateX(max(0px, calc(100cqw - var(--fish-width)))) scaleX(1); } 100% { transform: translateX(0) scaleX(1); } }
-@media (prefers-reduced-motion: reduce) { .fish { animation: none; } .fish:nth-child(even) { left: 55%; } }
+@media (prefers-reduced-motion: reduce) { .fish, .special-fish::before, .special-sparkle { animation: none; } .fish:nth-child(even) { left: 55%; } }
 </style>
