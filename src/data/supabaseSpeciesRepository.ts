@@ -8,14 +8,13 @@ export interface SpeciesRow {
   status: string | null;
   name: string;
   image: string | null;
-  "3d": string | null;
   rarity: string | null;
   weight_min: number | null;
   weight_max: number | null;
   base_catch_rate: number | null;
 }
 
-export type SpeciesPayload = Omit<SpeciesRow, "id" | "created_at" | "3d"> & Partial<Pick<SpeciesRow, "3d">>;
+export type SpeciesPayload = Omit<SpeciesRow, "id" | "created_at">;
 
 class SupabaseSpeciesRepository {
   async fetchAll(): Promise<SpeciesRow[]> {

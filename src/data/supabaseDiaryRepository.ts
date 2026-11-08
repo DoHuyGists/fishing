@@ -8,7 +8,6 @@ export interface Species {
   status: string | null;
   name: string;
   image: string | null;
-  "3d"?: string | null;
 }
 
 export interface CaughtDiary {
@@ -23,7 +22,7 @@ class SupabaseDiaryRepository {
    * Fetch all fish species from the `species` table.
    */
   async fetchSpecies(): Promise<Species[]> {
-    const { data, error } = await supabase.from("species").select("id, created_at, information, location, status, name, image, 3d").order("location", { ascending: true }).order("name", { ascending: true });
+    const { data, error } = await supabase.from("species").select("id, created_at, information, location, status, name, image").order("location", { ascending: true }).order("name", { ascending: true });
 
     if (error) {
       console.error("Error fetching species:", error);
@@ -37,7 +36,7 @@ class SupabaseDiaryRepository {
    * Fetch species filtered by location (matches country code or country name).
    */
   async fetchSpeciesByLocation(locationCode: string, locationName?: string): Promise<Species[]> {
-    let query = supabase.from("species").select("id, created_at, information, location, status, name, image, 3d");
+    let query = supabase.from("species").select("id, created_at, information, location, status, name, image");
 
     if (locationName) {
       query = query.or(`location.eq.${locationCode},location.eq.${locationName},location.ilike.%${locationCode}%,location.ilike.%${locationName}%`);

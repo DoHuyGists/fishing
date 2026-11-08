@@ -39,7 +39,6 @@ export type FishingInventoryRow = {
     name: string;
     image: string | null;
     rarity: string | null;
-    "3d": string | null;
   } | null;
 };
 
