@@ -8,6 +8,9 @@ type Credentials = {
   password: string;
 };
 
+let initializationPromise: Promise<void> | null = null;
+let adminStatusRequest = 0;
+
 export const useAuthStore = defineStore("auth", {
   state: () => ({
     session: null as Session | null,
@@ -17,6 +20,7 @@ export const useAuthStore = defineStore("auth", {
     initialized: false,
     error: "",
     isAdmin: false,
+    adminLoading: false,
   }),
   getters: {
     isAuthenticated: (state) => Boolean(state.session),
@@ -29,45 +33,52 @@ export const useAuthStore = defineStore("auth", {
     }
   },
   actions: {
+    applySession(session: Session | null) {
+      if (this.user?.id !== session?.user.id) {
+        adminStatusRequest++;
+        this.profile = null;
+        this.isAdmin = false;
+        this.adminLoading = Boolean(session?.user);
+      }
+      this.session = session;
+      this.user = session?.user ?? null;
+    },
     async initialize() {
       if (this.initialized) return;
+      if (initializationPromise) return initializationPromise;
 
       this.loading = true;
-      
-      // Đăng ký listener TRƯỚC khi gọi getSession hoặc để Supabase tự quản lý
-      supabase.auth.onAuthStateChange(async (_, session) => {
-        
-        const previousUserId = this.user?.id;
-        this.session = session;
-        this.user = session?.user ?? null;
-        
-        if (!session?.user) {
-          this.isAdmin = false;
-          return;
-        }
-        
-        if (previousUserId !== session.user.id) {
-          this.isAdmin = false;
-        }
-        
-        // Gọi loadAdminStatus tại đây là đủ cho mọi trường hợp (khởi động, login, token refresh)
+      supabase.auth.onAuthStateChange((_, session) => {
+        this.applySession(session);
+        if (!this.initialized || !session?.user) return;
 
-        await this.loadAdminStatus(session.user.id);
+        // Run database requests after the auth callback releases its lock.
+        const userId = session.user.id;
+        setTimeout(() => {
+          if (this.user?.id === userId) void this.loadAdminStatus(userId);
+        }, 0);
       });
 
-      // Chỉ cần gọi getSession để ép Supabase trigger event ban đầu (nếu SDK chưa tự chạy)
-      // Hoặc thậm chí để onAuthStateChange tự bắt session hiện tại của trình duyệt.
-      await supabase.auth.getSession();
-      
-      this.loading = false;
-      this.initialized = true;
+      initializationPromise = (async () => {
+        try {
+          const { data, error } = await supabase.auth.getSession();
+          if (error) throw error;
+          this.applySession(data.session);
+          if (this.user) await this.loadAdminStatus(this.user.id);
+        } catch (err) {
+          this.error = err instanceof Error ? err.message : "Không thể tải phiên đăng nhập";
+        } finally {
+          this.loading = false;
+          this.initialized = true;
+        }
+      })();
+      return initializationPromise;
     },
     async signIn({ email, password }: Credentials) {
       this.loading = true;
       this.error = "";
       const { data, error } = await supabase.auth.signInWithPassword({ email, password });
-      this.session = data.session;
-      this.user = data.user;
+      this.applySession(data.session);
       this.error = error?.message ?? "";
       this.isAdmin = false;
       if (!error && data.user) {
@@ -81,25 +92,30 @@ export const useAuthStore = defineStore("auth", {
       this.error = "";
       const { error } = await supabase.auth.signOut();
       if (!error) {
-        this.session = null;
-        this.user = null;
-        this.isAdmin = false;
+        this.applySession(null);
       }
       this.error = error?.message ?? "";
       this.loading = false;
       return !error;
     },
     async loadAdminStatus(userId: string) {
+      if (this.user?.id !== userId) return;
+      const request = ++adminStatusRequest;
+      this.adminLoading = true;
       try {
         const profile = await supabaseUserProfileRepository.fetchUserProfile(userId);
-        if (this.user?.id === userId) {
+        if (this.user?.id === userId && request === adminStatusRequest) {
           this.isAdmin = profile?.is_admin ?? false;
+          this.profile = profile;
         }
-        this.profile = profile;
       } catch (err) {
-        if (this.user?.id === userId) {
+        if (this.user?.id === userId && request === adminStatusRequest) {
           this.isAdmin = false;
           this.error = err instanceof Error ? err.message : "Không thể tải quyền quản trị";
+        }
+      } finally {
+        if (this.user?.id === userId && request === adminStatusRequest) {
+          this.adminLoading = false;
         }
       }
     },
