@@ -14,7 +14,48 @@ export const useAdminSpeciesStore = defineStore("AdminSpecies", {
     species: [] as SpeciesRow[],
     isLoading: false,
     error: "",
+    search: "",
+    statusFilter: "ALL",
+    rarityFilter: "ALL",
+    viewMode: "list" as "list" | "grid" | "grouped",
   }),
+  getters: {
+    statusOptions: (state) =>
+      [...new Set(state.species.map((item) => item.status).filter((value): value is string => Boolean(value)))].sort(),
+    rarityOptions: (state) =>
+      [...new Set(state.species.map((item) => item.rarity).filter((value): value is string => Boolean(value)))].sort(),
+    filteredSpecies: (state): SpeciesRow[] => {
+      const keyword = state.search.trim().toLocaleLowerCase();
+      return state.species.filter((item) => {
+        const matchesSearch =
+          !keyword ||
+          [item.name, item.location, item.status, item.rarity, item.information, item.image].some((value) =>
+            value?.toLocaleLowerCase().includes(keyword),
+          );
+        return matchesSearch &&
+          (state.statusFilter === "ALL" || item.status === state.statusFilter) &&
+          (state.rarityFilter === "ALL" || item.rarity === state.rarityFilter);
+      });
+    },
+    speciesGroups(): { location: string; species: SpeciesRow[] }[] {
+      if (this.viewMode !== "grouped") return [{ location: "", species: this.filteredSpecies }];
+
+      const groups = new Map<string, SpeciesRow[]>();
+      for (const item of this.filteredSpecies) {
+        const location = item.location?.trim() || "";
+        const group = groups.get(location);
+        if (group) group.push(item);
+        else groups.set(location, [item]);
+      }
+      return [...groups.entries()]
+        .sort(([left], [right]) => {
+          if (!left) return 1;
+          if (!right) return -1;
+          return left.localeCompare(right, "vi");
+        })
+        .map(([location, species]) => ({ location, species }));
+    },
+  },
   actions: {
     async fetchAll() {
       this.isLoading = true;

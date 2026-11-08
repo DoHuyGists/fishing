@@ -1,6 +1,7 @@
 <script lang="ts" setup>
 import AdminModal from "../AdminModal.vue";
-import { computed, onMounted, ref } from "vue";
+import { onMounted, ref } from "vue";
+import { storeToRefs } from "pinia";
 import type { SpeciesRow } from "../../../data/supabaseSpeciesRepository";
 import { useAdminSpeciesStore } from "./admin-species-store.ts";
 import SpeciesManagementForm from "./SpeciesManagementForm.vue";
@@ -8,38 +9,17 @@ import SpeciesManagementForm from "./SpeciesManagementForm.vue";
 const emit = defineEmits(["close"]);
 const speciesStore = useAdminSpeciesStore();
 
-const search = ref("");
-const statusFilter = ref("ALL");
-const rarityFilter = ref("ALL");
+const { search, statusFilter, rarityFilter, viewMode, statusOptions, rarityOptions, filteredSpecies, speciesGroups } =
+  storeToRefs(speciesStore);
+const viewModes = [
+  { value: "list", label: "Danh sách" },
+  { value: "grid", label: "Lưới" },
+  { value: "grouped", label: "Theo khu vực" },
+] as const;
 const isFormOpen = ref(false);
 const selectedSpecies = ref<SpeciesRow | null>(null);
 const deletingId = ref<string | null>(null);
 const confirmDeleteId = ref<string | null>(null);
-
-const statusOptions = computed(() =>
-  [
-    ...new Set(speciesStore.species.map((item) => item.status).filter((value): value is string => Boolean(value))),
-  ].sort(),
-);
-const rarityOptions = computed(() =>
-  [
-    ...new Set(speciesStore.species.map((item) => item.rarity).filter((value): value is string => Boolean(value))),
-  ].sort(),
-);
-
-const filteredSpecies = computed(() => {
-  const keyword = search.value.trim().toLocaleLowerCase();
-  return speciesStore.species.filter((item) => {
-    const matchesSearch =
-      !keyword ||
-      [item.name, item.location, item.status, item.rarity, item.information, item.image].some((value) =>
-        value?.toLocaleLowerCase().includes(keyword),
-      );
-    const matchesStatus = statusFilter.value === "ALL" || item.status === statusFilter.value;
-    const matchesRarity = rarityFilter.value === "ALL" || item.rarity === rarityFilter.value;
-    return matchesSearch && matchesStatus && matchesRarity;
-  });
-});
 
 function openCreateForm() {
   selectedSpecies.value = null;
@@ -113,6 +93,19 @@ onMounted(() => speciesStore.fetchAll());
           <option v-for="rarity in rarityOptions" :key="rarity" :value="rarity">{{ rarity }}</option>
         </select>
       </label>
+      <div role="group" aria-label="Chế độ hiển thị" class="flex rounded-lg border border-[#cbd9c6] bg-[#f5f9f0] p-1">
+        <button
+          v-for="mode in viewModes"
+          :key="mode.value"
+          type="button"
+          :aria-pressed="viewMode === mode.value"
+          class="rounded-md px-3 py-1.5 text-xs font-semibold transition-colors focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-emerald-700"
+          :class="viewMode === mode.value ? 'bg-white text-[#24352a] shadow-sm' : 'text-gray-600 hover:bg-white/60'"
+          @click="viewMode = mode.value"
+        >
+          {{ mode.label }}
+        </button>
+      </div>
       <div class="ml-auto flex items-center gap-2">
         <span class="hidden text-xs text-gray-500 sm:inline">{{ filteredSpecies.length }} kết quả</span>
         <button
@@ -168,7 +161,7 @@ onMounted(() => speciesStore.fetchAll());
             {{ speciesStore.species.length ? "Không tìm thấy loài cá phù hợp." : "Chưa có loài cá nào." }}
           </div>
         </div>
-        <div v-else class="min-h-0 flex-1 overflow-auto rounded-lg border border-gray-200 bg-white shadow-sm">
+        <div v-else-if="viewMode === 'list'" class="min-h-0 flex-1 overflow-auto rounded-lg border border-gray-200 bg-white shadow-sm">
           <table class="w-full min-w-[1050px] border-collapse text-left text-sm">
             <thead class="text-[11px] uppercase text-gray-600">
               <tr>
@@ -246,6 +239,49 @@ onMounted(() => speciesStore.fetchAll());
               </tr>
             </tbody>
           </table>
+        </div>
+        <div v-else class="min-h-0 flex-1 space-y-5 overflow-auto">
+          <section v-for="group in speciesGroups" :key="group.location" class="space-y-3">
+            <h3
+              v-if="viewMode === 'grouped'"
+              class="m-0 flex items-center gap-2 rounded-lg border border-[#cbd9c6] bg-[#f5f9f0] px-4 py-3 text-sm font-bold text-[#24352a]"
+            >
+              <span class="min-w-0 break-words">{{ group.location || "Chưa có khu vực" }}</span>
+              <span class="shrink-0 text-xs font-normal">({{ group.species.length }} loài)</span>
+            </h3>
+            <div class="grid grid-cols-[repeat(auto-fit,minmax(min(100%,18rem),1fr))] gap-4">
+              <article
+                v-for="item in group.species"
+                :key="item.id"
+                class="flex min-w-0 flex-col overflow-hidden rounded-lg border border-[#cbd9c6] bg-white shadow-sm"
+              >
+                <div class="grid h-40 place-items-center bg-[#f5f9f0]">
+                  <img v-if="item.image" :src="item.image" :alt="item.name" loading="lazy" class="h-full w-full object-contain p-3" />
+                  <span v-else class="text-5xl" role="img" aria-label="Chưa có hình ảnh">🐟</span>
+                </div>
+                <div class="flex flex-1 flex-col gap-3 p-4">
+                  <div>
+                    <h4 class="m-0 break-words text-sm font-bold text-[#24352a]">{{ item.name }}</h4>
+                    <p class="m-0 mt-1 line-clamp-2 text-xs text-gray-500" :title="item.information || ''">
+                      {{ item.information || "Chưa có mô tả" }}
+                    </p>
+                  </div>
+                  <dl class="m-0 grid grid-cols-2 gap-3 text-xs">
+                    <div class="min-w-0"><dt class="text-gray-500">Khu vực</dt><dd class="m-0 mt-1 break-words text-[#24352a]">{{ item.location || "—" }}</dd></div>
+                    <div class="min-w-0"><dt class="text-gray-500">Độ hiếm</dt><dd class="m-0 mt-1 break-words text-[#24352a]">{{ item.rarity || "—" }}</dd></div>
+                    <div><dt class="text-gray-500">Khối lượng</dt><dd class="m-0 mt-1 text-[#24352a]">{{ item.weight_min ?? "—" }} – {{ item.weight_max ?? "—" }}</dd></div>
+                    <div><dt class="text-gray-500">Tỉ lệ bắt</dt><dd class="m-0 mt-1 text-[#24352a]">{{ item.base_catch_rate ?? "—" }}</dd></div>
+                    <div class="min-w-0"><dt class="text-gray-500">Trạng thái</dt><dd class="m-0 mt-1 break-words text-emerald-800">{{ item.status || "—" }}</dd></div>
+                    <div><dt class="text-gray-500">Ngày tạo</dt><dd class="m-0 mt-1 text-[#24352a]">{{ formatDate(item.created_at) }}</dd></div>
+                  </dl>
+                  <div class="mt-auto flex justify-end gap-2 border-t border-[#cbd9c6] pt-3">
+                    <button type="button" :aria-label="`Sửa ${item.name}`" class="rounded-md border border-[#cbd9c6] px-2.5 py-1.5 text-xs font-bold text-[#24352a] hover:bg-[#f5f9f0]" @click="openEditForm(item)">Sửa</button>
+                    <button type="button" :aria-label="`Xoá ${item.name}`" class="rounded-md border border-red-200 px-2.5 py-1.5 text-xs font-bold text-red-700 hover:bg-red-50" @click="confirmDeleteId = item.id">Xoá</button>
+                  </div>
+                </div>
+              </article>
+            </div>
+          </section>
         </div>
       </section>
 
