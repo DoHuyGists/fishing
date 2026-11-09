@@ -2,6 +2,7 @@
 import { reactive, ref } from "vue";
 import { useRouter } from "vue-router";
 import supabase from "../database/connection";
+import { useAuthStore } from "../stores/auth";
 
 const router = useRouter();
 const form = reactive({ email: "", password: "", confirmPassword: "" });
@@ -9,6 +10,14 @@ const showPassword = ref(false);
 const loading = ref(false);
 const errorMessage = ref("");
 const confirmationSent = ref(false);
+const resent = ref(false);
+async function resend() {
+  if (loading.value) return;
+  loading.value = true; errorMessage.value = "";
+  try { await useAuthStore().resendConfirmation(form.email); resent.value = true; }
+  catch (err) { errorMessage.value = err instanceof Error ? err.message : "Không thể gửi lại email."; }
+  finally { loading.value = false; }
+}
 
 async function submit() {
   errorMessage.value = "";
@@ -52,6 +61,9 @@ async function submit() {
       <h1 id="signup-title" class="font-serif text-[34px] leading-tight">Tạo tài khoản</h1>
 
       <div v-if="confirmationSent" class="leading-relaxed text-[#61716d]" role="status">
+        <button type="button" :disabled="loading" class="my-3 text-sm underline" @click="resend">{{ loading ? 'Đang gửi…' : 'Gửi lại email xác nhận' }}</button>
+        <p v-if="resent">Đã gửi lại email xác nhận.</p>
+        <p v-if="errorMessage" role="alert" class="text-red-700">{{ errorMessage }}</p>
         <h2 class="mb-2 font-serif text-[22px] text-[#18312d]">Kiểm tra email của bạn</h2>
         <p class="mb-[18px]">Chúng tôi đã gửi liên kết xác nhận đến <strong class="text-[#18312d]">{{ form.email }}</strong>. Hãy xác nhận địa chỉ email để hoàn tất đăng ký.</p>
         <RouterLink class="font-bold text-[#346457] underline decoration-transparent underline-offset-4 transition hover:decoration-current" to="/login">Quay lại đăng nhập</RouterLink>

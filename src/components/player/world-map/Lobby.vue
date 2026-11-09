@@ -17,6 +17,8 @@ import SkillPoints from "../currency/SkillPoints.vue";
 import TeamMembersSticky from "../team/TeamMembersSticky.vue";
 import PrepareModal from "./PrepareModal.vue";
 import Fishingfightdemo from "../fishing-challenge/TensionChallenge.vue";
+import GuideTour from "../../shared/GuideTour.vue";
+import { useOnboardingStore } from "../../../stores/onboarding";
 
 const InteractWorldMap2 = defineAsyncComponent(() => import("./InteractWorldMap.vue"));
 const AccountInfoModal = defineAsyncComponent(() => import("../account/AccountInfoModal.vue"));
@@ -52,8 +54,19 @@ const userTurnsStore = useUserTurnsStore();
 const teamStore = useTeamStore();
 const currencyStore = useCurrencyStore();
 const userProfileStore = useUserProfileStore();
+const onboarding = useOnboardingStore();
+const firstPlaySteps = [
+  { target: '#first-play-account', title: 'Chào mừng bạn đến với hồ câu', description: 'Trong Tài khoản, chọn tên, ảnh đại diện và quốc gia để bắt đầu hành trình.' },
+  { target: '#first-play-inventory', title: 'Chuẩn bị trang bị', description: 'Mở Túi đồ và chọn đủ cần, dây, máy, lưỡi, mồi trong một set. Vào Cửa hàng nếu còn thiếu.' },
+  { target: '#first-play-map', title: 'Chọn bãi câu', description: 'Mở một quốc gia trên bản đồ, chọn bãi câu rồi kiểm tra trang bị trước khi vào.' },
+  { target: '#first-play-map', title: 'Thả câu và kéo cá', description: 'Ở bãi câu, chỉnh độ sâu, thả cần và chờ cá cắn. Làm theo hướng dẫn thử thách để kéo cá lên.' },
+  { target: '#first-play-storage', title: 'Giữ lại thành quả', description: 'Khi về sảnh, mở Lưới cá và chuyển cá muốn giữ vào Kho cá. Cá còn trong lưới sẽ được thả khi bạn chọn Kết thúc.' },
+  { target: '#first-play-market', title: 'Bán cá và tiếp tục khám phá', description: 'Trong Kho cá, bạn có thể bán cá hoặc đăng lên Chợ cá. Tiền kiếm được dùng mua trang bị và nguyên liệu tốt hơn.' },
+];
+watch(() => [authStore.user?.id, userProfileStore.profile?.onboarding_completed, modalStore.isModalOpening], () => {
+  if (authStore.user?.id && !modalStore.isModalOpening) onboarding.offer(authStore.user.id);
+}, { immediate: true });
 
-const hasNewNotification = ref(false);
 
 const MAP_VISIBLE_STORAGE_KEY = "worldMap2Visible";
 const isMapVisible = ref(localStorage.getItem(MAP_VISIBLE_STORAGE_KEY) !== "false");
@@ -66,7 +79,6 @@ onMounted(() => {
     void teamStore.loadData(authStore.userId);
     teamStore.subscribeRealtime(authStore.userId);
     notificationStore.subscribeToNewNotifications(authStore.userId, () => {
-      hasNewNotification.value = true;
     });
   }
 });
@@ -89,6 +101,7 @@ onUnmounted(() => {
       class="flex flex-wrap items-center justify-between gap-3 rounded-xl border border-[#cbd9c6] bg-[#f5f9f0] px-4 py-2.5 text-[#24352a]"
     >
       <span class="font-bold">Bản đồ thế giới</span>
+      <button type="button" class="rounded-lg border border-[#cbd9c6] px-3 py-1 text-xs" @click="onboarding.visible = true">Hướng dẫn chơi</button>
       <div class="flex flex-wrap items-center justify-end gap-2">
         <Cash :amount="currencyStore.formattedCash" />
         <Shells :amount="currencyStore.formattedShells" />
@@ -99,7 +112,7 @@ onUnmounted(() => {
 
     <main class="grid flex-1 grid-cols-1 gap-2 md:grid-cols-2">
       <!-- Khung Bản đồ trung tâm -->
-      <div class="">
+      <div id="first-play-map" class="">
         <button
           type="button"
           class="mb-2 px-3 py-1.5 rounded-xl border border-[#cbd9c6] bg-[#f5f9f0] text-[#24352a] font-bold text-xs cursor-pointer"
@@ -120,6 +133,7 @@ onUnmounted(() => {
             <button
               type="button"
               class="flex items-center gap-1.5 px-3 py-1.5 rounded-xl border border-[#cbd9c6] bg-[#f5f9f0] text-[#24352a] shadow-sm font-bold text-xs cursor-pointer transition-colors hover:border-[#70a77e] hover:bg-[#eaf5e8]"
+              id="first-play-account"
               @click="modalStore.open('account')"
             >
               <span class="text-sm">⚙️</span>
@@ -130,6 +144,7 @@ onUnmounted(() => {
               type="button"
               class="flex items-center gap-1.5 px-3 py-1.5 rounded-xl border border-[#cbd9c6] bg-[#f5f9f0] text-[#24352a] shadow-sm font-bold text-xs cursor-pointer transition-colors hover:border-[#70a77e] hover:bg-[#eaf5e8]"
               :disabled="!configStore.isUnlocked('market')"
+              id="first-play-market"
               @click="modalStore.open('market')"
             >
               <span class="text-sm">🏪</span>
@@ -180,6 +195,7 @@ onUnmounted(() => {
             <button
               type="button"
               class="flex items-center gap-1.5 px-3 py-1.5 rounded-xl border border-[#cbd9c6] bg-[#f5f9f0] text-[#24352a] shadow-sm font-bold text-xs cursor-pointer transition-colors hover:border-[#70a77e] hover:bg-[#eaf5e8]"
+              id="first-play-inventory"
               @click="modalStore.open('inventory')"
             >
               <span class="text-sm">📦</span>
@@ -244,6 +260,7 @@ onUnmounted(() => {
             <button
               type="button"
               class="flex items-center gap-1.5 px-3 py-1.5 rounded-xl border border-[#cbd9c6] bg-[#f5f9f0] text-[#24352a] shadow-sm font-bold text-xs cursor-pointer transition-colors hover:border-[#70a77e] hover:bg-[#eaf5e8]"
+              id="first-play-storage"
               @click="modalStore.open('caught')"
             >
               <span class="text-sm" aria-hidden="true">🐟</span>
@@ -288,13 +305,12 @@ onUnmounted(() => {
               type="button"
               class="flex items-center gap-1.5 px-3 py-1.5 rounded-xl border border-[#cbd9c6] bg-[#f5f9f0] text-[#24352a] shadow-sm font-bold text-xs cursor-pointer transition-colors hover:border-[#70a77e] hover:bg-[#eaf5e8]"
               @click="
-                hasNewNotification = false;
                 modalStore.open('notifications');
               "
             >
               <span class="text-sm" aria-hidden="true">🔔</span>
               <span>Thông báo</span>
-              <span v-if="hasNewNotification" class="size-2 rounded-full bg-red-500" aria-label="Có thông báo mới"></span>
+              <span v-if="notificationStore.unreadCount" class="rounded-full bg-red-600 px-1.5 text-[10px] text-white" :aria-label="`${notificationStore.unreadCount} thông báo chưa đọc`">{{ notificationStore.unreadCount }}</span>
             </button>
   
             <button
@@ -406,6 +422,8 @@ onUnmounted(() => {
       </div>
     </main>
 
+    <p v-if="onboarding.error" role="alert" class="text-sm text-red-700">{{ onboarding.error }} <button class="underline" @click="onboarding.finish()">Lưu lại</button></p>
+    <GuideTour v-if="onboarding.visible && !modalStore.isModalOpening" :steps="firstPlaySteps" @finish="onboarding.finish()" />
     <Teleport to="body">
       <Transition
         enter-active-class="transition-opacity duration-200 ease-out"

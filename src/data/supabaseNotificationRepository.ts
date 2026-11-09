@@ -114,7 +114,7 @@ class SupabaseNotificationRepository {
         { event: "*", schema: "public", table: "system_notification_reads", filter: `user_id=eq.${userId}` },
         onChange,
       )
-      .subscribe();
+      .subscribe(status => { if (status === "SUBSCRIBED") onChange(); });
   }
 
   subscribeToNewNotifications(userId: string, onNewNotification: () => void): RealtimeChannel {

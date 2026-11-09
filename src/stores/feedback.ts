@@ -1,13 +1,45 @@
 import { defineStore } from "pinia";
 import supabase from "../database/connection";
-import { supabaseFeedbackRepository } from "../data/supabaseFeedbackRepository";
+import { supabaseFeedbackRepository, type ErrorFeedbackRow } from "../data/supabaseFeedbackRepository";
+let myErrorsChannel: ReturnType<typeof supabaseFeedbackRepository.subscribeMyErrors> | null = null;
 
 export const useFeedbackStore = defineStore("feedback", {
   state: () => ({
     submitting: false,
     error: "",
+    myErrors: [] as ErrorFeedbackRow[],
+    historyLoading: false,
+    historyError: "",
+    page: 1,
+    hasNext: false,
+    historyRequest: 0,
+    watchingUserId: "",
   }),
   actions: {
+    async loadMyErrors(userId: string, page?: number) {
+      page ??= this.page;
+      const request = ++this.historyRequest;
+      this.historyLoading = true; this.historyError = "";
+      try {
+        const rows = await supabaseFeedbackRepository.fetchMyErrors(userId, page);
+        if (request !== this.historyRequest) return;
+        this.myErrors = rows.slice(0, 20); this.hasNext = rows.length > 20; this.page = page;
+      } catch (err) { if (request === this.historyRequest) this.historyError = err instanceof Error ? err.message : "Không thể tải báo lỗi."; }
+      finally { if (request === this.historyRequest) this.historyLoading = false; }
+    },
+    watchMyErrors(userId: string) {
+      this.stopWatchingErrors();
+      this.watchingUserId = userId;
+      this.myErrors = []; this.page = 1;
+      void this.loadMyErrors(userId, 1);
+      myErrorsChannel = supabaseFeedbackRepository.subscribeMyErrors(userId, () => { if (this.watchingUserId === userId) void this.loadMyErrors(userId); });
+    },
+    stopWatchingErrors() {
+      this.watchingUserId = "";
+      ++this.historyRequest;
+      if (myErrorsChannel) void supabaseFeedbackRepository.unsubscribe(myErrorsChannel);
+      myErrorsChannel = null;
+    },
     async submitOpinion(payload: { like: string; dislike: string; contribute: string }) {
       return this.submit(async (userId) => supabaseFeedbackRepository.createOpinionFeedback({
         userId,

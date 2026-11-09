@@ -65,6 +65,7 @@ watch(() => authStore.userId, load, { immediate: true });
                       ]"
                     >
                       <span class="text-3xl" :aria-label="`Hạng ${entry.rank}`" role="img">{{ rankLabel(entry.rank) }}</span>
+                      <img v-if="entry.avatarUrl" :src="entry.avatarUrl" alt="Ảnh đại diện" class="mx-auto mt-2 h-10 w-10 rounded-full object-cover" referrerpolicy="no-referrer" />
                       <p class="mb-1 mt-3 truncate text-xs font-bold sm:text-sm" :title="entry.displayName">{{ entry.displayName }}</p>
                       <span v-if="entry.userId && entry.userId === authStore.userId" class="text-xs font-semibold text-emerald-700">Bạn · </span>
                       <p class="m-0 break-words text-base font-extrabold tabular-nums sm:text-xl">{{ numberFormatter.format(entry.value) }}</p>
@@ -85,6 +86,7 @@ watch(() => authStore.userId, load, { immediate: true });
                         :class="entry.userId && entry.userId === authStore.userId ? 'bg-emerald-50 ring-2 ring-inset ring-emerald-600' : 'bg-white'"
                       >
                         <span class="w-8 shrink-0 text-center text-sm font-bold text-[#52654f]">#{{ entry.rank }}</span>
+                        <img v-if="entry.avatarUrl" :src="entry.avatarUrl" alt="" class="h-8 w-8 rounded-full object-cover" referrerpolicy="no-referrer" />
                         <span class="min-w-0 flex-1 truncate text-sm font-semibold" :title="entry.displayName">{{ entry.displayName }}</span>
                         <span v-if="entry.userId && entry.userId === authStore.userId" class="rounded-full bg-emerald-100 px-2 py-0.5 text-xs font-bold text-emerald-800">Bạn</span>
                         <span class="shrink-0 text-right text-sm font-bold tabular-nums">

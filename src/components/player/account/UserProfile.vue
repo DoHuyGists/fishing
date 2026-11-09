@@ -1,5 +1,5 @@
 <script lang="ts" setup>
-import { computed, onMounted, ref } from "vue";
+import { computed, onMounted, onUnmounted, ref } from "vue";
 import { useAuthStore } from "../../../stores/auth.ts";
 import { useCurrencyStore } from "../../../stores/currency.ts";
 import { useUserProfileStore } from "../../../stores/userProfile.ts";
@@ -21,11 +21,44 @@ const isCountryDropdownOpen = ref(false);
 const showCountryConfirm = ref(false);
 const isUpdatingCountry = ref(false);
 const countryError = ref("");
+const now = ref(Date.now());
+const clock = window.setInterval(() => { now.value = Date.now(); }, 60_000);
+onUnmounted(() => window.clearInterval(clock));
+const displayName = ref(userProfileStore.profile?.display_name ?? "");
+const avatarUrl = ref(userProfileStore.profile?.avatar_url ?? "");
+const avatarFile = ref<File>();
+const identityBusy = ref(false);
+const identityError = ref("");
+const identitySaved = ref(false);
+const currentPassword = ref("");
+const newPassword = ref("");
+const confirmPassword = ref("");
+const passwordError = ref("");
+const passwordSaved = ref(false);
+async function saveIdentity() {
+  identityBusy.value = true; identityError.value = ""; identitySaved.value = false;
+  try {
+    await userProfileStore.updateIdentity(displayName.value, avatarUrl.value.trim() || null, avatarFile.value);
+    avatarUrl.value = userProfileStore.profile?.avatar_url ?? "";
+    avatarFile.value = undefined;
+    identitySaved.value = true;
+  } catch (err) { identityError.value = err instanceof Error ? err.message : "Không thể lưu hồ sơ."; }
+  finally { identityBusy.value = false; }
+}
+async function changePassword() {
+  passwordError.value = ""; passwordSaved.value = false;
+  try {
+    if (!currentPassword.value) throw new Error("Vui lòng nhập mật khẩu hiện tại.");
+    await authStore.updatePassword(newPassword.value, confirmPassword.value, currentPassword.value);
+    currentPassword.value = newPassword.value = confirmPassword.value = "";
+    passwordSaved.value = true;
+  } catch (err) { passwordError.value = err instanceof Error ? err.message : "Không thể đổi mật khẩu."; }
+}
 
 const countryCooldownDaysRemaining = computed(() => {
   const cooldown = userProfileStore.profile?.update_country_cooldown;
   if (!cooldown) return 0;
-  const remainingMs = new Date(cooldown).getTime() - Date.now();
+  const remainingMs = new Date(cooldown).getTime() - now.value;
   return Number.isFinite(remainingMs) && remainingMs > 0 ? Math.ceil(remainingMs / (24 * 60 * 60 * 1000)) : 0;
 });
 const canChangeCountry = computed(
@@ -109,11 +142,12 @@ const userInitial = computed(() => {
       <div
         class="w-14 h-14 rounded-full bg-emerald-600 text-white flex items-center justify-center text-xl font-black shadow-md shrink-0"
       >
-        {{ userInitial }}
+        <img v-if="userProfileStore.profile?.avatar_url" :src="userProfileStore.profile.avatar_url" alt="Ảnh đại diện" class="h-full w-full rounded-full object-cover" referrerpolicy="no-referrer" />
+        <span v-else>{{ userInitial }}</span>
       </div>
       <div class="flex flex-col min-w-0 flex-1">
         <span class="font-bold text-sm text-[#263238] truncate" :title="authStore.user?.email || ''">
-          {{ authStore.user?.email || "Chưa cập nhật email" }}
+          {{ userProfileStore.profile?.display_name || authStore.user?.email || "Chưa cập nhật email" }}
         </span>
         <div class="flex flex-wrap items-center gap-2 mt-1.5">
           <span
@@ -257,7 +291,7 @@ const userInitial = computed(() => {
         v-if="showCountryConfirm"
         title="Xác nhận quốc gia"
         message="Sau khi đổi, bạn sẽ nhận được một chìa khóa mở khu vực câu."
-        :sub-text="`Sau khi cập nhật quốc gia, bạn cần chờ ${userProfileStore.profile?.country_id ? countryCooldownDaysRemaining : 365} ngày để có thể đổi.`"
+        sub-text="Sau khi cập nhật quốc gia, bạn cần chờ 365 ngày để có thể đổi tiếp."
         first-text="Hủy"
         :second-text="isUpdatingCountry ? 'Đang cập nhật...' : 'Xác nhận'"
         :on-first="
@@ -272,6 +306,25 @@ const userInitial = computed(() => {
       />
     </Teleport>
 
+    <form class="space-y-3 rounded-xl border border-[#cbd9c6] bg-[#f5f9f0] p-4 text-sm" @submit.prevent="saveIdentity">
+      <h3 class="font-bold">Tên và ảnh đại diện</h3>
+      <label class="block">Tên hiển thị<input v-model.trim="displayName" required minlength="2" maxlength="40" class="mt-1 w-full rounded border border-[#cbd9c6] bg-white p-2" /></label>
+      <label class="block">Đường dẫn ảnh đại diện (HTTPS)<input v-model.trim="avatarUrl" type="url" placeholder="https://…" class="mt-1 w-full rounded border border-[#cbd9c6] bg-white p-2" /></label>
+      <label class="block">Hoặc tải ảnh từ thiết bị (JPG, PNG, WebP · tối đa 2 MB)<input type="file" accept="image/jpeg,image/png,image/webp" class="mt-1 block w-full" @change="avatarFile = ($event.target as HTMLInputElement).files?.[0]" /></label>
+      <p class="text-xs text-gray-600">Ảnh tải từ thiết bị được ưu tiên. Để trống đường dẫn và không chọn file để dùng chữ cái đại diện.</p>
+      <p v-if="identityError" role="alert" class="text-red-700">{{ identityError }}</p>
+      <p v-if="identitySaved" role="status">Đã lưu hồ sơ.</p>
+      <button :disabled="identityBusy" class="rounded bg-[#24352a] px-4 py-2 text-white disabled:opacity-50">{{ identityBusy ? 'Đang lưu…' : 'Lưu hồ sơ' }}</button>
+    </form>
+    <form class="space-y-3 rounded-xl border border-[#cbd9c6] p-4 text-sm" @submit.prevent="changePassword">
+      <h3 class="font-bold">Đổi mật khẩu</h3>
+      <label class="block">Mật khẩu hiện tại<input v-model="currentPassword" required type="password" autocomplete="current-password" class="mt-1 w-full rounded border border-[#cbd9c6] p-2" /></label>
+      <label class="block">Mật khẩu mới<input v-model="newPassword" required minlength="8" type="password" autocomplete="new-password" class="mt-1 w-full rounded border border-[#cbd9c6] p-2" /></label>
+      <label class="block">Xác nhận mật khẩu mới<input v-model="confirmPassword" required minlength="8" type="password" autocomplete="new-password" class="mt-1 w-full rounded border border-[#cbd9c6] p-2" /></label>
+      <p v-if="passwordError" role="alert" class="text-red-700">{{ passwordError }}</p>
+      <p v-if="passwordSaved" role="status">Đã đổi mật khẩu.</p>
+      <button :disabled="authStore.passwordBusy" class="rounded bg-[#24352a] px-4 py-2 text-white disabled:opacity-50">{{ authStore.passwordBusy ? 'Đang lưu…' : 'Đổi mật khẩu' }}</button>
+    </form>
     <div class="flex items-end">
       <button
         type="button"

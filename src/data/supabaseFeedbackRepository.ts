@@ -43,6 +43,18 @@ export interface ErrorFeedbackRow {
 }
 
 class SupabaseFeedbackRepository {
+  async fetchMyErrors(userId: string, page: number): Promise<ErrorFeedbackRow[]> {
+    const { data, error } = await supabase.from("error_feedback").select("*").eq("user_id", userId)
+      .order("created_at", { ascending: false }).order("id").range((page - 1) * 20, page * 20);
+    if (error) throw new Error(error.message);
+    return (data ?? []) as ErrorFeedbackRow[];
+  }
+  subscribeMyErrors(userId: string, onChange: () => void) {
+    return supabase.channel(`my-errors:${userId}`).on("postgres_changes",
+      { event: "*", schema: "public", table: "error_feedback", filter: `user_id=eq.${userId}` }, onChange)
+      .subscribe(status => { if (status === "SUBSCRIBED") onChange(); });
+  }
+  async unsubscribe(channel: ReturnType<typeof supabase.channel>) { await supabase.removeChannel(channel); }
   async fetchOpinionFeedback(): Promise<OpinionFeedbackRow[]> {
     const { data, error } = await supabase.from("feedback").select("*").order("created_at", { ascending: false });
     if (error) throw new Error(error.message);

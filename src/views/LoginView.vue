@@ -38,6 +38,7 @@ async function submit() {
         </button>
       </form>
 
+      <RouterLink to="/forgot-password" class="mt-4 block text-center text-sm text-[#346457] underline">Quên mật khẩu?</RouterLink>
       <p class="mt-6 text-center text-sm text-[#61716d]">Chưa có tài khoản?
         <RouterLink class="font-bold text-[#346457] underline decoration-transparent underline-offset-4 transition hover:decoration-current" to="/signup">Đăng ký</RouterLink>
       </p>

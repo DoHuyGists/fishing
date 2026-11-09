@@ -1,5 +1,5 @@
 <script lang="ts" setup>
-import { computed, onMounted, ref } from "vue";
+import { computed, onMounted, onUnmounted, ref } from "vue";
 import { useCurrencyStore } from "../../../stores/currency.ts";
 import { supabaseMarketRepository, type MarketListing } from "../../../data/supabaseMarketRepository.ts";
 import { useAuthStore } from "../../../stores/auth.ts";
@@ -11,7 +11,7 @@ import { useToast } from "../../../composables/useToast.ts";
 
 const authStore = useAuthStore();
 const currencyStore = useCurrencyStore();
-const activeMarketTab = ref<"all" | "my">("all");
+const activeMarketTab = ref<"all" | "my" | "history">("all");
 const viewMode = ref<"list" | "grid" | "species">("grid");
 const toast = useToast();
 const marketSearch = ref("");
@@ -143,13 +143,29 @@ function getRarityBadgeClass(rarity: string | null | undefined) {
 }
 
 onMounted(() => {
+  marketStore.startRealtime(authStore.userId);
+  void marketStore.loadHistory(authStore.userId, 1);
   marketStore.loadMarketListings();
 });
+onUnmounted(() => marketStore.stopRealtime());
 </script>
 
 <template>
-  <Modal title="Chợ cá" :on-refresh="marketStore.loadMarketListings">
-    <div class="w-full h-full bg-white flex flex-col overflow-hidden relative">
+  <Modal title="Chợ cá" :on-refresh="() => { marketStore.loadMarketListings(); marketStore.loadHistory(authStore.userId); }">
+    <div v-if="marketStore.error" role="alert" class="mb-3 rounded bg-red-50 p-3 text-red-700">{{ marketStore.error }}</div>
+    <button type="button" class="mb-3 rounded-lg border border-[#cbd9c6] bg-[#f5f9f0] px-4 py-2 text-sm" @click="activeMarketTab = activeMarketTab === 'history' ? 'all' : 'history'; marketStore.loadHistory(authStore.userId)">{{ activeMarketTab === 'history' ? 'Quay lại chợ' : 'Lịch sử mua bán' }}</button>
+    <section v-if="activeMarketTab === 'history'" class="space-y-3 text-[#24352a]">
+      <h3 class="font-bold">Lịch sử mua bán của bạn</h3>
+      <p v-if="marketStore.historyError" role="alert" class="text-red-700">{{ marketStore.historyError }} <button class="underline" @click="marketStore.loadHistory(authStore.userId)">Thử lại</button></p>
+      <p v-if="marketStore.historyLoading">Đang tải lịch sử…</p>
+      <p v-else-if="!marketStore.history.length && !marketStore.historyError">Chưa có giao dịch mua bán.</p>
+      <article v-for="entry in marketStore.history" :key="entry.id" class="flex flex-wrap items-center justify-between gap-3 rounded-lg border border-[#cbd9c6] bg-[#f5f9f0] p-3 text-sm">
+        <div><b>{{ entry.buyer_id === authStore.userId ? 'Đã mua' : 'Đã bán' }}</b> · {{ entry.item.name || (entry.item.species as any)?.name || (entry.item.fish as any)?.name || 'Cá' }}<p class="text-xs text-gray-600">{{ formatDate(entry.created_at) }} · #{{ entry.id.slice(0, 8) }}</p></div>
+        <Cash :amount="entry.price" />
+      </article>
+      <div class="flex items-center gap-4"><button :disabled="marketStore.historyLoading || marketStore.historyPage <= 1" class="underline disabled:opacity-40" @click="marketStore.loadHistory(authStore.userId, marketStore.historyPage - 1)">Trước</button><span>Trang {{ marketStore.historyPage }}</span><button :disabled="marketStore.historyLoading || !marketStore.historyHasNext" class="underline disabled:opacity-40" @click="marketStore.loadHistory(authStore.userId, marketStore.historyPage + 1)">Sau</button></div>
+    </section>
+    <div v-else class="w-full h-full bg-white flex flex-col overflow-hidden relative">
       <!-- Navigation Tabs & Utility Toolbar -->
       <div class="flex flex-wrap items-center justify-between gap-3 flex-shrink-0">
         <!-- Tabs -->
@@ -527,7 +543,7 @@ onMounted(() => {
   <!-- Confirm Buy Dialog -->
   <div
     v-if="itemToBuy"
-    class="fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-4 backdrop-blur-xs"
+    class="fixed inset-0 z-[10001] flex items-center justify-center bg-black/50 p-4 backdrop-blur-xs"
     @click.self="cancelBuy"
   >
     <div

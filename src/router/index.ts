@@ -7,6 +7,8 @@ import AdminLayout from "../layouts/AdminLayout.vue";
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
   routes: [
+    { path: "/forgot-password", name: "forgotPassword", component: () => import("../views/PasswordView.vue") },
+    { path: "/reset-password", name: "resetPassword", component: () => import("../views/PasswordView.vue") },
     {
       path: "/",
       children: [
@@ -62,6 +64,7 @@ const router = createRouter({
 });
 
 router.beforeEach(async (to) => {
+  if (to.name === "resetPassword" || to.name === "forgotPassword") return;
   const { data } = await supabase.auth.getSession();
   const userId = data.session?.user.id;
 

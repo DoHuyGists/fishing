@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { computed, onMounted, ref, watch } from "vue";
-import { useDiaryStore, type DiaryFishEntry } from "../../../stores/diary.ts";
+import { useDiaryStore } from "../../../stores/diary.ts";
 import { useAuthStore } from "../../../stores/auth.ts";
 import { useCountryStore } from "../../../stores/country.ts";
 import type { Country } from "../../../stores/country.ts";
@@ -27,25 +27,16 @@ watch(
 
 const unlockedCountries = computed<Country[]>(() => countryStore.unlockedCountries);
 
-const currentBookEntries = computed<DiaryFishEntry[]>(() => {
-  if (!selectedCountry.value) return [];
-  if (diaryStore.currentLocationEntries.length) return diaryStore.currentLocationEntries;
-  return Array.from({ length: 10 }, (_, index) => ({
-    species: {
-      id: `mock-${selectedCountry.value!.code}-${index + 1}`,
-      created_at: "",
-      name: `Cá thần thoại #${index + 1}`,
-      information: `Loài cá sinh sống tại khu vực ${selectedCountry.value!.name}. Hãy thả câu ở vùng biển này để ghi chép lại thông tin!`,
-      location: selectedCountry.value!.code,
-      status: "Chưa khám phá",
-      image: null,
-    },
-    isCaught: false,
-  }));
-});
+const currentBookEntries = computed(() => diaryStore.currentLocationEntries);
+async function retry() {
+  await countryStore.fetchMyUnlockedCountries();
+  await diaryStore.initDiary(authStore.userId);
+  if (selectedCountry.value) await diaryStore.selectLocation(authStore.userId, selectedCountry.value.code, selectedCountry.value.name);
+}
 
 async function openCountryBook(country: Country) {
   selectedCountry.value = country;
+  viewMode.value = "openbook";
   await diaryStore.selectLocation(authStore.userId, country.code, country.name);
   viewMode.value = "openbook";
 }
@@ -71,8 +62,13 @@ function returnToBookshelf() {
         </button>
       </div>
 
+      <div v-if="diaryStore.error || countryStore.unlockedError" role="alert" class="rounded-lg border border-red-200 bg-red-50 p-5 text-red-800">
+        <p>{{ diaryStore.error || countryStore.unlockedError }}</p><button type="button" class="mt-2 underline" @click="retry">Thử lại</button>
+      </div>
+      <p v-else-if="viewMode === 'bookshelf' && (diaryStore.isLoading || countryStore.isLoadingUnlocked)" class="p-8 text-center">Đang tải nhật ký…</p>
+      <p v-else-if="viewMode === 'bookshelf' && !unlockedCountries.length" class="p-8 text-center">Bạn chưa mở quốc gia nào. Hãy mở một khu vực trên bản đồ để bắt đầu nhật ký.</p>
       <BookShelf
-        v-if="viewMode === 'bookshelf'"
+        v-else-if="viewMode === 'bookshelf'"
         :countries="unlockedCountries"
         :species-count-by-location="diaryStore.speciesCountByLocation"
         @select-country="openCountryBook"
@@ -83,6 +79,7 @@ function returnToBookshelf() {
           <div class="w-10 h-10 border border-amber-400 border-t-transparent rounded-full animate-spin mb-3"></div>
           <p class="font-serif text-sm">Đang lật mở trang nhật ký {{ selectedCountry?.name }}...</p>
         </div>
+        <p v-else-if="!currentBookEntries.length" class="p-8 text-center text-[#24352a]">Quốc gia này chưa có dữ liệu loài cá.</p>
         <FlipBook
           v-else-if="selectedCountry"
           :country="selectedCountry"

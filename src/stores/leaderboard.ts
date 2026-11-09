@@ -18,6 +18,7 @@ interface RankedLeaderboardEntry {
   id: string;
   userId: string | null;
   displayName: string;
+  avatarUrl?: string | null;
   value: number;
   rank: number;
 }
@@ -48,6 +49,7 @@ export const useLeaderboardStore = defineStore("leaderboard", {
               id: entry.id,
               userId: entry.user_id,
               displayName: entry.display_name || "Ẩn danh",
+              avatarUrl: entry.avatar_url,
               value: entry.score,
               rank: 0,
             }))

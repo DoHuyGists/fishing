@@ -1,6 +1,7 @@
 import type { Session, User } from "@supabase/supabase-js";
 import { defineStore } from "pinia";
 import supabase from "../database/connection";
+import { supabaseAuthRepository } from "../data/supabaseAuthRepository";
 import { supabaseUserProfileRepository, type UserProfile } from "../data/supabaseUserProfileRepository";
 
 type Credentials = {
@@ -21,6 +22,8 @@ export const useAuthStore = defineStore("auth", {
     error: "",
     isAdmin: false,
     adminLoading: false,
+    recoveringPassword: false,
+    passwordBusy: false,
   }),
   getters: {
     isAuthenticated: (state) => Boolean(state.session),
@@ -33,6 +36,25 @@ export const useAuthStore = defineStore("auth", {
     }
   },
   actions: {
+    async requestPasswordReset(email: string) {
+      if (this.passwordBusy) return;
+      this.passwordBusy = true;
+      try { await supabaseAuthRepository.requestPasswordReset(email.trim()); }
+      finally { this.passwordBusy = false; }
+    },
+    async updatePassword(password: string, confirmation: string, currentPassword?: string) {
+      if (this.passwordBusy) throw new Error("Đang xử lý mật khẩu.");
+      if (password.length < 8) throw new Error("Mật khẩu cần ít nhất 8 ký tự.");
+      if (password !== confirmation) throw new Error("Mật khẩu xác nhận không khớp.");
+      this.passwordBusy = true;
+      try {
+        await supabaseAuthRepository.updatePassword(password, currentPassword);
+        this.recoveringPassword = false;
+      } finally { this.passwordBusy = false; }
+    },
+    async resendConfirmation(email: string) {
+      await supabaseAuthRepository.resendConfirmation(email.trim());
+    },
     applySession(session: Session | null) {
       if (this.user?.id !== session?.user.id) {
         adminStatusRequest++;
@@ -48,7 +70,8 @@ export const useAuthStore = defineStore("auth", {
       if (initializationPromise) return initializationPromise;
 
       this.loading = true;
-      supabase.auth.onAuthStateChange((_, session) => {
+      supabase.auth.onAuthStateChange((event, session) => {
+        if (event === "PASSWORD_RECOVERY") this.recoveringPassword = true;
         this.applySession(session);
         if (!this.initialized || !session?.user) return;
 

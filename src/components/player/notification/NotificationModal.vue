@@ -10,7 +10,7 @@ import { formatDateTime } from "../../../utils/time.ts";
 type NotificationKind = "personal" | "system";
 const currentTabActive = ref("personal");
 const unreadPersonalNotifyCount = computed(() => notifications.personal.filter((x) => !x.is_read).length);
-const unreadASystemNotifyCount = computed(() => notifications.personal.filter((x) => !x.is_read).length);
+const unreadASystemNotifyCount = computed(() => notifications.system.filter((x) => !x.is_read).length);
 const tabs = computed(() => [
   { key: "personal", label: "Cá nhân", badge: unreadPersonalNotifyCount.value },
   { key: "system", label: "Hệ thống", badge: unreadASystemNotifyCount.value },
@@ -18,7 +18,7 @@ const tabs = computed(() => [
 
 const auth = useAuthStore();
 const notifications = useNotificationStore();
-const activeTab = ref<NotificationKind>("personal");
+const activeTab = computed(() => currentTabActive.value as NotificationKind);
 const selected = ref<NotificationRow | null>(null);
 const expandedNotificationId = ref<string | null>(null);
 const readError = ref("");
@@ -56,6 +56,7 @@ onUnmounted(() => {
 
 <template>
   <Modal title="Thông báo" sub-title="Tin nhắn dành cho bạn và thông báo hệ thống" :on-refresh="loadNotifications">
+    <p v-if="notifications.loadError || readError" role="alert" class="mb-3 rounded bg-red-50 p-3 text-sm text-red-700">{{ notifications.loadError || readError }}</p>
     <Tab v-model="currentTabActive" :tabs="tabs" lazy>
       <template #personal>
         <div class="flex min-h-0 flex-1 flex-col sm:flex-row">

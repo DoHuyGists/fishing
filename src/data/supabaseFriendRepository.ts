@@ -1,4 +1,5 @@
 import supabase from "../database/connection";
+import { supabaseAvatarRepository } from "./supabaseAvatarRepository";
 
 export type FriendStatus = "PENDING" | "ACCEPTED" | "REJECTED" | "BLOCKED";
 
@@ -13,6 +14,9 @@ export interface UserFriend {
 
 export interface FriendUserProfile {
   id: string;
+  display_name: string | null;
+  avatar_url: string | null;
+  avatar_path: string | null;
   experience_point: number;
   level: number;
   inventory_capacity: number;
@@ -54,7 +58,7 @@ class SupabaseFriendRepository {
       throw new Error(error.message || "Không thể tải danh sách người chơi");
     }
 
-    return (data ?? []) as FriendUserProfile[];
+    return supabaseAvatarRepository.resolveProfiles((data ?? []) as FriendUserProfile[]);
   }
 
   /**

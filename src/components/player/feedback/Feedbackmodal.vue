@@ -1,5 +1,7 @@
 <script setup lang="ts">
-import { onBeforeUnmount, ref } from "vue";
+import { onBeforeUnmount, onMounted, ref } from "vue";
+import { useAuthStore } from "../../../stores/auth";
+import { useFeedbackStore } from "../../../stores/feedback";
 import { useModalStore } from "../../../stores/modal.ts";
 import Modal from "../../shared/Modal.vue";
 import OpinionFeedbackForm from "./OpinionFeedbackForm.vue";
@@ -8,10 +10,15 @@ import Tab from "../../shared/Tab.vue";
 
 const SUCCESS_MESSAGE = "Cảm ơn bạn đã gửi phản hồi!";
 const modalStore = useModalStore();
-const currentActiveTab = ref<"opinion" | "error">("opinion");
+const feedbackStore = useFeedbackStore();
+const auth = useAuthStore();
+const currentActiveTab = ref<"opinion" | "error" | "history">("opinion");
+const statusLabels = { pending: 'Chờ xử lý', processing: 'Đang xử lý', resolved: 'Đã giải quyết', closed: 'Đã đóng' };
+onMounted(() => feedbackStore.watchMyErrors(auth.userId));
 const tabs = [
   { key: "opinion", label: "Góp ý" },
   { key: "error", label: "Báo lỗi" },
+  { key: "history", label: "Báo lỗi của tôi" },
 ];
 const toastVisible = ref(false);
 let toastTimer: ReturnType<typeof setTimeout> | undefined;
@@ -35,6 +42,7 @@ function onKeydown(event: KeyboardEvent) {
 
 document.addEventListener("keydown", onKeydown);
 onBeforeUnmount(() => {
+  feedbackStore.stopWatchingErrors();
   document.removeEventListener("keydown", onKeydown);
   document.body.style.overflow = "";
   clearTimeout(toastTimer);
@@ -55,6 +63,20 @@ onBeforeUnmount(() => {
         </template>
         <template #error>
           <ErrorFeedbackForm @submitted="showToast" />
+        </template>
+        <template #history>
+          <section class="space-y-3 p-4 text-sm text-[#24352a]">
+            <button type="button" class="underline" :disabled="feedbackStore.historyLoading" @click="feedbackStore.loadMyErrors(auth.userId)">Tải lại</button>
+            <p v-if="feedbackStore.historyError" role="alert" class="text-red-700">{{ feedbackStore.historyError }}</p>
+            <p v-if="feedbackStore.historyLoading">Đang tải báo lỗi…</p>
+            <p v-else-if="!feedbackStore.myErrors.length && !feedbackStore.historyError">Bạn chưa gửi báo lỗi nào.</p>
+            <article v-for="item in feedbackStore.myErrors" :key="item.id" class="rounded-lg border border-[#cbd9c6] bg-[#f5f9f0] p-4">
+              <div class="flex flex-wrap justify-between gap-2"><h3 class="font-bold">{{ item.title }}</h3><span>{{ statusLabels[item.status] || item.status }}</span></div>
+              <p class="mt-2 whitespace-pre-wrap">{{ item.description }}</p>
+              <p class="mt-2 text-xs text-gray-600">Gửi: {{ new Date(item.created_at).toLocaleString('vi-VN') }} · Cập nhật: {{ new Date(item.updated_at).toLocaleString('vi-VN') }}</p>
+            </article>
+            <div class="flex items-center gap-4"><button :disabled="feedbackStore.page <= 1 || feedbackStore.historyLoading" class="underline disabled:opacity-40" @click="feedbackStore.loadMyErrors(auth.userId, feedbackStore.page - 1)">Trước</button><span>Trang {{ feedbackStore.page }}</span><button :disabled="!feedbackStore.hasNext || feedbackStore.historyLoading" class="underline disabled:opacity-40" @click="feedbackStore.loadMyErrors(auth.userId, feedbackStore.page + 1)">Sau</button></div>
+          </section>
         </template>
       </Tab>
     </div>

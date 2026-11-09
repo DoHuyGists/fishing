@@ -52,7 +52,7 @@ export const useDiaryStore = defineStore("diary", {
       const name = state.selectedLocationName?.trim().toLowerCase();
 
       // Filter from allSpecies or locationSpecies
-      const targetSpecies = state.allSpecies.length > 0 ? state.allSpecies : state.locationSpecies;
+      const targetSpecies = state.selectedLocationCode ? state.locationSpecies : state.allSpecies;
 
       const filtered = targetSpecies.filter((item) => {
         if (!item.location) return false;
@@ -112,6 +112,8 @@ export const useDiaryStore = defineStore("diary", {
     },
 
     async selectLocation(userId: string | undefined, code: string, name: string) {
+      this.error = null;
+      this.locationSpecies = [];
       this.selectedLocationCode = code;
       this.selectedLocationName = name;
       this.isLoading = true;
@@ -126,7 +128,7 @@ export const useDiaryStore = defineStore("diary", {
         const speciesData = await supabaseDiaryRepository.fetchSpeciesByLocation(code, name);
         this.locationSpecies = speciesData;
       } catch (err: any) {
-        console.error(`Failed to load species for ${code} (${name}):`, err);
+        this.error = err?.message || "Không thể tải danh sách cá. Vui lòng thử lại.";
       } finally {
         this.isLoading = false;
       }

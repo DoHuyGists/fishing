@@ -1,4 +1,14 @@
 import supabase from "../database/connection";
+import type { RealtimeChannel } from "@supabase/supabase-js";
+
+export interface MarketHistory {
+  id: string;
+  created_at: string;
+  seller_id: string;
+  buyer_id: string;
+  item: Record<string, unknown>;
+  price: number;
+}
 
 export interface MarketListing {
   id: string;
@@ -45,6 +55,21 @@ function mapCaughtRow(row: any) {
 }
 
 class SupabaseMarketRepository {
+  async fetchHistory(userId: string, page: number): Promise<MarketHistory[]> {
+    const { data, error } = await supabase.from("market_history").select("*")
+      .or(`seller_id.eq.${userId},buyer_id.eq.${userId}`).order("created_at", { ascending: false }).order("id")
+      .range((page - 1) * 20, page * 20);
+    if (error) throw new Error(error.message);
+    return (data ?? []).map(row => ({ ...row, price: Number(row.price) })) as MarketHistory[];
+  }
+  subscribe(userId: string, onChange: () => void): RealtimeChannel {
+    return supabase.channel(`market:${userId}`)
+      .on("postgres_changes", { event: "*", schema: "public", table: "species_market" }, onChange)
+      .on("postgres_changes", { event: "INSERT", schema: "public", table: "market_history", filter: `buyer_id=eq.${userId}` }, onChange)
+      .on("postgres_changes", { event: "INSERT", schema: "public", table: "market_history", filter: `seller_id=eq.${userId}` }, onChange)
+      .subscribe(status => { if (status === "SUBSCRIBED") onChange(); });
+  }
+  async unsubscribe(channel: RealtimeChannel) { await supabase.removeChannel(channel); }
   async fetchActiveListings(): Promise<MarketListing[]> {
     try {
       const { data, error } = await supabase.from("species_market").select("id, created_at, caught_id, user_id, price, status, caught:caught_id (id, user_id, species_id, weight, created_at, species(name, image, rarity))").eq("status", "normal").order("created_at", { ascending: false });
@@ -75,7 +100,8 @@ class SupabaseMarketRepository {
   private async fetchActiveListingsFallback(): Promise<MarketListing[]> {
     const { data: rawData, error: rawError } = await supabase.from("species_market").select("*").eq("status", "normal").order("created_at", { ascending: false });
 
-    if (rawError || !rawData || rawData.length === 0) return [];
+    if (rawError) throw new Error(rawError.message);
+    if (!rawData || rawData.length === 0) return [];
 
     const itemIds = rawData.map((m) => m.caught_id);
     const { data: caughtData } = await supabase.from("caught").select("id, user_id, species_id, weight, created_at, species(name, image, rarity)").in("id", itemIds);
@@ -101,10 +127,11 @@ class SupabaseMarketRepository {
     seller_id: string;
     price: number;
   }> {
-    const { data, error } = await supabase.rpc("buy_species_from_market", {
+    const { data, error } = await supabase.rpc("buy_species_with_history", {
       p_market_id: speciesMarketId,
     });
     if (error) throw new Error(error.message);
+    if (data?.success === false) throw new Error(data.message || "Không thể mua cá.");
     return data;
   }
 }

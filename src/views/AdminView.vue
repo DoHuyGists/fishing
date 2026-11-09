@@ -8,6 +8,7 @@ const DashboarModal = defineAsyncComponent(() => import("../components/admin/mon
 const monitorOpen = ref(false);
 
 type ModuleKey =
+  | "blueprint"
   | "skill"
   | "zone"
   | "depthScope"
@@ -40,6 +41,7 @@ interface AdminModule {
 }
 
 const moduleComponents = {
+  blueprint: defineAsyncComponent(() => import("../components/admin/blueprint-management/BlueprintManagement.vue")),
   aquacultureSpecies: defineAsyncComponent(() => import("../components/admin/aquaculture-species-management/AquacultureSpeciesManagement.vue")),
   aquacultureFood: defineAsyncComponent(() => import("../components/admin/aquaculture-food-management/AquacultureFoodManagement.vue")),
   skill: defineAsyncComponent(() => import("../components/admin/skils-management/SkillManagementModal.vue")),
@@ -109,6 +111,7 @@ const groups: ModuleGroup[] = [
   {
     title: "Dữ liệu trò chơi",
     modules: [
+      { key: "blueprint", icon: "🛠️", label: "Công thức chế tạo", desc: "Quản lý bản vẽ, nguyên liệu, thành phẩm và phí chế tạo.", component: moduleComponents.blueprint },
       {
         key: "skill",
         icon: "✨",

@@ -4,6 +4,7 @@ import Modal from "../../shared/Modal.vue";
 import { useAuthStore } from "../../../stores/auth";
 import { useInventoryStore } from "../../../stores/inventory";
 import { useBlueprintStore } from "../../../stores/blueprint";
+import { useCurrencyStore } from "../../../stores/currency";
 import type { UserInventory } from "../../../data/supabaseUserInventoryRepository";
 import type { Blueprint } from "../../../data/supabaseBlueprintRepository";
 
@@ -11,6 +12,7 @@ type InventoryItem = { id: string; name: string; image: string | null; icon: str
 const authStore = useAuthStore();
 const inventoryStore = useInventoryStore();
 const blueprintStore = useBlueprintStore();
+const currencyStore = useCurrencyStore();
 const searchQuery = ref("");
 const selectedBlueprintId = ref<string | null>(null);
 const craftQuantity = ref(1);
@@ -47,7 +49,9 @@ const materials = computed(() => (selectedBlueprint.value?.requiredMaterials ?? 
   required: material.quantity * craftQuantity.value,
   owned: inventoryByItemId.value.get(material.item_id)?.quantity ?? 0,
 })));
-const canCraft = computed(() => Boolean(selectedBlueprint.value && materials.value.every((material) => material.owned >= material.required)));
+const quantityValid = computed(() => Number.isSafeInteger(craftQuantity.value) && craftQuantity.value >= 1 && craftQuantity.value <= 1000);
+const craftCost = computed(() => (selectedBlueprint.value?.goldCost ?? 0) * craftQuantity.value);
+const canCraft = computed(() => Boolean(quantityValid.value && selectedBlueprint.value && Number.isFinite(craftCost.value) && craftCost.value >= 0 && !currencyStore.error && currencyStore.cash >= craftCost.value && materials.value.every((material) => material.owned >= material.required)));
 
 async function craftSelectedBlueprint() {
   if (!selectedBlueprint.value || !canCraft.value || isLoading.value) return;
@@ -74,7 +78,7 @@ onMounted(async () => {
   errorMessage.value = "";
   try {
     if (!authStore.userId) throw new Error("Bạn cần đăng nhập để xem bàn chế tạo.");
-    await Promise.all([inventoryStore.setUserInventory(authStore.userId), blueprintStore.loadBlueprints()]);
+    await Promise.all([inventoryStore.setUserInventory(authStore.userId), blueprintStore.loadBlueprints(), currencyStore.fetchCurrency()]);
   } catch (error) {
     errorMessage.value = error instanceof Error ? error.message : "Không thể tải dữ liệu bàn chế tạo.";
   } finally {
@@ -145,7 +149,7 @@ const guideSteps = [
               <div class="flex items-center gap-2">
                 <span class="text-xs">Số lần chế tạo</span>
                 <button type="button" aria-label="Giảm số lần chế tạo" class="grid size-8 place-items-center rounded border border-[#cbd9c6] bg-white font-bold disabled:opacity-40" :disabled="craftQuantity <= 1" @click="craftQuantity = Math.max(1, craftQuantity - 1)">−</button>
-                <input v-model.number="craftQuantity" type="number" min="1" class="w-16 rounded border border-[#cbd9c6] bg-white px-2 py-1.5 text-center text-sm" />
+                <input v-model.number="craftQuantity" type="number" min="1" max="1000" step="1" class="w-16 rounded border border-[#cbd9c6] bg-white px-2 py-1.5 text-center text-sm" />
                 <button type="button" aria-label="Tăng số lần chế tạo" class="grid size-8 place-items-center rounded border border-[#cbd9c6] bg-white font-bold" @click="craftQuantity = Math.max(1, craftQuantity) + 1">+</button>
               </div>
             </div>
@@ -162,7 +166,7 @@ const guideSteps = [
               </div>
               <p v-if="!materials.length" class="col-span-full py-5 text-center text-xs opacity-60">Bản vẽ này chưa khai báo nguyên liệu.</p>
             </div>
-            <p class="mt-4 text-center text-xs font-semibold" :class="canCraft ? 'text-emerald-700' : 'text-red-600'">{{ canCraft ? `Đủ nguyên liệu · ${selectedBlueprint.goldCost * craftQuantity} vàng` : "Không đủ nguyên liệu để chế tạo số lượng đã chọn" }}</p>
+            <p class="mt-4 text-center text-xs font-semibold" :class="canCraft ? 'text-emerald-700' : 'text-red-600'">{{ !quantityValid ? 'Nhập số nguyên từ 1 đến 1000.' : currencyStore.error || (currencyStore.cash < craftCost ? 'Không đủ tiền chế tạo.' : canCraft ? `Đủ nguyên liệu · ${craftCost} vàng` : 'Không đủ nguyên liệu để chế tạo số lượng đã chọn.') }}</p>
             <button type="button" class="mt-3 w-full rounded-md bg-emerald-700 px-4 py-2 text-sm font-bold text-white disabled:cursor-not-allowed disabled:opacity-50" :disabled="!canCraft || isLoading" @click="craftSelectedBlueprint">{{ isLoading ? "Đang chế tạo..." : "Chế tạo" }}</button>
           </template>
           <div v-else class="grid h-full min-h-64 place-items-center text-center text-sm opacity-60">Chọn một bản vẽ để xem công thức chế tạo.</div>

@@ -50,7 +50,7 @@ const filteredPlayers = computed(() => {
   const query = searchQuery.value.trim().toLowerCase();
   if (!query) return otherPlayers.value;
 
-  return otherPlayers.value.filter((profile) => profile.id.toLowerCase().includes(query));
+  return otherPlayers.value.filter((profile) => profile.id.toLowerCase().includes(query) || profile.display_name?.toLocaleLowerCase().includes(query));
 });
 
 // Lọc bạn bè ở tab Bạn bè
@@ -60,7 +60,7 @@ const filteredFriends = computed(() => {
 
   return acceptedFriends.value.filter((record) => {
     const friendId = record.user_id === currentUserId.value ? record.friend_id : record.user_id;
-    return friendId.toLowerCase().includes(query);
+    return friendId.toLowerCase().includes(query) || profilesMap.value.get(friendId)?.display_name?.toLocaleLowerCase().includes(query);
   });
 });
 
@@ -434,13 +434,14 @@ async function executeDelete() {
                   class="size-11 rounded-xl bg-linear-to-br flex items-center justify-center text-white text-sm font-black shadow-sm shrink-0"
                   :class="getAvatarGradient(record.user_id === currentUserId ? record.friend_id : record.user_id)"
                 >
-                  {{ (record.user_id === currentUserId ? record.friend_id : record.user_id).slice(0, 2).toUpperCase() }}
+                  <img v-if="getFriendProfile(record)?.avatar_url" :src="getFriendProfile(record)?.avatar_url ?? ''" alt="Ảnh đại diện" class="h-full w-full rounded-xl object-cover" referrerpolicy="no-referrer" />
+                  <span v-else>{{ (getFriendProfile(record)?.display_name || (record.user_id === currentUserId ? record.friend_id : record.user_id)).slice(0, 2).toUpperCase() }}</span>
                 </div>
 
                 <div class="min-w-0">
                   <div class="flex items-center gap-1.5">
                     <span class="text-xs font-bold text-gray-900 font-mono">
-                      {{ formatUuid(record.user_id === currentUserId ? record.friend_id : record.user_id) }}
+                      {{ getFriendProfile(record)?.display_name || formatUuid(record.user_id === currentUserId ? record.friend_id : record.user_id) }}
                     </span>
                     <button
                       type="button"
@@ -513,13 +514,14 @@ async function executeDelete() {
                 class="size-11 rounded-xl bg-linear-to-br flex items-center justify-center text-white text-sm font-black shadow-sm shrink-0"
                 :class="getAvatarGradient(record.user_id)"
               >
-                {{ record.user_id.slice(0, 2).toUpperCase() }}
+                <img v-if="getSenderProfile(record)?.avatar_url" :src="getSenderProfile(record)?.avatar_url ?? ''" alt="Ảnh đại diện" class="h-full w-full rounded-xl object-cover" referrerpolicy="no-referrer" />
+                <span v-else>{{ (getSenderProfile(record)?.display_name || record.user_id).slice(0, 2).toUpperCase() }}</span>
               </div>
 
               <div class="min-w-0">
                 <div class="flex items-center gap-1.5">
                   <span class="text-xs font-bold text-gray-900 font-mono">
-                    {{ formatUuid(record.user_id) }}
+                    {{ getSenderProfile(record)?.display_name || formatUuid(record.user_id) }}
                   </span>
                   <button
                     type="button"
@@ -608,13 +610,14 @@ async function executeDelete() {
                 class="size-11 rounded-xl bg-linear-to-br flex items-center justify-center text-white text-sm font-black shadow-sm shrink-0"
                 :class="getAvatarGradient(record.friend_id)"
               >
-                {{ record.friend_id.slice(0, 2).toUpperCase() }}
+                <img v-if="getRecipientProfile(record)?.avatar_url" :src="getRecipientProfile(record)?.avatar_url ?? ''" alt="Ảnh đại diện" class="h-full w-full rounded-xl object-cover" referrerpolicy="no-referrer" />
+                <span v-else>{{ (getRecipientProfile(record)?.display_name || record.friend_id).slice(0, 2).toUpperCase() }}</span>
               </div>
 
               <div class="min-w-0">
                 <div class="flex items-center gap-1.5">
                   <span class="text-xs font-bold text-gray-900 font-mono">
-                    {{ formatUuid(record.friend_id) }}
+                    {{ getRecipientProfile(record)?.display_name || formatUuid(record.friend_id) }}
                   </span>
                   <button
                     type="button"
@@ -683,13 +686,14 @@ async function executeDelete() {
                   class="size-11 rounded-xl bg-linear-to-br flex items-center justify-center text-white text-sm font-black shadow-sm shrink-0"
                   :class="getAvatarGradient(player.id)"
                 >
-                  {{ player.id.slice(0, 2).toUpperCase() }}
+                  <img v-if="player.avatar_url" :src="player.avatar_url" alt="Ảnh đại diện" class="h-full w-full rounded-xl object-cover" referrerpolicy="no-referrer" />
+                  <span v-else>{{ (player.display_name || player.id).slice(0, 2).toUpperCase() }}</span>
                 </div>
 
                 <div class="min-w-0">
                   <div class="flex items-center gap-1.5">
                     <span class="text-xs font-bold text-gray-900 font-mono">
-                      {{ formatUuid(player.id) }}
+                      {{ player.display_name || formatUuid(player.id) }}
                     </span>
                     <button
                       type="button"
