@@ -29,6 +29,7 @@ type ModuleKey =
   | "dailyMissionRewards"
   | "dailyMissionTemplates"
   | "notifications"
+  | "guides"
   | "fishingPass"
   | "fishingPassRewards";
 
@@ -41,6 +42,7 @@ interface AdminModule {
 }
 
 const moduleComponents = {
+  guides: defineAsyncComponent(() => import("../components/admin/guides-management/GuidesManagementModal.vue")),
   blueprint: defineAsyncComponent(() => import("../components/admin/blueprint-management/BlueprintManagement.vue")),
   aquacultureSpecies: defineAsyncComponent(() => import("../components/admin/aquaculture-species-management/AquacultureSpeciesManagement.vue")),
   aquacultureFood: defineAsyncComponent(() => import("../components/admin/aquaculture-food-management/AquacultureFoodManagement.vue")),
@@ -174,6 +176,13 @@ const groups: ModuleGroup[] = [
         label: "Thông báo",
         desc: "Tạo và quản lý thông báo cá nhân, thông báo hệ thống.",
         component: moduleComponents.notifications,
+      },
+      {
+        key: "guides",
+        icon: "📖",
+        label: "Hướng dẫn người chơi",
+        desc: "Soạn nội dung, sắp xếp và quản lý trạng thái xuất bản hướng dẫn.",
+        component: moduleComponents.guides,
       },
       {
         key: "fishingPass",

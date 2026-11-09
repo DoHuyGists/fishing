@@ -14,6 +14,9 @@ export default defineConfig({
     }),
     tailwindcss(),
   ],
+  optimizeDeps: {
+    include: ["@tiptap/vue-3", "@tiptap/starter-kit", "@tiptap/extension-paragraph", "dompurify"],
+  },
   build: {
     chunkSizeWarningLimit: 600,
     rollupOptions: {

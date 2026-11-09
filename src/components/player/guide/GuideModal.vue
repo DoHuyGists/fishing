@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import { onMounted } from "vue";
 import Modal from "../../shared/Modal.vue";
+import RichTextContent from "../../shared/RichTextContent.vue";
 import { useGuideStore } from "../../../stores/guide";
 import { useModalStore } from "../../../stores/modal";
 import { useOnboardingStore } from "../../../stores/onboarding";
@@ -68,8 +69,8 @@ onMounted(() => guideStore.loadGuides());
         </nav>
         <article id="guide-content" aria-live="polite" class="min-h-0 min-w-0 flex-1 overflow-y-auto p-4 sm:p-6">
           <template v-if="guideStore.selectedGuide">
-            <p class="break-words text-xl font-bold">{{ guideStore.selectedGuide.title }}</p>
-            <div class="mt-4 whitespace-pre-wrap break-words text-sm leading-7">{{ guideStore.selectedGuide.content }}</div>
+            <div class="break-words text-xl font-bold">{{ guideStore.selectedGuide.title }}</div>
+            <RichTextContent class="mt-4" :content="guideStore.selectedGuide.content" />
           </template>
           <p v-else class="text-sm">Chọn một chỉ dẫn để xem nội dung.</p>
         </article>
