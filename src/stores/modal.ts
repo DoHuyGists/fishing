@@ -26,6 +26,7 @@ type ModalName =
     | "donation"
     | "skill"
     | "aquaculture"
+    | "guide"
     ;
 
 export const useModalStore = defineStore("Modal", {

@@ -44,6 +44,7 @@ const AttendanceModal = defineAsyncComponent(() => import("../attendance/Attenda
 const DonationModal = defineAsyncComponent(() => import("../donation/DonationModal.vue"));
 const SkillModal = defineAsyncComponent(() => import("../skill/SkillModal.vue"));
 const AquacultureModal = defineAsyncComponent(() => import("../aquaculture/AquacultureModal.vue"));
+const GuideModal = defineAsyncComponent(() => import("../guide/GuideModal.vue"));
 
 const authStore = useAuthStore();
 const caughtStore = useCaughtStore();
@@ -101,7 +102,6 @@ onUnmounted(() => {
       class="flex flex-wrap items-center justify-between gap-3 rounded-xl border border-[#cbd9c6] bg-[#f5f9f0] px-4 py-2.5 text-[#24352a]"
     >
       <span class="font-bold">Bản đồ thế giới</span>
-      <button type="button" class="rounded-lg border border-[#cbd9c6] px-3 py-1 text-xs" @click="onboarding.visible = true">Hướng dẫn chơi</button>
       <div class="flex flex-wrap items-center justify-end gap-2">
         <Cash :amount="currencyStore.formattedCash" />
         <Shells :amount="currencyStore.formattedShells" />
@@ -138,6 +138,14 @@ onUnmounted(() => {
             >
               <span class="text-sm">⚙️</span>
               <span>Tài khoản</span>
+            </button>
+            <button
+              type="button"
+              class="flex items-center gap-1.5 px-3 py-1.5 rounded-xl border border-[#cbd9c6] bg-[#f5f9f0] text-[#24352a] shadow-sm font-bold text-xs cursor-pointer transition-colors hover:border-[#70a77e] hover:bg-[#eaf5e8]"
+              @click="modalStore.open('guide')"
+            >
+              <span class="text-sm" aria-hidden="true">📖</span>
+              <span>Chỉ dẫn cơ bản</span>
             </button>
   
             <button
@@ -433,6 +441,7 @@ onUnmounted(() => {
       >
         <div v-if="modalStore.isModalOpening">
           <AccountInfoModal v-if="modalStore.isOpening('account')" />
+          <GuideModal v-if="modalStore.isOpening('guide')" />
           <MarketWindow v-if="configStore.isUnlocked('market') && modalStore.isOpening('market')" />
           <ShopModal v-if="modalStore.isOpening('shop')" />
           <CatchDiaryModal v-if="modalStore.isOpening('diary')" />

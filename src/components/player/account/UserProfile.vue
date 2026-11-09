@@ -6,6 +6,8 @@ import { useUserProfileStore } from "../../../stores/userProfile.ts";
 import { useCountryStore } from "../../../stores/country.ts";
 import Cash from "../currency/Cash.vue";
 import TwoOptionsModal from "../../shared/TwoOptionsModal.vue";
+import UpdateIdentityModal from "./UpdateIdentityModal.vue";
+import ChangePasswordModal from "./ChangePasswordModal.vue";
 import { formatDateTime } from "../../../utils/time.ts";
 
 defineEmits<{ signOut: [] }>();
@@ -24,36 +26,8 @@ const countryError = ref("");
 const now = ref(Date.now());
 const clock = window.setInterval(() => { now.value = Date.now(); }, 60_000);
 onUnmounted(() => window.clearInterval(clock));
-const displayName = ref(userProfileStore.profile?.display_name ?? "");
-const avatarUrl = ref(userProfileStore.profile?.avatar_url ?? "");
-const avatarFile = ref<File>();
-const identityBusy = ref(false);
-const identityError = ref("");
-const identitySaved = ref(false);
-const currentPassword = ref("");
-const newPassword = ref("");
-const confirmPassword = ref("");
-const passwordError = ref("");
-const passwordSaved = ref(false);
-async function saveIdentity() {
-  identityBusy.value = true; identityError.value = ""; identitySaved.value = false;
-  try {
-    await userProfileStore.updateIdentity(displayName.value, avatarUrl.value.trim() || null, avatarFile.value);
-    avatarUrl.value = userProfileStore.profile?.avatar_url ?? "";
-    avatarFile.value = undefined;
-    identitySaved.value = true;
-  } catch (err) { identityError.value = err instanceof Error ? err.message : "Không thể lưu hồ sơ."; }
-  finally { identityBusy.value = false; }
-}
-async function changePassword() {
-  passwordError.value = ""; passwordSaved.value = false;
-  try {
-    if (!currentPassword.value) throw new Error("Vui lòng nhập mật khẩu hiện tại.");
-    await authStore.updatePassword(newPassword.value, confirmPassword.value, currentPassword.value);
-    currentPassword.value = newPassword.value = confirmPassword.value = "";
-    passwordSaved.value = true;
-  } catch (err) { passwordError.value = err instanceof Error ? err.message : "Không thể đổi mật khẩu."; }
-}
+const showIdentityModal = ref(false);
+const showPasswordModal = ref(false);
 
 const countryCooldownDaysRemaining = computed(() => {
   const cooldown = userProfileStore.profile?.update_country_cooldown;
@@ -306,25 +280,28 @@ const userInitial = computed(() => {
       />
     </Teleport>
 
-    <form class="space-y-3 rounded-xl border border-[#cbd9c6] bg-[#f5f9f0] p-4 text-sm" @submit.prevent="saveIdentity">
-      <h3 class="font-bold">Tên và ảnh đại diện</h3>
-      <label class="block">Tên hiển thị<input v-model.trim="displayName" required minlength="2" maxlength="40" class="mt-1 w-full rounded border border-[#cbd9c6] bg-white p-2" /></label>
-      <label class="block">Đường dẫn ảnh đại diện (HTTPS)<input v-model.trim="avatarUrl" type="url" placeholder="https://…" class="mt-1 w-full rounded border border-[#cbd9c6] bg-white p-2" /></label>
-      <label class="block">Hoặc tải ảnh từ thiết bị (JPG, PNG, WebP · tối đa 2 MB)<input type="file" accept="image/jpeg,image/png,image/webp" class="mt-1 block w-full" @change="avatarFile = ($event.target as HTMLInputElement).files?.[0]" /></label>
-      <p class="text-xs text-gray-600">Ảnh tải từ thiết bị được ưu tiên. Để trống đường dẫn và không chọn file để dùng chữ cái đại diện.</p>
-      <p v-if="identityError" role="alert" class="text-red-700">{{ identityError }}</p>
-      <p v-if="identitySaved" role="status">Đã lưu hồ sơ.</p>
-      <button :disabled="identityBusy" class="rounded bg-[#24352a] px-4 py-2 text-white disabled:opacity-50">{{ identityBusy ? 'Đang lưu…' : 'Lưu hồ sơ' }}</button>
-    </form>
-    <form class="space-y-3 rounded-xl border border-[#cbd9c6] p-4 text-sm" @submit.prevent="changePassword">
-      <h3 class="font-bold">Đổi mật khẩu</h3>
-      <label class="block">Mật khẩu hiện tại<input v-model="currentPassword" required type="password" autocomplete="current-password" class="mt-1 w-full rounded border border-[#cbd9c6] p-2" /></label>
-      <label class="block">Mật khẩu mới<input v-model="newPassword" required minlength="8" type="password" autocomplete="new-password" class="mt-1 w-full rounded border border-[#cbd9c6] p-2" /></label>
-      <label class="block">Xác nhận mật khẩu mới<input v-model="confirmPassword" required minlength="8" type="password" autocomplete="new-password" class="mt-1 w-full rounded border border-[#cbd9c6] p-2" /></label>
-      <p v-if="passwordError" role="alert" class="text-red-700">{{ passwordError }}</p>
-      <p v-if="passwordSaved" role="status">Đã đổi mật khẩu.</p>
-      <button :disabled="authStore.passwordBusy" class="rounded bg-[#24352a] px-4 py-2 text-white disabled:opacity-50">{{ authStore.passwordBusy ? 'Đang lưu…' : 'Đổi mật khẩu' }}</button>
-    </form>
+    <div class="flex flex-wrap gap-3">
+      <button
+        type="button"
+        class="rounded-lg border border-[#cbd9c6] bg-[#f5f9f0] px-4 py-2 text-sm font-semibold text-[#24352a] transition-colors hover:bg-emerald-100 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-emerald-600"
+        aria-haspopup="dialog"
+        @click="showIdentityModal = true"
+      >
+        Tên và ảnh đại diện
+      </button>
+      <button
+        type="button"
+        class="rounded-lg border border-[#cbd9c6] bg-[#f5f9f0] px-4 py-2 text-sm font-semibold text-[#24352a] transition-colors hover:bg-emerald-100 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-emerald-600"
+        aria-haspopup="dialog"
+        @click="showPasswordModal = true"
+      >
+        Đổi mật khẩu
+      </button>
+    </div>
+    <Teleport to="body">
+      <UpdateIdentityModal v-if="showIdentityModal" @close="showIdentityModal = false" />
+      <ChangePasswordModal v-if="showPasswordModal" @close="showPasswordModal = false" />
+    </Teleport>
     <div class="flex items-end">
       <button
         type="button"
