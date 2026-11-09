@@ -1,6 +1,16 @@
 import DOMPurify from "dompurify";
 
-const supportedMarkup = /<\/?(?:div|p|h[1-6]|br|strong|b|em|i|u|s|strike|a|ul|ol|li|blockquote|pre|code|hr)(?:\s[^>]*|\s*\/?)>/i;
+const supportedMarkup = /<\/?(?:div|p|h[1-6]|br|strong|b|em|i|u|s|strike|a|ul|ol|li|blockquote|pre|code|hr|img)(?:\s[^>]*|\s*\/?)>/i;
+
+export function isGuideImageUrl(value: string): boolean {
+  const src = value.trim();
+  try {
+    const url = new URL(src);
+    return /^https?:\/\//i.test(src) && ["https:", "http:"].includes(url.protocol);
+  } catch {
+    return false;
+  }
+}
 
 function escapeText(value: string): string {
   return value.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;");
@@ -12,8 +22,8 @@ export function sanitizeGuideContent(content: string): string {
     ? content
     : `<div>${escapeText(content).replace(/\r\n?|\n/g, "<br>")}</div>`;
   const clean = DOMPurify.sanitize(html, {
-    ALLOWED_TAGS: ["div", "p", "h1", "h2", "h3", "h4", "h5", "h6", "br", "strong", "b", "em", "i", "u", "s", "strike", "a", "ul", "ol", "li", "blockquote", "pre", "code", "hr"],
-    ALLOWED_ATTR: ["href", "title", "start"],
+    ALLOWED_TAGS: ["div", "p", "h1", "h2", "h3", "h4", "h5", "h6", "br", "strong", "b", "em", "i", "u", "s", "strike", "a", "ul", "ol", "li", "blockquote", "pre", "code", "hr", "img"],
+    ALLOWED_ATTR: ["href", "title", "start", "src", "alt"],
     ALLOW_DATA_ATTR: false,
     ALLOW_ARIA_ATTR: false,
   });
@@ -29,12 +39,18 @@ export function sanitizeGuideContent(content: string): string {
     const href = link.getAttribute("href") ?? "";
     if (!/^(?:https?:\/\/|mailto:)/i.test(href)) link.removeAttribute("href");
   });
+  template.content.querySelectorAll("img").forEach((image) => {
+    const src = image.getAttribute("src")?.trim() ?? "";
+    if (isGuideImageUrl(src)) image.setAttribute("src", src);
+    else image.remove();
+  });
   return template.innerHTML;
 }
 
 export function guideContentText(content: string): string {
   const template = document.createElement("template");
   template.innerHTML = sanitizeGuideContent(content);
+  template.content.querySelectorAll("img").forEach((image) => image.replaceWith(`\n[${image.getAttribute("alt")?.trim() || "Hình ảnh"}]\n`));
   template.content.querySelectorAll("br").forEach((element) => element.replaceWith("\n"));
   template.content.querySelectorAll("div, li, blockquote, pre").forEach((element) => element.append("\n"));
   return template.content.textContent?.replace(/[\u200B\uFEFF]/g, "").trim() ?? "";

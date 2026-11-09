@@ -3,7 +3,8 @@ import { computed, ref, useId, watch } from "vue";
 import { EditorContent, useEditor, type Editor } from "@tiptap/vue-3";
 import StarterKit from "@tiptap/starter-kit";
 import Paragraph from "@tiptap/extension-paragraph";
-import { sanitizeGuideContent } from "../../../utils/guideContent";
+import Image from "@tiptap/extension-image";
+import { isGuideImageUrl, sanitizeGuideContent } from "../../../utils/guideContent";
 
 const model = defineModel<string>({ required: true });
 const props = withDefaults(defineProps<{ disabled?: boolean; invalid?: boolean; label?: string }>(), {
@@ -15,6 +16,11 @@ const editorId = useId();
 const linkOpen = ref(false);
 const linkUrl = ref("");
 const linkError = ref("");
+const imageOpen = ref(false);
+const imageUrl = ref("");
+const imageAlt = ref("");
+const imageError = ref("");
+const imagePanelId = `${editorId}-image`;
 const TextBlock = Paragraph.extend({
   parseHTML() { return [{ tag: "div" }, { tag: "p" }]; },
   renderHTML({ HTMLAttributes }) { return ["div", HTMLAttributes, 0]; },
@@ -28,6 +34,7 @@ const editor = useEditor({
       link: { openOnClick: false, defaultProtocol: "https", HTMLAttributes: { target: null, rel: "noopener noreferrer" } },
     }),
     TextBlock,
+    Image.configure({ allowBase64: false }),
   ],
   content: sanitizeGuideContent(model.value),
   editable: !props.disabled,
@@ -69,6 +76,7 @@ watch(() => props.invalid, (value) => editor.value?.view.dom.setAttribute("aria-
 
 function openLink() {
   if (!editor.value || props.disabled) return;
+  imageOpen.value = false;
   linkUrl.value = editor.value.getAttributes("link").href ?? "";
   linkError.value = "";
   linkOpen.value = true;
@@ -96,6 +104,31 @@ function removeLink() {
   editor.value?.chain().focus().extendMarkRange("link").unsetLink().run();
   linkOpen.value = false;
 }
+
+function openImage() {
+  if (!editor.value || props.disabled) return;
+  const attributes = editor.value.getAttributes("image");
+  imageUrl.value = attributes.src ?? "";
+  imageAlt.value = attributes.alt ?? "";
+  imageError.value = "";
+  linkOpen.value = false;
+  imageOpen.value = true;
+}
+
+function applyImage() {
+  if (!editor.value || props.disabled) return;
+  const src = imageUrl.value.trim();
+  if (!isGuideImageUrl(src)) {
+    imageError.value = "Nhập liên kết ảnh hợp lệ bắt đầu bằng https:// hoặc http://.";
+    return;
+  }
+  const inserted = editor.value.chain().focus().setImage({ src, alt: imageAlt.value.trim() }).run();
+  if (!inserted) {
+    imageError.value = "Không thể chèn ảnh tại vị trí này. Hãy đặt con trỏ vào một đoạn văn.";
+    return;
+  }
+  imageOpen.value = false;
+}
 </script>
 
 <template>
@@ -110,6 +143,7 @@ function removeLink() {
         @mousedown.prevent @click="editor && tool.run(editor)"
       >{{ tool.text }}</button>
       <button type="button" :disabled="disabled || !editor" :aria-expanded="linkOpen" :aria-pressed="editor?.isActive('link')" class="rounded-md border border-[#cbd9c6] px-2.5 py-1.5 text-xs font-semibold hover:bg-emerald-100 disabled:opacity-40" @mousedown.prevent @click="openLink">Liên kết</button>
+      <button type="button" :disabled="disabled || !editor" :aria-expanded="imageOpen" :aria-controls="imagePanelId" class="rounded-md border border-[#cbd9c6] px-2.5 py-1.5 text-xs font-semibold hover:bg-emerald-100 disabled:opacity-40" @mousedown.prevent @click="openImage">Chèn ảnh</button>
     </div>
     <div v-if="linkOpen" class="space-y-2 border-b border-[#cbd9c6] bg-[#f5f9f0] p-3">
       <label class="block text-xs font-semibold">Địa chỉ liên kết
@@ -122,6 +156,19 @@ function removeLink() {
         <button type="button" class="rounded-lg border border-[#cbd9c6] px-3 py-1.5 text-xs" @click="linkOpen = false">Đóng</button>
       </div>
     </div>
+    <div v-if="imageOpen" :id="imagePanelId" class="space-y-2 border-b border-[#cbd9c6] bg-[#f5f9f0] p-3" @keydown.esc.stop.prevent="imageOpen = false">
+      <label class="block text-xs font-semibold">Liên kết ảnh
+        <input v-model="imageUrl" type="url" placeholder="https://example.com/anh.jpg" :disabled="disabled" :aria-invalid="!!imageError" class="mt-1 w-full rounded-lg border border-[#cbd9c6] bg-white px-3 py-2 text-sm" @keydown.enter.prevent="applyImage" />
+      </label>
+      <label class="block text-xs font-semibold">Mô tả ảnh (tùy chọn)
+        <input v-model="imageAlt" type="text" placeholder="Mô tả nội dung ảnh" :disabled="disabled" class="mt-1 w-full rounded-lg border border-[#cbd9c6] bg-white px-3 py-2 text-sm" @keydown.enter.prevent="applyImage" />
+      </label>
+      <div v-if="imageError" role="alert" class="text-xs text-red-700">{{ imageError }}</div>
+      <div class="flex gap-2">
+        <button type="button" :disabled="disabled" class="rounded-lg bg-emerald-800 px-3 py-1.5 text-xs font-bold text-white disabled:opacity-40" @click="applyImage">{{ editor?.isActive('image') ? 'Cập nhật ảnh' : 'Chèn vào nội dung' }}</button>
+        <button type="button" class="rounded-lg border border-[#cbd9c6] px-3 py-1.5 text-xs" @click="imageOpen = false">Đóng</button>
+      </div>
+    </div>
     <EditorContent :editor="editor" class="guide-editor max-h-[55dvh] overflow-y-auto text-sm leading-7" />
     <div class="border-t border-[#cbd9c6] px-3 py-2 text-xs text-[#24352a]/65">{{ characterCount }} ký tự · Enter để xuống đoạn, Shift+Enter để xuống dòng.</div>
   </div>
@@ -132,4 +179,6 @@ function removeLink() {
 .guide-editor :deep(strong) { font-weight: 700; }
 .guide-editor :deep(em) { font-style: italic; }
 .guide-editor :deep(pre) { overflow-x: auto; border-radius: 0.5rem; background: #eef2e9; padding: 0.75rem; }
+.guide-editor :deep(img) { display: block; max-width: 100%; height: auto; margin: 0.75rem 0; border-radius: 0.5rem; }
+.guide-editor :deep(img.ProseMirror-selectednode) { outline: 2px solid #047857; outline-offset: 2px; }
 </style>

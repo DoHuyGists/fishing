@@ -30,6 +30,7 @@ type ModuleKey =
   | "dailyMissionTemplates"
   | "notifications"
   | "guides"
+  | "assets"
   | "fishingPass"
   | "fishingPassRewards";
 
@@ -42,6 +43,7 @@ interface AdminModule {
 }
 
 const moduleComponents = {
+  assets: defineAsyncComponent(() => import("../components/admin/assets/AssetsManagementModal.vue")),
   guides: defineAsyncComponent(() => import("../components/admin/guides-management/GuidesManagementModal.vue")),
   blueprint: defineAsyncComponent(() => import("../components/admin/blueprint-management/BlueprintManagement.vue")),
   aquacultureSpecies: defineAsyncComponent(() => import("../components/admin/aquaculture-species-management/AquacultureSpeciesManagement.vue")),
@@ -113,6 +115,7 @@ const groups: ModuleGroup[] = [
   {
     title: "Dữ liệu trò chơi",
     modules: [
+      { key: "assets", icon: "🖼️", label: "Ảnh & video", desc: "Tải lên, xem trước và sao chép link ảnh, video từ Storage.", component: moduleComponents.assets },
       { key: "blueprint", icon: "🛠️", label: "Công thức chế tạo", desc: "Quản lý bản vẽ, nguyên liệu, thành phẩm và phí chế tạo.", component: moduleComponents.blueprint },
       {
         key: "skill",
