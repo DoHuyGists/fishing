@@ -7,6 +7,7 @@ import { useMarketStore } from "../../../stores/market.ts";
 import { useCaughtStore } from "../../../stores/caught.ts";
 import Cash from "../currency/Cash.vue";
 import Modal from "../../shared/Modal.vue";
+import Tab from "../../shared/Tab.vue";
 import { useToast } from "../../../composables/useToast.ts";
 
 const authStore = useAuthStore();
@@ -59,6 +60,12 @@ const myMarketListings = computed(() => {
   if (!currentUserId) return [];
   return marketStore.marketListings.filter((item) => item.user_id === currentUserId);
 });
+
+const marketTabs = computed(() => [
+  { key: "all", label: "Sàn giao dịch", badge: marketStore.marketListings.length },
+  { key: "my", label: "Cá của tôi đang bán", badge: myMarketListings.value.length },
+  { key: "history", label: "Lịch sử mua bán" },
+]);
 
 const groupedListings = computed(() => {
   const groups = new Map<string, MarketListing[]>();
@@ -151,58 +158,10 @@ onUnmounted(() => marketStore.stopRealtime());
 </script>
 
 <template>
-  <Modal title="Chợ cá" :on-refresh="() => { marketStore.loadMarketListings(); marketStore.loadHistory(authStore.userId); }">
+  <Modal title="Chợ cá" :show-count-data="activeMarketTab !== 'history'" :on-refresh="() => { marketStore.loadMarketListings(); marketStore.loadHistory(authStore.userId); }">
     <div v-if="marketStore.error" role="alert" class="mb-3 rounded bg-red-50 p-3 text-red-700">{{ marketStore.error }}</div>
-    <button type="button" class="mb-3 rounded-lg border border-[#cbd9c6] bg-[#f5f9f0] px-4 py-2 text-sm" @click="activeMarketTab = activeMarketTab === 'history' ? 'all' : 'history'; marketStore.loadHistory(authStore.userId)">{{ activeMarketTab === 'history' ? 'Quay lại chợ' : 'Lịch sử mua bán' }}</button>
-    <section v-if="activeMarketTab === 'history'" class="space-y-3 text-[#24352a]">
-      <h3 class="font-bold">Lịch sử mua bán của bạn</h3>
-      <p v-if="marketStore.historyError" role="alert" class="text-red-700">{{ marketStore.historyError }} <button class="underline" @click="marketStore.loadHistory(authStore.userId)">Thử lại</button></p>
-      <p v-if="marketStore.historyLoading">Đang tải lịch sử…</p>
-      <p v-else-if="!marketStore.history.length && !marketStore.historyError">Chưa có giao dịch mua bán.</p>
-      <article v-for="entry in marketStore.history" :key="entry.id" class="flex flex-wrap items-center justify-between gap-3 rounded-lg border border-[#cbd9c6] bg-[#f5f9f0] p-3 text-sm">
-        <div><b>{{ entry.buyer_id === authStore.userId ? 'Đã mua' : 'Đã bán' }}</b> · {{ entry.item.name || (entry.item.species as any)?.name || (entry.item.fish as any)?.name || 'Cá' }}<p class="text-xs text-gray-600">{{ formatDate(entry.created_at) }} · #{{ entry.id.slice(0, 8) }}</p></div>
-        <Cash :amount="entry.price" />
-      </article>
-      <div class="flex items-center gap-4"><button :disabled="marketStore.historyLoading || marketStore.historyPage <= 1" class="underline disabled:opacity-40" @click="marketStore.loadHistory(authStore.userId, marketStore.historyPage - 1)">Trước</button><span>Trang {{ marketStore.historyPage }}</span><button :disabled="marketStore.historyLoading || !marketStore.historyHasNext" class="underline disabled:opacity-40" @click="marketStore.loadHistory(authStore.userId, marketStore.historyPage + 1)">Sau</button></div>
-    </section>
-    <div v-else class="w-full h-full bg-white flex flex-col overflow-hidden relative">
-      <!-- Navigation Tabs & Utility Toolbar -->
-      <div class="flex flex-wrap items-center justify-between gap-3 flex-shrink-0">
-        <!-- Tabs -->
-        <div class="flex items-center bg-gray-200/80 p-1 rounded-xl gap-1 text-xs font-bold">
-          <button
-            type="button"
-            class="px-4 py-1.5 rounded-lg transition-all cursor-pointer flex items-center gap-1.5"
-            :class="
-              activeMarketTab === 'all'
-                ? 'bg-white text-[#153221] shadow-xs font-extrabold'
-                : 'text-gray-600 hover:text-gray-900'
-            "
-            @click="activeMarketTab = 'all'"
-          >
-            <span>🛒 Sàn giao dịch</span>
-            <span class="px-1.5 py-0.2 rounded-full bg-emerald-100 text-emerald-800 text-[10px]">
-              {{ marketStore.marketListings.length }}
-            </span>
-          </button>
-          <button
-            type="button"
-            class="px-4 py-1.5 rounded-lg transition-all cursor-pointer flex items-center gap-1.5"
-            :class="
-              activeMarketTab === 'my'
-                ? 'bg-white text-[#153221] shadow-xs font-extrabold'
-                : 'text-gray-600 hover:text-gray-900'
-            "
-            @click="activeMarketTab = 'my'"
-          >
-            <span>📦 Cá của tôi đang bán</span>
-            <span class="px-1.5 py-0.2 rounded-full bg-amber-100 text-amber-800 text-[10px]">
-              {{ myMarketListings.length }}
-            </span>
-          </button>
-        </div>
-      </div>
-
+    <Tab v-model="activeMarketTab" :tabs="marketTabs" aria-label="Chợ cá" lazy>
+      <template #all>
       <!-- Filter & Search Toolbar (shown for 'all' tab) -->
       <div
         v-if="activeMarketTab === 'all'"
@@ -415,7 +374,7 @@ onUnmounted(() => marketStore.stopRealtime());
 
                 <!-- Thông tin chi tiết -->
                 <div class="flex flex-col gap-1 mb-3" :class="viewMode === 'list' ? 'min-w-0 flex-1' : ''">
-                  <h4 class="m-0 font-bold text-sm text-[#263238] truncate">{{ item.caught?.fish?.name }}</h4>
+                  <p class="m-0 font-bold text-sm text-[#263238] truncate">{{ item.caught?.fish?.name }}</p>
                   <div class="flex items-center gap-2 text-[11px] text-gray-500 font-medium">
                     <span
                       >⚖️
@@ -462,8 +421,10 @@ onUnmounted(() => marketStore.stopRealtime());
           </div>
         </div>
 
-        <!-- Tab 2: Cá Của Tôi Đang Bán -->
-        <div v-else-if="activeMarketTab === 'my'">
+      </div>
+      </template>
+      <template #my>
+        <div>
           <div v-if="!myMarketListings.length" class="py-16 text-center text-gray-400 text-xs">
             <span class="text-3xl block mb-2">📦</span>
             <p class="m-0 font-medium">Bạn chưa đăng bán con cá nào trên chợ.</p>
@@ -504,7 +465,7 @@ onUnmounted(() => marketStore.stopRealtime());
                 </div>
 
                 <div class="flex flex-col gap-1 mb-3">
-                  <h4 class="m-0 font-bold text-sm text-[#263238] truncate">{{ item.caught?.fish?.name }}</h4>
+                  <p class="m-0 font-bold text-sm text-[#263238] truncate">{{ item.caught?.fish?.name }}</p>
                   <div class="flex items-center gap-2 text-[11px] text-gray-500 font-medium">
                     <span
                       >⚖️
@@ -537,8 +498,40 @@ onUnmounted(() => marketStore.stopRealtime());
             </div>
           </div>
         </div>
-      </div>
-    </div>
+      </template>
+      <template #history>
+        <section class="space-y-3 text-sm text-[#24352a]" :aria-busy="marketStore.historyLoading" aria-label="Lịch sử mua bán của bạn">
+          <p v-if="marketStore.historyError" role="alert" class="flex items-center justify-between gap-3 rounded-lg border border-red-200 bg-red-50 px-3 py-2 text-xs text-red-700">
+            <span>{{ marketStore.historyError }}</span>
+            <button type="button" class="shrink-0 font-semibold underline disabled:opacity-40" :disabled="marketStore.historyLoading" @click="marketStore.loadHistory(authStore.userId)">Thử lại</button>
+          </p>
+          <p v-if="marketStore.historyLoading" role="status" class="py-2 text-center text-xs text-gray-500">Đang tải lịch sử…</p>
+          <div v-else-if="!marketStore.history.length && !marketStore.historyError" class="rounded-xl border border-dashed border-[#cbd9c6] bg-[#f5f9f0] px-4 py-8 text-center">
+            <p class="font-semibold">Chưa có giao dịch mua bán</p>
+            <p class="mt-1 text-xs text-gray-500">Các giao dịch đã hoàn tất sẽ xuất hiện tại đây.</p>
+          </div>
+          <div v-if="marketStore.history.length" class="max-h-[min(50dvh,26rem)] overflow-y-auto rounded-xl border border-[#cbd9c6]" :class="marketStore.historyLoading ? 'opacity-60' : ''">
+            <ul class="divide-y divide-[#cbd9c6]/60">
+              <li v-for="entry in marketStore.history" :key="entry.id" class="flex items-center gap-2 bg-[#f5f9f0]/60 px-3 py-2.5 sm:gap-3">
+                <span class="shrink-0 rounded-md px-2 py-1 text-[11px] font-semibold" :class="entry.buyer_id === authStore.userId ? 'bg-blue-50 text-blue-700' : 'bg-emerald-100 text-emerald-800'">
+                  {{ entry.buyer_id === authStore.userId ? 'Đã mua' : 'Đã bán' }}
+                </span>
+                <div class="min-w-0 flex-1">
+                  <p class="truncate text-xs font-semibold">{{ entry.item.name || (entry.item.species as any)?.name || (entry.item.fish as any)?.name || 'Cá' }}</p>
+                  <p class="mt-0.5 text-[11px] text-gray-500"><time :datetime="entry.created_at">{{ formatDate(entry.created_at) }}</time> · #{{ entry.id.slice(0, 8) }}</p>
+                </div>
+                <Cash :amount="entry.price" :size="16" :interactive="false" class="shrink-0 text-xs font-semibold" />
+              </li>
+            </ul>
+          </div>
+          <nav v-if="marketStore.history.length || marketStore.historyPage > 1" aria-label="Phân trang lịch sử mua bán" class="flex items-center justify-between gap-3 text-xs">
+            <button type="button" :disabled="marketStore.historyLoading || marketStore.historyPage <= 1" class="rounded-lg border border-[#cbd9c6] px-3 py-1.5 hover:bg-[#f5f9f0] disabled:cursor-not-allowed disabled:opacity-40" @click="marketStore.loadHistory(authStore.userId, marketStore.historyPage - 1)">Trước</button>
+            <span class="text-gray-500">Trang {{ marketStore.historyPage }}</span>
+            <button type="button" :disabled="marketStore.historyLoading || !marketStore.historyHasNext" class="rounded-lg border border-[#cbd9c6] px-3 py-1.5 hover:bg-[#f5f9f0] disabled:cursor-not-allowed disabled:opacity-40" @click="marketStore.loadHistory(authStore.userId, marketStore.historyPage + 1)">Sau</button>
+          </nav>
+        </section>
+      </template>
+    </Tab>
   </Modal>
   <!-- Confirm Buy Dialog -->
   <div
@@ -549,7 +542,7 @@ onUnmounted(() => marketStore.stopRealtime());
     <div
       class="w-full max-w-sm bg-white border border-gray-300 rounded-xl p-5 shadow-[0_12px_32px_rgba(38,50,56,0.3)] text-center relative"
     >
-      <h3 class="m-0 text-base font-bold text-[#263238]">Xác nhận mua cá</h3>
+      <p class="m-0 text-base font-bold text-[#263238]">Xác nhận mua cá</p>
 
       <div class="my-4 p-3 bg-emerald-50 border border-emerald-200 rounded-xl flex items-center gap-3 text-left">
         <img :src="itemToBuy.caught?.fish?.image || '/fish/VN/fish.jpg'" class="h-12 rounded-lg object-cover" />

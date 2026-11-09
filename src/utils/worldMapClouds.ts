@@ -4,7 +4,7 @@ export function createWorldMapCloudTexture(): HTMLCanvasElement | null {
   const size = 512;
   const canvas = document.createElement("canvas");
   canvas.width = canvas.height = size;
-  const context = canvas.getContext("2d");
+  const context = canvas.getContext("2d", { willReadFrequently: true });
   if (!context) return null;
 
   const hash = (x: number, y: number) => {

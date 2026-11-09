@@ -84,7 +84,7 @@ function claimMonthReward(_day: MonthReward, _lane: "free" | "pass") { /* Claims
 
 <template>
   <Modal title="Điểm danh" sub-title="Quà mỗi ngày và mỗi tháng">
-    <div class="mx-auto max-w-6xl">
+    <div class="w-full">
       <Tab v-model="activeTab" :tabs="tabs" aria-label="Loại điểm danh">
         <template #daily>
           <DailyAttendance :reward="dailyRewardToday" :next-claim-at="nextClaimDailyRewardAt" :is-claiming="isClaimingDailyReward" @claim="claimDailyReward" />
@@ -95,7 +95,7 @@ function claimMonthReward(_day: MonthReward, _lane: "free" | "pass") { /* Claims
             <div class="flex flex-wrap items-center justify-between gap-2">
               <div>
                 <h3 class="m-0 text-lg font-extrabold text-[#24352a]">Thẻ điểm danh {{ currentMonthLabel }}</h3>
-                <p class="mb-0 mt-1 text-sm text-emerald-900/60">Hàng Fishing Pass cần mua pass để mở khóa; hàng miễn phí nhận theo từng ngày.</p>
+                <p class="mb-0 mt-1 text-sm text-emerald-900/60">Phần thưởng Fishing Pass cần mua pass để mở khóa</p>
               </div>
               <span class="rounded-full bg-[#f5f9f0] px-3 py-1 text-xs font-bold text-[#24352a]">Ngày {{ currentDay }}/{{ daysInMonth }}</span>
             </div>

@@ -124,41 +124,43 @@ onMounted(() => void loadMissionData(true));
 
 <template>
   <Modal title="Bảng nhiệm vụ" sub-title="Nhiệm vụ theo giờ và hằng ngày" :on-refresh="loadMissionData">
-    <Tab v-model="activeTab" :tabs="tabs" aria-label="Loại nhiệm vụ" lazy>
-      <template #hourly>
-        <div v-if="isLoading || isRefreshing" class="grid h-full place-items-center text-sm text-emerald-900/70">
-          Đang tải cá và nhiệm vụ...
-        </div>
-        <div
-          v-else
-          class="grid grid-rows-[minmax(0,1fr)_minmax(0,1fr)] md:grid-rows-1 md:grid-cols-[minmax(0,1fr)_minmax(0,1fr)] h-full flex-1"
-        >
-          <CaughtFishList
-            :caught-fishes="caughtStore.caughtFishes"
-            :selected-caught-ids="selectedCaughtIds"
-            :required-fish-counts="requiredFishCounts"
-            :selected-fish-counts="selectedFishCounts"
-            @toggle="toggleCaught"
-          />
-          <MissionList
-            :missions="missionStore.missions"
-            :selected-mission="selectedMission"
-            :selected-mission-id="selectedMissionId"
-            :selected-caught-ids="selectedCaughtIds"
-            :required-fish-counts="requiredFishCounts"
-            :selected-fish-counts="selectedFishCounts"
-            :status-message="statusMessage"
-            :status-is-error="statusIsError"
-            :is-mission-complete="isMissionComplete"
-            :is-claiming="isClaiming"
-            @select="selectMission"
-            @claim="claimMission"
-          />
-        </div>
-      </template>
-      <template #daily>
-        <DailyMission />
-      </template>
-    </Tab>
+    <div class="h-full">
+      <Tab v-model="activeTab" :tabs="tabs" aria-label="Loại nhiệm vụ" lazy>
+        <template #hourly>
+          <div v-if="isLoading || isRefreshing" class="grid h-full place-items-center text-sm text-emerald-900/70">
+            Đang tải cá và nhiệm vụ...
+          </div>
+          <div
+            v-else
+            class="grid grid-rows-[minmax(0,1fr)_minmax(0,1fr)] md:grid-rows-1 md:grid-cols-[minmax(0,1fr)_minmax(0,1fr)] h-full flex-1"
+          >
+            <CaughtFishList
+              :caught-fishes="caughtStore.caughtFishes"
+              :selected-caught-ids="selectedCaughtIds"
+              :required-fish-counts="requiredFishCounts"
+              :selected-fish-counts="selectedFishCounts"
+              @toggle="toggleCaught"
+            />
+            <MissionList
+              :missions="missionStore.missions"
+              :selected-mission="selectedMission"
+              :selected-mission-id="selectedMissionId"
+              :selected-caught-ids="selectedCaughtIds"
+              :required-fish-counts="requiredFishCounts"
+              :selected-fish-counts="selectedFishCounts"
+              :status-message="statusMessage"
+              :status-is-error="statusIsError"
+              :is-mission-complete="isMissionComplete"
+              :is-claiming="isClaiming"
+              @select="selectMission"
+              @claim="claimMission"
+            />
+          </div>
+        </template>
+        <template #daily>
+          <DailyMission />
+        </template>
+      </Tab>
+    </div>
   </Modal>
 </template>

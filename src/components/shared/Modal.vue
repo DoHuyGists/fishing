@@ -15,12 +15,14 @@ const {
   guidSteps = [],
   onRefresh = undefined,
   showCountData = true,
+  compact = false,
 } = defineProps<{
   title?: string;
   subTitle?: string;
   guidSteps?: any[];
   onRefresh?: () => void;
   showCountData?: boolean
+  compact?: boolean;
 }>();
 const hasRefreshListener = onRefresh != undefined;
 const hasGuideSteps = guidSteps.length != 0;
@@ -74,12 +76,18 @@ onUnmounted(() => {
 </script>
 
 <template>
-  <div class="fixed inset-0 z-9999 flex h-[100vh] w-screen flex-col bg-white supports-[height:100dvh]:h-[100dvh]">
+  <div class="fixed inset-0 z-9999" :class="compact ? 'flex items-center justify-center bg-black/40 p-3 backdrop-blur-xs' : ''">
+  <div
+    class="flex flex-col bg-white"
+    :class="compact
+      ? 'max-h-[calc(100dvh-1.5rem)] w-full max-w-3xl overflow-hidden rounded-2xl border border-[#cbd9c6] shadow-xl'
+      : 'h-[100vh] w-screen supports-[height:100dvh]:h-[100dvh]'"
+  >
     <header
       class="flex flex-wrap items-center justify-between gap-x-3 gap-y-2 p-2 border-b border-emerald-950/10 bg-[#e7ecda] sm:flex-nowrap sm:gap-4"
     >
       <div class="min-w-0 flex-1 sm:flex-none">
-        <h2 class="m-0 mt-1 break-words text-lg font-bold sm:text-2xl">{{ title }}</h2>
+        <p class="m-0 mt-1 break-words text-lg font-bold sm:text-2xl">{{ title }}</p>
         <p class="m-0 break-words text-[10px] font-extrabold tracking-[0.14em] uppercase text-emerald-800">
           {{ subTitle }}
         </p>
@@ -122,6 +130,7 @@ onUnmounted(() => {
     <div class="min-h-0 flex-1 overflow-y-auto overflow-x-hidden p-2">
       <slot></slot>
     </div>
+  </div>
   </div>
   <GuideTour v-if="showGuide && hasGuideSteps" :steps="guidSteps" @finish="showGuide = false" />
 </template>

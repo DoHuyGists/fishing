@@ -95,7 +95,7 @@ async function onKeydown(e: KeyboardEvent, index: number) {
 </script>
 
 <template>
-  <div class="w-full">
+  <div class="w-full h-full">
     <!-- Danh sách tab -->
     <div
       role="tablist"
@@ -156,7 +156,7 @@ async function onKeydown(e: KeyboardEvent, index: number) {
         role="tabpanel"
         :aria-labelledby="tabId(tab.key)"
         tabindex="0"
-        class="py-4 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-green-500"
+        class="h-full py-4 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-green-500"
       >
         <slot :name="tab.key" :active="tab.key === activeKey" />
       </div>

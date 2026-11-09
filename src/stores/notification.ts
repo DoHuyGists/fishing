@@ -58,7 +58,7 @@ export const useNotificationStore = defineStore("notifications", {
       badgeChannel = supabaseNotificationRepository.subscribeToNotifications(userId, () => {
         void this.loadNotifications(userId);
         onNewNotification();
-      });
+      }, "badge");
     },
 
     async unsubscribeFromNotifications() {

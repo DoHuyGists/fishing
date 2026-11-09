@@ -100,9 +100,9 @@ class SupabaseNotificationRepository {
     if (error) throw new Error(error.message);
   }
 
-  subscribeToNotifications(userId: string, onChange: () => void): RealtimeChannel {
+  subscribeToNotifications(userId: string, onChange: () => void, consumer: "modal" | "badge" = "modal"): RealtimeChannel {
     return supabase
-      .channel(`notifications-modal:${userId}`)
+      .channel(`notifications-${consumer}:${userId}:${crypto.randomUUID()}`)
       .on(
         "postgres_changes",
         { event: "*", schema: "public", table: "personal_notifications", filter: `user_id=eq.${userId}` },

@@ -208,7 +208,7 @@ function updateCloudLayer() {
   const mask = document.createElement("canvas");
   mask.width = size;
   mask.height = size / 2;
-  const maskContext = mask.getContext("2d");
+  const maskContext = mask.getContext("2d", { willReadFrequently: true });
   if (!maskContext) return;
 
   const cloudProjection = d3.geoEquirectangular().fitSize([size, size / 2], { type: "Sphere" });
