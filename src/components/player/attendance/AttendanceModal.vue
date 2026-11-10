@@ -37,7 +37,9 @@ const nextClaimDailyRewardAt = ref<Date | null>(null);
 const isClaimingDailyReward = ref(false);
 const monthRewards = computed(() => [] as MonthReward[]);
 
-onMounted(async () => {
+async function loadData() {
+  if (isClaimingDailyReward.value || fishingPassStore.isBuying) return;
+  now.value = new Date();
   try {
     await fishingPassStore.fetchCurrentPass();
   } catch {
@@ -49,6 +51,10 @@ onMounted(async () => {
   } catch (err) {
     toast.error(err instanceof Error ? err.message : "Không thể tải trạng thái điểm danh.", { title: "Tải thất bại", position: "bottom" });
   }
+}
+
+onMounted(() => {
+  void loadData();
   clockInterval = setInterval(() => {
     now.value = new Date();
   }, 30_000);
@@ -83,7 +89,7 @@ function claimMonthReward(_day: MonthReward, _lane: "free" | "pass") { /* Claims
 </script>
 
 <template>
-  <Modal title="Điểm danh" sub-title="Quà mỗi ngày và mỗi tháng">
+  <Modal title="Điểm danh" sub-title="Quà mỗi ngày và mỗi tháng" :on-refresh="loadData">
     <div class="w-full">
       <Tab v-model="activeTab" :tabs="tabs" aria-label="Loại điểm danh">
         <template #daily>

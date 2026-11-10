@@ -1,5 +1,5 @@
 <template>
-  <Modal title="Gacha">
+  <Modal title="Gacha" :on-refresh="refreshRewards">
     <div class="flex w-full flex-col lg:flex-row">
       <div
         class="h-75 overflow-y-scroll min-h-0 w-full border-b border-emerald-300/20 p-2 sm:p-2 lg:h-full lg:w-1/2 lg:border-b-0 lg:border-r"
@@ -15,6 +15,9 @@
           :spin-confirmation="{ currentBalance: currencyStore.tickets, totalCost: 1 }"
           :disabled="!canSpin"
           :size="wheelSize"
+          @spin-start="isSpinning = true"
+          @spin-end="isSpinning = false"
+          @error="isSpinning = false"
         />
         <div class="text-center text-sm">
           <div v-if="spinWheelStore.season" class="font-semibold">{{ spinWheelStore.season.name }}</div>
@@ -45,6 +48,7 @@ import Tickets from "../currency/Tickets.vue";
 
 const spinWheelStore = useSpinWheelStore();
 const currencyStore = useCurrencyStore();
+const isSpinning = ref(false);
 const viewportWidth = ref(window.innerWidth);
 const eligibleRewards = computed(() => spinWheelStore.rewardList);
 const canSpin = computed(() => !spinWheelStore.loading && !spinWheelStore.error && !!spinWheelStore.season && eligibleRewards.value.length > 0 && currencyStore.tickets >= 1);
@@ -52,6 +56,11 @@ const wheelSize = computed(() => (viewportWidth.value < 640 ? 200 : viewportWidt
 
 function updateViewportWidth() {
   viewportWidth.value = window.innerWidth;
+}
+
+async function refreshRewards() {
+  if (isSpinning.value) return;
+  await Promise.all([spinWheelStore.setReward(), currencyStore.fetchCurrency()]);
 }
 
 onMounted(() => window.addEventListener("resize", updateViewportWidth));

@@ -229,14 +229,18 @@ const statusClass: Record<string, string> = {
 };
 
 // ─── Lifecycle ───────────────────────────────────────────────────────────────
-onMounted(async () => {
+async function loadData() {
   await Promise.all([teamStore.loadData(userId.value), friendStore.loadData(userId.value)]);
+}
+
+onMounted(async () => {
+  await loadData();
   view.value = "room";
 });
 </script>
 
 <template>
-  <Modal title="Lập đội câu" sub-title="Tìm đồng đội cùng chinh phục">
+  <Modal title="Lập đội câu" sub-title="Tìm đồng đội cùng chinh phục" :on-refresh="loadData">
     <!-- ── Loading ── -->
     <div v-if="teamStore.loading" class="flex flex-col items-center justify-center gap-3 py-12 text-[#5a7a5a]">
       <span class="block w-8 h-8 border-[3px] border-[#d1e7d1] border-t-[#3b7a57] rounded-full animate-spin" />

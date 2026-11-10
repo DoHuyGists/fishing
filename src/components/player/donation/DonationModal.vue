@@ -1,5 +1,5 @@
 <template>
-  <Modal title="Ủng hộ phát triển" :show-count-data="false">
+  <Modal title="Ủng hộ phát triển" :show-count-data="false" :on-refresh="refreshQr">
     <main class="mx-auto w-full max-w-3xl space-y-6 px-2 py-5 text-[#24352a] sm:py-8">
       <div class="space-y-2 text-center">
         <h3 class="text-xl font-bold sm:text-2xl">Cùng duy trì và phát triển game</h3>
@@ -13,10 +13,10 @@
         <div class="min-w-0 space-y-4">
         <figure class="min-w-0 overflow-hidden rounded-xl border border-[#cbd9c6] bg-white">
           <div v-if="!qrFailed" class="p-4">
-            <img :src="donationQrUrl" alt="Mã QR ủng hộ nhà phát triển, chủ tài khoản DO HUY, số tài khoản 060319966989" class="mx-auto h-auto w-full max-w-sm object-contain" draggable="false" @error="qrFailed = true" />
+            <img :src="qrImageUrl" alt="Mã QR ủng hộ nhà phát triển, chủ tài khoản DO HUY, số tài khoản 060319966989" class="mx-auto h-auto w-full max-w-sm object-contain" draggable="false" @error="qrFailed = true" />
           </div>
           <p v-else role="alert" class="px-5 py-12 text-center text-sm leading-6">
-            Không tải được mã QR. Bạn hãy đóng và mở lại cửa sổ để thử lại.
+            Không tải được mã QR. Bạn hãy nhấn Làm mới để thử lại.
           </p>
         </figure>
 
@@ -79,7 +79,13 @@ import { useToast } from "../../../composables/useToast.ts";
 const donationQrUrl = `${import.meta.env.BASE_URL}Sacombank_060319966989_DoHuy.png`;
 const donationAccountNumber = "060319966989";
 const qrFailed = ref(false);
+const qrImageUrl = ref(donationQrUrl);
 const toast = useToast();
+
+function refreshQr() {
+  qrFailed.value = false;
+  qrImageUrl.value = `${donationQrUrl}?refresh=${Date.now()}`;
+}
 
 async function copyAccountNumber() {
   try {

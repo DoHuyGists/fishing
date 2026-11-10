@@ -49,17 +49,24 @@ const usedSetIndex = computed(() => {
   return idx >= 0 ? idx : 0;
 });
 
-onMounted(async () => {
+async function loadData() {
+  if (switchingSet.value || selectingItemId.value) return;
   loading.value = true;
   error.value = "";
   try {
-    await inventoryStore.setEquipmentSet();
+    await Promise.all([
+      inventoryStore.setEquipmentSet(),
+      diaryStore.loadDiscoveredAreaSpecies(worldStore.selectedArea.id, authStore.userId),
+      userTurnsStore.fetchStatus(),
+    ]);
   } catch (err: any) {
     error.value = err?.message ?? "Không thể tải trang bị";
   } finally {
     loading.value = false;
   }
-});
+}
+
+onMounted(loadData);
 
 function isImageUrl(val?: string): boolean {
   if (!val) return false;
@@ -212,7 +219,7 @@ async function confirm() {
 </script>
 
 <template>
-  <Modal :title="worldStore.selectedArea.title">
+  <Modal :title="worldStore.selectedArea.title" :on-refresh="loadData">
     <div class="flex flex-col w-full h-full bg-[#f5f9f0] text-[#24352a] overflow-hidden">
       <!-- Body -->
       <div

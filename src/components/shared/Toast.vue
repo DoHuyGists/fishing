@@ -95,11 +95,12 @@ onBeforeUnmount(() => activeTimers.forEach(clearTimeout));
 </script>
 
 <template>
+  <Teleport to="body">
   <div aria-label="Thông báo" :aria-live="liveMode" aria-relevant="additions text">
     <div
       v-for="group in groupedToasts"
       :key="group.position"
-      class="pointer-events-none fixed z-[10000] w-[min(25rem,calc(100vw-2rem))]"
+      class="pointer-events-none fixed z-[10050] w-[min(25rem,calc(100vw-2rem))]"
       :class="positionClasses[group.position]"
     >
       <TransitionGroup
@@ -131,7 +132,7 @@ onBeforeUnmount(() => activeTimers.forEach(clearTimeout));
             <strong v-if="toast.title" class="mb-1 block text-sm font-bold leading-snug tracking-[0.01em]">{{
               toast.title
             }}</strong>
-            <p class="m-0 break-words text-sm leading-relaxed text-[#526354]">{{ toast.message }}</p>
+            <div class="m-0 break-words text-sm leading-relaxed text-[#526354]">{{ toast.message }}</div>
             <button
               v-if="toast.action"
               class="mt-2 inline-flex rounded-md bg-transparent p-0 text-sm font-bold underline decoration-1 underline-offset-4 transition-colors hover:brightness-75 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#78906f] focus-visible:ring-offset-2"
@@ -156,4 +157,5 @@ onBeforeUnmount(() => activeTimers.forEach(clearTimeout));
       </TransitionGroup>
     </div>
   </div>
+  </Teleport>
 </template>

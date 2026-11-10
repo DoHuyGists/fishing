@@ -1,6 +1,7 @@
 import { defineStore } from "pinia";
 import { supabaseCurrencyRepository, type CurrencyConversionRate } from "../data/supabaseCurrencyRepository";
 import { useAuthStore } from "./auth";
+import { useToast } from "../composables/useToast";
 
 export const useCurrencyStore = defineStore("currency", {
   state: () => ({
@@ -13,7 +14,6 @@ export const useCurrencyStore = defineStore("currency", {
     conversionRatesLoading: false,
     conversionRatesError: "",
     converting: false,
-    conversionNotice: null as { type: "success" | "error"; text: string } | null,
     conversionBatches: {} as Record<string, number>,
   }),
   getters: {
@@ -44,25 +44,28 @@ export const useCurrencyStore = defineStore("currency", {
       const batches = this.conversionBatches[`${rate.source_currency}-${rate.target_currency}`] ?? 1;
       return { batches, cost: batches * rate.source_amount, received: batches * rate.target_amount };
     },
-    canConvert(rate: CurrencyConversionRate): boolean {
+    hasValidConversionAmounts(rate: CurrencyConversionRate): boolean {
       const { batches, cost, received } = this.conversionAmounts(rate);
-      return !this.converting && !this.loading && !this.error && !this.conversionRatesLoading && !this.conversionRatesError
-        && Number.isSafeInteger(batches) && batches > 0
+      return Number.isSafeInteger(batches) && batches > 0
         && Number.isSafeInteger(cost) && cost > 0
-        && Number.isSafeInteger(received) && received > 0 && this[rate.source_currency] >= cost;
+        && Number.isSafeInteger(received) && received > 0;
+    },
+    canConvert(rate: CurrencyConversionRate): boolean {
+      return !this.converting && !this.loading && !this.error && !this.conversionRatesLoading && !this.conversionRatesError
+        && this.hasValidConversionAmounts(rate)
+        && this[rate.source_currency] >= this.conversionAmounts(rate).cost;
     },
     async convertCurrency(rate: CurrencyConversionRate) {
       if (!this.canConvert(rate)) return;
       this.converting = true;
-      this.conversionNotice = null;
       try {
         const wallet = await supabaseCurrencyRepository.convertCurrency(rate, this.conversionAmounts(rate).batches);
         this.cash = wallet.cash;
         this.shells = wallet.shells;
         this.tickets = wallet.tickets;
-        this.conversionNotice = { type: "success", text: "Quy đổi tiền tệ thành công!" };
+        useToast().success("Quy đổi tiền tệ thành công!");
       } catch (error) {
-        this.conversionNotice = { type: "error", text: error instanceof Error ? error.message : "Không thể quy đổi tiền tệ." };
+        useToast().error(error instanceof Error ? error.message : "Không thể quy đổi tiền tệ.");
         await this.fetchConversionRates();
         await this.fetchCurrency();
       } finally {

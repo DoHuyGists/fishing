@@ -49,7 +49,7 @@ function returnToBookshelf() {
 </script>
 
 <template>
-  <Modal :title="viewMode === 'bookshelf' ? 'Nhật ký đánh bắt' : `Nhật ký đánh bắt: ${selectedCountry?.name}`">
+  <Modal :title="viewMode === 'bookshelf' ? 'Nhật ký đánh bắt' : `Nhật ký đánh bắt: ${selectedCountry?.name}`" :on-refresh="retry">
     <div class="relative flex flex-col min-h-[620px] h-full w-full">
       <div class="mb-2">
         <button

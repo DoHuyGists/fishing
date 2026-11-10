@@ -73,7 +73,8 @@ function selectBlueprint(blueprint: Blueprint) {
   craftQuantity.value = 1;
 }
 
-onMounted(async () => {
+async function loadData() {
+  if (isLoading.value) return;
   isLoading.value = true;
   errorMessage.value = "";
   try {
@@ -84,7 +85,9 @@ onMounted(async () => {
   } finally {
     isLoading.value = false;
   }
-});
+}
+
+onMounted(loadData);
 
 const guideSteps = [
   { target: "#workbench-palette", title: "Vật phẩm", description: "Danh sách vật phẩm hiện có trong túi." },
@@ -94,7 +97,7 @@ const guideSteps = [
 </script>
 
 <template>
-  <Modal title="Bàn chế tạo" sub-title="Work bench" :guid-steps="guideSteps">
+  <Modal title="Bàn chế tạo" sub-title="Work bench" :guid-steps="guideSteps" :on-refresh="loadData">
     <section class="grid min-h-full w-full grid-cols-1 gap-4 text-[#24352a] lg:h-full lg:min-h-0 lg:grid-cols-[minmax(15rem,0.8fr)_minmax(0,1.8fr)]">
       <aside id="workbench-palette" class="flex min-h-0 flex-col rounded-lg border border-[#cbd9c6] bg-[#f5f9f0] p-3">
         <h3 class="mb-3 text-sm font-bold">Vật phẩm trong túi</h3>
