@@ -16,12 +16,13 @@
  * -----------------------------------------------------------------------
  */
 import { ref, computed, onBeforeUnmount } from 'vue'
-import Cash from '../currency/Cash.vue'
+import Tickets from '../currency/Tickets.vue'
 export interface Reward {
   id: string | number
   label: string
   value: string | number
   image?: string
+  information?: string
   /** Màu nền của lát cắt tương ứng, nếu không truyền sẽ dùng bảng màu mặc định */
   color?: string
 }
@@ -255,7 +256,7 @@ onBeforeUnmount(() => {
       </button>
     </div>
 
-    <p v-if="errorMsg" class="text-sm font-medium text-red-500">{{ errorMsg }}</p>
+    <div v-if="errorMsg" role="alert" class="text-sm font-medium text-red-500">{{ errorMsg }}</div>
 
     <Teleport to="body">
       <div
@@ -270,18 +271,18 @@ onBeforeUnmount(() => {
           aria-modal="true"
           aria-labelledby="spin-confirmation-title"
         >
-          <h2 id="spin-confirmation-title" class="m-0 text-center text-lg font-bold">
+          <div id="spin-confirmation-title" class="m-0 text-center text-lg font-bold">
             Xác nhận quay?
-          </h2>
+          </div>
           <div class="mt-5 space-y-3 text-sm">
             <div class="flex items-center justify-between gap-3">
               <span>Số dư hiện tại:</span>
-              <Cash :amount="spinConfirmation.currentBalance" />
+              <Tickets :amount="spinConfirmation.currentBalance" />
             </div>
             <hr>
             <div class="flex items-center justify-between gap-3 font-semibold">
               <span>Tổng chi phí lượt quay:</span>
-              <Cash :amount="spinConfirmation.totalCost" />
+              <Tickets :amount="spinConfirmation.totalCost" />
             </div>
           </div>
           <div class="mt-6 flex justify-center gap-3">
@@ -319,8 +320,8 @@ onBeforeUnmount(() => {
               :alt="resultReward.label"
               class="mx-auto mb-4 h-24 w-24 object-contain"
             />
-            <p class="mb-1 text-sm text-slate-500">Chúc mừng bạn đã nhận được</p>
-            <p class="mb-6 text-2xl font-bold text-slate-900">{{ resultReward?.label }}</p>
+            <div class="mb-1 text-sm text-slate-500">Chúc mừng bạn đã nhận được</div>
+            <div class="mb-6 text-2xl font-bold text-slate-900">{{ resultReward?.label }}</div>
             <button
               type="button"
               class="rounded-full bg-slate-900 px-6 py-2 text-sm font-semibold text-white transition-colors hover:bg-slate-700"

@@ -1,4 +1,5 @@
 import supabase from "../database/connection";
+import type { SpinWheelResult } from "./supabaseSpinWheelRepository";
 
 export interface UserInventory {
   id: string;
@@ -27,14 +28,12 @@ class SupabaseUserInventoryRepository {
         }) as UserInventory,
     );
   }
-  async claimRandomItem(itemIds: string[]): Promise<string> {
-    const { data, error } = await supabase.rpc("spin_wheel", {
-      p_item_ids: itemIds,
-    });
+  async claimRandomItem(): Promise<SpinWheelResult> {
+    const { data, error } = await supabase.rpc("spin_wheel");
     if (error) {
       throw new Error(error.message);
     }
-    return data.item_id;
+    return data;
   }
   async purchaseItem(itemId: string, quantity: number): Promise<void> {
     const { error } = await supabase.rpc("purchase_item", { p_item_id: itemId, p_quantity: quantity });

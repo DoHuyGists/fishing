@@ -13,6 +13,7 @@ import { useUserProfileStore } from "../../../stores/userProfile.ts";
 import UserTurn from "../stamina/UserTurn.vue";
 import Cash from "../currency/Cash.vue";
 import Shells from "../currency/Shells.vue";
+import Tickets from "../currency/Tickets.vue";
 import SkillPoints from "../currency/SkillPoints.vue";
 import TeamMembersSticky from "../team/TeamMembersSticky.vue";
 import PrepareModal from "./PrepareModal.vue";
@@ -105,6 +106,7 @@ onUnmounted(() => {
       <div class="flex flex-wrap items-center justify-end gap-2">
         <Cash :amount="currencyStore.formattedCash" />
         <Shells :amount="currencyStore.formattedShells" />
+        <Tickets :amount="currencyStore.formattedTickets" />
         <SkillPoints :amount="userProfileStore.skillPoints" />
         <UserTurn />
       </div>

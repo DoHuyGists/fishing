@@ -7,6 +7,7 @@ export interface CurrencyRow {
   user_id: string;
   cash: number;
   shells: number;
+  tickets: number;
 }
 
 class SupabaseCurrencyRepository {
@@ -18,6 +19,17 @@ class SupabaseCurrencyRepository {
     }
 
     return data;
+  }
+
+  async fetchTickets(userId: string): Promise<number> {
+    const { data, error } = await supabase
+      .from("currency")
+      .select("tickets")
+      .eq("user_id", userId)
+      .maybeSingle();
+
+    if (error) throw new Error(error.message);
+    return data?.tickets ?? 0;
   }
 
   async buyFishingPass(): Promise<void> {

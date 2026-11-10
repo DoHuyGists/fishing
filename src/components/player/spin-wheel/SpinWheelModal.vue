@@ -12,22 +12,23 @@
         <SpinWheel
           :rewards="eligibleRewards"
           :fetch-reward-index="fetchRewardIndex"
-          :spin-confirmation="{ currentBalance: currencyStore.cash, totalCost: spinFee }"
+          :spin-confirmation="{ currentBalance: currencyStore.tickets, totalCost: 1 }"
           :disabled="!canSpin"
-          @spin-end="onWin"
           :size="wheelSize"
         />
         <div class="text-center text-sm">
-          {{
-            canSpin
-              ? `${eligibleRewards.length} vật phẩm trong vòng quay`
-              : `Chọn thêm ${4 - eligibleRewards.length} vật phẩm nữa để quay`
-          }}
+          <div v-if="spinWheelStore.season" class="font-semibold">{{ spinWheelStore.season.name }}</div>
+          <span v-if="spinWheelStore.loading">Đang tải mùa quay...</span>
+          <span v-else-if="spinWheelStore.error" role="alert">{{ spinWheelStore.error }}</span>
+          <span v-else-if="!spinWheelStore.season">Chưa có mùa quay đang diễn ra.</span>
+          <span v-else-if="!eligibleRewards.length">Mùa quay chưa có phần thưởng.</span>
+          <span v-else>{{ eligibleRewards.length }} vật phẩm trong vòng quay</span>
         </div>
-        <div v-if="canSpin" class="flex items-center gap-2 text-xs">
-          <span>Chi phí lượt quay này: </span>
-          <Cash :amount="spinFee" />
+        <div class="flex items-center gap-2 text-xs">
+          <span>Chi phí mỗi lượt quay:</span>
+          <Tickets :amount="1" />
         </div>
+        <div v-if="currencyStore.tickets < 1" class="text-sm text-amber-800">Bạn cần ít nhất 1 vé để quay.</div>
       </div>
     </div>
   </Modal>
@@ -39,20 +40,15 @@ import { useSpinWheelStore } from "../../../stores/spinWheel.ts";
 import { useCurrencyStore } from "../../../stores/currency.ts";
 import ListItems from "./ListItems.vue";
 import SpinWheel from "./SpinWheel.vue";
-import type { Reward } from "./SpinWheel.vue";
 import Modal from "../../shared/Modal.vue";
-import Cash from "../currency/Cash.vue";
+import Tickets from "../currency/Tickets.vue";
 
 const spinWheelStore = useSpinWheelStore();
 const currencyStore = useCurrencyStore();
 const viewportWidth = ref(window.innerWidth);
-const eligibleRewards = computed(() => spinWheelStore.selectedReward);
-const canSpin = computed(() => eligibleRewards.value.length >= 4);
+const eligibleRewards = computed(() => spinWheelStore.rewardList);
+const canSpin = computed(() => !spinWheelStore.loading && !spinWheelStore.error && !!spinWheelStore.season && eligibleRewards.value.length > 0 && currencyStore.tickets >= 1);
 const wheelSize = computed(() => (viewportWidth.value < 640 ? 200 : viewportWidth.value < 1024 ? 340 : 480));
-const SPIN_BASE_COST = 1000;
-const spinFee = computed(() => {
-  return (spinWheelStore.rewardList.length + 1) * SPIN_BASE_COST - eligibleRewards.value.length * SPIN_BASE_COST;
-});
 
 function updateViewportWidth() {
   viewportWidth.value = window.innerWidth;
@@ -63,8 +59,7 @@ onBeforeUnmount(() => window.removeEventListener("resize", updateViewportWidth))
 
 // item_id returned by the RPC is matched back to its segment in eligibleRewards.
 async function fetchRewardIndex(): Promise<number> {
-  const itemIds = eligibleRewards.value.map((reward) => String(reward.id));
-  const itemId = await spinWheelStore.claimRandomItem(itemIds);
+  const itemId = await spinWheelStore.claimRandomItem();
   const index = eligibleRewards.value.findIndex((reward) => String(reward.id) === itemId);
   if (index === -1) {
     throw new Error("Không tìm thấy vật phẩm tương ứng với item_id trả về.");
@@ -72,7 +67,4 @@ async function fetchRewardIndex(): Promise<number> {
   return index;
 }
 
-function onWin(reward: Reward) {
-  console.log("Nhận thưởng:", reward);
-}
 </script>

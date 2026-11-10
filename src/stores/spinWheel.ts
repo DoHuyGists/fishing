@@ -1,25 +1,54 @@
 import { defineStore } from "pinia";
 import type { Reward } from "../components/player/spin-wheel/SpinWheel.vue";
 import { supabaseUserInventoryRepository } from "../data/supabaseUserInventoryRepository.ts";
-import { supabaseItemRepository } from "../data/supabaseItemRepository.ts";
+import { supabaseSpinWheelRepository, type SpinWheelSeasonRewards } from "../data/supabaseSpinWheelRepository";
+import { useCurrencyStore } from "./currency";
 
 export const useSpinWheelStore = defineStore("SpinWheel", {
   state: () => ({
-    selectedReward: [] as Reward[],
+    season: null as SpinWheelSeasonRewards["season"],
     rewardList: [] as Reward[],
+    loading: false,
+    claiming: false,
+    error: "",
   }),
   actions: {
-    async setReward() {
-      const items = await supabaseItemRepository.getReward();
-      this.rewardList = items.map((x) => ({
-        id: x.id,
-        label: x.name,
-        value: x.category,
-        image: x.image,
+    applyRewards(data: SpinWheelSeasonRewards) {
+      this.season = data.season;
+      this.rewardList = data.rewards.map((item) => ({
+        id: item.id,
+        label: item.name,
+        value: item.category,
+        image: item.image ?? undefined,
+        information: item.information ?? "",
       }));
     },
-    async claimRandomItem(itemIds: string[]): Promise<string> {
-      return await supabaseUserInventoryRepository.claimRandomItem(itemIds);
+    async setReward() {
+      if (this.loading || this.claiming) return;
+      this.loading = true;
+      this.error = "";
+      this.season = null;
+      this.rewardList = [];
+      try {
+        this.applyRewards(await supabaseSpinWheelRepository.fetchRewards());
+      } catch (err) {
+        this.error = err instanceof Error ? err.message : "Không thể tải phần thưởng vòng quay.";
+      } finally {
+        this.loading = false;
+      }
+    },
+    async claimRandomItem(): Promise<string> {
+      if (this.claiming) throw new Error("Đang xử lý lượt quay.");
+      this.claiming = true;
+      try {
+        const result = await supabaseUserInventoryRepository.claimRandomItem();
+        // Use the server snapshot if the season changed while the modal was open.
+        this.applyRewards(result);
+        useCurrencyStore().tickets = result.remaining_tickets;
+        return result.item_id;
+      } finally {
+        this.claiming = false;
+      }
     },
   },
 });
