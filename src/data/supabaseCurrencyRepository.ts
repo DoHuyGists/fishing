@@ -10,7 +10,34 @@ export interface CurrencyRow {
   tickets: number;
 }
 
+export type CurrencyKind = "cash" | "shells" | "tickets";
+
+export interface CurrencyConversionRate {
+  source_currency: CurrencyKind;
+  target_currency: CurrencyKind;
+  source_amount: number;
+  target_amount: number;
+}
+
 class SupabaseCurrencyRepository {
+  async fetchConversionRates(): Promise<CurrencyConversionRate[]> {
+    const { data, error } = await supabase.rpc("get_currency_conversion_rates");
+    if (error) throw new Error(error.message);
+    return data ?? [];
+  }
+
+  async convertCurrency(rate: CurrencyConversionRate, batches: number): Promise<Pick<CurrencyRow, "cash" | "shells" | "tickets">> {
+    const { data, error } = await supabase.rpc("convert_currency", {
+      p_source_currency: rate.source_currency,
+      p_target_currency: rate.target_currency,
+      p_batches: batches,
+      p_source_amount: rate.source_amount,
+      p_target_amount: rate.target_amount,
+    });
+    if (error) throw new Error(error.message);
+    return data;
+  }
+
   async fetchMyCurrency(): Promise<any> {
     const { data, error } = await supabase.rpc("get_my_currency");
 

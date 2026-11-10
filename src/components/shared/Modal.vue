@@ -8,6 +8,7 @@ import SkillPoints from "../player/currency/SkillPoints.vue";
 import GuideTour from "./GuideTour.vue";
 import UserTurn from "../player/stamina/UserTurn.vue";
 import Shells from "../player/currency/Shells.vue";
+import Tickets from "../player/currency/Tickets.vue";
 
 const {
   title = "",
@@ -95,6 +96,7 @@ onUnmounted(() => {
       <div v-if="showCountData" class="flex flex-col md:flex-row md:gap-2 order-2 ml-auto shrink-0 sm:order-none sm:ml-0">
         <Cash :amount="currencyStore.formattedCash" />
         <Shells :amount="currencyStore.formattedShells" />
+        <Tickets :amount="currencyStore.formattedTickets" />
         <SkillPoints :amount="userProfileStore.skillPoints" />
         <UserTurn />
       </div>

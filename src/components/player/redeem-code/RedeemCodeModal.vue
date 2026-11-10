@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import { onUnmounted, ref } from "vue";
 import Modal from "../../shared/Modal.vue";
+import CurrencyConvertTable from "./CurrencyConvertTable.vue";
 import supabase from "../../../database/connection.ts";
 
 const code = ref("");
@@ -62,14 +63,14 @@ onUnmounted(() => {
         class="w-full rounded-lg border border-emerald-900/20 px-3 py-2.5 text-sm outline-none transition focus:border-emerald-700 focus:ring-2 focus:ring-emerald-700/15 disabled:bg-gray-100"
       />
 
-      <p
+      <div
         v-if="notice"
         class="mt-4 rounded-lg px-3 py-2 text-sm font-medium"
         :class="notice.type === 'success' ? 'bg-emerald-50 text-emerald-800' : 'bg-red-50 text-red-700'"
         :role="notice.type === 'error' ? 'alert' : 'status'"
       >
         {{ notice.text }}
-      </p>
+      </div>
 
       <div class="mt-5 flex justify-center gap-2">
         <button
@@ -81,5 +82,6 @@ onUnmounted(() => {
         </button>
       </div>
     </form>
+    <CurrencyConvertTable />
   </Modal>
 </template>

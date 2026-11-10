@@ -31,7 +31,7 @@ const InventoryModal = defineAsyncComponent(() => import("../inventory/Inventory
 const Feedbackmodal = defineAsyncComponent(() => import("../feedback/Feedbackmodal.vue"));
 const MissionModal = defineAsyncComponent(() => import("../mission/MissionModal.vue"));
 const EventModal = defineAsyncComponent(() => import("../event/EventModal.vue"));
-const RedeemCode = defineAsyncComponent(() => import("../redeem-code/RedeemCode.vue"));
+const RedeemCode = defineAsyncComponent(() => import("../redeem-code/RedeemCodeModal.vue"));
 const NotificationModal = defineAsyncComponent(() => import("../notification/NotificationModal.vue"));
 const CaughtModal = defineAsyncComponent(() => import("../caught/CaughtModal.vue"));
 const FactionSelectModal = defineAsyncComponent(() => import("../faction/FactionSelectModal.vue"));
