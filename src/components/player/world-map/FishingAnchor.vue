@@ -3,6 +3,13 @@ import { onMounted } from "vue";
 import { useCountryStore } from "../../../stores/country";
 import { useFishingAreaStore } from "../../../stores/fishingArea";
 import { useWorldStore } from "../../../stores/worldMap";
+
+withDefaults(defineProps<{ collapsible?: boolean; mapVisible?: boolean }>(), {
+  collapsible: false,
+  mapVisible: true,
+});
+defineEmits<{ 'toggle-map': [] }>();
+
 const countryStore = useCountryStore();
 const fishingAreaStore = useFishingAreaStore();
 const worldStore = useWorldStore();
@@ -14,14 +21,26 @@ onMounted(() => {
 </script>
 <template>
   <aside
-    class="w-full md:w-60 flex-none h-full p-4 border border-[#cbd9c6] rounded-xl bg-[#f5f9f0] text-[#24352a] flex flex-col overflow-hidden"
+    class="w-full flex-none h-full p-4 border border-[#cbd9c6] rounded-xl bg-[#f5f9f0] text-[#24352a] flex flex-col overflow-hidden"
+    :class="{ 'md:w-60': mapVisible }"
   >
-    <div class="flex items-center gap-2">
+    <header class="flex items-center gap-2">
       <img src="/icons/check-point.svg" width="35" alt="" draggable="false" />
-      <h2 class="m-0 text-lg font-bold">Bản đồ</h2>
-    </div>
-    <div class="mt-5 flex-1 overflow-y-auto">
-      <p id="fishing-anchor-heading" class="m-0 text-[13px] font-bold">Danh sách bãi câu</p>
+      <span class="min-w-0 flex-1 text-lg font-bold">Bản đồ</span>
+      <button
+        v-if="collapsible"
+        type="button"
+        class="flex size-9 shrink-0 cursor-pointer items-center justify-center rounded-lg border border-[#cbd9c6] hover:bg-[#e5eddf] focus-visible:outline-2 focus-visible:outline-[#24352a]"
+        :aria-label="mapVisible ? 'Ẩn bản đồ' : 'Hiện bản đồ'"
+        :title="mapVisible ? 'Ẩn bản đồ' : 'Hiện bản đồ'"
+        :aria-expanded="mapVisible"
+        @click="$emit('toggle-map')"
+      >
+        <span aria-hidden="true">{{ mapVisible ? '🙈' : '🗺️' }}</span>
+      </button>
+    </header>
+    <div v-if="mapVisible" class="mt-5 flex-1 overflow-y-auto">
+      <div id="fishing-anchor-heading" class="m-0 text-[13px] font-bold">Danh sách bãi câu</div>
       <ul
         v-if="fishingAreaStore.fishingAreas.length"
         aria-labelledby="fishing-anchor-heading"
@@ -67,16 +86,16 @@ onMounted(() => {
           </details>
         </li>
       </ul>
-      <p v-if="fishingAreaStore.loading" class="mt-2 mb-0 text-[#607176] text-xs" role="status">
+      <div v-if="fishingAreaStore.loading" class="mt-2 mb-0 text-[#607176] text-xs" role="status">
         Đang tải bãi câu...
-      </p>
-      <p v-else-if="fishingAreaStore.error" class="mt-2 mb-0 text-red-700 text-xs" role="alert">
+      </div>
+      <div v-else-if="fishingAreaStore.error" class="mt-2 mb-0 text-red-700 text-xs" role="alert">
         {{ fishingAreaStore.error }}
         <button type="button" class="cursor-pointer underline" @click="fishingAreaStore.fetchArea()">Thử lại</button>
-      </p>
-      <p v-else-if="!fishingAreaStore.fishingAreas.length" class="mt-2 mb-0 text-[#607176] text-xs">
+      </div>
+      <div v-else-if="!fishingAreaStore.fishingAreas.length" class="mt-2 mb-0 text-[#607176] text-xs">
         Chưa có bãi câu
-      </p>
+      </div>
     </div>
   </aside>
 </template>

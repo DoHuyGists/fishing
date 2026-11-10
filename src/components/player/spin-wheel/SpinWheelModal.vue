@@ -7,7 +7,7 @@
         <ListItems />
       </div>
       <div
-        class="flex min-h-0 w-full flex-1 flex-col items-center justify-center gap-4 overflow-y-auto p-4 sm:p-8 lg:w-1/2"
+        class="flex min-h-0 w-full flex-1 flex-col items-center justify-center gap-4 overflow-y-auto lg:w-1/2"
       >
         <SpinWheel
           :rewards="eligibleRewards"

@@ -11,7 +11,10 @@ import FishingAnchor from "./FishingAnchor.vue";
 import { useModalStore } from "../../../stores/modal.ts";
 import { useCountryStore } from "../../../stores/country.ts";
 
-const props = withDefaults(defineProps<{ fogEnabled?: boolean }>(), { fogEnabled: true });
+const props = withDefaults(defineProps<{ fogEnabled?: boolean; collapsible?: boolean }>(), {
+  fogEnabled: true,
+  collapsible: false,
+});
 
 const toast = useToast();
 const authStore = useAuthStore();
@@ -26,9 +29,16 @@ const mapRef = ref<InstanceType<typeof WorldMap> | null>(null);
 const pickEnabled = computed(() => worldStore.isAnchorMode);
 const anchor = computed(() => worldStore.pickedLocation);
 const worldStore = useWorldStore();
+const isMapVisible = computed(() => !props.collapsible || worldStore.isMapVisible);
 const selectedArea = computed(() => (worldStore.selectedArea?.id ? worldStore.selectedArea : null));
 const pendingArea = ref<any | null>(null);
 const isEntering = ref(false);
+
+watch(isMapVisible, async (visible) => {
+  if (!visible) return;
+  await nextTick();
+  mapRef.value?.setView(worldStore.getLocation());
+});
 
 watch(
   () => [props.fogEnabled, authStore.user?.id ?? null] as const,
@@ -135,9 +145,13 @@ function zoomTo(k: number) {
 </script>
 
 <template>
-  <div class="grid grid-cols-1 md:grid-cols-[auto_1fr] h-fit gap-2">
-    <FishingAnchor />
-    <div class="flex flex-col gap-2">
+  <div class="grid grid-cols-1 h-fit gap-2" :class="{ 'md:grid-cols-[auto_1fr]': isMapVisible }">
+    <FishingAnchor
+      :collapsible="collapsible"
+      :map-visible="isMapVisible"
+      @toggle-map="worldStore.toggleMapVisibility()"
+    />
+    <div v-if="isMapVisible" class="flex flex-col gap-2">
       <div class="w-full h-fit overflow-hidden grid place-items-center border border-gray-300 rounded-xl">
         <WorldMap
           ref="mapRef"

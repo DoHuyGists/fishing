@@ -9,19 +9,19 @@ const recentCaughtFishes = computed(() => caughtStore.inNetFishes);
 
 </script>
 <template>
-  <section class="mt-3 w-full max-w-sm rounded-xl border border-emerald-900/15 bg-white/95 p-3 shadow-sm">
+  <section class="w-full max-w-sm rounded-xl border border-emerald-900/15 bg-white/95 p-3 shadow-sm">
     <div class="mb-2 flex items-center justify-between">
-      <h2 class="m-0 text-sm font-bold text-[#153221]">Cá trong lưới</h2>
+      <h2 class="m-0 text-sm font-bold text-[#153221]">Lưới</h2>
       <span class="text-[11px] text-gray-500">{{ recentCaughtFishes.length }} cá</span>
     </div>
     <p
       v-if="caughtStore.isLoadingCaught && !recentCaughtFishes.length"
       class="m-0 py-3 text-center text-xs text-gray-500"``
     >
-      Đang tải danh sách cá...
+      Đang tải danh sách loài vừa câu...
     </p>
     <p v-else-if="!recentCaughtFishes.length" class="m-0 py-3 text-center text-xs text-gray-500">
-      Chưa câu được cá nào
+      Chưa câu được con nào
     </p>
     <ul v-else class="m-0 max-h-[min(55vh,520px)] list-none space-y-2 overflow-y-auto p-0">
       <li

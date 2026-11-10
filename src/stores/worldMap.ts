@@ -7,12 +7,14 @@ interface Location {
 }
 
 const MAP_VIEW_STORAGE_KEY = "worldMapView";
+const MAP_VISIBLE_STORAGE_KEY = "worldMap2Visible";
 export const MIN_ZOOM = 1;
 export const MAX_ZOOM = 40;
 export const ZOOM_STEP = 1;
 
 export const useWorldStore = defineStore("worldMap", {
   state: () => ({
+    isMapVisible: localStorage.getItem(MAP_VISIBLE_STORAGE_KEY) !== "false",
     selectedArea: {} as any,
     k: 1,
     lon: 0,
@@ -29,6 +31,11 @@ export const useWorldStore = defineStore("worldMap", {
   }),
   getters: {},
   actions: {
+    toggleMapVisibility() {
+      this.isMapVisible = !this.isMapVisible;
+      localStorage.setItem(MAP_VISIBLE_STORAGE_KEY, String(this.isMapVisible));
+    },
+
     resetDefault() {
       this.isAnchorMode = false;
       this.zoomable = true;
