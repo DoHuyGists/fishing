@@ -34,7 +34,9 @@ const waitTime = computed(() => {
     <div class="flex flex-wrap items-center justify-between gap-3 rounded-2xl border border-[#cbd9c6] bg-[#f5f9f0] p-4 sm:p-5">
       <div>
         <p class="m-0 text-lg font-extrabold text-[#24352a]">Quà điểm danh ngày</p>
-        <p class="mb-0 mt-1 text-sm text-emerald-900/65">Mỗi ngày chỉ nhận một phần thưởng. Phần thưởng mới được mở khi sang ngày tiếp theo.</p>
+        <p class="mb-0 mt-1 text-sm text-emerald-900/65">Mỗi ngày chỉ nhận một phần thưởng ngẫu nhiên trong danh sách.</p>
+        <p class="mb-0 mt-1 text-sm text-emerald-900/65">Sau khi nhận cần chờ 24h để nhận tiếp.</p>
+
         <p v-if="!canClaim" class="mb-0 mt-2 text-sm font-bold text-emerald-800" role="timer" aria-live="off">Thời gian chờ: {{ waitTime }}</p>
       </div>
       <button type="button" class="rounded-xl bg-emerald-700 px-5 py-2.5 text-sm font-extrabold text-white hover:bg-emerald-800 disabled:cursor-default disabled:bg-emerald-900/40" :disabled="!canClaim || isClaiming" @click="emit('claim')">

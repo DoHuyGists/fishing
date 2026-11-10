@@ -1,28 +1,46 @@
 <template>
   <Modal title="Ủng hộ phát triển" :show-count-data="false" :on-refresh="refreshQr">
-    <main class="mx-auto w-full max-w-3xl space-y-6 px-2 py-5 text-[#24352a] sm:py-8">
-      <div class="space-y-2 text-center">
-        <h3 class="text-xl font-bold sm:text-2xl">Cùng duy trì và phát triển game</h3>
-        <p class="mx-auto max-w-xl text-sm leading-6 sm:text-base">
-          Sự ủng hộ của bạn giúp nhà phát triển duy trì máy chủ và tiếp tục nâng cấp game.
-          Mọi khoản đóng góp đều hoàn toàn tự nguyện, với số tiền do bạn lựa chọn.
-        </p>
-      </div>
+    <main class="grid min-h-full w-full items-start gap-5 rounded-2xl border border-[#cbd9c6] bg-[#f5f9f0] p-3 text-[#24352a] sm:grid-cols-2 sm:p-5">
+        <div class="min-w-0 space-y-6">
+          <div class="space-y-2">
+            <div role="heading" aria-level="2" class="text-xl font-bold sm:text-2xl">Cùng duy trì và phát triển game</div>
+            <div class="text-sm leading-6 sm:text-base">
+              Sự ủng hộ của bạn giúp nhà phát triển duy trì máy chủ và tiếp tục nâng cấp game.
+              Mọi khoản đóng góp đều hoàn toàn tự nguyện, với số tiền do bạn lựa chọn.
+            </div>
+          </div>
 
-      <div class="grid items-start gap-5 rounded-2xl border border-[#cbd9c6] bg-[#f5f9f0] p-3 sm:grid-cols-2 sm:p-5">
+          <section aria-labelledby="donation-instructions" class="min-w-0 rounded-xl border border-[#cbd9c6] bg-white p-4 sm:p-5">
+            <div id="donation-instructions" role="heading" aria-level="2" class="text-lg font-bold">Cách ủng hộ</div>
+            <ol class="mt-4 list-decimal space-y-4 pl-5 text-sm leading-6 marker:font-semibold marker:text-[#52634f]">
+              <li>Mở ứng dụng ngân hàng và quét mã QR trong cửa sổ này.</li>
+              <li>Nếu đang dùng điện thoại, tải ảnh QR rồi chọn ảnh trong mục quét QR của ứng dụng ngân hàng.</li>
+              <li>Kiểm tra thông tin người nhận, nhập số tiền bạn muốn ủng hộ rồi xác nhận chuyển khoản.</li>
+            </ol>
+          </section>
+
+          <div class="space-y-2 text-sm leading-6">
+            <div class="font-semibold">Cảm ơn bạn đã đồng hành cùng game!</div>
+            <div class="text-[#52634f]">
+              Đây là khoản ủng hộ tự nguyện, không phải giao dịch mua bán và không thể hoàn lại.
+              Vui lòng kiểm tra kỹ thông tin trước khi chuyển khoản.
+            </div>
+          </div>
+        </div>
+
         <div class="min-w-0 space-y-4">
         <figure class="min-w-0 overflow-hidden rounded-xl border border-[#cbd9c6] bg-white">
           <div v-if="!qrFailed" class="p-4">
-            <img :src="qrImageUrl" alt="Mã QR ủng hộ nhà phát triển, chủ tài khoản DO HUY, số tài khoản 060319966989" class="mx-auto h-auto w-full max-w-sm object-contain" draggable="false" @error="qrFailed = true" />
+            <img :src="qrImageUrl" alt="Mã QR ủng hộ nhà phát triển, chủ tài khoản DO HUY, số tài khoản 060319966989" class="mx-auto h-auto w-50 max-w-sm object-contain" draggable="false" @error="qrFailed = true" />
           </div>
-          <p v-else role="alert" class="px-5 py-12 text-center text-sm leading-6">
+          <div v-else role="alert" class="px-5 py-12 text-center text-sm leading-6">
             Không tải được mã QR. Bạn hãy nhấn Làm mới để thử lại.
-          </p>
+          </div>
         </figure>
 
           <dl class="space-y-3 rounded-xl border border-[#cbd9c6] bg-white p-4 text-sm">
             <div class="flex flex-wrap items-baseline justify-between gap-x-3 gap-y-1">
-              <dt class="text-[#52634f]">Chủ tài khoản</dt>
+              <dt class="text-[#52634f]">Tên tài khoản</dt>
               <dd class="font-bold">DO HUY</dd>
             </div>
             <div class="flex flex-wrap items-baseline justify-between gap-x-3 gap-y-1">
@@ -50,23 +68,6 @@
           </a>
         </div>
 
-        <section aria-labelledby="donation-instructions" class="min-w-0 rounded-xl border border-[#cbd9c6] bg-white p-4 sm:p-5">
-          <h3 id="donation-instructions" class="text-lg font-bold">Cách ủng hộ</h3>
-          <ol class="mt-4 list-decimal space-y-4 pl-5 text-sm leading-6 marker:font-semibold marker:text-[#52634f]">
-            <li>Mở ứng dụng ngân hàng và quét mã QR trong cửa sổ này.</li>
-            <li>Nếu đang dùng điện thoại, tải ảnh QR rồi chọn ảnh trong mục quét QR của ứng dụng ngân hàng.</li>
-            <li>Kiểm tra thông tin người nhận, nhập số tiền bạn muốn ủng hộ rồi xác nhận chuyển khoản.</li>
-          </ol>
-        </section>
-      </div>
-
-      <div class="space-y-2 text-center text-sm leading-6">
-        <p class="font-semibold">Cảm ơn bạn đã đồng hành cùng game!</p>
-        <p class="text-[#52634f]">
-          Đây là khoản ủng hộ tự nguyện, không phải giao dịch mua bán và không thể hoàn lại.
-          Vui lòng kiểm tra kỹ thông tin trước khi chuyển khoản.
-        </p>
-      </div>
     </main>
   </Modal>
 </template>

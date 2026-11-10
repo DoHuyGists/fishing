@@ -13,6 +13,15 @@ export const useFishingPassStore = defineStore("fishingPass", {
   getters: {
     price: (state) => state.currentPass?.price ?? 0,
     hasFishingPass: (state) => Boolean(state.currentPass?.purchased),
+    rewardProgress: (state) => {
+      const rewards = (state.currentPass?.rewards ?? []).filter(
+        (reward) => reward.reward_type === "FREE" || state.currentPass?.purchased,
+      );
+      return {
+        claimed: rewards.filter((reward) => reward.claimed_at !== null).length,
+        total: rewards.length,
+      };
+    },
   },
   actions: {
     async fetchCurrentPass() {

@@ -27,8 +27,6 @@ const now = ref(new Date());
 let clockInterval: ReturnType<typeof setInterval> | undefined;
 const dateKey = (date: Date) => `${date.getFullYear()}-${date.getMonth() + 1}-${date.getDate()}`;
 const todayKey = computed(() => dateKey(now.value));
-const currentDay = computed(() => now.value.getDate());
-const daysInMonth = computed(() => new Date(now.value.getFullYear(), now.value.getMonth() + 1, 0).getDate());
 const currentMonthLabel = computed(() => now.value.toLocaleDateString("vi-VN", { month: "long", year: "numeric" }));
 
 const dailyReward = ref<{ date: string; reward: Reward } | null>(null);
@@ -89,7 +87,7 @@ function claimMonthReward(_day: MonthReward, _lane: "free" | "pass") { /* Claims
 </script>
 
 <template>
-  <Modal title="Điểm danh" sub-title="Quà mỗi ngày và mỗi tháng" :on-refresh="loadData">
+  <Modal title="Điểm danh" sub-title="Nhận quà miễn phí mỗi ngày" :on-refresh="loadData">
     <div class="w-full">
       <Tab v-model="activeTab" :tabs="tabs" aria-label="Loại điểm danh">
         <template #daily>
@@ -99,11 +97,8 @@ function claimMonthReward(_day: MonthReward, _lane: "free" | "pass") { /* Claims
         <template #monthly>
           <section class="space-y-4">
             <div class="flex flex-wrap items-center justify-between gap-2">
-              <div>
-                <h3 class="m-0 text-lg font-extrabold text-[#24352a]">Thẻ điểm danh {{ currentMonthLabel }}</h3>
-                <p class="mb-0 mt-1 text-sm text-emerald-900/60">Phần thưởng Fishing Pass cần mua pass để mở khóa</p>
-              </div>
-              <span class="rounded-full bg-[#f5f9f0] px-3 py-1 text-xs font-bold text-[#24352a]">Ngày {{ currentDay }}/{{ daysInMonth }}</span>
+              <div class="m-0 text-lg font-extrabold text-[#24352a]">Điểm danh {{ currentMonthLabel }}</div>
+              <span class="rounded-full bg-[#f5f9f0] px-3 py-1 text-xs font-bold text-[#24352a]">Đã nhận {{ fishingPassStore.rewardProgress.claimed }}/{{ fishingPassStore.rewardProgress.total }} quà</span>
             </div>
             <FishingPassRewards v-model:show-pass-confirm="showPassConfirm" :month-rewards="monthRewards" @claim="claimMonthReward($event, 'free')" />
           </section>
