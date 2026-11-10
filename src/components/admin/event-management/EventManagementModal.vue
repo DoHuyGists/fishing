@@ -2,7 +2,7 @@
 import AdminModal from "../AdminModal.vue";
 import { onMounted } from "vue";
 import EventForm from "./EventForm.vue";
-import { useAdminEventStore } from "./admin-event-store";
+import { useAdminEventStore } from "./admin-event-store.ts";
 
 const emit = defineEmits(["close"]);
 const store = useAdminEventStore();
@@ -15,11 +15,7 @@ onMounted(() => store.loadEvents());
 </script>
 
 <template>
-  <AdminModal
-    title="Quản lý sự kiện"
-    icon="🎉"
-    @close="emit('close')"
-  >
+  <AdminModal title="Quản lý sự kiện" icon="🎉" @close="emit('close')">
     <template #subtitle>{{ store.events.length }} sự kiện trong danh mục</template>
 
     <div class="flex shrink-0 flex-wrap items-center gap-3 border-b border-gray-200 bg-white px-5 py-3 md:px-7">
@@ -109,7 +105,11 @@ onMounted(() => store.loadEvents());
               </tr>
             </thead>
             <tbody>
-              <tr v-for="item in store.filteredEvents" :key="item.id" class="border-t border-gray-100 hover:bg-emerald-50/40">
+              <tr
+                v-for="item in store.filteredEvents"
+                :key="item.id"
+                class="border-t border-gray-100 hover:bg-emerald-50/40"
+              >
                 <td class="max-w-[28rem] px-4 py-3">
                   <div class="flex items-center gap-3">
                     <img

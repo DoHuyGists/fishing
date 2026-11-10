@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import RichEditor from "../guides-management/RichEditor.vue";
 import { useAdminEventStore } from "./admin-event-store";
 
 const store = useAdminEventStore();
@@ -57,14 +58,14 @@ const store = useAdminEventStore();
               class="rounded-md border border-gray-300 px-3 py-2 text-sm font-normal text-gray-800 focus:border-emerald-600 focus:outline-none"
             />
           </label>
-          <label class="flex flex-col gap-1.5 text-xs font-bold text-gray-600"
-            >Mô tả
-            <textarea
+          <div class="flex flex-col gap-1.5">
+            <div class="text-xs font-bold text-gray-600">Mô tả</div>
+            <RichEditor
               v-model="store.form.description"
-              rows="5"
-              class="resize-y rounded-md border border-gray-300 px-3 py-2 text-sm font-normal text-gray-800 focus:border-emerald-600 focus:outline-none"
-            ></textarea>
-          </label>
+              label="Mô tả sự kiện"
+              :disabled="store.isSaving"
+            />
+          </div>
           <label class="flex items-center gap-2 text-xs font-bold text-gray-600">
             <input v-model="store.form.isDisabled" type="checkbox" class="size-4 rounded border-gray-300" />
             Tắt sự kiện

@@ -46,8 +46,12 @@ const moduleComponents = {
   assets: defineAsyncComponent(() => import("../components/admin/assets/AssetsManagementModal.vue")),
   guides: defineAsyncComponent(() => import("../components/admin/guides-management/GuidesManagementModal.vue")),
   blueprint: defineAsyncComponent(() => import("../components/admin/blueprint-management/BlueprintManagement.vue")),
-  aquacultureSpecies: defineAsyncComponent(() => import("../components/admin/aquaculture-species-management/AquacultureSpeciesManagement.vue")),
-  aquacultureFood: defineAsyncComponent(() => import("../components/admin/aquaculture-food-management/AquacultureFoodManagement.vue")),
+  aquacultureSpecies: defineAsyncComponent(
+    () => import("../components/admin/aquaculture-species-management/AquacultureSpeciesManagement.vue"),
+  ),
+  aquacultureFood: defineAsyncComponent(
+    () => import("../components/admin/aquaculture-food-management/AquacultureFoodManagement.vue"),
+  ),
   skill: defineAsyncComponent(() => import("../components/admin/skils-management/SkillManagementModal.vue")),
   dailyMissionRewards: defineAsyncComponent(
     () => import("../components/admin/daily-mission-rewards-management/DailyMissionRewardManagementModal.vue"),
@@ -83,7 +87,7 @@ const moduleComponents = {
   weatherModifier: defineAsyncComponent(
     () => import("../components/admin/weather-modifier-management/WeatherModifierManagement.vue"),
   ),
-  event: defineAsyncComponent(() => import("../components/admin/event-management/EventManagement.vue")),
+  event: defineAsyncComponent(() => import("../components/admin/event-management/EventManagementModal.vue")),
   schedule: defineAsyncComponent(
     () => import("../components/admin/event-schedule-management/EventScheduleManagement.vue"),
   ),
@@ -108,15 +112,39 @@ const groups: ModuleGroup[] = [
   {
     title: "Nuôi cá",
     modules: [
-      { key: "aquacultureSpecies", icon: "🐟", label: "Cấu hình loài nuôi", desc: "Sức chứa, thời gian nuôi, giá giống, giá bán và tỷ lệ cá đặc biệt.", component: moduleComponents.aquacultureSpecies },
-      { key: "aquacultureFood", icon: "🌾", label: "Thức ăn theo loài", desc: "Liên kết vật phẩm thức ăn và mức tăng chất lượng cho từng loài.", component: moduleComponents.aquacultureFood },
+      {
+        key: "aquacultureSpecies",
+        icon: "🐟",
+        label: "Cấu hình loài nuôi",
+        desc: "Sức chứa, thời gian nuôi, giá giống, giá bán và tỷ lệ cá đặc biệt.",
+        component: moduleComponents.aquacultureSpecies,
+      },
+      {
+        key: "aquacultureFood",
+        icon: "🌾",
+        label: "Thức ăn theo loài",
+        desc: "Liên kết vật phẩm thức ăn và mức tăng chất lượng cho từng loài.",
+        component: moduleComponents.aquacultureFood,
+      },
     ],
   },
   {
     title: "Dữ liệu trò chơi",
     modules: [
-      { key: "assets", icon: "🖼️", label: "Ảnh & video", desc: "Tải lên, xem trước và sao chép link ảnh, video từ Storage.", component: moduleComponents.assets },
-      { key: "blueprint", icon: "🛠️", label: "Công thức chế tạo", desc: "Quản lý bản vẽ, nguyên liệu, thành phẩm và phí chế tạo.", component: moduleComponents.blueprint },
+      {
+        key: "assets",
+        icon: "🖼️",
+        label: "Ảnh & video",
+        desc: "Tải lên, xem trước và sao chép link ảnh, video từ Storage.",
+        component: moduleComponents.assets,
+      },
+      {
+        key: "blueprint",
+        icon: "🛠️",
+        label: "Công thức chế tạo",
+        desc: "Quản lý bản vẽ, nguyên liệu, thành phẩm và phí chế tạo.",
+        component: moduleComponents.blueprint,
+      },
       {
         key: "skill",
         icon: "✨",
@@ -315,7 +343,10 @@ const close = () => {
         <p class="text-xs text-emerald-200/70 mt-0.5">Hệ thống câu cá</p>
       </div>
 
-      <nav class="min-h-0 flex-1 overflow-y-auto overscroll-contain px-3 py-4 space-y-5" aria-label="Điều hướng quản trị">
+      <nav
+        class="min-h-0 flex-1 overflow-y-auto overscroll-contain px-3 py-4 space-y-5"
+        aria-label="Điều hướng quản trị"
+      >
         <section v-for="group in groups" :key="group.title">
           <h2 class="px-3 mb-1.5 text-xs font-semibold text-emerald-200/60">{{ group.title }}</h2>
           <ul class="space-y-0.5">
