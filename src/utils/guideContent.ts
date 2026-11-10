@@ -1,8 +1,8 @@
 import DOMPurify from "dompurify";
 
-const supportedMarkup = /<\/?(?:div|p|h[1-6]|br|strong|b|em|i|u|s|strike|a|ul|ol|li|blockquote|pre|code|hr|img)(?:\s[^>]*|\s*\/?)>/i;
+const supportedMarkup = /<\/?(?:div|p|h[1-6]|br|strong|b|em|i|u|s|strike|a|ul|ol|li|blockquote|pre|code|hr|img|video)(?:\s[^>]*|\s*\/?)>/i;
 
-export function isGuideImageUrl(value: string): boolean {
+export function isGuideMediaUrl(value: string): boolean {
   const src = value.trim();
   try {
     const url = new URL(src);
@@ -11,6 +11,8 @@ export function isGuideImageUrl(value: string): boolean {
     return false;
   }
 }
+
+export const isGuideImageUrl = isGuideMediaUrl;
 
 function escapeText(value: string): string {
   return value.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;");
@@ -22,8 +24,8 @@ export function sanitizeGuideContent(content: string): string {
     ? content
     : `<div>${escapeText(content).replace(/\r\n?|\n/g, "<br>")}</div>`;
   const clean = DOMPurify.sanitize(html, {
-    ALLOWED_TAGS: ["div", "p", "h1", "h2", "h3", "h4", "h5", "h6", "br", "strong", "b", "em", "i", "u", "s", "strike", "a", "ul", "ol", "li", "blockquote", "pre", "code", "hr", "img"],
-    ALLOWED_ATTR: ["href", "title", "start", "src", "alt"],
+    ALLOWED_TAGS: ["div", "p", "h1", "h2", "h3", "h4", "h5", "h6", "br", "strong", "b", "em", "i", "u", "s", "strike", "a", "ul", "ol", "li", "blockquote", "pre", "code", "hr", "img", "video"],
+    ALLOWED_ATTR: ["href", "title", "start", "src", "alt", "controls", "playsinline", "preload"],
     ALLOW_DATA_ATTR: false,
     ALLOW_ARIA_ATTR: false,
   });
@@ -44,6 +46,17 @@ export function sanitizeGuideContent(content: string): string {
     if (isGuideImageUrl(src)) image.setAttribute("src", src);
     else image.remove();
   });
+  template.content.querySelectorAll("video").forEach((video) => {
+    const src = video.getAttribute("src")?.trim() ?? "";
+    if (!isGuideMediaUrl(src)) {
+      video.remove();
+      return;
+    }
+    video.setAttribute("src", src);
+    video.setAttribute("controls", "");
+    video.setAttribute("playsinline", "");
+    video.setAttribute("preload", "none");
+  });
   return template.innerHTML;
 }
 
@@ -51,6 +64,7 @@ export function guideContentText(content: string): string {
   const template = document.createElement("template");
   template.innerHTML = sanitizeGuideContent(content);
   template.content.querySelectorAll("img").forEach((image) => image.replaceWith(`\n[${image.getAttribute("alt")?.trim() || "Hình ảnh"}]\n`));
+  template.content.querySelectorAll("video").forEach((video) => video.replaceWith(`\n[${video.getAttribute("title")?.trim() || "Video"}]\n`));
   template.content.querySelectorAll("br").forEach((element) => element.replaceWith("\n"));
   template.content.querySelectorAll("div, li, blockquote, pre").forEach((element) => element.append("\n"));
   return template.content.textContent?.replace(/[\u200B\uFEFF]/g, "").trim() ?? "";

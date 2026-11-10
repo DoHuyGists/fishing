@@ -1,10 +1,14 @@
 <script setup lang="ts">
-import { computed, ref, useId, watch } from "vue";
+import { computed, defineAsyncComponent, nextTick, ref, useId, watch } from "vue";
 import { EditorContent, useEditor, type Editor } from "@tiptap/vue-3";
 import StarterKit from "@tiptap/starter-kit";
 import Paragraph from "@tiptap/extension-paragraph";
 import Image from "@tiptap/extension-image";
-import { isGuideImageUrl, sanitizeGuideContent } from "../../../utils/guideContent";
+import { isGuideMediaUrl, sanitizeGuideContent } from "../../../utils/guideContent";
+import { GuideVideo } from "./guideVideo";
+import type { AssetRow } from "../../../data/supabaseAssetRepository";
+
+const AssetsManagementModal = defineAsyncComponent(() => import("../assets/AssetsManagementModal.vue"));
 
 const model = defineModel<string>({ required: true });
 const props = withDefaults(defineProps<{ disabled?: boolean; invalid?: boolean; label?: string }>(), {
@@ -15,12 +19,31 @@ const props = withDefaults(defineProps<{ disabled?: boolean; invalid?: boolean; 
 const editorId = useId();
 const linkOpen = ref(false);
 const linkUrl = ref("");
+const linkText = ref("");
 const linkError = ref("");
-const imageOpen = ref(false);
-const imageUrl = ref("");
-const imageAlt = ref("");
-const imageError = ref("");
-const imagePanelId = `${editorId}-image`;
+const mediaOpen = ref(false);
+const mediaUrl = ref("");
+const mediaDescription = ref("");
+type MediaKind = "image" | "video";
+const knownMedia = ref<{ url: string; kind: MediaKind } | null>(null);
+const manualMediaKind = ref<MediaKind | "">("");
+const detectedMediaKind = computed<MediaKind | null>(() => {
+  const url = mediaUrl.value.trim();
+  if (knownMedia.value?.url === url) return knownMedia.value.kind;
+  try {
+    const path = new URL(url).pathname;
+    if (/\.(mp4|webm|mov|m4v|ogv)$/i.test(path)) return "video";
+    if (/\.(jpe?g|png|gif|webp|avif|svg|bmp|ico)$/i.test(path)) return "image";
+  } catch { /* Wait for a valid URL before asking for a type. */ }
+  return null;
+});
+const mediaKind = computed(() => detectedMediaKind.value ?? (manualMediaKind.value || null));
+const needsMediaKind = computed(() => isGuideMediaUrl(mediaUrl.value) && !detectedMediaKind.value);
+const mediaError = ref("");
+const assetTarget = ref<"link" | "media" | null>(null);
+const linkInput = ref<HTMLInputElement | null>(null);
+const mediaInput = ref<HTMLInputElement | null>(null);
+const mediaPanelId = `${editorId}-media`;
 const TextBlock = Paragraph.extend({
   parseHTML() { return [{ tag: "div" }, { tag: "p" }]; },
   renderHTML({ HTMLAttributes }) { return ["div", HTMLAttributes, 0]; },
@@ -35,6 +58,7 @@ const editor = useEditor({
     }),
     TextBlock,
     Image.configure({ allowBase64: false }),
+    GuideVideo,
   ],
   content: sanitizeGuideContent(model.value),
   editable: !props.disabled,
@@ -73,18 +97,55 @@ watch(model, (value) => {
 });
 watch(() => props.disabled, (value) => editor.value?.setEditable(!value));
 watch(() => props.invalid, (value) => editor.value?.view.dom.setAttribute("aria-invalid", String(value)));
+watch(mediaUrl, () => {
+  knownMedia.value = null;
+  manualMediaKind.value = "";
+  mediaError.value = "";
+}, { flush: "sync" });
 
 function openLink() {
   if (!editor.value || props.disabled) return;
-  imageOpen.value = false;
+  mediaOpen.value = false;
+  if (editor.value.state.selection.empty && editor.value.isActive("link")) {
+    editor.value.commands.extendMarkRange("link");
+  }
+  const { from, to } = editor.value.state.selection;
+  linkText.value = editor.value.state.doc.textBetween(from, to, " ");
   linkUrl.value = editor.value.getAttributes("link").href ?? "";
   linkError.value = "";
   linkOpen.value = true;
 }
 
+function openAssets(target: "link" | "media") {
+  if (!editor.value || props.disabled) return;
+  assetTarget.value = target;
+}
+
+async function closeAssets() {
+  const target = assetTarget.value;
+  assetTarget.value = null;
+  await nextTick();
+  (target === "media" ? mediaInput.value : linkInput.value)?.focus();
+}
+
+function selectAsset(asset: AssetRow) {
+  if (props.disabled || !assetTarget.value) return;
+  if (assetTarget.value === "media") {
+    mediaUrl.value = asset.url;
+    knownMedia.value = { url: asset.url.trim(), kind: asset.kind };
+    mediaError.value = "";
+  } else {
+    linkUrl.value = asset.url;
+    if (!linkText.value.trim()) linkText.value = asset.name;
+    linkError.value = "";
+  }
+  void closeAssets();
+}
+
 function applyLink() {
   if (!editor.value || props.disabled) return;
   const href = linkUrl.value.trim();
+  const text = linkText.value.trim();
   try {
     const url = new URL(href);
     if (!["http:", "https:", "mailto:"].includes(url.protocol)) throw new Error();
@@ -92,10 +153,20 @@ function applyLink() {
     linkError.value = "Nhập liên kết bắt đầu bằng https://, http:// hoặc mailto:.";
     return;
   }
-  if (editor.value.state.selection.empty && !editor.value.isActive("link")) {
-    editor.value.chain().focus().insertContent({ type: "text", text: href, marks: [{ type: "link", attrs: { href } }] }).run();
-  } else {
+  if (!text) {
+    linkError.value = "Nhập văn bản hiển thị cho liên kết.";
+    return;
+  }
+  const { from, to } = editor.value.state.selection;
+  if (text === editor.value.state.doc.textBetween(from, to, " ")) {
     editor.value.chain().focus().extendMarkRange("link").setLink({ href }).run();
+  } else {
+    const marks = editor.value.state.selection.$from.marks()
+      .filter(mark => mark.type.name !== "link")
+      .map(mark => mark.toJSON());
+    editor.value.chain().focus().insertContent({
+      type: "text", text, marks: [...marks, { type: "link", attrs: { href } }],
+    }).unsetMark("link").setMeta("preventAutolink", true).run();
   }
   linkOpen.value = false;
 }
@@ -105,29 +176,42 @@ function removeLink() {
   linkOpen.value = false;
 }
 
-function openImage() {
+function openMedia() {
   if (!editor.value || props.disabled) return;
-  const attributes = editor.value.getAttributes("image");
-  imageUrl.value = attributes.src ?? "";
-  imageAlt.value = attributes.alt ?? "";
-  imageError.value = "";
+  const kind = editor.value.isActive("video") ? "video" : "image";
+  const attributes = editor.value.getAttributes(kind);
+  mediaUrl.value = attributes.src ?? "";
+  knownMedia.value = attributes.src ? { url: mediaUrl.value.trim(), kind } : null;
+  manualMediaKind.value = "";
+  mediaDescription.value = (kind === "video" ? attributes.title : attributes.alt) ?? "";
+  mediaError.value = "";
   linkOpen.value = false;
-  imageOpen.value = true;
+  mediaOpen.value = true;
 }
 
-function applyImage() {
+function applyMedia() {
   if (!editor.value || props.disabled) return;
-  const src = imageUrl.value.trim();
-  if (!isGuideImageUrl(src)) {
-    imageError.value = "Nhập liên kết ảnh hợp lệ bắt đầu bằng https:// hoặc http://.";
+  const src = mediaUrl.value.trim();
+  if (!isGuideMediaUrl(src)) {
+    mediaError.value = "Nhập liên kết ảnh/video hợp lệ bắt đầu bằng https:// hoặc http://.";
     return;
   }
-  const inserted = editor.value.chain().focus().setImage({ src, alt: imageAlt.value.trim() }).run();
+  if (!mediaKind.value) {
+    mediaError.value = "Chưa nhận diện được loại tệp. Hãy chọn ảnh hoặc video.";
+    return;
+  }
+  const description = mediaDescription.value.trim();
+  const chain = editor.value.chain().focus();
+  const inserted = mediaKind.value === "image"
+    ? chain.setImage({ src, alt: description }).run()
+    : editor.value.isActive("video")
+      ? chain.updateAttributes("video", { src, title: description }).run()
+      : chain.insertContent({ type: "video", attrs: { src, title: description } }).run();
   if (!inserted) {
-    imageError.value = "Không thể chèn ảnh tại vị trí này. Hãy đặt con trỏ vào một đoạn văn.";
+    mediaError.value = "Không thể chèn ảnh/video tại vị trí này. Hãy đặt con trỏ vào một đoạn văn.";
     return;
   }
-  imageOpen.value = false;
+  mediaOpen.value = false;
 }
 </script>
 
@@ -143,34 +227,50 @@ function applyImage() {
         @mousedown.prevent @click="editor && tool.run(editor)"
       >{{ tool.text }}</button>
       <button type="button" :disabled="disabled || !editor" :aria-expanded="linkOpen" :aria-pressed="editor?.isActive('link')" class="rounded-md border border-[#cbd9c6] px-2.5 py-1.5 text-xs font-semibold hover:bg-emerald-100 disabled:opacity-40" @mousedown.prevent @click="openLink">Liên kết</button>
-      <button type="button" :disabled="disabled || !editor" :aria-expanded="imageOpen" :aria-controls="imagePanelId" class="rounded-md border border-[#cbd9c6] px-2.5 py-1.5 text-xs font-semibold hover:bg-emerald-100 disabled:opacity-40" @mousedown.prevent @click="openImage">Chèn ảnh</button>
+      <button type="button" :disabled="disabled || !editor" :aria-expanded="mediaOpen" :aria-controls="mediaPanelId" class="rounded-md border border-[#cbd9c6] px-2.5 py-1.5 text-xs font-semibold hover:bg-emerald-100 disabled:opacity-40" @mousedown.prevent @click="openMedia">Chèn ảnh/video</button>
     </div>
     <div v-if="linkOpen" class="space-y-2 border-b border-[#cbd9c6] bg-[#f5f9f0] p-3">
+      <label class="block text-xs font-semibold">Văn bản hiển thị
+        <input v-model="linkText" type="text" placeholder="Ví dụ: Xem hướng dẫn" :disabled="disabled" class="mt-1 w-full rounded-lg border border-[#cbd9c6] bg-white px-3 py-2 text-sm" @keydown.enter.prevent="applyLink" />
+      </label>
       <label class="block text-xs font-semibold">Địa chỉ liên kết
-        <input v-model="linkUrl" type="url" placeholder="https://..." :disabled="disabled" class="mt-1 w-full rounded-lg border border-[#cbd9c6] bg-white px-3 py-2 text-sm" @keydown.enter.prevent="applyLink" />
+        <input ref="linkInput" v-model="linkUrl" type="url" placeholder="https://..." :disabled="disabled" class="mt-1 w-full rounded-lg border border-[#cbd9c6] bg-white px-3 py-2 text-sm" @keydown.enter.prevent="applyLink" />
       </label>
       <div v-if="linkError" role="alert" class="text-xs text-red-700">{{ linkError }}</div>
       <div class="flex flex-wrap gap-2">
+        <button type="button" :disabled="disabled || !editor" class="rounded-lg border border-[#cbd9c6] bg-white px-3 py-1.5 text-xs font-semibold hover:bg-emerald-100 disabled:opacity-40" @click="openAssets('link')">Chọn từ kho ảnh / video</button>
         <button type="button" :disabled="disabled" class="rounded-lg bg-emerald-800 px-3 py-1.5 text-xs font-bold text-white disabled:opacity-40" @click="applyLink">Áp dụng</button>
         <button type="button" :disabled="disabled || !editor?.isActive('link')" class="rounded-lg border border-[#cbd9c6] px-3 py-1.5 text-xs disabled:opacity-40" @click="removeLink">Gỡ liên kết</button>
         <button type="button" class="rounded-lg border border-[#cbd9c6] px-3 py-1.5 text-xs" @click="linkOpen = false">Đóng</button>
       </div>
     </div>
-    <div v-if="imageOpen" :id="imagePanelId" class="space-y-2 border-b border-[#cbd9c6] bg-[#f5f9f0] p-3" @keydown.esc.stop.prevent="imageOpen = false">
-      <label class="block text-xs font-semibold">Liên kết ảnh
-        <input v-model="imageUrl" type="url" placeholder="https://example.com/anh.jpg" :disabled="disabled" :aria-invalid="!!imageError" class="mt-1 w-full rounded-lg border border-[#cbd9c6] bg-white px-3 py-2 text-sm" @keydown.enter.prevent="applyImage" />
+    <div v-if="mediaOpen" :id="mediaPanelId" class="space-y-2 border-b border-[#cbd9c6] bg-[#f5f9f0] p-3" @keydown.esc.stop.prevent="mediaOpen = false">
+      <label class="block text-xs font-semibold">Liên kết ảnh/video
+        <input ref="mediaInput" v-model="mediaUrl" type="url" placeholder="https://example.com/anh.jpg hoặc video.mp4" :disabled="disabled" :aria-invalid="!!mediaError" class="mt-1 w-full rounded-lg border border-[#cbd9c6] bg-white px-3 py-2 text-sm" @keydown.enter.prevent="applyMedia" />
       </label>
-      <label class="block text-xs font-semibold">Mô tả ảnh (tùy chọn)
-        <input v-model="imageAlt" type="text" placeholder="Mô tả nội dung ảnh" :disabled="disabled" class="mt-1 w-full rounded-lg border border-[#cbd9c6] bg-white px-3 py-2 text-sm" @keydown.enter.prevent="applyImage" />
+      <label v-if="needsMediaKind" class="block text-xs font-semibold">Chưa nhận diện được loại tệp. Chọn loại nội dung
+        <select v-model="manualMediaKind" :disabled="disabled" class="mt-1 block rounded-lg border border-[#cbd9c6] bg-white px-3 py-2 text-sm">
+          <option disabled value="">Chọn ảnh hoặc video</option>
+          <option value="image">Ảnh</option>
+          <option value="video">Video</option>
+        </select>
       </label>
-      <div v-if="imageError" role="alert" class="text-xs text-red-700">{{ imageError }}</div>
-      <div class="flex gap-2">
-        <button type="button" :disabled="disabled" class="rounded-lg bg-emerald-800 px-3 py-1.5 text-xs font-bold text-white disabled:opacity-40" @click="applyImage">{{ editor?.isActive('image') ? 'Cập nhật ảnh' : 'Chèn vào nội dung' }}</button>
-        <button type="button" class="rounded-lg border border-[#cbd9c6] px-3 py-1.5 text-xs" @click="imageOpen = false">Đóng</button>
+      <div class="text-xs text-[#24352a]/70">Video dùng link trực tiếp đến tệp, ví dụ MP4 hoặc WebM. Chọn từ kho để tự nhận diện loại tệp.</div>
+      <label class="block text-xs font-semibold">Mô tả ảnh/video (tùy chọn)
+        <input v-model="mediaDescription" type="text" placeholder="Mô tả nội dung ảnh/video" :disabled="disabled" class="mt-1 w-full rounded-lg border border-[#cbd9c6] bg-white px-3 py-2 text-sm" @keydown.enter.prevent="applyMedia" />
+      </label>
+      <div v-if="mediaError" role="alert" class="text-xs text-red-700">{{ mediaError }}</div>
+      <div class="flex flex-wrap gap-2">
+        <button type="button" :disabled="disabled || !editor" class="rounded-lg border border-[#cbd9c6] bg-white px-3 py-1.5 text-xs font-semibold hover:bg-emerald-100 disabled:opacity-40" @click="openAssets('media')">Chọn ảnh/video từ kho</button>
+        <button type="button" :disabled="disabled" class="rounded-lg bg-emerald-800 px-3 py-1.5 text-xs font-bold text-white disabled:opacity-40" @click="applyMedia">{{ editor?.isActive('image') || editor?.isActive('video') ? 'Cập nhật ảnh/video' : 'Chèn vào nội dung' }}</button>
+        <button type="button" class="rounded-lg border border-[#cbd9c6] px-3 py-1.5 text-xs" @click="mediaOpen = false">Đóng</button>
       </div>
     </div>
     <EditorContent :editor="editor" class="guide-editor max-h-[55dvh] overflow-y-auto text-sm leading-7" />
     <div class="border-t border-[#cbd9c6] px-3 py-2 text-xs text-[#24352a]/65">{{ characterCount }} ký tự · Enter để xuống đoạn, Shift+Enter để xuống dòng.</div>
+    <Teleport to="body">
+      <AssetsManagementModal v-if="assetTarget" selection-mode :z-index="60" @select="selectAsset" @close="closeAssets" />
+    </Teleport>
   </div>
 </template>
 
@@ -181,4 +281,7 @@ function applyImage() {
 .guide-editor :deep(pre) { overflow-x: auto; border-radius: 0.5rem; background: #eef2e9; padding: 0.75rem; }
 .guide-editor :deep(img) { display: block; max-width: 100%; height: auto; margin: 0.75rem 0; border-radius: 0.5rem; }
 .guide-editor :deep(img.ProseMirror-selectednode) { outline: 2px solid #047857; outline-offset: 2px; }
+.guide-editor :deep(video) { display: block; width: 100%; max-height: 55dvh; margin: 0.75rem 0; border-radius: 0.5rem; background: #000; }
+.guide-editor :deep(video.ProseMirror-selectednode) { outline: 2px solid #047857; outline-offset: 2px; }
+.guide-editor :deep(a) { color: #047857; text-decoration: underline; text-underline-offset: 2px; }
 </style>

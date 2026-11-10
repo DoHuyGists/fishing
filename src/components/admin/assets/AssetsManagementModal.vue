@@ -2,13 +2,21 @@
 import { onMounted, ref } from "vue";
 import AdminModal from "../AdminModal.vue";
 import TwoOptionsModal from "../../shared/TwoOptionsModal.vue";
-import { ASSET_MIME_TYPES } from "../../../data/supabaseAssetRepository";
+import { ASSET_MIME_TYPES, type AssetRow } from "../../../data/supabaseAssetRepository";
 import { useAdminAssetsStore } from "./admin-assets-store";
 
-const emit = defineEmits<{ close: [] }>();
+const props = withDefaults(defineProps<{
+  selectionMode?: boolean;
+  selectionKind?: "all" | "image";
+  zIndex?: number;
+}>(), { selectionMode: false, selectionKind: "all", zIndex: 50 });
+const emit = defineEmits<{ close: []; select: [asset: AssetRow] }>();
 const store = useAdminAssetsStore();
 const fileInput = ref<HTMLInputElement | null>(null);
-const accept = Object.keys(ASSET_MIME_TYPES).join(",");
+const searchInput = ref<HTMLInputElement | null>(null);
+const accept = Object.keys(ASSET_MIME_TYPES)
+  .filter(mime => props.selectionKind !== "image" || mime.startsWith("image/"))
+  .join(",");
 const formatSize = (size: number) => size < 1024 * 1024
   ? `${(size / 1024).toFixed(1)} KB` : `${(size / (1024 * 1024)).toFixed(1)} MB`;
 const formatDate = (date: string) => date ? new Date(date).toLocaleString("vi-VN") : "—";
@@ -19,20 +27,35 @@ function selectFiles(event: Event) {
   void store.upload(files);
 }
 function close() { if (!store.busy) emit("close"); }
-onMounted(() => { store.resetView(); void store.fetchRows(); });
+function escape() {
+  if (store.deleting) store.cancelDelete();
+  else close();
+}
+function selectAsset(row: AssetRow) {
+  if (store.loading || store.busy || (props.selectionKind === "image" && row.kind !== "image")) return;
+  emit("select", row);
+}
+onMounted(() => {
+  store.resetView();
+  if (props.selectionMode) {
+    store.kind = props.selectionKind;
+    searchInput.value?.focus();
+  }
+  void store.fetchRows();
+});
 </script>
 
 <template>
-  <AdminModal title="Quản lý ảnh & video" subtitle="Lưu trữ và sao chép link để sử dụng trong nội dung" :close-disabled="store.busy" @close="close">
+  <AdminModal :title="selectionMode ? (selectionKind === 'image' ? 'Chọn ảnh từ kho' : 'Chọn link ảnh / video') : 'Quản lý ảnh & video'" :subtitle="selectionMode ? 'Tìm hoặc tải tệp lên, rồi chọn Dùng link để đưa vào trình soạn thảo' : 'Lưu trữ và sao chép link để sử dụng trong nội dung'" :z-index="zIndex" :close-disabled="store.busy" @close="close" @keydown.esc.stop.prevent="escape">
     <div class="shrink-0 space-y-3 border-b border-[#cbd9c6] p-4 sm:px-6">
       <div class="flex flex-wrap gap-3">
-        <input v-model="store.search" type="search" aria-label="Tìm tên tệp" placeholder="Tìm tên tệp…" class="min-w-48 flex-1 rounded-lg border border-[#cbd9c6] bg-white px-3 py-2 text-sm focus:outline-emerald-700" />
-        <select v-model="store.kind" aria-label="Lọc loại tệp" class="rounded-lg border border-[#cbd9c6] bg-white px-3 py-2 text-sm">
+        <input ref="searchInput" v-model="store.search" type="search" aria-label="Tìm tên tệp" placeholder="Tìm tên tệp…" class="min-w-48 flex-1 rounded-lg border border-[#cbd9c6] bg-white px-3 py-2 text-sm focus:outline-emerald-700" />
+        <select v-if="selectionKind !== 'image'" v-model="store.kind" aria-label="Lọc loại tệp" class="rounded-lg border border-[#cbd9c6] bg-white px-3 py-2 text-sm">
           <option value="all">Tất cả</option><option value="image">Ảnh</option><option value="video">Video</option>
         </select>
         <button type="button" :disabled="store.loading || store.busy" class="rounded-lg border border-[#cbd9c6] bg-white px-3 py-2 text-sm font-semibold disabled:opacity-50" @click="store.fetchRows()">{{ store.loading ? 'Đang tải…' : 'Làm mới' }}</button>
         <input ref="fileInput" type="file" multiple :accept="accept" :disabled="store.loading || store.busy" aria-label="Chọn ảnh hoặc video tải lên" class="sr-only" tabindex="-1" @change="selectFiles" />
-        <button type="button" :disabled="store.loading || store.busy" class="rounded-lg bg-emerald-800 px-4 py-2 text-sm font-bold text-white hover:bg-emerald-900 disabled:opacity-50" @click="fileInput?.click()">{{ store.uploading ? 'Đang tải lên…' : '+ Tải ảnh / video' }}</button>
+        <button type="button" :disabled="store.loading || store.busy" class="rounded-lg bg-emerald-800 px-4 py-2 text-sm font-bold text-white hover:bg-emerald-900 disabled:opacity-50" @click="fileInput?.click()">{{ store.uploading ? 'Đang tải lên…' : selectionKind === 'image' ? '+ Tải ảnh' : '+ Tải ảnh / video' }}</button>
       </div>
       <div class="text-xs text-[#24352a]/70">JPG, PNG, GIF, WebP, AVIF, MP4, WebM, MOV · Tối đa 50 MB/tệp · Link công khai, không hết hạn.</div>
       <div v-if="store.uploading" role="status" aria-live="polite" class="text-sm font-semibold">Đã xử lý {{ store.completed }}/{{ store.total }} tệp. Vui lòng giữ cửa sổ mở.</div>
@@ -56,6 +79,7 @@ onMounted(() => { store.resetView(); void store.fetchRows(); });
             <div class="break-words text-sm font-bold">{{ row.name }}</div>
             <div class="text-xs text-[#24352a]/70">{{ row.kind === 'image' ? 'Ảnh' : 'Video' }} · {{ formatSize(row.size) }}<br />{{ formatDate(row.createdAt) }}</div>
             <input :value="row.url" readonly :aria-label="`Link ${row.name}`" class="w-full rounded border border-[#cbd9c6] bg-[#f5f9f0] px-2 py-1.5 text-xs" @focus="($event.target as HTMLInputElement).select()" />
+            <button v-if="selectionMode" type="button" :disabled="store.loading || store.busy" :aria-label="`Dùng link ${row.name}`" class="w-full rounded-lg bg-emerald-800 px-3 py-2 text-xs font-bold text-white hover:bg-emerald-900 disabled:opacity-50" @click="selectAsset(row)">Dùng link</button>
             <div class="flex items-center justify-between gap-2">
               <button type="button" :aria-label="`Sao chép link ${row.name}`" class="rounded-lg border border-[#cbd9c6] px-3 py-1.5 text-xs font-semibold hover:bg-emerald-100" @click="store.copyLink(row)">Copy link</button>
               <button type="button" :disabled="store.loading || store.busy" :aria-label="`Xóa ${row.name}`" class="rounded-lg border border-red-200 px-3 py-1.5 text-xs font-semibold text-red-700 hover:bg-red-50 disabled:opacity-50" @click="store.requestDelete(row)">Xóa</button>
