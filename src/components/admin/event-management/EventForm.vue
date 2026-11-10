@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import RichEditor from "../guides-management/RichEditor.vue";
+import RichEditor from "../../shared/RichEditor.vue";
 import { useAdminEventStore } from "./admin-event-store";
 
 const store = useAdminEventStore();

@@ -3,7 +3,7 @@ import { onMounted, onUnmounted, ref } from "vue";
 import AdminModal from "../AdminModal.vue";
 import TwoOptionsModal from "../../shared/TwoOptionsModal.vue";
 import RichTextContent from "../../shared/RichTextContent.vue";
-import RichEditor from "./RichEditor.vue";
+import RichEditor from "../../shared/RichEditor.vue";
 import { useAdminGuidesStore } from "./admin-guides-store";
 
 const emit = defineEmits<{ close: [] }>();

@@ -4,11 +4,11 @@ import { EditorContent, useEditor, type Editor } from "@tiptap/vue-3";
 import StarterKit from "@tiptap/starter-kit";
 import Paragraph from "@tiptap/extension-paragraph";
 import Image from "@tiptap/extension-image";
-import { isGuideMediaUrl, sanitizeGuideContent } from "../../../utils/guideContent";
+import { isGuideMediaUrl, sanitizeGuideContent } from "../../utils/guideContent";
 import { GuideVideo } from "./guideVideo";
-import type { AssetRow } from "../../../data/supabaseAssetRepository";
+import type { AssetRow } from "../../data/supabaseAssetRepository";
 
-const AssetsManagementModal = defineAsyncComponent(() => import("../assets/AssetsManagementModal.vue"));
+const AssetsManagementModal = defineAsyncComponent(() => import("../admin/assets/AssetsManagementModal.vue"));
 
 const model = defineModel<string>({ required: true });
 const props = withDefaults(defineProps<{ disabled?: boolean; invalid?: boolean; label?: string }>(), {

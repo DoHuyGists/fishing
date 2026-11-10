@@ -1,5 +1,5 @@
 import { mergeAttributes, Node } from "@tiptap/vue-3";
-import { isGuideMediaUrl } from "../../../utils/guideContent";
+import { isGuideMediaUrl } from "../../utils/guideContent";
 
 /** Native video files from the asset library or a direct HTTP(S) URL. */
 export const GuideVideo = Node.create({
