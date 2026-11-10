@@ -55,7 +55,7 @@ async function signOut() {
         <span class="text-xs text-gray-500 font-medium">Đang tải hồ sơ...</span>
       </div>
 
-      <div v-else-if="userProfileStore.error" class="p-4 bg-red-50 border border-red-200 rounded-xl mb-4">
+      <div v-else-if="userProfileStore.error && !userProfileStore.profile" class="p-4 bg-red-50 border border-red-200 rounded-xl mb-4">
         <div class="flex items-center justify-between">
           <span class="text-xs text-red-600 font-medium">{{ userProfileStore.error }}</span>
           <button

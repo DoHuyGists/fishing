@@ -19,8 +19,7 @@ const countryStore = useCountryStore();
 const copied = ref(false);
 const selectedCountryId = ref("");
 const countrySearch = ref("");
-const isCountryDropdownOpen = ref(false);
-const showCountryConfirm = ref(false);
+const showCountryModal = ref(false);
 const isUpdatingCountry = ref(false);
 const countryError = ref("");
 const now = ref(Date.now());
@@ -38,9 +37,8 @@ const countryCooldownDaysRemaining = computed(() => {
 const canChangeCountry = computed(
   () => !userProfileStore.profile?.country_id || countryCooldownDaysRemaining.value === 0,
 );
-const displayedCountryId = computed(() => selectedCountryId.value || userProfileStore.profile?.country_id);
-const selectedCountry = computed(() =>
-  countryStore.countries.find((country) => country.id === displayedCountryId.value),
+const currentCountry = computed(() =>
+  countryStore.countries.find((country) => country.id === userProfileStore.profile?.country_id),
 );
 const joinedDate = computed(() => {
   const value = userProfileStore.profile?.created_at || authStore.user?.created_at;
@@ -59,12 +57,12 @@ onMounted(() => countryStore.fetchCountries());
 
 async function updateCountry() {
   const userId = authStore.user?.id;
-  if (!userId || !selectedCountryId.value || !canChangeCountry.value || isUpdatingCountry.value) return;
+  if (!userId || !selectedCountryId.value || selectedCountryId.value === userProfileStore.profile?.country_id || !canChangeCountry.value || isUpdatingCountry.value) return;
   isUpdatingCountry.value = true;
   countryError.value = "";
   try {
     await userProfileStore.updateCountry(userId, selectedCountryId.value);
-    showCountryConfirm.value = false;
+    showCountryModal.value = false;
     selectedCountryId.value = "";
   } catch {
     countryError.value = userProfileStore.error || "Không thể cập nhật quốc gia. Vui lòng thử lại.";
@@ -73,11 +71,21 @@ async function updateCountry() {
   }
 }
 
-function selectCountry(countryId: string) {
-  selectedCountryId.value = countryId;
-  isCountryDropdownOpen.value = false;
+function openCountryModal() {
+  now.value = Date.now();
+  selectedCountryId.value = userProfileStore.profile?.country_id ?? "";
   countrySearch.value = "";
-  showCountryConfirm.value = !!countryId;
+  countryError.value = "";
+  showCountryModal.value = true;
+  void countryStore.fetchCountries();
+}
+
+function closeCountryModal() {
+  if (isUpdatingCountry.value) return;
+  showCountryModal.value = false;
+  selectedCountryId.value = "";
+  countrySearch.value = "";
+  countryError.value = "";
 }
 
 function copyUserId() {
@@ -110,12 +118,8 @@ const userInitial = computed(() => {
 
 <template>
   <div class="flex flex-col gap-5">
-    <div
-      class="flex items-center gap-4 bg-linear-to-r from-emerald-50 to-teal-50/70 border border-emerald-100/80 rounded-xl p-4"
-    >
-      <div
-        class="w-14 h-14 rounded-full bg-emerald-600 text-white flex items-center justify-center text-xl font-black shadow-md shrink-0"
-      >
+    <div class="flex items-center gap-4 bg-linear-to-r from-emerald-50 to-teal-50/70 border border-emerald-100/80 rounded-xl p-4">
+      <div class="w-14 h-14 rounded-full bg-emerald-600 text-white flex items-center justify-center text-xl font-black shadow-md shrink-0">
         <img v-if="userProfileStore.profile?.avatar_url" :src="userProfileStore.profile.avatar_url" alt="Ảnh đại diện" class="h-full w-full rounded-full object-cover" referrerpolicy="no-referrer" />
         <span v-else>{{ userInitial }}</span>
       </div>
@@ -124,14 +128,10 @@ const userInitial = computed(() => {
           {{ userProfileStore.profile?.display_name || authStore.user?.email || "Chưa cập nhật email" }}
         </span>
         <div class="flex flex-wrap items-center gap-2 mt-1.5">
-          <span
-            class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-bold bg-amber-100 text-amber-800 border border-amber-200"
-          >
+          <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-bold bg-amber-100 text-amber-800 border border-amber-200">
             ⭐ Cấp {{ userProfileStore.level }}
           </span>
-          <span
-            class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-semibold bg-emerald-100 text-emerald-800 border border-emerald-200"
-          >
+          <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-semibold bg-emerald-100 text-emerald-800 border border-emerald-200">
             ✨ {{ formattedExp }} EXP
           </span>
         </div>
@@ -168,8 +168,7 @@ const userInitial = computed(() => {
             <span>⚡</span><span>Điểm kinh nghiệm</span>
           </div>
           <div class="flex items-center gap-1 text-md text-[#263238]">
-            <span class="font-bold">{{ formattedExp }}</span
-            ><span>/</span><span>{{ maxExp }}</span>
+            <span class="font-bold">{{ formattedExp }}</span><span>/</span><span>{{ maxExp }}</span>
           </div>
         </div>
       </div>
@@ -178,77 +177,15 @@ const userInitial = computed(() => {
     <div>
       <div class="text-xs font-bold text-gray-400 uppercase tracking-wider mb-2">Chi tiết tài khoản</div>
       <div class="bg-gray-50 border border-gray-100 rounded-xl divide-y divide-gray-100 text-xs">
-        <div class="px-3.5 py-2.5">
-          <label for="profile-country" class="mb-1.5 block text-gray-500 font-medium">Quốc gia</label>
-          <div class="relative">
-            <button
-              id="profile-country"
-              type="button"
-              class="flex w-full items-center justify-between rounded-lg border border-[#cbd9c6] bg-[#f5f9f0] px-3 py-2 text-left text-sm text-[#24352a] disabled:cursor-not-allowed disabled:opacity-60"
-              :disabled="!canChangeCountry || countryStore.isLoading || isUpdatingCountry"
-              :aria-expanded="isCountryDropdownOpen"
-              aria-haspopup="listbox"
-              @click="isCountryDropdownOpen = !isCountryDropdownOpen"
-            >
-              <span>{{
-                selectedCountry?.name || (countryStore.isLoading ? "Đang tải quốc gia..." : "Chọn quốc gia")
-              }}</span
-              ><span aria-hidden="true" class="ml-2 text-gray-500">▾</span>
-            </button>
-            <div
-              v-if="isCountryDropdownOpen"
-              class="absolute z-20 mt-1 w-full overflow-hidden rounded-lg border border-[#cbd9c6] bg-[#f5f9f0] shadow-lg"
-            >
-              <div class="border-b border-[#cbd9c6] p-2">
-                <input
-                  v-model="countrySearch"
-                  type="search"
-                  autocomplete="off"
-                  placeholder="Tìm quốc gia..."
-                  aria-label="Tìm quốc gia"
-                  class="w-full rounded-md border border-[#cbd9c6] bg-white px-3 py-2 text-sm text-[#24352a] outline-none focus:ring-2 focus:ring-emerald-600"
-                  @keydown.esc="isCountryDropdownOpen = false"
-                />
-              </div>
-              <ul role="listbox" aria-label="Danh sách quốc gia" class="max-h-52 overflow-y-auto py-1">
-                <li
-                  v-for="country in filteredCountries"
-                  :key="country.id"
-                  role="option"
-                  :aria-selected="country.id === displayedCountryId"
-                >
-                  <button
-                    type="button"
-                    class="w-full px-3 py-2 text-left text-sm text-[#24352a] hover:bg-emerald-100 focus:bg-emerald-100 focus:outline-none"
-                    @click="selectCountry(country.id)"
-                  >
-                    {{ country.name }}
-                  </button>
-                </li>
-                <li v-if="filteredCountries.length === 0" class="px-3 py-2 text-sm text-gray-500">
-                  Không tìm thấy quốc gia.
-                </li>
-              </ul>
-            </div>
-          </div>
-          <p v-if="userProfileStore.profile?.country_id && countryCooldownDaysRemaining > 0" class="mt-1 text-gray-500">
-            Bạn còn {{ countryCooldownDaysRemaining }} ngày nữa mới có thể đổi quốc gia.
-          </p>
-          <p v-if="countryError" role="alert" class="mt-1 text-red-700">{{ countryError }}</p>
+        <div class="flex justify-between items-center gap-3 px-3.5 py-2.5">
+          <span class="text-gray-500 font-medium">Quốc gia</span>
+          <span class="text-right font-semibold text-[#24352a]">{{ currentCountry?.name || (countryStore.isLoading ? "Đang tải quốc gia..." : "Chưa có thông tin") }}</span>
         </div>
         <div class="flex justify-between items-center px-3.5 py-2.5">
           <span class="text-gray-500 font-medium">User ID</span>
           <div class="flex items-center gap-1.5">
-            <span
-              class="font-mono text-[11px] bg-white border border-gray-200 px-2 py-0.5 rounded text-gray-700 max-w-[170px] sm:max-w-[220px] truncate"
-              >{{ authStore.user?.id || "N/A" }}</span
-            >
-            <button
-              type="button"
-              class="cursor-pointer text-[10px] font-semibold text-emerald-700 bg-emerald-50 hover:bg-emerald-100 border border-emerald-200 px-2 py-0.5 rounded transition-colors"
-              @click="copyUserId"
-              title="Sao chép User ID"
-            >
+            <span class="font-mono text-[11px] bg-white border border-gray-200 px-2 py-0.5 rounded text-gray-700 max-w-[170px] sm:max-w-[220px] truncate">{{ authStore.user?.id || "N/A" }}</span>
+            <button type="button" class="cursor-pointer text-[10px] font-semibold text-emerald-700 bg-emerald-50 hover:bg-emerald-100 border border-emerald-200 px-2 py-0.5 rounded transition-colors" @click="copyUserId" title="Sao chép User ID">
               {{ copied ? "✓ Đã chép" : "Chép" }}
             </button>
           </div>
@@ -261,56 +198,62 @@ const userInitial = computed(() => {
     </div>
 
     <Teleport to="body">
-      <TwoOptionsModal
-        v-if="showCountryConfirm"
-        title="Xác nhận quốc gia"
-        message="Sau khi đổi, bạn sẽ nhận được một chìa khóa mở khu vực câu."
-        sub-text="Sau khi cập nhật quốc gia, bạn cần chờ 365 ngày để có thể đổi tiếp."
-        first-text="Hủy"
-        :second-text="isUpdatingCountry ? 'Đang cập nhật...' : 'Xác nhận'"
-        :on-first="
-          () => {
-            if (!isUpdatingCountry) {
-              showCountryConfirm = false;
-              selectedCountryId = '';
-            }
-          }
-        "
-        :on-second="updateCountry"
-      />
+      <TwoOptionsModal v-if="showCountryModal" title="Đổi quốc gia" first-text="Hủy"
+        :second-text="isUpdatingCountry ? 'Đang cập nhật...' : 'Xác nhận đổi'"
+        :first-disabled="isUpdatingCountry"
+        :second-disabled="!canChangeCountry || countryStore.isLoading || isUpdatingCountry || !selectedCountryId || selectedCountryId === userProfileStore.profile?.country_id"
+        :on-first="closeCountryModal" :on-dismiss="closeCountryModal" :on-second="updateCountry" @keydown.esc.stop="closeCountryModal">
+        <div class="max-h-[calc(100dvh-14rem)] space-y-4 overflow-y-auto text-sm text-[#24352a]">
+          <div class="rounded-lg border border-[#cbd9c6] bg-[#f5f9f0] p-3 text-xs leading-relaxed">
+            <div class="mb-1 font-semibold">Lưu ý trước khi đổi</div>
+            <div>Sau khi đổi, bạn sẽ nhận được một chìa khóa mở khu vực câu.</div>
+            <div class="mt-1">Sau khi cập nhật quốc gia, bạn cần chờ 365 ngày để có thể đổi tiếp.</div>
+          </div>
+          <div>Quốc gia hiện tại: <span class="font-semibold">{{ currentCountry?.name || "Chưa có thông tin" }}</span></div>
+          <div v-if="!canChangeCountry" role="status" class="rounded-lg border border-amber-200 bg-amber-50 p-3 text-xs text-amber-800">
+            Bạn còn {{ countryCooldownDaysRemaining }} ngày nữa mới có thể đổi quốc gia.
+          </div>
+          <fieldset :disabled="!canChangeCountry || countryStore.isLoading || isUpdatingCountry" class="min-w-0 space-y-2 disabled:opacity-60">
+            <legend class="mb-2 font-semibold">Chọn quốc gia mới</legend>
+            <input v-model="countrySearch" type="search" autocomplete="off" placeholder="Tìm quốc gia..." aria-label="Tìm quốc gia" class="w-full rounded-lg border border-[#cbd9c6] bg-white px-3 py-2 outline-none focus:ring-2 focus:ring-emerald-600" />
+            <div class="max-h-40 overflow-y-auto rounded-lg border border-[#cbd9c6] bg-[#f5f9f0]">
+              <div v-if="countryStore.isLoading" role="status" class="px-3 py-2 text-xs text-gray-500">Đang tải quốc gia...</div>
+              <template v-else>
+                <label v-for="country in filteredCountries" :key="country.id" class="flex cursor-pointer items-center gap-2 px-3 py-2 hover:bg-[#e7ecda]" :class="{ 'bg-[#e7ecda]': selectedCountryId === country.id }">
+                  <input v-model="selectedCountryId" type="radio" name="profile-country" :value="country.id" class="accent-[#24352a]" @change="countryError = ''" />
+                  <span>{{ country.name }}</span>
+                </label>
+                <div v-if="filteredCountries.length === 0" class="px-3 py-2 text-xs text-gray-500">Không tìm thấy quốc gia.</div>
+              </template>
+            </div>
+          </fieldset>
+          <div v-if="countryError" role="alert" class="rounded-lg border border-red-200 bg-red-50 p-3 text-xs text-red-700">{{ countryError }}</div>
+        </div>
+      </TwoOptionsModal>
     </Teleport>
-
-    <div class="flex flex-wrap gap-3">
-      <button
-        type="button"
-        class="rounded-lg border border-[#cbd9c6] bg-[#f5f9f0] px-4 py-2 text-sm font-semibold text-[#24352a] transition-colors hover:bg-emerald-100 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-emerald-600"
-        aria-haspopup="dialog"
-        @click="showIdentityModal = true"
-      >
+    <div class="flex flex-wrap gap-2 justify-end">
+      <button type="button" class="rounded-lg border border-[#cbd9c6] bg-[#f5f9f0] px-4 py-2 text-sm font-semibold text-[#24352a] transition-colors hover:bg-emerald-100 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-emerald-600" aria-haspopup="dialog"
+        @click="openCountryModal">
+        Đổi quốc gia
+      </button>
+      <button type="button" class="rounded-lg border border-[#cbd9c6] bg-[#f5f9f0] px-4 py-2 text-sm font-semibold text-[#24352a] transition-colors hover:bg-emerald-100 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-emerald-600" aria-haspopup="dialog"
+        @click="showIdentityModal = true">
         Tên và ảnh đại diện
       </button>
-      <button
-        type="button"
-        class="rounded-lg border border-[#cbd9c6] bg-[#f5f9f0] px-4 py-2 text-sm font-semibold text-[#24352a] transition-colors hover:bg-emerald-100 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-emerald-600"
-        aria-haspopup="dialog"
-        @click="showPasswordModal = true"
-      >
+      <button type="button" class="rounded-lg border border-[#cbd9c6] bg-[#f5f9f0] px-4 py-2 text-sm font-semibold text-[#24352a] transition-colors hover:bg-emerald-100 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-emerald-600" aria-haspopup="dialog"
+        @click="showPasswordModal = true">
         Đổi mật khẩu
       </button>
-    </div>
-    <Teleport to="body">
-      <UpdateIdentityModal v-if="showIdentityModal" @close="showIdentityModal = false" />
-      <ChangePasswordModal v-if="showPasswordModal" @close="showPasswordModal = false" />
-    </Teleport>
-    <div class="flex items-end">
-      <button
-        type="button"
-        class="inline-flex items-center gap-2 rounded-lg border border-red-200 bg-red-50 px-4 py-2 text-sm font-semibold text-red-700 transition-colors hover:border-red-300 hover:bg-red-100 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-red-600"
-        @click="$emit('signOut')"
-      >
+      <button type="button" class="inline-flex items-center gap-2 rounded-lg border border-red-200 bg-red-50 px-4 py-2 text-sm font-semibold text-red-700 transition-colors hover:border-red-300 hover:bg-red-100 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-red-600"
+        @click="$emit('signOut')">
         <span aria-hidden="true"><img src="/icons/signout.svg?v=2" width="20" alt="" draggable="false" /></span>
         Đăng xuất
       </button>
     </div>
+
+    <Teleport to="body">
+      <UpdateIdentityModal v-if="showIdentityModal" @close="showIdentityModal = false" />
+      <ChangePasswordModal v-if="showPasswordModal" @close="showPasswordModal = false" />
+    </Teleport>
   </div>
 </template>

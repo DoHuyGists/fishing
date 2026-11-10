@@ -100,7 +100,7 @@ const guideSteps = [
   <Modal title="Bàn chế tạo" sub-title="Work bench" :guid-steps="guideSteps" :on-refresh="loadData">
     <section class="grid min-h-full w-full grid-cols-1 gap-4 text-[#24352a] lg:h-full lg:min-h-0 lg:grid-cols-[minmax(15rem,0.8fr)_minmax(0,1.8fr)]">
       <aside id="workbench-palette" class="flex min-h-0 flex-col rounded-lg border border-[#cbd9c6] bg-[#f5f9f0] p-3">
-        <h3 class="mb-3 text-sm font-bold">Vật phẩm trong túi</h3>
+        <div class="mb-3 text-sm font-bold">Vật phẩm trong túi</div>
         <input v-model="searchQuery" type="search" placeholder="Tìm vật phẩm..." class="mb-3 w-full rounded-md border border-[#cbd9c6] bg-white px-3 py-2 text-xs outline-none focus:border-emerald-700" />
         <p v-if="isLoading" class="py-6 text-center text-xs opacity-60">Đang tải dữ liệu...</p>
         <p v-else-if="errorMessage" class="rounded-md border border-red-200 bg-red-50 p-2 text-xs text-red-700">{{ errorMessage }}</p>
@@ -119,10 +119,10 @@ const guideSteps = [
 
       <div class="grid min-h-0 min-w-0 gap-4 md:grid-cols-[minmax(12rem,0.7fr)_minmax(0,1.3fr)]">
         <aside id="workbench-blueprints" class="flex min-h-0 flex-col rounded-lg border border-[#cbd9c6] bg-[#f5f9f0] p-3">
-          <h3 class="mb-3 text-sm font-bold">Bản vẽ</h3>
+          <div class="mb-3 text-sm font-bold">Bản vẽ</div>
           <p v-if="blueprintStore.loading" class="py-4 text-center text-xs opacity-60">Đang tải bản vẽ...</p>
-          <ul v-else class="flex max-h-[min(65vh,44rem)] flex-col gap-2 overflow-y-auto lg:min-h-0 lg:max-h-none lg:flex-1">
-            <li v-for="blueprint in blueprintStore.blueprints" :key="blueprint.id">
+          <div v-else class="flex max-h-[min(65vh,44rem)] flex-col gap-2 overflow-y-auto lg:min-h-0 lg:max-h-none lg:flex-1">
+            <div v-for="blueprint in blueprintStore.blueprints" :key="blueprint.id">
               <button type="button" class="flex w-full items-center gap-2 rounded-md border p-2 text-left transition" :class="selectedBlueprintId === blueprint.id ? 'border-emerald-700 bg-emerald-100' : 'border-[#cbd9c6] bg-white hover:bg-[#e7ecda]'" @click="selectBlueprint(blueprint)">
                 <span class="grid size-11 shrink-0 place-items-center overflow-hidden rounded bg-[#f5f9f0] text-lg">
                   <img v-if="blueprintStore.itemsById[blueprint.resultItemId]?.image" :src="blueprintStore.itemsById[blueprint.resultItemId]?.image ?? undefined" :alt="blueprintStore.itemsById[blueprint.resultItemId]?.name ?? ''" class="h-full w-full object-contain p-1" />
@@ -130,9 +130,9 @@ const guideSteps = [
                 </span>
                 <span class="min-w-0 truncate text-xs font-bold">{{ blueprintStore.itemsById[blueprint.resultItemId]?.name ?? "Bản vẽ" }}</span>
               </button>
-            </li>
-            <li v-if="!blueprintStore.blueprints.length" class="py-4 text-center text-xs opacity-60">Chưa có bản vẽ.</li>
-          </ul>
+            </div>
+            <div v-if="!blueprintStore.blueprints.length" class="py-4 text-center text-xs opacity-60">Chưa có bản vẽ.</div>
+          </div>
         </aside>
 
         <section id="workbench-recipe" class="min-h-72 rounded-lg border border-[#cbd9c6] bg-[#f5f9f0] p-4 lg:min-h-0 lg:overflow-y-auto">

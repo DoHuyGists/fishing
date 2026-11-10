@@ -61,7 +61,7 @@ onMounted(loadSchedules);
 <template>
   <Modal title="Bảng sự kiện" sub-title="Sự kiện đang diễn ra" :on-refresh="loadSchedules">
     <section
-      class="relative flex max-w-none h-full flex-col overflow-hidden border-0 bg-[#f4f5e9] text-[#20372a] shadow-2xl"
+      class="relative flex max-w-none h-full flex-col overflow-hidden border-0 bg-[#f4f5e9] text-[#20372a]"
       role="dialog"
       aria-modal="true"
       aria-labelledby="event-title"

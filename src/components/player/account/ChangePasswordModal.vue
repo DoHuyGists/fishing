@@ -38,7 +38,7 @@ async function changePassword() {
       aria-labelledby="change-password-title"
     >
       <div class="mb-4 flex items-center justify-between gap-3">
-        <h2 id="change-password-title" class="text-lg font-bold">Đổi mật khẩu</h2>
+        <div id="change-password-title" class="text-lg font-bold">Đổi mật khẩu</div>
         <button type="button" aria-label="Đóng" class="rounded px-2 py-1 text-xl disabled:opacity-50" :disabled="authStore.passwordBusy" @click="close">&times;</button>
       </div>
       <form class="space-y-3" @submit.prevent="changePassword">
