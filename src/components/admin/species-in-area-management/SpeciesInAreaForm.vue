@@ -33,8 +33,8 @@ const speciesSearch = defineModel<string>("speciesSearch", { required: true });
     <aside class="ml-auto flex h-full w-full max-w-lg flex-col border-l border-[#cbd9c6] bg-white text-[#24352a] shadow-xl">
       <div class="flex shrink-0 items-center justify-between border-b border-[#cbd9c6] px-5 py-4">
         <div>
-          <h3 class="m-0 text-base font-extrabold">{{ form.originalAreaId ? 'Chỉnh sửa cấu hình' : 'Thêm cấu hình' }}</h3>
-          <p class="m-0 mt-1 text-xs text-gray-500">Thông tin trong bảng species_in_area</p>
+          <div class="m-0 text-base font-extrabold">{{ form.originalAreaId ? 'Chỉnh sửa cấu hình' : 'Thêm cấu hình' }}</div>
+          <div class="m-0 mt-1 text-xs text-gray-500">Thông tin trong bảng species_in_area</div>
         </div>
         <button type="button" aria-label="Đóng biểu mẫu" class="grid size-8 place-items-center rounded-md text-xl text-gray-500 hover:bg-gray-100" @click="emit('close')">&times;</button>
       </div>

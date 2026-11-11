@@ -34,8 +34,8 @@ watch([content, dialog], () => {
           @click="close"
         >&times;</button>
         <img :src="content.image" :alt="content.name" class="mx-auto mb-4 size-16 object-contain" draggable="false">
-        <h2 id="information-modal-title" class="text-lg font-bold">{{ content.name }}</h2>
-        <p id="information-modal-description" class="mt-2 whitespace-pre-line text-sm leading-relaxed">{{ content.description }}</p>
+        <div id="information-modal-title" class="text-lg font-bold">{{ content.name }}</div>
+        <div id="information-modal-description" class="mt-2 whitespace-pre-line text-sm leading-relaxed">{{ content.description }}</div>
       </div>
     </dialog>
   </Teleport>

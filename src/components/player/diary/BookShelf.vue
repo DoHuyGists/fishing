@@ -85,7 +85,7 @@ function getBookVariant(countryCode: string, speciesCount: number): BookVariant 
             </BookCover>
           </div>
           <div class="w-full text-center mt-2 pt-2 border-amber-800/40">
-            <h3 class="m-0 text-xs md:text-sm font-serif font-bold truncate px-1">{{ country.name }}</h3>
+            <div class="m-0 text-xs md:text-sm font-serif font-bold truncate px-1">{{ country.name }}</div>
             <span
               class="inline-block mt-1 text-[10px] font-bold px-2 py-0.5 rounded-full"
               :class="
@@ -103,7 +103,7 @@ function getBookVariant(countryCode: string, speciesCount: number): BookVariant 
         class="flex flex-col items-center justify-center p-12 text-amber-300/70"
       >
         <span class="text-4xl mb-2">🔍</span>
-        <p class="font-serif text-base">Không tìm thấy quốc gia phù hợp với "{{ searchQuery }}"</p>
+        <div class="font-serif text-base">Không tìm thấy quốc gia phù hợp với "{{ searchQuery }}"</div>
       </div>
     </div>
 

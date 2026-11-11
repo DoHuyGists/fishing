@@ -59,10 +59,10 @@ const guildeSteps = [
             </div>
           </template>
           <template v-else>
-            <h3 class="text-base font-semibold">Xóa {{ selected.size }} vật phẩm?</h3>
-            <p class="mt-2 text-sm text-slate-600">
+            <div class="text-base font-semibold">Xóa {{ selected.size }} vật phẩm?</div>
+            <div class="mt-2 text-sm text-slate-600">
               Không thể xóa vật phẩm đang có trong set. Hãy gỡ vật phẩm và lưu set trước khi xóa.
-            </p>
+            </div>
           </template>
 
           <div class="mt-5 flex justify-end gap-2">

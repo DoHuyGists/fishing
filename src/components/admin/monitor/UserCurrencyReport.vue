@@ -7,36 +7,36 @@ const store = useAdminMonitorStore();
 <template>
   <div class="space-y-6 text-[#24352a]">
     <div>
-      <h3 class="text-lg font-bold">Tiền tệ thế giới</h3>
-      <p class="mt-1 text-sm text-slate-600">Số dư hiện tại của tất cả ví người chơi, bao gồm người không ở trong bãi câu. Tiền và vỏ sò được thống kê riêng.</p>
+      <div class="text-lg font-bold">Tiền tệ thế giới</div>
+      <div class="mt-1 text-sm text-slate-600">Số dư hiện tại của tất cả ví người chơi, bao gồm người không ở trong bãi câu. Tiền và vỏ sò được thống kê riêng.</div>
     </div>
 
     <div class="grid gap-3 sm:grid-cols-3">
       <div v-for="currency in store.currencyReport" :key="currency.key" class="min-w-0 rounded-xl border border-[#cbd9c6] bg-white p-4">
-        <p class="flex items-center gap-2 text-sm text-slate-600">
+        <div class="flex items-center gap-2 text-sm text-slate-600">
           <img :src="currency.icon" alt="" class="size-6" aria-hidden="true" />
           Tổng {{ currency.label.toLocaleLowerCase("vi-VN") }} toàn thế giới
-        </p>
-        <p class="mt-2 break-words text-3xl font-extrabold tabular-nums">{{ currency.total.toLocaleString("vi-VN") }}</p>
-        <p class="mt-2 text-xs text-slate-600">{{ currency.holderCount.toLocaleString("vi-VN") }} ví có số dư {{ currency.label.toLocaleLowerCase("vi-VN") }} dương</p>
+        </div>
+        <div class="mt-2 break-words text-3xl font-extrabold tabular-nums">{{ currency.total.toLocaleString("vi-VN") }}</div>
+        <div class="mt-2 text-xs text-slate-600">{{ currency.holderCount.toLocaleString("vi-VN") }} ví có số dư {{ currency.label.toLocaleLowerCase("vi-VN") }} dương</div>
       </div>
       <div class="rounded-xl border border-[#cbd9c6] bg-white p-4">
-        <p class="text-sm text-slate-600">Tổng số ví người chơi</p>
-        <p class="mt-2 text-3xl font-extrabold tabular-nums">{{ store.currencies.length.toLocaleString("vi-VN") }}</p>
-        <p class="mt-2 text-xs text-slate-600">{{ store.emptyWalletCount.toLocaleString("vi-VN") }} ví không có tiền và vỏ sò</p>
+        <div class="text-sm text-slate-600">Tổng số ví người chơi</div>
+        <div class="mt-2 text-3xl font-extrabold tabular-nums">{{ store.currencies.length.toLocaleString("vi-VN") }}</div>
+        <div class="mt-2 text-xs text-slate-600">{{ store.emptyWalletCount.toLocaleString("vi-VN") }} ví không có tiền và vỏ sò</div>
       </div>
     </div>
 
-    <p v-if="!store.currencies.length" role="status" class="rounded-xl border border-[#cbd9c6] bg-white p-8 text-center text-sm text-slate-500">
+    <div v-if="!store.currencies.length" role="status" class="rounded-xl border border-[#cbd9c6] bg-white p-8 text-center text-sm text-slate-500">
       Chưa có dữ liệu ví tiền tệ của người chơi.
-    </p>
+    </div>
     <div v-else class="grid items-start gap-6 xl:grid-cols-2">
       <section v-for="currency in store.currencyReport" :key="currency.key" class="min-w-0 overflow-hidden rounded-xl border border-[#cbd9c6] bg-white">
         <div class="border-b border-[#cbd9c6] p-4 sm:px-5">
-          <h3 class="font-bold">Top 10 người chơi có nhiều {{ currency.label.toLocaleLowerCase("vi-VN") }} nhất</h3>
-          <p class="mt-1 text-sm text-slate-600">Xếp theo số dư giảm dần, chỉ tính ví có số dư dương.</p>
+          <div class="font-bold">Top 10 người chơi có nhiều {{ currency.label.toLocaleLowerCase("vi-VN") }} nhất</div>
+          <div class="mt-1 text-sm text-slate-600">Xếp theo số dư giảm dần, chỉ tính ví có số dư dương.</div>
         </div>
-        <p v-if="!currency.topHolders.length" class="p-8 text-center text-sm text-slate-500">Chưa có người chơi sở hữu {{ currency.label.toLocaleLowerCase("vi-VN") }}.</p>
+        <div v-if="!currency.topHolders.length" class="p-8 text-center text-sm text-slate-500">Chưa có người chơi sở hữu {{ currency.label.toLocaleLowerCase("vi-VN") }}.</div>
         <div v-else class="overflow-x-auto">
           <table class="w-full text-left text-sm">
             <caption class="sr-only">Top người chơi theo số dư {{ currency.label.toLocaleLowerCase("vi-VN") }}</caption>

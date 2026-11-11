@@ -30,10 +30,10 @@ function confirm() {
     @click.self="emit('cancel')"
   >
     <div class="relative w-full max-w-sm rounded-xl border border-gray-300 bg-white p-5 text-center shadow-xl">
-      <h3 class="m-0 text-base font-bold text-[#263238]">Đăng bán cá</h3>
-      <p class="my-3 text-xs leading-relaxed text-gray-600">
+      <div class="m-0 text-base font-bold text-[#263238]">Đăng bán cá</div>
+      <div class="my-3 text-xs leading-relaxed text-gray-600">
         Đăng bán <strong class="text-[#153221]">{{ fish.species?.name }}</strong> lên thị trường.
-      </p>
+      </div>
       <div class="my-4 text-left">
         <input
           v-model.number="price"
@@ -48,10 +48,10 @@ function confirm() {
           "
           @keyup.enter="confirm"
         />
-        <p v-if="error" class="mt-1 text-[11px] font-medium text-red-500">{{ error }}</p>
-        <p v-else-if="price !== '' && Number(price) <= 0" class="mt-1 text-[11px] font-medium text-red-500">
+        <div v-if="error" class="mt-1 text-[11px] font-medium text-red-500">{{ error }}</div>
+        <div v-else-if="price !== '' && Number(price) <= 0" class="mt-1 text-[11px] font-medium text-red-500">
           Giá bán phải lớn hơn 0.
-        </p>
+        </div>
       </div>
       <div class="space-y-2 text-left text-xs">
         <div class="flex items-center gap-2"><span>Số dư hiện tại:</span><Cash :amount="currencyStore.cash" /></div>

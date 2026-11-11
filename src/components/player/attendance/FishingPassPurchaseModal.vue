@@ -26,14 +26,14 @@ async function buyFishingPass() {
 <template>
   <div class="fixed inset-0 z-[10000] flex items-center justify-center bg-black/30 p-4" @click.self="emit('close')">
     <section class="w-full max-w-sm rounded-2xl border border-[#cbd9c6] bg-white p-4 text-[#24352a] shadow-xl" role="dialog" aria-modal="true" aria-labelledby="fishing-pass-confirm-title">
-      <h2 id="fishing-pass-confirm-title" class="m-0 text-base font-extrabold">Xác nhận mua Fishing Pass</h2>
-      <p class="mb-0 mt-1 text-sm text-emerald-900/70">Mở khóa phần thưởng Fishing Pass</p>
+      <div id="fishing-pass-confirm-title" class="m-0 text-base font-extrabold">Xác nhận mua Fishing Pass</div>
+      <div class="mb-0 mt-1 text-sm text-emerald-900/70">Mở khóa phần thưởng Fishing Pass</div>
       <div class="mt-4 space-y-3 rounded-xl bg-[#f5f9f0] p-3 text-sm">
         <div class="flex items-center justify-between gap-2"><span>Số vỏ sò hiện tại</span><Shells :amount="currencyStore.shells" :size="24" /></div>
         <div class="flex items-center justify-between gap-2"><span>Số vỏ sò cần thanh toán</span><Shells :amount="passStore.price" :size="24" /></div>
         <div class="flex items-center justify-between gap-2 border-t border-[#cbd9c6] pt-3 font-bold"><span>Số vỏ sò còn lại</span><Shells :amount="remainingShells" :size="24" /></div>
       </div>
-      <p v-if="currencyStore.shells < passStore.price" class="mb-0 mt-3 text-sm font-semibold text-red-700" role="alert">Bạn không đủ vỏ sò để mua Fishing Pass.</p>
+      <div v-if="currencyStore.shells < passStore.price" class="mb-0 mt-3 text-sm font-semibold text-red-700" role="alert">Bạn không đủ vỏ sò để mua Fishing Pass.</div>
       <div class="mt-4 flex justify-end gap-2">
         <button type="button" class="rounded-lg border border-[#cbd9c6] px-3 py-2 text-sm font-bold text-[#24352a]" :disabled="passStore.isBuying" @click="emit('close')">Hủy</button>
         <button type="button" class="rounded-lg bg-emerald-700 px-3 py-2 text-sm font-bold text-white hover:bg-emerald-800 disabled:cursor-not-allowed disabled:opacity-50" :disabled="currencyStore.shells < passStore.price || passStore.isBuying" @click="buyFishingPass">{{ passStore.isBuying ? "Đang xử lý..." : "Xác nhận mua" }}</button>

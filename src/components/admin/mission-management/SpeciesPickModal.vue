@@ -45,7 +45,7 @@ const viewBtn = (active: boolean) =>
   <div class="fixed inset-0 z-40 flex items-center justify-center bg-black/40 p-4" @click.self="emit('close')">
     <div class="flex max-h-[90vh] w-full max-w-3xl flex-col rounded-xl border border-[#cbd9c6] bg-white shadow-xl">
       <div class="flex shrink-0 items-center justify-between border-b border-[#cbd9c6] px-5 py-3">
-        <h3 class="m-0 text-base font-extrabold text-[#24352a]">Chọn cá ({{ picked.size }})</h3>
+        <div class="m-0 text-base font-extrabold text-[#24352a]">Chọn cá ({{ picked.size }})</div>
         <button
           type="button"
           aria-label="Đóng"
@@ -70,14 +70,14 @@ const viewBtn = (active: boolean) =>
       </div>
 
       <div class="min-h-0 flex-1 overflow-y-auto p-4">
-        <p v-if="store.isLoadingSpecies" class="m-0 py-8 text-center text-sm text-gray-500">Đang tải...</p>
-        <p v-else-if="store.speciesError" class="m-0 py-8 text-center text-sm text-red-700">
+        <div v-if="store.isLoadingSpecies" class="m-0 py-8 text-center text-sm text-gray-500">Đang tải...</div>
+        <div v-else-if="store.speciesError" class="m-0 py-8 text-center text-sm text-red-700">
           {{ store.speciesError }}
-        </p>
-        <p v-else-if="!filtered.length" class="m-0 py-8 text-center text-sm text-gray-500">Không có loài cá nào</p>
+        </div>
+        <div v-else-if="!filtered.length" class="m-0 py-8 text-center text-sm text-gray-500">Không có loài cá nào</div>
 
-        <ul v-else-if="viewMode === 'list'" class="m-0 flex list-none flex-col gap-2 p-0">
-          <li v-for="item in filtered" :key="item.id">
+        <div v-else-if="viewMode === 'list'" class="m-0 flex list-none flex-col gap-2 p-0">
+          <div v-for="item in filtered" :key="item.id">
             <label
               class="flex cursor-pointer items-center gap-3 rounded-lg border px-3 py-2"
               :class="picked.has(item.id) ? 'border-emerald-700 bg-[#f5f9f0]' : 'border-[#cbd9c6] hover:bg-[#f5f9f0]'"
@@ -92,11 +92,11 @@ const viewBtn = (active: boolean) =>
               <span class="min-w-0 flex-1 truncate text-sm font-bold text-[#24352a]">{{ item.name }}</span>
               <span class="text-xs text-gray-500">{{ item.rarity }}</span>
             </label>
-          </li>
-        </ul>
+          </div>
+        </div>
 
-        <ul v-else class="m-0 grid list-none grid-cols-2 gap-3 p-0 sm:grid-cols-3 md:grid-cols-4">
-          <li v-for="item in filtered" :key="item.id">
+        <div v-else class="m-0 grid list-none grid-cols-2 gap-3 p-0 sm:grid-cols-3 md:grid-cols-4">
+          <div v-for="item in filtered" :key="item.id">
             <label
               class="relative flex h-full cursor-pointer flex-col items-center gap-1 rounded-lg border p-3 text-center"
               :class="picked.has(item.id) ? 'border-emerald-700 bg-[#f5f9f0]' : 'border-[#cbd9c6] hover:bg-[#f5f9f0]'"
@@ -112,8 +112,8 @@ const viewBtn = (active: boolean) =>
               <span class="text-sm font-bold text-[#24352a]">{{ item.name }}</span>
               <span class="text-xs text-gray-500">{{ item.rarity }}</span>
             </label>
-          </li>
-        </ul>
+          </div>
+        </div>
       </div>
 
       <div class="flex shrink-0 justify-end gap-2 border-t border-[#cbd9c6] px-5 py-3">

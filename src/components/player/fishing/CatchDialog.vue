@@ -32,9 +32,9 @@ const variantFrameClass = computed(() => {
           aria-modal="true"
           aria-labelledby="catch-title"
         >
-          <p class="mt-[19px] mb-2.5 text-[#e8bd62] text-[10px] font-black tracking-[0.16em] uppercase">
+          <div class="mt-[19px] mb-2.5 text-[#e8bd62] text-[10px] font-black tracking-[0.16em] uppercase">
             Cú câu thành công
-          </p>
+          </div>
           <img
             :src="caught.image"
             :alt="caught.name"
@@ -51,17 +51,17 @@ const variantFrameClass = computed(() => {
               class="inline-block ml-1 px-2 py-1 rounded-full bg-[#fff1a8] text-[#6b4b00] text-[9px] font-black tracking-widest"
               >CÁ XỊN</span
             >
-            <p
+            <div
               v-if="caught.starRating !== undefined"
               class="mt-2 mb-0 text-[#ffd65a] text-sm font-black"
               :aria-label="`${caught.starRating} sao`"
             >
               {{ "★".repeat(Math.max(0, Math.floor(caught.starRating))) }}
-            </p>
-            <h2 id="catch-title" class="mt-2 mb-[3px] text-2xl">{{ caught.name }}</h2>
-            <p class="m-0 text-[#b7cfb9] text-[13px]">
+            </div>
+            <div id="catch-title" class="mt-2 mb-[3px] text-2xl">{{ caught.name }}</div>
+            <div class="m-0 text-[#b7cfb9] text-[13px]">
               {{ caught.weight }}<span v-if="caught.length"> · {{ caught.length }}</span>
-            </p>
+            </div>
           </div>
           <button
             type="button"

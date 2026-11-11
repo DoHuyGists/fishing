@@ -57,15 +57,15 @@ async function submit() {
 <template>
   <main class="grid min-h-screen place-items-center bg-[#dcebe4] bg-[linear-gradient(115deg,rgba(255,255,255,0.5)_1px,transparent_1px),linear-gradient(25deg,rgba(52,100,87,0.08)_1px,transparent_1px)] bg-size-[24px_24px,32px_32px] px-6 py-8 text-[#18312d]">
     <section class="w-full max-w-[408px] rounded-lg border border-[#b8cbc3] bg-[#fffdf8] p-8 shadow-[12px_12px_0_#346457] sm:p-[42px]" aria-labelledby="signup-title">
-      <p class="mb-[5px] mt-7 text-xs font-bold uppercase tracking-[0.08em] text-[#b9522c]">Bắt đầu hành trình</p>
-      <h1 id="signup-title" class="font-serif text-[34px] leading-tight">Tạo tài khoản</h1>
+      <div class="mb-[5px] mt-7 text-xs font-bold uppercase tracking-[0.08em] text-[#b9522c]">Bắt đầu hành trình</div>
+      <div id="signup-title" class="font-serif text-[34px] leading-tight">Tạo tài khoản</div>
 
       <div v-if="confirmationSent" class="leading-relaxed text-[#61716d]" role="status">
         <button type="button" :disabled="loading" class="my-3 text-sm underline" @click="resend">{{ loading ? 'Đang gửi…' : 'Gửi lại email xác nhận' }}</button>
-        <p v-if="resent">Đã gửi lại email xác nhận.</p>
-        <p v-if="errorMessage" role="alert" class="text-red-700">{{ errorMessage }}</p>
-        <h2 class="mb-2 font-serif text-[22px] text-[#18312d]">Kiểm tra email của bạn</h2>
-        <p class="mb-[18px]">Chúng tôi đã gửi liên kết xác nhận đến <strong class="text-[#18312d]">{{ form.email }}</strong>. Hãy xác nhận địa chỉ email để hoàn tất đăng ký.</p>
+        <div v-if="resent">Đã gửi lại email xác nhận.</div>
+        <div v-if="errorMessage" role="alert" class="text-red-700">{{ errorMessage }}</div>
+        <div class="mb-2 font-serif text-[22px] text-[#18312d]">Kiểm tra email của bạn</div>
+        <div class="mb-[18px]">Chúng tôi đã gửi liên kết xác nhận đến <strong class="text-[#18312d]">{{ form.email }}</strong>. Hãy xác nhận địa chỉ email để hoàn tất đăng ký.</div>
         <RouterLink class="font-bold text-[#346457] underline decoration-transparent underline-offset-4 transition hover:decoration-current" to="/login">Quay lại đăng nhập</RouterLink>
       </div>
 
@@ -85,15 +85,15 @@ async function submit() {
           <span>Nhập lại mật khẩu</span>
           <input v-model="form.confirmPassword" class="min-h-[46px] w-full rounded border border-[#9eb3aa] bg-white px-3 py-[10px] font-normal outline-none transition focus:border-[#346457] focus:ring-[3px] focus:ring-[#346457]/20" :type="showPassword ? 'text' : 'password'" autocomplete="new-password" required placeholder="Nhập lại mật khẩu" />
         </label>
-        <p v-if="errorMessage" class="-mt-1 text-[13px] leading-relaxed text-[#b52d26]" role="alert">{{ errorMessage }}</p>
+        <div v-if="errorMessage" class="-mt-1 text-[13px] leading-relaxed text-[#b52d26]" role="alert">{{ errorMessage }}</div>
         <button class="min-h-12 rounded bg-[#346457] font-bold text-white transition-colors hover:bg-[#254b40] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#346457] disabled:cursor-wait disabled:opacity-70" type="submit" :disabled="loading">
           {{ loading ? "Đang tạo tài khoản..." : "Đăng ký" }}
         </button>
       </form>
 
-      <p v-if="!confirmationSent" class="mt-6 text-center text-sm text-[#61716d]">Đã có tài khoản?
+      <div v-if="!confirmationSent" class="mt-6 text-center text-sm text-[#61716d]">Đã có tài khoản?
         <RouterLink class="font-bold text-[#346457] underline decoration-transparent underline-offset-4 transition hover:decoration-current" to="/login">Đăng nhập</RouterLink>
-      </p>
+      </div>
     </section>
   </main>
 </template>

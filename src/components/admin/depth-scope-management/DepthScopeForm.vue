@@ -50,10 +50,10 @@ async function submit() {
     <form class="w-full max-w-lg rounded-2xl border border-[#cbd9c6] bg-white shadow-xl" @submit.prevent="submit">
       <header class="flex items-center justify-between border-b border-[#cbd9c6] px-5 py-4">
         <div>
-          <h3 class="m-0 text-lg font-bold text-[#24352a]">
+          <div class="m-0 text-lg font-bold text-[#24352a]">
             {{ store.editingId ? "Chỉnh sửa phạm vi" : "Thêm phạm vi độ sâu" }}
-          </h3>
-          <p class="m-0 mt-1 text-xs text-gray-500">Thiết lập khoảng độ sâu và hình dạng đường cong.</p>
+          </div>
+          <div class="m-0 mt-1 text-xs text-gray-500">Thiết lập khoảng độ sâu và hình dạng đường cong.</div>
         </div>
         <button
           type="button"
@@ -126,12 +126,12 @@ async function submit() {
             class="rounded-lg border border-[#cbd9c6] px-3 py-2 font-normal"
           />
         </label>
-        <p
+        <div
           v-if="error"
           class="m-0 rounded-lg border border-red-200 bg-red-50 px-3 py-2 text-xs text-red-700 sm:col-span-2"
         >
           {{ error }}
-        </p>
+        </div>
       </div>
       <footer class="flex justify-end gap-2 border-t border-[#cbd9c6] px-5 py-4">
         <button

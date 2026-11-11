@@ -54,10 +54,10 @@ function isMilestoneReached(pointsRequired: number): boolean {
       <div class="flex items-center gap-2.5">
         <span class="text-lg text-emerald-700">⚡</span>
         <div>
-          <h3 class="m-0 text-xs sm:text-sm font-bold uppercase tracking-wider font-serif text-emerald-900">
+          <div class="m-0 text-xs sm:text-sm font-bold uppercase tracking-wider font-serif text-emerald-900">
             Phần Thưởng Năng Động Hàng Ngày
-          </h3>
-          <p class="m-0 text-[11px] text-[#617565]">Tích lũy hoạt động trong ngày để mở khóa 10 mốc ban thưởng</p>
+          </div>
+          <div class="m-0 text-[11px] text-[#617565]">Tích lũy hoạt động trong ngày để mở khóa 10 mốc ban thưởng</div>
         </div>
       </div>
 
@@ -162,12 +162,12 @@ function isMilestoneReached(pointsRequired: number): boolean {
               >
                 {{ item.icon }}
               </div>
-              <h4
+              <div
                 class="m-0 text-xs font-serif font-bold truncate max-w-full"
                 :class="isMilestoneReached(item.points) ? 'text-emerald-950' : 'text-[#526a58]'"
               >
                 {{ item.title }}
-              </h4>
+              </div>
             </div>
 
             <!-- Mô tả phần thưởng -->

@@ -53,7 +53,7 @@ async function handleSubmit() {
           ]"
           @input="errors.like = ''"
         />
-        <p v-if="errors.like" class="mt-1 text-sm text-red-600">{{ errors.like }}</p>
+        <div v-if="errors.like" class="mt-1 text-sm text-red-600">{{ errors.like }}</div>
       </div>
       <div>
         <label for="fb-dislike" class="mb-1.5 block text-sm font-medium text-gray-800"
@@ -74,7 +74,7 @@ async function handleSubmit() {
           ]"
           @input="errors.dislike = ''"
         />
-        <p v-if="errors.dislike" class="mt-1 text-sm text-red-600">{{ errors.dislike }}</p>
+        <div v-if="errors.dislike" class="mt-1 text-sm text-red-600">{{ errors.dislike }}</div>
       </div>
       <div>
         <label for="fb-contribute" class="mb-1.5 block text-sm font-medium text-gray-800"
@@ -89,9 +89,9 @@ async function handleSubmit() {
           :class="[textareaBase, 'border-gray-300 focus:border-indigo-500 focus:ring-indigo-200']"
         />
       </div>
-      <p v-if="submitError" role="alert" class="rounded-lg bg-red-50 px-3 py-2 text-sm text-red-700">
+      <div v-if="submitError" role="alert" class="rounded-lg bg-red-50 px-3 py-2 text-sm text-red-700">
         {{ submitError }}
-      </p>
+      </div>
     </div>
     <div class="flex justify-end gap-3 border-t border-gray-200 px-6 py-4">
       <button

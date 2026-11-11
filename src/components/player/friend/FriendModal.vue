@@ -226,10 +226,10 @@ async function executeDelete() {
             🎣
           </div>
           <div class="min-w-0">
-            <h3 class="m-0 text-base sm:text-lg font-bold text-white tracking-wide">Mã người chơi của bạn</h3>
-            <p class="m-0 text-xs text-emerald-200/70 font-mono truncate" :title="currentUserId">
+            <div class="m-0 text-base sm:text-lg font-bold text-white tracking-wide">Mã người chơi của bạn</div>
+            <div class="m-0 text-xs text-emerald-200/70 font-mono truncate" :title="currentUserId">
               {{ currentUserId || "Chưa đăng nhập" }}
-            </p>
+            </div>
           </div>
         </div>
 
@@ -403,14 +403,14 @@ async function executeDelete() {
           class="py-14 text-center bg-white/60 rounded-2xl border border-emerald-900/10 p-6"
         >
           <div class="text-4xl mb-2">🤝</div>
-          <h4 class="m-0 text-sm font-bold text-gray-800">Chưa có bạn bè nào</h4>
-          <p class="m-0 text-xs text-gray-500 mt-1">
+          <div class="m-0 text-sm font-bold text-gray-800">Chưa có bạn bè nào</div>
+          <div class="m-0 text-xs text-gray-500 mt-1">
             {{
               searchQuery
                 ? "Không tìm thấy bạn bè phù hợp với tìm kiếm."
                 : "Hãy chuyển sang tab 'Thêm bạn bè' để kết bạn cùng những ngư thủ khác nhé!"
             }}
-          </p>
+          </div>
           <button
             v-if="!searchQuery"
             type="button"
@@ -497,10 +497,10 @@ async function executeDelete() {
           class="py-14 text-center bg-white/60 rounded-2xl border border-emerald-900/10 p-6"
         >
           <div class="text-4xl mb-2">📬</div>
-          <h4 class="m-0 text-sm font-bold text-gray-800">Không có lời mời nào</h4>
-          <p class="m-0 text-xs text-gray-500 mt-1">
+          <div class="m-0 text-sm font-bold text-gray-800">Không có lời mời nào</div>
+          <div class="m-0 text-xs text-gray-500 mt-1">
             Hiện tại bạn chưa nhận được yêu cầu kết bạn nào từ người chơi khác.
-          </p>
+          </div>
         </div>
 
         <div v-else class="space-y-2">
@@ -595,8 +595,8 @@ async function executeDelete() {
           class="py-14 text-center bg-white/60 rounded-2xl border border-emerald-900/10 p-6"
         >
           <div class="text-4xl mb-2">📤</div>
-          <h4 class="m-0 text-sm font-bold text-gray-800">Chưa gửi lời mời nào</h4>
-          <p class="m-0 text-xs text-gray-500 mt-1">Bạn chưa gửi yêu cầu kết bạn nào đang ở trạng thái chờ.</p>
+          <div class="m-0 text-sm font-bold text-gray-800">Chưa gửi lời mời nào</div>
+          <div class="m-0 text-xs text-gray-500 mt-1">Bạn chưa gửi yêu cầu kết bạn nào đang ở trạng thái chờ.</div>
         </div>
 
         <div v-else class="space-y-2">
@@ -669,8 +669,8 @@ async function executeDelete() {
           class="py-14 text-center bg-white/60 rounded-2xl border border-emerald-900/10 p-6"
         >
           <div class="text-4xl mb-2">🔍</div>
-          <h4 class="m-0 text-sm font-bold text-gray-800">Không tìm thấy người chơi</h4>
-          <p class="m-0 text-xs text-gray-500 mt-1">Không có người chơi nào khớp với từ khóa tìm kiếm.</p>
+          <div class="m-0 text-sm font-bold text-gray-800">Không tìm thấy người chơi</div>
+          <div class="m-0 text-xs text-gray-500 mt-1">Không có người chơi nào khớp với từ khóa tìm kiếm.</div>
         </div>
 
         <div v-else class="grid min-w-0 grid-cols-1 gap-3 sm:grid-cols-2">
@@ -818,7 +818,7 @@ async function executeDelete() {
       >
         <div class="flex items-center gap-3 text-red-600">
           <div class="size-10 rounded-full bg-red-100 flex items-center justify-center text-lg shrink-0">⚠️</div>
-          <h4 class="m-0 text-base font-bold text-gray-900">
+          <div class="m-0 text-base font-bold text-gray-900">
             {{
               deleteConfirmTarget.type === "friend"
                 ? "Xác nhận hủy kết bạn"
@@ -826,10 +826,10 @@ async function executeDelete() {
                   ? "Hủy lời mời kết bạn"
                   : "Xóa yêu cầu kết bạn"
             }}
-          </h4>
+          </div>
         </div>
 
-        <p class="m-0 text-xs text-gray-600 leading-relaxed">
+        <div class="m-0 text-xs text-gray-600 leading-relaxed">
           {{
             deleteConfirmTarget.type === "friend"
               ? "Bạn có chắc chắn muốn xóa người này khỏi danh sách bạn bè? Hai người sẽ không còn là bạn của nhau nữa."
@@ -837,7 +837,7 @@ async function executeDelete() {
                 ? "Bạn có chắc chắn muốn hủy lời mời kết bạn đã gửi tới người chơi này?"
                 : "Bạn có chắc chắn muốn xóa yêu cầu kết bạn này?"
           }}
-        </p>
+        </div>
 
         <div class="p-2.5 rounded-lg bg-gray-50 border border-gray-200 text-xs font-mono text-gray-700 truncate">
           Mã người chơi: {{ deleteConfirmTarget.targetUserId }}

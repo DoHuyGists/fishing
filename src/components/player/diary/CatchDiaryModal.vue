@@ -63,10 +63,10 @@ function returnToBookshelf() {
       </div>
 
       <div v-if="diaryStore.error || countryStore.unlockedError" role="alert" class="rounded-lg border border-red-200 bg-red-50 p-5 text-red-800">
-        <p>{{ diaryStore.error || countryStore.unlockedError }}</p><button type="button" class="mt-2 underline" @click="retry">Thử lại</button>
+        <div>{{ diaryStore.error || countryStore.unlockedError }}</div><button type="button" class="mt-2 underline" @click="retry">Thử lại</button>
       </div>
-      <p v-else-if="viewMode === 'bookshelf' && (diaryStore.isLoading || countryStore.isLoadingUnlocked)" class="p-8 text-center">Đang tải nhật ký…</p>
-      <p v-else-if="viewMode === 'bookshelf' && !unlockedCountries.length" class="p-8 text-center">Bạn chưa mở quốc gia nào. Hãy mở một khu vực trên bản đồ để bắt đầu nhật ký.</p>
+      <div v-else-if="viewMode === 'bookshelf' && (diaryStore.isLoading || countryStore.isLoadingUnlocked)" class="p-8 text-center">Đang tải nhật ký…</div>
+      <div v-else-if="viewMode === 'bookshelf' && !unlockedCountries.length" class="p-8 text-center">Bạn chưa mở quốc gia nào. Hãy mở một khu vực trên bản đồ để bắt đầu nhật ký.</div>
       <BookShelf
         v-else-if="viewMode === 'bookshelf'"
         :countries="unlockedCountries"
@@ -77,9 +77,9 @@ function returnToBookshelf() {
       <div v-else class="flex-1 flex flex-col justify-between overflow-hidden relative">
         <div v-if="diaryStore.isLoading" class="flex-1 flex flex-col items-center justify-center p-12 text-amber-200">
           <div class="w-10 h-10 border border-amber-400 border-t-transparent rounded-full animate-spin mb-3"></div>
-          <p class="font-serif text-sm">Đang lật mở trang nhật ký {{ selectedCountry?.name }}...</p>
+          <div class="font-serif text-sm">Đang lật mở trang nhật ký {{ selectedCountry?.name }}...</div>
         </div>
-        <p v-else-if="!currentBookEntries.length" class="p-8 text-center text-[#24352a]">Quốc gia này chưa có dữ liệu loài cá.</p>
+        <div v-else-if="!currentBookEntries.length" class="p-8 text-center text-[#24352a]">Quốc gia này chưa có dữ liệu loài cá.</div>
         <FlipBook
           v-else-if="selectedCountry"
           :country="selectedCountry"

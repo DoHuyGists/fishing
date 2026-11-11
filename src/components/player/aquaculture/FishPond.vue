@@ -25,7 +25,7 @@ defineProps<{
         <div class="water-light pointer-events-none absolute inset-0" aria-hidden="true" />
         <div class="water-ripples pointer-events-none absolute inset-0" aria-hidden="true"><i /><i /><i /></div>
         <span v-if="pond.fish.some(f => f.status === 'ready')" class="absolute right-4 top-4 rounded-lg bg-amber-100 px-3 py-1.5 text-xs font-semibold text-amber-900">Có cá trưởng thành</span>
-        <p v-if="!pond.fish.length" class="empty-plaque absolute inset-x-4 top-1/2 m-0 text-center text-sm">Ao đã sẵn sàng. Thả lứa cá đầu tiên nhé!</p>
+        <div v-if="!pond.fish.length" class="empty-plaque absolute inset-x-4 top-1/2 m-0 text-center text-sm">Ao đã sẵn sàng. Thả lứa cá đầu tiên nhé!</div>
         <div class="swimming-area absolute inset-x-4 bottom-5 top-14" aria-hidden="true">
           <span v-for="(fish, i) in swimmers" :key="fish.id" class="fish absolute block" :class="{ 'special-fish': fish.special }" :style="{ '--fish-width': (68 + fish.progress * .4) + 'px', top: (15 + i * 19) + '%', animationDuration: (150 + i * 20) + 's', animationDelay: -(i * 43) + 's' }">
             <img :src="fishImageUrl(fish.image)" alt="" class="fish-image" decoding="async" draggable="false" />
@@ -45,7 +45,7 @@ defineProps<{
       <div class="my-2 h-2 overflow-hidden rounded-full bg-[#dfe8d8]" role="progressbar" aria-label="Sức chứa ao" :aria-valuenow="pond.used_capacity" :aria-valuemin="0" :aria-valuemax="pond.capacity">
         <div class="h-full rounded-full bg-emerald-600" :style="{ width: (pond.used_capacity / pond.capacity * 100) + '%' }" />
       </div>
-      <p class="m-0 text-[11px] text-stone-600">Còn {{ pond.available_capacity }} sức chứa để thả cá. Tổng sức chứa cá phải nhỏ hơn {{ pond.capacity }}.</p>
+      <div class="m-0 text-[11px] text-stone-600">Còn {{ pond.available_capacity }} sức chứa để thả cá. Tổng sức chứa cá phải nhỏ hơn {{ pond.capacity }}.</div>
     </div>
   </section>
 </template>

@@ -64,7 +64,7 @@ async function handleSubmit() {
           ]"
           @input="titleError = ''"
         />
-        <p v-if="titleError" class="mt-1 text-sm text-red-600">{{ titleError }}</p>
+        <div v-if="titleError" class="mt-1 text-sm text-red-600">{{ titleError }}</div>
       </div>
       <div>
         <label for="error-description" class="mb-1.5 block text-sm font-medium text-gray-800"
@@ -92,8 +92,8 @@ async function handleSubmit() {
           class="block w-full text-sm text-gray-600 file:mr-3 file:rounded-lg file:border-0 file:bg-indigo-50 file:px-3 file:py-2 file:text-sm file:font-medium file:text-indigo-700 hover:file:bg-indigo-100"
           @change="onFilesChanged"
         />
-        <p v-if="fileNames" class="mt-2 text-sm text-gray-600">{{ fileNames }}</p>
-        <p v-if="fileError" class="mt-1 text-sm text-red-600">{{ fileError }}</p>
+        <div v-if="fileNames" class="mt-2 text-sm text-gray-600">{{ fileNames }}</div>
+        <div v-if="fileError" class="mt-1 text-sm text-red-600">{{ fileError }}</div>
         <button
           v-if="files.length"
           type="button"
@@ -104,9 +104,9 @@ async function handleSubmit() {
           Xóa các file đã chọn
         </button>
       </div>
-      <p v-if="submitError" role="alert" class="rounded-lg bg-red-50 px-3 py-2 text-sm text-red-700">
+      <div v-if="submitError" role="alert" class="rounded-lg bg-red-50 px-3 py-2 text-sm text-red-700">
         {{ submitError }}
-      </p>
+      </div>
     </div>
     <div class="flex justify-end border-t border-gray-200 px-6 py-4">
       <button

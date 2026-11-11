@@ -17,8 +17,8 @@ async function submit() {
 <template>
   <main class="grid min-h-screen place-items-center bg-[#dcebe4] bg-[linear-gradient(115deg,rgba(255,255,255,0.5)_1px,transparent_1px),linear-gradient(25deg,rgba(52,100,87,0.08)_1px,transparent_1px)] bg-size-[24px_24px,32px_32px] px-6 py-8 text-[#18312d]">
     <section class="w-full max-w-[408px] rounded-lg border border-[#b8cbc3] bg-[#fffdf8] p-8 shadow-[12px_12px_0_#346457] sm:p-[42px]" aria-labelledby="login-title">
-      <p class="mb-[5px] mt-7 text-xs font-bold uppercase tracking-[0.08em] text-[#b9522c]">Chào mừng trở lại</p>
-      <h1 id="login-title" class="font-serif text-[34px] leading-tight">Đăng nhập</h1>
+      <div class="mb-[5px] mt-7 text-xs font-bold uppercase tracking-[0.08em] text-[#b9522c]">Chào mừng trở lại</div>
+      <div id="login-title" class="font-serif text-[34px] leading-tight">Đăng nhập</div>
 
       <form class="grid gap-[18px]" @submit.prevent="submit">
         <label class="grid gap-[7px] text-sm font-bold">
@@ -32,16 +32,16 @@ async function submit() {
             <button class="absolute inset-y-0 right-0 px-3 text-xs font-bold text-[#346457]" type="button" :aria-label="showPassword ? 'Ẩn mật khẩu' : 'Hiện mật khẩu'" @click="showPassword = !showPassword">{{ showPassword ? "Ẩn" : "Hiện" }}</button>
           </div>
         </label>
-        <p v-if="auth.error" class="-mt-1 text-[13px] leading-relaxed text-[#b52d26]" role="alert">{{ auth.error }}</p>
+        <div v-if="auth.error" class="-mt-1 text-[13px] leading-relaxed text-[#b52d26]" role="alert">{{ auth.error }}</div>
         <button class="min-h-12 rounded bg-[#346457] font-bold text-white transition-colors hover:bg-[#254b40] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#346457] disabled:cursor-wait disabled:opacity-70" type="submit" :disabled="auth.loading">
           {{ auth.loading ? "Đang đăng nhập..." : "Đăng nhập" }}
         </button>
       </form>
 
       <RouterLink to="/forgot-password" class="mt-4 block text-center text-sm text-[#346457] underline">Quên mật khẩu?</RouterLink>
-      <p class="mt-6 text-center text-sm text-[#61716d]">Chưa có tài khoản?
+      <div class="mt-6 text-center text-sm text-[#61716d]">Chưa có tài khoản?
         <RouterLink class="font-bold text-[#346457] underline decoration-transparent underline-offset-4 transition hover:decoration-current" to="/signup">Đăng ký</RouterLink>
-      </p>
+      </div>
     </section>
   </main>
 </template>

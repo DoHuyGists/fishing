@@ -69,20 +69,20 @@ const statusClass: Record<string, string> = {
     </button>
   </div>
   <section v-if="tab === 'invites'" class="flex flex-col gap-3">
-    <p
+    <div
       v-if="invites.length === 0"
       class="m-0 rounded-2xl border border-dashed border-[#cbd9c6] bg-[#f5f9f0] p-6 text-center text-sm text-[#556655]"
     >
       Bạn chưa có lời mời nào.
-    </p>
-    <ul v-else class="m-0 flex list-none flex-col gap-3 p-0">
-      <li v-for="invite in invites" :key="invite.id" class="rounded-xl border border-[#cbd9c6] bg-[#f5f9f0] p-3">
-        <p class="m-0 font-bold text-[#24352a]">{{ invite.team?.name ?? "Tổ đội không tồn tại" }}</p>
-        <p v-if="invite.team?.description" class="m-0 text-[0.8rem] text-[#556655]">{{ invite.team.description }}</p>
-        <p class="m-0 mt-1 text-[0.75rem] text-[#556655]">
+    </div>
+    <div v-else class="m-0 flex list-none flex-col gap-3 p-0">
+      <div v-for="invite in invites" :key="invite.id" class="rounded-xl border border-[#cbd9c6] bg-[#f5f9f0] p-3">
+        <div class="m-0 font-bold text-[#24352a]">{{ invite.team?.name ?? "Tổ đội không tồn tại" }}</div>
+        <div v-if="invite.team?.description" class="m-0 text-[0.8rem] text-[#556655]">{{ invite.team.description }}</div>
+        <div class="m-0 mt-1 text-[0.75rem] text-[#556655]">
           Từ <span class="font-mono">{{ invite.inviter_id.slice(0, 8) }}…</span> ·
           {{ new Date(invite.created_at).toLocaleString("vi-VN") }}
-        </p>
+        </div>
         <div class="mt-2 flex justify-end gap-2">
           <button
             :disabled="actionLoading"
@@ -100,8 +100,8 @@ const statusClass: Record<string, string> = {
             Chấp nhận
           </button>
         </div>
-      </li>
-    </ul>
+      </div>
+    </div>
   </section>
   <template v-else>
   <section v-if="team" class="flex flex-col gap-4">
@@ -109,16 +109,16 @@ const statusClass: Record<string, string> = {
       class="flex items-start justify-between gap-3 rounded-2xl border border-[#b8dab0] bg-linear-to-br from-[#e8f5e2] to-[#d4edcc] p-4"
     >
       <div>
-        <h3 class="m-0 mb-1 text-[1.1rem] font-extrabold text-[#1a3a1a]">{{ team.name }}</h3>
-        <p v-if="team.description" class="m-0 mb-2 text-[0.82rem] text-[#556655]">{{ team.description }}</p>
+        <div class="m-0 mb-1 text-[1.1rem] font-extrabold text-[#1a3a1a]">{{ team.name }}</div>
+        <div v-if="team.description" class="m-0 mb-2 text-[0.82rem] text-[#556655]">{{ team.description }}</div>
         <span :class="['inline-block rounded-full px-2 py-1 text-[0.72rem] font-bold', statusClass[team.status]]">{{
           statusLabel[team.status]
         }}</span>
       </div>
       <span class="font-bold text-[#2e6644]">{{ members.length }} / {{ team.max_members }}</span>
     </div>
-    <ul class="m-0 grid list-none grid-cols-1 gap-3 p-0 sm:grid-cols-2">
-      <li v-for="member in members" :key="member.id" class="rounded-xl border border-[#daefd4] bg-white p-3">
+    <div class="m-0 grid list-none grid-cols-1 gap-3 p-0 sm:grid-cols-2">
+      <div v-for="member in members" :key="member.id" class="rounded-xl border border-[#daefd4] bg-white p-3">
         <div class="flex items-center gap-3">
           <div
             class="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-[#3b7a57] text-xs font-extrabold text-white"
@@ -126,7 +126,7 @@ const statusClass: Record<string, string> = {
             {{ member.user_id.slice(0, 2).toUpperCase() }}
           </div>
           <div class="min-w-0">
-            <p class="m-0 truncate font-mono text-[0.8rem] text-[#334433]">{{ member.user_id.slice(0, 8) }}…</p>
+            <div class="m-0 truncate font-mono text-[0.8rem] text-[#334433]">{{ member.user_id.slice(0, 8) }}…</div>
             <span class="text-[0.72rem] font-bold text-[#2e6644]">{{
               member.role === "LEADER" ? "👑 Trưởng nhóm" : "Thành viên"
             }}</span>
@@ -151,8 +151,8 @@ const statusClass: Record<string, string> = {
             ✕
           </button>
         </div>
-      </li>
-    </ul>
+      </div>
+    </div>
     <form
       v-if="isLeader && team.join_type === 'invited' && showInviteForm"
       class="flex flex-wrap gap-2 rounded-xl border border-[#cbd9c6] bg-[#f5f9f0] p-3"
@@ -213,8 +213,8 @@ const statusClass: Record<string, string> = {
     v-else
     class="flex min-h-[240px] flex-col items-center justify-center rounded-2xl border border-dashed border-[#c0d8b8] bg-[#fafefc] p-6 text-center"
   >
-    <h3 class="m-0 text-lg font-bold text-[#1a3a1a]">Bạn chưa tham gia tổ đội</h3>
-    <p class="mb-4 text-sm text-[#556655]">Chọn một tổ đội ở bên trái hoặc tự tạo tổ đội mới.</p>
+    <div class="m-0 text-lg font-bold text-[#1a3a1a]">Bạn chưa tham gia tổ đội</div>
+    <div class="mb-4 text-sm text-[#556655]">Chọn một tổ đội ở bên trái hoặc tự tạo tổ đội mới.</div>
     <button class="rounded-lg bg-[#3b7a57] px-4 py-2 text-sm font-bold text-white" @click="emit('create')">
       + Tạo nhóm
     </button>

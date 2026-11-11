@@ -25,17 +25,27 @@ export function sanitizeGuideContent(content: string): string {
     : `<div>${escapeText(content).replace(/\r\n?|\n/g, "<br>")}</div>`;
   const clean = DOMPurify.sanitize(html, {
     ALLOWED_TAGS: ["div", "p", "h1", "h2", "h3", "h4", "h5", "h6", "br", "strong", "b", "em", "i", "u", "s", "strike", "a", "ul", "ol", "li", "blockquote", "pre", "code", "hr", "img", "video"],
-    ALLOWED_ATTR: ["href", "title", "start", "src", "alt", "controls", "playsinline", "preload"],
+    ALLOWED_ATTR: ["href", "title", "start", "src", "alt", "controls", "playsinline", "preload", "data-guide-list", "data-guide-list-item"],
     ALLOW_DATA_ATTR: false,
     ALLOW_ARIA_ATTR: false,
   });
   const template = document.createElement("template");
   template.innerHTML = clean;
   // Normalize imported blocks to the same div-based document used by the editor.
-  template.content.querySelectorAll("p, h1, h2, h3, h4, h5, h6").forEach((element) => {
+  template.content.querySelectorAll("p, h1, h2, h3, h4, h5, h6, ul, ol, li").forEach((element) => {
     const block = document.createElement("div");
+    if (element.tagName === "UL" || element.tagName === "OL") {
+      block.setAttribute("data-guide-list", element.tagName === "UL" ? "bullet" : "ordered");
+      if (element.hasAttribute("start")) block.setAttribute("start", element.getAttribute("start")!);
+    } else if (element.tagName === "LI") {
+      block.setAttribute("data-guide-list-item", "");
+    }
     block.append(...element.childNodes);
     element.replaceWith(block);
+  });
+  template.content.querySelectorAll('[data-guide-list="ordered"]').forEach((element) => {
+    const start = Number(element.getAttribute("start") ?? 1);
+    (element as HTMLElement).style.setProperty("--guide-list-start", String(Number.isSafeInteger(start) ? start - 1 : 0));
   });
   template.content.querySelectorAll("a[href]").forEach((link) => {
     const href = link.getAttribute("href") ?? "";

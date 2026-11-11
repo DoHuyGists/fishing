@@ -47,8 +47,8 @@ async function changePassword() {
           <label class="block">Mật khẩu mới<input v-model="newPassword" required minlength="8" type="password" autocomplete="new-password" class="mt-1 w-full rounded border border-[#cbd9c6] bg-white p-2" /></label>
           <label class="block">Xác nhận mật khẩu mới<input v-model="confirmPassword" required minlength="8" type="password" autocomplete="new-password" class="mt-1 w-full rounded border border-[#cbd9c6] bg-white p-2" /></label>
         </fieldset>
-        <p v-if="passwordError" role="alert" class="text-red-700">{{ passwordError }}</p>
-        <p v-if="passwordSaved" role="status">Đã đổi mật khẩu.</p>
+        <div v-if="passwordError" role="alert" class="text-red-700">{{ passwordError }}</div>
+        <div v-if="passwordSaved" role="status">Đã đổi mật khẩu.</div>
         <div class="flex justify-end gap-2">
           <button type="button" :disabled="authStore.passwordBusy" class="rounded border border-[#cbd9c6] px-4 py-2 disabled:opacity-50" @click="close">Đóng</button>
           <button type="submit" :disabled="authStore.passwordBusy" class="rounded bg-[#24352a] px-4 py-2 text-white disabled:opacity-50">{{ authStore.passwordBusy ? 'Đang lưu…' : 'Đổi mật khẩu' }}</button>

@@ -163,7 +163,7 @@ onBeforeUnmount(() => {
     class="flex min-h-screen flex-col items-center justify-center gap-4 bg-[#f5f9f0] px-6 text-center text-[#24352a]"
     role="alert"
   >
-    <p>Không thể chuẩn bị phiên câu: {{ sessionError }}</p>
+    <div>Không thể chuẩn bị phiên câu: {{ sessionError }}</div>
     <button
       type="button"
       class="rounded-lg border border-[#cbd9c6] bg-white px-4 py-2 font-medium hover:bg-[#f5f9f0]"
@@ -229,7 +229,7 @@ onBeforeUnmount(() => {
           aria-label="Trạng thái câu cá"
           class="flex flex-col gap-3 rounded-[15px] border border-[#cbd9c6] bg-[#f5f9f0] p-3 text-[#24352a]"
         >
-          <p role="status" class="text-xs">{{ fishingStore.castMessage }}</p>
+          <div role="status" class="text-xs">{{ fishingStore.castMessage }}</div>
           <button
             type="button"
             class="rounded-[10px] border border-[#cbd9c6] bg-white px-3 py-2 text-xs font-bold enabled:hover:bg-[#e2ecdc] disabled:cursor-not-allowed disabled:opacity-45"
@@ -315,7 +315,7 @@ onBeforeUnmount(() => {
           <div class="flex items-center justify-between gap-4">
             <div>
               <div id="fishing-sound-label" class="font-bold text-xl">Âm thanh nền</div>
-              <p class="mt-1 text-sm">Tiếng chim ngẫu nhiên với khoảng nghỉ giữa các lượt phát.</p>
+              <div class="mt-1 text-sm">Tiếng chim ngẫu nhiên với khoảng nghỉ giữa các lượt phát.</div>
             </div>
             <button
               type="button"
@@ -333,11 +333,11 @@ onBeforeUnmount(() => {
               />
             </button>
           </div>
-          <p v-if="userSettingStore.loading || userSettingStore.saving" role="status" class="mt-3 text-sm">
+          <div v-if="userSettingStore.loading || userSettingStore.saving" role="status" class="mt-3 text-sm">
             {{ userSettingStore.loading ? "Đang tải cài đặt..." : "Đang lưu cài đặt..." }}
-          </p>
+          </div>
           <div v-if="userSettingStore.error" role="alert" class="mt-3 text-sm text-red-700">
-            <p>{{ userSettingStore.error }}</p>
+            <div>{{ userSettingStore.error }}</div>
             <button
               v-if="!userSettingStore.ready"
               type="button"
@@ -351,13 +351,13 @@ onBeforeUnmount(() => {
       </div>
     </Teleport>
   </main>
-  <p
+  <div
     v-if="!sessionReady && fishingStore.leaveAreaError"
     role="alert"
     class="fixed bottom-4 left-4 right-4 z-50 rounded-lg bg-[#f5f9f0] p-3 text-center text-red-700"
   >
     {{ fishingStore.leaveAreaError }}
-  </p>
+  </div>
 </template>
 
 <style scoped>

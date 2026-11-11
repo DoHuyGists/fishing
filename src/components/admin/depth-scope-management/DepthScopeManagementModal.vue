@@ -164,10 +164,10 @@ onMounted(() => store.fetchAll());
       @click.self="deleteTarget = null"
     >
       <div class="w-full max-w-sm rounded-2xl border border-[#cbd9c6] bg-white p-5 shadow-xl">
-        <h3 class="m-0 text-lg font-bold">Xác nhận xóa</h3>
-        <p class="my-3 text-sm text-gray-600">
+        <div class="m-0 text-lg font-bold">Xác nhận xóa</div>
+        <div class="my-3 text-sm text-gray-600">
           Xóa phạm vi “{{ deleteTarget.name }}”? Thao tác này không thể hoàn tác.
-        </p>
+        </div>
         <div class="flex justify-end gap-2">
           <button
             type="button"

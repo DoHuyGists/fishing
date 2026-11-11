@@ -15,22 +15,22 @@ const store = useAdminNotificationStore();
       @submit.prevent="store.save()"
     >
       <header class="border-b border-gray-200 px-5 py-4">
-        <h3 class="m-0 text-base font-extrabold text-[#153221]">
+        <div class="m-0 text-base font-extrabold text-[#153221]">
           {{
             store.editing
               ? "Sửa thông báo"
               : "Tạo thông báo " + (store.tab === "system" ? "hệ thống" : "cá nhân")
           }}
-        </h3>
+        </div>
       </header>
       <div class="space-y-4 overflow-y-auto p-5">
-        <p
+        <div
           v-if="store.formError"
           role="alert"
           class="m-0 rounded-lg border border-red-200 bg-red-50 px-3 py-2 text-sm text-red-700"
         >
           {{ store.formError }}
-        </p>
+        </div>
         <label v-if="store.tab === 'personal'" class="flex flex-col gap-1.5 text-xs font-bold text-gray-600"
           >UUID người dùng *<input
             v-model="store.form.userId"

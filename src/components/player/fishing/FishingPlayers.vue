@@ -20,7 +20,7 @@ const store = useFishingStore();
         >
           <header class="flex justify-between px-5 pt-[19px] pb-3 border-b border-[rgba(223,241,207,0.14)]">
             <div>
-              <h2 id="players-title" class="m-0 text-xl">Người chơi đang câu ({{ store.nearbyPlayers.length }})</h2>
+              <div id="players-title" class="m-0 text-xl">Người chơi đang câu ({{ store.nearbyPlayers.length }})</div>
             </div>
             <button
               type="button"
@@ -31,7 +31,7 @@ const store = useFishingStore();
               ×
             </button>
           </header>
-          <!-- <p class="px-5 pt-3 pb-1.5 text-[#b7cfb9] text-xs">Chạm vào người chơi để xem thông tin.</p> -->
+          <!-- <div class="px-5 pt-3 pb-1.5 text-[#b7cfb9] text-xs">Chạm vào người chơi để xem thông tin.</div> -->
           <div v-if="store.isLoadingPlayers" class="py-8 text-center text-[#b7cfb9] text-xs">
             Đang cập nhật danh sách người câu...
           </div>
@@ -40,10 +40,10 @@ const store = useFishingStore();
             class="py-8 px-4 text-center text-[#b7cfb9] text-xs"
           >
             <span class="text-2xl mb-1 block">🎣</span>
-            <p class="m-0">Hiện chưa có người chơi nào trong khu vực này.</p>
+            <div class="m-0">Hiện chưa có người chơi nào trong khu vực này.</div>
           </div>
-          <ul v-else-if="!store.selectedPlayer" class="grid gap-2 m-0 p-3 list-none">
-            <li v-for="player in store.nearbyPlayers" :key="player.id">
+          <div v-else-if="!store.selectedPlayer" class="grid gap-2 m-0 p-3 list-none">
+            <div v-for="player in store.nearbyPlayers" :key="player.id">
               <button
                 type="button"
                 class="flex items-center w-full gap-[11px] p-2.5 border rounded-xl bg-[rgba(7,28,18,0.35)] text-inherit cursor-pointer text-left hover:border-[#d8b866] hover:bg-[rgba(55,91,57,0.5)] transition-colors"
@@ -67,8 +67,8 @@ const store = useFishingStore();
                 </span>
                 <span class="ml-auto text-[#e8bd62] text-[11px] font-extrabold">Xem ›</span>
               </button>
-            </li>
-          </ul>
+            </div>
+          </div>
           <article v-else class="grid justify-items-center px-5 pt-4 pb-[22px] text-center">
             <button
               type="button"
@@ -82,10 +82,10 @@ const store = useFishingStore();
               :style="{ background: store.selectedPlayer.color }"
               >{{ store.selectedPlayer.avatar }}</span
             >
-            <h3 class="m-0 text-xl">{{ store.selectedPlayer.name }}</h3>
-            <p class="mt-1 text-[#b7cfb9] text-xs">
+            <div class="m-0 text-xl">{{ store.selectedPlayer.name }}</div>
+            <div class="mt-1 text-[#b7cfb9] text-xs">
               Cấp {{ store.selectedPlayer.level }} · {{ store.selectedPlayer.title }}
-            </p>
+            </div>
             <div class="grid grid-cols-2 w-full gap-2 mt-[18px]">
               <span
                 class="grid gap-1 py-[11px] px-1.5 rounded-[10px] bg-[rgba(7,28,18,0.38)] text-[#b7cfb9] text-[10px]"

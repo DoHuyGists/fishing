@@ -86,7 +86,7 @@ onBeforeUnmount(() => window.removeEventListener("keydown", onKeydown));
         aria-label="Chọn trang bị"
       >
         <header class="flex items-center justify-between border-b border-[#cbd9c6] px-4 py-3">
-          <h2 class="m-0 text-base font-bold">Chọn trang bị</h2>
+          <div class="m-0 text-base font-bold">Chọn trang bị</div>
           <button
             type="button"
             class="grid h-8 w-8 place-items-center rounded-full text-2xl leading-none hover:bg-black/5"
@@ -106,13 +106,13 @@ onBeforeUnmount(() => window.removeEventListener("keydown", onKeydown));
                 class="mb-3 w-full rounded-lg border border-[#cbd9c6] bg-white px-3 py-2 text-xs outline-none focus:border-[#70a77e]"
                 placeholder="Tìm kiếm..."
               />
-              <ul
+              <div
                 class="m-0 grid max-h-[calc(92dvh-190px)] list-none grid-cols-1 gap-3 overflow-y-auto p-1 sm:grid-cols-2 lg:grid-cols-3"
               >
-                <li v-if="!filteredOptions.length" class="col-span-full p-3 text-center text-xs">
+                <div v-if="!filteredOptions.length" class="col-span-full p-3 text-center text-xs">
                   Không tìm thấy kết quả
-                </li>
-                <li v-for="variant in filteredOptions" :key="variant.id">
+                </div>
+                <div v-for="variant in filteredOptions" :key="variant.id">
                   <button
                     type="button"
                     class="relative flex min-h-[150px] w-full items-center gap-3 overflow-hidden rounded-xl border border-[#cbd9c6] bg-white p-3 text-left transition hover:bg-[#eef8e9]"
@@ -153,8 +153,8 @@ onBeforeUnmount(() => window.removeEventListener("keydown", onKeydown));
                       ĐÃ CHỌN
                     </span>
                   </button>
-                </li>
-              </ul>
+                </div>
+              </div>
             </template>
           </Tab>
         </div>

@@ -59,13 +59,13 @@ withDefaults(
       <div>
         <!-- Slot mặc định cho phép thay nội dung chính bằng HTML tùy ý -->
         <slot>
-          <p v-if="message" class="mb-2 text-[0.95rem] leading-normal text-[#374151]">
+          <div v-if="message" class="mb-2 text-[0.95rem] leading-normal text-[#374151]">
             {{ message }}
-          </p>
+          </div>
         </slot>
-        <p v-if="subText" class="mb-2 text-[0.85rem] leading-normal text-[#6b7280]">
+        <div v-if="subText" class="mb-2 text-[0.85rem] leading-normal text-[#6b7280]">
           {{ subText }}
-        </p>
+        </div>
       </div>
 
       <div class="mt-5 flex justify-center gap-3">

@@ -30,11 +30,11 @@ const zones = {
         <span class="rounded-full bg-white/10 px-3 py-1">🎣 Tension challenge</span>
         <span class="rounded-full bg-white/10 px-3 py-1">25 chỉ số · 2 nhóm</span>
       </div>
-      <h2 class="m-0 text-xl font-extrabold sm:text-2xl">Hiểu sức cá, cân bằng cuộc đấu</h2>
-      <p class="mb-0 mt-2 max-w-3xl text-emerald-100">
+      <div class="m-0 text-xl font-extrabold sm:text-2xl">Hiểu sức cá, cân bằng cuộc đấu</div>
+      <div class="mb-0 mt-2 max-w-3xl text-emerald-100">
         Người chơi giữ nút để thu dây, thả nút để nhả dây. Bạn điều chỉnh luật trong
         <code>config</code> và sức kéo trong <code>fish</code> để tạo cuộc đấu vừa sức, có nhịp nghỉ và có cơ hội xử lý.
-      </p>
+      </div>
     </div>
 
     <Tab v-model="guide.activeTab" :tabs="tabs" lazy aria-label="Nội dung hướng dẫn tension challenge">
@@ -43,26 +43,26 @@ const zones = {
           <div class="grid gap-3 sm:grid-cols-3">
             <section class="guide-card">
               <span class="text-2xl" aria-hidden="true">✊</span>
-              <h3 class="guide-title">Giữ: kéo cá lại gần</h3>
-              <p>Cộng <code>reelRate</code> vào lực cá. Khoảng cách giảm theo <code>reelSpeed</code> khi dây đạt <code>safeMin</code>.</p>
+              <div class="guide-title">Giữ: kéo cá lại gần</div>
+              <div>Cộng <code>reelRate</code> vào lực cá. Khoảng cách giảm theo <code>reelSpeed</code> khi dây đạt <code>safeMin</code>.</div>
             </section>
             <section class="guide-card">
               <span class="text-2xl" aria-hidden="true">🖐️</span>
-              <h3 class="guide-title">Thả: bớt căng dây</h3>
-              <p>Cộng <code>releaseRate</code> là số âm. Nếu cá giật quá mạnh, tổng lực vẫn dương và dây vẫn căng lên.</p>
+              <div class="guide-title">Thả: bớt căng dây</div>
+              <div>Cộng <code>releaseRate</code> là số âm. Nếu cá giật quá mạnh, tổng lực vẫn dương và dây vẫn căng lên.</div>
             </section>
             <section class="guide-card">
               <span class="text-2xl" aria-hidden="true">🟢</span>
-              <h3 class="guide-title">Vùng xanh: làm cá mệt</h3>
-              <p>Trong đoạn <code>safeMin</code> đến <code>safeMax</code>, cá hao thể lực và yếu dần, kể cả khi đang nhả dây.</p>
+              <div class="guide-title">Vùng xanh: làm cá mệt</div>
+              <div>Trong đoạn <code>safeMin</code> đến <code>safeMax</code>, cá hao thể lực và yếu dần, kể cả khi đang nhả dây.</div>
             </section>
           </div>
 
           <section class="guide-card overflow-hidden" aria-labelledby="tension-preview-title">
             <div class="mb-4 flex flex-wrap items-start justify-between gap-3">
               <div>
-                <h3 id="tension-preview-title" class="m-0 text-lg font-bold">Thử một khoảnh khắc trong ván đấu</h3>
-                <p class="mb-0 mt-1 text-xs text-slate-600">Kéo các thanh và đổi thao tác để thấy chỉ số tác động ra sao.</p>
+                <div id="tension-preview-title" class="m-0 text-lg font-bold">Thử một khoảnh khắc trong ván đấu</div>
+                <div class="mb-0 mt-1 text-xs text-slate-600">Kéo các thanh và đổi thao tác để thấy chỉ số tác động ra sao.</div>
               </div>
               <button type="button" class="guide-button" @click="guide.resetPreview">Đặt lại minh họa</button>
             </div>
@@ -109,41 +109,41 @@ const zones = {
                 </fieldset>
               </div>
               <div class="space-y-3 rounded-xl border border-[#cbd9c6] bg-[#f5f9f0] p-4">
-                <p class="m-0 text-xs font-bold uppercase tracking-wide text-emerald-800">Lực căng sẽ thay đổi thế nào?</p>
+                <div class="m-0 text-xs font-bold uppercase tracking-wide text-emerald-800">Lực căng sẽ thay đổi thế nào?</div>
                 <div class="grid grid-cols-3 gap-2 text-center">
                   <div><strong class="block text-lg">+{{ number(guide.preview.fishPull) }}</strong><span class="text-xs">Lực cá/giây</span></div>
                   <div><strong class="block text-lg">{{ guide.preview.playerPull > 0 ? '+' : '' }}{{ number(guide.preview.playerPull) }}</strong><span class="text-xs">Thao tác/giây</span></div>
                   <div><strong class="block text-lg" :class="guide.preview.delta > 0 ? 'text-amber-700' : 'text-sky-700'">{{ guide.preview.delta > 0 ? '+' : '' }}{{ number(guide.preview.delta) }}</strong><span class="text-xs">Tổng/giây</span></div>
                 </div>
-                <p class="rounded-lg bg-white p-3 font-semibold">
+                <div class="rounded-lg bg-white p-3 font-semibold">
                   {{ guide.preview.zone === 'broken' ? 'Đã chạm ngưỡng đứt dây: ván đấu kết thúc ở đây.'
                     : guide.preview.delta > 0 ? 'Dây đang căng lên. Cần giữ khoảng đệm tới ngưỡng đứt.'
                     : guide.preview.delta < 0 ? 'Dây đang chùng xuống. Chú ý ngưỡng cá thoát.' : 'Lực cá và thao tác đang cân bằng.' }}
-                </p>
-                <ul class="m-0 space-y-2 pl-5">
-                  <li>{{ guide.preview.getsCloser ? `Cá gần thêm khoảng ${number(guide.selectedPreset.config.reelSpeed)} m/giây.` : 'Lúc này không thu được khoảng cách.' }}</li>
-                  <li>{{ guide.preview.zone === 'slack' ? `Cá lùi xa khoảng ${number(guide.selectedPreset.config.slackDistanceRate)} m/giây, tối đa tới khoảng cách ban đầu.` : guide.preview.losesStamina ? 'Cá đang hao thể lực vì ở trong vùng xanh.' : guide.previewStamina === 0 ? 'Cá đã kiệt sức, vẫn giữ lực kéo tối thiểu.' : 'Cá không hao thể lực ở ngoài vùng xanh.' }}</li>
-                  <li v-if="guide.preview.zone !== 'broken'">{{ guide.preview.escapes ? `Đang đếm thời gian dây quá chùng; quá ${number(guide.selectedPreset.config.slackEscapeSeconds)} giây liên tục sẽ thoát.` : `Chỉ đếm cá thoát khi lực căng dưới ${number(guide.preview.slackThreshold)}.` }}</li>
-                </ul>
+                </div>
+                <div class="m-0 space-y-2 pl-5">
+                  <div>{{ guide.preview.getsCloser ? `Cá gần thêm khoảng ${number(guide.selectedPreset.config.reelSpeed)} m/giây.` : 'Lúc này không thu được khoảng cách.' }}</div>
+                  <div>{{ guide.preview.zone === 'slack' ? `Cá lùi xa khoảng ${number(guide.selectedPreset.config.slackDistanceRate)} m/giây, tối đa tới khoảng cách ban đầu.` : guide.preview.losesStamina ? 'Cá đang hao thể lực vì ở trong vùng xanh.' : guide.previewStamina === 0 ? 'Cá đã kiệt sức, vẫn giữ lực kéo tối thiểu.' : 'Cá không hao thể lực ở ngoài vùng xanh.' }}</div>
+                  <div v-if="guide.preview.zone !== 'broken'">{{ guide.preview.escapes ? `Đang đếm thời gian dây quá chùng; quá ${number(guide.selectedPreset.config.slackEscapeSeconds)} giây liên tục sẽ thoát.` : `Chỉ đếm cá thoát khi lực căng dưới ${number(guide.preview.slackThreshold)}.` }}</div>
+                </div>
                 <details class="rounded-lg bg-white p-3 text-xs text-slate-600">
                   <summary class="cursor-pointer font-semibold text-[#24352a]">Các con số này được tính ra sao?</summary>
-                  <p>Lực cá ≈ (nền + giật) × sức riêng × sức theo thể lực × hệ số vào dây.</p>
-                  <p class="break-words font-mono">{{ number(guide.preview.rawPull) }} × {{ number(guide.selectedPreset.fish.baseStrength) }} × {{ number(guide.preview.staminaFactor) }} × {{ number(guide.selectedPreset.config.fishPullMultiplier) }} ≈ {{ number(guide.preview.fishPull) }}</p>
-                  <p class="mb-0">Minh họa dùng nền ở mức trung tâm <code>basePull</code> và bỏ qua làm tròn từng tick. Trong ván thật, nền dao động và seed quyết định chuỗi giật.</p>
+                  <div>Lực cá ≈ (nền + giật) × sức riêng × sức theo thể lực × hệ số vào dây.</div>
+                  <div class="break-words font-mono">{{ number(guide.preview.rawPull) }} × {{ number(guide.selectedPreset.fish.baseStrength) }} × {{ number(guide.preview.staminaFactor) }} × {{ number(guide.selectedPreset.config.fishPullMultiplier) }} ≈ {{ number(guide.preview.fishPull) }}</div>
+                  <div class="mb-0">Minh họa dùng nền ở mức trung tâm <code>basePull</code> và bỏ qua làm tròn từng tick. Trong ván thật, nền dao động và seed quyết định chuỗi giật.</div>
                 </details>
               </div>
             </div>
-            <p class="mb-0 mt-4 text-xs text-slate-600">Đây là minh họa để đọc chỉ số. Các lựa chọn tại đây chỉ thay đổi bản xem hướng dẫn.</p>
+            <div class="mb-0 mt-4 text-xs text-slate-600">Đây là minh họa để đọc chỉ số. Các lựa chọn tại đây chỉ thay đổi bản xem hướng dẫn.</div>
           </section>
 
           <div class="grid gap-3 sm:grid-cols-3">
-            <section class="guide-card border-emerald-200"><h3 class="guide-title text-emerald-800">🏁 Thắng khi khoảng cách ≤ 0</h3><p>Cần thu dây hiệu quả đủ lâu để đưa cá về gần. Thời gian ván bị giới hạn bởi <code>expiresAt</code>; RPC hiện đặt 90 giây.</p></section>
-            <section class="guide-card border-red-200"><h3 class="guide-title text-red-800">💥 Thua khi dây đứt</h3><p>Chạm <code>maxTension</code> là đứt. Vượt <code>safeMax</code> chỉ là cảnh báo, vẫn còn cơ hội nhả dây.</p></section>
-            <section class="guide-card border-sky-200"><h3 class="guide-title text-sky-800">🐟 Thua khi cá thoát</h3><p>Dưới <code>safeMin × slackThresholdRatio</code> liên tục quá <code>slackEscapeSeconds</code> thì cá thoát. Dây hồi lên ngưỡng này sẽ xóa bộ đếm.</p></section>
+            <section class="guide-card border-emerald-200"><div class="guide-title text-emerald-800">🏁 Thắng khi khoảng cách ≤ 0</div><div>Cần thu dây hiệu quả đủ lâu để đưa cá về gần. Thời gian ván bị giới hạn bởi <code>expiresAt</code>; RPC hiện đặt 90 giây.</div></section>
+            <section class="guide-card border-red-200"><div class="guide-title text-red-800">💥 Thua khi dây đứt</div><div>Chạm <code>maxTension</code> là đứt. Vượt <code>safeMax</code> chỉ là cảnh báo, vẫn còn cơ hội nhả dây.</div></section>
+            <section class="guide-card border-sky-200"><div class="guide-title text-sky-800">🐟 Thua khi cá thoát</div><div>Dưới <code>safeMin × slackThresholdRatio</code> liên tục quá <code>slackEscapeSeconds</code> thì cá thoát. Dây hồi lên ngưỡng này sẽ xóa bộ đếm.</div></section>
           </div>
           <aside class="rounded-xl border border-[#cbd9c6] bg-emerald-50 p-4">
-            <h3 class="guide-title">Một ván, một bộ luật đã lưu</h3>
-            <p class="mb-0">Server lưu <code>config</code>, <code>fish</code> và <code>seed</code> trong session. Cùng seed và thao tác theo tick sẽ tạo cùng diễn biến ở client và server. Khi cân bằng lại, áp dụng cho session mới và giữ nguyên session đang chơi.</p>
+            <div class="guide-title">Một ván, một bộ luật đã lưu</div>
+            <div class="mb-0">Server lưu <code>config</code>, <code>fish</code> và <code>seed</code> trong session. Cùng seed và thao tác theo tick sẽ tạo cùng diễn biến ở client và server. Khi cân bằng lại, áp dụng cho session mới và giữ nguyên session đang chơi.</div>
           </aside>
         </div>
       </template>
@@ -151,8 +151,8 @@ const zones = {
       <template #indices>
         <div class="mb-4 space-y-3">
           <div class="grid gap-3 sm:grid-cols-2">
-            <div class="rounded-xl border border-[#cbd9c6] bg-white p-4"><strong>⚙️ config · Luật và trang bị</strong><p class="mb-0 mt-1 text-slate-600">Vùng lực căng, cách thu/nhả, tốc độ kéo cá và các điều kiện thoát.</p></div>
-            <div class="rounded-xl border border-[#cbd9c6] bg-white p-4"><strong>🐟 fish · Tính cách con cá</strong><p class="mb-0 mt-1 text-slate-600">Lực kéo nền, sức giật, thời lượng nhịp và tốc độ mệt.</p></div>
+            <div class="rounded-xl border border-[#cbd9c6] bg-white p-4"><strong>⚙️ config · Luật và trang bị</strong><div class="mb-0 mt-1 text-slate-600">Vùng lực căng, cách thu/nhả, tốc độ kéo cá và các điều kiện thoát.</div></div>
+            <div class="rounded-xl border border-[#cbd9c6] bg-white p-4"><strong>🐟 fish · Tính cách con cá</strong><div class="mb-0 mt-1 text-slate-600">Lực kéo nền, sức giật, thời lượng nhịp và tốc độ mệt.</div></div>
           </div>
           <label class="block font-semibold">Tìm key hoặc ý nghĩa
             <input v-model="guide.keyword" type="search" placeholder="Ví dụ: releaseRate, dây chùng, thể lực..." class="guide-input mt-1" />
@@ -161,7 +161,7 @@ const zones = {
             <button v-for="filter in filters" :key="filter.key" type="button" class="guide-button" :class="{ 'selected-button': guide.section === filter.key }" :aria-pressed="guide.section === filter.key" @click="guide.section = filter.key">{{ filter.label }}</button>
             <span class="ml-auto text-xs text-slate-600" role="status">{{ guide.filteredEntries.length }} chỉ số</span>
           </div>
-          <p class="text-xs text-slate-600">Giá trị bên dưới minh họa rules v2: cá RARE có sức hiệu lực 40, dây chịu 100, máy có pull_strength = 80, hệ số giật 1,5. Session thật dùng chỉ số cá và bộ đồ lúc thả câu.</p>
+          <div class="text-xs text-slate-600">Giá trị bên dưới minh họa rules v2: cá RARE có sức hiệu lực 40, dây chịu 100, máy có pull_strength = 80, hệ số giật 1,5. Session thật dùng chỉ số cá và bộ đồ lúc thả câu.</div>
         </div>
         <div class="grid items-start gap-3 lg:grid-cols-2">
           <section v-for="entry in guide.filteredEntries" :key="`${entry.section}.${entry.key}`" class="guide-card">
@@ -169,23 +169,23 @@ const zones = {
               <code class="break-all text-xs font-bold text-emerald-800">{{ entry.section }}.{{ entry.key }}</code>
               <span class="rounded-full bg-[#f5f9f0] px-2 py-1 text-xs font-semibold">{{ number(entry.value) }}</span>
             </div>
-            <h3 class="mb-1 mt-3 font-bold">{{ entry.name }} <span class="font-normal text-slate-500">· {{ entry.unit }}</span></h3>
-            <p class="mt-1">{{ entry.meaning }}</p>
+            <div class="mb-1 mt-3 font-bold">{{ entry.name }} <span class="font-normal text-slate-500">· {{ entry.unit }}</span></div>
+            <div class="mt-1">{{ entry.meaning }}</div>
             <dl class="m-0 space-y-3">
               <div><dt class="text-xs font-bold text-emerald-800">Cách hoạt động</dt><dd class="ml-0 mt-0.5 text-slate-600">{{ entry.mechanism }}</dd></div>
               <div><dt class="text-xs font-bold text-emerald-800">Khi điều chỉnh</dt><dd class="ml-0 mt-0.5 text-slate-600">{{ entry.tuning }}</dd></div>
             </dl>
-            <p class="mb-0 mt-3 rounded-lg bg-amber-50 p-3 text-xs text-amber-950"><strong>Ví dụ: </strong>{{ entry.example }}</p>
+            <div class="mb-0 mt-3 rounded-lg bg-amber-50 p-3 text-xs text-amber-950"><strong>Ví dụ: </strong>{{ entry.example }}</div>
           </section>
         </div>
-        <p v-if="!guide.filteredEntries.length" class="rounded-xl border border-dashed border-[#cbd9c6] p-8 text-center text-slate-600">Không tìm thấy chỉ số. Thử key khác hoặc chọn “Tất cả”.</p>
+        <div v-if="!guide.filteredEntries.length" class="rounded-xl border border-dashed border-[#cbd9c6] p-8 text-center text-slate-600">Không tìm thấy chỉ số. Thử key khác hoặc chọn “Tất cả”.</div>
       </template>
 
       <template #balance>
         <div class="space-y-5">
           <div>
-            <h3 class="m-0 text-lg font-bold">Bắt đầu từ một tình huống cụ thể</h3>
-            <p class="mb-0 mt-1 text-slate-600">Chọn một ví dụ để xem các thay đổi so với cấu hình RARE hiện tại. Các gợi ý cần được thử với nhiều seed và thao tác người chơi trước khi áp dụng.</p>
+            <div class="m-0 text-lg font-bold">Bắt đầu từ một tình huống cụ thể</div>
+            <div class="mb-0 mt-1 text-slate-600">Chọn một ví dụ để xem các thay đổi so với cấu hình RARE hiện tại. Các gợi ý cần được thử với nhiều seed và thao tác người chơi trước khi áp dụng.</div>
           </div>
           <div class="grid gap-3 sm:grid-cols-2 xl:grid-cols-4" role="group" aria-label="Chọn tình huống cân bằng">
             <button v-for="preset in tensionGuidePresets" :key="preset.id" type="button" class="guide-card cursor-pointer text-left transition-colors hover:border-emerald-600 focus-visible:outline-2 focus-visible:outline-emerald-700" :class="{ 'selected-preset': guide.selectedPresetId === preset.id }" :aria-pressed="guide.selectedPresetId === preset.id" @click="guide.selectPreset(preset.id)">
@@ -194,8 +194,8 @@ const zones = {
             </button>
           </div>
           <section class="guide-card">
-            <h3 class="m-0 text-lg font-bold">{{ guide.selectedPreset.icon }} {{ guide.selectedPreset.title }}</h3>
-            <p>{{ guide.selectedPreset.reason }}</p>
+            <div class="m-0 text-lg font-bold">{{ guide.selectedPreset.icon }} {{ guide.selectedPreset.title }}</div>
+            <div>{{ guide.selectedPreset.reason }}</div>
             <div v-if="guide.presetChanges.length" class="overflow-x-auto rounded-lg border border-[#cbd9c6]">
               <table class="w-full border-collapse text-left text-xs sm:text-sm">
                 <caption class="sr-only">Các chỉ số thay đổi so với cấu hình RARE gốc</caption>
@@ -203,38 +203,38 @@ const zones = {
                 <tbody><tr v-for="change in guide.presetChanges" :key="change.key" class="border-t border-[#cbd9c6]"><th scope="row" class="p-3 font-normal"><code class="break-all text-emerald-800">{{ change.key }}</code><span class="mt-0.5 block text-xs text-slate-500">{{ change.name }} · {{ change.unit }}</span></th><td class="p-3 tabular-nums">{{ number(change.before) }}</td><td class="p-3 font-bold text-emerald-800 tabular-nums">{{ number(change.after) }}</td></tr></tbody>
               </table>
             </div>
-            <p v-else class="rounded-lg bg-[#f5f9f0] p-3">Giữ nguyên cả 25 key để làm mốc so sánh.</p>
+            <div v-else class="rounded-lg bg-[#f5f9f0] p-3">Giữ nguyên cả 25 key để làm mốc so sánh.</div>
             <div class="mt-4 grid gap-3 sm:grid-cols-3">
-              <div class="rounded-lg bg-[#f5f9f0] p-3"><span class="block text-xs text-slate-600">Thu hiệu quả đủ {{ number(guide.selectedPreset.config.startDistance) }} m</span><strong class="text-xl">≈ {{ number(guide.preview.minimumReelSeconds) }} giây</strong><p class="mb-0 mt-1 text-xs text-slate-600">Ước tính khi luôn giữ nút và dây đủ căng. Ván thật còn thời gian nhả và cá lùi.</p></div>
-              <div class="rounded-lg bg-[#f5f9f0] p-3"><span class="block text-xs text-slate-600">Một nhịp vùng vẫy</span><strong class="text-xl">{{ number(guide.selectedPreset.fish.burstMinTicks / guide.selectedPreset.config.tickRate) }}–{{ number(guide.selectedPreset.fish.burstMaxTicks / guide.selectedPreset.config.tickRate) }} giây</strong><p class="mb-0 mt-1 text-xs text-slate-600">Cả nhịp có giật và nhịp nghỉ đều dùng khoảng thời lượng này.</p></div>
-              <div class="rounded-lg bg-[#f5f9f0] p-3"><span class="block text-xs text-slate-600">Ngưỡng dây quá chùng</span><strong class="text-xl">&lt; {{ number(guide.preview.slackThreshold) }}</strong><p class="mb-0 mt-1 text-xs text-slate-600">Liên tục quá {{ number(guide.selectedPreset.config.slackEscapeSeconds) }} giây thì cá thoát.</p></div>
+              <div class="rounded-lg bg-[#f5f9f0] p-3"><span class="block text-xs text-slate-600">Thu hiệu quả đủ {{ number(guide.selectedPreset.config.startDistance) }} m</span><strong class="text-xl">≈ {{ number(guide.preview.minimumReelSeconds) }} giây</strong><div class="mb-0 mt-1 text-xs text-slate-600">Ước tính khi luôn giữ nút và dây đủ căng. Ván thật còn thời gian nhả và cá lùi.</div></div>
+              <div class="rounded-lg bg-[#f5f9f0] p-3"><span class="block text-xs text-slate-600">Một nhịp vùng vẫy</span><strong class="text-xl">{{ number(guide.selectedPreset.fish.burstMinTicks / guide.selectedPreset.config.tickRate) }}–{{ number(guide.selectedPreset.fish.burstMaxTicks / guide.selectedPreset.config.tickRate) }} giây</strong><div class="mb-0 mt-1 text-xs text-slate-600">Cả nhịp có giật và nhịp nghỉ đều dùng khoảng thời lượng này.</div></div>
+              <div class="rounded-lg bg-[#f5f9f0] p-3"><span class="block text-xs text-slate-600">Ngưỡng dây quá chùng</span><strong class="text-xl">&lt; {{ number(guide.preview.slackThreshold) }}</strong><div class="mb-0 mt-1 text-xs text-slate-600">Liên tục quá {{ number(guide.selectedPreset.config.slackEscapeSeconds) }} giây thì cá thoát.</div></div>
             </div>
-            <p class="rounded-lg border border-amber-200 bg-amber-50 p-3 text-amber-950"><strong>Điểm cần theo dõi: </strong>{{ guide.selectedPreset.advice }}</p>
+            <div class="rounded-lg border border-amber-200 bg-amber-50 p-3 text-amber-950"><strong>Điểm cần theo dõi: </strong>{{ guide.selectedPreset.advice }}</div>
             <button type="button" class="guide-button" @click="guide.activeTab = 'mechanics'">Xem tình huống này trên thanh lực căng →</button>
           </section>
 
           <section class="guide-card">
-            <h3 class="guide-title">Sửa gì khi người chơi gặp vấn đề?</h3>
+            <div class="guide-title">Sửa gì khi người chơi gặp vấn đề?</div>
             <div class="mt-3 grid gap-4 md:grid-cols-2">
-              <div><strong>💥 Hay đứt dù đã nhả</strong><p class="mb-0 mt-1 text-slate-600">Kiểm tra <code>baseStrength</code>, <code>burstMax</code> và <code>burstMaxTicks</code>. Giảm đỉnh hoặc độ dài cú giật; thử nhả mạnh hơn bằng <code>releaseRate</code> âm hơn.</p></div>
-              <div><strong>🐟 Hay thoát ngay đầu ván</strong><p class="mb-0 mt-1 text-slate-600">Đưa <code>startTension</code> vào vùng xanh hoặc tăng <code>slackEscapeSeconds</code>. Kiểm tra ngưỡng <code>safeMin × slackThresholdRatio</code>.</p></div>
-              <div><strong>⏳ Ván quá dài, hay hết giờ</strong><p class="mb-0 mt-1 text-slate-600">Tăng <code>reelSpeed</code>, giảm <code>startDistance</code> hoặc giảm tiến độ mất do <code>slackDistanceRate</code>. Đối chiếu thời hạn 90 giây trong RPC.</p></div>
-              <div><strong>🔋 Cá không yếu đi rõ rệt</strong><p class="mb-0 mt-1 text-slate-600">Kiểm tra thời gian ở vùng xanh, tăng <code>staminaDrain</code> hoặc giảm <code>minimumStrength</code>. Cá không hao thể lực ngoài vùng xanh.</p></div>
+              <div><strong>💥 Hay đứt dù đã nhả</strong><div class="mb-0 mt-1 text-slate-600">Kiểm tra <code>baseStrength</code>, <code>burstMax</code> và <code>burstMaxTicks</code>. Giảm đỉnh hoặc độ dài cú giật; thử nhả mạnh hơn bằng <code>releaseRate</code> âm hơn.</div></div>
+              <div><strong>🐟 Hay thoát ngay đầu ván</strong><div class="mb-0 mt-1 text-slate-600">Đưa <code>startTension</code> vào vùng xanh hoặc tăng <code>slackEscapeSeconds</code>. Kiểm tra ngưỡng <code>safeMin × slackThresholdRatio</code>.</div></div>
+              <div><strong>⏳ Ván quá dài, hay hết giờ</strong><div class="mb-0 mt-1 text-slate-600">Tăng <code>reelSpeed</code>, giảm <code>startDistance</code> hoặc giảm tiến độ mất do <code>slackDistanceRate</code>. Đối chiếu thời hạn 90 giây trong RPC.</div></div>
+              <div><strong>🔋 Cá không yếu đi rõ rệt</strong><div class="mb-0 mt-1 text-slate-600">Kiểm tra thời gian ở vùng xanh, tăng <code>staminaDrain</code> hoặc giảm <code>minimumStrength</code>. Cá không hao thể lực ngoài vùng xanh.</div></div>
             </div>
           </section>
 
           <section class="guide-card">
-            <h3 class="guide-title">Các giới hạn cần nhớ <Hint text="Đây là các điều kiện chính của bộ kiểm tra hiện tại. Đổi giá trị không cần đổi công thức; thêm cơ chế hoặc đổi công thức cần cập nhật client, SQL và version cùng nhau." /></h3>
-            <ul class="mb-0 space-y-2 pl-5 text-slate-600">
-              <li><code>0 &lt; safeMin &lt; safeMax &lt; maxTension ≤ 1000</code>; lực ban đầu từ 0 đến dưới ngưỡng đứt.</li>
-              <li><code>tickRate</code> là số nguyên 1–120; thời hạn tối đa 180 giây ở client và 21.600 tick khi phát lại trên server. RPC hiện dùng 60 tick/giây, 90 giây.</li>
-              <li><code>reelRate</code>, <code>reelSpeed</code> dương; <code>releaseRate</code> âm. Tốc độ có độ lớn tối đa 1000; khoảng cách ban đầu phải dương và ≤ 1000.</li>
-              <li><code>burstChance</code>, <code>staminaDrain</code>, <code>minimumStrength</code> trong 0–1; <code>slackThresholdRatio</code> lớn hơn 0 và ≤ 1.</li>
-              <li><code>0 &lt; baseStrength ≤ 10</code>, <code>0 ≤ fishPullMultiplier ≤ 10</code>; <code>0 ≤ burstMin ≤ burstMax ≤ 1000</code> và <code>0 ≤ pullAmplitude ≤ basePull ≤ 1000</code>.</li>
-              <li><code>pullPeriodTicks</code> là số nguyên ≥ 4; hai mốc độ dài cú giật là số nguyên với <code>1 ≤ burstMinTicks ≤ burstMaxTicks</code>.</li>
-              <li>Phép tính dùng thang số nguyên 10.000 và cắt phần lẻ mỗi tick. Ví dụ ở 60 tick/giây, <code>staminaDrain = 0,001</code> cho <code>trunc(10 / 60) = 0</code>, nên cá sẽ không hao thể lực.</li>
-              <li>Đổi từng nhóm chỉ số, thử nhiều seed và giữ dữ liệu session đang chơi nguyên vẹn. Cấu hình mẫu ở đây dùng để định hướng cân bằng.</li>
-            </ul>
+            <div class="guide-title">Các giới hạn cần nhớ <Hint text="Đây là các điều kiện chính của bộ kiểm tra hiện tại. Đổi giá trị không cần đổi công thức; thêm cơ chế hoặc đổi công thức cần cập nhật client, SQL và version cùng nhau." /></div>
+            <div class="mb-0 space-y-2 pl-5 text-slate-600">
+              <div><code>0 &lt; safeMin &lt; safeMax &lt; maxTension ≤ 1000</code>; lực ban đầu từ 0 đến dưới ngưỡng đứt.</div>
+              <div><code>tickRate</code> là số nguyên 1–120; thời hạn tối đa 180 giây ở client và 21.600 tick khi phát lại trên server. RPC hiện dùng 60 tick/giây, 90 giây.</div>
+              <div><code>reelRate</code>, <code>reelSpeed</code> dương; <code>releaseRate</code> âm. Tốc độ có độ lớn tối đa 1000; khoảng cách ban đầu phải dương và ≤ 1000.</div>
+              <div><code>burstChance</code>, <code>staminaDrain</code>, <code>minimumStrength</code> trong 0–1; <code>slackThresholdRatio</code> lớn hơn 0 và ≤ 1.</div>
+              <div><code>0 &lt; baseStrength ≤ 10</code>, <code>0 ≤ fishPullMultiplier ≤ 10</code>; <code>0 ≤ burstMin ≤ burstMax ≤ 1000</code> và <code>0 ≤ pullAmplitude ≤ basePull ≤ 1000</code>.</div>
+              <div><code>pullPeriodTicks</code> là số nguyên ≥ 4; hai mốc độ dài cú giật là số nguyên với <code>1 ≤ burstMinTicks ≤ burstMaxTicks</code>.</div>
+              <div>Phép tính dùng thang số nguyên 10.000 và cắt phần lẻ mỗi tick. Ví dụ ở 60 tick/giây, <code>staminaDrain = 0,001</code> cho <code>trunc(10 / 60) = 0</code>, nên cá sẽ không hao thể lực.</div>
+              <div>Đổi từng nhóm chỉ số, thử nhiều seed và giữ dữ liệu session đang chơi nguyên vẹn. Cấu hình mẫu ở đây dùng để định hướng cân bằng.</div>
+            </div>
           </section>
         </div>
       </template>
@@ -250,8 +250,6 @@ const zones = {
   padding: 1rem;
 }
 .guide-title { margin: 0; font-size: 0.9375rem; font-weight: 700; }
-.guide-card > p { margin-top: 0.5rem; }
-.guide-card > p:last-child { margin-bottom: 0; }
 .guide-button {
   border: 1px solid #cbd9c6;
   border-radius: 0.5rem;

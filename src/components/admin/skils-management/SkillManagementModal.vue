@@ -19,9 +19,9 @@ onUnmounted(() => { store.closeForm(); store.cancelDelete(); });
       <button type="button" :disabled="store.busy" class="rounded-lg bg-[#24352a] px-4 py-2 text-sm font-bold text-white disabled:opacity-50" @click="store.openForm()">+ Thêm kỹ năng</button>
     </div>
     <main class="flex min-h-0 min-w-0 flex-1 flex-col overflow-hidden p-4 sm:p-6">
-      <p v-if="store.error && !store.deleteTarget" role="alert" class="shrink-0 rounded-lg border border-red-200 bg-red-50 p-3 text-sm text-red-700">{{ store.error }}</p>
-      <p v-if="store.loading && !store.items.length" role="status" class="py-10 text-center text-sm">Đang tải danh sách kỹ năng...</p>
-      <p v-else-if="!store.filteredItems.length && !store.error" class="py-10 text-center text-sm">{{ store.search ? 'Không tìm thấy kỹ năng phù hợp.' : 'Chưa có kỹ năng nào.' }}</p>
+      <div v-if="store.error && !store.deleteTarget" role="alert" class="shrink-0 rounded-lg border border-red-200 bg-red-50 p-3 text-sm text-red-700">{{ store.error }}</div>
+      <div v-if="store.loading && !store.items.length" role="status" class="py-10 text-center text-sm">Đang tải danh sách kỹ năng...</div>
+      <div v-else-if="!store.filteredItems.length && !store.error" class="py-10 text-center text-sm">{{ store.search ? 'Không tìm thấy kỹ năng phù hợp.' : 'Chưa có kỹ năng nào.' }}</div>
       <div v-else-if="store.filteredItems.length" class="min-h-0 min-w-0 flex-1 overflow-auto rounded-xl border border-[#cbd9c6] bg-white">
         <table class="w-full min-w-[800px] text-left text-sm">
           <thead class="sticky top-0 z-10 bg-[#f5f9f0]"><tr>
@@ -31,7 +31,7 @@ onUnmounted(() => { store.closeForm(); store.cancelDelete(); });
             <tr v-for="item in store.filteredItems" :key="item.id" class="border-t border-[#cbd9c6]">
               <td class="p-3">{{ item.sort_order }}</td>
               <td class="p-3 font-mono">{{ item.code }}</td>
-              <td class="max-w-sm p-3"><p class="m-0 font-bold">{{ item.name }}</p><p v-if="item.description" class="mb-0 mt-1 whitespace-pre-line text-xs text-gray-500">{{ item.description }}</p></td>
+              <td class="max-w-sm p-3"><div class="m-0 font-bold">{{ item.name }}</div><div v-if="item.description" class="mb-0 mt-1 whitespace-pre-line text-xs text-gray-500">{{ item.description }}</div></td>
               <td class="p-3">{{ item.max_level }}</td>
               <td class="p-3">{{ item.is_disabled ? 'Vô hiệu hóa' : 'Hoạt động' }}</td>
               <td class="p-3"><div class="flex justify-end gap-2">
@@ -45,8 +45,8 @@ onUnmounted(() => { store.closeForm(); store.cancelDelete(); });
     </main>
     <SkillFormManagement />
     <TwoOptionsModal v-if="store.deleteTarget" title="Xóa kỹ năng" :message="`Xóa kỹ năng “${store.deleteTarget.name}”?`" sub-text="Thao tác này cũng xóa cấp kỹ năng đã học của mọi người chơi và không thể hoàn tác." first-text="Hủy" :second-text="store.deleting ? 'Đang xóa...' : 'Xóa kỹ năng'" :first-disabled="store.deleting" :second-disabled="store.deleting" :on-first="store.cancelDelete" :on-second="store.remove" :on-dismiss="store.cancelDelete">
-      <p class="text-sm">Xóa kỹ năng “{{ store.deleteTarget.name }}”?</p>
-      <p v-if="store.error" role="alert" class="text-sm text-red-700">{{ store.error }}</p>
+      <div class="text-sm">Xóa kỹ năng “{{ store.deleteTarget.name }}”?</div>
+      <div v-if="store.error" role="alert" class="text-sm text-red-700">{{ store.error }}</div>
     </TwoOptionsModal>
   </AdminModal>
 </template>

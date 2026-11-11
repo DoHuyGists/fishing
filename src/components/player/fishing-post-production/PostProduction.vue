@@ -127,11 +127,11 @@ onMounted(() => {
         <template v-for="(panel, index) in panels" :key="panel.key">
           <section class="flex min-w-0 flex-1 flex-col rounded-lg border border-emerald-900/15 bg-white">
             <div class="flex flex-wrap items-center gap-2 border-b border-emerald-900/10 p-2">
-              <h3 class="m-0 text-sm font-bold text-emerald-950">
+              <div class="m-0 text-sm font-bold text-emerald-950">
                 {{ panel.title }} ({{ panel.total
                 }}<template v-if="panel.key === 'stored'">/{{ panel.capacity }}</template
                 >)
-              </h3>
+              </div>
               <input
                 v-model="search[panel.key]"
                 type="search"
@@ -181,8 +181,8 @@ onMounted(() => {
             </div>
 
             <div class="grow h-0 overflow-y-auto p-2">
-              <p v-if="caughtStore.isLoadingCaught" class="text-center text-sm text-gray-500">Đang tải...</p>
-              <p v-else-if="panel.fishes.length === 0" class="text-center text-sm text-gray-500">Không có cá</p>
+              <div v-if="caughtStore.isLoadingCaught" class="text-center text-sm text-gray-500">Đang tải...</div>
+              <div v-else-if="panel.fishes.length === 0" class="text-center text-sm text-gray-500">Không có cá</div>
 
               <div v-else-if="viewMode[panel.key] === 'species'" class="flex flex-col gap-2">
                 <section
@@ -209,11 +209,11 @@ onMounted(() => {
                       expandedSpecies[panel.key].has(group.key) ? "▴" : "▾"
                     }}</span>
                   </button>
-                  <ul
+                  <div
                     v-if="expandedSpecies[panel.key].has(group.key)"
                     class="m-0 flex max-h-48 list-none flex-col gap-1 overflow-y-auto border-t border-emerald-900/10 p-2"
                   >
-                    <li v-for="fish in group.fishes" :key="fish.id">
+                    <div v-for="fish in group.fishes" :key="fish.id">
                       <button
                         type="button"
                         class="flex w-full items-center gap-2 rounded-md border p-1 text-left transition-colors"
@@ -232,8 +232,8 @@ onMounted(() => {
                         <span class="grow truncate text-xs font-bold">{{ fish.species?.name || "Cá" }}</span>
                         <span class="text-xs text-gray-600">{{ fish.weight }} kg</span>
                       </button>
-                    </li>
-                  </ul>
+                    </div>
+                  </div>
                 </section>
               </div>
 
@@ -263,8 +263,8 @@ onMounted(() => {
                 </button>
               </div>
 
-              <ul v-else class="m-0 flex list-none flex-col gap-1 p-0">
-                <li v-for="fish in panel.fishes" :key="fish.id">
+              <div v-else class="m-0 flex list-none flex-col gap-1 p-0">
+                <div v-for="fish in panel.fishes" :key="fish.id">
                   <button
                     type="button"
                     class="flex w-full items-center gap-2 rounded-md border p-1 text-left transition-colors"
@@ -283,8 +283,8 @@ onMounted(() => {
                     <span class="grow truncate text-sm font-bold">{{ fish.species?.name }}</span>
                     <span class="text-xs text-gray-600">{{ fish.weight }} kg</span>
                   </button>
-                </li>
-              </ul>
+                </div>
+              </div>
             </div>
           </section>
 

@@ -18,13 +18,13 @@ const goBack = () => {
         </span>
       </div>
 
-      <h1 id="error-title" class="mt-10 text-2xl font-semibold tracking-tight sm:text-3xl">
+      <div id="error-title" class="mt-10 text-2xl font-semibold tracking-tight sm:text-3xl">
         Không tìm thấy trang
-      </h1>
-      <p class="mt-3 max-w-md text-base leading-relaxed text-[#24352a]/70">
+      </div>
+      <div class="mt-3 max-w-md text-base leading-relaxed text-[#24352a]/70">
         Địa chỉ này không tồn tại hoặc đã được chuyển đi. Hãy kiểm tra lại đường dẫn
         hoặc quay về trang trước đó.
-      </p>
+      </div>
 
       <div class="mt-8 flex flex-wrap gap-3">
         <a

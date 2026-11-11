@@ -7,8 +7,8 @@ const store = useAdminRedeemCodeStore();
 <template>
   <div v-if="store.confirmDeleteId" class="fixed inset-0 z-40 grid place-items-center bg-black/45 p-4">
     <div class="w-full max-w-sm rounded-xl bg-white p-5 shadow-xl">
-      <h3 class="m-0 text-base font-extrabold text-gray-800">Xác nhận xoá mã?</h3>
-      <p class="my-3 text-sm text-gray-600">Thao tác này không thể hoàn tác.</p>
+      <div class="m-0 text-base font-extrabold text-gray-800">Xác nhận xoá mã?</div>
+      <div class="my-3 text-sm text-gray-600">Thao tác này không thể hoàn tác.</div>
       <div class="flex justify-end gap-2">
         <button
           type="button"

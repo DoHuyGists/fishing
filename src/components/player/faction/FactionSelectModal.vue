@@ -170,7 +170,7 @@ onMounted(() => {
       <!-- Loading State -->
       <div v-if="factionStore.loading" class="py-16 text-center text-[#526a5e] space-y-2">
         <div class="inline-block animate-spin text-2xl text-[#526a58]">❖</div>
-        <p class="text-xs uppercase tracking-widest font-bold">Đang tải thông tin phe phái...</p>
+        <div class="text-xs uppercase tracking-widest font-bold">Đang tải thông tin phe phái...</div>
       </div>
 
       <!-- Error State -->
@@ -178,7 +178,7 @@ onMounted(() => {
         v-else-if="factionStore.error && factionStore.factions.length === 0"
         class="p-4 rounded-lg border border-red-300 bg-red-50 text-red-800 text-center text-sm"
       >
-        <p>{{ factionStore.error }}</p>
+        <div>{{ factionStore.error }}</div>
         <button
           type="button"
           class="mt-3 px-4 py-1.5 rounded border border-red-700 bg-red-100 hover:bg-red-200 text-xs font-bold transition-colors cursor-pointer"
@@ -253,9 +253,9 @@ onMounted(() => {
               </div>
 
               <!-- Tên Phe -->
-              <h3 class="m-0 text-xl sm:text-2xl font-bold font-serif text-[#24352a] tracking-wide">
+              <div class="m-0 text-xl sm:text-2xl font-bold font-serif text-[#24352a] tracking-wide">
                 {{ activeFaction.name }}
-              </h3>
+              </div>
 
               <!-- Mã Phe & Thuộc tính & Số lượng thành viên -->
               <div class="mt-2 flex flex-wrap justify-center gap-1.5 text-[11px] text-[#617565]">
@@ -318,26 +318,26 @@ onMounted(() => {
             <div class="lg:col-span-4 space-y-5">
               <!-- Giới thiệu / Tôn chỉ -->
               <div class="p-4 rounded-lg border border-[#d5e1d0] bg-[#eaf2e5]">
-                <h4
+                <div
                   class="m-0 mb-2 text-xs uppercase tracking-widest font-extrabold text-[#344f3b] font-serif flex items-center gap-1.5"
                 >
                   <span>📜</span>
                   <span>Tôn Chỉ & Giới Thiệu</span>
-                </h4>
-                <p class="m-0 text-sm leading-relaxed text-[#405446] whitespace-pre-line">
+                </div>
+                <div class="m-0 text-sm leading-relaxed text-[#405446] whitespace-pre-line">
                   {{ activeFaction.description || "Chưa có văn tự mô tả cho phe này." }}
-                </p>
+                </div>
               </div>
 
               <!-- Danh sách Hiệu ứng Phe -->
               <div class="p-4 rounded-lg border border-[#d5e1d0] bg-[#eaf2e5] space-y-3">
                 <div class="flex items-center justify-between border-b border-[#cbd9c6] pb-2">
-                  <h4
+                  <div
                     class="m-0 text-xs uppercase tracking-widest font-extrabold text-[#344f3b] font-serif flex items-center gap-1.5"
                   >
                     <span>⚡</span>
                     <span>Hiệu Ứng Áp Dụng ({{ displayedEffects.length }})</span>
-                  </h4>
+                  </div>
                   <span v-if="isActiveJoined" class="text-[11px] text-[#526a58] font-medium">
                     ● Kích hoạt theo tài khoản
                   </span>
@@ -362,18 +362,18 @@ onMounted(() => {
                           {{ getEffectTypeBadge(effect.effect_type).icon }}
                           {{ getEffectTypeBadge(effect.effect_type).label }}
                         </span>
-                        <h5 class="m-0 text-sm font-bold text-[#24352a] font-serif">
+                        <div class="m-0 text-sm font-bold text-[#24352a] font-serif">
                           {{ effect.name }}
-                        </h5>
+                        </div>
                       </div>
                       <span class="text-[11px] font-mono text-[#617565]">
                         Chỉ số: <strong class="text-[#344f3b]">{{ effect.target_stat }}</strong>
                       </span>
                     </div>
 
-                    <p v-if="effect.description" class="m-0 text-xs text-[#405446] leading-relaxed">
+                    <div v-if="effect.description" class="m-0 text-xs text-[#405446] leading-relaxed">
                       {{ effect.description }}
-                    </p>
+                    </div>
 
                     <!-- Chi tiết config nếu có -->
                     <div
@@ -402,12 +402,12 @@ onMounted(() => {
         <!-- ================= BOTTOM SECTION: CÁC PHE CÒN LẠI ================= -->
         <section class="space-y-4 pt-2">
           <div class="flex items-center justify-between border-b border-[#cbd9c6] pb-2">
-            <h3
+            <div
               class="m-0 text-xs sm:text-sm uppercase tracking-widest font-extrabold text-[#526a58] font-serif flex items-center gap-2"
             >
               <span>🏛️</span>
               <span>Các phe Khác ({{ otherFactions.length }})</span>
-            </h3>
+            </div>
             <span class="text-[11px] text-[#617565]"> Chọn phe bên dưới để xem chi tiết bên trên </span>
           </div>
 
@@ -430,9 +430,9 @@ onMounted(() => {
                     {{ faction.symbol || "⚔️" }}
                   </div>
                   <div class="min-w-0 flex-1">
-                    <h4 class="m-0 text-base font-bold font-serif text-[#24352a] truncate">
+                    <div class="m-0 text-base font-bold font-serif text-[#24352a] truncate">
                       {{ faction.name }}
-                    </h4>
+                    </div>
                     <div class="mt-0.5 flex items-center gap-1.5 text-[11px] text-[#617565]">
                       <span class="font-mono text-[10px]">{{ faction.code }}</span>
                       <span v-if="faction.element" class="text-[#344f3b]">· Hệ {{ faction.element }}</span>
@@ -441,9 +441,9 @@ onMounted(() => {
                 </div>
 
                 <!-- Mô tả tóm tắt -->
-                <p class="m-0 text-xs text-[#405446] line-clamp-2 leading-relaxed mb-3">
+                <div class="m-0 text-xs text-[#405446] line-clamp-2 leading-relaxed mb-3">
                   {{ faction.description || "Chưa có mô tả chi tiết." }}
-                </p>
+                </div>
 
                 <!-- Tóm tắt số thành viên & số hiệu ứng -->
                 <div class="mb-4 flex flex-wrap gap-1.5 text-[10px]">
@@ -513,10 +513,10 @@ onMounted(() => {
               >
                 {{ confirmingAction.faction.symbol || "❖" }}
               </div>
-              <h3 class="m-0 text-lg font-bold font-serif text-[#24352a]">
+              <div class="m-0 text-lg font-bold font-serif text-[#24352a]">
                 {{ confirmingAction.type === "join" ? "Xác nhận gia nhập phe" : "Xác nhận chuyển đổi phe" }}
-              </h3>
-              <p class="m-0 text-xs text-[#405446] leading-relaxed">
+              </div>
+              <div class="m-0 text-xs text-[#405446] leading-relaxed">
                 <template v-if="confirmingAction.type === 'join'">
                   Bạn đang chuẩn bị gia nhập phe
                   <strong class="text-[#344f3b] font-serif text-sm">{{ confirmingAction.faction.name }}</strong
@@ -527,7 +527,7 @@ onMounted(() => {
                   <strong class="text-[#344f3b] font-serif text-sm">{{ confirmingAction.faction.name }}</strong
                   >. Mọi hiệu ứng của phe hiện tại sẽ được thay thế bằng hiệu ứng của phe mới.
                 </template>
-              </p>
+              </div>
             </div>
 
             <div class="pt-2 flex items-center justify-end gap-3 border-t border-[#cbd9c6]">

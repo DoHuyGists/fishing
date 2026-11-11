@@ -33,13 +33,13 @@ const goBack = () => {
         </span>
       </div>
 
-      <h1 id="error-title" class="mt-10 text-2xl font-semibold tracking-tight sm:text-3xl">
+      <div id="error-title" class="mt-10 text-2xl font-semibold tracking-tight sm:text-3xl">
         Bạn không có quyền truy cập
-      </h1>
-      <p class="mt-3 max-w-md text-base leading-relaxed text-[#24352a]/70">
+      </div>
+      <div class="mt-3 max-w-md text-base leading-relaxed text-[#24352a]/70">
         Tài khoản hiện tại chưa được cấp quyền xem trang này. Hãy đăng nhập bằng tài khoản
         khác hoặc liên hệ quản trị viên để được cấp quyền.
-      </p>
+      </div>
 
       <div class="mt-8 flex flex-wrap gap-3">
         <a

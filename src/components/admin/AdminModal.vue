@@ -37,10 +37,10 @@ const titleId = useId();
           aria-hidden="true"
         >{{ icon }}</span>
         <div class="min-w-0">
-          <h2 :id="titleId" class="m-0 break-words text-lg font-extrabold">{{ title }}</h2>
-          <p v-if="subtitle || $slots.subtitle" class="m-0 mt-0.5 break-words text-xs text-emerald-200">
+          <div :id="titleId" class="m-0 break-words text-lg font-extrabold">{{ title }}</div>
+          <div v-if="subtitle || $slots.subtitle" class="m-0 mt-0.5 break-words text-xs text-emerald-200">
             <slot name="subtitle">{{ subtitle }}</slot>
-          </p>
+          </div>
         </div>
       </div>
       <button

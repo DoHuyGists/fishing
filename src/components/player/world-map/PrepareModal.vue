@@ -233,8 +233,8 @@ async function confirm() {
         >
           <header class="flex flex-wrap items-center justify-between gap-2 border-b border-[#cbd9c6] bg-[#eaf2e5] p-3">
             <div>
-              <h3 class="m-0 text-[15px] font-bold text-[#24352a]">Cá trong hồ</h3>
-              <p class="m-0 mt-0.5 text-xs text-[#617565]">Các loài bạn đã câu thành công.</p>
+              <div class="m-0 text-[15px] font-bold text-[#24352a]">Cá trong hồ</div>
+              <div class="m-0 mt-0.5 text-xs text-[#617565]">Các loài bạn đã câu thành công.</div>
             </div>
             <span
               v-if="!diaryStore.isLoadingAreaSpecies && !diaryStore.areaSpeciesError"
@@ -243,11 +243,11 @@ async function confirm() {
               {{ diaryStore.discoveredAreaSpecies.length }} loài đã khám phá
             </span>
           </header>
-          <p v-if="diaryStore.isLoadingAreaSpecies" class="m-0 p-4 text-center text-sm text-[#617565]" role="status">
+          <div v-if="diaryStore.isLoadingAreaSpecies" class="m-0 p-4 text-center text-sm text-[#617565]" role="status">
             Đang tải danh sách cá…
-          </p>
+          </div>
           <div v-else-if="diaryStore.areaSpeciesError" class="p-4 text-center" role="alert">
-            <p class="m-0 text-sm text-red-600">Không thể tải danh sách cá trong hồ.</p>
+            <div class="m-0 text-sm text-red-600">Không thể tải danh sách cá trong hồ.</div>
             <button
               type="button"
               class="mt-2 rounded-lg border border-[#cbd9c6] bg-[#eaf2e5] px-3 py-1.5 text-xs font-semibold text-[#24352a] hover:bg-white"
@@ -256,11 +256,11 @@ async function confirm() {
               Thử lại
             </button>
           </div>
-          <ul
+          <div
             v-else-if="diaryStore.discoveredAreaSpecies.length"
             class="m-0 grid list-none grid-cols-1 gap-2 p-3 sm:grid-cols-2 xl:grid-cols-3"
           >
-            <li
+            <div
               v-for="fish in diaryStore.discoveredAreaSpecies"
               :key="fish.id"
               class="flex items-start gap-3 rounded-lg border border-[#cbd9c6] bg-white/70 p-2.5"
@@ -273,20 +273,20 @@ async function confirm() {
                 draggable="false"
               />
               <div class="min-w-0 flex-1">
-                <p class="m-0 break-words text-sm font-semibold text-[#24352a]">{{ fish.name }}</p>
-                <p v-if="fish.rarity" class="m-0 mt-0.5 text-xs text-[#526a58]">{{ fish.rarity }}</p>
-                <p v-if="fish.information" class="m-0 mt-1 text-xs leading-relaxed text-[#617565]">
+                <div class="m-0 break-words text-sm font-semibold text-[#24352a]">{{ fish.name }}</div>
+                <div v-if="fish.rarity" class="m-0 mt-0.5 text-xs text-[#526a58]">{{ fish.rarity }}</div>
+                <div v-if="fish.information" class="m-0 mt-1 text-xs leading-relaxed text-[#617565]">
                   {{ fish.information }}
-                </p>
-                <p v-if="fish.weight_min != null || fish.weight_max != null" class="m-0 mt-1 text-xs text-[#617565]">
+                </div>
+                <div v-if="fish.weight_min != null || fish.weight_max != null" class="m-0 mt-1 text-xs text-[#617565]">
                   Cân nặng: {{ fish.weight_min ?? "?" }}–{{ fish.weight_max ?? "?" }} kg
-                </p>
+                </div>
               </div>
-            </li>
-          </ul>
-          <p v-else class="m-0 p-4 text-center text-sm text-[#617565]">
+            </div>
+          </div>
+          <div v-else class="m-0 p-4 text-center text-sm text-[#617565]">
             Bạn chưa khám phá được loài cá nào trong hồ này.
-          </p>
+          </div>
         </section>
 
         <!-- Loading state -->
@@ -298,7 +298,7 @@ async function confirm() {
         <!-- Error state -->
         <div v-else-if="error" class="flex-1 flex flex-col items-center justify-center gap-2.5 text-center">
           <span class="text-4xl">⚠️</span>
-          <p class="m-0 text-red-400 text-sm">{{ error }}</p>
+          <div class="m-0 text-red-400 text-sm">{{ error }}</div>
         </div>
 
         <!-- Content -->
@@ -309,12 +309,12 @@ async function confirm() {
               <div class="flex items-center gap-2.5">
                 <span class="w-2.5 h-2.5 rounded-full bg-[#8eaa91] shrink-0"></span>
                 <div>
-                  <h3 class="m-0 text-[15px] font-bold text-[#24352a] tracking-tight leading-snug">
+                  <div class="m-0 text-[15px] font-bold text-[#24352a] tracking-tight leading-snug">
                     Danh sách set trang bị
-                  </h3>
-                  <p class="m-0 mt-0.5 text-xs text-[#617565] leading-normal">
+                  </div>
+                  <div class="m-0 mt-0.5 text-xs text-[#617565] leading-normal">
                     Bấm để đổi set sử dụng. Chọn trang bị muốn dùng trong từng loại.
-                  </p>
+                  </div>
                 </div>
               </div>
               <div v-if="usedSet" class="flex items-center gap-2">

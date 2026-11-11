@@ -59,7 +59,7 @@ function joinTypeLabel(team: UserTeam) {
 <template>
   <aside class="flex min-h-0 flex-col gap-3 rounded-2xl border border-[#cde0c9] bg-[#f5f9f0] p-3 sm:max-h-[62vh]">
     <div class="flex items-center justify-between gap-2">
-      <h3 class="m-0 text-base font-bold text-[#1a3a1a]">Tổ đội hiện hành</h3>
+      <div class="m-0 text-base font-bold text-[#1a3a1a]">Tổ đội hiện hành</div>
       <button
         class="inline-flex items-center justify-center rounded-lg bg-linear-to-br from-[#3b7a57] to-[#2e6644] px-3 py-2 text-[0.8rem] font-bold text-white transition-all hover:from-[#2e6644] hover:to-[#245236]"
         @click="emit('create')"
@@ -76,24 +76,24 @@ function joinTypeLabel(team: UserTeam) {
     />
     <Tab v-model="status" :tabs="statusTabs" aria-label="Lọc tổ đội theo trạng thái" class="min-h-0">
       <template v-for="tab in statusTabs" :key="tab.key" #[tab.key]>
-        <p v-if="teams.length === 0" class="m-0 py-8 text-center text-[0.85rem] text-[#778877]">
+        <div v-if="teams.length === 0" class="m-0 py-8 text-center text-[0.85rem] text-[#778877]">
           Chưa có tổ đội nào.
-        </p>
-        <p v-else-if="filteredTeams.length === 0" class="m-0 py-8 text-center text-[0.85rem] text-[#778877]">
+        </div>
+        <div v-else-if="filteredTeams.length === 0" class="m-0 py-8 text-center text-[0.85rem] text-[#778877]">
           Không tìm thấy tổ đội phù hợp.
-        </p>
-        <ul v-else class="m-0 flex min-h-0 list-none flex-col gap-2 overflow-y-auto p-0 pr-1">
-          <li v-for="team in filteredTeams" :key="team.id" class="rounded-xl border border-[#cde0c9] bg-white p-3">
+        </div>
+        <div v-else class="m-0 flex min-h-0 list-none flex-col gap-2 overflow-y-auto p-0 pr-1">
+          <div v-for="team in filteredTeams" :key="team.id" class="rounded-xl border border-[#cde0c9] bg-white p-3">
             <div class="flex items-start justify-between gap-2">
               <span class="font-bold text-[#1a3a1a]">{{ team.name }}</span
               ><span :class="['shrink-0 rounded-full px-2 py-[2px] text-[0.68rem] font-bold', statusClass[team.status]]">
                 {{ statusLabel[team.status] }}
               </span>
             </div>
-            <p v-if="team.description" class="my-1 line-clamp-2 text-[0.78rem] text-[#556655]">
+            <div v-if="team.description" class="my-1 line-clamp-2 text-[0.78rem] text-[#556655]">
               {{ team.description }}
-            </p>
-            <p class="my-1 text-[0.72rem] text-[#778877]">{{ joinTypeLabel(team) }} · tối đa {{ team.max_members }}</p>
+            </div>
+            <div class="my-1 text-[0.72rem] text-[#778877]">{{ joinTypeLabel(team) }} · tối đa {{ team.max_members }}</div>
             <div class="mt-2 flex justify-end">
               <span
                 v-if="team.id === currentTeamId"
@@ -112,8 +112,8 @@ function joinTypeLabel(team: UserTeam) {
                 {{ joinRestrictionLabel(team) }}
               </span>
             </div>
-          </li>
-        </ul>
+          </div>
+        </div>
       </template>
     </Tab>
   </aside>

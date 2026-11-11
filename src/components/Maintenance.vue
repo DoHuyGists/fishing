@@ -25,13 +25,13 @@ const retry = () => {
         </div>
       </div>
 
-      <h1 id="error-title" class="mt-10 text-2xl font-semibold tracking-tight sm:text-3xl">
+      <div id="error-title" class="mt-10 text-2xl font-semibold tracking-tight sm:text-3xl">
         Dịch vụ tạm thời gián đoạn
-      </h1>
-      <p class="mt-3 max-w-md text-base leading-relaxed text-[#24352a]/70">
+      </div>
+      <div class="mt-3 max-w-md text-base leading-relaxed text-[#24352a]/70">
         Máy chủ đang bảo trì hoặc quá tải. Dữ liệu của bạn không bị ảnh hưởng.
         Vui lòng thử lại sau ít phút.
-      </p>
+      </div>
 
       <div class="mt-8 flex flex-wrap gap-3">
         <button

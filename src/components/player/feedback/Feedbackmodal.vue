@@ -67,13 +67,13 @@ onBeforeUnmount(() => {
         <template #history>
           <section class="space-y-3 p-4 text-sm text-[#24352a]">
             <button type="button" class="underline" :disabled="feedbackStore.historyLoading" @click="feedbackStore.loadMyErrors(auth.userId)">Tải lại</button>
-            <p v-if="feedbackStore.historyError" role="alert" class="text-red-700">{{ feedbackStore.historyError }}</p>
-            <p v-if="feedbackStore.historyLoading">Đang tải báo lỗi…</p>
-            <p v-else-if="!feedbackStore.myErrors.length && !feedbackStore.historyError">Bạn chưa gửi báo lỗi nào.</p>
+            <div v-if="feedbackStore.historyError" role="alert" class="text-red-700">{{ feedbackStore.historyError }}</div>
+            <div v-if="feedbackStore.historyLoading">Đang tải báo lỗi…</div>
+            <div v-else-if="!feedbackStore.myErrors.length && !feedbackStore.historyError">Bạn chưa gửi báo lỗi nào.</div>
             <article v-for="item in feedbackStore.myErrors" :key="item.id" class="rounded-lg border border-[#cbd9c6] bg-[#f5f9f0] p-4">
-              <div class="flex flex-wrap justify-between gap-2"><h3 class="font-bold">{{ item.title }}</h3><span>{{ statusLabels[item.status] || item.status }}</span></div>
-              <p class="mt-2 whitespace-pre-wrap">{{ item.description }}</p>
-              <p class="mt-2 text-xs text-gray-600">Gửi: {{ new Date(item.created_at).toLocaleString('vi-VN') }} · Cập nhật: {{ new Date(item.updated_at).toLocaleString('vi-VN') }}</p>
+              <div class="flex flex-wrap justify-between gap-2"><div class="font-bold">{{ item.title }}</div><span>{{ statusLabels[item.status] || item.status }}</span></div>
+              <div class="mt-2 whitespace-pre-wrap">{{ item.description }}</div>
+              <div class="mt-2 text-xs text-gray-600">Gửi: {{ new Date(item.created_at).toLocaleString('vi-VN') }} · Cập nhật: {{ new Date(item.updated_at).toLocaleString('vi-VN') }}</div>
             </article>
             <div class="flex items-center gap-4"><button :disabled="feedbackStore.page <= 1 || feedbackStore.historyLoading" class="underline disabled:opacity-40" @click="feedbackStore.loadMyErrors(auth.userId, feedbackStore.page - 1)">Trước</button><span>Trang {{ feedbackStore.page }}</span><button :disabled="!feedbackStore.hasNext || feedbackStore.historyLoading" class="underline disabled:opacity-40" @click="feedbackStore.loadMyErrors(auth.userId, feedbackStore.page + 1)">Sau</button></div>
           </section>
@@ -95,7 +95,7 @@ onBeforeUnmount(() => {
         clip-rule="evenodd"
       />
     </svg>
-    <p class="flex-1 leading-relaxed">{{ SUCCESS_MESSAGE }}</p>
+    <div class="flex-1 leading-relaxed">{{ SUCCESS_MESSAGE }}</div>
     <button
       type="button"
       class="-mr-1 rounded p-1 text-gray-400 hover:text-white focus:outline-none focus-visible:ring-2 focus-visible:ring-white"

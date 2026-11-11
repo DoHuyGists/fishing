@@ -55,8 +55,8 @@ function addBoundaryPoint(event: MouseEvent) {
       >
         <header class="flex items-center justify-between gap-3 border-b border-[#cbd9c6] px-4 py-3 sm:px-5">
           <div>
-            <h2 id="fishing-boundary-picker-title" class="m-0 text-sm font-extrabold">Thiết lập vùng câu</h2>
-            <p class="m-0 mt-1 text-xs text-gray-600">Nhấn vào ảnh để thêm các điểm giới hạn vùng câu.</p>
+            <div id="fishing-boundary-picker-title" class="m-0 text-sm font-extrabold">Thiết lập vùng câu</div>
+            <div class="m-0 mt-1 text-xs text-gray-600">Nhấn vào ảnh để thêm các điểm giới hạn vùng câu.</div>
           </div>
           <button
             type="button"
@@ -69,9 +69,9 @@ function addBoundaryPoint(event: MouseEvent) {
         </header>
 
         <div class="flex min-h-0 flex-1 items-center justify-center overflow-auto p-3 sm:p-5">
-          <p v-if="sceneImageError" class="rounded-lg border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-700">
+          <div v-if="sceneImageError" class="rounded-lg border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-700">
             Không thể tải ảnh cảnh: {{ sceneImageUrl }}
-          </p>
+          </div>
           <div v-else class="relative inline-block max-h-full max-w-full">
             <img
               :src="sceneImageUrl"

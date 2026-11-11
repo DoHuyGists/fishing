@@ -24,17 +24,17 @@ const emit = defineEmits<{
         <span v-else>{{ skill.displayIcon }}</span>
       </div>
       <div class="min-w-0">
-        <h4 class="m-0 break-words text-sm font-extrabold leading-snug">{{ skill.name }}</h4>
+        <div class="m-0 break-words text-sm font-extrabold leading-snug">{{ skill.name }}</div>
       </div>
     </div>
-    <p class="mb-3 mt-2 min-h-8 whitespace-pre-line text-xs leading-relaxed text-[#64715e]">{{ skill.description }}</p>
+    <div class="mb-3 mt-2 min-h-8 whitespace-pre-line text-xs leading-relaxed text-[#64715e]">{{ skill.description }}</div>
     <div role="progressbar" :aria-label="`Cấp kỹ năng ${skill.name}`" :aria-valuenow="skill.level" :aria-valuemin="0" :aria-valuemax="skill.max_level" class="mb-3 flex h-1.5 gap-1">
       <span v-for="step in skill.max_level" :key="step" class="min-w-0 flex-1 rounded-sm border" :class="step <= skill.level ? 'border-emerald-700/20 bg-gradient-to-t from-emerald-700 to-emerald-500' : 'border-[#cbd9c6]/60 bg-[#e3e9dc]'" aria-hidden="true"></span>
     </div>
     <div class="mb-3 space-y-1.5">
       <template v-for="group in [{ title: 'Mỗi cấp nhận thêm', effects: skill.effects }, { title: 'Hiệu ứng hiện tại', effects: skill.currentEffects }]" :key="group.title">
         <div v-if="group.effects.length" class="rounded-lg border border-[#dce4d3] bg-white/65 p-2.5 text-xs">
-          <p class="mb-1.5 mt-0 text-[10px] font-bold uppercase tracking-wider text-[#78856b]">{{ group.title }}</p>
+          <div class="mb-1.5 mt-0 text-[10px] font-bold uppercase tracking-wider text-[#78856b]">{{ group.title }}</div>
           <dl class="m-0 space-y-1.5">
             <div v-for="effect in group.effects" :key="effect.label" class="flex items-baseline justify-between gap-2">
               <dt class="break-words text-[#52634c]">{{ effect.label }}</dt>

@@ -258,8 +258,8 @@ onUnmounted(() => clearInterval(clockInterval));
         >
           <div class="mb-5 flex flex-wrap items-center justify-between gap-2">
             <div>
-              <h3 class="m-0 text-sm font-extrabold text-gray-800">Lịch nhiệm vụ trong ngày</h3>
-              <p class="m-0 mt-1 text-xs text-gray-500">Các khung giờ được sắp xếp theo giờ UTC.</p>
+              <div class="m-0 text-sm font-extrabold text-gray-800">Lịch nhiệm vụ trong ngày</div>
+              <div class="m-0 mt-1 text-xs text-gray-500">Các khung giờ được sắp xếp theo giờ UTC.</div>
             </div>
             <div class="flex flex-wrap items-center gap-2">
               <span class="inline-flex items-center gap-2 rounded-full border border-emerald-200 bg-emerald-50 px-3 py-1.5 text-xs font-bold text-emerald-900">
@@ -340,9 +340,9 @@ onUnmounted(() => clearInterval(clockInterval));
                           {{ fish.name }}
                         </span>
                       </div>
-                      <p class="mb-0 mt-2 text-xs font-semibold text-emerald-800">
+                      <div class="mb-0 mt-2 text-xs font-semibold text-emerald-800">
                         Thưởng: {{ item.cash === null ? "—" : `${item.cash.toLocaleString("vi-VN")} xu` }}
-                      </p>
+                      </div>
                     </div>
                     <div class="flex shrink-0 gap-2">
                       <button
@@ -395,8 +395,8 @@ onUnmounted(() => clearInterval(clockInterval));
 
     <div v-if="store.confirmDeleteId" class="fixed inset-0 z-40 grid place-items-center bg-black/45 p-4">
       <div class="w-full max-w-sm rounded-xl bg-white p-5 shadow-xl">
-        <h3 class="m-0 text-base font-extrabold text-gray-800">Xác nhận xoá nhiệm vụ?</h3>
-        <p class="my-3 text-sm text-gray-600">Thao tác này không thể hoàn tác.</p>
+        <div class="m-0 text-base font-extrabold text-gray-800">Xác nhận xoá nhiệm vụ?</div>
+        <div class="my-3 text-sm text-gray-600">Thao tác này không thể hoàn tác.</div>
         <div class="flex justify-end gap-2">
           <button
             type="button"

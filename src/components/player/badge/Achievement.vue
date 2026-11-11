@@ -68,20 +68,20 @@ function clearFilters() {
         ></div>
         <div class="relative flex items-center justify-between gap-2 sm:items-end sm:gap-4">
           <div>
-            <p
+            <div
               class="m-0 text-[9px] font-black uppercase tracking-[0.16em] text-emerald-800 sm:text-[10px] sm:tracking-[0.22em]"
             >
               Hành trình của bạn
-            </p>
-            <h3
+            </div>
+            <div
               id="badges-title"
               class="mb-0 mt-0.5 text-base font-black tracking-tight text-[#24352a] sm:mt-1 sm:text-xl"
             >
               Bộ sưu tập huy hiệu
-            </h3>
-            <p class="m-0 mt-0.5 hidden max-w-md text-xs leading-relaxed text-[#617265] sm:block">
+            </div>
+            <div class="m-0 mt-0.5 hidden max-w-md text-xs leading-relaxed text-[#617265] sm:block">
               Mỗi huy hiệu là một dấu ấn trên hành trình chinh phục những vùng nước mới.
-            </p>
+            </div>
           </div>
           <div
             class="flex shrink-0 items-center gap-2 rounded-xl border border-white/80 bg-white/75 px-2.5 py-1.5 shadow-sm backdrop-blur sm:gap-3 sm:px-3 sm:py-2"
@@ -92,11 +92,11 @@ function clearFilters() {
               >🏆</span
             >
             <div>
-              <p class="m-0 text-sm font-black leading-tight text-[#24352a] sm:text-base">
+              <div class="m-0 text-sm font-black leading-tight text-[#24352a] sm:text-base">
                 {{ earnedBadges.length
                 }}<span class="text-xs font-semibold text-gray-400"> / {{ badgesStore.badges.length }}</span>
-              </p>
-              <p class="m-0 text-[9px] font-bold uppercase tracking-wide text-gray-500 sm:text-[10px]">đã sưu tầm</p>
+              </div>
+              <div class="m-0 text-[9px] font-bold uppercase tracking-wide text-gray-500 sm:text-[10px]">đã sưu tầm</div>
             </div>
           </div>
         </div>
@@ -114,7 +114,7 @@ function clearFilters() {
         <div
           class="relative mt-3 flex flex-col gap-2 border-t border-emerald-900/10 pt-2.5 sm:mt-4 sm:flex-row sm:items-center sm:justify-between sm:gap-3 sm:pt-3"
         >
-          <p class="m-0 shrink-0 text-[10px] font-bold text-[#405346] sm:text-xs">Những chiếc cúp của cần thủ</p>
+          <div class="m-0 shrink-0 text-[10px] font-bold text-[#405346] sm:text-xs">Những chiếc cúp của cần thủ</div>
           <button
             v-if="badgesStore.error"
             type="button"
@@ -211,15 +211,15 @@ function clearFilters() {
         class="mt-4 rounded-2xl border border-dashed border-[#cbd9c6] bg-[#f5f9f0] p-8 text-center"
       >
         <span class="text-4xl" aria-hidden="true">🎣</span>
-        <p class="mb-1 mt-3 text-sm font-bold text-[#24352a]">Hồ sơ đang chờ dấu ấn đầu tiên</p>
-        <p class="m-0 text-xs text-gray-500">Huy hiệu sẽ xuất hiện tại đây khi có sẵn trong trò chơi.</p>
+        <div class="mb-1 mt-3 text-sm font-bold text-[#24352a]">Hồ sơ đang chờ dấu ấn đầu tiên</div>
+        <div class="m-0 text-xs text-gray-500">Huy hiệu sẽ xuất hiện tại đây khi có sẵn trong trò chơi.</div>
       </div>
       <div
         v-else-if="filteredBadges.length === 0"
         class="mt-4 rounded-2xl border border-dashed border-[#cbd9c6] bg-[#f5f9f0] p-8 text-center"
       >
-        <p class="m-0 text-sm font-bold text-[#24352a]">Không tìm thấy huy hiệu phù hợp</p>
-        <p class="mb-3 mt-1 text-xs text-gray-500">Thử thay đổi từ khóa hoặc bộ lọc của bạn.</p>
+        <div class="m-0 text-sm font-bold text-[#24352a]">Không tìm thấy huy hiệu phù hợp</div>
+        <div class="mb-3 mt-1 text-xs text-gray-500">Thử thay đổi từ khóa hoặc bộ lọc của bạn.</div>
         <button
           type="button"
           class="cursor-pointer rounded-full border border-[#cbd9c6] bg-white px-4 py-2 text-xs font-bold text-emerald-800 hover:bg-emerald-50"
@@ -229,9 +229,9 @@ function clearFilters() {
         </button>
       </div>
       <div v-else class="mt-3 sm:mt-4">
-        <p class="mb-2 mt-0 text-[10px] text-gray-500 sm:mb-3 sm:text-xs">
+        <div class="mb-2 mt-0 text-[10px] text-gray-500 sm:mb-3 sm:text-xs">
           Hiển thị {{ filteredBadges.length }} / {{ badgesStore.badges.length }} huy hiệu
-        </p>
+        </div>
         <div class="grid grid-cols-3 gap-1.5 sm:grid-cols-4 sm:gap-2 lg:grid-cols-6 xl:grid-cols-7 2xl:grid-cols-8">
           <button
             v-for="(badge, index) in filteredBadges"
@@ -283,12 +283,12 @@ function clearFilters() {
                 >✦</span
               >
             </span>
-            <h4
+            <div
               class="relative m-0 mt-1 line-clamp-2 w-full text-[10px] font-extrabold leading-tight text-[#24352a] sm:mt-1.5 sm:text-xs"
               :title="badge.name"
             >
               {{ badge.name }}
-            </h4>
+            </div>
             <span
               v-if="badge.can_claim"
               class="relative mt-1 rounded-full bg-amber-100 px-1.5 py-0.5 text-[9px] font-bold leading-tight text-amber-800 sm:mt-1.5 sm:px-2 sm:text-[10px]"
@@ -344,28 +344,28 @@ function clearFilters() {
               />
               <span v-else class="text-6xl" aria-hidden="true">🏅</span>
             </div>
-            <p class="mb-1 mt-5 text-[10px] font-black uppercase tracking-[0.2em] text-emerald-800">
+            <div class="mb-1 mt-5 text-[10px] font-black uppercase tracking-[0.2em] text-emerald-800">
               {{ selectedBadge.is_earned ? "Dấu ấn đã chinh phục" : "Mục tiêu tiếp theo" }}
-            </p>
-            <h4 id="badge-detail-title" class="m-0 text-xl font-black text-[#24352a]">{{ selectedBadge.name }}</h4>
-            <p class="mb-0 mt-2 text-sm leading-relaxed text-[#617265]">
+            </div>
+            <div id="badge-detail-title" class="m-0 text-xl font-black text-[#24352a]">{{ selectedBadge.name }}</div>
+            <div class="mb-0 mt-2 text-sm leading-relaxed text-[#617265]">
               {{ selectedBadge.description || "Một huy hiệu đặc biệt trong hành trình câu cá của bạn." }}
-            </p>
+            </div>
             <div v-if="selectedBadge.reward !== null">
-              <p class="mb-0 mt-3 text-xs font-bold text-amber-800">Phần thưởng:</p>
+              <div class="mb-0 mt-3 text-xs font-bold text-amber-800">Phần thưởng:</div>
               <div class="flex justify-center">
                 <Cash :amount="selectedBadge.reward.cash" />
               </div>
             </div>
-            <p
+            <div
               v-if="selectedBadge.is_earned"
               class="mb-0 mt-4 inline-flex rounded-full bg-emerald-100 px-3 py-1.5 text-xs font-bold text-emerald-900"
             >
               Đạt {{ selectedBadge.quantity }} lần
-            </p>
-            <p v-else class="mb-0 mt-4 inline-flex rounded-full bg-white px-3 py-1.5 text-xs font-bold text-gray-500">
+            </div>
+            <div v-else class="mb-0 mt-4 inline-flex rounded-full bg-white px-3 py-1.5 text-xs font-bold text-gray-500">
               Chưa mở khóa
-            </p>
+            </div>
             <div v-if="selectedBadge.can_claim" class="mt-4">
               <button
                 type="button"
@@ -376,12 +376,12 @@ function clearFilters() {
                 {{ badgesStore.claimingId === selectedBadge.badge_id ? "Đang nhận..." : "Nhận thưởng" }}
               </button>
             </div>
-            <p v-else-if="selectedBadge.is_claim" class="mb-0 mt-3 text-xs font-semibold text-[#617265]">
+            <div v-else-if="selectedBadge.is_claim" class="mb-0 mt-3 text-xs font-semibold text-[#617265]">
               Đã nhận thưởng
-            </p>
-            <p v-if="badgesStore.claimError" role="alert" class="mb-0 mt-3 text-xs text-red-700">
+            </div>
+            <div v-if="badgesStore.claimError" role="alert" class="mb-0 mt-3 text-xs text-red-700">
               {{ badgesStore.claimError }}
-            </p>
+            </div>
           </section>
         </div>
       </Teleport>

@@ -339,8 +339,8 @@ const close = () => {
       class="hidden lg:sticky lg:top-0 lg:flex lg:h-dvh lg:w-64 lg:shrink-0 lg:self-start flex-col overflow-hidden bg-[#153221] text-emerald-50"
     >
       <div class="shrink-0 px-6 py-5 border-b border-white/10">
-        <p class="text-lg font-extrabold leading-tight">Quản trị</p>
-        <p class="text-xs text-emerald-200/70 mt-0.5">Hệ thống câu cá</p>
+        <div class="text-lg font-extrabold leading-tight">Quản trị</div>
+        <div class="text-xs text-emerald-200/70 mt-0.5">Hệ thống câu cá</div>
       </div>
 
       <nav
@@ -348,9 +348,9 @@ const close = () => {
         aria-label="Điều hướng quản trị"
       >
         <section v-for="group in groups" :key="group.title">
-          <h2 class="px-3 mb-1.5 text-xs font-semibold text-emerald-200/60">{{ group.title }}</h2>
-          <ul class="space-y-0.5">
-            <li v-for="m in group.modules" :key="m.key">
+          <div class="px-3 mb-1.5 text-xs font-semibold text-emerald-200/60">{{ group.title }}</div>
+          <div class="space-y-0.5">
+            <div v-for="m in group.modules" :key="m.key">
               <button
                 type="button"
                 class="w-full flex items-center gap-3 rounded-lg px-3 py-2 text-left text-sm font-medium transition-colors cursor-pointer focus-visible:outline-2 focus-visible:outline-emerald-300"
@@ -363,8 +363,8 @@ const close = () => {
                 <span class="text-base" aria-hidden="true">{{ m.icon }}</span>
                 {{ m.label }}
               </button>
-            </li>
-          </ul>
+            </div>
+          </div>
         </section>
       </nav>
     </aside>
@@ -375,8 +375,8 @@ const close = () => {
         class="bg-white border-b border-slate-200 px-5 py-4 sm:px-8 flex flex-wrap items-center gap-4 justify-between"
       >
         <div>
-          <h1 class="text-xl font-extrabold text-[#153221]">Bảng điều khiển</h1>
-          <p class="text-sm text-slate-500">Chọn một mục để quản lý dữ liệu.</p>
+          <div class="text-xl font-extrabold text-[#153221]">Bảng điều khiển</div>
+          <div class="text-sm text-slate-500">Chọn một mục để quản lý dữ liệu.</div>
         </div>
 
         <div class="flex w-full flex-col gap-3 sm:w-auto sm:flex-row sm:flex-wrap sm:items-center sm:justify-end">
@@ -429,7 +429,7 @@ const close = () => {
 
       <div class="px-5 py-6 sm:px-8 space-y-8">
         <section v-for="group in filteredGroups" :key="group.title">
-          <h2 class="mb-3 text-sm font-bold text-slate-600">{{ group.title }}</h2>
+          <div class="mb-3 text-sm font-bold text-slate-600">{{ group.title }}</div>
 
           <div class="grid gap-4 sm:grid-cols-2 xl:grid-cols-3">
             <button
@@ -453,12 +453,12 @@ const close = () => {
           </div>
         </section>
 
-        <p
+        <div
           v-if="filteredGroups.length === 0"
           class="rounded-xl border border-dashed border-slate-300 bg-white p-8 text-center text-sm text-slate-500"
         >
           Không có mục nào khớp với "{{ keyword }}". Hãy thử từ khoá khác.
-        </p>
+        </div>
       </div>
     </main>
 

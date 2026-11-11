@@ -186,9 +186,9 @@ onUnmounted(() => {
   >
     <div class="p-5 flex flex-col gap-4">
       <div class="flex items-center justify-between">
-        <h3 class="m-0 text-sm font-extrabold text-[#153221]">
+        <div class="m-0 text-sm font-extrabold text-[#153221]">
           {{ adminFishingAreaStore.isUpdate ? "Chỉnh sửa bãi câu" : "Thêm bãi câu mới" }}
-        </h3>
+        </div>
         <button
           type="button"
           @click="adminFishingAreaStore.closeForm"

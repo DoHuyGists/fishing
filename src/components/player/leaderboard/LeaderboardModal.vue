@@ -33,29 +33,29 @@ watch(() => authStore.userId, load, { immediate: true });
           <section class="space-y-4" :aria-label="board.label" :aria-busy="board.loading">
             <div class="flex flex-wrap items-start justify-between gap-3">
               <div>
-                <h3 class="m-0 text-xl font-extrabold">{{ board.label }}</h3>
-                <p class="mb-0 mt-1 text-sm text-[#52654f]">{{ board.description }}</p>
+                <div class="m-0 text-xl font-extrabold">{{ board.label }}</div>
+                <div class="mb-0 mt-1 text-sm text-[#52654f]">{{ board.description }}</div>
               </div>
               <span class="rounded-full border border-[#cbd9c6] bg-[#f5f9f0] px-3 py-1 text-xs font-semibold">
                 {{ board.isMock ? "Dữ liệu mẫu" : "Dữ liệu thực tế" }}
               </span>
             </div>
 
-            <p v-if="board.isMock" class="m-0 rounded-xl border border-amber-200 bg-amber-50 px-4 py-3 text-sm text-amber-900">
+            <div v-if="board.isMock" class="m-0 rounded-xl border border-amber-200 bg-amber-50 px-4 py-3 text-sm text-amber-900">
               Bảng này đang dùng dữ liệu mẫu để minh họa. Thứ hạng chưa phản ánh thành tích thực tế của người chơi.
-            </p>
-            <p v-if="board.error" role="alert" class="m-0 rounded-xl border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-700">
+            </div>
+            <div v-if="board.error" role="alert" class="m-0 rounded-xl border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-700">
               {{ board.error }}. Hãy thử làm mới bảng xếp hạng.
-            </p>
-            <p v-if="board.loading" role="status" class="m-0 text-sm text-[#52654f]">
+            </div>
+            <div v-if="board.loading" role="status" class="m-0 text-sm text-[#52654f]">
               {{ board.entries.length ? "Đang cập nhật bảng xếp hạng…" : "Đang tải bảng xếp hạng…" }}
-            </p>
+            </div>
 
             <div class="grid items-start gap-4 lg:grid-cols-[minmax(0,1fr)_16rem]">
               <div class="min-w-0 space-y-4">
                 <template v-if="board.entries.length">
-                  <ol aria-label="Ba vị trí dẫn đầu" class="m-0 grid list-none grid-cols-3 gap-2 p-0 sm:gap-3">
-                    <li
+                  <div aria-label="Ba vị trí dẫn đầu" class="m-0 grid list-none grid-cols-3 gap-2 p-0 sm:gap-3">
+                    <div
                       v-for="entry in board.leaders"
                       :key="entry.id"
                       class="min-w-0 rounded-2xl border p-2 text-center sm:p-4"
@@ -66,20 +66,20 @@ watch(() => authStore.userId, load, { immediate: true });
                     >
                       <span class="text-3xl" :aria-label="`Hạng ${entry.rank}`" role="img">{{ rankLabel(entry.rank) }}</span>
                       <img v-if="entry.avatarUrl" :src="entry.avatarUrl" alt="Ảnh đại diện" class="mx-auto mt-2 h-10 w-10 rounded-full object-cover" referrerpolicy="no-referrer" />
-                      <p class="mb-1 mt-3 truncate text-xs font-bold sm:text-sm" :title="entry.displayName">{{ entry.displayName }}</p>
+                      <div class="mb-1 mt-3 truncate text-xs font-bold sm:text-sm" :title="entry.displayName">{{ entry.displayName }}</div>
                       <span v-if="entry.userId && entry.userId === authStore.userId" class="text-xs font-semibold text-emerald-700">Bạn · </span>
-                      <p class="m-0 break-words text-base font-extrabold tabular-nums sm:text-xl">{{ numberFormatter.format(entry.value) }}</p>
-                      <p class="mb-0 mt-1 text-xs text-[#52654f]">{{ board.unit }}</p>
-                    </li>
-                  </ol>
+                      <div class="m-0 break-words text-base font-extrabold tabular-nums sm:text-xl">{{ numberFormatter.format(entry.value) }}</div>
+                      <div class="mb-0 mt-1 text-xs text-[#52654f]">{{ board.unit }}</div>
+                    </div>
+                  </div>
 
                   <div class="overflow-hidden rounded-2xl border border-[#cbd9c6]">
                     <div class="flex items-center justify-between gap-3 bg-[#f5f9f0] px-3 py-3 text-xs font-bold sm:px-4">
                       <span>Top {{ board.entries.length }} cần thủ</span>
                       <span class="text-right">{{ board.metric }}</span>
                     </div>
-                    <ol v-if="board.remaining.length" start="4" class="m-0 list-none divide-y divide-[#cbd9c6]/60 p-0">
-                      <li
+                    <div v-if="board.remaining.length" start="4" class="m-0 list-none divide-y divide-[#cbd9c6]/60 p-0">
+                      <div
                         v-for="entry in board.remaining"
                         :key="entry.id"
                         class="flex items-center gap-2 px-3 py-3 sm:gap-3 sm:px-4"
@@ -92,33 +92,33 @@ watch(() => authStore.userId, load, { immediate: true });
                         <span class="shrink-0 text-right text-sm font-bold tabular-nums">
                           {{ numberFormatter.format(entry.value) }} <span class="text-xs font-normal text-[#52654f]">{{ board.unit }}</span>
                         </span>
-                      </li>
-                    </ol>
+                      </div>
+                    </div>
                   </div>
                 </template>
                 <div v-else-if="!board.loading && !board.error" class="rounded-2xl border border-dashed border-[#cbd9c6] bg-[#f5f9f0] px-4 py-10 text-center">
                   <span class="text-3xl" aria-hidden="true">🎣</span>
-                  <p class="mb-1 mt-3 font-bold">Chưa có dữ liệu xếp hạng</p>
-                  <p class="m-0 text-sm text-[#52654f]">Các cần thủ sẽ xuất hiện khi có thành tích được ghi nhận.</p>
+                  <div class="mb-1 mt-3 font-bold">Chưa có dữ liệu xếp hạng</div>
+                  <div class="m-0 text-sm text-[#52654f]">Các cần thủ sẽ xuất hiện khi có thành tích được ghi nhận.</div>
                 </div>
               </div>
 
               <aside class="order-first rounded-2xl border border-[#cbd9c6] bg-[#f5f9f0] p-4 lg:order-last" aria-label="Thứ hạng cá nhân">
-                <h4 class="m-0 text-sm font-bold">Thứ hạng của bạn</h4>
-                <p v-if="board.isMock" class="mb-0 mt-2 text-sm leading-relaxed text-[#52654f]">
+                <div class="m-0 text-sm font-bold">Thứ hạng của bạn</div>
+                <div v-if="board.isMock" class="mb-0 mt-2 text-sm leading-relaxed text-[#52654f]">
                   Thứ hạng cá nhân sẽ hiển thị khi tiêu chí này có dữ liệu thực tế.
-                </p>
-                <p v-else-if="board.loading" class="mb-0 mt-2 text-sm text-[#52654f]">Đang tải thứ hạng…</p>
+                </div>
+                <div v-else-if="board.loading" class="mb-0 mt-2 text-sm text-[#52654f]">Đang tải thứ hạng…</div>
                 <template v-else-if="board.myEntry && board.myRank !== null">
                   <div class="mt-3 flex flex-wrap items-end justify-between gap-2">
                     <span class="text-3xl font-extrabold text-emerald-800">#{{ board.myRank }}</span>
                     <span class="text-sm font-bold tabular-nums">{{ numberFormatter.format(board.myEntry.score) }} {{ board.unit }}</span>
                   </div>
-                  <p class="mb-0 mt-3 truncate text-sm text-[#52654f]">{{ board.myEntry.display_name || "Ẩn danh" }}</p>
+                  <div class="mb-0 mt-3 truncate text-sm text-[#52654f]">{{ board.myEntry.display_name || "Ẩn danh" }}</div>
                 </template>
-                <p v-else class="mb-0 mt-2 text-sm leading-relaxed text-[#52654f]">
+                <div v-else class="mb-0 mt-2 text-sm leading-relaxed text-[#52654f]">
                   {{ board.error ? "Chưa thể tải thứ hạng cá nhân. Vui lòng thử làm mới." : authStore.userId ? "Bạn chưa có thứ hạng ở tiêu chí này. Tiếp tục câu cá để ghi dấu thành tích!" : "Đăng nhập để xem thứ hạng của bạn." }}
-                </p>
+                </div>
               </aside>
             </div>
           </section>

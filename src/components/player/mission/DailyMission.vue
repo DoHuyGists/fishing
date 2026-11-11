@@ -63,21 +63,21 @@ onMounted(() => void loadDailyMissions());
 
 <template>
   <section class="mx-auto flex w-full max-w-[1600px] flex-col gap-4 px-1 text-[#24352a] sm:px-4 lg:h-[calc(100dvh-10rem)] lg:min-h-[400px] lg:px-6">
-    <p v-if="isLoading" class="rounded-xl border border-[#cbd9c6] bg-white p-6 text-center text-sm">
+    <div v-if="isLoading" class="rounded-xl border border-[#cbd9c6] bg-white p-6 text-center text-sm">
       Đang tải nhiệm vụ hằng ngày...
-    </p>
-    <p v-else-if="errorMessage" role="alert" class="rounded-xl border border-red-200 bg-red-50 p-4 text-sm text-red-800">
+    </div>
+    <div v-else-if="errorMessage" role="alert" class="rounded-xl border border-red-200 bg-red-50 p-4 text-sm text-red-800">
       {{ errorMessage }}
       <button type="button" class="ml-2 font-bold underline" @click="loadDailyMissions">Thử lại</button>
-    </p>
+    </div>
     <template v-else-if="missionStore.dailyMissions">
       <header class="shrink-0 rounded-2xl border border-[#cbd9c6] bg-[#f5f9f0] px-4 py-3 sm:px-5">
         <div class="flex flex-wrap items-center justify-between gap-3">
           <div>
-            <h3 class="m-0 text-lg font-extrabold">Nhiệm vụ hằng ngày</h3>
-            <p class="mb-0 mt-1 text-sm capitalize text-emerald-900/65">
+            <div class="m-0 text-lg font-extrabold">Nhiệm vụ hằng ngày</div>
+            <div class="mb-0 mt-1 text-sm capitalize text-emerald-900/65">
               {{ formatDate(missionStore.dailyMissions.mission_date) }}
-            </p>
+            </div>
           </div>
           <div class="flex items-baseline gap-2 rounded-xl bg-white px-4 py-2">
             <strong class="text-2xl tabular-nums">{{ missionStore.dailyMissions.total_points }}</strong>
@@ -90,8 +90,8 @@ onMounted(() => void loadDailyMissions());
       <section aria-label="Mốc thưởng" class="order-1 flex min-h-0 min-w-0 flex-col gap-3 rounded-2xl border border-[#cbd9c6] bg-[#f5f9f0] p-4 lg:overflow-y-auto xl:p-5">
         <div class="flex items-end justify-between gap-2">
           <div>
-            <h4 class="m-0 text-sm font-extrabold">Mốc thưởng</h4>
-            <p class="mb-0 mt-1 text-xs text-emerald-900/60">Tích lũy điểm để nhận quà</p>
+            <div class="m-0 text-sm font-extrabold">Mốc thưởng</div>
+            <div class="mb-0 mt-1 text-xs text-emerald-900/60">Tích lũy điểm để nhận quà</div>
           </div>
           <span class="text-xs font-bold text-emerald-800">{{ missionStore.dailyMissions.total_points }} điểm</span>
         </div>
@@ -101,8 +101,8 @@ onMounted(() => void loadDailyMissions());
             <div class="w-full rounded-full bg-emerald-600 transition-[height]"
               :style="{ height: `${Math.max(0, Math.min(100, missionStore.dailyMissions.total_points / Math.max(...missionStore.dailyMissions.rewards.map((reward) => reward.required_points), 1) * 100))}%` }" />
           </div>
-          <ol class="relative m-0 flex min-h-full list-none flex-col justify-between gap-3 p-0">
-            <li v-for="reward in missionStore.dailyMissions.rewards" :key="reward.id" class="relative pl-10">
+          <div class="relative m-0 flex min-h-full list-none flex-col justify-between gap-3 p-0">
+            <div v-for="reward in missionStore.dailyMissions.rewards" :key="reward.id" class="relative pl-10">
               <span class="absolute left-[15px] top-4 z-10 flex size-[17px] items-center justify-center rounded-full border-2 border-white shadow-sm"
                 :class="reward.is_unlocked ? 'bg-emerald-600' : 'bg-[#cbd9c6]'">
                 <span v-if="reward.is_claimed" class="text-[9px] font-black text-white">✓</span>
@@ -125,32 +125,32 @@ onMounted(() => void loadDailyMissions());
                     <span class="pointer-events-none absolute bottom-full left-1/2 z-20 mb-1 hidden w-max max-w-48 -translate-x-1/2 rounded-md bg-[#24352a] px-2 py-1 text-[10px] text-white group-hover:block group-focus-within:block">{{ rewardLabel(item) }}</span>
                   </div>
                 </div>
-                <p v-else class="m-0 text-xs text-emerald-900/55">Phần thưởng theo mốc</p>
+                <div v-else class="m-0 text-xs text-emerald-900/55">Phần thưởng theo mốc</div>
                 <button v-if="reward.can_claim" type="button"
                   class="mt-2 w-full rounded-lg bg-emerald-700 px-2 py-1.5 text-xs font-bold text-white transition hover:bg-emerald-800"
                   @click="claimReward">Nhận thưởng</button>
-                <p v-else-if="!reward.is_unlocked" class="mb-0 mt-2 text-[10px] text-emerald-900/55">
+                <div v-else-if="!reward.is_unlocked" class="mb-0 mt-2 text-[10px] text-emerald-900/55">
                   Còn {{ Math.max(0, reward.required_points - missionStore.dailyMissions.total_points) }} điểm
-                </p>
+                </div>
               </article>
-            </li>
-          </ol>
+            </div>
+          </div>
         </div>
-        <p v-else class="m-0 rounded-xl bg-white/70 p-4 text-center text-xs text-emerald-900/55">Chưa có mốc thưởng.</p>
+        <div v-else class="m-0 rounded-xl bg-white/70 p-4 text-center text-xs text-emerald-900/55">Chưa có mốc thưởng.</div>
       </section>
 
       <section aria-label="Danh sách nhiệm vụ" class="order-2 flex min-h-0 min-w-0 flex-col gap-3">
-        <h4 class="m-0 text-sm font-extrabold">Tiến độ nhiệm vụ <span class="font-medium text-emerald-900/60">({{ missionStore.dailyMissions.missions.length }}/{{ missionStore.dailyMissions.mission_count }})</span></h4>
+        <div class="m-0 text-sm font-extrabold">Tiến độ nhiệm vụ <span class="font-medium text-emerald-900/60">({{ missionStore.dailyMissions.missions.length }}/{{ missionStore.dailyMissions.mission_count }})</span></div>
         <div class="min-h-0 flex-1 space-y-3 overflow-y-auto pb-1 pr-2 lg:overflow-y-scroll">
         <article v-for="mission in missionStore.dailyMissions.missions" :key="mission.id"
           class="rounded-xl border border-[#cbd9c6] bg-white p-3.5 xl:p-4">
           <div class="flex flex-wrap items-start justify-between gap-3">
             <div class="min-w-0 flex-1">
               <div class="flex flex-wrap items-center gap-2">
-                <h5 class="m-0 text-sm font-bold">{{ mission.name }}</h5>
+                <div class="m-0 text-sm font-bold">{{ mission.name }}</div>
                 <span class="rounded-full bg-[#f5f9f0] px-2 py-0.5 text-[10px] font-bold">{{ mission.difficulty }}</span>
               </div>
-              <p class="mb-0 mt-1 text-sm text-emerald-900/65">{{ mission.description }}</p>
+              <div class="mb-0 mt-1 text-sm text-emerald-900/65">{{ mission.description }}</div>
             </div>
             <span class="shrink-0 text-xs font-bold">{{ mission.mission_points }} điểm</span>
           </div>
@@ -162,7 +162,7 @@ onMounted(() => void loadDailyMissions());
             <span v-if="mission.is_completed" class="text-xs font-bold text-emerald-700">Hoàn thành</span>
           </div>
         </article>
-        <p v-if="!missionStore.dailyMissions.missions.length" class="rounded-xl bg-[#f5f9f0] p-5 text-center text-sm">Hôm nay chưa có nhiệm vụ.</p>
+        <div v-if="!missionStore.dailyMissions.missions.length" class="rounded-xl bg-[#f5f9f0] p-5 text-center text-sm">Hôm nay chưa có nhiệm vụ.</div>
         </div>
       </section>
       </div>

@@ -152,14 +152,14 @@ function getSheetZIndex(sheetIndex: number): number {
 
               <!-- Country Overview Card -->
               <div class="bg-amber-900/10 p-4 rounded-sm border border-amber-900/20 mb-4">
-                <h4 class="m-0 font-serif font-bold text-sm text-amber-950 mb-2">Tổng Quan</h4>
-                <p class="m-0 text-amber-900/80 leading-relaxed italic text-sm">
+                <div class="m-0 font-serif font-bold text-sm text-amber-950 mb-2">Tổng Quan</div>
+                <div class="m-0 text-amber-900/80 leading-relaxed italic text-sm">
                   {{
                     country.information ||
                     `Vùng biển và hồ nước tại khu vực ${country.name} là nơi cư trú của nhiều
                   loài sinh vật độc đáo.`
                   }}
-                </p>
+                </div>
               </div>
               <!-- Collection Progress Badge -->
               <div
@@ -175,9 +175,9 @@ function getSheetZIndex(sheetIndex: number): number {
                     :style="{ width: `${stats.percentage}%` }"
                   ></div>
                 </div>
-                <p class="m-0 text-[10px] text-amber-900/70 mt-2 text-right italic font-serif">
+                <div class="m-0 text-[10px] text-amber-900/70 mt-2 text-right italic font-serif">
                   Hoàn thành {{ stats.percentage }}%
-                </p>
+                </div>
               </div>
             </div>
 
@@ -210,12 +210,12 @@ function getSheetZIndex(sheetIndex: number): number {
               <div class="grid place-items-center w-full h-full">
                 <div class="p-6 text-center text-amber-950/80 flex flex-col items-center justify-center">
                   <span class="text-4xl mb-3">⚓</span>
-                  <h4 class="m-0 font-serif font-bold text-base text-amber-950 mb-1">
+                  <div class="m-0 font-serif font-bold text-base text-amber-950 mb-1">
                     Đã xem hết nhật ký {{ country.name }}
-                  </h4>
-                  <p class="m-0 text-xs text-amber-900/70 italic max-w-xs">
+                  </div>
+                  <div class="m-0 text-xs text-amber-900/70 italic max-w-xs">
                     Hãy di chuyển đến các bãi câu thuộc {{ country.name }} để tiếp tục chinh phục những loài cá mới!
-                  </p>
+                  </div>
                 </div>
               </div>
             </div>
@@ -300,9 +300,9 @@ function getSheetZIndex(sheetIndex: number): number {
                     >
                       <div>
                         <div class="flex items-center justify-between gap-1">
-                          <h4 class="m-0 font-serif font-bold text-lg text-white lg:text-amber-950 truncate">
+                          <div class="m-0 font-serif font-bold text-lg text-white lg:text-amber-950 truncate">
                             {{ entry.isCaught ? entry.species.name : "???" }}
-                          </h4>
+                          </div>
                           <span
                             class="px-1 py-0.2 rounded text-[8px] font-bold uppercase shrink-0 border"
                             :class="[
@@ -314,13 +314,13 @@ function getSheetZIndex(sheetIndex: number): number {
                             {{ entry.isCaught ? entry.species.status || "Đã câu" : "Chưa bắt" }}
                           </span>
                         </div>
-                        <p class="m-0 text-md text-white lg:text-amber-900/80 line-clamp-1 leading-tight italic mt-0.5">
+                        <div class="m-0 text-md text-white lg:text-amber-900/80 line-clamp-1 leading-tight italic mt-0.5">
                           {{
                             entry.isCaught
                               ? entry.species.information || "Chưa có thông tin sinh thái."
                               : "Chưa khám phá."
                           }}
-                        </p>
+                        </div>
                       </div>
                       <div class="text-[8px] text-white lg:text-emerald-800 font-semibold mt-0.5">
                         <span v-if="entry.isCaught">✓ {{ formatDate(entry.caughtAt) }}</span>
@@ -405,9 +405,9 @@ function getSheetZIndex(sheetIndex: number): number {
                     >
                       <div>
                         <div class="flex items-center justify-between gap-1">
-                          <h4 class="m-0 font-serif font-bold text-[11px] text-white lg:text-amber-950 truncate">
+                          <div class="m-0 font-serif font-bold text-[11px] text-white lg:text-amber-950 truncate">
                             {{ entry.isCaught ? entry.species.name : "???" }}
-                          </h4>
+                          </div>
                           <span
                             class="px-1 py-0.2 rounded text-[8px] font-bold uppercase shrink-0 border"
                             :class="[
@@ -419,7 +419,7 @@ function getSheetZIndex(sheetIndex: number): number {
                             {{ entry.isCaught ? entry.species.status || "Đã câu" : "Chưa bắt" }}
                           </span>
                         </div>
-                        <p
+                        <div
                           class="m-0 text-[9px] text-white lg:text-amber-900/80 line-clamp-1 leading-tight italic mt-0.5"
                         >
                           {{
@@ -427,7 +427,7 @@ function getSheetZIndex(sheetIndex: number): number {
                               ? entry.species.information || "Chưa có thông tin sinh thái."
                               : "Chưa khám phá."
                           }}
-                        </p>
+                        </div>
                       </div>
                       <div class="text-[8px] text-white lg:text-emerald-800 font-semibold mt-0.5">
                         <span v-if="entry.isCaught">✓ {{ formatDate(entry.caughtAt) }}</span>

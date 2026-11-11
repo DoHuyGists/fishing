@@ -288,7 +288,7 @@ onBeforeUnmount(() => {
                   enter-active-class="transition-opacity duration-300"
                   enter-from-class="opacity-0"
                 >
-                  <li
+                  <div
                     v-for="m in modifiers"
                     :key="m.code"
                     class="flex items-center gap-2 rounded-lg border border-emerald-900/10 bg-white/80 px-2.5 py-2"
@@ -309,7 +309,7 @@ onBeforeUnmount(() => {
                         ></div>
                       </div>
                     </div>
-                  </li>
+                  </div>
                 </TransitionGroup>
                 <div v-else class="py-4 text-center text-sm text-emerald-800">Chưa có hiệu ứng nào.</div>
               </div>

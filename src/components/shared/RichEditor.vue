@@ -1,8 +1,9 @@
 <script setup lang="ts">
 import { computed, defineAsyncComponent, nextTick, ref, useId, watch } from "vue";
-import { EditorContent, useEditor, type Editor } from "@tiptap/vue-3";
+import { EditorContent, mergeAttributes, useEditor, type Editor } from "@tiptap/vue-3";
 import StarterKit from "@tiptap/starter-kit";
 import Paragraph from "@tiptap/extension-paragraph";
+import { BulletList, OrderedList, ListItem } from "@tiptap/extension-list";
 import Image from "@tiptap/extension-image";
 import { isGuideMediaUrl, sanitizeGuideContent } from "../../utils/guideContent";
 import { GuideVideo } from "./guideVideo";
@@ -45,8 +46,35 @@ const linkInput = ref<HTMLInputElement | null>(null);
 const mediaInput = ref<HTMLInputElement | null>(null);
 const mediaPanelId = `${editorId}-media`;
 const TextBlock = Paragraph.extend({
-  parseHTML() { return [{ tag: "div" }, { tag: "p" }]; },
+  parseHTML() {
+    return [
+      { tag: "div", getAttrs: (element) => element.hasAttribute("data-guide-list") || element.hasAttribute("data-guide-list-item") ? false : null },
+      { tag: "p" },
+    ];
+  },
   renderHTML({ HTMLAttributes }) { return ["div", HTMLAttributes, 0]; },
+});
+const DivBulletList = BulletList.extend({
+  parseHTML() { return [{ tag: 'div[data-guide-list="bullet"]' }, { tag: "ul" }]; },
+  renderHTML({ HTMLAttributes }) {
+    return ["div", mergeAttributes(this.options.HTMLAttributes, HTMLAttributes, { "data-guide-list": "bullet" }), 0];
+  },
+});
+const DivOrderedList = OrderedList.extend({
+  parseHTML() { return [{ tag: 'div[data-guide-list="ordered"]' }, { tag: "ol" }]; },
+  renderHTML({ HTMLAttributes }) {
+    const start = Number(HTMLAttributes.start ?? 1);
+    return ["div", mergeAttributes(this.options.HTMLAttributes, HTMLAttributes, {
+      "data-guide-list": "ordered",
+      style: `--guide-list-start: ${Number.isSafeInteger(start) ? start - 1 : 0}`,
+    }), 0];
+  },
+});
+const DivListItem = ListItem.extend({
+  parseHTML() { return [{ tag: "div[data-guide-list-item]" }, { tag: "li" }]; },
+  renderHTML({ HTMLAttributes }) {
+    return ["div", mergeAttributes(this.options.HTMLAttributes, HTMLAttributes, { "data-guide-list-item": "" }), 0];
+  },
 });
 
 const editor = useEditor({
@@ -54,9 +82,15 @@ const editor = useEditor({
     StarterKit.configure({
       paragraph: false,
       heading: false,
+      bulletList: false,
+      orderedList: false,
+      listItem: false,
       link: { openOnClick: false, defaultProtocol: "https", HTMLAttributes: { target: null, rel: "noopener noreferrer" } },
     }),
     TextBlock,
+    DivBulletList,
+    DivOrderedList,
+    DivListItem,
     Image.configure({ allowBase64: false }),
     GuideVideo,
   ],

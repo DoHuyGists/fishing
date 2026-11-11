@@ -23,7 +23,7 @@ async function submit() {
   <details class="rounded-xl border border-[#cbd9c6] bg-white" :open="!farm.activePond?.fish.length">
     <summary class="cursor-pointer px-4 py-3 text-sm font-bold">+ Thả một lứa mới</summary>
     <form class="space-y-3 border-t border-[#cbd9c6] p-4 text-xs" @submit.prevent="submit">
-      <p class="m-0 leading-relaxed text-stone-600">Mỗi lứa một loài. Bạn có thể thả nhiều loài chung ao nếu còn sức chứa.</p>
+      <div class="m-0 leading-relaxed text-stone-600">Mỗi lứa một loài. Bạn có thể thả nhiều loài chung ao nếu còn sức chứa.</div>
       <label class="block">Loài cá
         <select v-model="speciesId" required class="mt-1 w-full rounded-lg border border-[#cbd9c6] bg-white p-2" :disabled="!farm.canMutate">
           <option value="">Chọn loài cá</option>
@@ -32,7 +32,7 @@ async function submit() {
           </option>
         </select>
       </label>
-      <p v-if="!farm.farm?.species.length" class="text-stone-500">Chưa có loài nào được mở nuôi.</p>
+      <div v-if="!farm.farm?.species.length" class="text-stone-500">Chưa có loài nào được mở nuôi.</div>
       <template v-if="rule">
         <div class="grid grid-cols-2 gap-2 rounded-lg bg-[#f5f9f0] p-3">
           <span>{{ rule.capacity_per_fish }} sức chứa/con</span><span>{{ formatDuration(rule.grow_seconds) }}/lứa</span>

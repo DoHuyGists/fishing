@@ -91,13 +91,13 @@ async function signOut() {
         aria-modal="true"
         aria-labelledby="sign-out-title"
       >
-        <h2 id="sign-out-title" class="m-0 text-lg font-bold text-[#263238]">Xác nhận đăng xuất</h2>
-        <p class="my-3 text-sm leading-relaxed text-gray-600">
+        <div id="sign-out-title" class="m-0 text-lg font-bold text-[#263238]">Xác nhận đăng xuất</div>
+        <div class="my-3 text-sm leading-relaxed text-gray-600">
           Bạn có chắc chắn muốn đăng xuất khỏi tài khoản này không?
-        </p>
-        <p v-if="signOutError" role="alert" class="mb-3 text-sm font-medium text-red-700">
+        </div>
+        <div v-if="signOutError" role="alert" class="mb-3 text-sm font-medium text-red-700">
           {{ signOutError }}
-        </p>
+        </div>
         <div class="flex justify-end gap-2">
           <button
             type="button"

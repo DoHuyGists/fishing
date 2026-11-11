@@ -244,7 +244,7 @@ onMounted(async () => {
     <!-- ── Loading ── -->
     <div v-if="teamStore.loading" class="flex flex-col items-center justify-center gap-3 py-12 text-[#5a7a5a]">
       <span class="block w-8 h-8 border-[3px] border-[#d1e7d1] border-t-[#3b7a57] rounded-full animate-spin" />
-      <p>Đang tải dữ liệu…</p>
+      <div>Đang tải dữ liệu…</div>
     </div>
 
     <template v-else>
@@ -262,12 +262,12 @@ onMounted(async () => {
           @join="handleJoin"
         />
         <div class="min-w-0">
-          <p
+          <div
             v-if="teamStore.error"
             class="mb-3 rounded-lg border border-[#f5c6c3] bg-[#fef0ef] px-3 py-2 text-[0.83rem] text-[#c0392b]"
           >
             {{ teamStore.error }}
-          </p>
+          </div>
           <MyTeamPanel
             :team="teamStore.myTeam"
             :members="teamStore.myTeamMembers"
@@ -306,10 +306,10 @@ onMounted(async () => {
           class="flex items-start justify-between gap-3 p-4 bg-linear-to-br from-[#e8f5e2] to-[#d4edcc] rounded-2xl border border-[#b8dab0]"
         >
           <div>
-            <h3 class="m-0 mb-1 text-[1.1rem] font-extrabold text-[#1a3a1a]">{{ teamStore.myTeam.name }}</h3>
-            <p v-if="teamStore.myTeam.description" class="m-0 mb-2 text-[0.82rem] text-[#556655]">
+            <div class="m-0 mb-1 text-[1.1rem] font-extrabold text-[#1a3a1a]">{{ teamStore.myTeam.name }}</div>
+            <div v-if="teamStore.myTeam.description" class="m-0 mb-2 text-[0.82rem] text-[#556655]">
               {{ teamStore.myTeam.description }}
-            </p>
+            </div>
             <span
               :class="[
                 'inline-block px-[10px] py-[2px] rounded-full text-[0.72rem] font-bold tracking-wide',
@@ -330,8 +330,8 @@ onMounted(async () => {
         </div>
 
         <!-- Member list -->
-        <ul class="list-none m-0 p-0 grid grid-cols-1 sm:grid-cols-5 gap-3">
-          <li
+        <div class="list-none m-0 p-0 grid grid-cols-1 sm:grid-cols-5 gap-3">
+          <div
             v-for="member in teamStore.myTeamMembers"
             :key="member.id"
             class="flex flex-col gap-3 p-4 bg-linear-to-br from-white to-[#f5faf2] border border-[#daefd4] rounded-2xl shadow-sm"
@@ -393,16 +393,16 @@ onMounted(async () => {
                 ✕
               </button>
             </div>
-          </li>
-        </ul>
+          </div>
+        </div>
 
         <!-- Error -->
-        <p
+        <div
           v-if="teamStore.error"
           class="m-0 text-[#c0392b] bg-[#fef0ef] border border-[#f5c6c3] rounded-lg px-3 py-2 text-[0.83rem]"
         >
           {{ teamStore.error }}
-        </p>
+        </div>
 
         <div class="grid grid-cols-1 sm:grid-cols-[1fr_180px] gap-2 mb-3">
           <input
@@ -458,7 +458,7 @@ onMounted(async () => {
       <!-- ════════════════════════════════════════════════════════ -->
       <div v-else-if="view === 'list'">
         <div class="flex items-center justify-between gap-3 mb-4">
-          <h3 class="m-0 text-base font-bold text-[#1a3a1a]">Nhóm đang hoạt động</h3>
+          <div class="m-0 text-base font-bold text-[#1a3a1a]">Nhóm đang hoạt động</div>
           <button
             class="inline-flex items-center justify-center gap-1.5 px-4 py-2 rounded-lg text-[0.87rem] font-bold bg-linear-to-br from-[#3b7a57] to-[#2e6644] text-white cursor-pointer hover:from-[#2e6644] hover:to-[#245236] active:scale-[0.97] transition-all"
             @click="view = 'create'"
@@ -467,23 +467,23 @@ onMounted(async () => {
           </button>
         </div>
 
-        <p
+        <div
           v-if="teamStore.error"
           class="m-0 text-[#c0392b] bg-[#fef0ef] border border-[#f5c6c3] rounded-lg px-3 py-2 text-[0.83rem]"
         >
           {{ teamStore.error }}
-        </p>
+        </div>
 
         <div v-if="teamStore.teams.length === 0" class="text-center py-10 px-5 text-[#778877] text-[0.9rem]">
-          <p>Chưa có nhóm nào. Hãy tạo nhóm đầu tiên!</p>
+          <div>Chưa có nhóm nào. Hãy tạo nhóm đầu tiên!</div>
         </div>
 
         <div v-else-if="filteredTeams.length === 0" class="text-center py-8 px-5 text-[#778877] text-[0.9rem]">
           Không tìm thấy tổ đội phù hợp.
         </div>
 
-        <ul v-else class="list-none m-0 p-0 flex flex-col gap-2.5">
-          <li
+        <div v-else class="list-none m-0 p-0 flex flex-col gap-2.5">
+          <div
             v-for="team in filteredTeams"
             :key="team.id"
             class="bg-[#f5f9f0] border border-[#cde0c9] rounded-xl overflow-hidden transition-shadow hover:shadow-[0_4px_16px_rgba(59,122,87,0.12)]"
@@ -500,8 +500,8 @@ onMounted(async () => {
                   {{ statusLabel[team.status] }}
                 </span>
               </div>
-              <p v-if="team.description" class="text-[0.82rem] text-[#556655] my-1 mb-2">{{ team.description }}</p>
-              <p class="text-[0.76rem] text-[#778877] my-1">
+              <div v-if="team.description" class="text-[0.82rem] text-[#556655] my-1 mb-2">{{ team.description }}</div>
+              <div class="text-[0.76rem] text-[#778877] my-1">
                 {{
                   team.join_type === "everyone"
                     ? "Ai cũng có thể tham gia"
@@ -509,7 +509,7 @@ onMounted(async () => {
                       ? "Chỉ bạn bè của trưởng nhóm"
                       : "Chỉ người được mời"
                 }}
-              </p>
+              </div>
               <div class="flex items-center justify-between gap-2 mt-2">
                 <span class="text-[0.78rem] text-[#778877]">Chỗ trống · max {{ team.max_members }}</span>
                 <button
@@ -527,8 +527,8 @@ onMounted(async () => {
                 >
               </div>
             </div>
-          </li>
-        </ul>
+          </div>
+        </div>
       </div>
 
       <!-- ════════════════════════════════════════════════════════ -->
@@ -542,9 +542,9 @@ onMounted(async () => {
           >
             ← Quay lại
           </button>
-          <h3 class="m-0 text-base font-bold text-[#1a3a1a]">
+          <div class="m-0 text-base font-bold text-[#1a3a1a]">
             {{ view === "edit" ? "Cập nhật tổ đội" : "Tạo nhóm mới" }}
-          </h3>
+          </div>
         </div>
 
         <form class="flex flex-col gap-4" @submit.prevent="view === 'edit' ? handleUpdate() : handleCreate()">
@@ -612,12 +612,12 @@ onMounted(async () => {
               <option value="invited">Chỉ người được mời</option>
             </select>
           </label>
-          <p
+          <div
             v-if="createError"
             class="m-0 text-[#c0392b] bg-[#fef0ef] border border-[#f5c6c3] rounded-lg px-3 py-2 text-[0.83rem]"
           >
             {{ createError }}
-          </p>
+          </div>
 
           <button
             type="submit"
@@ -660,12 +660,12 @@ onMounted(async () => {
         :on-second="confirmLeave"
         :on-dismiss="() => (showLeaveConfirm = false)"
       >
-        <p class="mb-2 text-[0.95rem] leading-normal text-[#374151]">
+        <div class="mb-2 text-[0.95rem] leading-normal text-[#374151]">
           Bạn sẽ rời khỏi nhóm hiện tại.
           <template v-if="isLeader && otherMembers.length > 0">
             Tiếp theo, bạn có thể chuyển quyền trưởng nhóm hoặc hủy nhóm.
           </template>
-        </p>
+        </div>
       </TwoOptionsModal>
 
       <div
@@ -678,10 +678,10 @@ onMounted(async () => {
           class="bg-white rounded-2xl px-6 py-7 max-w-[380px] w-full shadow-[0_20px_60px_rgba(0,0,0,0.22)]"
           style="animation: slideUp 0.2s ease"
         >
-          <h4 class="m-0 mb-2 text-[1.05rem] font-extrabold text-[#1a3a1a]">Bạn là trưởng nhóm</h4>
-          <p class="m-0 mb-4 text-[0.88rem] text-[#445544]">
+          <div class="m-0 mb-2 text-[1.05rem] font-extrabold text-[#1a3a1a]">Bạn là trưởng nhóm</div>
+          <div class="m-0 mb-4 text-[0.88rem] text-[#445544]">
             Còn {{ otherMembers.length }} thành viên trong nhóm. Chọn một tùy chọn:
-          </p>
+          </div>
 
           <label class="flex flex-col gap-1.5 text-[0.85rem] font-semibold text-[#2a4a2a]">
             Chuyển quyền cho
@@ -732,10 +732,10 @@ onMounted(async () => {
           class="bg-white rounded-2xl px-6 py-7 max-w-[380px] w-full shadow-[0_20px_60px_rgba(0,0,0,0.22)]"
           style="animation: slideUp 0.2s ease"
         >
-          <h4 class="m-0 mb-2 text-[1.05rem] font-extrabold text-[#1a3a1a]">Chuyển quyền trưởng nhóm</h4>
-          <p class="m-0 mb-4 text-[0.88rem] text-[#445544]">
+          <div class="m-0 mb-2 text-[1.05rem] font-extrabold text-[#1a3a1a]">Chuyển quyền trưởng nhóm</div>
+          <div class="m-0 mb-4 text-[0.88rem] text-[#445544]">
             Chuyển cho: <strong>{{ transferTarget.slice(0, 8) }}…</strong>
-          </p>
+          </div>
           <div class="flex flex-col gap-2 mt-4">
             <button
               class="inline-flex items-center justify-center gap-1.5 px-4 py-2 rounded-lg text-[0.87rem] font-bold bg-linear-to-br from-[#3b7a57] to-[#2e6644] text-white cursor-pointer hover:from-[#2e6644] hover:to-[#245236] active:scale-[0.97] disabled:opacity-55 disabled:cursor-not-allowed transition-all"
@@ -776,9 +776,9 @@ onMounted(async () => {
           }
         "
       >
-        <p class="mb-2 text-[0.95rem] leading-normal text-[#374151]">
+        <div class="mb-2 text-[0.95rem] leading-normal text-[#374151]">
           Thành viên <strong class="font-mono">{{ kickTargetId.slice(0, 8) }}…</strong> sẽ bị đưa khỏi tổ đội.
-        </p>
+        </div>
       </TwoOptionsModal>
     </Teleport>
   </Modal>

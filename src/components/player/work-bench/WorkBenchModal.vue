@@ -102,8 +102,8 @@ const guideSteps = [
       <aside id="workbench-palette" class="flex min-h-0 flex-col rounded-lg border border-[#cbd9c6] bg-[#f5f9f0] p-3">
         <div class="mb-3 text-sm font-bold">Vật phẩm trong túi</div>
         <input v-model="searchQuery" type="search" placeholder="Tìm vật phẩm..." class="mb-3 w-full rounded-md border border-[#cbd9c6] bg-white px-3 py-2 text-xs outline-none focus:border-emerald-700" />
-        <p v-if="isLoading" class="py-6 text-center text-xs opacity-60">Đang tải dữ liệu...</p>
-        <p v-else-if="errorMessage" class="rounded-md border border-red-200 bg-red-50 p-2 text-xs text-red-700">{{ errorMessage }}</p>
+        <div v-if="isLoading" class="py-6 text-center text-xs opacity-60">Đang tải dữ liệu...</div>
+        <div v-else-if="errorMessage" class="rounded-md border border-red-200 bg-red-50 p-2 text-xs text-red-700">{{ errorMessage }}</div>
         <div v-else class="grid max-h-[min(65vh,44rem)] grid-cols-2 content-start gap-2 overflow-y-auto pr-1 lg:min-h-0 lg:max-h-none lg:flex-1">
           <div v-for="item in filteredInventory" :key="item.id" class="flex min-w-0 flex-col items-center gap-1 rounded-md border border-[#cbd9c6] bg-white p-2 text-center">
             <span class="grid size-14 place-items-center overflow-hidden rounded-lg bg-[#f5f9f0] text-xl">
@@ -113,14 +113,14 @@ const guideSteps = [
             <span class="line-clamp-2 text-xs font-bold" :title="item.name">{{ item.name }}</span>
             <span class="text-[10px] opacity-70">×{{ item.quantity }}</span>
           </div>
-          <p v-if="!filteredInventory.length" class="col-span-2 py-4 text-center text-xs opacity-60">Không có vật phẩm.</p>
+          <div v-if="!filteredInventory.length" class="col-span-2 py-4 text-center text-xs opacity-60">Không có vật phẩm.</div>
         </div>
       </aside>
 
       <div class="grid min-h-0 min-w-0 gap-4 md:grid-cols-[minmax(12rem,0.7fr)_minmax(0,1.3fr)]">
         <aside id="workbench-blueprints" class="flex min-h-0 flex-col rounded-lg border border-[#cbd9c6] bg-[#f5f9f0] p-3">
           <div class="mb-3 text-sm font-bold">Bản vẽ</div>
-          <p v-if="blueprintStore.loading" class="py-4 text-center text-xs opacity-60">Đang tải bản vẽ...</p>
+          <div v-if="blueprintStore.loading" class="py-4 text-center text-xs opacity-60">Đang tải bản vẽ...</div>
           <div v-else class="flex max-h-[min(65vh,44rem)] flex-col gap-2 overflow-y-auto lg:min-h-0 lg:max-h-none lg:flex-1">
             <div v-for="blueprint in blueprintStore.blueprints" :key="blueprint.id">
               <button type="button" class="flex w-full items-center gap-2 rounded-md border p-2 text-left transition" :class="selectedBlueprintId === blueprint.id ? 'border-emerald-700 bg-emerald-100' : 'border-[#cbd9c6] bg-white hover:bg-[#e7ecda]'" @click="selectBlueprint(blueprint)">
@@ -143,12 +143,12 @@ const guideSteps = [
                 <span v-else>{{ resultItem?.icon || resultItem?.name.charAt(0) }}</span>
                 <span class="absolute -right-2 -top-2 rounded-full bg-emerald-700 px-2 py-1 text-xs font-bold text-white">×{{ selectedBlueprint.resultQuantity * craftQuantity }}</span>
               </span>
-              <h3 class="mt-2 text-base font-bold">{{ resultItem?.name ?? "Vật phẩm chưa xác định" }}</h3>
-              <p class="text-xs opacity-70">{{ resultItem?.information }}</p>
+              <div class="mt-2 text-base font-bold">{{ resultItem?.name ?? "Vật phẩm chưa xác định" }}</div>
+              <div class="text-xs opacity-70">{{ resultItem?.information }}</div>
             </div>
 
             <div class="my-4 flex flex-wrap items-center justify-between gap-3">
-              <h4 class="text-sm font-bold">Nguyên liệu cần thiết</h4>
+              <div class="text-sm font-bold">Nguyên liệu cần thiết</div>
               <div class="flex items-center gap-2">
                 <span class="text-xs">Số lần chế tạo</span>
                 <button type="button" aria-label="Giảm số lần chế tạo" class="grid size-8 place-items-center rounded border border-[#cbd9c6] bg-white font-bold disabled:opacity-40" :disabled="craftQuantity <= 1" @click="craftQuantity = Math.max(1, craftQuantity - 1)">−</button>
@@ -167,9 +167,9 @@ const guideSteps = [
                 <span class="line-clamp-2 text-xs font-bold">{{ material.item?.name ?? "Nguyên liệu" }}</span>
                 <span class="text-[10px]" :class="material.owned >= material.required ? 'text-emerald-700' : 'text-red-600'">Có {{ material.owned }}</span>
               </div>
-              <p v-if="!materials.length" class="col-span-full py-5 text-center text-xs opacity-60">Bản vẽ này chưa khai báo nguyên liệu.</p>
+              <div v-if="!materials.length" class="col-span-full py-5 text-center text-xs opacity-60">Bản vẽ này chưa khai báo nguyên liệu.</div>
             </div>
-            <p class="mt-4 text-center text-xs font-semibold" :class="canCraft ? 'text-emerald-700' : 'text-red-600'">{{ !quantityValid ? 'Nhập số nguyên từ 1 đến 1000.' : currencyStore.error || (currencyStore.cash < craftCost ? 'Không đủ tiền chế tạo.' : canCraft ? `Đủ nguyên liệu · ${craftCost} vàng` : 'Không đủ nguyên liệu để chế tạo số lượng đã chọn.') }}</p>
+            <div class="mt-4 text-center text-xs font-semibold" :class="canCraft ? 'text-emerald-700' : 'text-red-600'">{{ !quantityValid ? 'Nhập số nguyên từ 1 đến 1000.' : currencyStore.error || (currencyStore.cash < craftCost ? 'Không đủ tiền chế tạo.' : canCraft ? `Đủ nguyên liệu · ${craftCost} vàng` : 'Không đủ nguyên liệu để chế tạo số lượng đã chọn.') }}</div>
             <button type="button" class="mt-3 w-full rounded-md bg-emerald-700 px-4 py-2 text-sm font-bold text-white disabled:cursor-not-allowed disabled:opacity-50" :disabled="!canCraft || isLoading" @click="craftSelectedBlueprint">{{ isLoading ? "Đang chế tạo..." : "Chế tạo" }}</button>
           </template>
           <div v-else class="grid h-full min-h-64 place-items-center text-center text-sm opacity-60">Chọn một bản vẽ để xem công thức chế tạo.</div>

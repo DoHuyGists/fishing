@@ -12,11 +12,11 @@
 
           <section aria-labelledby="donation-instructions" class="min-w-0 rounded-xl border border-[#cbd9c6] bg-white p-4 sm:p-5">
             <div id="donation-instructions" role="heading" aria-level="2" class="text-lg font-bold">Cách ủng hộ</div>
-            <ol class="mt-4 list-decimal space-y-4 pl-5 text-sm leading-6 marker:font-semibold marker:text-[#52634f]">
-              <li>Mở ứng dụng ngân hàng và quét mã QR trong cửa sổ này.</li>
-              <li>Nếu đang dùng điện thoại, tải ảnh QR rồi chọn ảnh trong mục quét QR của ứng dụng ngân hàng.</li>
-              <li>Kiểm tra thông tin người nhận, nhập số tiền bạn muốn ủng hộ rồi xác nhận chuyển khoản.</li>
-            </ol>
+            <div class="mt-4 space-y-4 text-sm leading-6">
+              <div>1. Mở ứng dụng ngân hàng và quét mã QR trong cửa sổ này.</div>
+              <div>2. Nếu đang dùng điện thoại, tải ảnh QR rồi chọn ảnh trong mục quét QR của ứng dụng ngân hàng.</div>
+              <div>3. Kiểm tra thông tin người nhận, nhập số tiền bạn muốn ủng hộ rồi xác nhận chuyển khoản.</div>
+            </div>
           </section>
 
           <div class="space-y-2 text-sm leading-6">

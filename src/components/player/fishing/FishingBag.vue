@@ -78,7 +78,7 @@ function getRewardEffect(variant: "NORMAL" | "GOLDEN" | "MUTATED") {
             class="flex justify-between items-start px-5 pt-[19px] pb-3.5 border-b border-[rgba(223,241,207,0.14)]"
           >
             <div>
-              <h2 id="bag-title" class="m-0 text-xl">Thành quả câu được</h2>
+              <div id="bag-title" class="m-0 text-xl">Thành quả câu được</div>
             </div>
             <button
               type="button"
@@ -89,9 +89,9 @@ function getRewardEffect(variant: "NORMAL" | "GOLDEN" | "MUTATED") {
               ×
             </button>
           </header>
-          <p v-if="!store.inventory.length" class="py-[35px] px-5 text-[#b7cfb9] text-center text-[13px]">
+          <div v-if="!store.inventory.length" class="py-[35px] px-5 text-[#b7cfb9] text-center text-[13px]">
             Túi còn trống. Hãy ra hồ câu một con cá!
-          </p>
+          </div>
           <template v-else>
             <div class="flex justify-end px-[13px] pt-[13px]">
               <div
@@ -117,8 +117,8 @@ function getRewardEffect(variant: "NORMAL" | "GOLDEN" | "MUTATED") {
                 </button>
               </div>
             </div>
-            <ul v-if="viewMode === 'group'" class="grid gap-[9px] m-0 p-[13px] list-none">
-              <li
+            <div v-if="viewMode === 'group'" class="grid gap-[9px] m-0 p-[13px] list-none">
+              <div
                 v-for="group in groupedInventory"
                 :key="group.name"
                 class="p-2 border rounded-xl border-[rgba(223,241,207,0.15)]"
@@ -146,11 +146,11 @@ function getRewardEffect(variant: "NORMAL" | "GOLDEN" | "MUTATED") {
                     </button>
                   </div>
                 </div>
-                <ul
+                <div
                   v-if="expandedGroup === group.name"
                   class="grid gap-2 m-0 mt-2 pt-2 p-0 list-none border-t border-[rgba(223,241,207,0.14)]"
                 >
-                  <li
+                  <div
                     v-for="fish in group.fishes"
                     :key="fish.id"
                     :class="`flex items-center justify-between gap-3 p-2 border ${fish.isShiny ? getRewardEffect(fish.variantType) : ''} rounded-lg border-[rgba(223,241,207,0.15)]`"
@@ -170,12 +170,12 @@ function getRewardEffect(variant: "NORMAL" | "GOLDEN" | "MUTATED") {
                     >
                       Thả
                     </button>
-                  </li>
-                </ul>
-              </li>
-            </ul>
-            <ul v-else class="grid gap-[9px] m-0 p-[13px] list-none" :class="viewMode === 'grid' ? 'grid-cols-2' : ''">
-              <li
+                  </div>
+                </div>
+              </div>
+            </div>
+            <div v-else class="grid gap-[9px] m-0 p-[13px] list-none" :class="viewMode === 'grid' ? 'grid-cols-2' : ''">
+              <div
                 v-for="fish in store.inventory"
                 :key="fish.id"
                 :class="[
@@ -207,8 +207,8 @@ function getRewardEffect(variant: "NORMAL" | "GOLDEN" | "MUTATED") {
                 >
                   Thả
                 </button>
-              </li>
-            </ul>
+              </div>
+            </div>
           </template>
         </section>
       </div>
@@ -228,12 +228,12 @@ function getRewardEffect(variant: "NORMAL" | "GOLDEN" | "MUTATED") {
           aria-modal="true"
           aria-labelledby="confirm-release-title"
         >
-          <h3 id="confirm-release-title" class="m-0 text-lg font-bold text-[#e8bd62]">Xác nhận thả cá</h3>
-          <p class="my-4 text-sm text-[#c8dccb] leading-relaxed">
+          <div id="confirm-release-title" class="m-0 text-lg font-bold text-[#e8bd62]">Xác nhận thả cá</div>
+          <div class="my-4 text-sm text-[#c8dccb] leading-relaxed">
             Bạn có chắc chắn muốn thả <strong class="text-white">{{ selectedFishToRelease.name }}</strong> ({{
               selectedFishToRelease.weight
             }}) về lại hồ không?
-          </p>
+          </div>
           <div class="flex justify-center gap-3 mt-5">
             <button
               type="button"

@@ -112,15 +112,15 @@ const displayedGroups = computed(() =>
     </header>
 
     <div class="flex-1 p-4">
-      <p v-if="pagedItems.length === 0" class="py-12 text-center text-sm text-slate-500">
+      <div v-if="pagedItems.length === 0" class="py-12 text-center text-sm text-slate-500">
         {{ inventoryStore.items.length === 0 ? "Kho đồ đang trống." : "Không có vật phẩm nào khớp với tìm kiếm." }}
-      </p>
+      </div>
 
       <div v-for="group in displayedGroups" :key="group.category" class="mb-4 last:mb-0">
-        <h3 v-if="viewMode === 'grouped'" class="mb-2 text-sm font-semibold text-slate-700">
+        <div v-if="viewMode === 'grouped'" class="mb-2 text-sm font-semibold text-slate-700">
           {{ categoryName(group.category) || "Khác" }}
           <span class="font-normal text-slate-500">({{ group.items.length }})</span>
-        </h3>
+        </div>
         <div :class="viewMode === 'list' ? 'flex flex-col gap-2' : 'grid grid-cols-2 gap-3 sm:grid-cols-3 xl:grid-cols-4'">
         <div v-for="item in group.items" :key="item.id" :class="[
           'relative cursor-pointer rounded-md border bg-white transition',

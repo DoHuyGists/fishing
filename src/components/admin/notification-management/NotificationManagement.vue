@@ -59,13 +59,13 @@ onMounted(() => store.fetchRows());
       </button>
     </div>
     <main class="min-h-0 flex-1 overflow-auto p-4 md:p-6">
-      <p
+      <div
         v-if="store.error"
         role="alert"
         class="mb-4 rounded-lg border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-700"
       >
         {{ store.error }}
-      </p>
+      </div>
       <div v-if="store.loading" class="grid min-h-64 place-items-center text-sm text-gray-500">
         Đang tải thông báo...
       </div>
@@ -95,7 +95,7 @@ onMounted(() => store.fetchRows());
             >
               <td class="max-w-64 px-4 py-3 font-bold text-gray-800">{{ item.title }}</td>
               <td class="max-w-96 px-4 py-3">
-                <p class="line-clamp-2 whitespace-pre-wrap text-gray-600">{{ item.body }}</p>
+                <div class="line-clamp-2 whitespace-pre-wrap text-gray-600">{{ item.body }}</div>
               </td>
               <td v-if="store.tab === 'personal'" class="max-w-56 break-all px-4 py-3 font-mono text-xs text-gray-500">
                 {{ item.user_id }}
@@ -131,8 +131,8 @@ onMounted(() => store.fetchRows());
     <NotificationForm />
     <div v-if="store.deleting" class="fixed inset-0 z-40 grid place-items-center bg-black/45 p-4">
       <div class="w-full max-w-sm rounded-xl bg-white p-5 shadow-xl">
-        <h3 class="m-0 text-base font-extrabold text-gray-800">Xóa thông báo?</h3>
-        <p class="my-3 text-sm text-gray-600">{{ store.deleting.title }}</p>
+        <div class="m-0 text-base font-extrabold text-gray-800">Xóa thông báo?</div>
+        <div class="my-3 text-sm text-gray-600">{{ store.deleting.title }}</div>
         <div class="flex justify-end gap-2">
           <button
             type="button"

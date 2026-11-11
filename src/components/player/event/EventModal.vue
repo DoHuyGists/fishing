@@ -69,7 +69,7 @@ onMounted(loadSchedules);
       <div v-if="isLoading" class="grid flex-1 place-items-center text-sm text-emerald-900/70">Đang tải sự kiện...</div>
       <div v-else-if="loadError" class="grid flex-1 place-items-center text-center text-sm text-red-700">
         <div>
-          <p>{{ loadError }}</p>
+          <div>{{ loadError }}</div>
           <button type="button" class="mt-2 font-bold underline" @click="loadSchedules">Thử lại</button>
         </div>
       </div>
@@ -80,13 +80,13 @@ onMounted(loadSchedules);
         <!-- Danh sách sự kiện -->
         <section class="flex min-h-0 flex-col border-b border-emerald-950/10 md:border-b-0 md:border-r">
           <div class="flex items-center justify-between border-b border-emerald-950/10 px-5 py-3 sm:px-6">
-            <h3 class="m-0 text-sm font-bold">Danh sách sự kiện</h3>
+            <div class="m-0 text-sm font-bold">Danh sách sự kiện</div>
             <span class="text-xs text-emerald-900/60">{{ activeSchedules.length }} sự kiện</span>
           </div>
           <div class="grow h-0 space-y-2 overflow-y-scroll p-3 sm:p-4">
-            <p v-if="!activeSchedules.length" class="py-8 text-center text-sm text-emerald-900/55">
+            <div v-if="!activeSchedules.length" class="py-8 text-center text-sm text-emerald-900/55">
               Hiện không có sự kiện nào.
-            </p>
+            </div>
             <button
               v-for="item in activeSchedules"
               :key="item.id"
@@ -138,7 +138,7 @@ onMounted(loadSchedules);
               class="mb-5 h-56 w-full rounded-xl border border-emerald-950/10 object-cover sm:h-72"
               draggable="false"
             />
-            <p class="m-0 text-[10px] font-extrabold uppercase tracking-[0.14em] text-emerald-800">
+            <div class="m-0 text-[10px] font-extrabold uppercase tracking-[0.14em] text-emerald-800">
               {{
                 scheduleStatus(selectedSchedule) === "ongoing"
                   ? "Đang diễn ra"
@@ -146,11 +146,11 @@ onMounted(loadSchedules);
                     ? "Sắp diễn ra"
                     : "Đã kết thúc"
               }}
-            </p>
-            <h1 class="m-0 mt-2 flex items-center gap-2 text-2xl font-bold sm:text-3xl">
+            </div>
+            <div class="m-0 mt-2 flex items-center gap-2 text-2xl font-bold sm:text-3xl">
               <span>{{ "🎉" }}</span>
               <span>{{ selectedSchedule.eventName || "Sự kiện" }}</span>
-            </h1>
+            </div>
             <div class="mt-3 flex flex-wrap items-center gap-x-4 gap-y-1 text-xs text-emerald-900/60">
               <span>🗓️ {{ formatDate(selectedSchedule.start) }} — {{ formatDate(selectedSchedule.end) }}</span>
               <span>👁️ {{ selectedSchedule.viewCount }} lượt xem</span>

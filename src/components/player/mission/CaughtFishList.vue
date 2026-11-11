@@ -62,7 +62,7 @@ function selectionClass(caught: CaughtFish) {
 <template>
   <section class="flex h-full flex-col border-b border-emerald-950/10 md:border-b-0 md:border-r">
     <div class="flex flex-wrap items-center justify-between gap-2 border-b border-emerald-950/10 px-5 py-3 sm:px-6">
-      <h3 class="m-0 text-sm font-bold">Cá đã câu</h3>
+      <div class="m-0 text-sm font-bold">Cá đã câu</div>
       <span class="text-xs text-emerald-900/60">{{ caughtFishes.length }} con</span>
       <div
         class="flex rounded-md border border-[#cbd9c6] p-0.5 text-xs font-bold"
@@ -99,9 +99,9 @@ function selectionClass(caught: CaughtFish) {
       </div>
     </div>
 
-    <p v-if="!caughtFishes.length" class="py-8 text-center text-sm text-emerald-900/55">
+    <div v-if="!caughtFishes.length" class="py-8 text-center text-sm text-emerald-900/55">
       Bạn chưa có cá trong bộ sưu tập.
-    </p>
+    </div>
     <div v-else class="h-0 grow overflow-y-auto p-3 sm:p-4">
       <div v-if="viewMode === 'species'" class="flex flex-col gap-2">
         <section
@@ -126,11 +126,11 @@ function selectionClass(caught: CaughtFish) {
             >
             <span aria-hidden="true" class="text-sm">{{ expandedSpecies.has(group.key) ? "▴" : "▾" }}</span>
           </button>
-          <ul
+          <div
             v-if="expandedSpecies.has(group.key)"
             class="m-0 flex max-h-48 list-none flex-col gap-1 overflow-y-auto border-t border-[#cbd9c6] p-2"
           >
-            <li v-for="caught in group.fishes" :key="caught.id">
+            <div v-for="caught in group.fishes" :key="caught.id">
               <button
                 type="button"
                 class="flex w-full items-center gap-3 rounded-lg border p-2 text-left transition-colors disabled:cursor-not-allowed"
@@ -154,8 +154,8 @@ function selectionClass(caught: CaughtFish) {
                   >Phù hợp</span
                 >
               </button>
-            </li>
-          </ul>
+            </div>
+          </div>
         </section>
       </div>
 

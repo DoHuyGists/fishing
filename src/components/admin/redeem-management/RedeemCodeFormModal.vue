@@ -9,10 +9,10 @@ const store = useAdminRedeemCodeStore();
     <aside class="ml-auto flex h-full w-full max-w-xl flex-col border-l border-gray-200 bg-white shadow-xl">
       <div class="flex shrink-0 items-center justify-between border-b border-gray-200 px-5 py-4">
         <div>
-          <h3 class="m-0 text-base font-extrabold text-[#153221]">
+          <div class="m-0 text-base font-extrabold text-[#153221]">
             {{ store.form.id ? "Chỉnh sửa mã" : "Thêm mã đổi thưởng" }}
-          </h3>
-          <p class="m-0 mt-1 text-xs text-gray-500">Mã đổi xu cho người chơi</p>
+          </div>
+          <div class="m-0 mt-1 text-xs text-gray-500">Mã đổi xu cho người chơi</div>
         </div>
         <button
           type="button"

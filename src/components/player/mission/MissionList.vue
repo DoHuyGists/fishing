@@ -24,11 +24,11 @@ const emit = defineEmits<{
 <template>
   <section class="min-h-0 flex flex-col">
     <div class="px-5 py-3 sm:px-6 border-b border-emerald-950/10 flex items-center justify-between">
-      <h3 class="m-0 text-sm font-bold">Nhiệm vụ</h3>
+      <div class="m-0 text-sm font-bold">Nhiệm vụ</div>
       <span class="text-xs text-emerald-900/60">{{ missions.length }} nhiệm vụ</span>
     </div>
     <div class="flex-1 overflow-y-auto p-4 sm:p-5 space-y-4">
-      <p v-if="!missions.length" class="py-8 text-center text-sm text-emerald-900/55">Hiện không có nhiệm vụ.</p>
+      <div v-if="!missions.length" class="py-8 text-center text-sm text-emerald-900/55">Hiện không có nhiệm vụ.</div>
       <button
         v-for="mission in missions"
         :key="mission.id"
@@ -51,7 +51,7 @@ const emit = defineEmits<{
       </button>
 
       <div v-if="selectedMission" class="pt-1">
-        <h4 class="m-0 mb-2 text-xs font-extrabold uppercase tracking-wide text-emerald-900/65">Cá cần có</h4>
+        <div class="m-0 mb-2 text-xs font-extrabold uppercase tracking-wide text-emerald-900/65">Cá cần có</div>
         <div class="space-y-2">
           <div
             v-for="(fish, index) in selectedMission.content"
@@ -76,9 +76,9 @@ const emit = defineEmits<{
       </div>
     </div>
     <footer class="px-4 py-3 sm:px-5 border-t border-emerald-950/10 bg-white/40">
-      <p v-if="statusMessage" class="m-0 mb-2 text-xs" :class="statusIsError ? 'text-red-700' : 'text-emerald-800'">
+      <div v-if="statusMessage" class="m-0 mb-2 text-xs" :class="statusIsError ? 'text-red-700' : 'text-emerald-800'">
         {{ statusMessage }}
-      </p>
+      </div>
       <div class="flex items-center justify-between gap-3">
         <span class="text-xs text-emerald-900/65">Đã chọn {{ selectedCaughtIds.length }} cá</span>
         <button

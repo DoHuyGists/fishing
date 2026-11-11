@@ -71,8 +71,8 @@ function submit() {
 		<aside class="ml-auto flex h-full w-full max-w-xl flex-col border-l border-[#cbd9c6] bg-[#f5f9f0] shadow-xl text-[#24352a]">
 			<div class="flex shrink-0 items-center justify-between border-b border-[#cbd9c6] px-5 py-4">
 				<div>
-					<h3 class="m-0 text-base font-extrabold">{{ item ? 'Chỉnh sửa vật phẩm' : 'Thêm vật phẩm' }}</h3>
-					<p class="m-0 mt-1 text-xs text-gray-500">Thông tin trong bảng items</p>
+					<div class="m-0 text-base font-extrabold">{{ item ? 'Chỉnh sửa vật phẩm' : 'Thêm vật phẩm' }}</div>
+					<div class="m-0 mt-1 text-xs text-gray-500">Thông tin trong bảng items</div>
 				</div>
 				<button type="button" aria-label="Đóng biểu mẫu" class="grid size-8 place-items-center rounded-md text-xl text-gray-500 hover:bg-white" @click="emit('close')">&times;</button>
 			</div>

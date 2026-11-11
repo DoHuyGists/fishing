@@ -156,7 +156,7 @@ async function handleRelease() {
       <!-- Header  -->
       <div class="flex items-center justify-between gap-2 pb-3">
         <div class="flex items-center gap-2">
-          <h2 class="m-0 text-base font-bold text-[#263238]">Tổng số cá</h2>
+          <div class="m-0 text-base font-bold text-[#263238]">Tổng số cá</div>
           <span class="px-2 py-0.5 rounded-full bg-[#153221] text-white text-[11px] font-extrabold shadow-xs">
             {{ caughtStore.caughtFishes.length }}
           </span>
@@ -283,9 +283,9 @@ async function handleRelease() {
             <div class="min-w-0 flex-1 p-2">
               <div class="flex items-start justify-between gap-2">
                 <div class="min-w-0">
-                  <h3 class="m-0 truncate font-bold text-xs text-[#263238]">
+                  <div class="m-0 truncate font-bold text-xs text-[#263238]">
                     {{ group.fishes[0].species?.name || "Cá chưa rõ tên" }}
-                  </h3>
+                  </div>
                   <span
                     v-if="group.fishes[0].species?.rarity"
                     class="inline-block mt-1 px-1.5 py-1 text-[9px] font-extrabold rounded border uppercase"

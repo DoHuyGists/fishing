@@ -192,15 +192,15 @@ function zoomTo(k: number) {
           </template>
         </WorldMap>
       </div>
-      <p v-if="fogEnabled && countryStore.unlockedError" class="text-xs text-red-700" role="alert">
+      <div v-if="fogEnabled && countryStore.unlockedError" class="text-xs text-red-700" role="alert">
         {{ countryStore.unlockedError }}
         <button type="button" class="ml-1 underline cursor-pointer" @click="countryStore.fetchMyUnlockedCountries()">
           Thử lại
         </button>
-      </p>
-      <p v-else-if="fogEnabled && countryStore.isLoadingUnlocked" class="text-xs text-[#24352a]" role="status">
+      </div>
+      <div v-else-if="fogEnabled && countryStore.isLoadingUnlocked" class="text-xs text-[#24352a]" role="status">
         Đang tải quốc gia đã mở khóa...
-      </p>
+      </div>
       <div class="slide-fade-in from-bottom-right flex gap-2">
         <button @click="zoomTo(3)" class="border border-gray-300 rounded-md px-3">3x</button>
         <button @click="zoomTo(6)" class="border border-gray-300 rounded-md px-3">6x</button>

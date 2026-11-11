@@ -27,7 +27,7 @@ onMounted(() => guideStore.loadGuides());
   >
     <div class="flex h-full min-h-0 flex-col">
     <div class="mb-3 flex shrink-0 flex-wrap items-center justify-between gap-3 rounded-xl border border-[#cbd9c6] bg-[#f5f9f0] p-3 text-[#24352a]">
-      <p class="text-sm">Xem hướng dẫn từng bước ngay tại sảnh.</p>
+      <div class="text-sm">Xem hướng dẫn từng bước ngay tại sảnh.</div>
       <button
         type="button"
         class="shrink-0 rounded-xl border border-[#cbd9c6] bg-white px-3 py-1.5 text-xs font-bold cursor-pointer transition-colors hover:border-[#70a77e] hover:bg-[#eaf5e8]"
@@ -43,12 +43,12 @@ onMounted(() => guideStore.loadGuides());
       :aria-busy="guideStore.loading"
       class="flex min-h-0 flex-1 flex-col overflow-hidden rounded-xl border border-[#cbd9c6] bg-[#f5f9f0] text-[#24352a]"
     >
-      <p v-if="guideStore.loading" role="status" class="p-5 text-sm">Đang tải hướng dẫn...</p>
+      <div v-if="guideStore.loading" role="status" class="p-5 text-sm">Đang tải hướng dẫn...</div>
       <div v-else-if="guideStore.loadError" role="alert" class="p-5 text-sm text-red-700">
-        <p>{{ guideStore.loadError }}</p>
+        <div>{{ guideStore.loadError }}</div>
         <button type="button" class="mt-2 font-bold underline" @click="guideStore.loadGuides">Thử lại</button>
       </div>
-      <p v-else-if="!guideStore.guides.length" class="p-5 text-sm">Chưa có hướng dẫn nào.</p>
+      <div v-else-if="!guideStore.guides.length" class="p-5 text-sm">Chưa có hướng dẫn nào.</div>
       <div v-else class="flex min-h-0 flex-1 flex-col sm:flex-row">
         <nav
           aria-label="Danh sách chỉ dẫn"
@@ -72,7 +72,7 @@ onMounted(() => guideStore.loadGuides());
             <div class="break-words text-xl font-bold">{{ guideStore.selectedGuide.title }}</div>
             <RichTextContent class="mt-4" :content="guideStore.selectedGuide.content" />
           </template>
-          <p v-else class="text-sm">Chọn một chỉ dẫn để xem nội dung.</p>
+          <div v-else class="text-sm">Chọn một chỉ dẫn để xem nội dung.</div>
         </article>
       </div>
     </section>

@@ -14,7 +14,7 @@ const html = computed(() => sanitizeGuideContent(props.content));
 .rich-text-content :deep(div) { min-height: 1.75em; }
 .rich-text-content :deep(strong), .rich-text-content :deep(b) { font-weight: 700; }
 .rich-text-content :deep(em), .rich-text-content :deep(i) { font-style: italic; }
-.rich-text-content :deep(li > div) { margin: 0; }
+.rich-text-content :deep([data-guide-list-item] > div) { margin: 0; }
 .rich-text-content :deep(pre) { overflow-x: auto; white-space: pre; border-radius: 0.5rem; background: #eef2e9; padding: 0.75rem; }
 .rich-text-content :deep(img) { display: block; max-width: 100%; height: auto; margin: 0.75rem 0; border-radius: 0.5rem; }
 .rich-text-content :deep(video) { display: block; width: 100%; max-height: 70dvh; margin: 0.75rem 0; border-radius: 0.5rem; background: #000; }

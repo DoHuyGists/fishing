@@ -242,13 +242,13 @@ onMounted(() => speciesStore.fetchAll());
         </div>
         <div v-else class="min-h-0 flex-1 space-y-5 overflow-auto">
           <section v-for="group in speciesGroups" :key="group.location" class="space-y-3">
-            <h3
+            <div
               v-if="viewMode === 'grouped'"
               class="m-0 flex items-center gap-2 rounded-lg border border-[#cbd9c6] bg-[#f5f9f0] px-4 py-3 text-sm font-bold text-[#24352a]"
             >
               <span class="min-w-0 break-words">{{ group.location || "Chưa có khu vực" }}</span>
               <span class="shrink-0 text-xs font-normal">({{ group.species.length }} loài)</span>
-            </h3>
+            </div>
             <div class="grid grid-cols-[repeat(auto-fit,minmax(min(100%,18rem),1fr))] gap-4">
               <article
                 v-for="item in group.species"
@@ -261,10 +261,10 @@ onMounted(() => speciesStore.fetchAll());
                 </div>
                 <div class="flex flex-1 flex-col gap-3 p-4">
                   <div>
-                    <h4 class="m-0 break-words text-sm font-bold text-[#24352a]">{{ item.name }}</h4>
-                    <p class="m-0 mt-1 line-clamp-2 text-xs text-gray-500" :title="item.information || ''">
+                    <div class="m-0 break-words text-sm font-bold text-[#24352a]">{{ item.name }}</div>
+                    <div class="m-0 mt-1 line-clamp-2 text-xs text-gray-500" :title="item.information || ''">
                       {{ item.information || "Chưa có mô tả" }}
-                    </p>
+                    </div>
                   </div>
                   <dl class="m-0 grid grid-cols-2 gap-3 text-xs">
                     <div class="min-w-0"><dt class="text-gray-500">Khu vực</dt><dd class="m-0 mt-1 break-words text-[#24352a]">{{ item.location || "—" }}</dd></div>
@@ -296,10 +296,10 @@ onMounted(() => speciesStore.fetchAll());
 
     <div v-if="confirmDeleteId" class="fixed inset-0 z-40 grid place-items-center bg-black/45 p-4">
       <div class="w-full max-w-sm rounded-xl bg-white p-5 shadow-xl">
-        <h3 class="m-0 text-base font-extrabold text-gray-800">Xác nhận xoá loài cá?</h3>
-        <p class="my-3 text-sm text-gray-600">
+        <div class="m-0 text-base font-extrabold text-gray-800">Xác nhận xoá loài cá?</div>
+        <div class="my-3 text-sm text-gray-600">
           Thao tác này không thể hoàn tác. Các dữ liệu liên quan có thể bị ràng buộc bởi cơ sở dữ liệu.
-        </p>
+        </div>
         <div class="flex justify-end gap-2">
           <button
             type="button"

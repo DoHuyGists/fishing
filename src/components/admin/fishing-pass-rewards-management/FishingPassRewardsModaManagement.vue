@@ -51,14 +51,14 @@ onMounted(() => store.fetchAll());
     @keydown.esc="emit('close')"
   >
       <div v-if="formOpen" class="overflow-y-auto p-5 sm:p-7">
-        <h3 class="mb-4 text-base font-bold">{{ editing ? "Sửa phần thưởng" : "Tạo phần thưởng" }}</h3>
-        <p v-if="store.error" class="mb-3 rounded-lg bg-red-50 p-3 text-sm text-red-700">{{ store.error }}</p>
-        <p
+        <div class="mb-4 text-base font-bold">{{ editing ? "Sửa phần thưởng" : "Tạo phần thưởng" }}</div>
+        <div v-if="store.error" class="mb-3 rounded-lg bg-red-50 p-3 text-sm text-red-700">{{ store.error }}</div>
+        <div
           v-if="!store.passes.length || !store.items.length"
           class="mb-3 rounded-lg bg-amber-50 p-3 text-sm text-amber-800"
         >
           Cần có ít nhất một vé câu và một vật phẩm trước khi tạo phần thưởng.
-        </p>
+        </div>
         <FishingPassRewardsForm
           :reward="editing"
           :passes="store.passes"
@@ -98,9 +98,9 @@ onMounted(() => store.fetchAll());
             + Tạo phần thưởng
           </button>
         </div>
-        <p v-if="store.error" class="mx-5 mt-4 rounded-lg bg-red-50 p-3 text-sm text-red-700 sm:mx-6">
+        <div v-if="store.error" class="mx-5 mt-4 rounded-lg bg-red-50 p-3 text-sm text-red-700 sm:mx-6">
           {{ store.error }}
-        </p>
+        </div>
         <div class="min-h-0 flex-1 overflow-auto p-4 sm:p-6">
           <div v-if="store.loading && !store.rewards.length" class="py-12 text-center text-sm text-[#24352a]/70">
             Đang tải phần thưởng…
@@ -159,10 +159,10 @@ onMounted(() => store.fetchAll());
       </template>
     <div v-if="deleting" class="fixed inset-0 z-[60] grid place-items-center bg-black/45 p-4">
       <div class="w-full max-w-sm rounded-xl bg-white p-5 shadow-xl">
-        <h3 class="font-bold">Xác nhận xoá phần thưởng</h3>
-        <p class="my-3 text-sm text-slate-600">
+        <div class="font-bold">Xác nhận xoá phần thưởng</div>
+        <div class="my-3 text-sm text-slate-600">
           Xoá vật phẩm “{{ deleting.itemName }}” khỏi {{ deleting.passName }}, ngày {{ deleting.dayNumber }}?
-        </p>
+        </div>
         <div class="flex justify-end gap-2">
           <button type="button" class="rounded-lg border px-3 py-2 text-sm" @click="deleting = null">Huỷ</button
           ><button

@@ -185,9 +185,9 @@ async function buyItem() {
             </button>
           </div>
         </div>
-        <p v-if="inventoryStore.shopLoading" class="py-16 text-center text-sm text-emerald-900/60">
+        <div v-if="inventoryStore.shopLoading" class="py-16 text-center text-sm text-emerald-900/60">
           Đang tải vật phẩm...
-        </p>
+        </div>
         <div
           v-else-if="!filteredItems.length"
           class="rounded-xl border border-dashed border-[#cbd9c6] py-16 text-center text-sm text-emerald-900/60"
@@ -196,13 +196,13 @@ async function buyItem() {
         </div>
         <div v-else class="space-y-5">
           <section v-for="group in displayGroups" :key="group.category || 'all-items'">
-            <h3
+            <div
               v-if="viewMode === 'group'"
               class="mb-2 mt-0 flex items-center gap-2 border-b border-[#cbd9c6] pb-2 text-sm font-extrabold uppercase tracking-wide text-emerald-900"
             >
               {{ group.category }}
               <span class="rounded-full bg-emerald-100 px-2 py-0.5 text-[10px]">{{ group.items.length }}</span>
-            </h3>
+            </div>
             <div :class="viewMode === 'list' ? 'flex flex-col gap-3' : 'grid grid-cols-1 gap-3 sm:grid-cols-2'">
               <button
                 v-for="item in group.items"
@@ -228,14 +228,14 @@ async function buyItem() {
                   <span v-else class="text-5xl">{{ item.icon || "🎁" }}</span>
                 </div>
                 <div class="flex min-w-0 flex-1 flex-col p-3">
-                  <p
+                  <div
                     v-if="item.classification"
                     class="m-0 text-[10px] font-bold uppercase tracking-wide text-emerald-800"
                   >
                     {{ item.classification }}
-                  </p>
-                  <h3 class="m-0 truncate text-sm font-extrabold" :title="item.name">{{ item.name }}</h3>
-                  <p class="m-0 mt-1 line-clamp-2 text-xs text-emerald-950/65">{{ item.information }}</p>
+                  </div>
+                  <div class="m-0 truncate text-sm font-extrabold" :title="item.name">{{ item.name }}</div>
+                  <div class="m-0 mt-1 line-clamp-2 text-xs text-emerald-950/65">{{ item.information }}</div>
                   <div
                     class="mt-auto flex items-center justify-between gap-1 border-t border-[#cbd9c6]/70 pt-2 text-xs"
                   >
@@ -244,9 +244,9 @@ async function buyItem() {
                     }}</span>
                     <strong class="whitespace-nowrap text-amber-700">{{ item.price.toLocaleString("vi-VN") }} đ</strong>
                   </div>
-                  <p v-if="item.quantity != null" class="m-0 mt-1 text-[10px] text-emerald-950/55">
+                  <div v-if="item.quantity != null" class="m-0 mt-1 text-[10px] text-emerald-950/55">
                     Còn {{ item.quantity.toLocaleString("vi-VN") }}
-                  </p>
+                  </div>
                 </div>
               </button>
             </div>
@@ -254,7 +254,7 @@ async function buyItem() {
         </div>
       </section>
       <aside class="h-fit rounded-xl border border-[#cbd9c6] bg-[#f5f9f0] p-4 lg:sticky lg:top-0">
-        <h3 class="m-0 text-base font-extrabold">Đơn hàng</h3>
+        <div class="m-0 text-base font-extrabold">Đơn hàng</div>
         <div v-if="selectedItem" class="mt-4">
           <div class="flex items-center gap-3">
             <div
@@ -268,8 +268,8 @@ async function buyItem() {
               /><span v-else>{{ selectedItem.icon || "🎁" }}</span>
             </div>
             <div class="min-w-0">
-              <p class="m-0 truncate font-bold">{{ selectedItem.name }}</p>
-              <p class="m-0 text-xs text-emerald-950/60">{{ selectedItem.category || "Vật phẩm" }}</p>
+              <div class="m-0 truncate font-bold">{{ selectedItem.name }}</div>
+              <div class="m-0 text-xs text-emerald-950/60">{{ selectedItem.category || "Vật phẩm" }}</div>
             </div>
           </div>
           <label class="mt-5 block text-xs font-bold"
@@ -293,12 +293,12 @@ async function buyItem() {
               <span>Số dư hiện tại</span><Cash :amount="currencyStore.formattedCash" />
             </div>
           </div>
-          <p v-if="selectedItem.quantity != null && selectedItem.quantity < 1" class="mt-3 text-xs text-red-700">
+          <div v-if="selectedItem.quantity != null && selectedItem.quantity < 1" class="mt-3 text-xs text-red-700">
             Vật phẩm đã hết hàng.
-          </p>
-          <p v-else-if="!canBuy && quantity > 0" class="mt-3 text-xs text-red-700">
+          </div>
+          <div v-else-if="!canBuy && quantity > 0" class="mt-3 text-xs text-red-700">
             {{ currencyStore.cash < totalPrice ? "Bạn không đủ tiền." : "Số lượng vượt quá tồn kho." }}
-          </p>
+          </div>
           <button
             type="button"
             class="mt-4 w-full rounded-lg bg-[#24352a] px-4 py-2.5 text-sm font-bold text-white transition hover:bg-emerald-900 disabled:cursor-not-allowed disabled:opacity-45"
@@ -308,11 +308,11 @@ async function buyItem() {
             {{ busy ? "Đang xử lý..." : "Mua vật phẩm" }}
           </button>
         </div>
-        <p v-else class="mt-4 text-sm text-emerald-950/60">Chọn một vật phẩm để xem giá và mua.</p>
-        <p v-if="error" class="mt-3 rounded-lg border border-red-200 bg-red-50 p-2 text-xs text-red-700">{{ error }}</p>
-        <p v-if="notice" class="mt-3 rounded-lg border border-emerald-200 bg-emerald-50 p-2 text-xs text-emerald-800">
+        <div v-else class="mt-4 text-sm text-emerald-950/60">Chọn một vật phẩm để xem giá và mua.</div>
+        <div v-if="error" class="mt-3 rounded-lg border border-red-200 bg-red-50 p-2 text-xs text-red-700">{{ error }}</div>
+        <div v-if="notice" class="mt-3 rounded-lg border border-emerald-200 bg-emerald-50 p-2 text-xs text-emerald-800">
           {{ notice }}
-        </p>
+        </div>
       </aside>
     </div>
   </Modal>
@@ -339,11 +339,11 @@ async function buyItem() {
         :alt="previewImage.alt"
         class="max-h-[calc(100vh-2rem)] max-w-[calc(100vw-2rem)] object-contain"
       />
-      <p
+      <div
         class="absolute bottom-3 left-1/2 max-w-[90vw] -translate-x-1/2 truncate rounded-full bg-black/50 px-4 py-1.5 text-sm text-white"
       >
         {{ previewImage.alt }}
-      </p>
+      </div>
     </div>
   </Teleport>
 </template>

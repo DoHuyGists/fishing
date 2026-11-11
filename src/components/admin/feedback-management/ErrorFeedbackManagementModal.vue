@@ -52,24 +52,24 @@ function attachmentUrl(path: string) {
       </button>
     </div>
       <div class="min-h-0 flex-1 overflow-auto p-4 sm:p-6">
-        <p v-if="store.error" role="alert" class="mb-4 rounded-lg bg-red-50 px-4 py-3 text-sm text-red-700">
+        <div v-if="store.error" role="alert" class="mb-4 rounded-lg bg-red-50 px-4 py-3 text-sm text-red-700">
           {{ store.error }}
-        </p>
-        <p
+        </div>
+        <div
           v-if="store.attachmentError"
           role="alert"
           class="mb-4 rounded-lg bg-amber-50 px-4 py-3 text-sm text-amber-800"
         >
           Không thể tạo signed URL cho tệp đính kèm. Kiểm tra quyền đọc Storage của tài khoản admin:
           {{ store.attachmentError }}
-        </p>
-        <p v-else-if="store.loadingAttachments" class="mb-4 text-sm text-slate-500">
+        </div>
+        <div v-else-if="store.loadingAttachments" class="mb-4 text-sm text-slate-500">
           Đang tạo liên kết an toàn cho tệp đính kèm…
-        </p>
-        <p v-if="store.loading" class="py-10 text-center text-sm text-slate-500">Đang tải báo lỗi…</p>
-        <p v-else-if="!store.errorFeedback.length" class="py-10 text-center text-sm text-slate-500">
+        </div>
+        <div v-if="store.loading" class="py-10 text-center text-sm text-slate-500">Đang tải báo lỗi…</div>
+        <div v-else-if="!store.errorFeedback.length" class="py-10 text-center text-sm text-slate-500">
           Chưa có báo lỗi nào.
-        </p>
+        </div>
         <div v-else class="space-y-4">
           <article
             v-for="item in store.errorFeedback"
@@ -78,10 +78,10 @@ function attachmentUrl(path: string) {
           >
             <div class="flex flex-col justify-between gap-3 sm:flex-row">
               <div class="min-w-0">
-                <h3 class="text-base font-bold text-slate-800">{{ item.title }}</h3>
-                <p class="mt-1 text-xs text-slate-500">
+                <div class="text-base font-bold text-slate-800">{{ item.title }}</div>
+                <div class="mt-1 text-xs text-slate-500">
                   {{ formatDate(item.created_at) }} · Người dùng {{ item.user_id ?? "đã xóa tài khoản" }}
-                </p>
+                </div>
               </div>
               <label class="flex shrink-0 items-center gap-2 text-sm"
                 ><span class="font-medium text-slate-600">Trạng thái</span
@@ -99,9 +99,9 @@ function attachmentUrl(path: string) {
                 ><span v-if="store.updatingIds.includes(item.id)" class="text-xs text-slate-500">Đang lưu…</span></label
               >
             </div>
-            <p v-if="item.description" class="mt-3 whitespace-pre-wrap text-sm leading-relaxed text-slate-700">
+            <div v-if="item.description" class="mt-3 whitespace-pre-wrap text-sm leading-relaxed text-slate-700">
               {{ item.description }}
-            </p>
+            </div>
             <div v-if="item.attachments?.length" class="mt-4 rounded-lg border border-slate-200">
               <button
                 type="button"
@@ -156,7 +156,7 @@ function attachmentUrl(path: string) {
                 >
               </div>
             </div>
-            <p class="mt-3 text-xs text-slate-400">Cập nhật lần cuối: {{ formatDate(item.updated_at) }}</p>
+            <div class="mt-3 text-xs text-slate-400">Cập nhật lần cuối: {{ formatDate(item.updated_at) }}</div>
           </article>
         </div>
       </div>

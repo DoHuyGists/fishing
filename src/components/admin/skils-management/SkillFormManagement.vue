@@ -35,7 +35,7 @@ const store = useAdminSkillStore();
         <label class="flex items-center gap-2 text-sm sm:col-span-2">
           <input v-model="store.draft.is_disabled" type="checkbox" /> Vô hiệu hóa kỹ năng
         </label>
-        <p v-if="store.formError" role="alert" class="m-0 rounded-lg border border-red-200 bg-red-50 p-3 text-sm text-red-700 sm:col-span-2">{{ store.formError }}</p>
+        <div v-if="store.formError" role="alert" class="m-0 rounded-lg border border-red-200 bg-red-50 p-3 text-sm text-red-700 sm:col-span-2">{{ store.formError }}</div>
         <div class="flex justify-end gap-2 sm:col-span-2">
           <button type="button" class="rounded-lg border border-[#cbd9c6] px-4 py-2 text-sm" @click="store.closeForm">Hủy</button>
           <button type="submit" class="rounded-lg bg-[#24352a] px-4 py-2 text-sm font-bold text-white disabled:opacity-50">{{ store.saving ? 'Đang lưu...' : 'Lưu kỹ năng' }}</button>

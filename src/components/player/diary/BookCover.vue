@@ -77,7 +77,7 @@ const styleVars = computed(() => {
     <div class="book">
       <div class="front">
         <div class="cover">
-          <p class="num-up">{{ numUp }}</p>
+          <div class="num-up">{{ numUp }}</div>
           <slot name="cover-icon">
             <svg
               id="eye-left"
@@ -118,16 +118,16 @@ const styleVars = computed(() => {
               />
             </svg>
           </slot>
-          <p class="num-down">{{ numDown }}</p>
-          <p class="author">{{ author }}</p>
-          <p class="title">{{ title }}</p>
+          <div class="num-down">{{ numDown }}</div>
+          <div class="author">{{ author }}</div>
+          <div class="title">{{ title }}</div>
         </div>
       </div>
       <div class="left-side">
-        <h2>
+        <div class="spine-title">
           <span>{{ author }}</span>
           <span>{{ title }}</span>
-        </h2>
+        </div>
       </div>
     </div>
   </div>
@@ -264,7 +264,7 @@ const styleVars = computed(() => {
   box-shadow: 1px 0 3px rgba(255, 255, 255, 0.1);
 }
 
-.book-container h2 {
+.book-container .spine-title {
   width: 500px;
   height: 40px;
   color: var(--book-text-color);
@@ -280,14 +280,14 @@ const styleVars = computed(() => {
   background: var(--book-cover-bg);
 }
 
-.left-side h2 span:first-child {
+.left-side .spine-title span:first-child {
   font-weight: 400;
   font-size: 13px;
   padding-right: 20px;
   color: white;
 }
 
-.left-side h2 span:last-child {
+.left-side .spine-title span:last-child {
   font-family: acumin-pro, sans-serif;
   color: white;
 }

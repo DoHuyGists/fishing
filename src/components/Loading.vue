@@ -29,12 +29,12 @@ withDefaults(
         aria-hidden="true"
       />
 
-      <p class="flex items-baseline text-sm font-medium text-[#24352a]/70">
+      <div class="flex items-baseline text-sm font-medium text-[#24352a]/70">
         {{ text }}
         <span class="loading-dots ml-0.5 inline-flex" aria-hidden="true">
           <span>.</span><span>.</span><span>.</span>
         </span>
-      </p>
+      </div>
 
       <span class="sr-only">Vui lòng chờ trong giây lát</span>
     </div>

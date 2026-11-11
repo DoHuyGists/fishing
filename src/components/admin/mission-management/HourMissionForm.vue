@@ -35,10 +35,10 @@ const inputClass =
     <aside class="ml-auto flex h-full w-full max-w-xl flex-col border-l border-gray-200 bg-white shadow-xl">
       <div class="flex shrink-0 items-center justify-between border-b border-gray-200 px-5 py-4">
         <div>
-          <h3 class="m-0 text-base font-extrabold text-[#153221]">
+          <div class="m-0 text-base font-extrabold text-[#153221]">
             {{ store.form.id ? "Chỉnh sửa nhiệm vụ giờ" : "Thêm nhiệm vụ giờ" }}
-          </h3>
-          <p class="m-0 mt-1 text-xs text-gray-500">Giờ lưu theo múi giờ UTC</p>
+          </div>
+          <div class="m-0 mt-1 text-xs text-gray-500">Giờ lưu theo múi giờ UTC</div>
         </div>
         <button
           type="button"
@@ -63,10 +63,10 @@ const inputClass =
             >Kết thúc<input v-model="store.form.end" type="time" step="1" :class="inputClass"
           /></label>
         </div>
-        <p class="m-0 -mt-2 text-xs leading-relaxed text-gray-500">
+        <div class="m-0 -mt-2 text-xs leading-relaxed text-gray-500">
           Giờ hiện tại trên thiết bị của bạn là {{ localCurrentTime() }} (giờ địa phương), tương ứng
           {{ utcCurrentTime() }} UTC. Nếu muốn chọn giờ hiện tại, hãy nhập {{ utcCurrentTime() }} vào trường thời gian.
-        </p>
+        </div>
         <br>
 
         <label class="flex flex-col gap-1.5 text-xs font-bold text-gray-600"
@@ -87,7 +87,7 @@ const inputClass =
 
         <section class="space-y-3">
           <div class="flex items-center justify-between">
-            <h4 class="m-0 text-xs font-bold text-gray-600">Cá cần câu ({{ store.form.content.length }})</h4>
+            <div class="m-0 text-xs font-bold text-gray-600">Cá cần câu ({{ store.form.content.length }})</div>
             <button
               type="button"
               class="rounded-md border border-emerald-200 px-2.5 py-1.5 text-xs font-bold text-emerald-800 hover:bg-emerald-50"
@@ -97,7 +97,7 @@ const inputClass =
             </button>
           </div>
 
-          <p v-if="!store.form.content.length" class="m-0 text-xs text-gray-500">Chưa chọn cá nào</p>
+          <div v-if="!store.form.content.length" class="m-0 text-xs text-gray-500">Chưa chọn cá nào</div>
           <div class="grid grid-cols-2 gap-3 sm:grid-cols-3">
             <div
               v-for="(fish, index) in store.form.content"

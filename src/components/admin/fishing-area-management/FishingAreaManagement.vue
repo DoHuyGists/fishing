@@ -205,7 +205,7 @@ watch(
 
         <div v-else-if="!filteredAreas.length" class="py-16 text-center text-gray-400 text-xs">
           <span class="text-3xl block mb-2">🎣</span>
-          <p class="m-0 font-medium">Không tìm thấy bãi câu nào phù hợp.</p>
+          <div class="m-0 font-medium">Không tìm thấy bãi câu nào phù hợp.</div>
         </div>
 
         <div v-else class="bg-white border border-gray-200 rounded-xl overflow-hidden shadow-2xs">
@@ -276,8 +276,8 @@ watch(
     <!-- Delete confirmation -->
     <div v-if="confirmDeleteId" class="fixed inset-0 z-60 bg-black/40 flex items-center justify-center p-4">
       <div class="bg-white rounded-xl shadow-lg p-5 w-full max-w-sm">
-        <h4 class="m-0 text-sm font-extrabold text-gray-800 mb-2">Xác nhận xoá</h4>
-        <p class="text-xs text-gray-500 mb-4">Bạn có chắc muốn xoá bãi câu này? Hành động này không thể hoàn tác.</p>
+        <div class="m-0 text-sm font-extrabold text-gray-800 mb-2">Xác nhận xoá</div>
+        <div class="text-xs text-gray-500 mb-4">Bạn có chắc muốn xoá bãi câu này? Hành động này không thể hoàn tác.</div>
         <div class="flex items-center justify-end gap-2">
           <button
             type="button"

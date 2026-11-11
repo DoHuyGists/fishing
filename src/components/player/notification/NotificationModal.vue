@@ -56,13 +56,13 @@ onUnmounted(() => {
 
 <template>
   <Modal title="Thông báo" sub-title="Tin nhắn dành cho bạn và thông báo hệ thống" :on-refresh="loadNotifications">
-    <p v-if="notifications.loadError || readError" role="alert" class="mb-3 rounded bg-red-50 p-3 text-sm text-red-700">{{ notifications.loadError || readError }}</p>
+    <div v-if="notifications.loadError || readError" role="alert" class="mb-3 rounded bg-red-50 p-3 text-sm text-red-700">{{ notifications.loadError || readError }}</div>
     <Tab v-model="currentTabActive" :tabs="tabs" lazy>
       <template #personal>
         <div class="flex min-h-0 flex-1 flex-col sm:flex-row">
           <aside class="w-full shrink-0 overflow-y-auto sm:w-80 sm:border-r sm:border-gray-200">
-            <p v-if="notifications.loading" class="p-5 text-sm text-gray-500">Đang tải thông báo...</p>
-            <p v-else-if="!notifications.personal.length" class="p-5 text-sm text-gray-500">Chưa có thông báo nào.</p>
+            <div v-if="notifications.loading" class="p-5 text-sm text-gray-500">Đang tải thông báo...</div>
+            <div v-else-if="!notifications.personal.length" class="p-5 text-sm text-gray-500">Chưa có thông báo nào.</div>
             <button
               v-for="item in notifications.personal"
               :key="item.id"
@@ -111,15 +111,15 @@ onUnmounted(() => {
                 }}</span
                 ><span class="text-xs text-gray-500">{{ formatDateTime(selected.created_at) }}</span>
               </div>
-              <h3 class="m-0 text-xl font-extrabold text-[#153221]">{{ selected.title }}</h3>
-              <p class="mt-5 whitespace-pre-wrap text-sm leading-7 text-gray-700">{{ selected.body }}</p>
-              <p v-if="readError" role="alert" class="mt-5 rounded-lg bg-red-50 p-3 text-sm text-red-700">
+              <div class="m-0 text-xl font-extrabold text-[#153221]">{{ selected.title }}</div>
+              <div class="mt-5 whitespace-pre-wrap text-sm leading-7 text-gray-700">{{ selected.body }}</div>
+              <div v-if="readError" role="alert" class="mt-5 rounded-lg bg-red-50 p-3 text-sm text-red-700">
                 Không thể cập nhật trạng thái đã đọc: {{ readError }}
-              </p>
+              </div>
             </div>
-            <p v-else class="grid h-full place-items-center text-center text-sm text-gray-400">
+            <div v-else class="grid h-full place-items-center text-center text-sm text-gray-400">
               Chọn một thông báo ở danh sách bên trái để xem nội dung.
-            </p>
+            </div>
           </article>
         </div>
       </template>
@@ -127,8 +127,8 @@ onUnmounted(() => {
       <template #system>
         <div class="flex min-h-0 flex-1 flex-col sm:flex-row">
           <aside class="w-full shrink-0 overflow-y-auto sm:w-80 sm:border-r sm:border-gray-200">
-            <p v-if="notifications.loading" class="p-5 text-sm text-gray-500">Đang tải thông báo...</p>
-            <p v-else-if="!notifications.system.length" class="p-5 text-sm text-gray-500">Chưa có thông báo nào.</p>
+            <div v-if="notifications.loading" class="p-5 text-sm text-gray-500">Đang tải thông báo...</div>
+            <div v-else-if="!notifications.system.length" class="p-5 text-sm text-gray-500">Chưa có thông báo nào.</div>
             <button
               v-for="item in notifications.system"
               :key="item.id"
@@ -177,15 +177,15 @@ onUnmounted(() => {
                 }}</span
                 ><span class="text-xs text-gray-500">{{ formatDateTime(selected.created_at) }}</span>
               </div>
-              <h3 class="m-0 text-xl font-extrabold text-[#153221]">{{ selected.title }}</h3>
-              <p class="mt-5 whitespace-pre-wrap text-sm leading-7 text-gray-700">{{ selected.body }}</p>
-              <p v-if="readError" role="alert" class="mt-5 rounded-lg bg-red-50 p-3 text-sm text-red-700">
+              <div class="m-0 text-xl font-extrabold text-[#153221]">{{ selected.title }}</div>
+              <div class="mt-5 whitespace-pre-wrap text-sm leading-7 text-gray-700">{{ selected.body }}</div>
+              <div v-if="readError" role="alert" class="mt-5 rounded-lg bg-red-50 p-3 text-sm text-red-700">
                 Không thể cập nhật trạng thái đã đọc: {{ readError }}
-              </p>
+              </div>
             </div>
-            <p v-else class="grid h-full place-items-center text-center text-sm text-gray-400">
+            <div v-else class="grid h-full place-items-center text-center text-sm text-gray-400">
               Chọn một thông báo ở danh sách bên trái để xem nội dung.
-            </p>
+            </div>
           </article>
         </div>
       </template>

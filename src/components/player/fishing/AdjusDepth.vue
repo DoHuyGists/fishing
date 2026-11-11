@@ -91,9 +91,9 @@ onBeforeUnmount(() => {
           aria-labelledby="depth-title"
         >
           <header class="flex items-center justify-between border-b border-white/10 px-5 py-3.5 sm:px-6">
-            <h2 id="depth-title" class="m-0 flex items-center gap-2.5 text-base font-bold">
+            <div id="depth-title" class="m-0 flex items-center gap-2.5 text-base font-bold">
               <span class="text-[#5ad0b3]" aria-hidden="true">≋</span>Điều chỉnh độ sâu
-            </h2>
+            </div>
             <button
               type="button"
               class="grid h-9 w-9 place-items-center rounded-full text-2xl text-[#b8ccc4] transition hover:bg-white/10 hover:text-white"
@@ -138,10 +138,10 @@ onBeforeUnmount(() => {
             <section class="control-card" aria-label="Bộ điều khiển độ sâu">
               <div class="flex items-start justify-between gap-2">
                 <div>
-                  <p class="m-0 text-[11px] text-[#91aaa0]">Độ sâu hiện tại</p>
-                  <p class="m-0 mt-1 text-[25px] font-extrabold leading-none text-white">
+                  <div class="m-0 text-[11px] text-[#91aaa0]">Độ sâu hiện tại</div>
+                  <div class="m-0 mt-1 text-[25px] font-extrabold leading-none text-white">
                     {{ formattedDepth }} <span class="text-sm font-semibold text-[#a9c4b8]">m</span>
-                  </p>
+                  </div>
                 </div>
                 <span class="mt-1 rounded-full bg-[#174a3d] px-2.5 py-1 text-[10px] font-bold text-[#b9ebd8]">{{
                   layer.label
@@ -174,15 +174,15 @@ onBeforeUnmount(() => {
                   </button>
                 </div>
               </div>
-              <p class="m-0 text-center text-[10px] text-[#78958a]">Kéo thanh hoặc dùng phím mũi tên để chỉnh</p>
+              <div class="m-0 text-center text-[10px] text-[#78958a]">Kéo thanh hoặc dùng phím mũi tên để chỉnh</div>
             </section>
 
             <section class="info-card col-span-2 md:col-span-1">
               <div class="grid grid-cols-2 md:grid-cols-1 gap-2">
                 <div>
-                  <h3 class="m-0 mb-3 text-[12px] font-bold text-[#d8e9e0]">Thông tin tầng nước</h3>
-                  <ul class="m-0 list-none space-y-2.5 p-0">
-                    <li
+                  <div class="m-0 mb-3 text-[12px] font-bold text-[#d8e9e0]">Thông tin tầng nước</div>
+                  <div class="m-0 list-none space-y-2.5 p-0">
+                    <div
                       v-for="waterLayer in depthConfig.layers"
                       :key="waterLayer.id"
                       class="flex items-start gap-2.5 rounded-lg px-2 py-1.5"
@@ -198,12 +198,12 @@ onBeforeUnmount(() => {
                           >{{ waterLayer.minMeters }}–{{ waterLayer.maxMeters }} m</span
                         ></span
                       >
-                    </li>
-                  </ul>
+                    </div>
+                  </div>
                 </div>
                 <div class="md:border-t md:pt-2 border-white/10">
-                  <h3 class="m-0 text-[11px] font-bold text-[#d8e9e0]">Cá có thể xuất hiện</h3>
-                  <p
+                  <div class="m-0 text-[11px] font-bold text-[#d8e9e0]">Cá có thể xuất hiện</div>
+                  <div
                     v-if="store.isLoadingDepthPreview"
                     class="mb-0 mt-2 flex items-center gap-2 rounded-lg bg-black/10 px-2.5 py-2 text-[10px] text-[#91aaa0]"
                     role="status"
@@ -214,20 +214,20 @@ onBeforeUnmount(() => {
                       aria-hidden="true"
                     ></span
                     >Đang cập nhật danh sách cá ở {{ formattedDepth }} m...
-                  </p>
-                  <p
+                  </div>
+                  <div
                     v-else-if="store.depthPreviewError"
                     class="mb-0 mt-2 rounded-lg bg-black/10 px-2.5 py-2 text-[10px] leading-relaxed text-[#ffc18b]"
                   >
                     {{ store.depthPreviewError }}
-                  </p>
+                  </div>
                   <template v-else-if="store.depthPreview">
-                    <p class="mb-2 mt-1 text-[9px] text-[#91aaa0]">
+                    <div class="mb-2 mt-1 text-[9px] text-[#91aaa0]">
                       {{ store.depthPreview.total_species }} loài · {{ store.depthPreview.discovered_species }} đã khám
                       phá · {{ store.depthPreview.undiscovered_species }} chưa khám phá
-                    </p>
-                    <ul v-if="store.depthPreview.fishes.length" class="m-0 list-none space-y-1.5 overflow-y-auto p-0">
-                      <li
+                    </div>
+                    <div v-if="store.depthPreview.fishes.length" class="m-0 list-none space-y-1.5 overflow-y-auto p-0">
+                      <div
                         v-for="fish in store.depthPreview.fishes"
                         :key="fish.species_id"
                         class="flex items-center gap-2 rounded-lg bg-black/10 px-2 py-1.5"
@@ -259,26 +259,26 @@ onBeforeUnmount(() => {
                           >
                           <span v-if="fish.rarity" class="text-[8px] text-[#a9c4b8]">{{ fish.rarity }}</span>
                         </span>
-                      </li>
-                    </ul>
-                    <p v-else class="mb-0 mt-2 text-[10px] text-[#91aaa0]">Không có loài cá ở độ sâu này.</p>
+                      </div>
+                    </div>
+                    <div v-else class="mb-0 mt-2 text-[10px] text-[#91aaa0]">Không có loài cá ở độ sâu này.</div>
                   </template>
-                  <p
+                  <div
                     v-else
                     class="mb-0 mt-2 rounded-lg bg-black/10 px-2.5 py-2 text-[10px] leading-relaxed text-[#91aaa0]"
                   >
                     Chưa có dữ liệu dự đoán ở {{ formattedDepth }} m.
-                  </p>
+                  </div>
                 </div>
               </div>
             </section>
           </div>
 
           <footer class="flex flex-wrap items-center justify-between gap-3 border-t border-white/10 px-4 py-3 sm:px-5">
-            <p v-if="errorMessage" class="m-0 text-[11px] text-[#ffc18b]" role="status">{{ errorMessage }}</p>
-            <p v-else-if="!store.canAdjustDepth" class="m-0 text-[11px] text-[#d5c994]">
+            <div v-if="errorMessage" class="m-0 text-[11px] text-[#ffc18b]" role="status">{{ errorMessage }}</div>
+            <div v-else-if="!store.canAdjustDepth" class="m-0 text-[11px] text-[#d5c994]">
               Hãy thu mồi về trước khi áp dụng thay đổi.
-            </p>
+            </div>
             <span v-else class="text-[10px] text-[#78958a]">Độ sâu đã lưu: {{ store.appliedDepthMeters }} m</span>
             <div class="ml-auto flex gap-2">
               <button

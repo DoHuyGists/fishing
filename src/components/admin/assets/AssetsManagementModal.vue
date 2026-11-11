@@ -103,7 +103,7 @@ onMounted(() => {
       <div v-if="store.error" role="alert" class="mb-4 rounded-lg border border-red-200 bg-red-50 p-3 text-sm text-red-700">{{ store.error }}</div>
       <div v-if="store.uploadErrors.length" role="alert" class="mb-4 max-h-48 overflow-auto rounded-lg border border-red-200 bg-red-50 p-3 text-sm text-red-700">
         <div class="font-semibold">Các tệp chưa tải lên được:</div>
-        <ul class="mt-2 list-inside list-disc break-words"><li v-for="(error, index) in store.uploadErrors" :key="index">{{ error }}</li></ul>
+        <div class="mt-2 space-y-1 break-words"><div v-for="(error, index) in store.uploadErrors" :key="index">• {{ error }}</div></div>
       </div>
       <div class="mb-4 text-sm" role="status" aria-live="polite">{{ store.filteredRows.length }} tệp phù hợp · Tổng kho: {{ store.rows.length }} tệp<span v-if="store.viewMode === 'tree' && store.search.trim()"> · Đã mở các nhánh có kết quả tìm kiếm</span></div>
       <div v-if="store.loading && !store.rows.length" role="status" class="py-12 text-center text-sm">Đang tải ảnh và video…</div>

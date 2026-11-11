@@ -7,7 +7,7 @@ const store = useAdminDailyMissionTemplateStore();
   <div v-if="store.isFormOpen" class="fixed inset-0 z-60 flex justify-end bg-black/40" role="dialog" aria-modal="true" aria-label="Biểu mẫu nhiệm vụ" @click.self="store.closeForm()">
     <form class="flex h-full w-full max-w-xl flex-col bg-white text-[#24352a] shadow-xl" @submit.prevent="store.save()">
       <header class="flex shrink-0 items-center justify-between gap-3 border-b border-emerald-900 bg-[#153221] p-5 text-white">
-        <h3 class="text-lg font-bold">{{ store.form.id ? "Chỉnh sửa" : "Thêm mới" }} mẫu nhiệm vụ</h3>
+        <div class="text-lg font-bold">{{ store.form.id ? "Chỉnh sửa" : "Thêm mới" }} mẫu nhiệm vụ</div>
         <button type="button" aria-label="Đóng biểu mẫu" class="grid size-9 place-items-center rounded-lg border border-emerald-600 hover:bg-emerald-800 disabled:opacity-50" :disabled="store.isSaving" @click="store.closeForm()">✕</button>
       </header>
       <fieldset :disabled="store.isSaving" class="min-h-0 flex-1 space-y-5 overflow-y-auto bg-gray-50/60 p-5 text-sm">

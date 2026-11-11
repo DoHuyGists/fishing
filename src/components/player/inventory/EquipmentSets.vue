@@ -40,13 +40,13 @@ const {
     </header>
 
     <div class="flex-1 space-y-4 overflow-y-scroll p-4">
-      <p v-if="pagedSets.length === 0" class="py-12 text-center text-sm text-slate-500">
+      <div v-if="pagedSets.length === 0" class="py-12 text-center text-sm text-slate-500">
         {{
           inventoryStore.equipmentSets.length === 0
             ? 'Bạn chưa có set nào. Bấm "Mua thêm set" để bắt đầu.'
             : "Không có set nào khớp với tìm kiếm."
         }}
-      </p>
+      </div>
 
       <article v-for="{ set, index: setIndex } in pagedSets" :key="set.id"
         class="rounded-md border border-slate-200 bg-white p-3">
@@ -83,17 +83,17 @@ const {
               <span class="text-slate-400">{{ set[slot].length }}</span>
             </button>
 
-            <ul class="space-y-1">
-              <li v-for="eq in set[slot]" :key="eq.id"
+            <div class="space-y-1">
+              <div v-for="eq in set[slot]" :key="eq.id"
                 class="flex items-center justify-between gap-1 rounded bg-slate-100 px-1.5 py-1 text-xs">
                 <span class="truncate" :title="itemName(eq, eq.id)">{{ itemName(eq, eq.id) }}</span>
                 <button type="button" class="shrink-0 rounded px-1 text-slate-500 hover:bg-red-100 hover:text-red-600"
                   :aria-label="`Gỡ ${itemName(eq, eq.id)} khỏi set`" @click.stop="removeFromSet(set, slot, eq)">
                   ✕
                 </button>
-              </li>
-            </ul>
-            <p v-if="set[slot].length === 0" class="py-2 text-center text-xs text-slate-400">Trống</p>
+              </div>
+            </div>
+            <div v-if="set[slot].length === 0" class="py-2 text-center text-xs text-slate-400">Trống</div>
           </div>
         </div>
       </article>
