@@ -30,7 +30,7 @@ onMounted(() => store.load());
 
 <template>
   <Modal title="Thực hành câu cá" sub-title="Học cơ chế qua các màn chơi hướng dẫn" :show-count-data="false" :on-refresh="store.load">
-    <div class="mx-auto max-w-6xl space-y-4 p-2 text-[#24352a] sm:p-4">
+    <div class="space-y-4 p-2 text-[#24352a] sm:p-4">
       <div class="flex flex-wrap items-center justify-between gap-3 rounded-xl border border-[#cbd9c6] bg-[#f5f9f0] p-4">
         <div class="max-w-2xl text-sm leading-6">Tập luyện với trang bị có sẵn. Cá, mồi và tiến độ trong màn hướng dẫn chỉ tồn tại trong lượt chơi này.</div>
         <div class="flex gap-1 rounded-lg border border-[#cbd9c6] bg-white p-1" role="group" aria-label="Chế độ hiển thị">
@@ -46,7 +46,7 @@ onMounted(() => store.load());
         <button type="button" class="mt-3 font-bold underline" @click="store.load">Thử lại</button>
       </div>
       <div v-else-if="!store.tutorials.length" class="py-12 text-center">Chưa có màn hướng dẫn nào.</div>
-      <div v-else class="grid gap-4" :class="store.viewMode === 'grid' ? 'sm:grid-cols-2 lg:grid-cols-3' : 'grid-cols-1'" aria-label="Các màn hướng dẫn">
+      <div v-else class="grid gap-4" :class="store.viewMode === 'grid' ? 'grid-cols-2 md:grid-cols-3 lg:grid-cols-4' : 'grid-cols-1'" aria-label="Các màn hướng dẫn">
         <button v-for="lesson in store.tutorials" :key="lesson.id" type="button" :disabled="opening" :aria-label="`Chơi màn ${lesson.title}`"
           class="overflow-hidden rounded-2xl border border-[#cbd9c6] bg-[#f5f9f0] text-left transition hover:border-[#70a77e] hover:shadow-md focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-emerald-700 disabled:opacity-50"
           :class="store.viewMode === 'list' ? 'flex flex-col sm:flex-row' : ''" @click="enterLesson(lesson.slug)">

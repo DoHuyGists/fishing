@@ -181,7 +181,7 @@ onBeforeUnmount(() => {
     </button>
   </section>
   <main v-else class="w-full h-screen overflow-hidden touch-none overscroll-none bg-[#193224] text-[#e9f4e8]">
-    <div class="fixed top-3 left-3 text-white flex justify-between items-start">
+    <div class="fixed top-3 left-3 z-20 text-white flex justify-between items-start">
       <div class="flex flex-col gap-2">
         <DayPhaseClock :area-id="userInAreaStore.userInArea?.area_id" />
         <div class="backdrop-blur-2xl h-fit w-fit rounded p-1">
