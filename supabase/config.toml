@@ -1,0 +1,7 @@
+project_id = "fishing"
+
+[functions.paypal-donation]
+verify_jwt = false
+
+[functions.paypal-webhook]
+verify_jwt = false

@@ -1,4 +1,34 @@
 {
+  "donationPayment": {
+    "thankYouTitle": "Thank you for your support!",
+    "thankYouDescription": "Your contribution of {amount} has been confirmed.\nYour support helps keep the servers running and the game growing.",
+    "title": "PayPal / Visa / Mastercard",
+    "description": "Support the game in USD. Card payment is shown only when PayPal makes it available. Your bank or PayPal may apply currency conversion fees.",
+    "unavailable": "Online payment is not available yet. You can still support us by bank transfer below.",
+    "signIn": "Sign in to support us with PayPal or a card.",
+    "amount": "Support amount (USD)",
+    "amountHelp": "From 1.00 to 1,000.00 USD. Use a dot for decimals. This voluntary contribution does not grant in-game rewards.",
+    "loading": "Loading payment methods…",
+    "processing": "Processing. Please wait before starting another payment.",
+    "cancelled": "Checkout was closed. No successful payment has been confirmed.",
+    "invalidAmount": "Enter an amount from 1.00 to 1,000.00 USD with at most two decimal places.",
+    "ineligible": "PayPal has no eligible payment method for this transaction. You can use the bank QR code below.",
+    "error": "Unable to confirm payment. If you already approved it, check the existing transaction before trying again.",
+    "rateLimited": "Too many checkout attempts. Please try again in an hour.",
+    "expired": "This checkout attempt expired. Start a new contribution.",
+    "verify": "Check / complete existing transaction",
+    "newDonation": "Start a new contribution",
+    "retry": "Reload payment methods",
+    "status_CREATED": "Checkout created. Payment has not been confirmed.",
+    "status_APPROVED": "Approved. Complete the existing transaction to confirm payment.",
+    "status_PENDING": "PayPal is processing the payment. Check this transaction again later.",
+    "status_COMPLETED": "Payment confirmed. Thank you for supporting the game!",
+    "status_DECLINED": "Payment was declined.",
+    "status_FAILED": "Payment could not be completed.",
+    "status_REFUNDED": "This payment was refunded.",
+    "status_PARTIALLY_REFUNDED": "This payment was partially refunded.",
+    "status_REVERSED": "This payment was reversed."
+  },
   "Forbidden": {
     "ban_khong_co_quyen_truy_cap": "You do not have access",
     "tai_khoan_hien_tai_chua_duoc_cap_quyen_xem_trang_nay_hay_dang_nh": "Your account does not have permission to view this page. Sign in with another account or contact an administrator for access.",
@@ -430,6 +460,8 @@
     "end": "End"
   },
   "DonationModal": {
+    "bankTransfer": "Bank transfer",
+    "bankInstructions": "How to make a bank transfer",
     "da_sao_chep_so_tai_khoan": "Account number copied",
     "khong_the_sao_chep_ban_hay_sao_chep_so_tai_khoan_thu_cong": "Unable to copy. Please copy the account number manually.",
     "ung_ho_phat_trien": "Support development",

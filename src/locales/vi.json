@@ -1,4 +1,34 @@
 {
+  "donationPayment": {
+    "thankYouTitle": "Cảm ơn bạn đã ủng hộ!",
+    "thankYouDescription": "Đã nhận khoản ủng hộ {amount} của bạn.\nSự đồng hành của bạn giúp duy trì máy chủ và tiếp tục phát triển game.",
+    "title": "PayPal / Visa / Mastercard",
+    "description": "Ủng hộ bằng USD. Thanh toán thẻ chỉ hiển thị khi được PayPal hỗ trợ. Ngân hàng hoặc PayPal có thể tính phí chuyển đổi tiền tệ.",
+    "unavailable": "Thanh toán trực tuyến chưa khả dụng. Bạn vẫn có thể ủng hộ qua chuyển khoản bên dưới.",
+    "signIn": "Đăng nhập để ủng hộ bằng PayPal hoặc thẻ.",
+    "amount": "Số tiền ủng hộ (USD)",
+    "amountHelp": "Từ 1.00 đến 1,000.00 USD. Dùng dấu chấm cho phần thập phân. Khoản ủng hộ tự nguyện không nhận phần thưởng trong game.",
+    "loading": "Đang tải phương thức thanh toán…",
+    "processing": "Đang xử lý. Vui lòng chờ trước khi bắt đầu giao dịch khác.",
+    "cancelled": "Cửa sổ thanh toán đã đóng. Chưa xác nhận thanh toán thành công.",
+    "invalidAmount": "Nhập số tiền từ 1.00 đến 1,000.00 USD, tối đa hai chữ số thập phân.",
+    "ineligible": "PayPal chưa có phương thức phù hợp cho giao dịch này. Bạn có thể dùng mã QR ngân hàng bên dưới.",
+    "error": "Chưa thể xác nhận thanh toán. Nếu đã duyệt, hãy kiểm tra giao dịch hiện tại trước khi thử lại.",
+    "rateLimited": "Bạn đã tạo quá nhiều lượt thanh toán. Vui lòng thử lại sau một giờ.",
+    "expired": "Lượt thanh toán đã hết hạn. Hãy bắt đầu khoản ủng hộ mới.",
+    "verify": "Kiểm tra / hoàn tất giao dịch hiện tại",
+    "newDonation": "Bắt đầu khoản ủng hộ mới",
+    "retry": "Tải lại phương thức thanh toán",
+    "status_CREATED": "Đã tạo lượt thanh toán. Chưa xác nhận đã nhận tiền.",
+    "status_APPROVED": "Đã duyệt. Hãy hoàn tất giao dịch hiện tại để xác nhận thanh toán.",
+    "status_PENDING": "PayPal đang xử lý thanh toán. Vui lòng kiểm tra lại giao dịch này sau.",
+    "status_COMPLETED": "Đã xác nhận thanh toán. Cảm ơn bạn đã ủng hộ game!",
+    "status_DECLINED": "Thanh toán bị từ chối.",
+    "status_FAILED": "Không thể hoàn tất thanh toán.",
+    "status_REFUNDED": "Khoản thanh toán đã được hoàn tiền.",
+    "status_PARTIALLY_REFUNDED": "Khoản thanh toán đã được hoàn tiền một phần.",
+    "status_REVERSED": "Khoản thanh toán đã bị đảo ngược."
+  },
   "language": {
     "label": "Ngôn ngữ",
     "save_error": "Không thể lưu ngôn ngữ. Vui lòng thử lại."
@@ -434,6 +464,8 @@
     "end": "End"
   },
   "DonationModal": {
+    "bankTransfer": "Chuyển khoản ngân hàng",
+    "bankInstructions": "Hướng dẫn chuyển khoản ngân hàng",
     "da_sao_chep_so_tai_khoan": "Đã sao chép số tài khoản",
     "khong_the_sao_chep_ban_hay_sao_chep_so_tai_khoan_thu_cong": "Không thể sao chép. Bạn hãy sao chép số tài khoản thủ công.",
     "ung_ho_phat_trien": "Ủng hộ phát triển",
