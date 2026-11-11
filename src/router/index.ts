@@ -7,6 +7,12 @@ import AdminLayout from "../layouts/AdminLayout.vue";
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
   routes: [
+    {
+      path: "/tutorial/:slug",
+      name: "tutorial",
+      component: () => import("../views/TutorialView.vue"),
+      meta: { requiresAuth: true, localContext: true },
+    },
     { path: "/forgot-password", name: "forgotPassword", component: () => import("../views/PasswordView.vue") },
     { path: "/reset-password", name: "resetPassword", component: () => import("../views/PasswordView.vue") },
     {
@@ -70,6 +76,9 @@ router.beforeEach(async (to) => {
 
   if (to.meta.requiresAuth && !data.session) {
     return { name: "login" };
+  } else if (to.meta.localContext) {
+    // Practice has no area membership and bypasses live fishing redirects.
+    return;
   } else if (userId != null) {
     const fishingArea = await supabaseUserInAreaRepository.getCurrentUserArea(userId);
     if (fishingArea?.status !== "enter") {

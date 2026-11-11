@@ -18,6 +18,7 @@ type LobbyAction = {
 const utilityActions: LobbyAction[] = [
   { modal: 'account', label: 'Tài khoản', icon: '⚙️', tourId: 'first-play-account' },
   { modal: 'guide', label: 'Hướng dẫn', icon: '📖' },
+  { modal: 'tutorial', label: 'Thực hành', icon: '🎣' },
   { modal: 'notifications', label: 'Thông báo', icon: '🔔' },
 ];
 
@@ -77,7 +78,7 @@ const supportActions: LobbyAction[] = [
           <div class="mt-0.5 text-[11px] leading-4 text-[#61745d]">Chuẩn bị cho chuyến câu tiếp theo</div>
         </div>
       </div>
-      <div class="grid grid-cols-3 gap-1.5">
+      <div class="grid grid-cols-2 gap-1.5">
         <button
           v-for="action in utilityActions"
           :id="action.tourId"

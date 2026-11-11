@@ -47,6 +47,7 @@ const DonationModal = defineAsyncComponent(() => import("../donation/DonationMod
 const SkillModal = defineAsyncComponent(() => import("../skill/SkillModal.vue"));
 const AquacultureModal = defineAsyncComponent(() => import("../aquaculture/AquacultureModal.vue"));
 const GuideModal = defineAsyncComponent(() => import("../guide/GuideModal.vue"));
+const TutorialModal = defineAsyncComponent(() => import("../tutorial/TutorialModal.vue"));
 
 const authStore = useAuthStore();
 const caughtStore = useCaughtStore();
@@ -135,6 +136,7 @@ onUnmounted(() => {
         <div v-if="modalStore.isModalOpening">
           <AccountInfoModal v-if="modalStore.isOpening('account')" />
           <GuideModal v-if="modalStore.isOpening('guide')" />
+          <TutorialModal v-if="modalStore.isOpening('tutorial')" />
           <MarketWindow v-if="configStore.isUnlocked('market') && modalStore.isOpening('market')" />
           <ShopModal v-if="modalStore.isOpening('shop')" />
           <CatchDiaryModal v-if="modalStore.isOpening('diary')" />

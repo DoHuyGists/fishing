@@ -20,6 +20,7 @@ interface GuideStep {
 
 const props = defineProps<{
   steps: GuideStep[]
+  finishLabel?: string
 }>()
 
 const emit = defineEmits<{
@@ -28,6 +29,7 @@ const emit = defineEmits<{
 
 const maskId = `guide-mask-${useId()}`
 const currentIndex = ref(0)
+const tooltipElement = ref<HTMLElement | null>(null)
 
 const viewport = ref({
   width: window.innerWidth,
@@ -76,7 +78,7 @@ function updatePosition() {
 
   const margin = 16
   const tooltipWidth = Math.min(320, window.innerWidth - 32)
-  const tooltipHeight = 160
+  const tooltipHeight = tooltipElement.value?.getBoundingClientRect().height || 220
 
   let x = rect.left + rect.width / 2 - tooltipWidth / 2
   x = Math.max(
@@ -187,6 +189,8 @@ onMounted(async () => {
 
   // Chủ động cuộn về target đầu tiên
   await goToStep(0)
+  await nextTick()
+  updatePosition()
 })
 
 onUnmounted(() => {
@@ -307,6 +311,7 @@ onUnmounted(() => {
       <!-- Tooltip -->
       <Transition name="guide-tooltip" mode="out-in">
         <section
+          ref="tooltipElement"
           :key="currentIndex"
           class="guide-tour__tooltip"
           :style="{
@@ -319,8 +324,8 @@ onUnmounted(() => {
             HƯỚNG DẪN · {{ progress }}
           </div>
 
-          <h3>{{ activeStep.title }}</h3>
-          <p>{{ activeStep.description }}</p>
+          <div class="guide-tour__title">{{ activeStep.title }}</div>
+          <div class="guide-tour__description">{{ activeStep.description }}</div>
 
           <div class="guide-tour__actions">
             <button
@@ -345,7 +350,7 @@ onUnmounted(() => {
               >
                 {{
                   currentIndex === steps.length - 1
-                    ? 'Hoàn tất'
+                    ? (finishLabel ?? 'Hoàn tất')
                     : 'Tiếp theo'
                 }}
               </button>
@@ -396,6 +401,8 @@ onUnmounted(() => {
 .guide-tour__tooltip {
   position: fixed;
   box-sizing: border-box;
+  max-height: calc(100dvh - 32px);
+  overflow-y: auto;
   z-index: 10;
   padding: 18px;
   color: #f8fafc;
@@ -415,13 +422,13 @@ onUnmounted(() => {
   letter-spacing: 1px;
 }
 
-.guide-tour__tooltip h3 {
+.guide-tour__title {
   margin: 0 0 8px;
   font-size: 17px;
   font-weight: 700;
 }
 
-.guide-tour__tooltip p {
+.guide-tour__description {
   margin: 0;
   color: #c4c8d1;
   font-size: 13px;

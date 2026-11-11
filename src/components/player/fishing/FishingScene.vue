@@ -9,27 +9,32 @@ import { supabaseFishingAreaRepository } from "../../../data/supabaseFishingArea
 import type { RealtimeChannel } from "@supabase/supabase-js";
 import { useDayPhaseStore } from "../../../stores/dayPhase.ts";
 import { useUserInAreaStore } from "../../../stores/userInArea.ts";
+import type { FishingSceneContext } from "../../../data/fishingGameplay";
 
+const props = defineProps<{ context?: FishingSceneContext }>();
 const router = useRouter();
-const dayPhaseStore = useDayPhaseStore();
-const fishingStore = useFishingStore();
-const equipmentStore = useEquipmentStore();
-const isLeaving = computed(() => fishingStore.isLeavingArea);
+// Local practice never initializes live stores or subscribes to a fishing session.
+const live = props.context ? null : {
+  fishing: useFishingStore(), equipment: useEquipmentStore(),
+  dayPhase: useDayPhaseStore(), userInArea: useUserInAreaStore(),
+};
+const fishingStore = props.context?.state ?? live!.fishing;
+const sceneImage = computed(() => props.context?.sceneImage ?? live?.dayPhase.currentScenePhace);
+const isLeaving = computed(() => live?.fishing.isLeavingArea ?? false);
 const showExitConfirmation = ref(false);
-const userInAreaStore = useUserInAreaStore();
-const tripCaughtCount = computed(() => fishingStore.inventory.length);
+const tripCaughtCount = computed(() => live?.fishing.inventory.length ?? 0);
 let fishingSessionSubscription: RealtimeChannel | null = null;
 let subscribedSessionId: string | null = null;
 let handledBiteSessionId: string | null = null;
 
 watch(
-  () => fishingStore.sessionId,
+  () => live?.fishing.sessionId,
   (sessionId) => {
     if (fishingSessionSubscription) {
       void supabaseFishingAreaRepository.unsubscribe(fishingSessionSubscription);
       fishingSessionSubscription = null;
     }
-    subscribedSessionId = sessionId;
+    subscribedSessionId = sessionId ?? null;
     handledBiteSessionId = null;
     if (!sessionId) return;
 
@@ -37,7 +42,7 @@ watch(
     fishingSessionSubscription = supabaseFishingAreaRepository.subscribeToFishingSession(activeSessionId, (session) => {
       if (subscribedSessionId !== activeSessionId || handledBiteSessionId === activeSessionId) return;
       handledBiteSessionId = activeSessionId;
-      void fishingStore.startChallengeForSession(session.id);
+      void live?.fishing.startChallengeForSession(session.id);
     });
   },
   { immediate: true },
@@ -48,16 +53,16 @@ function handleBackToMap() {
 }
 
 watch(
-  () => fishingStore.leaveAreaError,
+  () => live?.fishing.leaveAreaError,
   (error) => {
     if (error) showExitConfirmation.value = true;
   },
 );
 
 watch(
-  () => fishingStore.currentArea,
+  () => live?.fishing.currentArea,
   (newArea) => {
-    dayPhaseStore.setCurrentScenePhase(newArea);
+    if (live) live.dayPhase.setCurrentScenePhase(newArea);
   },
   { immediate: true },
 );
@@ -77,7 +82,8 @@ const ripple = ref(false);
 const invalidTap = ref(false);
 const castClass = computed(() => `phase-${fishingStore.castPhase}`);
 const selectedRodImage = computed(() => {
-  const selectedRod = equipmentStore.variants.rod.find((rod) => rod.id === fishingStore.equipmentLoadout.rod);
+  if (props.context) return props.context.rodImage;
+  const selectedRod = live?.equipment.variants.rod.find((rod) => rod.id === live.fishing.equipmentLoadout.rod);
   return selectedRod?.image || "/fishing-rob.png";
 });
 const linePath = computed(() => {
@@ -131,6 +137,8 @@ watch(
 );
 
 let rodPositionFrame: number | undefined;
+let invalidTapTimer: ReturnType<typeof setTimeout> | undefined;
+let rippleTimer: ReturnType<typeof setTimeout> | undefined;
 
 function updateRodPosition() {
   if (!sceneElement.value || !rodLineAnchor.value) return;
@@ -153,6 +161,8 @@ onMounted(() => {
   window.addEventListener("resize", updateRodPosition);
 });
 onBeforeUnmount(() => {
+  clearTimeout(invalidTapTimer);
+  clearTimeout(rippleTimer);
   subscribedSessionId = null;
   if (rodPositionFrame) window.cancelAnimationFrame(rodPositionFrame);
   if (biteMotionFrame !== undefined) window.cancelAnimationFrame(biteMotionFrame);
@@ -177,29 +187,31 @@ function castAt(event: MouseEvent) {
   if (Array.isArray(boundary) && boundary.length >= 3 && !isPointInWater({ x, y }, boundary)) {
     invalidTap.value = true;
     fishingStore.rejectCast();
-    window.setTimeout(() => (invalidTap.value = false), 520);
+    clearTimeout(invalidTapTimer);
+    invalidTapTimer = setTimeout(() => (invalidTap.value = false), 520);
     return;
   }
   fishingStore.castTo(x, y);
   ripple.value = true;
-  window.setTimeout(() => (ripple.value = false), 900);
+  clearTimeout(rippleTimer);
+  rippleTimer = setTimeout(() => (ripple.value = false), 900);
 }
 </script>
 
 <template>
   <section class="fishing-scene" @contextmenu.prevent="">
     <img
-      :src="dayPhaseStore.currentScenePhace"
-      alt="Ao câu trong rừng"
+      :src="sceneImage"
+      alt="Khung cảnh bãi câu"
       class="pond-image"
       draggable="false"
       ref="sceneElement"
       @click="castAt"
     />
     <div class="scene-shade"></div>
-    <div class="absolute top-2 left-2 text-white flex justify-between items-start">
+    <div v-if="live" class="absolute top-2 left-2 text-white flex justify-between items-start">
       <div class="flex flex-col gap-2">
-        <DayPhaseClock :area-id="userInAreaStore.userInArea?.area_id" />
+        <DayPhaseClock :area-id="live.userInArea.userInArea?.area_id" />
         <div class="backdrop-blur-2xl h-fit w-fit rounded p-1">
           <button
             type="button"
@@ -252,7 +264,7 @@ function castAt(event: MouseEvent) {
     <Teleport to="body">
       <Transition name="exit-dialog">
         <div
-          v-if="showExitConfirmation"
+          v-if="live && showExitConfirmation"
           class="fixed z-[40] inset-0 grid place-items-center p-5 bg-[rgba(4,17,11,0.72)] backdrop-blur-[7px]"
           role="presentation"
           @click.self="showExitConfirmation = false"
@@ -263,14 +275,14 @@ function castAt(event: MouseEvent) {
             aria-modal="true"
             aria-labelledby="confirm-exit-title"
           >
-            <h2 id="confirm-exit-title" class="m-0 text-lg font-bold text-[#e8bd62]">Kết thúc chuyến câu?</h2>
-            <p class="my-4 text-sm text-[#c8dccb] leading-relaxed">
+            <div id="confirm-exit-title" class="m-0 text-lg font-bold text-[#e8bd62]">Kết thúc chuyến câu?</div>
+            <div class="my-4 text-sm text-[#c8dccb] leading-relaxed">
               Giỏ cá hiện có <strong class="text-white">{{ tripCaughtCount }}</strong> con cá. Bạn có chắc
               chắn muốn quay lại bản đồ không?
-            </p>
-            <p v-if="fishingStore.leaveAreaError" role="alert" class="my-3 text-sm text-red-300">
-              {{ fishingStore.leaveAreaError }}
-            </p>
+            </div>
+            <div v-if="live.fishing.leaveAreaError" role="alert" class="my-3 text-sm text-red-300">
+              {{ live.fishing.leaveAreaError }}
+            </div>
             <div class="flex justify-center gap-3 mt-5">
               <button
                 type="button"
