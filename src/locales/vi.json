@@ -1,6 +1,7 @@
 {
   "language": {
-    "label": "Ngôn ngữ"
+    "label": "Ngôn ngữ",
+    "save_error": "Không thể lưu ngôn ngữ. Vui lòng thử lại."
   },
   "Forbidden": {
     "ban_khong_co_quyen_truy_cap": "Bạn không có quyền truy cập",

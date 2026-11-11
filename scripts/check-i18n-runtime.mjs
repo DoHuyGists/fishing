@@ -68,6 +68,47 @@ try {
   locale.setLocale('fr');
   assert.equal(locale.locale, 'vi');
 
+  const { useAuthStore } = await server.ssrLoadModule('/src/stores/auth.ts');
+  const { useUserProfileStore } = await server.ssrLoadModule('/src/stores/userProfile.ts');
+  const { supabaseUserProfileRepository } = await server.ssrLoadModule('/src/data/supabaseUserProfileRepository.ts');
+  const auth = useAuthStore(pinia);
+  const profile = useUserProfileStore(pinia);
+  const originalUpdateLanguage = supabaseUserProfileRepository.updateLanguage;
+  const languageWrites = [];
+  try {
+    supabaseUserProfileRepository.updateLanguage = async (id, language) => {
+      languageWrites.push({ id, language });
+    };
+    auth.user = { id: 'language-test-user' };
+    auth.profile = { id: auth.user.id, language: 'en' };
+    await nextTick();
+    assert.equal(locale.locale, 'en');
+    assert.equal(languageWrites.length, 0);
+    profile.profile = { id: auth.user.id, language: 'en' };
+    await nextTick();
+    await locale.setLocale('vi');
+    assert.deepEqual(languageWrites, [{ id: auth.user.id, language: 'vi' }]);
+    assert.equal(auth.profile.language, 'vi');
+    assert.equal(profile.profile.language, 'vi');
+    assert.equal(saved.get('fishing.locale'), 'vi');
+    supabaseUserProfileRepository.updateLanguage = async () => { throw new Error('Save failed'); };
+    await locale.setLocale('en');
+    assert.equal(locale.locale, 'vi');
+    assert.equal(saved.get('fishing.locale'), 'vi');
+    assert.equal(profile.profile.language, 'vi');
+    assert.equal(locale.error, t('language.save_error'));
+    assert.equal(locale.saving, false);
+    profile.profile = { id: 'other-user', language: 'en' };
+    await nextTick();
+    assert.equal(locale.locale, 'vi');
+  } finally {
+    supabaseUserProfileRepository.updateLanguage = originalUpdateLanguage;
+    auth.user = null;
+    auth.profile = null;
+    profile.profile = null;
+    await nextTick();
+  }
+
   // Compile a client render function so locale changes can be checked on one mounted instance.
   const descriptor = parse(fs.readFileSync('src/components/shared/TwoOptionsModal.vue', 'utf8')).descriptor;
   const component = compileScript(descriptor, { id: 'i18n-confirm-check', inlineTemplate: true });

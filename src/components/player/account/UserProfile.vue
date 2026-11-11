@@ -7,6 +7,7 @@ import { useAuthStore } from "../../../stores/auth.ts";
 import { useCurrencyStore } from "../../../stores/currency.ts";
 import { useUserProfileStore } from "../../../stores/userProfile.ts";
 import { useCountryStore } from "../../../stores/country.ts";
+import { useLocaleStore } from "../../../stores/locale.ts";
 import Cash from "../currency/Cash.vue";
 import TwoOptionsModal from "../../shared/TwoOptionsModal.vue";
 import UpdateIdentityModal from "./UpdateIdentityModal.vue";
@@ -19,6 +20,7 @@ const authStore = useAuthStore();
 const currencyStore = useCurrencyStore();
 const userProfileStore = useUserProfileStore();
 const countryStore = useCountryStore();
+const localeStore = useLocaleStore();
 const copied = ref(false);
 const selectedCountryId = ref("");
 const countrySearch = ref("");
@@ -201,11 +203,9 @@ const userInitial = computed(() => {
     </div>
 
     <Teleport to="body">
-      <TwoOptionsModal v-if="showCountryModal" :title="tr('UserProfile.doi_quoc_gia')" :first-text="tr('AccountInfoModal.huy')"
-        :second-text="isUpdatingCountry ? tr('UserProfile.dang_cap_nhat') : tr('UserProfile.xac_nhan_doi')"
-        :first-disabled="isUpdatingCountry"
-        :second-disabled="!canChangeCountry || countryStore.isLoading || isUpdatingCountry || !selectedCountryId || selectedCountryId === userProfileStore.profile?.country_id"
-        :on-first="closeCountryModal" :on-dismiss="closeCountryModal" :on-second="updateCountry" @keydown.esc.stop="closeCountryModal">
+      <TwoOptionsModal v-if="showCountryModal" :title="tr('UserProfile.doi_quoc_gia')" :first-text="tr('AccountInfoModal.huy')" :second-text="isUpdatingCountry ? tr('UserProfile.dang_cap_nhat') : tr('UserProfile.xac_nhan_doi')" :first-disabled="isUpdatingCountry"
+        :second-disabled="!canChangeCountry || countryStore.isLoading || isUpdatingCountry || !selectedCountryId || selectedCountryId === userProfileStore.profile?.country_id" :on-first="closeCountryModal" :on-dismiss="closeCountryModal" :on-second="updateCountry"
+        @keydown.esc.stop="closeCountryModal">
         <div class="max-h-[calc(100dvh-14rem)] space-y-4 overflow-y-auto text-sm text-[#24352a]">
           <div class="rounded-lg border border-[#cbd9c6] bg-[#f5f9f0] p-3 text-xs leading-relaxed">
             <div class="mb-1 font-semibold">{{ tr('UserProfile.luu_y_truoc_khi_doi') }}</div>
@@ -235,6 +235,14 @@ const userInitial = computed(() => {
       </TwoOptionsModal>
     </Teleport>
     <div class="flex flex-wrap gap-2 justify-end">
+      <label class="flex items-center justify-between gap-3 rounded-lg border border-[#cbd9c6] bg-[#f5f9f0] px-3.5 py-2.5 text-xs text-[#24352a]">
+        <span class="font-medium">{{ tr('language.label') }}</span>
+      <select v-model="localeStore.locale" :disabled="localeStore.saving" :aria-busy="localeStore.saving" class="cursor-pointer rounded bg-transparent focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-emerald-600 disabled:cursor-wait disabled:opacity-60" :aria-label="tr('language.label')">
+          <option value="vi">Tiếng Việt</option>
+          <option value="en">English</option>
+        </select>
+    </label>
+    <div v-if="localeStore.error" role="alert" class="text-xs text-red-700">{{ localeStore.error }}</div>
       <button type="button" class="rounded-lg border border-[#cbd9c6] bg-[#f5f9f0] px-4 py-2 text-sm font-semibold text-[#24352a] transition-colors hover:bg-emerald-100 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-emerald-600" aria-haspopup="dialog"
         @click="openCountryModal">
         {{ tr('UserProfile.doi_quoc_gia') }}

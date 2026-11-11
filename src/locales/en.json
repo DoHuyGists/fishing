@@ -1952,6 +1952,7 @@
     "ve_sanh_cau_ca": "Back to fishing lobby"
   },
   "language": {
-    "label": "Language"
+    "label": "Language",
+    "save_error": "Unable to save language. Please try again."
   }
 }

@@ -18,9 +18,21 @@ export interface UserProfile {
   avatar_url: string | null;
   avatar_path: string | null;
   onboarding_completed: boolean;
+  language: string | null;
 }
 
 class SupabaseUserProfileRepository {
+  async updateLanguage(userId: string, language: "vi" | "en"): Promise<void> {
+    const { error } = await supabase
+      .from("user_profile")
+      .update({ language })
+      .eq("id", userId)
+      .select("language")
+      .single();
+
+    if (error) throw new Error(error.message);
+  }
+
   async fetchUserProfile(userId: string): Promise<UserProfile | null> {
     const { data, error } = await supabase
       .from("user_profile")
