@@ -1,8 +1,11 @@
 <script lang="ts" setup>
 import { ref } from "vue";
+import PlayerIdentity from "../../shared/PlayerIdentity.vue";
+import type { FriendUserProfile } from "../../../data/supabaseFriendRepository";
 import type { UserTeam, UserTeamInvite, UserTeamMember } from "../../../data/supabaseTeamRepository";
 
 defineProps<{
+  profiles: Map<string, FriendUserProfile>;
   team: UserTeam | null;
   members: UserTeamMember[];
   invites: UserTeamInvite[];
@@ -80,7 +83,8 @@ const statusClass: Record<string, string> = {
         <div class="m-0 font-bold text-[#24352a]">{{ invite.team?.name ?? "Tổ đội không tồn tại" }}</div>
         <div v-if="invite.team?.description" class="m-0 text-[0.8rem] text-[#556655]">{{ invite.team.description }}</div>
         <div class="m-0 mt-1 text-[0.75rem] text-[#556655]">
-          Từ <span class="font-mono">{{ invite.inviter_id.slice(0, 8) }}…</span> ·
+          Người mời:
+          <PlayerIdentity :user-id="invite.inviter_id" :profile="profiles.get(invite.inviter_id)" class="my-2" />
           {{ new Date(invite.created_at).toLocaleString("vi-VN") }}
         </div>
         <div class="mt-2 flex justify-end gap-2">
@@ -119,19 +123,11 @@ const statusClass: Record<string, string> = {
     </div>
     <div class="m-0 grid list-none grid-cols-1 gap-3 p-0 sm:grid-cols-2">
       <div v-for="member in members" :key="member.id" class="rounded-xl border border-[#daefd4] bg-white p-3">
-        <div class="flex items-center gap-3">
-          <div
-            class="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-[#3b7a57] text-xs font-extrabold text-white"
-          >
-            {{ member.user_id.slice(0, 2).toUpperCase() }}
-          </div>
-          <div class="min-w-0">
-            <div class="m-0 truncate font-mono text-[0.8rem] text-[#334433]">{{ member.user_id.slice(0, 8) }}…</div>
+        <PlayerIdentity :user-id="member.user_id" :profile="member.user_profile">
             <span class="text-[0.72rem] font-bold text-[#2e6644]">{{
               member.role === "LEADER" ? "👑 Trưởng nhóm" : "Thành viên"
             }}</span>
-          </div>
-        </div>
+        </PlayerIdentity>
         <div
           v-if="isLeader && member.user_id !== userId"
           class="mt-3 flex justify-end gap-2 border-t border-[#e3eee0] pt-2"

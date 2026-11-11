@@ -25,6 +25,9 @@ export const useCountryStore = defineStore("Country", {
     unlockedError: "",
   }),
   getters: {
+    getCountryName: (state) => (countryId?: string | null): string =>
+      state.countries.find((country) => country.id === countryId)?.name
+        || (countryId && state.isLoading ? "Đang tải quốc gia..." : "Chưa có thông tin quốc gia"),
     unlockedWorldMapCountryIds: (state): string[] => state.unlockedCountries
       .map((country) => getWorldMapCountryId(country.code))
       .filter((id): id is string => id !== null),

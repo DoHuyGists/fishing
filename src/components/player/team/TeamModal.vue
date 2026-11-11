@@ -1,6 +1,8 @@
 <script lang="ts" setup>
 import { computed, onMounted, ref } from "vue";
 import Modal from "../../shared/Modal.vue";
+import PlayerIdentity from "../../shared/PlayerIdentity.vue";
+import { useCountryStore } from "../../../stores/country.ts";
 import { useTeamStore } from "../../../stores/team.ts";
 import { useAuthStore } from "../../../stores/auth.ts";
 import { useFriendStore } from "../../../stores/friend.ts";
@@ -13,6 +15,12 @@ import TwoOptionsModal from "../../shared/TwoOptionsModal.vue";
 const authStore = useAuthStore();
 const teamStore = useTeamStore();
 const friendStore = useFriendStore();
+const countryStore = useCountryStore();
+
+function getMemberName(id: string) {
+  return teamStore.myTeamMembers.find((member) => member.user_id === id)?.user_profile?.display_name
+    || friendStore.profilesMap.get(id)?.display_name || `${id.slice(0, 8)}…`;
+}
 
 const userId = computed(() => authStore.userId);
 const isLeader = computed(() => teamStore.isLeader(userId.value));
@@ -230,7 +238,7 @@ const statusClass: Record<string, string> = {
 
 // ─── Lifecycle ───────────────────────────────────────────────────────────────
 async function loadData() {
-  await Promise.all([teamStore.loadData(userId.value), friendStore.loadData(userId.value)]);
+  await Promise.all([teamStore.loadData(userId.value), friendStore.loadData(userId.value), countryStore.fetchCountries()]);
 }
 
 onMounted(async () => {
@@ -253,6 +261,7 @@ onMounted(async () => {
         class="flex flex-col gap-4 lg:grid lg:grid-cols-[minmax(260px,0.8fr)_minmax(0,1.7fr)] lg:items-start"
       >
         <TeamListSidebar
+          :profiles="friendStore.profilesMap"
           :teams="teamStore.teams"
           :current-team-id="teamStore.myTeam?.id"
           :action-loading="teamStore.actionLoading"
@@ -269,6 +278,7 @@ onMounted(async () => {
             {{ teamStore.error }}
           </div>
           <MyTeamPanel
+            :profiles="friendStore.profilesMap"
             :team="teamStore.myTeam"
             :members="teamStore.myTeamMembers"
             :invites="teamStore.myInvites"
@@ -337,13 +347,8 @@ onMounted(async () => {
             class="flex flex-col gap-3 p-4 bg-linear-to-br from-white to-[#f5faf2] border border-[#daefd4] rounded-2xl shadow-sm"
           >
             <div class="flex items-center gap-3 min-w-0">
-              <div
-                class="w-11 h-11 rounded-full bg-linear-to-br from-[#3b7a57] to-[#2e6644] text-white flex items-center justify-center text-[0.78rem] font-extrabold shrink-0 shadow-sm"
-              >
-                {{ member.user_id.slice(0, 2).toUpperCase() }}
-              </div>
+              <PlayerIdentity :user-id="member.user_id" :profile="member.user_profile" class="flex-1" />
               <div class="flex-1 min-w-0 flex flex-col gap-1">
-                <span class="text-[0.82rem] text-[#334433] font-mono truncate">{{ member.user_id.slice(0, 8) }}…</span>
                 <span
                   :class="[
                     'inline-block px-[7px] py-[1px] rounded-full text-[0.7rem] font-bold',
@@ -501,6 +506,7 @@ onMounted(async () => {
                 </span>
               </div>
               <div v-if="team.description" class="text-[0.82rem] text-[#556655] my-1 mb-2">{{ team.description }}</div>
+              <PlayerIdentity :user-id="team.leader_id" :profile="friendStore.profilesMap.get(team.leader_id)" class="my-2" />
               <div class="text-[0.76rem] text-[#778877] my-1">
                 {{
                   team.join_type === "everyone"
@@ -691,7 +697,7 @@ onMounted(async () => {
             >
               <option value="" disabled>-- Chọn thành viên --</option>
               <option v-for="m in otherMembers" :key="m.user_id" :value="m.user_id">
-                {{ m.user_id.slice(0, 8) }}…
+                {{ getMemberName(m.user_id) }}
               </option>
             </select>
           </label>
@@ -734,7 +740,8 @@ onMounted(async () => {
         >
           <div class="m-0 mb-2 text-[1.05rem] font-extrabold text-[#1a3a1a]">Chuyển quyền trưởng nhóm</div>
           <div class="m-0 mb-4 text-[0.88rem] text-[#445544]">
-            Chuyển cho: <strong>{{ transferTarget.slice(0, 8) }}…</strong>
+            Chuyển cho: <strong>{{ getMemberName(transferTarget) }}</strong>
+            <PlayerIdentity :user-id="transferTarget" :profile="teamStore.myTeamMembers.find((member) => member.user_id === transferTarget)?.user_profile" class="mt-2" />
           </div>
           <div class="flex flex-col gap-2 mt-4">
             <button
@@ -777,7 +784,8 @@ onMounted(async () => {
         "
       >
         <div class="mb-2 text-[0.95rem] leading-normal text-[#374151]">
-          Thành viên <strong class="font-mono">{{ kickTargetId.slice(0, 8) }}…</strong> sẽ bị đưa khỏi tổ đội.
+          Thành viên <strong>{{ getMemberName(kickTargetId) }}</strong> sẽ bị đưa khỏi tổ đội.
+          <PlayerIdentity :user-id="kickTargetId" :profile="teamStore.myTeamMembers.find((member) => member.user_id === kickTargetId)?.user_profile" class="mt-2" />
         </div>
       </TwoOptionsModal>
     </Teleport>

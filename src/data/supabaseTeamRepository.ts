@@ -1,5 +1,6 @@
 import supabase from "../database/connection";
 import type { UserProfile } from "./supabaseUserProfileRepository";
+import { supabaseAvatarRepository } from "./supabaseAvatarRepository";
 
 export type TeamStatus = "PENDING" | "OPEN" | "FULL" | "FISHING" | "CLOSED";
 export type TeamJoinType = "everyone" | "friend" | "invited";
@@ -23,7 +24,7 @@ export interface UserTeamMember {
   user_id: string;
   role: TeamMemberRole;
   joined_at: string;
-  user_profile: Pick<UserProfile, "id" | "level" | "experience_point"> | null;
+  user_profile: Pick<UserProfile, "id" | "level" | "experience_point" | "display_name" | "avatar_url" | "avatar_path" | "country_id"> | null;
 }
 
 export type TeamInviteStatus = "PENDING" | "ACCEPTED" | "DECLINED";
@@ -111,11 +112,12 @@ class SupabaseTeamRepository {
 
     const { data: profiles, error: profileError } = await supabase
       .from("user_profile")
-      .select("id, level, experience_point")
+      .select("id, level, experience_point, display_name, avatar_url, avatar_path, country_id")
       .in("id", members.map((member) => member.user_id));
 
     if (profileError) throw new Error(profileError.message || "Không thể tải hồ sơ thành viên");
-    const profileById = new Map((profiles ?? []).map((profile) => [profile.id, profile]));
+    const resolvedProfiles = await supabaseAvatarRepository.resolveProfiles(profiles ?? []);
+    const profileById = new Map(resolvedProfiles.map((profile) => [profile.id, profile]));
 
     return members.map((member) => ({
       ...member,

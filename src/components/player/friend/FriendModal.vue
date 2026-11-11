@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import { computed, onMounted, ref } from "vue";
 import Modal from "../../shared/Modal.vue";
+import { useCountryStore } from "../../../stores/country.ts";
 import { useAuthStore } from "../../../stores/auth.ts";
 import { useFriendStore, type FriendshipRelation } from "../../../stores/friend.ts";
 import { useToast } from "../../../composables/useToast.ts";
@@ -10,6 +11,7 @@ type ActiveTab = "friends" | "received" | "sent" | "discover";
 
 const authStore = useAuthStore();
 const friendStore = useFriendStore();
+const countryStore = useCountryStore();
 const toast = useToast();
 
 const activeTab = ref<ActiveTab>("friends");
@@ -66,7 +68,7 @@ const filteredFriends = computed(() => {
 
 async function handleRefresh() {
   if (!currentUserId.value) return;
-  await friendStore.loadData(currentUserId.value);
+  await Promise.all([friendStore.loadData(currentUserId.value), countryStore.fetchCountries()]);
 }
 
 onMounted(() => {
@@ -338,7 +340,7 @@ async function executeDelete() {
           <input
             v-model="searchQuery"
             type="text"
-            placeholder="Tìm theo mã người chơi (ID)..."
+            placeholder="Tìm theo tên hoặc mã người chơi (ID)..."
             class="w-full px-3.5 py-2 pl-9 rounded-xl border border-emerald-900/20 bg-white/90 text-xs text-gray-800 placeholder-gray-400 focus:outline-none focus:border-emerald-600 focus:ring-1 focus:ring-emerald-600"
           />
           <span class="absolute left-3 top-2.5 text-xs text-gray-400">🔍</span>
@@ -453,6 +455,7 @@ async function executeDelete() {
                     </button>
                   </div>
 
+                  <div class="mt-1 text-[11px] text-[#556655]">{{ countryStore.getCountryName(getFriendProfile(record)?.country_id) }}</div>
                   <!-- Thông số hồ sơ nếu có -->
                   <div v-if="getFriendProfile(record)" class="flex items-center gap-2 mt-1 flex-wrap text-[11px]">
                     <span
@@ -536,7 +539,8 @@ async function executeDelete() {
                   </span>
                 </div>
 
-                <div v-if="getSenderProfile(record)" class="flex items-center gap-2 mt-1 text-[11px]">
+                <div class="mt-1 text-[11px] text-[#556655]">{{ countryStore.getCountryName(getSenderProfile(record)?.country_id) }}</div>
+                <div v-if="getSenderProfile(record)" class="flex flex-wrap items-center gap-2 mt-1 text-[11px]">
                   <span class="font-bold text-amber-800"> ⭐ Cấp {{ getSenderProfile(record)?.level }} </span>
                   <span class="text-gray-500">·</span>
                   <span class="text-emerald-800 font-medium">
@@ -634,7 +638,8 @@ async function executeDelete() {
                   </span>
                 </div>
 
-                <div v-if="getRecipientProfile(record)" class="flex items-center gap-2 mt-1 text-[11px]">
+                <div class="mt-1 text-[11px] text-[#556655]">{{ countryStore.getCountryName(getRecipientProfile(record)?.country_id) }}</div>
+                <div v-if="getRecipientProfile(record)" class="flex flex-wrap items-center gap-2 mt-1 text-[11px]">
                   <span class="font-bold text-amber-800"> ⭐ Cấp {{ getRecipientProfile(record)?.level }} </span>
                   <span class="text-gray-500">·</span>
                   <span class="text-gray-400 text-[10px]">
@@ -705,6 +710,7 @@ async function executeDelete() {
                     </button>
                   </div>
 
+                  <div class="mt-1 text-[11px] text-[#556655]">{{ countryStore.getCountryName(player.country_id) }}</div>
                   <!-- Thông số: Cấp & EXP -->
                   <div class="flex items-center gap-2 mt-1 flex-wrap text-[11px]">
                     <span

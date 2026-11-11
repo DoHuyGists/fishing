@@ -1,9 +1,12 @@
 <script lang="ts" setup>
 import { computed, ref } from "vue";
+import PlayerIdentity from "../../shared/PlayerIdentity.vue";
+import type { FriendUserProfile } from "../../../data/supabaseFriendRepository";
 import type { UserTeam } from "../../../data/supabaseTeamRepository";
 import Tab, { type TabItem } from "../../shared/Tab.vue";
 
 const props = defineProps<{
+  profiles: Map<string, FriendUserProfile>;
   teams: UserTeam[];
   currentTeamId?: string;
   actionLoading: boolean;
@@ -94,6 +97,8 @@ function joinTypeLabel(team: UserTeam) {
               {{ team.description }}
             </div>
             <div class="my-1 text-[0.72rem] text-[#778877]">{{ joinTypeLabel(team) }} · tối đa {{ team.max_members }}</div>
+            <div class="mt-2 text-[11px] text-[#556655]">Trưởng nhóm</div>
+            <PlayerIdentity :user-id="team.leader_id" :profile="profiles.get(team.leader_id)" class="mt-1" />
             <div class="mt-2 flex justify-end">
               <span
                 v-if="team.id === currentTeamId"

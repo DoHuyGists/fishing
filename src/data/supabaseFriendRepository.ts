@@ -17,6 +17,7 @@ export interface FriendUserProfile {
   display_name: string | null;
   avatar_url: string | null;
   avatar_path: string | null;
+  country_id: string | null;
   experience_point: number;
   level: number;
   inventory_capacity: number;
