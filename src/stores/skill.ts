@@ -1,3 +1,4 @@
+import { t as tr } from "../i18n";
 import { computed, ref, watch } from "vue";
 import { acceptHMRUpdate, defineStore } from "pinia";
 import { supabaseSkillRepository, type Skill, type UserSkill } from "../data/supabaseSkillRepository";
@@ -5,11 +6,11 @@ import { useAuthStore } from "./auth";
 import { useUserProfileStore } from "./userProfile";
 
 const effectLabels: Record<string, string> = {
-  catch_rate_bonus: "Tỷ lệ câu thành công",
-  xp_bonus: "Kinh nghiệm nhận được",
-  bite_time_reduction: "Giảm thời gian cá cắn câu",
-  shiny_rate_bonus: "Cơ hội gặp cá Shiny",
-  luck_bonus: "May mắn",
+  get catch_rate_bonus() { return tr('skill.ty_le_cau_thanh_cong'); },
+  get xp_bonus() { return tr('skill.kinh_nghiem_nhan_duoc'); },
+  get bite_time_reduction() { return tr('skill.giam_thoi_gian_ca_can_cau'); },
+  get shiny_rate_bonus() { return tr('skill.co_hoi_gap_ca_shiny'); },
+  get luck_bonus() { return tr('skill.may_man'); },
 };
 
 const skillIcons: Record<string, string> = {
@@ -76,7 +77,7 @@ export const useSkillStore = defineStore("skill", () => {
     const currentRequest = ++requestId;
     error.value = "";
     if (!userId) {
-      error.value = "Vui lòng đăng nhập để xem kỹ năng.";
+      error.value = tr('skill.vui_long_dang_nhap_de_xem_ky_nang');
       return false;
     }
     loading.value = true;
@@ -91,7 +92,7 @@ export const useSkillStore = defineStore("skill", () => {
       return true;
     } catch (err) {
       if (currentRequest === requestId) {
-        error.value = err instanceof Error ? err.message : "Không thể tải kỹ năng.";
+        error.value = err instanceof Error ? err.message : tr('skill.khong_the_tai_ky_nang');
       }
       return false;
     } finally {
@@ -125,7 +126,7 @@ export const useSkillStore = defineStore("skill", () => {
       return result;
     } catch (err) {
       if (authStore.user?.id === userId) {
-        upgradeError.value = err instanceof Error ? err.message : "Không thể nâng cấp kỹ năng.";
+        upgradeError.value = err instanceof Error ? err.message : tr('supabaseSkillRepository.khong_the_nang_cap_ky_nang');
       }
       return false;
     } finally {

@@ -1,3 +1,4 @@
+import { t as tr } from "../i18n";
 import { defineStore } from "pinia";
 import { supabaseTutorialRepository, type TutorialRow } from "../data/supabaseTutorialRepository";
 
@@ -19,7 +20,7 @@ export const useTutorialStore = defineStore("tutorial", {
       try {
         this.tutorials = await supabaseTutorialRepository.fetchPublished();
       } catch {
-        this.error = "Không thể tải các màn hướng dẫn. Vui lòng thử lại.";
+        this.error = tr('tutorial.khong_the_tai_cac_man_huong_dan_vui_long_thu_lai');
       } finally {
         this.loading = false;
       }

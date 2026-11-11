@@ -1,3 +1,4 @@
+import { t as tr } from "../i18n";
 import { defineStore } from "pinia";
 import type { Reward } from "../components/player/spin-wheel/SpinWheel.vue";
 import { supabaseUserInventoryRepository } from "../data/supabaseUserInventoryRepository.ts";
@@ -32,13 +33,13 @@ export const useSpinWheelStore = defineStore("SpinWheel", {
       try {
         this.applyRewards(await supabaseSpinWheelRepository.fetchRewards());
       } catch (err) {
-        this.error = err instanceof Error ? err.message : "Không thể tải phần thưởng vòng quay.";
+        this.error = err instanceof Error ? err.message : tr('spinWheel.khong_the_tai_phan_thuong_vong_quay');
       } finally {
         this.loading = false;
       }
     },
     async claimRandomItem(): Promise<string> {
-      if (this.claiming) throw new Error("Đang xử lý lượt quay.");
+      if (this.claiming) throw new Error(tr('spinWheel.dang_xu_ly_luot_quay'));
       this.claiming = true;
       try {
         const result = await supabaseUserInventoryRepository.claimRandomItem();

@@ -1,4 +1,6 @@
 <script setup lang="ts">
+import { t as tr } from "../i18n";
+
 withDefaults(
   defineProps<{
     /** Nội dung hiển thị bên dưới vòng xoay */
@@ -7,7 +9,7 @@ withDefaults(
     fullscreen?: boolean
   }>(),
   {
-    text: 'Đang tải',
+    get text() { return tr('Loading.dang_tai'); },
     fullscreen: true,
   },
 )
@@ -36,7 +38,7 @@ withDefaults(
         </span>
       </div>
 
-      <span class="sr-only">Vui lòng chờ trong giây lát</span>
+      <span class="sr-only">{{ tr('Loading.vui_long_cho_trong_giay_lat') }}</span>
     </div>
   </div>
 </template>

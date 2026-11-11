@@ -1,3 +1,4 @@
+import { t as tr } from "../i18n";
 import supabase from "../database/connection";
 import type { RealtimeChannel } from "@supabase/supabase-js";
 
@@ -133,7 +134,7 @@ class SupabaseMarketRepository {
       p_market_id: speciesMarketId,
     });
     if (error) throw new Error(error.message);
-    if (data?.success === false) throw new Error(data.message || "Không thể mua cá.");
+    if (data?.success === false) throw new Error(data.message || tr('supabaseMarketRepository.khong_the_mua_ca'));
     return data;
   }
 }

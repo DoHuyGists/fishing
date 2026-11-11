@@ -21,23 +21,25 @@
         />
         <div class="text-center text-sm">
           <div v-if="spinWheelStore.season" class="font-semibold">{{ spinWheelStore.season.name }}</div>
-          <span v-if="spinWheelStore.loading">Đang tải mùa quay...</span>
+          <span v-if="spinWheelStore.loading">{{ tr('SpinWheelModal.dang_tai_mua_quay') }}</span>
           <span v-else-if="spinWheelStore.error" role="alert">{{ spinWheelStore.error }}</span>
-          <span v-else-if="!spinWheelStore.season">Chưa có mùa quay đang diễn ra.</span>
-          <span v-else-if="!eligibleRewards.length">Mùa quay chưa có phần thưởng.</span>
-          <span v-else>{{ eligibleRewards.length }} vật phẩm trong vòng quay</span>
+          <span v-else-if="!spinWheelStore.season">{{ tr('ListItems.chua_co_mua_quay_dang_dien_ra') }}</span>
+          <span v-else-if="!eligibleRewards.length">{{ tr('SpinWheelModal.mua_quay_chua_co_phan_thuong') }}</span>
+          <span v-else>{{ eligibleRewards.length }} {{ tr('SpinWheelModal.vat_pham_trong_vong_quay') }}</span>
         </div>
         <div class="flex items-center gap-2 text-xs">
-          <span>Chi phí mỗi lượt quay:</span>
+          <span>{{ tr('SpinWheelModal.chi_phi_moi_luot_quay') }}</span>
           <Tickets :amount="1" />
         </div>
-        <div v-if="currencyStore.tickets < 1" class="text-sm text-amber-800">Bạn cần ít nhất 1 vé để quay.</div>
+        <div v-if="currencyStore.tickets < 1" class="text-sm text-amber-800">{{ tr('SpinWheelModal.ban_can_it_nhat_1_ve_de_quay') }}</div>
       </div>
     </div>
   </Modal>
 </template>
 
 <script setup lang="ts">
+import { t as tr } from "../../../i18n";
+
 import { computed, onBeforeUnmount, onMounted, ref } from "vue";
 import { useSpinWheelStore } from "../../../stores/spinWheel.ts";
 import { useCurrencyStore } from "../../../stores/currency.ts";
@@ -71,7 +73,7 @@ async function fetchRewardIndex(): Promise<number> {
   const itemId = await spinWheelStore.claimRandomItem();
   const index = eligibleRewards.value.findIndex((reward) => String(reward.id) === itemId);
   if (index === -1) {
-    throw new Error("Không tìm thấy vật phẩm tương ứng với item_id trả về.");
+    throw new Error(tr('SpinWheelModal.khong_tim_thay_vat_pham_tuong_ung_voi_item_id_tra_ve'));
   }
   return index;
 }

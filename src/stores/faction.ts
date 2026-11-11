@@ -1,3 +1,4 @@
+import { t as tr } from "../i18n";
 import { defineStore } from "pinia";
 import {
   supabaseFactionRepository,
@@ -112,7 +113,7 @@ export const useFactionStore = defineStore("faction", {
             (factionsList.find((x) => x.is_neutral)?.id ?? factionsList[0]?.id ?? null);
         }
       } catch (err) {
-        this.error = err instanceof Error ? err.message : "Không thể tải thông tin phe phái";
+        this.error = err instanceof Error ? err.message : tr('faction.khong_the_tai_thong_tin_phe_phai');
       } finally {
         this.loading = false;
       }
@@ -132,7 +133,7 @@ export const useFactionStore = defineStore("faction", {
           if (verifiedId) this.currentFactionId = verifiedId;
         }
       } catch (err) {
-        const message = err instanceof Error ? err.message : "Tham gia phe thất bại";
+        const message = err instanceof Error ? err.message : tr('faction.tham_gia_phe_that_bai');
         this.error = message;
         throw new Error(message);
       } finally {
@@ -154,7 +155,7 @@ export const useFactionStore = defineStore("faction", {
           if (verifiedId) this.currentFactionId = verifiedId;
         }
       } catch (err) {
-        const message = err instanceof Error ? err.message : "Chuyển phe thất bại";
+        const message = err instanceof Error ? err.message : tr('faction.chuyen_phe_that_bai');
         this.error = message;
         throw new Error(message);
       } finally {

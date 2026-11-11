@@ -1,4 +1,6 @@
 <script setup lang="ts">
+import { t as tr } from "../../../i18n";
+
 import { computed, onBeforeUnmount, onMounted, ref, watch } from "vue";
 import { isPointInWater } from "../../../data/fishingMap.ts";
 import type { FishingSceneContext } from "../../../data/fishingGameplay";
@@ -132,7 +134,7 @@ function castAt(event: MouseEvent) {
   <section class="fishing-scene" @contextmenu.prevent="">
     <img
       :src="context.sceneImage"
-      alt="Khung cảnh bãi câu"
+      :alt="tr('FishingScene.khung_canh_bai_cau')"
       class="pond-image"
       draggable="false"
       ref="sceneElement"
@@ -142,7 +144,7 @@ function castAt(event: MouseEvent) {
 
     <!-- <div class="scene-instruction">Chạm mặt hồ để vung cần đến điểm đó</div> -->
     <div class="water-glow"></div>
-    <div v-if="invalidTap" class="invalid-tap">Chọn phần mặt nước</div>
+    <div v-if="invalidTap" class="invalid-tap">{{ tr('FishingScene.chon_phan_mat_nuoc') }}</div>
     <div
       v-if="ripple"
       class="ripple"
@@ -172,7 +174,7 @@ function castAt(event: MouseEvent) {
       <img :src="context.rodImage" alt="" class="fishing-rod" />
       <span ref="rodLineAnchor" class="rod-line-anchor"></span>
     </div>
-    <div class="bite-alert" :class="{ visible: sceneState.castPhase === 'bite' }">! CÁ CẮN CÂU !</div>
+    <div class="bite-alert" :class="{ visible: sceneState.castPhase === 'bite' }">{{ tr('FishingScene.ca_can_cau') }}</div>
     <div class="scene-status" :class="{ active: sceneState.castPhase !== 'idle' }">
       <span class="status-dot"></span>{{ sceneState.castMessage }}
     </div>

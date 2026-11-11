@@ -1,10 +1,11 @@
+import { t as tr } from "../i18n";
 import supabase from "../database/connection";
 import { createUuid } from "../utils/uuid";
 const bucket = 'player-profile-avatars';
 export const supabaseAvatarRepository = {
   async upload(userId: string, file: File) {
     const extension = ({ 'image/jpeg': 'jpg', 'image/png': 'png', 'image/webp': 'webp' } as Record<string, string>)[file.type];
-    if (!extension || file.size > 2 * 1024 * 1024) throw new Error("Chọn ảnh JPG, PNG hoặc WebP tối đa 2 MB.");
+    if (!extension || file.size > 2 * 1024 * 1024) throw new Error(tr('supabaseAvatarRepository.chon_anh_jpg_png_hoac_webp_toi_da_2_mb'));
     const path = `${userId}/${createUuid()}.${extension}`;
     const { error } = await supabase.storage.from(bucket).upload(path, file, { contentType: file.type });
     if (error) throw new Error(error.message);

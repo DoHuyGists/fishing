@@ -1,3 +1,4 @@
+import { getFormattingLocale, t as tr } from "../i18n";
 import { defineStore } from "pinia";
 import { supabaseCurrencyRepository, type CurrencyConversionRate } from "../data/supabaseCurrencyRepository";
 import { useAuthStore } from "./auth";
@@ -18,10 +19,10 @@ export const useCurrencyStore = defineStore("currency", {
   }),
   getters: {
     formattedCash: (state): string => {
-      return state.cash.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ".");
+      return state.cash.toLocaleString(getFormattingLocale());
     },
-    formattedShells: (state): string => state.shells.toString().replace(/\B(?=(\d{3})+(?!\d))/g, "."),
-    formattedTickets: (state): string => state.tickets.toString().replace(/\B(?=(\d{3})+(?!\d))/g, "."),
+    formattedShells: (state): string => state.shells.toLocaleString(getFormattingLocale()),
+    formattedTickets: (state): string => state.tickets.toLocaleString(getFormattingLocale()),
   },
   actions: {
     async fetchConversionRates() {
@@ -35,7 +36,7 @@ export const useCurrencyStore = defineStore("currency", {
           this.conversionBatches[key] ??= 1;
         }
       } catch (error) {
-        this.conversionRatesError = error instanceof Error ? error.message : "Không thể tải tỷ giá quy đổi.";
+        this.conversionRatesError = error instanceof Error ? error.message : tr('currency.khong_the_tai_ty_gia_quy_doi');
       } finally {
         this.conversionRatesLoading = false;
       }
@@ -63,9 +64,9 @@ export const useCurrencyStore = defineStore("currency", {
         this.cash = wallet.cash;
         this.shells = wallet.shells;
         this.tickets = wallet.tickets;
-        useToast().success("Quy đổi tiền tệ thành công!");
+        useToast().success(tr('currency.quy_doi_tien_te_thanh_cong'));
       } catch (error) {
-        useToast().error(error instanceof Error ? error.message : "Không thể quy đổi tiền tệ.");
+        useToast().error(error instanceof Error ? error.message : tr('currency.khong_the_quy_doi_tien_te'));
         await this.fetchConversionRates();
         await this.fetchCurrency();
       } finally {
@@ -81,7 +82,7 @@ export const useCurrencyStore = defineStore("currency", {
         this.shells = shells ?? 0;
         this.tickets = await supabaseCurrencyRepository.fetchTickets(useAuthStore().userId);
       } catch (err) {
-        this.error = err instanceof Error ? err.message : "Không thể lấy dữ liệu tiền tệ";
+        this.error = err instanceof Error ? err.message : tr('currency.khong_the_lay_du_lieu_tien_te');
       } finally {
         this.loading = false;
       }

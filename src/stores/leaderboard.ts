@@ -1,3 +1,4 @@
+import { t as tr } from "../i18n";
 import { defineStore } from "pinia";
 import { supabaseLeaderboardRepository, type LeaderboardEntry } from "../data/supabaseLeaderboardRepository";
 import { mockLeaderboards, type MockLeaderboardCriterion } from "../data/mockLeaderboard";
@@ -24,10 +25,10 @@ interface RankedLeaderboardEntry {
 }
 
 const categories: LeaderboardCategory[] = [
-  { key: "score", label: "Tổng điểm", description: "Những cần thủ dẫn đầu về điểm xếp hạng.", metric: "Tổng điểm", unit: "điểm", emoji: "🏆", isMock: false },
-  { key: "catches", label: "Số cá đã câu", description: "Xếp hạng theo tổng số cá câu được.", metric: "Số cá đã câu", unit: "con", emoji: "🎣", isMock: true },
-  { key: "largest", label: "Cá lớn nhất", description: "Xếp hạng theo cân nặng của con cá lớn nhất từng câu được.", metric: "Kỷ lục cân nặng", unit: "kg", emoji: "🐟", isMock: true },
-  { key: "collection", label: "Bộ sưu tập", description: "Xếp hạng theo số loài cá khác nhau đã khám phá.", metric: "Loài đã khám phá", unit: "loài", emoji: "📖", isMock: true },
+  { key: "score", get label() { return tr('leaderboard.tong_diem'); }, get description() { return tr('leaderboard.nhung_can_thu_dan_dau_ve_diem_xep_hang'); }, get metric() { return tr('leaderboard.tong_diem'); }, get unit() { return tr('DailyMission.diem'); }, emoji: "🏆", isMock: false },
+  { key: "catches", get label() { return tr('leaderboard.so_ca_da_cau'); }, get description() { return tr('leaderboard.xep_hang_theo_tong_so_ca_cau_duoc'); }, get metric() { return tr('leaderboard.so_ca_da_cau'); }, get unit() { return tr('UserProfile.con'); }, emoji: "🎣", isMock: true },
+  { key: "largest", get label() { return tr('leaderboard.ca_lon_nhat'); }, get description() { return tr('leaderboard.xep_hang_theo_can_nang_cua_con_ca_lon_nhat_tung_cau_duoc'); }, get metric() { return tr('leaderboard.ky_luc_can_nang'); }, unit: "kg", emoji: "🐟", isMock: true },
+  { key: "collection", get label() { return tr('leaderboard.bo_suu_tap'); }, get description() { return tr('leaderboard.xep_hang_theo_so_loai_ca_khac_nhau_da_kham_pha'); }, get metric() { return tr('leaderboard.loai_da_kham_pha'); }, get unit() { return tr('FlipBook.loai'); }, emoji: "📖", isMock: true },
 ];
 
 export const useLeaderboardStore = defineStore("leaderboard", {
@@ -48,7 +49,7 @@ export const useLeaderboardStore = defineStore("leaderboard", {
           ? state.entries.map((entry) => ({
               id: entry.id,
               userId: entry.user_id,
-              displayName: entry.display_name || "Ẩn danh",
+              displayName: entry.display_name || tr('LeaderboardModal.an_danh'),
               avatarUrl: entry.avatar_url,
               value: entry.score,
               rank: 0,
@@ -96,7 +97,7 @@ export const useLeaderboardStore = defineStore("leaderboard", {
         this.myRank = myRank;
       } catch (error) {
         if (requestId !== this.requestId) return;
-        this.error = error instanceof Error ? error.message : "Không thể tải bảng xếp hạng";
+        this.error = error instanceof Error ? error.message : tr('leaderboard.khong_the_tai_bang_xep_hang');
       } finally {
         if (requestId === this.requestId) this.loading = false;
       }

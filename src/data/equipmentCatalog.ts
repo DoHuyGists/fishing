@@ -1,3 +1,4 @@
+import { t as tr } from "../i18n";
 import type { FishingTool } from "../stores/fishing";
 
 export interface EquipmentVariant {
@@ -16,11 +17,11 @@ export interface EquipmentVariant {
 }
 
 export const equipmentCategories: { id: FishingTool; name: string; icon: string}[] = [
-  { id: "rod", name: "Cần câu", icon: "/icons/items/rod.svg"},
-  { id: "line", name: "Dây câu", icon: "/icons/items/line.svg"},
-  { id: "reel", name: "Cuộn câu", icon: "/icons/items/reel.svg"},
-  { id: "hook", name: "Móc câu", icon: "/icons/items/hook.svg"},
-  { id: "bait", name: "Mồi câu", icon: "/icons/items/bait.svg"},
+  { id: "rod", get name() { return tr('useInventoryTable.can_cau'); }, icon: "/icons/items/rod.svg"},
+  { id: "line", get name() { return tr('useInventoryTable.day_cau'); }, icon: "/icons/items/line.svg"},
+  { id: "reel", get name() { return tr('equipmentCatalog.cuon_cau'); }, icon: "/icons/items/reel.svg"},
+  { id: "hook", get name() { return tr('equipmentCatalog.moc_cau'); }, icon: "/icons/items/hook.svg"},
+  { id: "bait", get name() { return tr('equipmentCatalog.moi_cau'); }, icon: "/icons/items/bait.svg"},
 ];
 
 // Seed data used only to bootstrap a brand-new user's row in Supabase; live data always comes from the DB afterwards.

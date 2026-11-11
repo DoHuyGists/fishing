@@ -1,3 +1,4 @@
+import { t as tr } from "../i18n";
 import supabase from "../database/connection";
 import { createUuid } from "../utils/uuid";
 
@@ -75,7 +76,7 @@ class SupabaseFeedbackRepository {
       .select("id")
       .maybeSingle();
     if (error) throw new Error(error.message);
-    if (!data) throw new Error("Không tìm thấy báo lỗi để cập nhật hoặc bạn không có quyền cập nhật.");
+    if (!data) throw new Error(tr('supabaseFeedbackRepository.khong_tim_thay_bao_loi_de_cap_nhat_hoac_ban_khong_co_quyen_cap_n'));
   }
 
   async createErrorFeedbackSignedUrls(paths: string[]): Promise<Record<string, string>> {
@@ -106,7 +107,7 @@ class SupabaseFeedbackRepository {
     try {
       for (const file of payload.files) {
         const type = file.type.startsWith("image/") ? "image" : file.type.startsWith("video/") ? "video" : null;
-        if (!type) throw new Error("Chỉ hỗ trợ file ảnh hoặc video.");
+        if (!type) throw new Error(tr('supabaseFeedbackRepository.chi_ho_tro_file_anh_hoac_video'));
 
         const safeName = file.name.replace(/[^a-zA-Z0-9._-]/g, "_");
         const path = `${payload.userId}/${createUuid()}-${safeName}`;

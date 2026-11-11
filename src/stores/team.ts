@@ -1,3 +1,4 @@
+import { t as tr } from "../i18n";
 import { defineStore } from "pinia";
 import type { RealtimeChannel } from "@supabase/supabase-js";
 import supabase from "../database/connection";
@@ -50,7 +51,7 @@ export const useTeamStore = defineStore("team", {
         this.myTeam = myTeamData?.team ?? null;
         this.myTeamMembers = myTeamData?.members ?? [];
       } catch (err) {
-        this.error = err instanceof Error ? err.message : "Không thể tải dữ liệu nhóm";
+        this.error = err instanceof Error ? err.message : tr('team.khong_the_tai_du_lieu_nhom');
       } finally {
         this.loading = false;
       }
@@ -105,7 +106,7 @@ export const useTeamStore = defineStore("team", {
         await this.loadData(userId);
         return true;
       } catch (err) {
-        this.error = err instanceof Error ? err.message : "Không thể tạo nhóm";
+        this.error = err instanceof Error ? err.message : tr('supabaseTeamRepository.khong_the_tao_nhom');
         return false;
       } finally {
         this.actionLoading = false;
@@ -121,7 +122,7 @@ export const useTeamStore = defineStore("team", {
         await this.loadData(userId);
         return true;
       } catch (err) {
-        this.error = err instanceof Error ? err.message : "Không thể cập nhật nhóm";
+        this.error = err instanceof Error ? err.message : tr('supabaseTeamRepository.khong_the_cap_nhat_nhom');
         return false;
       } finally {
         this.actionLoading = false;
@@ -136,7 +137,7 @@ export const useTeamStore = defineStore("team", {
         await this.loadData(userId);
         return true;
       } catch (err) {
-        this.error = err instanceof Error ? err.message : "Không thể tham gia nhóm";
+        this.error = err instanceof Error ? err.message : tr('supabaseTeamRepository.khong_the_tham_gia_nhom');
         return false;
       } finally {
         this.actionLoading = false;
@@ -152,7 +153,7 @@ export const useTeamStore = defineStore("team", {
         await this.loadData(userId);
         return true;
       } catch (err) {
-        this.error = err instanceof Error ? err.message : "Không thể rời nhóm";
+        this.error = err instanceof Error ? err.message : tr('supabaseTeamRepository.khong_the_roi_nhom');
         return false;
       } finally {
         this.actionLoading = false;
@@ -168,7 +169,7 @@ export const useTeamStore = defineStore("team", {
         await this.loadData(userId);
         return true;
       } catch (err) {
-        this.error = err instanceof Error ? err.message : "Không thể kick thành viên";
+        this.error = err instanceof Error ? err.message : tr('supabaseTeamRepository.khong_the_kick_thanh_vien');
         return false;
       } finally {
         this.actionLoading = false;
@@ -184,7 +185,7 @@ export const useTeamStore = defineStore("team", {
         await this.loadData(userId);
         return true;
       } catch (err) {
-        this.error = err instanceof Error ? err.message : "Không thể đóng nhóm";
+        this.error = err instanceof Error ? err.message : tr('supabaseTeamRepository.khong_the_dong_nhom');
         return false;
       } finally {
         this.actionLoading = false;
@@ -202,7 +203,7 @@ export const useTeamStore = defineStore("team", {
         await this.loadData(userId);
         return true;
       } catch (err) {
-        this.error = err instanceof Error ? err.message : "Không thể rời và đóng nhóm";
+        this.error = err instanceof Error ? err.message : tr('team.khong_the_roi_va_dong_nhom');
         return false;
       } finally {
         this.actionLoading = false;
@@ -217,7 +218,7 @@ export const useTeamStore = defineStore("team", {
         await supabaseTeamRepository.inviteUser(this.myTeam.id, userId, inviteeId);
         return true;
       } catch (err) {
-        this.error = err instanceof Error ? err.message : "Không thể gửi lời mời";
+        this.error = err instanceof Error ? err.message : tr('supabaseTeamRepository.khong_the_gui_loi_moi');
         return false;
       } finally {
         this.actionLoading = false;
@@ -232,7 +233,7 @@ export const useTeamStore = defineStore("team", {
         await this.loadData(userId);
         return true;
       } catch (err) {
-        this.error = err instanceof Error ? err.message : "Không thể xử lý lời mời";
+        this.error = err instanceof Error ? err.message : tr('supabaseTeamRepository.khong_the_xu_ly_loi_moi');
         return false;
       } finally {
         this.actionLoading = false;
@@ -248,7 +249,7 @@ export const useTeamStore = defineStore("team", {
         await this.loadData(userId);
         return true;
       } catch (err) {
-        this.error = err instanceof Error ? err.message : "Không thể chuyển quyền trưởng nhóm";
+        this.error = err instanceof Error ? err.message : tr('supabaseTeamRepository.khong_the_chuyen_quyen_truong_nhom');
         return false;
       } finally {
         this.actionLoading = false;

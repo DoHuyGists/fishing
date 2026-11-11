@@ -1,4 +1,6 @@
 <script setup lang="ts">
+import { t as tr } from "../../../i18n";
+
 import type { AquaculturePond } from '../../../data/aquaculture'
 import { fishImageUrl } from './pondPresentation'
 
@@ -14,9 +16,9 @@ defineProps<{
     <div class="mb-3 flex flex-wrap items-center justify-between gap-2">
       <div class="flex gap-2 items-center">
         <div class="m-0 mt-1 text-xl font-bold">{{ pond.name }}</div>
-        <span class="rounded-lg bg-[#f5f9f0]/90 px-3 py-1.5 text-xs text-emerald-900">{{ pond.batches.length }} lứa đang nuôi</span>
+        <span class="rounded-lg bg-[#f5f9f0]/90 px-3 py-1.5 text-xs text-emerald-900">{{ pond.batches.length }} {{ tr('FishPond.lua_dang_nuoi') }}</span>
       </div>
-      <span class="rounded-full border border-white/70 bg-white/80 px-3 py-1.5 text-xs font-semibold">Cấp {{ pond.level }} · {{ pond.fish.length }} con</span>
+      <span class="rounded-full border border-white/70 bg-white/80 px-3 py-1.5 text-xs font-semibold">{{ tr('FishPond.cap') }} {{ pond.level }} · {{ pond.fish.length }} {{ tr('UserProfile.con') }}</span>
     </div>
     <div class="pond-bank relative">
       <div class="bank-grass bank-grass-left" aria-hidden="true" />
@@ -24,8 +26,8 @@ defineProps<{
       <div class="pond-water relative h-full overflow-hidden">
         <div class="water-light pointer-events-none absolute inset-0" aria-hidden="true" />
         <div class="water-ripples pointer-events-none absolute inset-0" aria-hidden="true"><i /><i /><i /></div>
-        <span v-if="pond.fish.some(f => f.status === 'ready')" class="absolute right-4 top-4 rounded-lg bg-amber-100 px-3 py-1.5 text-xs font-semibold text-amber-900">Có cá trưởng thành</span>
-        <div v-if="!pond.fish.length" class="empty-plaque absolute inset-x-4 top-1/2 m-0 text-center text-sm">Ao đã sẵn sàng. Thả lứa cá đầu tiên nhé!</div>
+        <span v-if="pond.fish.some(f => f.status === 'ready')" class="absolute right-4 top-4 rounded-lg bg-amber-100 px-3 py-1.5 text-xs font-semibold text-amber-900">{{ tr('FishPond.co_ca_truong_thanh') }}</span>
+        <div v-if="!pond.fish.length" class="empty-plaque absolute inset-x-4 top-1/2 m-0 text-center text-sm">{{ tr('FishPond.ao_da_san_sang_tha_lua_ca_dau_tien_nhe') }}</div>
         <div class="swimming-area absolute inset-x-4 bottom-5 top-14" aria-hidden="true">
           <span v-for="(fish, i) in swimmers" :key="fish.id" class="fish absolute block" :class="{ 'special-fish': fish.special }" :style="{ '--fish-width': (68 + fish.progress * .4) + 'px', top: (15 + i * 19) + '%', animationDuration: (150 + i * 20) + 's', animationDelay: -(i * 43) + 's' }">
             <img :src="fishImageUrl(fish.image)" alt="" class="fish-image" decoding="async" draggable="false" />
@@ -41,11 +43,11 @@ defineProps<{
       <span class="pond-dock" aria-hidden="true" />
     </div>
     <div class="mt-5 rounded-xl border border-white/80 bg-white/85 p-3">
-      <div class="flex justify-between gap-2 text-xs"><span>Sức chứa đã dùng</span><b>{{ pond.used_capacity }} / {{ pond.capacity }}</b></div>
-      <div class="my-2 h-2 overflow-hidden rounded-full bg-[#dfe8d8]" role="progressbar" aria-label="Sức chứa ao" :aria-valuenow="pond.used_capacity" :aria-valuemin="0" :aria-valuemax="pond.capacity">
+      <div class="flex justify-between gap-2 text-xs"><span>{{ tr('FishPond.suc_chua_da_dung') }}</span><b>{{ pond.used_capacity }} / {{ pond.capacity }}</b></div>
+      <div class="my-2 h-2 overflow-hidden rounded-full bg-[#dfe8d8]" role="progressbar" :aria-label="tr('FishPond.suc_chua_ao')" :aria-valuenow="pond.used_capacity" :aria-valuemin="0" :aria-valuemax="pond.capacity">
         <div class="h-full rounded-full bg-emerald-600" :style="{ width: (pond.used_capacity / pond.capacity * 100) + '%' }" />
       </div>
-      <div class="m-0 text-[11px] text-stone-600">Còn {{ pond.available_capacity }} sức chứa để thả cá. Tổng sức chứa cá phải nhỏ hơn {{ pond.capacity }}.</div>
+      <div class="m-0 text-[11px] text-stone-600">{{ tr('Fishfarm.con') }} {{ pond.available_capacity }} {{ tr('FishPond.suc_chua_de_tha_ca_tong_suc_chua_ca_phai_nho_hon') }} {{ pond.capacity }}.</div>
     </div>
   </section>
 </template>

@@ -1,4 +1,6 @@
 <script lang="ts" setup>
+import { t as tr } from "../../../i18n";
+
 import { onMounted } from "vue";
 import { useCountryStore } from "../../../stores/country";
 import { useFishingAreaStore } from "../../../stores/fishingArea";
@@ -26,13 +28,13 @@ onMounted(() => {
   >
     <header class="flex items-center gap-2">
       <img src="/icons/check-point.svg" width="35" alt="" draggable="false" />
-      <span class="min-w-0 flex-1 text-lg font-bold">Bản đồ</span>
+      <span class="min-w-0 flex-1 text-lg font-bold">{{ tr('FishingAnchor.ban_do') }}</span>
       <button
         v-if="collapsible"
         type="button"
         class="flex size-9 shrink-0 cursor-pointer items-center justify-center rounded-lg border border-[#cbd9c6] hover:bg-[#e5eddf] focus-visible:outline-2 focus-visible:outline-[#24352a]"
-        :aria-label="mapVisible ? 'Ẩn bản đồ' : 'Hiện bản đồ'"
-        :title="mapVisible ? 'Ẩn bản đồ' : 'Hiện bản đồ'"
+        :aria-label="mapVisible ? tr('FishingAnchor.an_ban_do') : tr('FishingAnchor.hien_ban_do')"
+        :title="mapVisible ? tr('FishingAnchor.an_ban_do') : tr('FishingAnchor.hien_ban_do')"
         :aria-expanded="mapVisible"
         @click="$emit('toggle-map')"
       >
@@ -43,13 +45,13 @@ onMounted(() => {
       <input
         v-model="fishingAreaStore.searchQuery"
         type="search"
-        aria-label="Tìm quốc gia hoặc bãi câu"
-        placeholder="Tìm quốc gia, bãi câu..."
+        :aria-label="tr('FishingAnchor.tim_quoc_gia_hoac_bai_cau')"
+        :placeholder="tr('FishingAnchor.tim_quoc_gia_bai_cau')"
         class="w-full rounded-lg border border-[#cbd9c6] bg-white px-3 py-2 text-xs text-[#24352a] placeholder:text-[#607176] focus-visible:outline-2 focus-visible:outline-[#24352a]"
       />
     </div>
     <div v-if="mapVisible" class="mt-5 flex-1 overflow-y-auto">
-      <div id="fishing-anchor-heading" class="m-0 text-[13px] font-bold">Danh sách bãi câu</div>
+      <div id="fishing-anchor-heading" class="m-0 text-[13px] font-bold">{{ tr('FishingAnchor.danh_sach_bai_cau') }}</div>
       <div
         v-if="fishingAreaStore.filteredAreasByCountry.length"
         role="list"
@@ -90,7 +92,7 @@ onMounted(() => {
                   @click="worldStore.handleMoveToArea(area)"
                 >
                   <span aria-hidden="true" class="mt-1 h-2 w-2 shrink-0 rounded-full bg-[#d84315]"></span>
-                  <span class="min-w-0 wrap-break-word">{{ area.title || "Bãi câu chưa đặt tên" }}</span>
+                  <span class="min-w-0 wrap-break-word">{{ area.title || tr('FishingAnchor.bai_cau_chua_dat_ten') }}</span>
                 </button>
               </div>
             </div>
@@ -98,17 +100,17 @@ onMounted(() => {
         </div>
       </div>
       <div v-if="fishingAreaStore.loading" class="mt-2 mb-0 text-[#607176] text-xs" role="status">
-        Đang tải bãi câu...
+        {{ tr('FishingAnchor.dang_tai_bai_cau') }}
       </div>
       <div v-else-if="fishingAreaStore.error" class="mt-2 mb-0 text-red-700 text-xs" role="alert">
         {{ fishingAreaStore.error }}
-        <button type="button" class="cursor-pointer underline" @click="fishingAreaStore.fetchArea()">Thử lại</button>
+        <button type="button" class="cursor-pointer underline" @click="fishingAreaStore.fetchArea()">{{ tr('Maintenance.thu_lai') }}</button>
       </div>
       <div v-else-if="!fishingAreaStore.fishingAreas.length" class="mt-2 mb-0 text-[#607176] text-xs">
-        Chưa có bãi câu
+        {{ tr('FishingAnchor.chua_co_bai_cau') }}
       </div>
       <div v-else-if="!fishingAreaStore.filteredAreasByCountry.length" class="mt-2 text-xs text-[#607176]" role="status">
-        Không tìm thấy quốc gia hoặc bãi câu phù hợp.
+        {{ tr('FishingAnchor.khong_tim_thay_quoc_gia_hoac_bai_cau_phu_hop') }}
       </div>
     </div>
   </aside>

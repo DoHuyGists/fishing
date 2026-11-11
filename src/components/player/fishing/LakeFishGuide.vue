@@ -1,4 +1,6 @@
 <script setup lang="ts">
+import { t as tr } from "../../../i18n";
+
 import { computed } from "vue";
 import { useFishingStore } from "../../../stores/fishing";
 const store = useFishingStore();
@@ -20,7 +22,7 @@ const undiscoveredFishes = computed(() => store.areaSpeciesDiary?.fishes.filter(
         >
           <header class="flex justify-between px-5 pt-[19px] pb-3 border-b border-[rgba(223,241,207,0.14)]">
             <div>
-              <div class="m-0 text-xl">Cá trong hồ</div>
+              <div class="m-0 text-xl">{{ tr('EquipmentMenu.ca_trong_ho') }}</div>
             </div>
             <button
               type="button"
@@ -32,39 +34,39 @@ const undiscoveredFishes = computed(() => store.areaSpeciesDiary?.fishes.filter(
           </header>
           <div class="px-5 py-4">
             <div v-if="store.isLoadingAreaSpeciesDiary" class="py-8 text-center text-sm text-[#b7cfb9]" role="status">
-              Đang tải danh sách cá...
+              {{ tr('CaughtModal.dang_tai_danh_sach_ca') }}
             </div>
             <div v-else-if="store.areaSpeciesDiaryError" class="py-6 text-center text-sm text-[#f3b8a8]" role="alert">
-              <div class="mb-3">Không thể tải sổ tay cá trong hồ.</div>
+              <div class="mb-3">{{ tr('LakeFishGuide.khong_the_tai_so_tay_ca_trong_ho') }}</div>
               <button
                 type="button"
                 class="rounded-lg border border-white/20 px-3 py-2 text-xs text-white"
                 @click="store.fetchAreaSpeciesDiary"
               >
-                Thử lại
+                {{ tr('Maintenance.thu_lai') }}
               </button>
             </div>
             <template v-else-if="store.areaSpeciesDiary">
               <div class="mb-4 grid grid-cols-3 gap-2 text-center">
                 <div class="rounded-xl bg-white/[0.07] p-2">
                   <strong class="block text-lg">{{ store.areaSpeciesDiary.total_species }}</strong>
-                  <span class="text-[10px] text-[#b7cfb9]">Tổng loài</span>
+                  <span class="text-[10px] text-[#b7cfb9]">{{ tr('LakeFishGuide.tong_loai') }}</span>
                 </div>
                 <div class="rounded-xl bg-white/[0.07] p-2">
                   <strong class="block text-lg text-[#c7e6a5]">{{ store.areaSpeciesDiary.discovered_species }}</strong>
-                  <span class="text-[10px] text-[#b7cfb9]">Đã khám phá</span>
+                  <span class="text-[10px] text-[#b7cfb9]">{{ tr('LakeFishGuide.da_kham_pha') }}</span>
                 </div>
                 <div class="rounded-xl bg-white/[0.07] p-2">
                   <strong class="block text-lg text-[#e8bd62]">{{
                     store.areaSpeciesDiary.undiscovered_species
                   }}</strong>
-                  <span class="text-[10px] text-[#b7cfb9]">Chưa khám phá</span>
+                  <span class="text-[10px] text-[#b7cfb9]">{{ tr('LakeFishGuide.chua_kham_pha') }}</span>
                 </div>
               </div>
 
               <div class="max-h-[min(55vh,420px)] space-y-4 overflow-y-auto pr-1">
                 <section v-if="discoveredFishes.length">
-                  <div class="mb-2 text-xs font-bold uppercase tracking-wide text-[#c7e6a5]">Đã khám phá</div>
+                  <div class="mb-2 text-xs font-bold uppercase tracking-wide text-[#c7e6a5]">{{ tr('LakeFishGuide.da_kham_pha') }}</div>
                   <div class="m-0 space-y-2 p-0">
                     <div
                       v-for="fish in discoveredFishes"
@@ -79,7 +81,7 @@ const undiscoveredFishes = computed(() => store.areaSpeciesDiary?.fishes.filter(
                       />
                       <div class="min-w-0 flex-1">
                         <div class="m-0 font-semibold">{{ fish.display_name || fish.name }}</div>
-                        <div class="m-0 text-[10px] text-[#e8bd62]">{{ fish.rarity || "Chưa rõ độ hiếm" }}</div>
+                        <div class="m-0 text-[10px] text-[#e8bd62]">{{ fish.rarity || tr('LakeFishGuide.chua_ro_do_hiem') }}</div>
                         <div v-if="fish.information" class="mb-0 mt-1 text-xs leading-relaxed text-[#b7cfb9]">
                           {{ fish.information }}
                         </div>
@@ -87,7 +89,7 @@ const undiscoveredFishes = computed(() => store.areaSpeciesDiary?.fishes.filter(
                           v-if="fish.weight_min != null || fish.weight_max != null"
                           class="mb-0 mt-1 text-[10px] text-[#b7cfb9]"
                         >
-                          Cân nặng: {{ fish.weight_min ?? "?" }}–{{ fish.weight_max ?? "?" }} kg
+                          {{ tr('LakeFishGuide.can_nang') }} {{ fish.weight_min ?? "?" }}–{{ fish.weight_max ?? "?" }} kg
                         </div>
                       </div>
                     </div>
@@ -95,7 +97,7 @@ const undiscoveredFishes = computed(() => store.areaSpeciesDiary?.fishes.filter(
                 </section>
 
                 <section v-if="undiscoveredFishes.length">
-                  <div class="mb-2 text-xs font-bold uppercase tracking-wide text-[#e8bd62]">Chưa khám phá</div>
+                  <div class="mb-2 text-xs font-bold uppercase tracking-wide text-[#e8bd62]">{{ tr('LakeFishGuide.chua_kham_pha') }}</div>
                   <div class="m-0 grid grid-cols-2 gap-2 p-0">
                     <div
                       v-for="fish in undiscoveredFishes"
@@ -108,17 +110,17 @@ const undiscoveredFishes = computed(() => store.areaSpeciesDiary?.fishes.filter(
                         >?</span
                       >
                       <span class="text-xs font-semibold text-[#d3dfd0]">{{
-                        fish.display_name || "Chưa khám phá"
+                        fish.display_name || tr('LakeFishGuide.chua_kham_pha')
                       }}</span>
                     </div>
                   </div>
                 </section>
                 <div v-if="!store.areaSpeciesDiary.fishes.length" class="m-0 py-6 text-center text-sm text-[#b7cfb9]">
-                  Chưa có dữ liệu loài cá ở khu vực này.
+                  {{ tr('LakeFishGuide.chua_co_du_lieu_loai_ca_o_khu_vuc_nay') }}
                 </div>
               </div>
             </template>
-            <div v-else class="m-0 py-8 text-center text-sm text-[#b7cfb9]">Chưa có khu vực câu cá được chọn.</div>
+            <div v-else class="m-0 py-8 text-center text-sm text-[#b7cfb9]">{{ tr('LakeFishGuide.chua_co_khu_vuc_cau_ca_duoc_chon') }}</div>
           </div>
         </section>
       </div>

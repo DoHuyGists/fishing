@@ -1,4 +1,6 @@
 <script setup lang="ts">
+import { t as tr } from "../../i18n";
+
 import { computed, onBeforeUnmount, watch } from "vue";
 import { useToast, type ToastItem, type ToastPosition, type ToastVariant } from "../../composables/useToast";
 
@@ -96,7 +98,7 @@ onBeforeUnmount(() => activeTimers.forEach(clearTimeout));
 
 <template>
   <Teleport to="body">
-  <div aria-label="Thông báo" :aria-live="liveMode" aria-relevant="additions text">
+  <div :aria-label="tr('NotificationModal.thong_bao')" :aria-live="liveMode" aria-relevant="additions text">
     <div
       v-for="group in groupedToasts"
       :key="group.position"
@@ -148,7 +150,7 @@ onBeforeUnmount(() => activeTimers.forEach(clearTimeout));
             class="-mr-1 -mt-1 grid h-8 w-8 flex-none place-items-center rounded-lg bg-transparent text-xl leading-none transition-colors hover:bg-black/5 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#78906f]"
             :class="variantTextClasses[toast.variant]"
             type="button"
-            :aria-label="`Đóng thông báo: ${toast.message}`"
+            :aria-label="tr('Toast.dong_thong_bao_value0', { value0: toast.message })"
             @click="dismiss(toast.id)"
           >
             <span aria-hidden="true">×</span>

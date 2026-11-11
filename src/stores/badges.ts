@@ -1,3 +1,4 @@
+import { t as tr } from "../i18n";
 import { defineStore } from "pinia";
 import { supabaseBadgeRepository, type UserBadgeStatus } from "../data/supabaseBadgeRepository";
 import { useCurrencyStore } from "./currency";
@@ -21,7 +22,7 @@ export const useBadgesStore = defineStore("badges", {
         const badges = await supabaseBadgeRepository.fetchUserBadgesStatus();
         this.badges = [...badges].sort((a, b) => Number(b.is_earned) - Number(a.is_earned) || a.name.localeCompare(b.name));
       } catch (error) {
-        this.error = error instanceof Error ? error.message : "Không thể tải danh sách huy hiệu";
+        this.error = error instanceof Error ? error.message : tr('badges.khong_the_tai_danh_sach_huy_hieu');
       } finally {
         this.loading = false;
       }
@@ -35,7 +36,7 @@ export const useBadgesStore = defineStore("badges", {
         await Promise.all([this.fetchBadges(), useCurrencyStore().fetchCurrency()]);
         return true;
       } catch (error) {
-        this.claimError = error instanceof Error ? error.message : "Không thể nhận thưởng";
+        this.claimError = error instanceof Error ? error.message : tr('DailyMission.khong_the_nhan_thuong');
         return false;
       } finally {
         this.claimingId = "";

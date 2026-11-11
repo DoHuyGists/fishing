@@ -1,3 +1,4 @@
+import { t as tr } from "../i18n";
 import supabase from "../database/connection";
 import type { UserProfile } from "./supabaseUserProfileRepository";
 import { supabaseAvatarRepository } from "./supabaseAvatarRepository";
@@ -47,15 +48,15 @@ class SupabaseTeamRepository {
       .select("id")
       .eq("id", inviteeId)
       .maybeSingle();
-    if (profileError) throw new Error(profileError.message || "Không thể kiểm tra người chơi");
-    if (!profile) throw new Error("Không tìm thấy người chơi với ID này");
+    if (profileError) throw new Error(profileError.message || tr('supabaseTeamRepository.khong_the_kiem_tra_nguoi_choi'));
+    if (!profile) throw new Error(tr('supabaseTeamRepository.khong_tim_thay_nguoi_choi_voi_id_nay'));
 
     const { error } = await supabase
       .from("user_team_invite")
       .insert({ team_id: teamId, inviter_id: inviterId, invitee_id: inviteeId });
     if (error) {
-      if (error.code === "23505") throw new Error("Người chơi này đã được mời vào tổ đội");
-      throw new Error(error.message || "Không thể gửi lời mời");
+      if (error.code === "23505") throw new Error(tr('supabaseTeamRepository.nguoi_choi_nay_da_duoc_moi_vao_to_doi'));
+      throw new Error(error.message || tr('supabaseTeamRepository.khong_the_gui_loi_moi'));
     }
   }
 
@@ -67,7 +68,7 @@ class SupabaseTeamRepository {
       .eq("invitee_id", userId)
       .eq("status", "PENDING")
       .order("created_at", { ascending: false });
-    if (error) throw new Error(error.message || "Không thể tải lời mời");
+    if (error) throw new Error(error.message || tr('supabaseTeamRepository.khong_the_tai_loi_moi'));
     const invites = data ?? [];
     if (invites.length === 0) return [];
 
@@ -75,7 +76,7 @@ class SupabaseTeamRepository {
       .from("user_teams")
       .select("id, name, description, max_members, status")
       .in("id", [...new Set(invites.map((invite) => invite.team_id))]);
-    if (teamError) throw new Error(teamError.message || "Không thể tải thông tin tổ đội");
+    if (teamError) throw new Error(teamError.message || tr('supabaseTeamRepository.khong_the_tai_thong_tin_to_doi'));
     const teamById = new Map((teams ?? []).map((team) => [team.id, team]));
 
     return invites.map((invite) => ({ ...invite, team: teamById.get(invite.team_id) ?? null })) as UserTeamInvite[];
@@ -83,7 +84,7 @@ class SupabaseTeamRepository {
 
   async respondInvite(inviteId: string, accept: boolean): Promise<void> {
     const { error } = await supabase.rpc("respond_team_invite", { p_invite_id: inviteId, p_accept: accept });
-    if (error) throw new Error(error.message || "Không thể xử lý lời mời");
+    if (error) throw new Error(error.message || tr('supabaseTeamRepository.khong_the_xu_ly_loi_moi'));
   }
 
   /** Lấy danh sách nhóm theo status (mặc định OPEN + FULL để hiển thị) */
@@ -94,7 +95,7 @@ class SupabaseTeamRepository {
       .in("status", statuses)
       .order("created_at", { ascending: false });
 
-    if (error) throw new Error(error.message || "Không thể tải danh sách nhóm");
+    if (error) throw new Error(error.message || tr('supabaseTeamRepository.khong_the_tai_danh_sach_nhom'));
     return (data ?? []) as UserTeam[];
   }
 
@@ -106,7 +107,7 @@ class SupabaseTeamRepository {
       .eq("team_id", teamId)
       .order("joined_at", { ascending: true });
 
-    if (error) throw new Error(error.message || "Không thể tải danh sách thành viên");
+    if (error) throw new Error(error.message || tr('supabaseTeamRepository.khong_the_tai_danh_sach_thanh_vien'));
     const members = data ?? [];
     if (members.length === 0) return [];
 
@@ -115,7 +116,7 @@ class SupabaseTeamRepository {
       .select("id, level, experience_point, display_name, avatar_url, avatar_path, country_id")
       .in("id", members.map((member) => member.user_id));
 
-    if (profileError) throw new Error(profileError.message || "Không thể tải hồ sơ thành viên");
+    if (profileError) throw new Error(profileError.message || tr('supabaseTeamRepository.khong_the_tai_ho_so_thanh_vien'));
     const resolvedProfiles = await supabaseAvatarRepository.resolveProfiles(profiles ?? []);
     const profileById = new Map(resolvedProfiles.map((profile) => [profile.id, profile]));
 
@@ -156,7 +157,7 @@ class SupabaseTeamRepository {
       p_description: description,
       p_max_members: maxMembers,
     });
-    if (error) throw new Error(error.message || "Không thể tạo nhóm");
+    if (error) throw new Error(error.message || tr('supabaseTeamRepository.khong_the_tao_nhom'));
 
     const { data: membership, error: membershipError } = await supabase
       .from("user_team_members")
@@ -166,7 +167,7 @@ class SupabaseTeamRepository {
       .limit(1)
       .maybeSingle();
     if (membershipError) throw new Error(membershipError.message);
-    if (!membership) throw new Error("Không tìm thấy nhóm vừa tạo");
+    if (!membership) throw new Error(tr('supabaseTeamRepository.khong_tim_thay_nhom_vua_tao'));
 
     await this.updateTeam(membership.team_id, { status, join_type: joinType });
   }
@@ -176,17 +177,17 @@ class SupabaseTeamRepository {
       .from("user_teams")
       .update(updates)
       .eq("id", teamId);
-    if (error) throw new Error(error.message || "Không thể cập nhật nhóm");
+    if (error) throw new Error(error.message || tr('supabaseTeamRepository.khong_the_cap_nhat_nhom'));
   }
 
   async joinTeam(teamId: string): Promise<void> {
     const { error } = await supabase.rpc("join_team", { p_team_id: teamId });
-    if (error) throw new Error(error.message || "Không thể tham gia nhóm");
+    if (error) throw new Error(error.message || tr('supabaseTeamRepository.khong_the_tham_gia_nhom'));
   }
 
   async leaveTeam(teamId: string): Promise<void> {
     const { error } = await supabase.rpc("leave_team", { p_team_id: teamId });
-    if (error) throw new Error(error.message || "Không thể rời nhóm");
+    if (error) throw new Error(error.message || tr('supabaseTeamRepository.khong_the_roi_nhom'));
   }
 
   async kickMember(teamId: string, memberId: string): Promise<void> {
@@ -194,12 +195,12 @@ class SupabaseTeamRepository {
       p_team_id: teamId,
       p_member_id: memberId,
     });
-    if (error) throw new Error(error.message || "Không thể kick thành viên");
+    if (error) throw new Error(error.message || tr('supabaseTeamRepository.khong_the_kick_thanh_vien'));
   }
 
   async closeTeam(teamId: string): Promise<void> {
     const { error } = await supabase.rpc("close_team", { p_team_id: teamId });
-    if (error) throw new Error(error.message || "Không thể đóng nhóm");
+    if (error) throw new Error(error.message || tr('supabaseTeamRepository.khong_the_dong_nhom'));
   }
 
   async transferLeadership(teamId: string, newLeaderId: string): Promise<void> {
@@ -207,7 +208,7 @@ class SupabaseTeamRepository {
       p_team_id: teamId,
       p_new_leader_id: newLeaderId,
     });
-    if (error) throw new Error(error.message || "Không thể chuyển quyền trưởng nhóm");
+    if (error) throw new Error(error.message || tr('supabaseTeamRepository.khong_the_chuyen_quyen_truong_nhom'));
   }
 }
 

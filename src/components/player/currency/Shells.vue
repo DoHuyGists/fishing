@@ -1,13 +1,16 @@
 <script lang="ts" setup>
+import { getFormattingLocale } from '../../../i18n';
+import { t as tr } from "../../../i18n";
+
 import { computed } from 'vue';
 import { useInformationModal } from '../../../composables/useInformationModal';
 
 const { open } = useInformationModal();
 function showInformation() {
     open({
-        name: 'Vỏ sò',
+        get name() { return tr('Shells.vo_so'); },
         image: '/currency/shells.svg',
-        description: 'Vỏ sò là một loại tiền tệ trong trò chơi, dùng để mua Fishing Pass. Fishing Pass mở thêm các phần thưởng trong mùa điểm danh; hãy kiểm tra số vỏ sò cần dùng trước khi mua.',
+        get description() { return tr('Shells.vo_so_la_mot_loai_tien_te_trong_tro_choi_dung_de_mua_fishing_pas'); },
     });
 }
 
@@ -19,12 +22,12 @@ const props = withDefaults(defineProps<{
     size: 25
 })
 
-const fmtPrice = computed(() => props.amount != undefined && props.amount != 0 ? props.amount.toLocaleString("vi-VN") : 0)
+const fmtPrice = computed(() => props.amount != undefined && props.amount != 0 ? props.amount.toLocaleString(getFormattingLocale()) : 0)
 
 </script>
 <template>
-    <button type="button" class="flex gap-2 items-center bg-white rounded-full px-2 cursor-pointer" aria-label="Thông tin về vỏ sò" @click.stop="showInformation">
+    <button type="button" class="flex gap-2 items-center bg-white rounded-full px-2 cursor-pointer" :aria-label="tr('Shells.thong_tin_ve_vo_so')" @click.stop="showInformation">
         <div v-if="props.amount != undefined">{{ fmtPrice }}</div>
-        <img src="/currency/shells.svg" :width="props.size" alt="Shell" draggable="false">
+        <img src="/currency/shells.svg" :width="props.size" :alt="tr('Shells.shell')" draggable="false">
     </button>
 </template>

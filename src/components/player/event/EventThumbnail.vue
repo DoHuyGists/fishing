@@ -1,4 +1,6 @@
 <script setup lang="ts">
+import { t as tr } from "../../../i18n";
+
 import { computed, ref, watch } from "vue";
 
 interface Props {
@@ -65,7 +67,7 @@ const frameStyle = computed(() => ({
     <div
       v-else
       role="img"
-      aria-label="Chưa có ảnh"
+      :aria-label="tr('EventThumbnail.chua_co_anh')"
       class="flex h-full w-full items-center justify-center bg-linear-to-br from-zinc-700 to-zinc-600 text-zinc-400"
     >
       <svg

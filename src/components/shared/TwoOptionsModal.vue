@@ -1,4 +1,6 @@
 <script setup lang="ts">
+import { t as tr } from "../../i18n";
+
 withDefaults(
   defineProps<{
     /** Hiện/ẩn modal. Có thể bỏ qua nếu dùng v-if ở nơi gọi */
@@ -28,8 +30,8 @@ withDefaults(
     show: true,
     message: '',
     subText: '',
-    firstText: 'Hủy',
-    secondText: 'Xác nhận',
+    firstText: undefined,
+    secondText: undefined,
     firstDisabled: false,
     secondDisabled: false,
     onFirst: undefined,
@@ -76,7 +78,7 @@ withDefaults(
           :class="{ 'cursor-not-allowed opacity-50': firstDisabled }"
           @click="onFirst?.()"
         >
-          {{ firstText }}
+          {{ firstText ?? tr('AccountInfoModal.huy') }}
         </button>
         <button
           type="button"
@@ -85,7 +87,7 @@ withDefaults(
           :class="{ 'cursor-not-allowed opacity-50': secondDisabled }"
           @click="onSecond?.()"
         >
-          {{ secondText }}
+          {{ secondText ?? tr('Fishfarm.xac_nhan') }}
         </button>
       </div>
     </div>

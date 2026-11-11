@@ -1,3 +1,4 @@
+import { t as tr } from "../i18n";
 import type { Session, User } from "@supabase/supabase-js";
 import { defineStore } from "pinia";
 import supabase from "../database/connection";
@@ -43,9 +44,9 @@ export const useAuthStore = defineStore("auth", {
       finally { this.passwordBusy = false; }
     },
     async updatePassword(password: string, confirmation: string, currentPassword?: string) {
-      if (this.passwordBusy) throw new Error("Đang xử lý mật khẩu.");
-      if (password.length < 8) throw new Error("Mật khẩu cần ít nhất 8 ký tự.");
-      if (password !== confirmation) throw new Error("Mật khẩu xác nhận không khớp.");
+      if (this.passwordBusy) throw new Error(tr('auth.dang_xu_ly_mat_khau'));
+      if (password.length < 8) throw new Error(tr('auth.mat_khau_can_it_nhat_8_ky_tu'));
+      if (password !== confirmation) throw new Error(tr('auth.mat_khau_xac_nhan_khong_khop'));
       this.passwordBusy = true;
       try {
         await supabaseAuthRepository.updatePassword(password, currentPassword);
@@ -89,7 +90,7 @@ export const useAuthStore = defineStore("auth", {
           this.applySession(data.session);
           if (this.user) await this.loadAdminStatus(this.user.id);
         } catch (err) {
-          this.error = err instanceof Error ? err.message : "Không thể tải phiên đăng nhập";
+          this.error = err instanceof Error ? err.message : tr('auth.khong_the_tai_phien_dang_nhap');
         } finally {
           this.loading = false;
           this.initialized = true;
@@ -134,7 +135,7 @@ export const useAuthStore = defineStore("auth", {
       } catch (err) {
         if (this.user?.id === userId && request === adminStatusRequest) {
           this.isAdmin = false;
-          this.error = err instanceof Error ? err.message : "Không thể tải quyền quản trị";
+          this.error = err instanceof Error ? err.message : tr('auth.khong_the_tai_quyen_quan_tri');
         }
       } finally {
         if (this.user?.id === userId && request === adminStatusRequest) {

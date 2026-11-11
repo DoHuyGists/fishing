@@ -1,4 +1,6 @@
 <script lang="ts" setup>
+import { t as tr } from "../../../i18n";
+
 import { computed, onMounted, ref } from "vue";
 import { useMissionStore } from "../../../stores/mission.ts";
 import { useCaughtStore, type CaughtFish } from "../../../stores/caught.ts";
@@ -22,8 +24,8 @@ const statusMessage = ref("");
 const statusIsError = ref(false);
 const activeTab = ref("hourly");
 const tabs: TabItem[] = [
-  { key: "hourly", label: "Nhiệm vụ theo giờ" },
-  { key: "daily", label: "Nhiệm vụ hằng ngày" },
+  { key: "hourly", get label() { return tr('MissionModal.nhiem_vu_theo_gio'); } },
+  { key: "daily", get label() { return tr('DailyMission.nhiem_vu_hang_ngay'); } },
 ];
 
 const selectedMission = computed(
@@ -61,7 +63,7 @@ function canSelectCaught(caught: CaughtFish) {
 
 function toggleCaught(caught: CaughtFish) {
   if (caught.status === "on-market") {
-    toast.error("Con này đang ở được bày bán", { title: "Không thể chọn", position: "bottom" });
+    toast.error(tr('MissionModal.con_nay_dang_o_duoc_bay_ban'), { get title() { return tr('MissionModal.khong_the_chon'); }, position: "bottom" });
     return;
   }
 
@@ -89,10 +91,10 @@ async function loadMissionData(initialLoad = false) {
     }
     selectedCaughtIds.value = [];
     statusIsError.value = false;
-    statusMessage.value = initialLoad ? "" : "Đã làm mới dữ liệu.";
+    statusMessage.value = initialLoad ? "" : tr('MissionModal.da_lam_moi_du_lieu');
   } catch (error) {
     statusIsError.value = true;
-    statusMessage.value = error instanceof Error ? error.message : "Không thể tải dữ liệu nhiệm vụ.";
+    statusMessage.value = error instanceof Error ? error.message : tr('MissionModal.khong_the_tai_du_lieu_nhiem_vu');
   } finally {
     if (initialLoad) isLoading.value = false;
     else isRefreshing.value = false;
@@ -110,10 +112,10 @@ async function claimMission() {
     statusMessage.value = "";
     selectedCaughtIds.value = [];
     await Promise.all([caughtStore.loadCaughtFishes(), missionStore.SetMission()]);
-    toast.success(`Nhận ${reward}`, { title: "Nhiệm vụ hoàn tất", position: "bottom" });
+    toast.success(tr('MissionModal.nhan_value0', { value0: reward }), { get title() { return tr('MissionModal.nhiem_vu_hoan_tat'); }, position: "bottom" });
   } catch (error) {
     statusIsError.value = true;
-    statusMessage.value = error instanceof Error ? error.message : "Không thể nhận nhiệm vụ.";
+    statusMessage.value = error instanceof Error ? error.message : tr('MissionModal.khong_the_nhan_nhiem_vu');
   } finally {
     isClaiming.value = false;
   }
@@ -123,12 +125,12 @@ onMounted(() => void loadMissionData(true));
 </script>
 
 <template>
-  <Modal title="Bảng nhiệm vụ" sub-title="Nhiệm vụ theo giờ và hằng ngày" :on-refresh="loadMissionData">
+  <Modal :title="tr('MissionModal.bang_nhiem_vu')" :sub-title="tr('MissionModal.nhiem_vu_theo_gio_va_hang_ngay')" :on-refresh="loadMissionData">
     <div class="h-full">
-      <Tab v-model="activeTab" :tabs="tabs" aria-label="Loại nhiệm vụ" lazy>
+      <Tab v-model="activeTab" :tabs="tabs" :aria-label="tr('MissionModal.loai_nhiem_vu')" lazy>
         <template #hourly>
           <div v-if="isLoading || isRefreshing" class="grid h-full place-items-center text-sm text-emerald-900/70">
-            Đang tải cá và nhiệm vụ...
+            {{ tr('MissionModal.dang_tai_ca_va_nhiem_vu') }}
           </div>
           <div
             v-else

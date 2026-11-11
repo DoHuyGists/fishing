@@ -1,4 +1,7 @@
 <script lang="ts" setup>
+import { getFormattingLocale } from '../../../i18n';
+import { t as tr } from "../../../i18n";
+
 import { computed, onMounted, onUnmounted, ref } from "vue";
 import { useCurrencyStore } from "../../../stores/currency.ts";
 import { supabaseMarketRepository, type MarketListing } from "../../../data/supabaseMarketRepository.ts";
@@ -62,9 +65,9 @@ const myMarketListings = computed(() => {
 });
 
 const marketTabs = computed(() => [
-  { key: "all", label: "Sàn giao dịch", badge: marketStore.marketListings.length },
-  { key: "my", label: "Cá của tôi đang bán", badge: myMarketListings.value.length },
-  { key: "history", label: "Lịch sử mua bán" },
+  { key: "all", get label() { return tr('MarketWindow.san_giao_dich'); }, badge: marketStore.marketListings.length },
+  { key: "my", get label() { return tr('MarketWindow.ca_cua_toi_dang_ban'); }, badge: myMarketListings.value.length },
+  { key: "history", get label() { return tr('MarketWindow.lich_su_mua_ban'); } },
 ]);
 
 const groupedListings = computed(() => {
@@ -88,22 +91,22 @@ function cancelBuy() {
 async function handleBuyFish() {
   if (!itemToBuy.value) return;
   if (!authStore.userId) {
-    toast.error("Bạn chưa đăng nhập", { title: "Không thể mua cá", position: "bottom" });
+    toast.error(tr('MarketWindow.ban_chua_dang_nhap'), { get title() { return tr('MarketWindow.khong_the_mua_ca'); }, position: "bottom" });
     return;
   }
 
   isBuying.value = true;
   try {
-    const fishName = itemToBuy.value.caught?.fish?.name || "cá";
+    const fishName = itemToBuy.value.caught?.fish?.name || tr('Fishfarm.ca_2');
     await supabaseMarketRepository.buyFish(itemToBuy.value.id);
     await marketStore.loadMarketListings();
     await caughtStore.loadCaughtFishes();
     cancelBuy();
-    toast.success(`Mua ${fishName} thành công!`, { title: "Giao dịch thành công", position: "bottom" });
+    toast.success(tr('MarketWindow.mua_value0_thanh_cong', { value0: fishName }), { get title() { return tr('FishingPassPurchaseModal.giao_dich_thanh_cong'); }, position: "bottom" });
   } catch (err: any) {
     console.error("Lỗi khi mua cá:", err);
-    toast.error(err?.message || "Không thể mua cá. Vui lòng thử lại.", {
-      title: "Mua cá thất bại",
+    toast.error(err?.message || tr('MarketWindow.khong_the_mua_ca_vui_long_thu_lai'), {
+      get title() { return tr('MarketWindow.mua_ca_that_bai'); },
       position: "bottom",
     });
   } finally {
@@ -118,10 +121,10 @@ async function handleCancelListing(item: MarketListing) {
     await supabaseMarketRepository.cancelListing(item.id);
     await marketStore.loadMarketListings();
     await caughtStore.loadCaughtFishes();
-    toast.success("Đã gỡ tin bán cá", { title: "Thành công", position: "bottom" });
+    toast.success(tr('MarketWindow.da_go_tin_ban_ca'), { get title() { return tr('AttendanceModal.thanh_cong'); }, position: "bottom" });
   } catch (err) {
     console.error("Lỗi khi gỡ cá:", err);
-    toast.error("Bạn chưa đăng nhập", { title: "Không thể mua cá", position: "bottom" });
+    toast.error(tr('MarketWindow.ban_chua_dang_nhap'), { get title() { return tr('MarketWindow.khong_the_mua_ca'); }, position: "bottom" });
   } finally {
     isCancellingListing.value = false;
   }
@@ -129,7 +132,7 @@ async function handleCancelListing(item: MarketListing) {
 function formatDate(dateStr: string) {
   if (!dateStr) return "";
   const d = new Date(dateStr);
-  return d.toLocaleDateString("vi-VN", {
+  return d.toLocaleDateString(getFormattingLocale(), {
     day: "2-digit",
     month: "2-digit",
     hour: "2-digit",
@@ -158,9 +161,9 @@ onUnmounted(() => marketStore.stopRealtime());
 </script>
 
 <template>
-  <Modal title="Chợ cá" :show-count-data="activeMarketTab !== 'history'" :on-refresh="() => { marketStore.loadMarketListings(); marketStore.loadHistory(authStore.userId); }">
+  <Modal :title="tr('MarketWindow.cho_ca')" :show-count-data="activeMarketTab !== 'history'" :on-refresh="() => { marketStore.loadMarketListings(); marketStore.loadHistory(authStore.userId); }">
     <div v-if="marketStore.error" role="alert" class="mb-3 rounded bg-red-50 p-3 text-red-700">{{ marketStore.error }}</div>
-    <Tab v-model="activeMarketTab" :tabs="marketTabs" aria-label="Chợ cá" lazy>
+    <Tab v-model="activeMarketTab" :tabs="marketTabs" :aria-label="tr('MarketWindow.cho_ca')" lazy>
       <template #all>
       <!-- Filter & Search Toolbar (shown for 'all' tab) -->
       <div
@@ -172,7 +175,7 @@ onUnmounted(() => marketStore.stopRealtime());
           <input
             v-model="marketSearch"
             type="text"
-            placeholder="Tìm kiếm cá rao bán..."
+            :placeholder="tr('MarketWindow.tim_kiem_ca_rao_ban')"
             class="w-full pl-8 pr-3 py-1.5 text-xs border border-gray-300 rounded-lg focus:outline-none focus:border-gray-300 bg-gray-50/70"
           />
           <svg
@@ -192,23 +195,23 @@ onUnmounted(() => marketStore.stopRealtime());
 
         <!-- Rarity filter -->
         <div class="flex items-center gap-1 text-xs">
-          <span class="text-gray-500 font-medium text-[11px]">Độ hiếm:</span>
+          <span class="text-gray-500 font-medium text-[11px]">{{ tr('MarketWindow.do_hiem') }}</span>
           <select
             v-model="marketRarity"
             class="px-2 py-1 border border-gray-300 rounded-lg text-xs bg-white text-gray-700 focus:outline-none"
           >
-            <option value="ALL">Tất cả</option>
-            <option value="HUYỀN THOẠI">Huyền thoại</option>
-            <option value="SỬ THI">Sử thi</option>
-            <option value="HIẾM">Hiếm</option>
-            <option value="THƯỜNG">Thường</option>
+            <option value="ALL">{{ tr('Achievement.tat_ca') }}</option>
+            <option value="HUYỀN THOẠI">{{ tr('WeatherSection.huyen_thoai') }}</option>
+            <option value="SỬ THI">{{ tr('WeatherSection.su_thi') }}</option>
+            <option value="HIẾM">{{ tr('WeatherSection.hiem') }}</option>
+            <option value="THƯỜNG">{{ tr('LatestCaughtList.thuong') }}</option>
           </select>
         </div>
 
         <div
           class="ml-auto flex rounded-lg border border-gray-200 bg-white p-0.5"
           role="group"
-          aria-label="Chế độ hiển thị"
+          :aria-label="tr('CaughtModal.che_do_hien_thi')"
         >
           <button
             type="button"
@@ -217,7 +220,7 @@ onUnmounted(() => marketStore.stopRealtime());
             :aria-pressed="viewMode === 'list'"
             @click="viewMode = 'list'"
           >
-            Danh sách
+            {{ tr('CaughtModal.danh_sach') }}
           </button>
           <button
             type="button"
@@ -226,7 +229,7 @@ onUnmounted(() => marketStore.stopRealtime());
             :aria-pressed="viewMode === 'grid'"
             @click="viewMode = 'grid'"
           >
-            Lưới
+            {{ tr('CaughtModal.luoi') }}
           </button>
           <button
             type="button"
@@ -235,19 +238,19 @@ onUnmounted(() => marketStore.stopRealtime());
             :aria-pressed="viewMode === 'species'"
             @click="viewMode = 'species'"
           >
-            Theo loài
+            {{ tr('CaughtModal.theo_loai') }}
           </button>
         </div>
         <!-- Sort dropdown -->
         <div class="flex items-center gap-1 text-xs">
-          <span class="text-gray-500 font-medium text-[11px]">Sắp xếp:</span>
+          <span class="text-gray-500 font-medium text-[11px]">{{ tr('MarketWindow.sap_xep') }}</span>
           <select
             v-model="marketSort"
             class="px-2 py-1 border border-gray-300 rounded-lg text-xs bg-white text-gray-700 focus:outline-none"
           >
-            <option value="newest">Mới nhất</option>
-            <option value="price-asc">Giá thấp ➔ cao</option>
-            <option value="price-desc">Giá cao ➔ thấp</option>
+            <option value="newest">{{ tr('MarketWindow.moi_nhat') }}</option>
+            <option value="price-asc">{{ tr('MarketWindow.gia_thap_cao') }}</option>
+            <option value="price-desc">{{ tr('MarketWindow.gia_cao_thap') }}</option>
           </select>
         </div>
       </div>
@@ -261,7 +264,7 @@ onUnmounted(() => marketStore.stopRealtime());
             class="py-16 text-center text-gray-500 text-xs flex flex-col items-center gap-2"
           >
             <div class="w-8 h-8 border border-emerald-600 border-t-transparent rounded-full animate-spin"></div>
-            <span>Đang tải các cá đang giao dịch...</span>
+            <span>{{ tr('MarketWindow.dang_tai_cac_ca_dang_giao_dich') }}</span>
           </div>
 
           <div v-else-if="!filteredMarketListings.length" class="py-16 text-center text-gray-400 text-xs">
@@ -269,8 +272,8 @@ onUnmounted(() => marketStore.stopRealtime());
             <div class="m-0 font-medium">
               {{
                 marketSearch || marketRarity !== "ALL"
-                  ? "Không tìm thấy con cá nào phù hợp với bộ lọc"
-                  : "Hiện chưa có cá nào được đăng bán trên thị trường."
+                  ? tr('MarketWindow.khong_tim_thay_con_ca_nao_phu_hop_voi_bo_loc')
+                  : tr('MarketWindow.hien_chua_co_ca_nao_duoc_dang_ban_tren_thi_truong')
               }}
             </div>
           </div>
@@ -286,10 +289,10 @@ onUnmounted(() => marketStore.stopRealtime());
             >
               <div class="flex items-center justify-between gap-2 border-b border-gray-100 px-3 py-2">
                 <span class="truncate text-xs font-bold">{{
-                  group.listings[0]?.caught?.fish?.name || "Cá chưa rõ tên"
+                  group.listings[0]?.caught?.fish?.name || tr('CaughtModal.ca_chua_ro_ten')
                 }}</span>
                 <span class="shrink-0 rounded-full bg-emerald-100 px-2 py-0.5 text-[10px] font-bold text-emerald-800"
-                  >{{ group.listings.length }} tin</span
+                  >{{ group.listings.length }} {{ tr('MarketWindow.tin') }}</span
                 >
               </div>
               <div class="space-y-2 p-2">
@@ -307,7 +310,7 @@ onUnmounted(() => marketStore.stopRealtime());
                     <div class="truncate text-[11px] text-gray-500">
                       {{ item.caught?.fish?.weight }} kg · {{ formatDate(item.created_at) }}
                     </div>
-                    <div class="text-xs font-bold text-amber-700">{{ item.price.toLocaleString("vi-VN") }} đ</div>
+                    <div class="text-xs font-bold text-amber-700">{{ item.price.toLocaleString(getFormattingLocale()) }} {{ tr('currency.cashUnit') }}</div>
                   </div>
                   <button
                     v-if="item.user_id === authStore.userId"
@@ -315,7 +318,7 @@ onUnmounted(() => marketStore.stopRealtime());
                     disabled
                     class="rounded bg-gray-100 px-2 py-1 text-[10px] text-gray-400"
                   >
-                    Đã đăng
+                    {{ tr('MarketWindow.da_dang') }}
                   </button>
                   <button
                     v-else
@@ -323,7 +326,7 @@ onUnmounted(() => marketStore.stopRealtime());
                     class="rounded bg-[#153221] px-2 py-1 text-[10px] font-bold text-white"
                     @click="confirmBuy(item)"
                   >
-                    Mua
+                    {{ tr('InventoryModal.mua') }}
                   </button>
                 </article>
               </div>
@@ -368,7 +371,7 @@ onUnmounted(() => marketStore.stopRealtime());
                     v-if="item.user_id === authStore.userId"
                     class="absolute top-2 left-2 px-2 py-0.5 bg-amber-500 text-white font-extrabold text-[9px] rounded shadow-xs"
                   >
-                    Cá của bạn
+                    {{ tr('MarketWindow.ca_cua_ban') }}
                   </span>
                 </div>
 
@@ -385,7 +388,7 @@ onUnmounted(() => marketStore.stopRealtime());
                       }}</span
                     >
                   </div>
-                  <div class="text-[10px] text-gray-400 mt-0.5">📅 Đăng bán: {{ formatDate(item.created_at) }}</div>
+                  <div class="text-[10px] text-gray-400 mt-0.5">{{ tr('MarketWindow.dang_ban') }} {{ formatDate(item.created_at) }}</div>
                 </div>
               </div>
 
@@ -395,8 +398,8 @@ onUnmounted(() => marketStore.stopRealtime());
                 :class="viewMode === 'list' ? 'border-t-0 border-l pl-3' : ''"
               >
                 <div class="flex flex-col">
-                  <span class="text-[10px] text-gray-400 uppercase font-bold">Giá bán</span>
-                  <span class="text-sm font-extrabold text-amber-600">{{ item.price.toLocaleString("vi-VN") }} đ</span>
+                  <span class="text-[10px] text-gray-400 uppercase font-bold">{{ tr('MarketWindow.gia_ban') }}</span>
+                  <span class="text-sm font-extrabold text-amber-600">{{ item.price.toLocaleString(getFormattingLocale()) }} {{ tr('currency.cashUnit') }}</span>
                 </div>
 
                 <button
@@ -405,7 +408,7 @@ onUnmounted(() => marketStore.stopRealtime());
                   disabled
                   class="px-3 py-1.5 bg-gray-100 text-gray-400 font-bold text-xs rounded-lg cursor-not-allowed"
                 >
-                  Đã đăng
+                  {{ tr('MarketWindow.da_dang') }}
                 </button>
 
                 <button
@@ -414,7 +417,7 @@ onUnmounted(() => marketStore.stopRealtime());
                   @click="confirmBuy(item)"
                   class="px-3 py-1.5 bg-[#153221] hover:bg-[#1a3e29] text-white font-bold text-xs rounded-lg transition-colors shadow-xs cursor-pointer flex items-center gap-1"
                 >
-                  <span>Mua cá</span>
+                  <span>{{ tr('MarketWindow.mua_ca') }}</span>
                 </button>
               </div>
             </div>
@@ -427,9 +430,9 @@ onUnmounted(() => marketStore.stopRealtime());
         <div>
           <div v-if="!myMarketListings.length" class="py-16 text-center text-gray-400 text-xs">
             <span class="text-3xl block mb-2">📦</span>
-            <div class="m-0 font-medium">Bạn chưa đăng bán con cá nào trên chợ.</div>
+            <div class="m-0 font-medium">{{ tr('MarketWindow.ban_chua_dang_ban_con_ca_nao_tren_cho') }}</div>
             <div class="mt-1 text-gray-400">
-              Chọn cá trong danh sách túi đồ bên phải và nhấn nút <strong>"Bán"</strong> để rao bán cá.
+              {{ tr('MarketWindow.chon_ca_trong_danh_sach_tui_do_ben_phai_va_nhan_nut') }} <strong>{{ tr('MarketWindow.ban') }}</strong> {{ tr('MarketWindow.de_rao_ban_ca') }}
             </div>
           </div>
 
@@ -476,14 +479,14 @@ onUnmounted(() => marketStore.stopRealtime());
                       }}</span
                     >
                   </div>
-                  <div class="text-[10px] text-gray-400">📅 Ngày đăng: {{ formatDate(item.created_at) }}</div>
+                  <div class="text-[10px] text-gray-400">{{ tr('MarketWindow.ngay_dang') }} {{ formatDate(item.created_at) }}</div>
                 </div>
               </div>
 
               <div class="pt-2 border-t border-gray-100 flex items-center justify-between gap-2">
                 <div>
-                  <span class="text-[10px] text-gray-400 uppercase font-bold block">Giá niêm yết</span>
-                  <span class="text-sm font-extrabold text-amber-600">{{ item.price.toLocaleString("vi-VN") }} đ</span>
+                  <span class="text-[10px] text-gray-400 uppercase font-bold block">{{ tr('MarketWindow.gia_niem_yet') }}</span>
+                  <span class="text-sm font-extrabold text-amber-600">{{ item.price.toLocaleString(getFormattingLocale()) }} {{ tr('currency.cashUnit') }}</span>
                 </div>
 
                 <button
@@ -492,7 +495,7 @@ onUnmounted(() => marketStore.stopRealtime());
                   :disabled="isCancellingListing"
                   class="px-3 py-1.5 border border-red-200 bg-red-50 hover:bg-red-100 text-red-600 font-bold text-xs rounded-lg transition-colors cursor-pointer"
                 >
-                  {{ isCancellingListing ? "Đang gỡ..." : "Gỡ bán" }}
+                  {{ isCancellingListing ? tr('MarketWindow.dang_go') : tr('MarketWindow.go_ban') }}
                 </button>
               </div>
             </div>
@@ -500,34 +503,34 @@ onUnmounted(() => marketStore.stopRealtime());
         </div>
       </template>
       <template #history>
-        <section class="space-y-3 text-sm text-[#24352a]" :aria-busy="marketStore.historyLoading" aria-label="Lịch sử mua bán của bạn">
+        <section class="space-y-3 text-sm text-[#24352a]" :aria-busy="marketStore.historyLoading" :aria-label="tr('MarketWindow.lich_su_mua_ban_cua_ban')">
           <div v-if="marketStore.historyError" role="alert" class="flex items-center justify-between gap-3 rounded-lg border border-red-200 bg-red-50 px-3 py-2 text-xs text-red-700">
             <span>{{ marketStore.historyError }}</span>
-            <button type="button" class="shrink-0 font-semibold underline disabled:opacity-40" :disabled="marketStore.historyLoading" @click="marketStore.loadHistory(authStore.userId)">Thử lại</button>
+            <button type="button" class="shrink-0 font-semibold underline disabled:opacity-40" :disabled="marketStore.historyLoading" @click="marketStore.loadHistory(authStore.userId)">{{ tr('Maintenance.thu_lai') }}</button>
           </div>
-          <div v-if="marketStore.historyLoading" role="status" class="py-2 text-center text-xs text-gray-500">Đang tải lịch sử…</div>
+          <div v-if="marketStore.historyLoading" role="status" class="py-2 text-center text-xs text-gray-500">{{ tr('MarketWindow.dang_tai_lich_su') }}</div>
           <div v-else-if="!marketStore.history.length && !marketStore.historyError" class="rounded-xl border border-dashed border-[#cbd9c6] bg-[#f5f9f0] px-4 py-8 text-center">
-            <div class="font-semibold">Chưa có giao dịch mua bán</div>
-            <div class="mt-1 text-xs text-gray-500">Các giao dịch đã hoàn tất sẽ xuất hiện tại đây.</div>
+            <div class="font-semibold">{{ tr('MarketWindow.chua_co_giao_dich_mua_ban') }}</div>
+            <div class="mt-1 text-xs text-gray-500">{{ tr('MarketWindow.cac_giao_dich_da_hoan_tat_se_xuat_hien_tai_day') }}</div>
           </div>
           <div v-if="marketStore.history.length" class="max-h-[min(50dvh,26rem)] overflow-y-auto rounded-xl border border-[#cbd9c6]" :class="marketStore.historyLoading ? 'opacity-60' : ''">
             <div class="divide-y divide-[#cbd9c6]/60">
               <div v-for="entry in marketStore.history" :key="entry.id" class="flex items-center gap-2 bg-[#f5f9f0]/60 px-3 py-2.5 sm:gap-3">
                 <span class="shrink-0 rounded-md px-2 py-1 text-[11px] font-semibold" :class="entry.buyer_id === authStore.userId ? 'bg-blue-50 text-blue-700' : 'bg-emerald-100 text-emerald-800'">
-                  {{ entry.buyer_id === authStore.userId ? 'Đã mua' : 'Đã bán' }}
+                  {{ entry.buyer_id === authStore.userId ? tr('MarketWindow.da_mua') : tr('MarketWindow.da_ban') }}
                 </span>
                 <div class="min-w-0 flex-1">
-                  <div class="truncate text-xs font-semibold">{{ entry.item.name || (entry.item.species as any)?.name || (entry.item.fish as any)?.name || 'Cá' }}</div>
+                  <div class="truncate text-xs font-semibold">{{ entry.item.name || (entry.item.species as any)?.name || (entry.item.fish as any)?.name || tr('CaughtModal.ca') }}</div>
                   <div class="mt-0.5 text-[11px] text-gray-500"><time :datetime="entry.created_at">{{ formatDate(entry.created_at) }}</time> · #{{ entry.id.slice(0, 8) }}</div>
                 </div>
                 <Cash :amount="entry.price" :size="16" :interactive="false" class="shrink-0 text-xs font-semibold" />
               </div>
             </div>
           </div>
-          <nav v-if="marketStore.history.length || marketStore.historyPage > 1" aria-label="Phân trang lịch sử mua bán" class="flex items-center justify-between gap-3 text-xs">
-            <button type="button" :disabled="marketStore.historyLoading || marketStore.historyPage <= 1" class="rounded-lg border border-[#cbd9c6] px-3 py-1.5 hover:bg-[#f5f9f0] disabled:cursor-not-allowed disabled:opacity-40" @click="marketStore.loadHistory(authStore.userId, marketStore.historyPage - 1)">Trước</button>
-            <span class="text-gray-500">Trang {{ marketStore.historyPage }}</span>
-            <button type="button" :disabled="marketStore.historyLoading || !marketStore.historyHasNext" class="rounded-lg border border-[#cbd9c6] px-3 py-1.5 hover:bg-[#f5f9f0] disabled:cursor-not-allowed disabled:opacity-40" @click="marketStore.loadHistory(authStore.userId, marketStore.historyPage + 1)">Sau</button>
+          <nav v-if="marketStore.history.length || marketStore.historyPage > 1" :aria-label="tr('MarketWindow.phan_trang_lich_su_mua_ban')" class="flex items-center justify-between gap-3 text-xs">
+            <button type="button" :disabled="marketStore.historyLoading || marketStore.historyPage <= 1" class="rounded-lg border border-[#cbd9c6] px-3 py-1.5 hover:bg-[#f5f9f0] disabled:cursor-not-allowed disabled:opacity-40" @click="marketStore.loadHistory(authStore.userId, marketStore.historyPage - 1)">{{ tr('Fishfarm.truoc') }}</button>
+            <span class="text-gray-500">{{ tr('CaughtModal.trang') }} {{ marketStore.historyPage }}</span>
+            <button type="button" :disabled="marketStore.historyLoading || !marketStore.historyHasNext" class="rounded-lg border border-[#cbd9c6] px-3 py-1.5 hover:bg-[#f5f9f0] disabled:cursor-not-allowed disabled:opacity-40" @click="marketStore.loadHistory(authStore.userId, marketStore.historyPage + 1)">{{ tr('Fishfarm.sau') }}</button>
           </nav>
         </section>
       </template>
@@ -542,7 +545,7 @@ onUnmounted(() => marketStore.stopRealtime());
     <div
       class="w-full max-w-sm bg-white border border-gray-300 rounded-xl p-5 shadow-[0_12px_32px_rgba(38,50,56,0.3)] text-center relative"
     >
-      <div class="m-0 text-base font-bold text-[#263238]">Xác nhận mua cá</div>
+      <div class="m-0 text-base font-bold text-[#263238]">{{ tr('MarketWindow.xac_nhan_mua_ca') }}</div>
 
       <div class="my-4 p-3 bg-emerald-50 border border-emerald-200 rounded-xl flex items-center gap-3 text-left">
         <img :src="itemToBuy.caught?.fish?.image || '/fish/VN/fish.jpg'" class="h-12 rounded-lg object-cover" />
@@ -553,25 +556,25 @@ onUnmounted(() => marketStore.stopRealtime());
       </div>
 
       <div class="flex items-center gap-2 text-xs text-gray-600 leading-relaxed">
-        <span>Số dư hiện có: </span>
+        <span>{{ tr('MarketWindow.so_du_hien_co') }} </span>
         <Cash :amount="currencyStore.formattedCash" />
       </div>
       <hr class="my-2" />
       <div class="flex items-center gap-2 text-xs text-gray-600 leading-relaxed">
-        <span>Giá:</span>
+        <span>{{ tr('MarketWindow.gia') }}</span>
         <Cash :amount="itemToBuy.price" />
       </div>
       <div class="flex items-center gap-2 text-xs">
-        <span>Phí niêm yết thị trường:</span>
+        <span>{{ tr('FishSellConfirm.phi_niem_yet_thi_truong') }}</span>
         <Cash :amount="LISTED_PRICE" />
       </div>
       <div class="flex items-center gap-2 text-xs">
-        <span>Phí cân bằng thị trường: </span>
+        <span>{{ tr('FishSellConfirm.phi_can_bang_thi_truong') }} </span>
         <Cash :amount="balanceFee" />
       </div>
       <hr class="my-2" />
       <div class="flex items-center gap-2 text-xs">
-        <span>Tổng phí: </span>
+        <span>{{ tr('FishSellConfirm.tong_phi') }} </span>
         <Cash :amount="LISTED_PRICE + balanceFee + itemToBuy.price" />
       </div>
 
@@ -581,7 +584,7 @@ onUnmounted(() => marketStore.stopRealtime());
           class="py-1.5 px-4 rounded-lg border border-gray-300 bg-transparent text-[#263238] text-xs font-bold cursor-pointer hover:bg-[#eef3f1]"
           @click="cancelBuy"
         >
-          Hủy
+          {{ tr('AccountInfoModal.huy') }}
         </button>
         <button
           type="button"
@@ -589,7 +592,7 @@ onUnmounted(() => marketStore.stopRealtime());
           :disabled="isBuying"
           @click="handleBuyFish"
         >
-          {{ isBuying ? "Đang xử lý..." : "Mua" }}
+          {{ isBuying ? tr('DailyAttendance.dang_xu_ly') : tr('InventoryModal.mua') }}
         </button>
       </div>
     </div>

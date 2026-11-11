@@ -1,4 +1,6 @@
 <script lang="ts" setup>
+import { t as tr } from "../../../i18n";
+
 import { computed, onMounted, ref, watch } from "vue";
 import { useCaughtStore, type CaughtFish } from "../../../stores/caught.ts";
 import { supabaseFishRepository } from "../../../data/supabaseFishRepository.ts";
@@ -101,9 +103,9 @@ async function handleSell(priceNum: number) {
     caughtStore.caughtFishes = caughtStore.caughtFishes.filter((f) => f.id !== fishToSell.value.id);
     await marketStore.loadMarketListings();
     cancelSell();
-    toast.success("Đã đăng bán", { title: "Thành công", position: "bottom" });
+    toast.success(tr('CaughtModal.da_dang_ban'), { get title() { return tr('AttendanceModal.thanh_cong'); }, position: "bottom" });
   } catch (err: any) {
-    toast.error("Lỗi khi đăng bán cá", { title: "Không thành công", position: "bottom" });
+    toast.error(tr('CaughtModal.loi_khi_dang_ban_ca'), { get title() { return tr('CaughtModal.khong_thanh_cong'); }, position: "bottom" });
   } finally {
     isSelling.value = false;
   }
@@ -137,9 +139,9 @@ async function handleRelease() {
     await supabaseFishRepository.deleteCaughtFish(fishToRelease.value.id);
     caughtStore.caughtFishes = caughtStore.caughtFishes.filter((f) => f.id !== fishToRelease.value.id);
     fishToRelease.value = null;
-    toast.success("Đã thả", { title: "Thành công", position: "bottom" });
+    toast.success(tr('CaughtModal.da_tha'), { get title() { return tr('AttendanceModal.thanh_cong'); }, position: "bottom" });
   } catch (err) {
-    toast.error("Lỗi khi thả cá", { title: "Không thành công", position: "bottom" });
+    toast.error(tr('CaughtModal.loi_khi_tha_ca'), { get title() { return tr('CaughtModal.khong_thanh_cong'); }, position: "bottom" });
   } finally {
     isReleasing.value = false;
   }
@@ -148,50 +150,50 @@ async function handleRelease() {
 <template>
   <Modal
     class="caught-list-modal"
-    title="Túi cá"
-    sub-title="Những loài cá bạn sẵn được"
+    :title="tr('CaughtModal.tui_ca')"
+    :sub-title="tr('CaughtModal.nhung_loai_ca_ban_san_duoc')"
     :on-refresh="caughtStore.loadCaughtFishes"
   >
     <section class="h-full min-h-0 text-[#263238] flex flex-col overflow-hidden">
       <!-- Header  -->
       <div class="flex items-center justify-between gap-2 pb-3">
         <div class="flex items-center gap-2">
-          <div class="m-0 text-base font-bold text-[#263238]">Tổng số cá</div>
+          <div class="m-0 text-base font-bold text-[#263238]">{{ tr('CaughtModal.tong_so_ca') }}</div>
           <span class="px-2 py-0.5 rounded-full bg-[#153221] text-white text-[11px] font-extrabold shadow-xs">
             {{ caughtStore.caughtFishes.length }}
           </span>
         </div>
         <div class="flex items-center gap-2">
-          <div class="flex rounded-lg border border-gray-200 bg-white p-0.5" role="group" aria-label="Chế độ hiển thị">
+          <div class="flex rounded-lg border border-gray-200 bg-white p-0.5" role="group" :aria-label="tr('CaughtModal.che_do_hien_thi')">
             <button
               type="button"
               class="rounded-md px-2 py-1.5 text-xs font-bold transition-colors cursor-pointer"
               :class="viewMode === 'grid' ? 'bg-[#153221] text-white' : 'text-gray-600 hover:bg-gray-100'"
               :aria-pressed="viewMode === 'grid'"
-              aria-label="Hiển thị dạng lưới"
+              :aria-label="tr('CaughtModal.hien_thi_dang_luoi')"
               @click="viewMode = 'grid'"
             >
-              Lưới
+              {{ tr('CaughtModal.luoi') }}
             </button>
             <button
               type="button"
               class="rounded-md px-2 py-1.5 text-xs font-bold transition-colors cursor-pointer"
               :class="viewMode === 'list' ? 'bg-[#153221] text-white' : 'text-gray-600 hover:bg-gray-100'"
               :aria-pressed="viewMode === 'list'"
-              aria-label="Hiển thị dạng danh sách"
+              :aria-label="tr('CaughtModal.hien_thi_dang_danh_sach')"
               @click="viewMode = 'list'"
             >
-              Danh sách
+              {{ tr('CaughtModal.danh_sach') }}
             </button>
             <button
               type="button"
               class="rounded-md px-2 py-1.5 text-xs font-bold transition-colors cursor-pointer"
               :class="viewMode === 'species' ? 'bg-[#153221] text-white' : 'text-gray-600 hover:bg-gray-100'"
               :aria-pressed="viewMode === 'species'"
-              aria-label="Gom theo loài"
+              :aria-label="tr('CaughtModal.gom_theo_loai')"
               @click="viewMode = 'species'"
             >
-              Theo loài
+              {{ tr('CaughtModal.theo_loai') }}
             </button>
           </div>
         </div>
@@ -203,7 +205,7 @@ async function handleRelease() {
           <input
             v-model="searchQuery"
             type="text"
-            placeholder="Tìm theo tên cá..."
+            :placeholder="tr('CaughtModal.tim_theo_ten_ca')"
             class="w-full pl-8 pr-3 py-1.5 text-xs border border-gray-300 rounded-lg focus:outline-none focus:border-gray-300 bg-gray-50/80"
           />
           <svg
@@ -235,7 +237,7 @@ async function handleRelease() {
             "
             @click="selectedRarity = 'ALL'"
           >
-            Tất cả
+            {{ tr('Achievement.tat_ca') }}
           </button>
           <button
             v-for="rarity in rarityOptions"
@@ -260,13 +262,13 @@ async function handleRelease() {
         :class="viewMode !== 'list' ? 'grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 xl:grid-cols-6' : 'flex flex-col'"
       >
         <div v-if="caughtStore.isLoadingCaught" class="col-span-full text-center text-xs text-gray-500">
-          Đang tải danh sách cá...
+          {{ tr('CaughtModal.dang_tai_danh_sach_ca') }}
         </div>
         <div v-else-if="!filteredCaughtFishes.length" class="col-span-full py-12 text-center text-xs text-gray-400">
           {{
             searchQuery || selectedRarity !== "ALL"
-              ? "Không tìm thấy cá phù hợp"
-              : "Chưa có con cá nào trong bộ sưu tập"
+              ? tr('CaughtModal.khong_tim_thay_ca_phu_hop')
+              : tr('CaughtModal.chua_co_con_ca_nao_trong_bo_suu_tap')
           }}
         </div>
         <template v-else-if="viewMode === 'species'">
@@ -277,14 +279,14 @@ async function handleRelease() {
           >
             <img
               :src="group.fishes[0].species?.image || '/fish/VN/fish.jpg'"
-              :alt="group.fishes[0].species?.name || 'Cá'"
+              :alt="group.fishes[0].species?.name || tr('CaughtModal.ca')"
               class="object-cover bg-gray-200 w-full h-36 border-b border-gray-200"
             />
             <div class="min-w-0 flex-1 p-2">
               <div class="flex items-start justify-between gap-2">
                 <div class="min-w-0">
                   <div class="m-0 truncate font-bold text-xs text-[#263238]">
-                    {{ group.fishes[0].species?.name || "Cá chưa rõ tên" }}
+                    {{ group.fishes[0].species?.name || tr('CaughtModal.ca_chua_ro_ten') }}
                   </div>
                   <span
                     v-if="group.fishes[0].species?.rarity"
@@ -295,7 +297,7 @@ async function handleRelease() {
                   </span>
                 </div>
                 <span class="shrink-0 px-2 py-1 rounded-full bg-[#153221] text-white text-[10px] font-extrabold">
-                  {{ group.fishes.length }} con
+                  {{ group.fishes.length }} {{ tr('UserProfile.con') }}
                 </span>
               </div>
               <button
@@ -304,7 +306,7 @@ async function handleRelease() {
                 :aria-expanded="expandedSpecies === group.id"
                 @click="expandedSpecies = expandedSpecies === group.id ? null : group.id"
               >
-                {{ expandedSpecies === group.id ? "Ẩn chi tiết" : "Xem từng con" }}
+                {{ expandedSpecies === group.id ? tr('CaughtModal.an_chi_tiet') : tr('CaughtModal.xem_tung_con') }}
               </button>
               <div
                 v-if="expandedSpecies === group.id"
@@ -327,23 +329,23 @@ async function handleRelease() {
                   >
                     {{ fish.origin.country }} - {{ fish.origin.name }}
                   </button>
-                  <span v-else class="mt-1 block text-emerald-700">Nguồn: Nuôi tại ao</span>
+                  <span v-else class="mt-1 block text-emerald-700">{{ tr('CaughtModal.nguon_nuoi_tai_ao') }}</span>
                   <div class="mt-2 flex gap-2">
                     <button
                       type="button"
                       class="px-2 py-1 border border-emerald-200 rounded-lg bg-emerald-50 hover:bg-emerald-100 text-emerald-700 font-bold transition-colors cursor-pointer"
-                      title="Đăng bán"
+                      :title="tr('CaughtModal.dang_ban')"
                       @click="openSellConfirm(fish)"
                     >
-                      Bán
+                      {{ tr('Fishfarm.ban') }}
                     </button>
                     <button
                       type="button"
                       class="px-2 py-1 border border-red-200 rounded-lg bg-red-50 hover:bg-red-100 text-red-600 font-bold transition-colors cursor-pointer"
-                      title="Thả cá về lại tự nhiên"
+                      :title="tr('CaughtModal.tha_ca_ve_lai_tu_nhien')"
                       @click="openReleaseConfirm(fish)"
                     >
-                      Thả
+                      {{ tr('Fishfarm.tha') }}
                     </button>
                   </div>
                 </div>
@@ -395,25 +397,25 @@ async function handleRelease() {
                 >
                   {{ item.origin.country }} - {{ item.origin.name }}
                 </div>
-                <div v-else class="mt-1 text-xs text-emerald-700">Nguồn: Nuôi tại ao</div>
+                <div v-else class="mt-1 text-xs text-emerald-700">{{ tr('CaughtModal.nguon_nuoi_tai_ao') }}</div>
               </div>
             </div>
             <div class="flex gap-2 shrink-0">
               <button
                 type="button"
                 class="px-2 py-1.5 border border-emerald-200 rounded-lg bg-emerald-50 hover:bg-emerald-100 text-emerald-700 font-bold text-xs transition-colors cursor-pointer"
-                title="Đăng bán"
+                :title="tr('CaughtModal.dang_ban')"
                 @click="openSellConfirm(item)"
               >
-                Bán
+                {{ tr('Fishfarm.ban') }}
               </button>
               <button
                 type="button"
                 class="px-2 py-1.5 border border-red-200 rounded-lg bg-red-50 hover:bg-red-100 text-red-600 font-bold text-xs transition-colors cursor-pointer"
-                title="Thả cá về lại tự nhiên"
+                :title="tr('CaughtModal.tha_ca_ve_lai_tu_nhien')"
                 @click="openReleaseConfirm(item)"
               >
-                Thả
+                {{ tr('Fishfarm.tha') }}
               </button>
             </div>
           </div>
@@ -424,8 +426,8 @@ async function handleRelease() {
         class="flex items-center justify-between gap-3 border-t border-gray-200 pt-3 mt-3 text-xs"
       >
         <span class="text-gray-500"
-          >Trang {{ currentPage }} / {{ pageCount }} ({{
-            viewMode === "species" ? `${groupedCaughtFishes.length} loài` : `${filteredCaughtFishes.length} cá`
+          >{{ tr('CaughtModal.trang') }} {{ currentPage }} / {{ pageCount }} ({{
+            viewMode === "species" ? tr('CaughtModal.value0_loai', { value0: groupedCaughtFishes.length }) : tr('CaughtModal.value0_ca', { value0: filteredCaughtFishes.length })
           }})</span
         >
         <div class="flex gap-2">
@@ -435,7 +437,7 @@ async function handleRelease() {
             :disabled="currentPage === 1"
             @click="currentPage--"
           >
-            Trước
+            {{ tr('Fishfarm.truoc') }}
           </button>
           <button
             type="button"
@@ -443,7 +445,7 @@ async function handleRelease() {
             :disabled="currentPage === pageCount"
             @click="currentPage++"
           >
-            Sau
+            {{ tr('Fishfarm.sau') }}
           </button>
         </div>
       </div>

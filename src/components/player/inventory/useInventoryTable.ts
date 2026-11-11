@@ -1,3 +1,4 @@
+import { t as tr } from "../../../i18n";
 import { inject, type InjectionKey } from "vue";
 import { computed, onMounted, ref, watch } from "vue";
 import { useAuthStore } from "../../../stores/auth.ts";
@@ -9,11 +10,11 @@ import { useToast } from "../../../composables/useToast.ts";
 
 const SLOTS: Category[] = ["rod", "line", "reel", "hook", "bait"];
 const LABELS: Record<Category, string> = {
-  rod: "Cần câu",
-  line: "Dây câu",
-  reel: "Máy câu",
-  hook: "Lưỡi câu",
-  bait: "Mồi",
+  get rod() { return tr('useInventoryTable.can_cau'); },
+  get line() { return tr('useInventoryTable.day_cau'); },
+  get reel() { return tr('useInventoryTable.may_cau'); },
+  get hook() { return tr('useInventoryTable.luoi_cau'); },
+  get bait() { return tr('useInventoryTable.moi'); },
 };
 const SET_PRICE = 50000;
 const SETS_PER_PAGE = 3;
@@ -42,7 +43,7 @@ export function useInventoryTable() {
   const modal = ref<"buy" | "delete" | null>(null);
 
   const itemName = (d: ItemData, fallbackId = "") =>
-    (d.name as string | undefined) ?? (fallbackId ? `#${fallbackId.slice(0, 6)}` : "Không tên");
+    (d.name as string | undefined) ?? (fallbackId ? `#${fallbackId.slice(0, 6)}` : tr('useInventoryTable.khong_ten'));
 
   const snapshotOf = (set: EquipmentSet) => JSON.stringify(SLOTS.map((slot) => set[slot]));
   const isDirty = (set: EquipmentSet) => snapshotOf(set) !== savedSnapshot.value[set.id];
@@ -58,7 +59,7 @@ export function useInventoryTable() {
     userId.value = authStore.userId ?? null;
     if (!userId.value) {
       loading.value = false;
-      return toast.error("Bạn cần đăng nhập để xem kho đồ.");
+      return toast.error(tr('useInventoryTable.ban_can_dang_nhap_de_xem_kho_do'));
     }
 
     await inventoryStore.setUserInventory(userId.value);
@@ -117,7 +118,7 @@ export function useInventoryTable() {
       await inventoryStore.useItem(item.id);
       await inventoryStore.setUserInventory(userId.value!);
       selected.value = new Set();
-      toast.success("Đã sử dụng vật phẩm.");
+      toast.success(tr('useInventoryTable.da_su_dung_vat_pham'));
     } catch (error) {
       toast.error((error as Error).message);
     } finally {
@@ -136,7 +137,7 @@ export function useInventoryTable() {
     );
 
     if (isItemInSet) {
-      toast.error("Không thể xóa vật phẩm đang có trong set. Hãy gỡ vật phẩm và lưu set trước.");
+      toast.error(tr('useInventoryTable.khong_the_xoa_vat_pham_dang_co_trong_set_hay_go_vat_pham_va_luu_'));
       return;
     }
 
@@ -146,7 +147,7 @@ export function useInventoryTable() {
       inventoryStore.items = inventoryStore.items.filter((item) => !selectedIds.has(item.id));
       selected.value = new Set();
       modal.value = null;
-      toast.success(`Đã xóa ${ids.length} vật phẩm.`);
+      toast.success(tr('useInventoryTable.da_xoa_value0_vat_pham', { value0: ids.length }));
     } catch (error) {
       toast.error((error as Error).message);
     } finally {
@@ -195,10 +196,10 @@ export function useInventoryTable() {
 
   function pickItem(item: UserInventory) {
     if (!active.value || !activeSet.value) {
-      return toast.info("Chọn một ô trong set bên phải trước, rồi bấm vật phẩm.");
+      return toast.info(tr('useInventoryTable.chon_mot_o_trong_set_ben_phai_truoc_roi_bam_vat_pham'));
     }
     if (item.data.category !== active.value.slot) {
-      return toast.error(`Ô này chỉ nhận vật phẩm loại "${LABELS[active.value.slot]}".`);
+      return toast.error(tr('useInventoryTable.o_nay_chi_nhan_vat_pham_loai_value0', { value0: LABELS[active.value.slot] }));
     }
     const list = activeSet.value[active.value.slot];
     if (list.some((setItem) => setItem.inventory_id === item.id)) return;
@@ -220,7 +221,7 @@ export function useInventoryTable() {
       await equipmentStore.saveSet(userId.value, set);
       savedSnapshot.value = { ...savedSnapshot.value, [set.id]: snapshotOf(set) };
       savedSetInventoryIds.value = { ...savedSetInventoryIds.value, [set.id]: inventoryIdsInSet(set) };
-      toast.success("Đã lưu set.");
+      toast.success(tr('useInventoryTable.da_luu_set'));
     } catch (error) {
       toast.error((error as Error).message);
     } finally {
@@ -233,7 +234,7 @@ export function useInventoryTable() {
       busy.value = true;
       await equipmentStore.buySet();
       await inventoryStore.setEquipmentSet();
-      toast.success("Đã thêm set mới.");
+      toast.success(tr('useInventoryTable.da_them_set_moi'));
     } catch (error) {
       toast.error((error as Error).message);
     } finally {
@@ -246,7 +247,7 @@ export function useInventoryTable() {
   function handleUpdateSetUsed(event: Event, setId: string) {
     if ((event.target as HTMLInputElement).value === "on") {
       equipmentStore.chooseSet(userId.value!, setId);
-      toast.success("Cập nhật thành công.");
+      toast.success(tr('useInventoryTable.cap_nhat_thanh_cong'));
     }
   }
 

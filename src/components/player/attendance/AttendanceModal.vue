@@ -1,4 +1,7 @@
 <script setup lang="ts">
+import { getFormattingLocale } from '../../../i18n';
+import { t as tr } from "../../../i18n";
+
 import { computed, onMounted, onUnmounted, ref } from "vue";
 import Modal from "../../shared/Modal.vue";
 import Tab from "../../shared/Tab.vue";
@@ -14,8 +17,8 @@ type Reward = { name: string; icon: string; amount?: number };
 type MonthReward = { day: number; freeReward: Reward; passReward: Reward; freeClaimed: boolean; passClaimed: boolean; unlocked: boolean };
 
 const tabs = [
-  { key: "daily", label: "Điểm danh ngày" },
-  { key: "monthly", label: "Điểm danh tháng" },
+  { key: "daily", get label() { return tr('AttendanceModal.diem_danh_ngay'); } },
+  { key: "monthly", get label() { return tr('AttendanceModal.diem_danh_thang'); } },
 ];
 const activeTab = ref("daily");
 const currencyStore = useCurrencyStore();
@@ -27,7 +30,7 @@ const now = ref(new Date());
 let clockInterval: ReturnType<typeof setInterval> | undefined;
 const dateKey = (date: Date) => `${date.getFullYear()}-${date.getMonth() + 1}-${date.getDate()}`;
 const todayKey = computed(() => dateKey(now.value));
-const currentMonthLabel = computed(() => now.value.toLocaleDateString("vi-VN", { month: "long", year: "numeric" }));
+const currentMonthLabel = computed(() => now.value.toLocaleDateString(getFormattingLocale(), { month: "long", year: "numeric" }));
 
 const dailyReward = ref<{ date: string; reward: Reward } | null>(null);
 const dailyRewardToday = computed(() => dailyReward.value?.date === todayKey.value ? dailyReward.value.reward : null);
@@ -47,7 +50,7 @@ async function loadData() {
     const nextClaimAt = await supabaseCurrencyRepository.getNextDailyRewardAt();
     nextClaimDailyRewardAt.value = nextClaimAt ? new Date(nextClaimAt) : null;
   } catch (err) {
-    toast.error(err instanceof Error ? err.message : "Không thể tải trạng thái điểm danh.", { title: "Tải thất bại", position: "bottom" });
+    toast.error(err instanceof Error ? err.message : tr('AttendanceModal.khong_the_tai_trang_thai_diem_danh'), { get title() { return tr('AttendanceModal.tai_that_bai'); }, position: "bottom" });
   }
 }
 
@@ -64,21 +67,21 @@ async function claimDailyReward() {
   isClaimingDailyReward.value = true;
   try {
     const result = await supabaseCurrencyRepository.claimDailyReward();
-    if (!result?.success) throw new Error(result?.message || "Không thể nhận phần thưởng hôm nay.");
+    if (!result?.success) throw new Error(result?.message || tr('AttendanceModal.khong_the_nhan_phan_thuong_hom_nay'));
     const item = result.item ?? {};
     dailyReward.value = {
       date: todayKey.value,
       reward: {
-        name: item.name ?? item.item_name ?? "Phần thưởng hằng ngày",
+        name: item.name ?? item.item_name ?? tr('AttendanceModal.phan_thuong_hang_ngay'),
         icon: item.icon ?? "🎁",
         amount: item.amount ?? item.quantity,
       },
     };
     nextClaimDailyRewardAt.value = result.next_claim_daily_reward_at ? new Date(result.next_claim_daily_reward_at) : new Date(Date.now() + 24 * 60 * 60 * 1000);
     await currencyStore.fetchCurrency();
-    toast.success("Đã nhận phần thưởng điểm danh!", { title: "Thành công", position: "bottom" });
+    toast.success(tr('AttendanceModal.da_nhan_phan_thuong_diem_danh'), { get title() { return tr('AttendanceModal.thanh_cong'); }, position: "bottom" });
   } catch (err) {
-    toast.error(err instanceof Error ? err.message : "Không thể nhận phần thưởng. Vui lòng thử lại.", { title: "Nhận thưởng thất bại", position: "bottom" });
+    toast.error(err instanceof Error ? err.message : tr('AttendanceModal.khong_the_nhan_phan_thuong_vui_long_thu_lai'), { get title() { return tr('AttendanceModal.nhan_thuong_that_bai'); }, position: "bottom" });
   } finally {
     isClaimingDailyReward.value = false;
   }
@@ -87,9 +90,9 @@ function claimMonthReward(_day: MonthReward, _lane: "free" | "pass") { /* Claims
 </script>
 
 <template>
-  <Modal title="Điểm danh" sub-title="Nhận quà miễn phí mỗi ngày" :on-refresh="loadData">
+  <Modal :title="tr('AttendanceModal.diem_danh')" :sub-title="tr('AttendanceModal.nhan_qua_mien_phi_moi_ngay')" :on-refresh="loadData">
     <div class="w-full">
-      <Tab v-model="activeTab" :tabs="tabs" aria-label="Loại điểm danh">
+      <Tab v-model="activeTab" :tabs="tabs" :aria-label="tr('AttendanceModal.loai_diem_danh')">
         <template #daily>
           <DailyAttendance :reward="dailyRewardToday" :next-claim-at="nextClaimDailyRewardAt" :is-claiming="isClaimingDailyReward" @claim="claimDailyReward" />
         </template>
@@ -97,8 +100,8 @@ function claimMonthReward(_day: MonthReward, _lane: "free" | "pass") { /* Claims
         <template #monthly>
           <section class="space-y-4">
             <div class="flex flex-wrap items-center justify-between gap-2">
-              <div class="m-0 text-lg font-extrabold text-[#24352a]">Điểm danh {{ currentMonthLabel }}</div>
-              <span class="rounded-full bg-[#f5f9f0] px-3 py-1 text-xs font-bold text-[#24352a]">Đã nhận {{ fishingPassStore.rewardProgress.claimed }}/{{ fishingPassStore.rewardProgress.total }} quà</span>
+              <div class="m-0 text-lg font-extrabold text-[#24352a]">{{ tr('AttendanceModal.diem_danh') }} {{ currentMonthLabel }}</div>
+              <span class="rounded-full bg-[#f5f9f0] px-3 py-1 text-xs font-bold text-[#24352a]">{{ tr('AttendanceModal.da_nhan') }} {{ fishingPassStore.rewardProgress.claimed }}/{{ fishingPassStore.rewardProgress.total }} {{ tr('AttendanceModal.qua') }}</span>
             </div>
             <FishingPassRewards v-model:show-pass-confirm="showPassConfirm" :month-rewards="monthRewards" @claim="claimMonthReward($event, 'free')" />
           </section>

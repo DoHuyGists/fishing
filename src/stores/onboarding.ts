@@ -1,3 +1,4 @@
+import { t as tr } from "../i18n";
 import { defineStore } from "pinia";
 import { useUserProfileStore } from "./userProfile";
 export const useOnboardingStore = defineStore("onboarding", {
@@ -10,7 +11,7 @@ export const useOnboardingStore = defineStore("onboarding", {
     async finish() {
       this.visible = false; this.error = ""; this.saving = true;
       try { await useUserProfileStore().completeOnboarding(); }
-      catch (err) { this.error = err instanceof Error ? err.message : "Không thể lưu trạng thái hướng dẫn."; }
+      catch (err) { this.error = err instanceof Error ? err.message : tr('onboarding.khong_the_luu_trang_thai_huong_dan'); }
       finally { this.saving = false; }
     },
   },

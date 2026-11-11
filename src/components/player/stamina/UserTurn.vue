@@ -1,13 +1,15 @@
 <script setup lang="ts">
+import { t as tr } from "../../../i18n";
+
 import { useUserTurnsStore } from "../../../stores/userTurns";
 import { useInformationModal } from "../../../composables/useInformationModal";
 
 const { open } = useInformationModal();
 function showInformation() {
   open({
-    name: "Lượt câu",
+    get name() { return tr('UserTurn.luot_cau'); },
     image: "/items/rod/fishing-rob.png",
-    description: "Lượt câu dùng để thực hiện các lần câu cá. Khi chưa đạt giới hạn, bạn được hồi 1 lượt sau mỗi 5 phút. Đồng hồ bên cạnh cho biết thời gian còn lại đến lượt hồi tiếp theo.",
+    get description() { return tr('UserTurn.luot_cau_dung_de_thuc_hien_cac_lan_cau_ca_khi_chua_dat_gioi_han_'); },
   });
 }
 
@@ -15,14 +17,14 @@ const userTurnsStore = useUserTurnsStore();
 </script>
 
 <template>
-  <button type="button" class="flex flex-wrap items-center gap-1 bg-white rounded-full px-2 cursor-pointer" aria-live="polite" aria-label="Thông tin về lượt câu" @click.stop="showInformation">
+  <button type="button" class="flex flex-wrap items-center gap-1 bg-white rounded-full px-2 cursor-pointer" aria-live="polite" :aria-label="tr('UserTurn.thong_tin_ve_luot_cau')" @click.stop="showInformation">
     <span class="font-bold">
       {{ userTurnsStore.status?.turns ?? "—" }} / {{ userTurnsStore.status?.max_turns ?? "—" }}
     </span>
     <span aria-hidden="true">🎣</span>
     <span v-if="userTurnsStore.status && userTurnsStore.status.turns < userTurnsStore.status.max_turns" class="text-xs w-20 text-[#617565]">
-      +1 sau {{ userTurnsStore.countdown }}
+      {{ tr('UserTurn.1_sau') }} {{ userTurnsStore.countdown }}
     </span>
-    <span v-else-if="userTurnsStore.error" class="text-xs text-red-700">Không tải được</span>
+    <span v-else-if="userTurnsStore.error" class="text-xs text-red-700">{{ tr('UserTurn.khong_tai_duoc') }}</span>
   </button>
 </template>

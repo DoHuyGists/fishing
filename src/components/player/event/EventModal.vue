@@ -1,4 +1,7 @@
 <script lang="ts" setup>
+import { getFormattingLocale } from '../../../i18n';
+import { t as tr } from "../../../i18n";
+
 import { computed, onMounted, ref } from "vue";
 import {
   supabaseEventScheduleRepository,
@@ -28,7 +31,7 @@ function scheduleStatus(item: EventScheduleRow): "upcoming" | "ongoing" | "ended
 }
 
 function formatDate(value: string) {
-  return value ? new Date(value).toLocaleString("vi-VN") : "—";
+  return value ? new Date(value).toLocaleString(getFormattingLocale()) : "—";
 }
 
 async function loadSchedules() {
@@ -40,7 +43,7 @@ async function loadSchedules() {
       await selectSchedule(activeSchedules.value[0]);
     }
   } catch (error) {
-    loadError.value = error instanceof Error ? error.message : "Không thể tải danh sách sự kiện";
+    loadError.value = error instanceof Error ? error.message : tr('EventModal.khong_the_tai_danh_sach_su_kien');
   } finally {
     isLoading.value = false;
   }
@@ -59,18 +62,18 @@ async function selectSchedule(item: EventScheduleRow) {
 onMounted(loadSchedules);
 </script>
 <template>
-  <Modal title="Bảng sự kiện" sub-title="Sự kiện đang diễn ra" :on-refresh="loadSchedules">
+  <Modal :title="tr('EventModal.bang_su_kien')" :sub-title="tr('EventModal.su_kien_dang_dien_ra')" :on-refresh="loadSchedules">
     <section
       class="relative flex max-w-none h-full flex-col overflow-hidden border-0 bg-[#f4f5e9] text-[#20372a]"
       role="dialog"
       aria-modal="true"
       aria-labelledby="event-title"
     >
-      <div v-if="isLoading" class="grid flex-1 place-items-center text-sm text-emerald-900/70">Đang tải sự kiện...</div>
+      <div v-if="isLoading" class="grid flex-1 place-items-center text-sm text-emerald-900/70">{{ tr('EventModal.dang_tai_su_kien') }}</div>
       <div v-else-if="loadError" class="grid flex-1 place-items-center text-center text-sm text-red-700">
         <div>
           <div>{{ loadError }}</div>
-          <button type="button" class="mt-2 font-bold underline" @click="loadSchedules">Thử lại</button>
+          <button type="button" class="mt-2 font-bold underline" @click="loadSchedules">{{ tr('Maintenance.thu_lai') }}</button>
         </div>
       </div>
       <div
@@ -80,12 +83,12 @@ onMounted(loadSchedules);
         <!-- Danh sách sự kiện -->
         <section class="flex min-h-0 flex-col border-b border-emerald-950/10 md:border-b-0 md:border-r">
           <div class="flex items-center justify-between border-b border-emerald-950/10 px-5 py-3 sm:px-6">
-            <div class="m-0 text-sm font-bold">Danh sách sự kiện</div>
-            <span class="text-xs text-emerald-900/60">{{ activeSchedules.length }} sự kiện</span>
+            <div class="m-0 text-sm font-bold">{{ tr('EventModal.danh_sach_su_kien') }}</div>
+            <span class="text-xs text-emerald-900/60">{{ activeSchedules.length }} {{ tr('EventModal.su_kien') }}</span>
           </div>
           <div class="grow h-0 space-y-2 overflow-y-scroll p-3 sm:p-4">
             <div v-if="!activeSchedules.length" class="py-8 text-center text-sm text-emerald-900/55">
-              Hiện không có sự kiện nào.
+              {{ tr('EventModal.hien_khong_co_su_kien_nao') }}
             </div>
             <button
               v-for="item in activeSchedules"
@@ -101,7 +104,7 @@ onMounted(loadSchedules);
                 </div>
                 <span class="min-w-0 flex-1">
                   <span class="flex flex-col gap-2">
-                    <span class="truncate text-sm font-bold">{{ item.eventName || "Sự kiện" }}</span>
+                    <span class="truncate text-sm font-bold">{{ item.eventName || tr('EventModal.su_kien_2') }}</span>
                     <span
                       class="shrink-0 rounded-full w-fit px-2 py-0.5 text-[10px] font-bold"
                       :class="{
@@ -112,10 +115,10 @@ onMounted(loadSchedules);
                     >
                       {{
                         scheduleStatus(item) === "ongoing"
-                          ? "Đang diễn ra"
+                          ? tr('EventModal.dang_dien_ra')
                           : scheduleStatus(item) === "upcoming"
-                            ? "Sắp diễn ra"
-                            : "Đã kết thúc"
+                            ? tr('EventModal.sap_dien_ra')
+                            : tr('EventModal.da_ket_thuc')
                       }}
                     </span>
                   </span>
@@ -141,27 +144,27 @@ onMounted(loadSchedules);
             <div class="m-0 text-[10px] font-extrabold uppercase tracking-[0.14em] text-emerald-800">
               {{
                 scheduleStatus(selectedSchedule) === "ongoing"
-                  ? "Đang diễn ra"
+                  ? tr('EventModal.dang_dien_ra')
                   : scheduleStatus(selectedSchedule) === "upcoming"
-                    ? "Sắp diễn ra"
-                    : "Đã kết thúc"
+                    ? tr('EventModal.sap_dien_ra')
+                    : tr('EventModal.da_ket_thuc')
               }}
             </div>
             <div class="m-0 mt-2 flex items-center gap-2 text-2xl font-bold sm:text-3xl">
               <span>{{ "🎉" }}</span>
-              <span>{{ selectedSchedule.eventName || "Sự kiện" }}</span>
+              <span>{{ selectedSchedule.eventName || tr('EventModal.su_kien_2') }}</span>
             </div>
             <div class="mt-3 flex flex-wrap items-center gap-x-4 gap-y-1 text-xs text-emerald-900/60">
               <span>🗓️ {{ formatDate(selectedSchedule.start) }} — {{ formatDate(selectedSchedule.end) }}</span>
-              <span>👁️ {{ selectedSchedule.viewCount }} lượt xem</span>
+              <span>👁️ {{ selectedSchedule.viewCount }} {{ tr('EventModal.luot_xem') }}</span>
             </div>
             <hr class="my-5 border-emerald-950/10" />
             <div class="prose prose-sm max-w-none whitespace-pre-line text-[15px] leading-relaxed text-[#20372a]">
-              {{ selectedSchedule.eventDescription || "Sự kiện chưa có mô tả chi tiết." }}
+              {{ selectedSchedule.eventDescription || tr('EventModal.su_kien_chua_co_mo_ta_chi_tiet') }}
             </div>
           </article>
           <div v-else class="grid h-full place-items-center p-8 text-center text-sm text-emerald-900/55">
-            Chọn một sự kiện ở danh sách bên trái để xem chi tiết.
+            {{ tr('EventModal.chon_mot_su_kien_o_danh_sach_ben_trai_de_xem_chi_tiet') }}
           </div>
         </section>
       </div>

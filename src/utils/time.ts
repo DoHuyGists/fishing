@@ -1,9 +1,10 @@
-﻿import dayjs from 'dayjs';
+import { getFormattingLocale } from '../i18n';
+import dayjs from 'dayjs';
 import utc from 'dayjs/plugin/utc';
 dayjs.extend(utc);
 
 export function formatDateTime(value: string | Date) {
-  return new Date(value).toLocaleString(undefined, {
+  return new Date(value).toLocaleString(getFormattingLocale(), {
     year: 'numeric',
     month: '2-digit',
     day: '2-digit',

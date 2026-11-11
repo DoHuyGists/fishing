@@ -1,4 +1,6 @@
 <script setup lang="ts">
+import { t as tr } from "../../../i18n";
+
 import { computed, ref, watch } from "vue";
 import Cash from "../currency/Cash.vue";
 import { useCurrencyStore } from "../../../stores/currency.ts";
@@ -30,16 +32,16 @@ function confirm() {
     @click.self="emit('cancel')"
   >
     <div class="relative w-full max-w-sm rounded-xl border border-gray-300 bg-white p-5 text-center shadow-xl">
-      <div class="m-0 text-base font-bold text-[#263238]">Đăng bán cá</div>
+      <div class="m-0 text-base font-bold text-[#263238]">{{ tr('FishSellConfirm.dang_ban_ca') }}</div>
       <div class="my-3 text-xs leading-relaxed text-gray-600">
-        Đăng bán <strong class="text-[#153221]">{{ fish.species?.name }}</strong> lên thị trường.
+        {{ tr('CaughtModal.dang_ban') }} <strong class="text-[#153221]">{{ fish.species?.name }}</strong> {{ tr('FishSellConfirm.len_thi_truong') }}
       </div>
       <div class="my-4 text-left">
         <input
           v-model.number="price"
           type="number"
           min="1"
-          placeholder="Nhập giá bán..."
+          :placeholder="tr('FishSellConfirm.nhap_gia_ban')"
           class="w-full rounded-lg border border-gray-300 px-3 py-2 text-xs focus:outline-none"
           @keydown="
             (e: KeyboardEvent) => {
@@ -50,16 +52,16 @@ function confirm() {
         />
         <div v-if="error" class="mt-1 text-[11px] font-medium text-red-500">{{ error }}</div>
         <div v-else-if="price !== '' && Number(price) <= 0" class="mt-1 text-[11px] font-medium text-red-500">
-          Giá bán phải lớn hơn 0.
+          {{ tr('FishSellConfirm.gia_ban_phai_lon_hon_0') }}
         </div>
       </div>
       <div class="space-y-2 text-left text-xs">
-        <div class="flex items-center gap-2"><span>Số dư hiện tại:</span><Cash :amount="currencyStore.cash" /></div>
+        <div class="flex items-center gap-2"><span>{{ tr('FishSellConfirm.so_du_hien_tai') }}</span><Cash :amount="currencyStore.cash" /></div>
         <hr />
-        <div class="flex items-center gap-2"><span>Phí niêm yết thị trường:</span><Cash :amount="listedPrice" /></div>
-        <div class="flex items-center gap-2"><span>Phí cân bằng thị trường:</span><Cash :amount="balanceFee" /></div>
+        <div class="flex items-center gap-2"><span>{{ tr('FishSellConfirm.phi_niem_yet_thi_truong') }}</span><Cash :amount="listedPrice" /></div>
+        <div class="flex items-center gap-2"><span>{{ tr('FishSellConfirm.phi_can_bang_thi_truong') }}</span><Cash :amount="balanceFee" /></div>
         <hr />
-        <div class="flex items-center gap-2"><span>Tổng phí:</span><Cash :amount="listedPrice + balanceFee" /></div>
+        <div class="flex items-center gap-2"><span>{{ tr('FishSellConfirm.tong_phi') }}</span><Cash :amount="listedPrice + balanceFee" /></div>
       </div>
       <div class="mt-5 flex justify-center gap-3">
         <button
@@ -67,7 +69,7 @@ function confirm() {
           class="rounded-lg border border-gray-300 px-4 py-1.5 text-xs font-bold hover:bg-gray-100"
           @click="emit('cancel')"
         >
-          Hủy
+          {{ tr('AccountInfoModal.huy') }}
         </button>
         <button
           type="button"
@@ -75,7 +77,7 @@ function confirm() {
           :disabled="isLoading || Number(price) <= 0"
           @click="confirm"
         >
-          {{ isLoading ? "Đang xử lý..." : "Đăng bán" }}
+          {{ isLoading ? tr('DailyAttendance.dang_xu_ly') : tr('CaughtModal.dang_ban') }}
         </button>
       </div>
     </div>

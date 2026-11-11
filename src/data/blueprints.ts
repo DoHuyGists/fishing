@@ -1,3 +1,4 @@
+import { t as tr } from "../i18n";
 export type ItemCategory = (typeof import("./items.ts").items)[number]["category"];
 
 export interface Blueprint {
@@ -12,8 +13,8 @@ export interface Blueprint {
 export const blueprints: Blueprint[] = [
   {
     id: "bp-basic-rod",
-    name: "Cần câu cơ bản",
-    result: { category: "Rod", name: "Cần câu cơ bản", quantity: 1 },
+    get name() { return tr('blueprints.can_cau_co_ban'); },
+    result: { category: "Rod", get name() { return tr('blueprints.can_cau_co_ban'); }, quantity: 1 },
     pattern: [
       [null, null, "Line"],
       [null, "Line", "Hook"],
@@ -22,8 +23,8 @@ export const blueprints: Blueprint[] = [
   },
   {
     id: "bp-lure",
-    name: "Mồi giả",
-    result: { category: "Lure", name: "Mồi giả", quantity: 2 },
+    get name() { return tr('blueprints.moi_gia'); },
+    result: { category: "Lure", get name() { return tr('blueprints.moi_gia'); }, quantity: 2 },
     pattern: [
       ["Hook", "Bait"],
       ["Swivel", "Bait"],
@@ -31,14 +32,14 @@ export const blueprints: Blueprint[] = [
   },
   {
     id: "bp-float",
-    name: "Phao câu",
-    result: { category: "Float", name: "Phao câu", quantity: 1 },
+    get name() { return tr('blueprints.phao_cau'); },
+    result: { category: "Float", get name() { return tr('blueprints.phao_cau'); }, quantity: 1 },
     pattern: [["Line"], ["Float"], ["Sinker"]],
   },
   {
     id: "bp-box",
-    name: "Hộp đồ câu",
-    result: { category: "Box", name: "Hộp đồ câu lớn", quantity: 1 },
+    get name() { return tr('blueprints.hop_do_cau'); },
+    result: { category: "Box", get name() { return tr('blueprints.hop_do_cau_lon'); }, quantity: 1 },
     pattern: [
       ["Box", "Box"],
       ["Bag", "Tool"],

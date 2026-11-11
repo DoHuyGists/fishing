@@ -1,4 +1,6 @@
 <script lang="ts" setup>
+import { t as tr } from "../../../i18n";
+
 import { ref, computed, onMounted, watch } from "vue";
 import { useAuthStore } from "../../../stores/auth.ts";
 import { useInventoryStore } from "../../../stores/inventory.ts";
@@ -60,7 +62,7 @@ async function loadData() {
       userTurnsStore.fetchStatus(),
     ]);
   } catch (err: any) {
-    error.value = err?.message ?? "Không thể tải trang bị";
+    error.value = err?.message ?? tr('PrepareModal.khong_the_tai_trang_bi');
   } finally {
     loading.value = false;
   }
@@ -119,7 +121,7 @@ async function switchSet(targetSet: EquipmentSet) {
       await inventoryStore.setEquipmentSet();
     }
   } catch (err: any) {
-    error.value = err?.message ?? "Không thể đổi set trang bị";
+    error.value = err?.message ?? tr('PrepareModal.khong_the_doi_set_trang_bi');
   } finally {
     switchingSet.value = false;
   }
@@ -186,13 +188,13 @@ const canProceed = computed(() => {
 const proceedBlockReason = computed(() => {
   if (loading.value || error.value) return null;
   if (!usedSet.value) {
-    return "Chưa chọn set trang bị nào.";
+    return tr('PrepareModal.chua_chon_set_trang_bi_nao');
   }
   if (!isUsedSetComplete.value) {
-    return `Set đang chọn thiếu loại: ${missingCategoriesInSet.value.join(", ")} (cần có ít nhất 1 món mỗi loại).`;
+    return tr('PrepareModal.set_dang_chon_thieu_loai_value0_can_co_it_nhat_1_mon_moi_loai', { value0: missingCategoriesInSet.value.join(", ") });
   }
   if (!allSlotsReady.value) {
-    return `Chưa chọn đủ 5/5 trang bị chính (còn thiếu: ${missingUsedSlots.value.join(", ")}).`;
+    return tr('PrepareModal.chua_chon_du_5_5_trang_bi_chinh_con_thieu_value0', { value0: missingUsedSlots.value.join(", ") });
   }
   return null;
 });
@@ -205,8 +207,8 @@ async function confirm() {
     await supabaseUserInAreaRepository.setUserEnterArea(worldStore.selectedArea.id);
   } catch (err) {
     console.error("Failed to consume turn or enter area:", err);
-    toast.error(err instanceof Error ? err.message : "Không thể trừ lượt câu cá", {
-      title: "Chưa thể vào bãi câu",
+    toast.error(err instanceof Error ? err.message : tr('PrepareModal.khong_the_tru_luot_cau_ca'), {
+      get title() { return tr('PrepareModal.chua_the_vao_bai_cau'); },
       position: "top",
     });
     return;
@@ -228,32 +230,32 @@ async function confirm() {
         <WeatherSection :area-id="worldStore.selectedArea.id" inline />
 
         <section
-          aria-label="Cá trong hồ"
+          :aria-label="tr('EquipmentMenu.ca_trong_ho')"
           class="shrink-0 overflow-hidden rounded-lg border border-[#cbd9c6] bg-[#f5f9f0] shadow-sm"
         >
           <header class="flex flex-wrap items-center justify-between gap-2 border-b border-[#cbd9c6] bg-[#eaf2e5] p-3">
             <div>
-              <div class="m-0 text-[15px] font-bold text-[#24352a]">Cá trong hồ</div>
-              <div class="m-0 mt-0.5 text-xs text-[#617565]">Các loài bạn đã câu thành công.</div>
+              <div class="m-0 text-[15px] font-bold text-[#24352a]">{{ tr('EquipmentMenu.ca_trong_ho') }}</div>
+              <div class="m-0 mt-0.5 text-xs text-[#617565]">{{ tr('PrepareModal.cac_loai_ban_da_cau_thanh_cong') }}</div>
             </div>
             <span
               v-if="!diaryStore.isLoadingAreaSpecies && !diaryStore.areaSpeciesError"
               class="text-xs font-semibold text-[#526a58]"
             >
-              {{ diaryStore.discoveredAreaSpecies.length }} loài đã khám phá
+              {{ diaryStore.discoveredAreaSpecies.length }} {{ tr('PrepareModal.loai_da_kham_pha') }}
             </span>
           </header>
           <div v-if="diaryStore.isLoadingAreaSpecies" class="m-0 p-4 text-center text-sm text-[#617565]" role="status">
-            Đang tải danh sách cá…
+            {{ tr('PrepareModal.dang_tai_danh_sach_ca') }}
           </div>
           <div v-else-if="diaryStore.areaSpeciesError" class="p-4 text-center" role="alert">
-            <div class="m-0 text-sm text-red-600">Không thể tải danh sách cá trong hồ.</div>
+            <div class="m-0 text-sm text-red-600">{{ tr('PrepareModal.khong_the_tai_danh_sach_ca_trong_ho') }}</div>
             <button
               type="button"
               class="mt-2 rounded-lg border border-[#cbd9c6] bg-[#eaf2e5] px-3 py-1.5 text-xs font-semibold text-[#24352a] hover:bg-white"
               @click="diaryStore.loadDiscoveredAreaSpecies(worldStore.selectedArea.id, authStore.userId)"
             >
-              Thử lại
+              {{ tr('Maintenance.thu_lai') }}
             </button>
           </div>
           <div
@@ -279,20 +281,20 @@ async function confirm() {
                   {{ fish.information }}
                 </div>
                 <div v-if="fish.weight_min != null || fish.weight_max != null" class="m-0 mt-1 text-xs text-[#617565]">
-                  Cân nặng: {{ fish.weight_min ?? "?" }}–{{ fish.weight_max ?? "?" }} kg
+                  {{ tr('LakeFishGuide.can_nang') }} {{ fish.weight_min ?? "?" }}–{{ fish.weight_max ?? "?" }} kg
                 </div>
               </div>
             </div>
           </div>
           <div v-else class="m-0 p-4 text-center text-sm text-[#617565]">
-            Bạn chưa khám phá được loài cá nào trong hồ này.
+            {{ tr('PrepareModal.ban_chua_kham_pha_duoc_loai_ca_nao_trong_ho_nay') }}
           </div>
         </section>
 
         <!-- Loading state -->
         <div v-if="loading" class="flex-1 flex flex-col items-center justify-center gap-3.5 text-[#617565] text-sm">
           <div class="w-9 h-9 border-[3px] border-[#cbd9c6] border-t-[#526a58] rounded-full animate-spin"></div>
-          <span>Đang tải trang bị…</span>
+          <span>{{ tr('PrepareModal.dang_tai_trang_bi') }}</span>
         </div>
 
         <!-- Error state -->
@@ -310,10 +312,10 @@ async function confirm() {
                 <span class="w-2.5 h-2.5 rounded-full bg-[#8eaa91] shrink-0"></span>
                 <div>
                   <div class="m-0 text-[15px] font-bold text-[#24352a] tracking-tight leading-snug">
-                    Danh sách set trang bị
+                    {{ tr('PrepareModal.danh_sach_set_trang_bi') }}
                   </div>
                   <div class="m-0 mt-0.5 text-xs text-[#617565] leading-normal">
-                    Bấm để đổi set sử dụng. Chọn trang bị muốn dùng trong từng loại.
+                    {{ tr('PrepareModal.bam_de_doi_set_su_dung_chon_trang_bi_muon_dung_trong_tung_loai') }}
                   </div>
                 </div>
               </div>
@@ -322,12 +324,12 @@ async function confirm() {
                   v-if="!isUsedSetComplete"
                   class="inline-flex items-center gap-1 px-3 py-1 bg-amber-100 border border-amber-300 text-amber-800 text-xs font-semibold rounded-lg"
                 >
-                  ⚠️ Set chưa đủ 5 loại
+                  {{ tr('PrepareModal.set_chua_du_5_loai') }}
                 </span>
                 <span
                   class="inline-flex items-center gap-1 px-3 py-1 bg-[#dce9d7] border border-[#b7cbb4] text-[#344f3b] text-xs font-semibold rounded-lg"
                 >
-                  ✓ Đang dùng Set {{ usedSetIndex + 1 }}
+                  {{ tr('PrepareModal.dang_dung_set') }} {{ usedSetIndex + 1 }}
                 </span>
               </div>
             </div>
@@ -353,20 +355,20 @@ async function confirm() {
                   <span
                     v-if="s.isUsed"
                     class="text-[10px] font-semibold px-1.5 py-px rounded-full bg-[#dce9d7] text-[#344f3b]"
-                    >Đang dùng</span
+                    >{{ tr('EquipmentPickerModal.dang_dung') }}</span
                   >
                   <span
                     v-else
                     class="text-[10px] font-medium px-1.5 py-px rounded-full bg-[#eaf2e5] text-[#526a58] transition-colors group-hover:bg-[#cbd9c6] group-hover:text-[#24352a] group-hover:font-semibold"
-                    >Đổi sang set này</span
+                    >{{ tr('PrepareModal.doi_sang_set_nay') }}</span
                   >
                   <span
                     v-if="!isSetComplete(s)"
                     class="text-[10px] font-semibold px-1.5 py-px rounded-md bg-amber-100 border border-amber-300 text-amber-800"
-                    >Thiếu loại</span
+                    >{{ tr('PrepareModal.thieu_loai') }}</span
                   >
                 </div>
-                <span class="text-[11px] text-[#617565]"> {{ countSetItems(s) }} vật phẩm </span>
+                <span class="text-[11px] text-[#617565]"> {{ countSetItems(s) }} {{ tr('ListItems.vat_pham') }} </span>
               </button>
             </div>
 
@@ -375,7 +377,7 @@ async function confirm() {
               v-if="inventoryStore.equipmentSets.length === 0"
               class="p-6 text-center text-[13px] text-[#617565] bg-[#f5f9f0] rounded-xl border border-[#cbd9c6]"
             >
-              <span>📦 Bạn chưa có set trang bị nào trong kho đồ. Hãy vào Kho đồ để tạo hoặc mua thêm set.</span>
+              <span>{{ tr('PrepareModal.ban_chua_co_set_trang_bi_nao_trong_kho_do_hay_vao_kho_do_de_tao_') }}</span>
             </div>
 
             <!-- Category Items in Currently Used Set -->
@@ -391,7 +393,7 @@ async function confirm() {
                     <div class="flex items-center gap-1.5">
                       <span class="text-xs font-semibold text-[#24352a]">{{ cat.name }}</span>
                     </div>
-                    <span class="text-[11px] text-[#617565]"> {{ (usedSet[cat.id] || []).length }} món </span>
+                    <span class="text-[11px] text-[#617565]"> {{ (usedSet[cat.id] || []).length }} {{ tr('PrepareModal.mon') }} </span>
                   </div>
 
                   <!-- Items list in this category -->
@@ -436,11 +438,11 @@ async function confirm() {
                               v-if="isItemSelected(cat.id, item.id)"
                               class="text-[9px] font-bold bg-[#dce9d7] text-[#344f3b] px-1 py-px rounded shrink-0"
                             >
-                              Chính
+                              {{ tr('PrepareModal.chinh') }}
                             </span>
                           </div>
                           <span class="text-[11px] text-[#617565] truncate block" :title="getItemDisplay(item).detail">
-                            {{ getItemDisplay(item).detail || "Trang bị" }}
+                            {{ getItemDisplay(item).detail || tr('InventoryModal.trang_bi') }}
                           </span>
                         </div>
                         <div class="shrink-0">
@@ -457,14 +459,14 @@ async function confirm() {
                                 : 'bg-[#eaf2e5] text-[#526a58] group-hover:bg-[#cbd9c6] group-hover:text-[#24352a] group-hover:font-bold'
                             "
                           >
-                            {{ isItemSelected(cat.id, item.id) ? "✓ Đang dùng" : "Chọn" }}
+                            {{ isItemSelected(cat.id, item.id) ? tr('PrepareModal.dang_dung') : tr('NewPlayerFishing.chon') }}
                           </span>
                         </div>
                       </div>
                     </template>
                     <template v-else>
                       <div class="flex items-center justify-center py-6 px-2 text-[11px] text-[#617565] italic">
-                        <span class="text-amber-700 font-medium">⚠️ Chưa có đồ</span>
+                        <span class="text-amber-700 font-medium">{{ tr('PrepareModal.chua_co_do') }}</span>
                       </div>
                     </template>
                   </div>
@@ -493,11 +495,11 @@ async function confirm() {
             type="button"
             class="inline-flex items-center justify-center gap-2 px-4 py-2 border border-[#344f3b] rounded-xl text-sm font-bold cursor-pointer transition-all duration-150 active:scale-95 bg-[#344f3b] text-[#f5f9f0] shadow-md hover:not-disabled:bg-[#24352a] disabled:opacity-50 disabled:cursor-not-allowed"
             :disabled="!canProceed"
-            :title="proceedBlockReason || 'Sẵn sàng tiếp tục'"
+            :title="proceedBlockReason || tr('PrepareModal.san_sang_tiep_tuc')"
             @click="confirm"
           >
             <span class="text-base">🚀</span>
-            Tiếp tục
+            {{ tr('TeamModal.tiep_tuc') }}
           </button>
         </div>
       </footer>

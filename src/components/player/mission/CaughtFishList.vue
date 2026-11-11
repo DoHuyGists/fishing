@@ -1,4 +1,6 @@
 <script setup lang="ts">
+import { t as tr } from "../../../i18n";
+
 import { computed, reactive, ref } from "vue";
 import type { CaughtFish } from "../../../stores/caught";
 
@@ -24,7 +26,7 @@ const groupedBySpecies = computed(() => {
     const key = caught.species?.id || "unknown";
     let group = groups.get(key);
     if (!group) {
-      group = { key, name: caught.species?.name || "Cá chưa rõ tên", image: caught.species?.image ?? null, fishes: [] };
+      group = { key, name: caught.species?.name || tr('CaughtModal.ca_chua_ro_ten'), image: caught.species?.image ?? null, fishes: [] };
       groups.set(key, group);
     }
     group.fishes.push(caught);
@@ -62,12 +64,12 @@ function selectionClass(caught: CaughtFish) {
 <template>
   <section class="flex h-full flex-col border-b border-emerald-950/10 md:border-b-0 md:border-r">
     <div class="flex flex-wrap items-center justify-between gap-2 border-b border-emerald-950/10 px-5 py-3 sm:px-6">
-      <div class="m-0 text-sm font-bold">Cá đã câu</div>
-      <span class="text-xs text-emerald-900/60">{{ caughtFishes.length }} con</span>
+      <div class="m-0 text-sm font-bold">{{ tr('FishingPlayers.ca_da_cau') }}</div>
+      <span class="text-xs text-emerald-900/60">{{ caughtFishes.length }} {{ tr('UserProfile.con') }}</span>
       <div
         class="flex rounded-md border border-[#cbd9c6] p-0.5 text-xs font-bold"
         role="group"
-        aria-label="Chế độ xem cá đã câu"
+        :aria-label="tr('CaughtFishList.che_do_xem_ca_da_cau')"
       >
         <button
           type="button"
@@ -76,7 +78,7 @@ function selectionClass(caught: CaughtFish) {
           :aria-pressed="viewMode === 'list'"
           @click="viewMode = 'list'"
         >
-          Danh sách
+          {{ tr('CaughtModal.danh_sach') }}
         </button>
         <button
           type="button"
@@ -85,7 +87,7 @@ function selectionClass(caught: CaughtFish) {
           :aria-pressed="viewMode === 'grid'"
           @click="viewMode = 'grid'"
         >
-          Lưới
+          {{ tr('CaughtModal.luoi') }}
         </button>
         <button
           type="button"
@@ -94,13 +96,13 @@ function selectionClass(caught: CaughtFish) {
           :aria-pressed="viewMode === 'species'"
           @click="viewMode = 'species'"
         >
-          Theo loài
+          {{ tr('CaughtModal.theo_loai') }}
         </button>
       </div>
     </div>
 
     <div v-if="!caughtFishes.length" class="py-8 text-center text-sm text-emerald-900/55">
-      Bạn chưa có cá trong bộ sưu tập.
+      {{ tr('CaughtFishList.ban_chua_co_ca_trong_bo_suu_tap') }}
     </div>
     <div v-else class="h-0 grow overflow-y-auto p-3 sm:p-4">
       <div v-if="viewMode === 'species'" class="flex flex-col gap-2">
@@ -122,7 +124,7 @@ function selectionClass(caught: CaughtFish) {
             />
             <span class="min-w-0 flex-1 truncate text-sm font-bold text-[#24352a]">{{ group.name }}</span>
             <span class="shrink-0 rounded-full bg-white px-2 py-1 text-xs font-bold"
-              >{{ group.fishes.length }} con</span
+              >{{ group.fishes.length }} {{ tr('UserProfile.con') }}</span
             >
             <span aria-hidden="true" class="text-sm">{{ expandedSpecies.has(group.key) ? "▴" : "▾" }}</span>
           </button>
@@ -140,18 +142,18 @@ function selectionClass(caught: CaughtFish) {
               >
                 <img
                   :src="caught.species?.image || '/fish/VN/fish.jpg'"
-                  :alt="caught.species?.name || 'Cá'"
+                  :alt="caught.species?.name || tr('CaughtModal.ca')"
                   class="h-10 w-12 shrink-0 rounded-md object-cover"
                 />
                 <span class="min-w-0 flex-1">
-                  <span class="block truncate text-sm font-bold">{{ caught.species?.name || "Cá chưa rõ tên" }}</span>
+                  <span class="block truncate text-sm font-bold">{{ caught.species?.name || tr('CaughtModal.ca_chua_ro_ten') }}</span>
                   <span class="block text-xs text-emerald-900/60"
-                    >{{ caught.species?.rarity || "Không rõ độ hiếm" }} · {{ caught.weight }} kg</span
+                    >{{ caught.species?.rarity || tr('CaughtFishList.khong_ro_do_hiem') }} · {{ caught.weight }} kg</span
                   >
                 </span>
-                <span v-if="isSelected(caught)" class="text-xs font-bold text-emerald-800">Đã chọn</span>
+                <span v-if="isSelected(caught)" class="text-xs font-bold text-emerald-800">{{ tr('Fishfarm.da_chon') }}</span>
                 <span v-else-if="isFishRequired(caught.species?.id)" class="text-xs font-bold text-amber-800"
-                  >Phù hợp</span
+                  >{{ tr('CaughtFishList.phu_hop') }}</span
                 >
               </button>
             </div>
@@ -176,7 +178,7 @@ function selectionClass(caught: CaughtFish) {
         >
           <img
             :src="caught.species?.image || '/fish/VN/fish.jpg'"
-            :alt="caught.species?.name || 'Cá'"
+            :alt="caught.species?.name || tr('CaughtModal.ca')"
             :class="
               viewMode === 'grid'
                 ? 'h-16 w-full rounded-md object-cover bg-emerald-950/5'
@@ -184,14 +186,14 @@ function selectionClass(caught: CaughtFish) {
             "
           />
           <span :class="viewMode === 'grid' ? 'w-full min-w-0' : 'min-w-0 flex-1'">
-            <span class="block truncate text-sm font-bold">{{ caught.species?.name || "Cá chưa rõ tên" }}</span>
+            <span class="block truncate text-sm font-bold">{{ caught.species?.name || tr('CaughtModal.ca_chua_ro_ten') }}</span>
             <span class="block truncate text-xs text-emerald-900/60"
-              >{{ caught.species?.rarity || "Không rõ độ hiếm" }} · {{ caught.weight }} kg</span
+              >{{ caught.species?.rarity || tr('CaughtFishList.khong_ro_do_hiem') }} · {{ caught.weight }} kg</span
             >
           </span>
-          <span v-if="isSelected(caught)" class="shrink-0 text-xs font-bold text-emerald-800">Đã chọn</span>
+          <span v-if="isSelected(caught)" class="shrink-0 text-xs font-bold text-emerald-800">{{ tr('Fishfarm.da_chon') }}</span>
           <span v-else-if="isFishRequired(caught.species?.id)" class="shrink-0 text-xs font-bold text-amber-800"
-            >Phù hợp</span
+            >{{ tr('CaughtFishList.phu_hop') }}</span
           >
         </button>
       </div>

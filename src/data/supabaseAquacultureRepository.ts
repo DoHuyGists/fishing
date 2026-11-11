@@ -1,3 +1,4 @@
+import { t as tr } from "../i18n";
 import supabase from '../database/connection'
 import type { AquacultureCatalog, AquacultureFarm, AquacultureRecord, FarmAction, FarmActionResult } from './aquaculture'
 
@@ -11,7 +12,7 @@ class SupabaseAquacultureRepository {
     const { data, error } = await supabase.rpc('get_aquaculture_farm')
     if (error) throw new Error(error.message)
     if (!data || !Array.isArray(data.ponds) || !Array.isArray(data.species)) {
-      throw new Error('Dữ liệu nông trại không hợp lệ. Vui lòng kiểm tra RPC get_aquaculture_farm.')
+      throw new Error(tr('supabaseAquacultureRepository.du_lieu_nong_trai_khong_hop_le_vui_long_kiem_tra_rpc_get_aquacul'))
     }
     return data as AquacultureFarm
   }

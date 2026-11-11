@@ -1,4 +1,6 @@
 <script setup lang="ts">
+import { t as tr } from "../i18n";
+
 import { ref } from 'vue'
 
 const retrying = ref(false)
@@ -26,11 +28,10 @@ const retry = () => {
       </div>
 
       <div id="error-title" class="mt-10 text-2xl font-semibold tracking-tight sm:text-3xl">
-        Dịch vụ tạm thời gián đoạn
+        {{ tr('Maintenance.dich_vu_tam_thoi_gian_doan') }}
       </div>
       <div class="mt-3 max-w-md text-base leading-relaxed text-[#24352a]/70">
-        Máy chủ đang bảo trì hoặc quá tải. Dữ liệu của bạn không bị ảnh hưởng.
-        Vui lòng thử lại sau ít phút.
+        {{ tr('Maintenance.may_chu_dang_bao_tri_hoac_qua_tai_du_lieu_cua_ban_khong_bi_anh_h') }}
       </div>
 
       <div class="mt-8 flex flex-wrap gap-3">
@@ -52,13 +53,13 @@ const retry = () => {
           >
             <path d="M21 12a9 9 0 1 1-6.2-8.55" />
           </svg>
-          {{ retrying ? 'Đang thử lại' : 'Thử lại' }}
+          {{ retrying ? tr('Maintenance.dang_thu_lai') : tr('Maintenance.thu_lai') }}
         </button>
         <a
           href="/"
           class="inline-flex items-center rounded-lg border border-[#cbd9c6] bg-[#f5f9f0] px-5 py-2.5 text-sm font-medium text-[#24352a] transition-colors hover:bg-[#cbd9c6]/40 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#24352a]"
         >
-          Về trang chủ
+          {{ tr('Maintenance.ve_trang_chu') }}
         </a>
       </div>
     </section>

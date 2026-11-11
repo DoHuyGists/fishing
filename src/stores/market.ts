@@ -1,3 +1,4 @@
+import { t as tr } from "../i18n";
 import { defineStore } from "pinia";
 import { supabaseMarketRepository, type MarketListing, type MarketHistory } from "../data/supabaseMarketRepository";
 import type { RealtimeChannel } from "@supabase/supabase-js";
@@ -28,7 +29,7 @@ export const useMarketStore = defineStore("species_market", {
         const rows = await supabaseMarketRepository.fetchHistory(userId, page);
         if (request !== this.historyRequest) return;
         this.history = rows.slice(0, 20); this.historyPage = page; this.historyHasNext = rows.length > 20;
-      } catch (err) { if (request === this.historyRequest) this.historyError = err instanceof Error ? err.message : "Không thể tải lịch sử."; }
+      } catch (err) { if (request === this.historyRequest) this.historyError = err instanceof Error ? err.message : tr('market.khong_the_tai_lich_su'); }
       finally { if (request === this.historyRequest) this.historyLoading = false; }
     },
     startRealtime(userId: string) {
@@ -66,7 +67,7 @@ export const useMarketStore = defineStore("species_market", {
         if (request !== this.listingRequest) return;
         this.marketListings = data;
       } catch (err) {
-        if (request === this.listingRequest) this.error = err instanceof Error ? err.message : "Không thể tải chợ cá.";
+        if (request === this.listingRequest) this.error = err instanceof Error ? err.message : tr('market.khong_the_tai_cho_ca');
       } finally {
         if (request === this.listingRequest) this.isLoadingMarket = false;
       }

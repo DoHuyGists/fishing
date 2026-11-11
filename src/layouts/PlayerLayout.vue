@@ -1,4 +1,6 @@
 <script lang="ts" setup>
+import { t as tr } from "../i18n";
+
 import { onBeforeMount, onBeforeUnmount, onMounted, watch } from "vue";
 import type { RealtimeChannel } from "@supabase/supabase-js";
 import { useSingleSession } from "../composables/use-single-session";
@@ -90,11 +92,11 @@ watch(
     <Teleport to="body">
       <TwoOptionsModal
         v-if="showConflictModal"
-        title="⚠️ Phát hiện trùng phiên truy cập"
+        :title="tr('PlayerLayout.phat_hien_trung_phien_truy_cap')"
         :message="modalMessage"
-        sub-text="Bạn vui lòng chọn thao tác tiếp theo:"
-        first-text="Đóng tab này"
-        second-text="Đăng xuất tài khoản"
+        :sub-text="tr('PostProduction.ban_vui_long_chon_thao_tac_tiep_theo')"
+        :first-text="tr('PlayerLayout.dong_tab_nay')"
+        :second-text="tr('PlayerLayout.dang_xuat_tai_khoan')"
         :on-first="closeCurrentTab"
         :on-second="logoutAccount"
       />

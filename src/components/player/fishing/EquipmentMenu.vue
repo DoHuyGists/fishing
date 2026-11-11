@@ -1,4 +1,6 @@
 <script setup lang="ts">
+import { t as tr } from "../../../i18n";
+
 import { computed } from "vue";
 import { useEquipmentStore } from "../../../stores/equipment.ts";
 import { useFishingStore } from "../../../stores/fishing.ts";
@@ -36,25 +38,25 @@ watch(
 
 <template>
   <div class="flex items-start justify-between gap-2">
-    <div class="equipment-actions flex flex-wrap items-start gap-2" aria-label="Dụng cụ câu cá">
+    <div class="equipment-actions flex flex-wrap items-start gap-2" :aria-label="tr('EquipmentMenu.dung_cu_cau_ca')">
       <button type="button" class="flex items-center gap-2 rounded-xl border border-[#cbd9c6] bg-[#f5f9f0] px-3 py-2 text-[11px] font-bold text-[#24352a] transition hover:border-[#70a77e] hover:bg-[#eaf5e8]" :disabled="!store.canAdjustDepth" @click="openPicker">
         <span aria-hidden="true" class="text-base">🎣</span>
-        Chọn trang bị
+        {{ tr('EquipmentMenu.chon_trang_bi') }}
       </button>
       <EquipmentPickerModal :open="pickerOpen && store.canAdjustDepth" @close="pickerOpen = false" />
       <button type="button" class="relative flex items-center gap-2 rounded-xl border border-[#cbd9c6] bg-[#f5f9f0] px-3 py-2 text-[11px] font-bold text-[#24352a] transition hover:border-[#70a77e] hover:bg-[#eaf5e8]" :disabled="!store.canAdjustDepth || !store.currentAreaId || store.isLoadingCurrentArea"
-        :title="!store.canAdjustDepth ? 'Không thể điều chỉnh độ sâu lúc này' : store.currentAreaLoadError || undefined"
-        :aria-label="!store.canAdjustDepth ? 'Điều chỉnh độ sâu đang bị khóa' : undefined" @click="openDepthAdjuster">
-        <span class="absolute -top-2 right-2 rounded-full border border-[#cbd9c6] bg-white px-1.5 py-0.5 text-[9px] font-bold leading-none text-[#24352a] shadow-sm" aria-label="Độ sâu đã chọn">
+        :title="!store.canAdjustDepth ? tr('EquipmentMenu.khong_the_dieu_chinh_do_sau_luc_nay') : store.currentAreaLoadError || undefined"
+        :aria-label="!store.canAdjustDepth ? tr('EquipmentMenu.dieu_chinh_do_sau_dang_bi_khoa') : undefined" @click="openDepthAdjuster">
+        <span class="absolute -top-2 right-2 rounded-full border border-[#cbd9c6] bg-white px-1.5 py-0.5 text-[9px] font-bold leading-none text-[#24352a] shadow-sm" :aria-label="tr('EquipmentMenu.do_sau_da_chon')">
           {{ store.appliedDepthMeters }} m
         </span>
         <span aria-hidden="true" class="text-base text-[#398d80]">≋</span>
         {{
           store.isLoadingCurrentArea
-            ? "Đang tải thông tin hồ..."
+            ? tr('EquipmentMenu.dang_tai_thong_tin_ho')
             : store.currentAreaLoadError
-              ? "Tải lại độ sâu hồ"
-              : "Điều chỉnh độ sâu"
+              ? tr('EquipmentMenu.tai_lai_do_sau_ho')
+              : tr('AdjusDepth.dieu_chinh_do_sau')
         }}
         <span v-if="!store.canAdjustDepth" class="depth-lock-overlay pointer-events-none absolute inset-0 flex items-center justify-center rounded-[inherit]" aria-hidden="true">
           <span class="flex size-6 items-center justify-center rounded-full border border-[#cbd9c6] bg-[#f5f9f0] text-[#24352a] shadow-sm">
@@ -69,31 +71,31 @@ watch(
       <AdjusDepth />
       <button type="button" class="relative flex items-center gap-2 rounded-xl border border-[#cbd9c6] bg-[#f5f9f0] px-3 py-2 text-[11px] font-bold text-[#24352a] transition hover:border-[#70a77e] hover:bg-[#eaf5e8]" @click="store.openBag">
         <span aria-hidden="true" class="text-base">🕸️</span>
-        Túi cá
-        <b class="absolute -top-2 right-2 grid h-[17px] min-w-[17px] place-items-center rounded-full border border-[#cbd9c6] bg-white px-1 text-[9px] font-bold leading-none text-[#24352a] shadow-sm" aria-label="Số cá trong túi">
+        {{ tr('CaughtModal.tui_ca') }}
+        <b class="absolute -top-2 right-2 grid h-[17px] min-w-[17px] place-items-center rounded-full border border-[#cbd9c6] bg-white px-1 text-[9px] font-bold leading-none text-[#24352a] shadow-sm" :aria-label="tr('EquipmentMenu.so_ca_trong_tui')">
           {{ store.inventory.length }}
         </b>
       </button>
       <button type="button" class="relative flex items-center gap-2 rounded-xl border border-[#cbd9c6] bg-[#f5f9f0] px-3 py-2 text-[11px] font-bold text-[#24352a] transition hover:border-[#70a77e] hover:bg-[#eaf5e8]" @click="store.openLakeGuide">
         <span aria-hidden="true" class="text-base">🐠</span>
-        Cá trong hồ
-        <b class="absolute -top-2 right-2 grid h-[17px] min-w-[17px] place-items-center rounded-full border border-[#cbd9c6] bg-white px-1 text-[9px] font-bold leading-none text-[#24352a] shadow-sm" aria-label="Số loài cá trong hồ">
+        {{ tr('EquipmentMenu.ca_trong_ho') }}
+        <b class="absolute -top-2 right-2 grid h-[17px] min-w-[17px] place-items-center rounded-full border border-[#cbd9c6] bg-white px-1 text-[9px] font-bold leading-none text-[#24352a] shadow-sm" :aria-label="tr('EquipmentMenu.so_loai_ca_trong_ho')">
           {{ store.areaSpeciesDiary?.fishes.length ?? 0 }}
         </b>
       </button>
       <button type="button" class="relative flex items-center gap-2 rounded-xl border border-[#cbd9c6] bg-[#f5f9f0] px-3 py-2 text-[11px] font-bold text-[#24352a] transition hover:border-[#70a77e] hover:bg-[#eaf5e8]" @click="store.openPlayers">
         <span aria-hidden="true" class="text-base">👥</span>
-        Người câu
-        <b class="absolute -top-2 right-2 grid h-[17px] min-w-[17px] place-items-center rounded-full border border-[#cbd9c6] bg-white px-1 text-[9px] font-bold leading-none text-[#24352a] shadow-sm" aria-label="Số người câu gần đây">
+        {{ tr('EquipmentMenu.nguoi_cau') }}
+        <b class="absolute -top-2 right-2 grid h-[17px] min-w-[17px] place-items-center rounded-full border border-[#cbd9c6] bg-white px-1 text-[9px] font-bold leading-none text-[#24352a] shadow-sm" :aria-label="tr('EquipmentMenu.so_nguoi_cau_gan_day')">
           {{ store.nearbyPlayers.length }}
         </b>
       </button>
     </div>
-    <div class="flex shrink-0 items-center gap-2 rounded-lg border border-[#cbd9c6] bg-[#f5f9f0] px-2 py-1 text-[11px] leading-3 text-[#24352a]" aria-label="Mồi đang chọn">
+    <div class="flex shrink-0 items-center gap-2 rounded-lg border border-[#cbd9c6] bg-[#f5f9f0] px-2 py-1 text-[11px] leading-3 text-[#24352a]" :aria-label="tr('EquipmentMenu.moi_dang_chon')">
       <img :src="selectedBait?.image ?? ''" class="size-6 object-contain" alt="">
       <div class="flex flex-col gap-0.5">
-        <span class="font-bold">{{ selectedBait?.name ?? "Chưa chọn mồi" }}</span>
-        <span class="text-[#4b5f50]">Còn: {{ selectedBait?.quantity ?? 0 }}</span>
+        <span class="font-bold">{{ selectedBait?.name ?? tr('EquipmentMenu.chua_chon_moi') }}</span>
+        <span class="text-[#4b5f50]">{{ tr('EquipmentMenu.con') }} {{ selectedBait?.quantity ?? 0 }}</span>
       </div>
     </div>
   </div>

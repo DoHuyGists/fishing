@@ -1,4 +1,6 @@
 <script setup lang="ts">
+import { t as tr } from "../../i18n";
+
 import { computed } from 'vue'
 
 interface Props {
@@ -13,7 +15,7 @@ interface Props {
 const props = withDefaults(defineProps<Props>(), {
   text: '',
   maxWidthClass: 'max-w-[16rem]',
-  label: 'Xem gợi ý',
+  label: undefined,
 })
 
 // id duy nhất để liên kết nút với tooltip (aria-describedby)
@@ -27,7 +29,7 @@ const tooltipClasses = computed(() => ['w-max', props.maxWidthClass])
   <span class="group relative inline-flex align-middle">
     <button
       type="button"
-      :aria-label="label"
+      :aria-label="label ?? tr('Hint.xem_goi_y')"
       :aria-describedby="tooltipId"
       class="inline-flex h-4 w-4 cursor-help select-none items-center justify-center rounded-full bg-green-100 border border-green-700 text-[11px] font-bold leading-none text-green-700 transition-colors duration-150 hover:bg-green-600 hover:text-white focus-visible:bg-green-600 focus-visible:text-white focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-green-500 focus-visible:ring-offset-1"
     >

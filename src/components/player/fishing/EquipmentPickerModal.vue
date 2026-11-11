@@ -1,4 +1,6 @@
 <script setup lang="ts">
+import { t as tr } from "../../../i18n";
+
 import { computed, onBeforeUnmount, onMounted, ref, watch } from "vue";
 import { equipmentCategories, type EquipmentVariant } from "../../../data/equipmentCatalog.ts";
 import { useEquipmentStore } from "../../../stores/equipment.ts";
@@ -83,14 +85,14 @@ onBeforeUnmount(() => window.removeEventListener("keydown", onKeydown));
         class="flex max-h-[92dvh] w-[min(920px,100%)] flex-col overflow-hidden rounded-2xl border border-[#cbd9c6] bg-[#f5f9f0] text-[#24352a] shadow-[0_24px_70px_rgba(0,0,0,0.4)]"
         role="dialog"
         aria-modal="true"
-        aria-label="Chọn trang bị"
+        :aria-label="tr('EquipmentMenu.chon_trang_bi')"
       >
         <header class="flex items-center justify-between border-b border-[#cbd9c6] px-4 py-3">
-          <div class="m-0 text-base font-bold">Chọn trang bị</div>
+          <div class="m-0 text-base font-bold">{{ tr('EquipmentMenu.chon_trang_bi') }}</div>
           <button
             type="button"
             class="grid h-8 w-8 place-items-center rounded-full text-2xl leading-none hover:bg-black/5"
-            aria-label="Đóng"
+            :aria-label="tr('ChangePasswordModal.dong')"
             @click="emit('close')"
           >
             ×
@@ -98,19 +100,19 @@ onBeforeUnmount(() => window.removeEventListener("keydown", onKeydown));
         </header>
 
         <div class="flex min-h-0 flex-1 flex-col overflow-hidden px-4 pt-2 sm:px-6">
-          <Tab v-model="activeTab" :tabs="tabs" aria-label="Loại trang bị">
+          <Tab v-model="activeTab" :tabs="tabs" :aria-label="tr('EquipmentPickerModal.loai_trang_bi')">
             <template v-for="tab in tabs" :key="tab.key" #[tab.key]>
               <input
                 v-model="search"
                 type="text"
                 class="mb-3 w-full rounded-lg border border-[#cbd9c6] bg-white px-3 py-2 text-xs outline-none focus:border-[#70a77e]"
-                placeholder="Tìm kiếm..."
+                :placeholder="tr('EquipmentPickerModal.tim_kiem')"
               />
               <div
                 class="m-0 grid max-h-[calc(92dvh-190px)] list-none grid-cols-1 gap-3 overflow-y-auto p-1 sm:grid-cols-2 lg:grid-cols-3"
               >
                 <div v-if="!filteredOptions.length" class="col-span-full p-3 text-center text-xs">
-                  Không tìm thấy kết quả
+                  {{ tr('EquipmentPickerModal.khong_tim_thay_ket_qua') }}
                 </div>
                 <div v-for="variant in filteredOptions" :key="variant.id">
                   <button
@@ -138,19 +140,19 @@ onBeforeUnmount(() => window.removeEventListener("keydown", onKeydown));
                         class="mb-1 flex items-center gap-1 text-[10px] font-extrabold uppercase tracking-wide text-[#24733d]"
                       >
                         <span class="grid h-4 w-4 place-items-center rounded-full bg-[#2f8f4e] text-white">✓</span>
-                        Đang dùng
+                        {{ tr('EquipmentPickerModal.dang_dung') }}
                       </span>
                       <strong class="text-xs font-bold">{{ variant.name }}</strong>
                       <small class="text-[10px] text-[#4b5f50]">{{ variant.detail }}</small>
                       <small v-if="activeTab === 'bait'" class="mt-1 text-[10px] font-semibold text-[#24733d]">
-                        Số lượng: {{ variant.quantity ?? 0 }}
+                        {{ tr('EquipmentPickerModal.so_luong') }} {{ variant.quantity ?? 0 }}
                       </small>
                     </span>
                     <span
                       v-if="isSelected(variant)"
                       class="absolute right-2 top-2 rounded-full bg-[#2f8f4e] px-2 py-1 text-[9px] font-extrabold text-white"
                     >
-                      ĐÃ CHỌN
+                      {{ tr('EquipmentPickerModal.da_chon') }}
                     </span>
                   </button>
                 </div>
@@ -165,7 +167,7 @@ onBeforeUnmount(() => window.removeEventListener("keydown", onKeydown));
             class="rounded-xl border border-[#cbd9c6] bg-white px-4 py-2 text-xs font-bold hover:bg-[#eaf5e8]"
             @click="emit('close')"
           >
-            Xong
+            {{ tr('EquipmentPickerModal.xong') }}
           </button>
         </footer>
       </section>

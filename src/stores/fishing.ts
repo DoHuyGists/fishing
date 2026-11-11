@@ -1,3 +1,4 @@
+import { t as tr } from "../i18n";
 import { defineStore } from "pinia";
 import { useAuthStore } from "./auth";
 import { useEquipmentStore } from "./equipment";
@@ -87,7 +88,7 @@ export const useFishingStore = defineStore("fishing", {
     selectedTool: "rod" as FishingTool,
     castPhase: "idle" as CastPhase,
     baitPosition: { x: 56, y: 60 },
-    castMessage: "Sẵn sàng thả câu",
+    castMessage: tr('fishing.san_sang_tha_cau'),
     isCasting: false,
     catchDialogOpen: false,
     bagOpen: false,
@@ -167,7 +168,7 @@ export const useFishingStore = defineStore("fishing", {
         ]);
         if (requestId !== this.sessionRequestId) return;
         if (useEquipmentStore().error) throw new Error(useEquipmentStore().error);
-        if (area?.status !== "enter" || !area.area_id) throw new Error("Bạn chưa ở trong bãi câu.");
+        if (area?.status !== "enter" || !area.area_id) throw new Error(tr('fishing.ban_chua_o_trong_bai_cau'));
         await this.initializeFishingArea(area.area_id);
         if (requestId !== this.sessionRequestId) return;
         if (this.currentAreaLoadError) throw new Error(this.currentAreaLoadError);
@@ -176,7 +177,7 @@ export const useFishingStore = defineStore("fishing", {
         this.sessionReady = true;
       } catch (err) {
         if (requestId !== this.sessionRequestId) return;
-        this.sessionError = err instanceof Error ? err.message : "Không thể chuẩn bị phiên câu.";
+        this.sessionError = err instanceof Error ? err.message : tr('fishing.khong_the_chuan_bi_phien_cau');
       }
     },
     async leaveFishingArea(): Promise<boolean> {
@@ -184,7 +185,7 @@ export const useFishingStore = defineStore("fishing", {
       if (this.isLeavingArea) return false;
       this.leaveAreaError = "";
       if (this.isCasting || this.castPhase === "submitting" || this.isStartingTensionChallenge || this.isReleasingFish) {
-        this.leaveAreaError = "Đang xử lý lượt câu hoặc thả cá. Vui lòng thử lại sau giây lát.";
+        this.leaveAreaError = tr('fishing.dang_xu_ly_luot_cau_hoac_tha_ca_vui_long_thu_lai_sau_giay_lat');
         return false;
       }
       this.isLeavingArea = true;
@@ -194,7 +195,7 @@ export const useFishingStore = defineStore("fishing", {
         const area = await useUserInAreaStore().setCurrentUserInArea(useAuthStore().userId);
         if (requestId !== this.sessionRequestId) return false;
         if (area?.status === "enter") {
-          if (!area.area_id) throw new Error("Không tìm thấy bãi câu hiện tại.");
+          if (!area.area_id) throw new Error(tr('fishing.khong_tim_thay_bai_cau_hien_tai'));
           const fishes = await supabaseFishRepository.fetchFishingInventory(area.area_id);
           if (requestId !== this.sessionRequestId) return false;
           if (fishes.length > 0) await supabaseUserInAreaRepository.setUserLeaveArea();
@@ -208,7 +209,7 @@ export const useFishingStore = defineStore("fishing", {
         return requestId === this.sessionRequestId;
       } catch (err) {
         if (requestId !== this.sessionRequestId) return false;
-        this.leaveAreaError = err instanceof Error ? err.message : "Không thể kết thúc chuyến câu. Vui lòng thử lại.";
+        this.leaveAreaError = err instanceof Error ? err.message : tr('fishing.khong_the_ket_thuc_chuyen_cau_vui_long_thu_lai');
         return false;
       } finally {
         if (requestId === this.sessionRequestId) this.isLeavingArea = false;
@@ -237,11 +238,11 @@ export const useFishingStore = defineStore("fishing", {
         const area = await supabaseFishingAreaRepository.fetchOneAreas(areaId);
         if (activeRequestId !== this.currentAreaRequestId || areaId !== this.currentAreaId) return;
         this.currentArea = area ?? {};
-        if (!area) this.currentAreaLoadError = "Không tìm thấy thông tin hồ câu.";
+        if (!area) this.currentAreaLoadError = tr('fishing.khong_tim_thay_thong_tin_ho_cau');
         this.appliedDepthMeters = Math.min(this.appliedDepthMeters, this.depthConfig.maxMeters);
       } catch (err) {
         if (activeRequestId !== this.currentAreaRequestId) return;
-        this.currentAreaLoadError = err instanceof Error ? err.message : "Không thể tải thông tin hồ.";
+        this.currentAreaLoadError = err instanceof Error ? err.message : tr('fishing.khong_the_tai_thong_tin_ho');
         console.error("Lỗi khi tải thông tin hồ câu:", err);
       } finally {
         if (activeRequestId === this.currentAreaRequestId) this.isLoadingCurrentArea = false;
@@ -258,7 +259,7 @@ export const useFishingStore = defineStore("fishing", {
       } catch (err) {
         if (requestId !== this.depthPreviewRequestId) return;
         this.depthPreview = null;
-        this.depthPreviewError = err instanceof Error ? err.message : "Không thể tải dự đoán cá ở độ sâu này.";
+        this.depthPreviewError = err instanceof Error ? err.message : tr('fishing.khong_the_tai_du_doan_ca_o_do_sau_nay');
       } finally {
         if (requestId === this.depthPreviewRequestId) this.isLoadingDepthPreview = false;
       }
@@ -274,7 +275,7 @@ export const useFishingStore = defineStore("fishing", {
       } catch (err) {
         if (requestId !== this.areaSpeciesDiaryRequestId) return;
         this.areaSpeciesDiary = null;
-        this.areaSpeciesDiaryError = err instanceof Error ? err.message : "Không thể tải sổ tay cá trong hồ.";
+        this.areaSpeciesDiaryError = err instanceof Error ? err.message : tr('LakeFishGuide.khong_the_tai_so_tay_ca_trong_ho');
       } finally {
         if (requestId === this.areaSpeciesDiaryRequestId) this.isLoadingAreaSpeciesDiary = false;
       }
@@ -327,29 +328,29 @@ export const useFishingStore = defineStore("fishing", {
           const stat = playerStats.get(row.user_id) || { count: 0, bestWeight: 0, bestFishName: "" };
           const level = Math.max(1, Math.floor(stat.count / 3) + 1);
 
-          let title = "Tân thủ";
-          if (level >= 30) title = "Huyền thoại mặt nước";
-          else if (level >= 20) title = "Người săn cá hiếm";
-          else if (level >= 10) title = "Thợ câu lão luyện";
-          else if (level >= 5) title = "Thợ câu hồ";
+          let title = tr('fishing.tan_thu');
+          if (level >= 30) title = tr('fishing.huyen_thoai_mat_nuoc');
+          else if (level >= 20) title = tr('fishing.nguoi_san_ca_hiem');
+          else if (level >= 10) title = tr('fishing.tho_cau_lao_luyen');
+          else if (level >= 5) title = tr('fishing.tho_cau_ho');
 
           let name = "";
           let avatar = "";
 
           if (isCurrent) {
-            const rawName = authStore.user?.user_metadata?.full_name || authStore.user?.email?.split("@")[0] || "Tôi";
-            name = `${rawName} (Bạn)`;
+            const rawName = authStore.user?.user_metadata?.full_name || authStore.user?.email?.split("@")[0] || tr('fishing.toi');
+            name = tr('fishing.value0_ban', { value0: rawName });
             avatar = rawName.slice(0, 2).toUpperCase();
           } else {
             const shortId = row.user_id.slice(0, 5);
-            name = `Cần thủ #${shortId}`;
+            name = tr('fishing.can_thu_value0', { value0: shortId });
             avatar = shortId.slice(0, 2).toUpperCase();
           }
 
           const charCodeSum = row.user_id.split("").reduce((sum, ch) => sum + ch.charCodeAt(0), 0);
           const color = colors[charCodeSum % colors.length];
 
-          const bestCatch = stat.bestWeight > 0 ? `${stat.bestFishName} ${stat.bestWeight} kg` : "Chưa có";
+          const bestCatch = stat.bestWeight > 0 ? `${stat.bestFishName} ${stat.bestWeight} kg` : tr('fishing.chua_co');
 
           return {
             id: row.id,
@@ -380,7 +381,7 @@ export const useFishingStore = defineStore("fishing", {
           const species = Array.isArray(row.species) ? row.species[0] : row.species;
           return {
             id: row.id,
-            name: species?.name ?? "Cá",
+            name: species?.name ?? tr('CaughtModal.ca'),
             weight: `${row.weight} kg`,
             variantType: row.variant_type,
             image: species?.image ?? "/fish/VN/fish.jpg",
@@ -390,7 +391,7 @@ export const useFishingStore = defineStore("fishing", {
         });
       } catch (err) {
         if (requestId !== this.inventoryRequestId) return;
-        this.inventoryError = err instanceof Error ? err.message : "Không thể tải giỏ cá.";
+        this.inventoryError = err instanceof Error ? err.message : tr('fishing.khong_the_tai_gio_ca');
         console.error("Lỗi khi tải danh sách cá trong túi:", err);
       }
     },
@@ -441,18 +442,18 @@ export const useFishingStore = defineStore("fishing", {
     },
     async castTo(x: number, y: number) {
       if (!this.canCast) {
-        this.rejectCast("Hãy thu mồi trước khi quăng mồi lại");
+        this.rejectCast(tr('fishing.hay_thu_moi_truoc_khi_quang_moi_lai'));
         return;
       }
       const areaId = this.currentAreaId;
       if (!areaId) {
-        this.rejectCast("Không tìm thấy bãi câu. Hãy thử vào lại khu vực.");
+        this.rejectCast(tr('fishing.khong_tim_thay_bai_cau_hay_thu_vao_lai_khu_vuc'));
         return;
       }
 
       const bait = useEquipmentStore().variants.bait?.find((variant) => variant.id === this.equipmentLoadout.bait);
       if (!bait || (bait.quantity ?? 0) < 1) {
-        this.rejectCast("Bạn đã hết mồi. Hãy chọn hoặc mua thêm mồi để quăng.");
+        this.rejectCast(tr('fishing.ban_da_het_moi_hay_chon_hoac_mua_them_moi_de_quang'));
         return;
       }
 
@@ -463,7 +464,7 @@ export const useFishingStore = defineStore("fishing", {
       this.sessionId = null;
       this.isCasting = true;
       this.castPhase = "casting";
-      this.castMessage = "Đang kết nối với bãi câu...";
+      this.castMessage = tr('fishing.dang_ket_noi_voi_bai_cau');
 
       try {
         const data = await withTimeout(supabaseFishingAreaRepository.castRod(areaId, this.appliedDepthMeters), RPC_TIMEOUT_MS);
@@ -479,13 +480,13 @@ export const useFishingStore = defineStore("fishing", {
           ? response.server_time_ms - performance.now() : Date.now() - performance.now();
         this.isCasting = false;
         this.castPhase = "waiting";
-        this.castMessage = "Mồi đã chạm nước. Đang chờ tín hiệu...";
+        this.castMessage = tr('fishing.moi_da_cham_nuoc_dang_cho_tin_hieu');
       } catch {
         if (requestId !== this.castRequestId) return;
         this.sessionId = null;
         this.isCasting = false;
         this.castPhase = "lost";
-        this.castMessage = "Không thể kết nối. Hãy thử thả cần lại.";
+        this.castMessage = tr('fishing.khong_the_ket_noi_hay_thu_tha_can_lai');
       }
     },
     async startChallengeForSession(sessionId: string) {
@@ -493,7 +494,7 @@ export const useFishingStore = defineStore("fishing", {
       if (this.sessionId !== sessionId || this.castPhase !== "waiting" || this.isLoadingChallenge) return;
       const requestId = this.castRequestId;
       this.isLoadingChallenge = true;
-      this.castMessage = "Cá cắn câu! Đang tải thử thách...";
+      this.castMessage = tr('fishing.ca_can_cau_dang_tai_thu_thach');
       try {
         const session = await withTimeout(supabaseFishingAreaRepository.fetchSessionChallenge(sessionId), RPC_TIMEOUT_MS);
         if (requestId !== this.castRequestId || this.sessionId !== sessionId) return;
@@ -508,14 +509,14 @@ export const useFishingStore = defineStore("fishing", {
         this.tensionReeling = false;
         // The scheduled bite time is not the beginning of the playable fight.
         this.tensionStartedAt = null;
-        this.castMessage = "Có tín hiệu! Giữ nút hoặc Space khi sẵn sàng để thu dây.";
+        this.castMessage = tr('fishing.co_tin_hieu_giu_nut_hoac_space_khi_san_sang_de_thu_day');
         this.castPhase = "bite";
       } catch {
         if (requestId !== this.castRequestId) return;
         this.sessionId = null;
         this.resetTensionChallenge();
         this.castPhase = "lost";
-        this.castMessage = "Không thể tải thử thách. Hãy thả cần lại.";
+        this.castMessage = tr('fishing.khong_the_tai_thu_thach_hay_tha_can_lai');
       } finally {
         if (requestId === this.castRequestId) this.isLoadingChallenge = false;
       }
@@ -537,7 +538,7 @@ export const useFishingStore = defineStore("fishing", {
         this.tensionStartedAt !== null || this.isStartingTensionChallenge) return;
       const requestId = this.castRequestId;
       this.isStartingTensionChallenge = true;
-      this.castMessage = "Đang bắt đầu đấu sức với cá...";
+      this.castMessage = tr('TensionChallenge.dang_bat_dau_dau_suc_voi_ca');
       try {
         const response = await withTimeout(supabaseFishingAreaRepository.startTensionChallenge(sessionId), RPC_TIMEOUT_MS);
         if (requestId !== this.castRequestId || this.sessionId !== sessionId) return;
@@ -557,14 +558,14 @@ export const useFishingStore = defineStore("fishing", {
         // and loading the challenge must never be replayed as released inputs.
         this.serverClockOffset = response.server_time_ms - performance.now();
         this.tensionStartedAt = challenge.startedAt - this.serverClockOffset;
-        this.castMessage = "Giữ và thả để điều chỉnh lực căng.";
+        this.castMessage = tr('fishing.giu_va_tha_de_dieu_chinh_luc_cang');
       } catch (err) {
         if (requestId !== this.castRequestId || this.sessionId !== sessionId) return;
         console.error("Không thể bắt đầu thử thách lực căng:", err);
         this.sessionId = null;
         this.resetTensionChallenge();
         this.castPhase = "lost";
-        this.castMessage = "Không thể bắt đầu thử thách hoặc phiên đã hết hạn. Hãy thả cần lại.";
+        this.castMessage = tr('fishing.khong_the_bat_dau_thu_thach_hoac_phien_da_het_han_hay_tha_can_la');
       } finally {
         if (requestId === this.castRequestId) this.isStartingTensionChallenge = false;
       }
@@ -579,7 +580,7 @@ export const useFishingStore = defineStore("fishing", {
           // Invalidate any activation request still in flight as well.
           this.resetCast();
           this.castPhase = "lost";
-          this.castMessage = "Đã hết thời gian bắt đầu thử thách. Cá đã thoát!";
+          this.castMessage = tr('fishing.da_het_thoi_gian_bat_dau_thu_thach_ca_da_thoat');
         }
         return;
       }
@@ -615,7 +616,7 @@ export const useFishingStore = defineStore("fishing", {
       this.resetTensionChallenge();
       this.isCasting = false;
       this.castPhase = "idle";
-      this.castMessage = "Sẵn sàng thả câu";
+      this.castMessage = tr('fishing.san_sang_tha_cau');
     },
     async submitTensionChallenge(payload: TensionSubmission) {
       if (!this.tensionChallenge || this.tensionStartedAt === null || payload.sessionId !== this.sessionId || this.castPhase !== "bite") return;
@@ -625,7 +626,7 @@ export const useFishingStore = defineStore("fishing", {
       if (this.isLeavingArea || this.hasLeftArea) return;
       const requestId = this.castRequestId;
       this.castPhase = "submitting";
-      this.castMessage = "Đang xác nhận kết quả...";
+      this.castMessage = tr('TensionChallenge.dang_xac_nhan_ket_qua');
 
       try {
         const data = await withTimeout(submit(), RPC_TIMEOUT_MS);
@@ -646,10 +647,10 @@ export const useFishingStore = defineStore("fishing", {
           this.inventoryRequestId++;
           this.catchDialogOpen = true;
           this.castPhase = "caught";
-          this.castMessage = "Bạn đã câu được cá!";
+          this.castMessage = tr('fishing.ban_da_cau_duoc_ca');
         } else {
           this.castPhase = "lost";
-          this.castMessage = response?.message || "Cá đã thoát. Hãy thử lại!";
+          this.castMessage = response?.message || tr('fishing.ca_da_thoat_hay_thu_lai');
         }
         this.sessionId = null;
         this.resetTensionChallenge();
@@ -658,7 +659,7 @@ export const useFishingStore = defineStore("fishing", {
         this.sessionId = null;
         this.resetTensionChallenge();
         this.castPhase = "lost";
-        this.castMessage = "Không thể xác nhận kết quả. Hãy thử lại.";
+        this.castMessage = tr('fishing.khong_the_xac_nhan_ket_qua_hay_thu_lai');
       }
     },
     closeCatchDialog() {
@@ -667,7 +668,7 @@ export const useFishingStore = defineStore("fishing", {
       this.sessionId = null;
       this.resetTensionChallenge();
       this.castPhase = "idle";
-      this.castMessage = "Chạm mặt hồ để câu tiếp";
+      this.castMessage = tr('fishing.cham_mat_ho_de_cau_tiep');
     },
     async openBag() {
       this.bagOpen = true;
@@ -697,7 +698,7 @@ export const useFishingStore = defineStore("fishing", {
     selectPlayer(player: FishingPlayer) {
       this.selectedPlayer = player;
     },
-    rejectCast(message = "Chỉ có thể quăng mồi xuống mặt nước") {
+    rejectCast(message = tr('fishing.chi_co_the_quang_moi_xuong_mat_nuoc')) {
       this.castMessage = message;
     },
   },

@@ -1,4 +1,6 @@
 <script lang="ts" setup>
+import { t as tr } from "../../i18n";
+
 import { onMounted, onUnmounted, ref, watch } from "vue";
 import { useModalStore } from "../../stores/modal.ts";
 import { useCurrencyStore } from "../../stores/currency.ts";
@@ -108,7 +110,7 @@ onUnmounted(() => {
           :disabled="isRefreshing"
           @click="handleGuide"
         >
-          <span aria-hidden="true" class="mr-1">Hướng dẫn</span>
+          <span aria-hidden="true" class="mr-1">{{ tr('FeatureTable.huong_dan') }}</span>
         </button>
         <button
           v-if="hasRefreshListener"
@@ -117,15 +119,15 @@ onUnmounted(() => {
           :disabled="isRefreshing"
           @click="handleRefresh"
         >
-          <span aria-hidden="true" class="mr-1">↻</span>{{ isRefreshing ? `${refreshCooldown}s` : "Làm mới" }}
+          <span aria-hidden="true" class="mr-1">↻</span>{{ isRefreshing ? `${refreshCooldown}s` : tr('Modal.lam_moi') }}
         </button>
         <button
           type="button"
           class="w-9 h-9 rounded-full border border-emerald-900/15 bg-white/70 text-emerald-950 hover:bg-white text-2xl leading-none cursor-pointer"
-          aria-label="Đóng"
+          :aria-label="tr('ChangePasswordModal.dong')"
           @click="modalStore.close"
         >
-          &times;
+          ×
         </button>
       </div>
     </header>

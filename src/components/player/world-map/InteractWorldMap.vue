@@ -1,4 +1,6 @@
 <script lang="ts" setup>
+import { t as tr } from "../../../i18n";
+
 import { computed, nextTick, onMounted, ref, watch } from "vue";
 import { useWorldStore } from "../../../stores/worldMap.ts";
 import WorldMap from "./WorldMap.vue";
@@ -61,7 +63,7 @@ onMounted(async () => {
 
 function togglePick() {
   if (!worldStore.anchorable) {
-    toast.info("Mở khóa form để thao tác", { title: "Nhắc nhở", position: "bottom", duration: 2000 });
+    toast.info(tr('InteractWorldMap.mo_khoa_form_de_thao_tac'), { get title() { return tr('InteractWorldMap.nhac_nho'); }, position: "bottom", duration: 2000 });
     return;
   }
   worldStore.toggleAnchorMode();
@@ -99,7 +101,7 @@ watch(
 
 function openPrepare(area: any) {
   if (!userInAreaStore.canEnterFishingArea) {
-    toast.error("Cần kết thúc xử lý cá trong lưới trước", { title: "Thao tác bị chặn", position: "top" });
+    toast.error(tr('InteractWorldMap.can_ket_thuc_xu_ly_ca_trong_luoi_truoc'), { get title() { return tr('InteractWorldMap.thao_tac_bi_chan'); }, position: "top" });
     return;
   }
   pendingArea.value = area;
@@ -186,7 +188,7 @@ function zoomTo(k: number) {
                 :disabled="isEntering"
                 @click="openPrepare(area)"
               >
-                {{ isEntering ? "Đang vào..." : "Đi đến bãi câu" }}
+                {{ isEntering ? tr('InteractWorldMap.dang_vao') : tr('InteractWorldMap.di_den_bai_cau') }}
               </button>
             </div>
           </template>
@@ -195,11 +197,11 @@ function zoomTo(k: number) {
       <div v-if="fogEnabled && countryStore.unlockedError" class="text-xs text-red-700" role="alert">
         {{ countryStore.unlockedError }}
         <button type="button" class="ml-1 underline cursor-pointer" @click="countryStore.fetchMyUnlockedCountries()">
-          Thử lại
+          {{ tr('Maintenance.thu_lai') }}
         </button>
       </div>
       <div v-else-if="fogEnabled && countryStore.isLoadingUnlocked" class="text-xs text-[#24352a]" role="status">
-        Đang tải quốc gia đã mở khóa...
+        {{ tr('InteractWorldMap.dang_tai_quoc_gia_da_mo_khoa') }}
       </div>
       <div class="slide-fade-in from-bottom-right flex gap-2">
         <button @click="zoomTo(3)" class="border border-gray-300 rounded-md px-3">3x</button>

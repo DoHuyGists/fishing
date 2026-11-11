@@ -1,4 +1,6 @@
 <script setup lang="ts">
+import { t as tr } from "../i18n";
+
 const goBack = () => {
   if (window.history.length > 1) window.history.back()
   else window.location.href = '/'
@@ -34,11 +36,10 @@ const goBack = () => {
       </div>
 
       <div id="error-title" class="mt-10 text-2xl font-semibold tracking-tight sm:text-3xl">
-        Bạn không có quyền truy cập
+        {{ tr('Forbidden.ban_khong_co_quyen_truy_cap') }}
       </div>
       <div class="mt-3 max-w-md text-base leading-relaxed text-[#24352a]/70">
-        Tài khoản hiện tại chưa được cấp quyền xem trang này. Hãy đăng nhập bằng tài khoản
-        khác hoặc liên hệ quản trị viên để được cấp quyền.
+        {{ tr('Forbidden.tai_khoan_hien_tai_chua_duoc_cap_quyen_xem_trang_nay_hay_dang_nh') }}
       </div>
 
       <div class="mt-8 flex flex-wrap gap-3">
@@ -46,14 +47,14 @@ const goBack = () => {
           href="/login"
           class="inline-flex items-center rounded-lg border border-[#24352a] bg-[#24352a] px-5 py-2.5 text-sm font-medium text-[#f5f9f0] transition-colors hover:bg-[#24352a]/90 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#24352a]"
         >
-          Đăng nhập tài khoản khác
+          {{ tr('Forbidden.dang_nhap_tai_khoan_khac') }}
         </a>
         <button
           type="button"
           class="inline-flex items-center rounded-lg border border-[#cbd9c6] bg-[#f5f9f0] px-5 py-2.5 text-sm font-medium text-[#24352a] transition-colors hover:bg-[#cbd9c6]/40 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#24352a]"
           @click="goBack"
         >
-          Quay lại
+          {{ tr('Forbidden.quay_lai') }}
         </button>
       </div>
     </section>

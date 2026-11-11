@@ -1,3 +1,4 @@
+import { t as tr } from "../i18n";
 import { defineStore } from "pinia";
 import { supabaseCountryRepository } from "../data/supabaseCountryRepository";
 import { getWorldMapCountryId } from "../data/worldMapCountries";
@@ -27,7 +28,7 @@ export const useCountryStore = defineStore("Country", {
   getters: {
     getCountryName: (state) => (countryId?: string | null): string =>
       state.countries.find((country) => country.id === countryId)?.name
-        || (countryId && state.isLoading ? "Đang tải quốc gia..." : "Chưa có thông tin quốc gia"),
+        || (countryId && state.isLoading ? tr('UserProfile.dang_tai_quoc_gia') : tr('country.chua_co_thong_tin_quoc_gia')),
     unlockedWorldMapCountryIds: (state): string[] => state.unlockedCountries
       .map((country) => getWorldMapCountryId(country.code))
       .filter((id): id is string => id !== null),
@@ -60,7 +61,7 @@ export const useCountryStore = defineStore("Country", {
         if (isCurrentRequest()) this.unlockedCountries = countries;
       } catch (error) {
         if (isCurrentRequest()) {
-          this.unlockedError = "Không thể tải quốc gia đã mở khóa. Vui lòng thử lại.";
+          this.unlockedError = tr('country.khong_the_tai_quoc_gia_da_mo_khoa_vui_long_thu_lai');
           console.error("Failed to fetch unlocked countries:", error);
         }
       } finally {

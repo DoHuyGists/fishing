@@ -1,4 +1,6 @@
 <script lang="ts" setup>
+import { t as tr } from "../../../i18n";
+
 import { computed, onMounted, reactive, ref } from "vue";
 import Modal from "../../shared/Modal.vue";
 import Hint from "../../shared/Hint.vue";
@@ -37,7 +39,7 @@ function groupedBySpecies(fishes: CaughtFish[]) {
     const key = fish.species?.id ?? "unknown";
     let group = groups.get(key);
     if (!group) {
-      group = { key, name: fish.species?.name || "Chưa rõ loài", image: fish.species?.image ?? null, fishes: [] };
+      group = { key, name: fish.species?.name || tr('PostProduction.chua_ro_loai'), image: fish.species?.image ?? null, fishes: [] };
       groups.set(key, group);
     }
     group.fishes.push(fish);
@@ -54,7 +56,7 @@ function toggleSpecies(side: Side, key: string) {
 const panels = computed(() => [
   {
     key: "net" as Side,
-    title: "Lưới",
+    get title() { return tr('CaughtModal.luoi'); },
     total: caughtStore.inNetFishes.length,
     fishes: filtered(caughtStore.inNetFishes, search.net),
   },
@@ -84,7 +86,7 @@ async function move(from: Side) {
   if (ids.length === 0 || isMoving.value) return;
   if (from === "net" && ids.length > remainingStorage.value) {
     toast.error(
-      `Kho cá đã đạt giới hạn (${caughtStore.storedFishes.length}/${storageCapacity.value}). Có thể chuyển tối đa ${remainingStorage.value} cá.`,
+      tr('PostProduction.kho_ca_da_dat_gioi_han_value0_value1_co_the_chuyen_toi_da_value2', { value0: caughtStore.storedFishes.length, value1: storageCapacity.value, value2: remainingStorage.value }),
     );
     return;
   }
@@ -92,11 +94,11 @@ async function move(from: Side) {
   try {
     await caughtStore.moveFishes(ids, from === "net" ? "normal" : "in-net");
     selected[from].clear();
-    toast.success(from === "net" ? `Đã chuyển ${ids.length} cá vào kho` : `Đã chuyển ${ids.length} cá ra lưới`, {
+    toast.success(from === "net" ? tr('PostProduction.da_chuyen_value0_ca_vao_kho', { value0: ids.length }) : tr('PostProduction.da_chuyen_value0_ca_ra_luoi', { value0: ids.length }), {
       position: "bottom",
     });
   } catch (err) {
-    toast.error(err instanceof Error ? err.message : "Không thể chuyển cá", { position: "bottom" });
+    toast.error(err instanceof Error ? err.message : tr('PostProduction.khong_the_chuyen_ca'), { position: "bottom" });
   } finally {
     isMoving.value = false;
   }
@@ -109,7 +111,7 @@ async function finish() {
     showConfirm.value = false;
     modalStore.close();
   } catch (err) {
-    toast.error(err instanceof Error ? err.message : "Không thể kết thúc câu cá");
+    toast.error(err instanceof Error ? err.message : tr('PostProduction.khong_the_ket_thuc_cau_ca'));
   } finally {
     isFinishing.value = false;
   }
@@ -121,7 +123,7 @@ onMounted(() => {
 </script>
 
 <template>
-  <Modal title="Lưới cá" sub-title="Xử lý sau khi câu" :on-refresh="caughtStore.loadCaughtFishes">
+  <Modal :title="tr('PostProduction.luoi_ca')" :sub-title="tr('PostProduction.xu_ly_sau_khi_cau')" :on-refresh="caughtStore.loadCaughtFishes">
     <div class="flex h-full flex-col gap-2">
       <div class="flex min-h-0 grow flex-col gap-2 md:flex-row">
         <template v-for="(panel, index) in panels" :key="panel.key">
@@ -135,7 +137,7 @@ onMounted(() => {
               <input
                 v-model="search[panel.key]"
                 type="search"
-                placeholder="Tìm cá..."
+                :placeholder="tr('PostProduction.tim_ca')"
                 class="min-w-0 grow rounded-md border border-gray-300 px-2 py-1 text-sm focus:border-emerald-600 focus:outline-none"
               />
               <button
@@ -143,12 +145,12 @@ onMounted(() => {
                 class="rounded-md border border-emerald-900/15 px-2 py-1 text-xs font-bold hover:bg-emerald-50"
                 @click="selectAllVisible(panel.key)"
               >
-                Chọn tất cả
+                {{ tr('PostProduction.chon_tat_ca') }}
               </button>
               <div
                 class="flex rounded-md border border-emerald-900/15 p-0.5 text-xs font-bold"
                 role="group"
-                aria-label="Chế độ xem"
+                :aria-label="tr('PostProduction.che_do_xem')"
               >
                 <button
                   type="button"
@@ -157,7 +159,7 @@ onMounted(() => {
                   :aria-pressed="viewMode[panel.key] === 'list'"
                   @click="viewMode[panel.key] = 'list'"
                 >
-                  Danh sách
+                  {{ tr('CaughtModal.danh_sach') }}
                 </button>
                 <button
                   type="button"
@@ -166,7 +168,7 @@ onMounted(() => {
                   :aria-pressed="viewMode[panel.key] === 'grid'"
                   @click="viewMode[panel.key] = 'grid'"
                 >
-                  Lưới
+                  {{ tr('CaughtModal.luoi') }}
                 </button>
                 <button
                   type="button"
@@ -175,14 +177,14 @@ onMounted(() => {
                   :aria-pressed="viewMode[panel.key] === 'species'"
                   @click="viewMode[panel.key] = 'species'"
                 >
-                  Theo loài
+                  {{ tr('CaughtModal.theo_loai') }}
                 </button>
               </div>
             </div>
 
             <div class="grow h-0 overflow-y-auto p-2">
-              <div v-if="caughtStore.isLoadingCaught" class="text-center text-sm text-gray-500">Đang tải...</div>
-              <div v-else-if="panel.fishes.length === 0" class="text-center text-sm text-gray-500">Không có cá</div>
+              <div v-if="caughtStore.isLoadingCaught" class="text-center text-sm text-gray-500">{{ tr('WeatherSection.dang_tai') }}</div>
+              <div v-else-if="panel.fishes.length === 0" class="text-center text-sm text-gray-500">{{ tr('PostProduction.khong_co_ca') }}</div>
 
               <div v-else-if="viewMode[panel.key] === 'species'" class="flex flex-col gap-2">
                 <section
@@ -203,7 +205,7 @@ onMounted(() => {
                     />
                     <span class="min-w-0 grow truncate text-sm font-bold text-[#24352a]">{{ group.name }}</span>
                     <span class="shrink-0 rounded-full bg-white px-2 py-1 text-xs font-bold"
-                      >{{ group.fishes.length }} cá</span
+                      >{{ group.fishes.length }} {{ tr('Fishfarm.ca_2') }}</span
                     >
                     <span aria-hidden="true" class="text-sm">{{
                       expandedSpecies[panel.key].has(group.key) ? "▴" : "▾"
@@ -226,10 +228,10 @@ onMounted(() => {
                       >
                         <img
                           :src="fish.species?.image || '/fish/VN/fish.jpg'"
-                          :alt="fish.species?.name || 'Cá'"
+                          :alt="fish.species?.name || tr('CaughtModal.ca')"
                           class="h-9 w-12 shrink-0 rounded object-cover"
                         />
-                        <span class="grow truncate text-xs font-bold">{{ fish.species?.name || "Cá" }}</span>
+                        <span class="grow truncate text-xs font-bold">{{ fish.species?.name || tr('CaughtModal.ca') }}</span>
                         <span class="text-xs text-gray-600">{{ fish.weight }} kg</span>
                       </button>
                     </div>
@@ -255,7 +257,7 @@ onMounted(() => {
                 >
                   <img
                     :src="fish.species?.image || '/fish/VN/fish.jpg'"
-                    :alt="fish.species?.name || 'Cá'"
+                    :alt="fish.species?.name || tr('CaughtModal.ca')"
                     class="h-14 w-full rounded object-cover"
                   />
                   <span class="w-full truncate text-[11px] font-bold">{{ fish.species?.name }}</span>
@@ -277,7 +279,7 @@ onMounted(() => {
                   >
                     <img
                       :src="fish.species?.image || '/fish/VN/fish.jpg'"
-                      :alt="fish.species?.name || 'Cá'"
+                      :alt="fish.species?.name || tr('CaughtModal.ca')"
                       class="h-10 w-14 shrink-0 rounded object-cover"
                     />
                     <span class="grow truncate text-sm font-bold">{{ fish.species?.name }}</span>
@@ -293,7 +295,7 @@ onMounted(() => {
             class="flex shrink-0 flex-row flex-wrap items-center justify-center gap-2 md:flex-col"
           >
             <div class="">
-              <Hint text="Chọn cá rồi nhấn nút chuyển. Cá còn trong lưới khi kết thúc sẽ được thả." />
+              <Hint :text="tr('PostProduction.chon_ca_roi_nhan_nut_chuyen_ca_con_trong_luoi_khi_ket_thuc_se_du')" />
             </div>
             <button
               type="button"
@@ -301,7 +303,7 @@ onMounted(() => {
               :disabled="isMoving || selected.net.size === 0"
               @click="move('net')"
             >
-              Chuyển vào kho ➜
+              {{ tr('PostProduction.chuyen_vao_kho') }}
             </button>
             <button
               type="button"
@@ -309,7 +311,7 @@ onMounted(() => {
               :disabled="isMoving || selected.stored.size === 0"
               @click="move('stored')"
             >
-              ⬅ Chuyển ra lưới
+              {{ tr('PostProduction.chuyen_ra_luoi') }}
             </button>
           </div>
         </template>
@@ -322,7 +324,7 @@ onMounted(() => {
           :disabled="isFinishing"
           @click="showConfirm = true"
         >
-          Kết thúc
+          {{ tr('PostProduction.ket_thuc') }}
         </button>
       </div>
     </div>
@@ -330,11 +332,11 @@ onMounted(() => {
     <Teleport to="body">
       <TwoOptionsModal
         v-if="showConfirm"
-        title="⚠️ Xác nhận"
-        message="Kết thúc thì cá trong lưới sẽ được thả."
-        sub-text="Bạn vui lòng chọn thao tác tiếp theo:"
-        first-text="Hủy"
-        second-text="Đồng ý"
+        :title="tr('PostProduction.xac_nhan')"
+        :message="tr('PostProduction.ket_thuc_thi_ca_trong_luoi_se_duoc_tha')"
+        :sub-text="tr('PostProduction.ban_vui_long_chon_thao_tac_tiep_theo')"
+        :first-text="tr('AccountInfoModal.huy')"
+        :second-text="tr('PostProduction.dong_y')"
         :on-first="
           () => {
             showConfirm = false;

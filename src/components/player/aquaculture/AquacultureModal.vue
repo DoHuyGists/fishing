@@ -1,4 +1,6 @@
 <script setup lang="ts">
+import { t as tr } from "../../../i18n";
+
 import { onBeforeUnmount, onMounted, ref, watch } from 'vue'
 import Modal from '../../shared/Modal.vue'
 import Fishfarm from './Fishfarm.vue'
@@ -26,7 +28,7 @@ onBeforeUnmount(() => {
 </script>
 
 <template>
-  <Modal title="Nông trại cá" sub-title="Nuôi thong thả" :on-refresh="() => farm.refresh(true)">
+  <Modal :title="tr('AquacultureModal.nong_trai_ca')" :sub-title="tr('AquacultureModal.nuoi_thong_tha')" :on-refresh="() => farm.refresh(true)">
     <Fishfarm :paused="paused" />
   </Modal>
 </template>

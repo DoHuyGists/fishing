@@ -1,4 +1,6 @@
 <script setup lang="ts">
+import { t as tr } from "../../../i18n";
+
 import { computed, onBeforeUnmount, ref, watch } from "vue";
 const props = defineProps<{
   challenge: {
@@ -94,8 +96,8 @@ onBeforeUnmount(stopAnimation);
       <div class="flex-1">
         <small class="block mt-0.5 text-[#879188] text-[9px]">{{
           canPull
-            ? "Bấm khi vạch nằm trong vùng sáng"
-            : "Chờ bắt đầu"
+            ? tr('CatchChallenge.bam_khi_vach_nam_trong_vung_sang')
+            : tr('CatchChallenge.cho_bat_dau')
         }}</small>
       </div>
       <b class="text-[13px] text-[#e29a31]">{{ canPull ? `${Math.ceil(timeRemaining / 1000)}s` : "" }}</b>
@@ -113,8 +115,8 @@ onBeforeUnmount(stopAnimation);
       ></i>
     </div>
     <div class="flex justify-between text-[#617363] text-[9px] font-bold">
-      <span>Thời gian thử thách</span
-      ><b class="text-[#e29a31] text-[13px]">{{ canPull ? `${Math.ceil(timeRemaining / 1000)} giây` : "--" }}</b>
+      <span>{{ tr('CatchChallenge.thoi_gian_thu_thach') }}</span
+      ><b class="text-[#e29a31] text-[13px]">{{ canPull ? tr('CatchChallenge.value0_giay', { value0: Math.ceil(timeRemaining / 1000) }) : "--" }}</b>
     </div>
     <div class="relative h-[5px] my-[5px] mb-2.5 overflow-hidden rounded-full bg-[#e6e9df]">
       <i
@@ -129,7 +131,7 @@ onBeforeUnmount(stopAnimation);
         :disabled="!canPull"
         @click="finishChallenge"
       >
-        {{ canPull ? "Móc cá" : "Chờ bắt đầu" }}
+        {{ canPull ? tr('CatchChallenge.moc_ca') : tr('CatchChallenge.cho_bat_dau') }}
       </button>
     </div>
   </section>

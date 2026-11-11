@@ -1,3 +1,4 @@
+import { t as tr } from "../i18n";
 import { defineStore } from "pinia";
 import { supabaseFeedbackRepository, type OpinionFeedbackRow } from "../data/supabaseFeedbackRepository";
 
@@ -14,7 +15,7 @@ export const useFeedbackListStore = defineStore("feedback-list", {
       try {
         this.opinionFeedback = await supabaseFeedbackRepository.fetchOpinionFeedback();
       } catch (error) {
-        this.error = error instanceof Error ? error.message : "Không thể tải danh sách góp ý.";
+        this.error = error instanceof Error ? error.message : tr('feedbackList.khong_the_tai_danh_sach_gop_y');
       } finally {
         this.loading = false;
       }

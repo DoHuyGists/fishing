@@ -1,3 +1,4 @@
+import { t as tr } from "../i18n";
 import supabase from "../database/connection";
 import { createUuid } from "../utils/uuid";
 import { normalizeAssetFolder } from "../utils/assetFolders";
@@ -49,8 +50,8 @@ export const supabaseAssetRepository = {
   async upload(file: File, destination = ""): Promise<AssetRow> {
     const folder = normalizeAssetFolder(destination);
     const extension = ASSET_MIME_TYPES[file.type];
-    if (!extension) throw new Error("Chỉ hỗ trợ JPG, PNG, GIF, WebP, AVIF, MP4, WebM và MOV.");
-    if (!file.size || file.size > ASSET_MAX_BYTES) throw new Error("Tệp phải có dung lượng lớn hơn 0 và tối đa 50 MB.");
+    if (!extension) throw new Error(tr('supabaseAssetRepository.chi_ho_tro_jpg_png_gif_webp_avif_mp4_webm_va_mov'));
+    if (!file.size || file.size > ASSET_MAX_BYTES) throw new Error(tr('supabaseAssetRepository.tep_phai_co_dung_luong_lon_hon_0_va_toi_da_50_mb'));
     const stem = file.name.replace(/\.[^.]+$/, "").normalize("NFD")
       .replace(/[\u0300-\u036f]/g, "").replace(/[đĐ]/g, "d")
       .replace(/[^a-zA-Z0-9_-]+/g, "-").replace(/^-+|-+$/g, "").slice(0, 100) || "asset";
@@ -69,14 +70,14 @@ export const supabaseAssetRepository = {
           .select(columns).eq("id", id).maybeSingle();
         if (existing) return toRow(existing as AssetRecord);
         if (lookupError) {
-          throw new Error(`Chưa xác định được kết quả lưu tệp. Hãy làm mới kho trước khi tải lại. Mã tệp: ${id}. ${error.message}`);
+          throw new Error(tr('supabaseAssetRepository.chua_xac_dinh_duoc_ket_qua_luu_tep_hay_lam_moi_kho_truoc_khi_tai', { value0: id, value1: error.message }));
         }
       }
       const { error: cleanupError } = await storage().remove([path]);
       if (cleanupError) {
-        throw new Error(`Không thể lưu thông tin hoặc dọn tệp trên Storage (${path}): ${error.message}. ${cleanupError.message}`);
+        throw new Error(tr('supabaseAssetRepository.khong_the_luu_thong_tin_hoac_don_tep_tren_storage_value0_value1_', { value0: path, value1: error.message, value2: cleanupError.message }));
       }
-      throw new Error(`Không thể lưu thông tin tệp: ${error.message}`);
+      throw new Error(tr('supabaseAssetRepository.khong_the_luu_thong_tin_tep_value0', { value0: error.message }));
     }
     return toRow(data as AssetRecord);
   },
@@ -98,6 +99,6 @@ export const supabaseAssetRepository = {
     if (error) throw new Error(error.message);
     // Keep the record on failure so deletion can be retried after an idempotent Storage removal.
     const { error: recordError } = await supabase.from("assets").delete().eq("id", row.id).select("id").single();
-    if (recordError) throw new Error(`Tệp đã được xóa khỏi Storage nhưng chưa xóa được thông tin. Hãy thử xóa lại. ${recordError.message}`);
+    if (recordError) throw new Error(tr('supabaseAssetRepository.tep_da_duoc_xoa_khoi_storage_nhung_chua_xoa_duoc_thong_tin_hay_t', { value0: recordError.message }));
   },
 };

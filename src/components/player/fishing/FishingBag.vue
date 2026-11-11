@@ -1,13 +1,15 @@
 <script setup lang="ts">
+import { t as tr } from "../../../i18n";
+
 import { computed, ref, watch } from "vue";
 import { useFishingStore, type CaughtFish } from "../../../stores/fishing";
 
 const store = useFishingStore();
 type ViewMode = "list" | "grid" | "group";
 const viewModes: { value: ViewMode; label: string; ariaLabel: string }[] = [
-  { value: "list", label: "Danh sách", ariaLabel: "Hiển thị dạng danh sách" },
-  { value: "grid", label: "Lưới", ariaLabel: "Hiển thị dạng lưới" },
-  { value: "group", label: "Theo loài", ariaLabel: "Gom theo loài" },
+  { value: "list", get label() { return tr('CaughtModal.danh_sach'); }, get ariaLabel() { return tr('CaughtModal.hien_thi_dang_danh_sach'); } },
+  { value: "grid", get label() { return tr('CaughtModal.luoi'); }, get ariaLabel() { return tr('CaughtModal.hien_thi_dang_luoi'); } },
+  { value: "group", get label() { return tr('CaughtModal.theo_loai'); }, get ariaLabel() { return tr('CaughtModal.gom_theo_loai'); } },
 ];
 const viewMode = ref<ViewMode>("group");
 const expandedGroup = ref<string | null>(null);
@@ -78,26 +80,26 @@ function getRewardEffect(variant: "NORMAL" | "GOLDEN" | "MUTATED") {
             class="flex justify-between items-start px-5 pt-[19px] pb-3.5 border-b border-[rgba(223,241,207,0.14)]"
           >
             <div>
-              <div id="bag-title" class="m-0 text-xl">Thành quả câu được</div>
+              <div id="bag-title" class="m-0 text-xl">{{ tr('FishingBag.thanh_qua_cau_duoc') }}</div>
             </div>
             <button
               type="button"
               class="w-[29px] h-[29px] border-0 rounded-full bg-[rgba(235,243,219,0.13)] text-white cursor-pointer text-[22px] leading-none"
-              aria-label="Đóng túi cá"
+              :aria-label="tr('FishingBag.dong_tui_ca')"
               @click="store.closeBag"
             >
               ×
             </button>
           </header>
           <div v-if="!store.inventory.length" class="py-[35px] px-5 text-[#b7cfb9] text-center text-[13px]">
-            Túi còn trống. Hãy ra hồ câu một con cá!
+            {{ tr('FishingBag.tui_con_trong_hay_ra_ho_cau_mot_con_ca') }}
           </div>
           <template v-else>
             <div class="flex justify-end px-[13px] pt-[13px]">
               <div
                 class="flex rounded-lg border border-[rgba(223,241,207,0.2)] p-0.5"
                 role="group"
-                aria-label="Chế độ hiển thị"
+                :aria-label="tr('CaughtModal.che_do_hien_thi')"
               >
                 <button
                   v-for="mode in viewModes"
@@ -134,7 +136,7 @@ function getRewardEffect(variant: "NORMAL" | "GOLDEN" | "MUTATED") {
                   </div>
                   <div class="flex items-center gap-2 flex-shrink-0">
                     <span class="px-2 py-1 rounded-full bg-[rgba(235,243,219,0.13)] text-[10px] font-extrabold"
-                      >{{ group.fishes.length }} con</span
+                      >{{ group.fishes.length }} {{ tr('UserProfile.con') }}</span
                     >
                     <button
                       type="button"
@@ -142,7 +144,7 @@ function getRewardEffect(variant: "NORMAL" | "GOLDEN" | "MUTATED") {
                       :aria-expanded="expandedGroup === group.name"
                       @click="expandedGroup = expandedGroup === group.name ? null : group.name"
                     >
-                      {{ expandedGroup === group.name ? "Ẩn" : "Xem" }}
+                      {{ expandedGroup === group.name ? tr('FishingBag.an') : "Xem" }}
                     </button>
                   </div>
                 </div>
@@ -168,7 +170,7 @@ function getRewardEffect(variant: "NORMAL" | "GOLDEN" | "MUTATED") {
                       class="flex-shrink-0 px-3 py-1.5 border border-[rgba(235,110,110,0.4)] rounded-lg bg-[rgba(194,59,59,0.2)] hover:bg-[rgba(194,59,59,0.4)] text-[#ffaaaa] hover:text-white text-xs font-bold transition-colors cursor-pointer"
                       @click.stop="openReleaseConfirm(fish)"
                     >
-                      Thả
+                      {{ tr('Fishfarm.tha') }}
                     </button>
                   </div>
                 </div>
@@ -205,7 +207,7 @@ function getRewardEffect(variant: "NORMAL" | "GOLDEN" | "MUTATED") {
                   class="flex-shrink-0 px-3 py-1.5 border border-[rgba(235,110,110,0.4)] rounded-lg bg-[rgba(194,59,59,0.2)] hover:bg-[rgba(194,59,59,0.4)] text-[#ffaaaa] hover:text-white text-xs font-bold transition-colors cursor-pointer"
                   @click.stop="openReleaseConfirm(fish)"
                 >
-                  Thả
+                  {{ tr('Fishfarm.tha') }}
                 </button>
               </div>
             </div>
@@ -228,11 +230,11 @@ function getRewardEffect(variant: "NORMAL" | "GOLDEN" | "MUTATED") {
           aria-modal="true"
           aria-labelledby="confirm-release-title"
         >
-          <div id="confirm-release-title" class="m-0 text-lg font-bold text-[#e8bd62]">Xác nhận thả cá</div>
+          <div id="confirm-release-title" class="m-0 text-lg font-bold text-[#e8bd62]">{{ tr('FishReleaseConfirm.xac_nhan_tha_ca') }}</div>
           <div class="my-4 text-sm text-[#c8dccb] leading-relaxed">
-            Bạn có chắc chắn muốn thả <strong class="text-white">{{ selectedFishToRelease.name }}</strong> ({{
+            {{ tr('FishReleaseConfirm.ban_co_chac_chan_muon_tha') }} <strong class="text-white">{{ selectedFishToRelease.name }}</strong> ({{
               selectedFishToRelease.weight
-            }}) về lại hồ không?
+            }}{{ tr('FishingBag.ve_lai_ho_khong') }}
           </div>
           <div class="flex justify-center gap-3 mt-5">
             <button
@@ -240,7 +242,7 @@ function getRewardEffect(variant: "NORMAL" | "GOLDEN" | "MUTATED") {
               class="px-4 py-2 border border-[rgba(255,255,255,0.2)] rounded-xl bg-[rgba(255,255,255,0.1)] hover:bg-[rgba(255,255,255,0.2)] text-white text-xs font-semibold transition-colors cursor-pointer"
               @click="cancelRelease"
             >
-              Hủy
+              {{ tr('AccountInfoModal.huy') }}
             </button>
             <button
               type="button"
@@ -248,7 +250,7 @@ function getRewardEffect(variant: "NORMAL" | "GOLDEN" | "MUTATED") {
               :disabled="isReleasing"
               @click="handleRelease"
             >
-              {{ isReleasing ? "Đang thả..." : "Xác nhận thả" }}
+              {{ isReleasing ? tr('FishReleaseConfirm.dang_tha') : tr('FishReleaseConfirm.xac_nhan_tha') }}
             </button>
           </div>
         </div>

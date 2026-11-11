@@ -1,3 +1,4 @@
+import { t as tr } from "../i18n";
 export const mapData = {
   UNKNOWN: {
     name: "Unknown",
@@ -172,7 +173,7 @@ export const mapData = {
     information: "",
   },
   CI: {
-    name: "Côte d'Ivoire",
+    get name() { return tr('map.cote_d_ivoire'); },
     information: "",
   },
   CK: {
@@ -208,7 +209,7 @@ export const mapData = {
     information: "",
   },
   CW: {
-    name: "Curaçao",
+    get name() { return tr('map.curacao'); },
     information: "",
   },
   CX: {
@@ -993,8 +994,7 @@ export const mapData = {
   },
   VN: {
     name: "Vietnam",
-    information:
-      "Môi trường tự nhiên mang đặc trưng nhiệt đới với phần lớn diện tích là đồi núi (chiếm khoảng 3/4), chạy dọc theo các hướng địa hình chính. Xen kẽ giữa các hệ thống núi cao là những đồng bằng phù sa màu mỡ và hệ thống sông ngòi dày đặc. Đường bờ biển kéo dài mở ra không gian biển rộng lớn, mang lại nguồn tài nguyên thiên nhiên, khoáng sản, thủy sản và hệ sinh thái đa dạng. Khí hậu mang tính chất nhiệt đới gió mùa, độ ẩm cao (trung bình trên 80%) và lượng mưa dồi dào (1.500 - 2.000 mm/năm). Sự phân hóa thời tiết phụ thuộc vào độ cao và sự tác động của các luồng gió mùa, tạo ra sự đa dạng về các mùa: nơi có mùa đông lạnh và mùa hè nóng mưa nhiều, nơi lại có nền nhiệt cao quanh năm phân chia thành hai mùa mưa - khô. Sự kết hợp giữa địa hình và biển đã tạo nên một hệ sinh thái sinh động, mang lại nhiều lợi ích tự nhiên nhưng cũng đi kèm các thách thức từ bão, lũ lụt và hạn hán.",
+    get information() { return tr('map.moi_truong_tu_nhien_mang_dac_trung_nhiet_doi_voi_phan_lon_dien_t'); },
   },
   VU: {
     name: "Vanuatu",

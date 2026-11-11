@@ -1,3 +1,4 @@
+import { t as tr } from "../i18n";
 import { defineStore } from "pinia";
 import { computed, ref } from "vue";
 import { isPointInWater, type MapPoint } from "../data/fishingMap";
@@ -30,7 +31,7 @@ export interface TutorialSessionConfig {
 export const useTutorialSessionStore = defineStore("tutorial-session", () => {
   const config = ref<TutorialSessionConfig | null>(null);
   const castPhase = ref<FishingPhase>("idle");
-  const castMessage = ref("Chọn đủ trang bị để bắt đầu.");
+  const castMessage = ref(tr('tutorialSession.chon_du_trang_bi_de_bat_dau'));
   const baitPosition = ref<MapPoint>({ x: 56, y: 60 });
   const loadout = ref<Partial<Record<TutorialTool, string>>>({});
   const equipmentConfirmed = ref(false);
@@ -79,7 +80,7 @@ export const useTutorialSessionStore = defineStore("tutorial-session", () => {
     clearFight();
     config.value = null;
     castPhase.value = "idle";
-    castMessage.value = "Chọn đủ trang bị để bắt đầu.";
+    castMessage.value = tr('tutorialSession.chon_du_trang_bi_de_bat_dau');
     baitPosition.value = { x: 56, y: 60 };
     loadout.value = {};
     equipmentConfirmed.value = false;
@@ -101,9 +102,9 @@ export const useTutorialSessionStore = defineStore("tutorial-session", () => {
   function confirmEquipment() {
     if (!canChangeEquipment.value || !equipmentReady.value) return;
     equipmentConfirmed.value = true;
-    castMessage.value = "Chạm vào mặt nước để quăng cần.";
+    castMessage.value = tr('tutorialSession.cham_vao_mat_nuoc_de_quang_can');
   }
-  function rejectCast(message = "Chỉ có thể quăng mồi xuống mặt nước.") {
+  function rejectCast(message = tr('tutorialSession.chi_co_the_quang_moi_xuong_mat_nuoc')) {
     castMessage.value = message;
   }
   function castTo(x: number, y: number) {
@@ -117,11 +118,11 @@ export const useTutorialSessionStore = defineStore("tutorial-session", () => {
     const attempt = generation;
     baitPosition.value = { x, y };
     castPhase.value = "casting";
-    castMessage.value = "Đang quăng cần...";
+    castMessage.value = tr('tutorialSession.dang_quang_can');
     castTimer = setTimeout(() => {
       if (attempt !== generation || !config.value) return;
       castPhase.value = "waiting";
-      castMessage.value = "Chờ cá cắn câu. Bạn có thể thu mồi để chọn lại vị trí.";
+      castMessage.value = tr('tutorialSession.cho_ca_can_cau_ban_co_the_thu_moi_de_chon_lai_vi_tri');
       biteTimer = setTimeout(() => {
         if (attempt !== generation || !config.value) return;
         const now = Math.floor(performance.now());
@@ -132,7 +133,7 @@ export const useTutorialSessionStore = defineStore("tutorial-session", () => {
         };
         tensionFight.value = createTensionFight(tensionChallenge.value);
         castPhase.value = "bite";
-        castMessage.value = "Cá cắn câu! Giữ để thu dây, thả để giảm lực căng.";
+        castMessage.value = tr('tutorialSession.ca_can_cau_giu_de_thu_day_tha_de_giam_luc_cang');
       }, config.value.waitTimeMs);
     }, 650);
   }
@@ -141,7 +142,7 @@ export const useTutorialSessionStore = defineStore("tutorial-session", () => {
     clearTimers();
     clearFight();
     castPhase.value = "idle";
-    castMessage.value = "Đã thu mồi. Chạm mặt nước để quăng lại.";
+    castMessage.value = tr('tutorialSession.da_thu_moi_cham_mat_nuoc_de_quang_lai');
   }
   function advanceTensionFight(now = performance.now()) {
     const challenge = tensionChallenge.value;
@@ -153,12 +154,12 @@ export const useTutorialSessionStore = defineStore("tutorial-session", () => {
     if (fight.result === "won" && config.value) {
       inventory.value.push({ ...config.value.fish });
       castPhase.value = "caught";
-      castMessage.value = "Bạn đã câu được con cá đầu tiên!";
+      castMessage.value = tr('tutorialSession.ban_da_cau_duoc_con_ca_dau_tien');
     } else {
       castPhase.value = "lost";
-      castMessage.value = fight.result === "snapped" ? "Dây bị đứt vì lực căng quá cao. Thả nút sớm hơn khi thử lại."
-        : fight.result === "escaped" ? "Cá thoát vì dây quá chùng. Giữ nút để thu dây khi thử lại."
-          : "Hết thời gian kéo cá. Hãy thử lại!";
+      castMessage.value = fight.result === "snapped" ? tr('tutorialSession.day_bi_dut_vi_luc_cang_qua_cao_tha_nut_som_hon_khi_thu_lai')
+        : fight.result === "escaped" ? tr('tutorialSession.ca_thoat_vi_day_qua_chung_giu_nut_de_thu_day_khi_thu_lai')
+          : tr('tutorialSession.het_thoi_gian_keo_ca_hay_thu_lai');
     }
     clearFight();
   }

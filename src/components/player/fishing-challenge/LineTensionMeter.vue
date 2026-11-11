@@ -1,4 +1,6 @@
 <script lang="ts" setup>
+import { t as tr } from "../../../i18n";
+
 import { computed, watch } from 'vue'
 
 /**
@@ -35,10 +37,10 @@ watch(zone, (z, old) => emit('zone-change', z, old))
 const zoneInfo = computed(
   () =>
     ({
-      slack: { label: 'Dây chùng', text: 'text-sky-300', knob: 'bg-sky-300' },
-      safe: { label: 'An toàn', text: 'text-emerald-300', knob: 'bg-emerald-300' },
-      danger: { label: 'Sắp đứt!', text: 'text-red-400', knob: 'bg-red-400' },
-      broken: { label: 'Dây đã đứt', text: 'text-red-500', knob: 'bg-red-500' },
+      slack: { get label() { return tr('LineTensionMeter.day_chung'); }, text: 'text-sky-300', knob: 'bg-sky-300' },
+      safe: { get label() { return tr('LineTensionMeter.an_toan'); }, text: 'text-emerald-300', knob: 'bg-emerald-300' },
+      danger: { get label() { return tr('LineTensionMeter.sap_dut'); }, text: 'text-red-400', knob: 'bg-red-400' },
+      broken: { get label() { return tr('LineTensionMeter.day_da_dut'); }, text: 'text-red-500', knob: 'bg-red-500' },
     })[zone.value],
 )
 
@@ -62,7 +64,7 @@ const vibration = computed(() => {
     class="w-full min-w-0 select-none rounded-md bg-[#0E2A33] text-[#E8F1EE]"
     :class="compact ? 'px-2 py-1.5' : 'px-4 py-3'"
     role="meter"
-    aria-label="Lực căng dây câu"
+    :aria-label="tr('LineTensionMeter.luc_cang_day_cau')"
     :aria-valuenow="Math.round(tension)"
     aria-valuemin="0"
     :aria-valuemax="max"
@@ -114,13 +116,13 @@ const vibration = computed(() => {
     </div>
 
     <div v-if="!compact" class="relative mt-2 h-4 text-[#E8F1EE]/40" aria-hidden="true">
-      <span class="absolute left-0" title="Dây chùng">
+      <span class="absolute left-0" :title="tr('LineTensionMeter.day_chung')">
         <svg viewBox="0 0 24 16" class="h-4 w-5" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"><path d="M2 3c1 12 19 12 20 0" /></svg>
       </span>
-      <span class="absolute -translate-x-1/2 text-emerald-300/80" :style="{ left: (safeStart + safeEnd) / 2 + '%' }" title="Giữ vạch trong vùng xanh">
+      <span class="absolute -translate-x-1/2 text-emerald-300/80" :style="{ left: (safeStart + safeEnd) / 2 + '%' }" :title="tr('LineTensionMeter.giu_vach_trong_vung_xanh')">
         <svg viewBox="0 0 20 20" class="size-4" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="10" cy="10" r="7" /><path d="m6.5 10 2.3 2.3 4.7-4.6" /></svg>
       </span>
-      <span class="absolute right-0" title="Nguy cơ đứt dây">
+      <span class="absolute right-0" :title="tr('LineTensionMeter.nguy_co_dut_day')">
         <svg viewBox="0 0 20 20" class="size-4" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="m11 2-7 9h5l-1 7 8-10h-5l1-6Z" /></svg>
       </span>
     </div>

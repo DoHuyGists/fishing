@@ -1,4 +1,6 @@
 <script setup lang="ts">
+import { t as tr } from "../../../i18n";
+
 import type { HourMission } from "../../../data/supabaseMissionRepository.ts";
 import Cash from "../currency/Cash.vue";
 
@@ -24,11 +26,11 @@ const emit = defineEmits<{
 <template>
   <section class="min-h-0 flex flex-col">
     <div class="px-5 py-3 sm:px-6 border-b border-emerald-950/10 flex items-center justify-between">
-      <div class="m-0 text-sm font-bold">Nhiệm vụ</div>
-      <span class="text-xs text-emerald-900/60">{{ missions.length }} nhiệm vụ</span>
+      <div class="m-0 text-sm font-bold">{{ tr('MissionList.nhiem_vu') }}</div>
+      <span class="text-xs text-emerald-900/60">{{ missions.length }} {{ tr('MissionList.nhiem_vu_2') }}</span>
     </div>
     <div class="flex-1 overflow-y-auto p-4 sm:p-5 space-y-4">
-      <div v-if="!missions.length" class="py-8 text-center text-sm text-emerald-900/55">Hiện không có nhiệm vụ.</div>
+      <div v-if="!missions.length" class="py-8 text-center text-sm text-emerald-900/55">{{ tr('MissionList.hien_khong_co_nhiem_vu') }}</div>
       <button
         v-for="mission in missions"
         :key="mission.id"
@@ -44,14 +46,14 @@ const emit = defineEmits<{
         <span class="flex items-center justify-between gap-3">
           <strong class="text-sm">{{ mission.start }} - {{ mission.end }}</strong>
           <span class="flex items-center gap-2"
-            ><span class="text-sm">Phần thưởng:</span><Cash :amount="mission.cash"
+            ><span class="text-sm">{{ tr('Achievement.phan_thuong') }}</span><Cash :amount="mission.cash"
           /></span>
         </span>
-        <span class="mt-1 block text-xs text-emerald-900/65">{{ mission.content.length }} cá cần nộp</span>
+        <span class="mt-1 block text-xs text-emerald-900/65">{{ mission.content.length }} {{ tr('MissionList.ca_can_nop') }}</span>
       </button>
 
       <div v-if="selectedMission" class="pt-1">
-        <div class="m-0 mb-2 text-xs font-extrabold uppercase tracking-wide text-emerald-900/65">Cá cần có</div>
+        <div class="m-0 mb-2 text-xs font-extrabold uppercase tracking-wide text-emerald-900/65">{{ tr('MissionList.ca_can_co') }}</div>
         <div class="space-y-2">
           <div
             v-for="(fish, index) in selectedMission.content"
@@ -80,14 +82,14 @@ const emit = defineEmits<{
         {{ statusMessage }}
       </div>
       <div class="flex items-center justify-between gap-3">
-        <span class="text-xs text-emerald-900/65">Đã chọn {{ selectedCaughtIds.length }} cá</span>
+        <span class="text-xs text-emerald-900/65">{{ tr('Fishfarm.da_chon') }} {{ selectedCaughtIds.length }} {{ tr('Fishfarm.ca_2') }}</span>
         <button
           type="button"
           class="px-4 py-2 rounded-md bg-emerald-800 text-white text-sm font-bold hover:bg-emerald-700 disabled:opacity-40 disabled:cursor-not-allowed"
           :disabled="!isMissionComplete || isClaiming"
           @click="emit('claim')"
         >
-          {{ isClaiming ? "Đang gửi..." : "Nộp" }}
+          {{ isClaiming ? tr('MissionList.dang_gui') : tr('MissionList.nop') }}
         </button>
       </div>
     </footer>

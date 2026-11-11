@@ -1,3 +1,4 @@
+import { t as tr } from "../i18n";
 import { defineStore } from "pinia";
 import { defaultEquipmentVariants, type EquipmentVariant } from "../data/equipmentCatalog";
 
@@ -76,7 +77,7 @@ export const useEquipmentStore = defineStore("equipment", {
         } catch (err) {
           if (requestId !== this.requestId) return;
           this.loaded = false;
-          this.error = err instanceof Error ? err.message : "Không thể tải trang bị từ máy chủ";
+          this.error = err instanceof Error ? err.message : tr('equipment.khong_the_tai_trang_bi_tu_may_chu');
         } finally {
           if (requestId === this.requestId) this.loading = false;
         }

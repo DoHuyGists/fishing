@@ -1,3 +1,4 @@
+import { t as tr } from "../i18n";
 import { defineStore } from "pinia";
 import supabase from "../database/connection";
 import { supabaseFeedbackRepository, type ErrorFeedbackRow } from "../data/supabaseFeedbackRepository";
@@ -24,7 +25,7 @@ export const useFeedbackStore = defineStore("feedback", {
         const rows = await supabaseFeedbackRepository.fetchMyErrors(userId, page);
         if (request !== this.historyRequest) return;
         this.myErrors = rows.slice(0, 20); this.hasNext = rows.length > 20; this.page = page;
-      } catch (err) { if (request === this.historyRequest) this.historyError = err instanceof Error ? err.message : "Không thể tải báo lỗi."; }
+      } catch (err) { if (request === this.historyRequest) this.historyError = err instanceof Error ? err.message : tr('feedback.khong_the_tai_bao_loi'); }
       finally { if (request === this.historyRequest) this.historyLoading = false; }
     },
     watchMyErrors(userId: string) {
@@ -61,10 +62,10 @@ export const useFeedbackStore = defineStore("feedback", {
       this.error = "";
       try {
         const { data: { user }, error } = await supabase.auth.getUser();
-        if (error || !user) throw new Error("Bạn cần đăng nhập để gửi phản hồi.");
+        if (error || !user) throw new Error(tr('feedback.ban_can_dang_nhap_de_gui_phan_hoi'));
         await action(user.id);
       } catch (error) {
-        this.error = error instanceof Error ? error.message : "Không thể gửi phản hồi lúc này. Vui lòng thử lại.";
+        this.error = error instanceof Error ? error.message : tr('feedback.khong_the_gui_phan_hoi_luc_nay_vui_long_thu_lai');
         throw error;
       } finally {
         this.submitting = false;

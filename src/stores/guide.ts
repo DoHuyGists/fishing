@@ -1,3 +1,4 @@
+import { t as tr } from "../i18n";
 import { defineStore } from "pinia";
 import { supabaseGuideRepository, type GuideRow } from "../data/supabaseGuideRepository";
 
@@ -23,7 +24,7 @@ export const useGuideStore = defineStore("guide", {
           this.selectedId = this.guides[0]?.id ?? null;
         }
       } catch {
-        this.loadError = "Không thể tải hướng dẫn. Vui lòng thử lại.";
+        this.loadError = tr('guide.khong_the_tai_huong_dan_vui_long_thu_lai');
       } finally {
         this.loading = false;
       }

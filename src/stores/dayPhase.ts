@@ -1,11 +1,12 @@
+import { t as tr } from "../i18n";
 import { defineStore } from "pinia";
 
 // 4 giai đoạn trong ngày: rạng đông, ban ngày, hoàng hôn, ban đêm
 const DAY_PHASES = [
-  { key: "dawn", label: "Sáng", from: 3, to: 9, icon: "/time/sunrise.png" },
-  { key: "day", label: "Trưa", from: 9, to: 17, icon: "/time/noon.png" },
-  { key: "dusk", label: "Hoàng hôn", from: 17, to: 19, icon: "/time/dusk.png" },
-  { key: "night", label: "Ban đêm", from: 19, to: 3, icon: "/time/night.png" },
+  { key: "dawn", get label() { return tr('dayPhase.sang'); }, from: 3, to: 9, icon: "/time/sunrise.png" },
+  { key: "day", get label() { return tr('dayPhase.trua'); }, from: 9, to: 17, icon: "/time/noon.png" },
+  { key: "dusk", get label() { return tr('dayPhase.hoang_hon'); }, from: 17, to: 19, icon: "/time/dusk.png" },
+  { key: "night", get label() { return tr('dayPhase.ban_dem'); }, from: 19, to: 3, icon: "/time/night.png" },
 ] as const;
 
 

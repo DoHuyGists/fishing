@@ -1,4 +1,6 @@
 <script setup lang="ts">
+import { t as tr } from "../../../i18n";
+
 import { watch } from "vue";
 import Modal from "../../shared/Modal.vue";
 import SkillCard from "./SkillCard.vue";
@@ -13,7 +15,7 @@ const toast = useToast();
 async function refresh() {
   if (skillStore.upgradingId) return;
   if (!await skillStore.fetchSkills() && skillStore.error) {
-    toast.error(skillStore.error, { title: "Không thể tải kỹ năng", position: "bottom" });
+    toast.error(skillStore.error, { get title() { return tr('SkillModal.khong_the_tai_ky_nang'); }, position: "bottom" });
   }
 }
 
@@ -22,25 +24,25 @@ watch(() => authStore.user?.id, refresh, { immediate: true });
 async function upgrade(skillId: string) {
   const result = await skillStore.upgradeSkill(skillId);
   if (result) {
-    toast.success(`Đã nâng ${result.skill_name} lên cấp ${result.current_level}!`, { title: "Nâng cấp thành công", position: "bottom" });
+    toast.success(tr('SkillModal.da_nang_value0_len_cap_value1', { value0: result.skill_name, value1: result.current_level }), { get title() { return tr('SkillModal.nang_cap_thanh_cong'); }, position: "bottom" });
   } else if (skillStore.upgradeError) {
-    toast.error(skillStore.upgradeError, { title: "Nâng cấp thất bại", position: "bottom" });
+    toast.error(skillStore.upgradeError, { get title() { return tr('SkillModal.nang_cap_that_bai'); }, position: "bottom" });
   }
 }
 </script>
 
 <template>
-  <Modal title="Kỹ năng" sub-title="Rèn luyện kỹ năng cần thủ" :on-refresh="refresh">
+  <Modal :title="tr('SkillModal.ky_nang')" :sub-title="tr('SkillModal.ren_luyen_ky_nang_can_thu')" :on-refresh="refresh">
     <section class="skill-board min-h-full w-full space-y-4 rounded-2xl p-3 text-[#24352a] sm:p-4" :aria-busy="skillStore.loading">
-      <button v-if="skillStore.error" type="button" class="cursor-pointer text-sm font-bold text-emerald-800 underline disabled:opacity-50" :disabled="skillStore.loading || !!skillStore.upgradingId" @click="refresh">Tải lại kỹ năng</button>
-      <div v-if="skillStore.loading" role="status" class="py-4 text-center text-sm">Đang tải kỹ năng...</div>
-      <div v-else-if="!skillStore.error && !skillStore.skillCards.length" class="rounded-xl border border-dashed border-[#cbd9c6] p-8 text-center text-sm">Chưa có kỹ năng nào.</div>
+      <button v-if="skillStore.error" type="button" class="cursor-pointer text-sm font-bold text-emerald-800 underline disabled:opacity-50" :disabled="skillStore.loading || !!skillStore.upgradingId" @click="refresh">{{ tr('SkillModal.tai_lai_ky_nang') }}</button>
+      <div v-if="skillStore.loading" role="status" class="py-4 text-center text-sm">{{ tr('SkillModal.dang_tai_ky_nang') }}</div>
+      <div v-else-if="!skillStore.error && !skillStore.skillCards.length" class="rounded-xl border border-dashed border-[#cbd9c6] p-8 text-center text-sm">{{ tr('SkillModal.chua_co_ky_nang_nao') }}</div>
 
       <div class="flex flex-wrap items-center gap-3">
-        <div class="m-0 text-[11px] font-extrabold uppercase tracking-[0.18em] text-[#60745d]">Chọn kỹ năng để rèn luyện</div>
+        <div class="m-0 text-[11px] font-extrabold uppercase tracking-[0.18em] text-[#60745d]">{{ tr('SkillModal.chon_ky_nang_de_ren_luyen') }}</div>
         <span aria-hidden="true" class="h-px flex-1 bg-[#cbd9c6]"></span>
         <div v-if="skillStore.remainingSkillPoints !== null" role="status" class="m-0 rounded-lg border border-[#cbd9c6] bg-[#f5f9f0] px-3 py-1.5 text-xs text-[#52634c]">
-          <span aria-hidden="true" class="mr-1 text-[#8b651b]">✦</span> Điểm kỹ năng: <strong class="tabular-nums text-emerald-800">{{ skillStore.remainingSkillPoints }}</strong>
+          <span aria-hidden="true" class="mr-1 text-[#8b651b]">✦</span> {{ tr('SkillModal.diem_ky_nang') }} <strong class="tabular-nums text-emerald-800">{{ skillStore.remainingSkillPoints }}</strong>
         </div>
       </div>
 

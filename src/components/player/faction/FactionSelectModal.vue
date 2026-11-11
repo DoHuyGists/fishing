@@ -1,4 +1,7 @@
 <script setup lang="ts">
+import { getFormattingLocale } from '../../../i18n';
+import { t as tr } from "../../../i18n";
+
 import { computed, nextTick, onMounted, ref } from "vue";
 import Modal from "../../shared/Modal.vue";
 import FactionActivityRewards from "./FactionActivityRewards.vue";
@@ -83,14 +86,14 @@ async function executeConfirm() {
   try {
     if (type === "join") {
       await factionStore.joinFaction(faction.id, currentUserId.value);
-      toast.success(`Đã chính thức gia nhập phe: ${faction.name}`);
+      toast.success(tr('FactionSelectModal.da_chinh_thuc_gia_nhap_phe_value0', { value0: faction.name }));
     } else {
       await factionStore.changeFaction(faction.id, currentUserId.value);
-      toast.success(`Đã chuyển sang phe: ${faction.name}`);
+      toast.success(tr('FactionSelectModal.da_chuyen_sang_phe_value0', { value0: faction.name }));
     }
     confirmingAction.value = null;
   } catch (error) {
-    const message = error instanceof Error ? error.message : "Thao tác thất bại";
+    const message = error instanceof Error ? error.message : tr('FactionSelectModal.thao_tac_that_bai');
     toast.error(message);
   }
 }
@@ -99,19 +102,19 @@ function getEffectTypeBadge(type: string) {
   switch (type) {
     case "BUFF":
       return {
-        label: "Hiệu quả phe",
+        get label() { return tr('FactionSelectModal.hieu_qua_phe'); },
         class: "bg-[#dce9d7] text-[#344f3b] border-[#b7cbb4]",
         icon: "✦",
       };
     case "DEBUFF":
       return {
-        label: "Hiệu quả cân bằng",
+        get label() { return tr('FactionSelectModal.hieu_qua_can_bang'); },
         class: "bg-rose-100 text-rose-800 border-rose-300",
         icon: "▲",
       };
     case "UNIQUE":
       return {
-        label: "Hiệu quả độc nhất",
+        get label() { return tr('FactionSelectModal.hieu_qua_doc_nhat'); },
         class: "bg-amber-100 text-amber-800 border-amber-300",
         icon: "★",
       };
@@ -141,7 +144,7 @@ onMounted(() => {
 </script>
 
 <template>
-  <Modal title="Phe phái" sub-title="Gia nhập phe phái để nhận các lợi ích tập thể" :on-refresh="handleRefresh">
+  <Modal :title="tr('FactionSelectModal.phe_phai')" :sub-title="tr('FactionSelectModal.gia_nhap_phe_phai_de_nhan_cac_loi_ich_tap_the')" :on-refresh="handleRefresh">
     <div class="faction-screen min-h-full p-5 sm:p-8 space-y-6 bg-[#f5f9f0] text-[#24352a]">
       <!-- Thanh trạng thái người chơi -->
       <section
@@ -149,11 +152,11 @@ onMounted(() => {
       >
         <div class="flex items-center gap-2 text-xs sm:text-sm">
           <span class="text-[#526a58] font-serif">❖</span>
-          <span class="text-[#617565] uppercase tracking-wider text-[11px] font-bold">phe hiện tại:</span>
+          <span class="text-[#617565] uppercase tracking-wider text-[11px] font-bold">{{ tr('FactionSelectModal.phe_hien_tai') }}</span>
           <span v-if="joinedFaction" class="font-bold text-[#344f3b] font-serif text-sm sm:text-base">
             {{ joinedFaction.name }} ({{ joinedFaction.code }})
           </span>
-          <span v-else class="text-[#617565] italic"> Chưa gia nhập phe nào </span>
+          <span v-else class="text-[#617565] italic"> {{ tr('FactionSelectModal.chua_gia_nhap_phe_nao') }} </span>
         </div>
 
         <div v-if="joinedFaction && activeFaction && activeFaction.id !== joinedFaction.id">
@@ -162,7 +165,7 @@ onMounted(() => {
             class="px-3 py-1 rounded border border-[#8eaa91] bg-[#dce9d7] hover:bg-[#cbd9c6] text-xs font-bold text-[#344f3b] transition-colors cursor-pointer"
             @click="handleResetToJoined"
           >
-            ← Trở về phe của bạn
+            {{ tr('FactionSelectModal.tro_ve_phe_cua_ban') }}
           </button>
         </div>
       </section>
@@ -170,7 +173,7 @@ onMounted(() => {
       <!-- Loading State -->
       <div v-if="factionStore.loading" class="py-16 text-center text-[#526a5e] space-y-2">
         <div class="inline-block animate-spin text-2xl text-[#526a58]">❖</div>
-        <div class="text-xs uppercase tracking-widest font-bold">Đang tải thông tin phe phái...</div>
+        <div class="text-xs uppercase tracking-widest font-bold">{{ tr('FactionSelectModal.dang_tai_thong_tin_phe_phai') }}</div>
       </div>
 
       <!-- Error State -->
@@ -184,7 +187,7 @@ onMounted(() => {
           class="mt-3 px-4 py-1.5 rounded border border-red-700 bg-red-100 hover:bg-red-200 text-xs font-bold transition-colors cursor-pointer"
           @click="handleRefresh"
         >
-          Thử lại
+          {{ tr('Maintenance.thu_lai') }}
         </button>
       </div>
 
@@ -213,28 +216,28 @@ onMounted(() => {
               <span class="text-xs uppercase tracking-widest font-extrabold text-[#344f3b] font-serif">
                 {{
                   isActiveJoined
-                    ? "👑 Phe Hiện Tại"
+                    ? tr('FactionSelectModal.phe_hien_tai_2')
                     : hasJoined
-                      ? "👁️ Chi Tiết Phe Đang Xem Xét"
-                      : "⚔️ Chi Tiết Phe Đã Chọn"
+                      ? tr('FactionSelectModal.chi_tiet_phe_dang_xem_xet')
+                      : tr('FactionSelectModal.chi_tiet_phe_da_chon')
                 }}
               </span>
               <span
                 v-if="isActiveJoined"
                 class="px-2 py-0.5 rounded text-[10px] font-extrabold uppercase bg-[#dce9d7] text-[#344f3b] border border-[#b7cbb4]"
               >
-                Đang Kích Hoạt
+                {{ tr('FactionSelectModal.dang_kich_hoat') }}
               </span>
             </div>
             <div class="flex items-center gap-2.5 text-xs text-[#405446] font-serif">
               <span v-if="activeFaction.element">
-                Mệnh: <span class="font-bold text-[#526a58]">{{ activeFaction.element }}</span>
+                {{ tr('FactionSelectModal.menh') }} <span class="font-bold text-[#526a58]">{{ activeFaction.element }}</span>
               </span>
               <span
                 class="inline-flex items-center gap-1 px-2 py-0.5 rounded bg-[#eaf2e5] border border-[#cbd9c6] text-[#344f3b] font-sans font-medium text-[11px]"
               >
                 <span>👥</span>
-                <span class="font-bold">{{ getMemberCount(activeFaction.id).toLocaleString("vi-VN") }}</span> thành viên
+                <span class="font-bold">{{ getMemberCount(activeFaction.id).toLocaleString(getFormattingLocale()) }}</span> {{ tr('FactionSelectModal.thanh_vien') }}
               </span>
             </div>
           </div>
@@ -260,22 +263,22 @@ onMounted(() => {
               <!-- Mã Phe & Thuộc tính & Số lượng thành viên -->
               <div class="mt-2 flex flex-wrap justify-center gap-1.5 text-[11px] text-[#617565]">
                 <span class="px-2 py-0.5 rounded bg-[#f5f9f0] border border-[#cbd9c6] font-mono">
-                  MÃ: {{ activeFaction.code }}
+                  {{ tr('FactionSelectModal.ma') }} {{ activeFaction.code }}
                 </span>
                 <span
                   v-if="activeFaction.is_neutral"
                   class="px-2 py-0.5 rounded bg-[#eaf2e5] text-[#405446] border border-[#cbd9c6]"
                 >
-                  Trung Lập
+                  {{ tr('FactionSelectModal.trung_lap') }}
                 </span>
                 <span
                   class="px-2 py-0.5 rounded bg-[#f5f9f0] border border-[#cbd9c6] text-[#344f3b] flex items-center gap-1"
                 >
                   <span>👥</span>
                   <span class="font-sans font-bold">{{
-                    getMemberCount(activeFaction.id).toLocaleString("vi-VN")
+                    getMemberCount(activeFaction.id).toLocaleString(getFormattingLocale())
                   }}</span>
-                  thành viên
+                  {{ tr('FactionSelectModal.thanh_vien') }}
                 </span>
               </div>
 
@@ -287,7 +290,7 @@ onMounted(() => {
                   class="w-full py-2.5 px-3 rounded-lg bg-[#dce9d7] border border-[#b7cbb4] text-[#344f3b] text-xs font-bold flex items-center justify-center gap-1.5"
                 >
                   <span>✓</span>
-                  <span>Đang thụ hưởng toàn bộ hiệu ứng</span>
+                  <span>{{ tr('FactionSelectModal.dang_thu_huong_toan_bo_hieu_ung') }}</span>
                 </div>
 
                 <!-- Chưa vào phe nào -> Nút Gia nhập -->
@@ -298,7 +301,7 @@ onMounted(() => {
                   :disabled="factionStore.actionLoading"
                   @click="promptJoin(activeFaction)"
                 >
-                  {{ factionStore.actionLoading ? "Đang xử lý..." : "Gia Nhập Phe Này" }}
+                  {{ factionStore.actionLoading ? tr('DailyAttendance.dang_xu_ly') : tr('FactionSelectModal.gia_nhap_phe_nay') }}
                 </button>
 
                 <!-- Đã vào phe khác -> Nút Chuyển phe -->
@@ -309,7 +312,7 @@ onMounted(() => {
                   :disabled="factionStore.actionLoading"
                   @click="promptChange(activeFaction)"
                 >
-                  {{ factionStore.actionLoading ? "Đang xử lý..." : "Chuyển Sang Phe Này" }}
+                  {{ factionStore.actionLoading ? tr('DailyAttendance.dang_xu_ly') : tr('FactionSelectModal.chuyen_sang_phe_nay') }}
                 </button>
               </div>
             </div>
@@ -322,10 +325,10 @@ onMounted(() => {
                   class="m-0 mb-2 text-xs uppercase tracking-widest font-extrabold text-[#344f3b] font-serif flex items-center gap-1.5"
                 >
                   <span>📜</span>
-                  <span>Tôn Chỉ & Giới Thiệu</span>
+                  <span>{{ tr('FactionSelectModal.ton_chi_gioi_thieu') }}</span>
                 </div>
                 <div class="m-0 text-sm leading-relaxed text-[#405446] whitespace-pre-line">
-                  {{ activeFaction.description || "Chưa có văn tự mô tả cho phe này." }}
+                  {{ activeFaction.description || tr('FactionSelectModal.chua_co_van_tu_mo_ta_cho_phe_nay') }}
                 </div>
               </div>
 
@@ -336,15 +339,15 @@ onMounted(() => {
                     class="m-0 text-xs uppercase tracking-widest font-extrabold text-[#344f3b] font-serif flex items-center gap-1.5"
                   >
                     <span>⚡</span>
-                    <span>Hiệu Ứng Áp Dụng ({{ displayedEffects.length }})</span>
+                    <span>{{ tr('FactionSelectModal.hieu_ung_ap_dung') }}{{ displayedEffects.length }})</span>
                   </div>
                   <span v-if="isActiveJoined" class="text-[11px] text-[#526a58] font-medium">
-                    ● Kích hoạt theo tài khoản
+                    {{ tr('FactionSelectModal.kich_hoat_theo_tai_khoan') }}
                   </span>
                 </div>
 
                 <div v-if="displayedEffects.length === 0" class="py-6 text-center text-xs text-[#617565] italic">
-                  phe này hiện chưa có hiệu ứng được công bố.
+                  {{ tr('FactionSelectModal.phe_nay_hien_chua_co_hieu_ung_duoc_cong_bo') }}
                 </div>
 
                 <div v-else class="space-y-2.5 max-h-[360px] overflow-y-auto pr-1">
@@ -367,7 +370,7 @@ onMounted(() => {
                         </div>
                       </div>
                       <span class="text-[11px] font-mono text-[#617565]">
-                        Chỉ số: <strong class="text-[#344f3b]">{{ effect.target_stat }}</strong>
+                        {{ tr('FactionSelectModal.chi_so') }} <strong class="text-[#344f3b]">{{ effect.target_stat }}</strong>
                       </span>
                     </div>
 
@@ -406,13 +409,13 @@ onMounted(() => {
               class="m-0 text-xs sm:text-sm uppercase tracking-widest font-extrabold text-[#526a58] font-serif flex items-center gap-2"
             >
               <span>🏛️</span>
-              <span>Các phe Khác ({{ otherFactions.length }})</span>
+              <span>{{ tr('FactionSelectModal.cac_phe_khac') }}{{ otherFactions.length }})</span>
             </div>
-            <span class="text-[11px] text-[#617565]"> Chọn phe bên dưới để xem chi tiết bên trên </span>
+            <span class="text-[11px] text-[#617565]"> {{ tr('FactionSelectModal.chon_phe_ben_duoi_de_xem_chi_tiet_ben_tren') }} </span>
           </div>
 
           <div v-if="otherFactions.length === 0" class="py-8 text-center text-xs text-[#617565] italic">
-            Không còn phe nào khác.
+            {{ tr('FactionSelectModal.khong_con_phe_nao_khac') }}
           </div>
 
           <div v-else class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
@@ -435,14 +438,14 @@ onMounted(() => {
                     </div>
                     <div class="mt-0.5 flex items-center gap-1.5 text-[11px] text-[#617565]">
                       <span class="font-mono text-[10px]">{{ faction.code }}</span>
-                      <span v-if="faction.element" class="text-[#344f3b]">· Hệ {{ faction.element }}</span>
+                      <span v-if="faction.element" class="text-[#344f3b]">{{ tr('FactionSelectModal.he') }} {{ faction.element }}</span>
                     </div>
                   </div>
                 </div>
 
                 <!-- Mô tả tóm tắt -->
                 <div class="m-0 text-xs text-[#405446] line-clamp-2 leading-relaxed mb-3">
-                  {{ faction.description || "Chưa có mô tả chi tiết." }}
+                  {{ faction.description || tr('FactionSelectModal.chua_co_mo_ta_chi_tiet') }}
                 </div>
 
                 <!-- Tóm tắt số thành viên & số hiệu ứng -->
@@ -451,17 +454,17 @@ onMounted(() => {
                     class="px-1.5 py-0.5 rounded bg-[#eaf2e5] border border-[#cbd9c6] text-[#344f3b] flex items-center gap-1"
                   >
                     <span>👥</span>
-                    <span class="font-sans font-bold">{{ getMemberCount(faction.id).toLocaleString("vi-VN") }}</span>
-                    thành viên
+                    <span class="font-sans font-bold">{{ getMemberCount(faction.id).toLocaleString(getFormattingLocale()) }}</span>
+                    {{ tr('FactionSelectModal.thanh_vien') }}
                   </span>
                   <span class="px-1.5 py-0.5 rounded bg-[#eaf2e5] border border-[#cbd9c6] text-[#405446]">
-                    {{ (faction.faction_effects ?? []).length }} Hiệu ứng
+                    {{ (faction.faction_effects ?? []).length }} {{ tr('FactionSelectModal.hieu_ung') }}
                   </span>
                   <span
                     v-if="faction.is_neutral"
                     class="px-1.5 py-0.5 rounded bg-[#eaf2e5] text-[#405446] border border-[#cbd9c6]"
                   >
-                    Trung lập
+                    {{ tr('FactionSelectModal.trung_lap_2') }}
                   </span>
                 </div>
               </div>
@@ -473,7 +476,7 @@ onMounted(() => {
                   class="flex-1 py-1.5 px-2 rounded-lg border border-[#b7cbb4] bg-[#eaf2e5] hover:bg-[#dce9d7] text-xs font-bold text-[#344f3b] transition-colors cursor-pointer"
                   @click="handleViewDetail(faction.id)"
                 >
-                  Xem chi tiết
+                  {{ tr('FactionSelectModal.xem_chi_tiet') }}
                 </button>
 
                 <!-- Nếu chưa có phe -> Nút gia nhập nhanh -->
@@ -483,7 +486,7 @@ onMounted(() => {
                   class="py-1.5 px-3 rounded-lg border border-[#24352a] bg-[#344f3b] hover:bg-[#24352a] text-xs font-bold text-[#f5f9f0] transition-colors cursor-pointer"
                   @click="promptJoin(faction)"
                 >
-                  Gia nhập
+                  {{ tr('FactionSelectModal.gia_nhap') }}
                 </button>
 
                 <!-- Nếu đã có phe khác -> Nút chuyển phe nhanh -->
@@ -493,7 +496,7 @@ onMounted(() => {
                   class="py-1.5 px-3 rounded-lg border border-[#8eaa91] bg-[#dce9d7] hover:bg-[#cbd9c6] text-xs font-bold text-[#344f3b] transition-colors cursor-pointer"
                   @click="promptChange(faction)"
                 >
-                  Chuyển phe
+                  {{ tr('FactionSelectModal.chuyen_phe') }}
                 </button>
               </div>
             </article>
@@ -514,18 +517,18 @@ onMounted(() => {
                 {{ confirmingAction.faction.symbol || "❖" }}
               </div>
               <div class="m-0 text-lg font-bold font-serif text-[#24352a]">
-                {{ confirmingAction.type === "join" ? "Xác nhận gia nhập phe" : "Xác nhận chuyển đổi phe" }}
+                {{ confirmingAction.type === "join" ? tr('FactionSelectModal.xac_nhan_gia_nhap_phe') : tr('FactionSelectModal.xac_nhan_chuyen_doi_phe') }}
               </div>
               <div class="m-0 text-xs text-[#405446] leading-relaxed">
                 <template v-if="confirmingAction.type === 'join'">
-                  Bạn đang chuẩn bị gia nhập phe
+                  {{ tr('FactionSelectModal.ban_dang_chuan_bi_gia_nhap_phe') }}
                   <strong class="text-[#344f3b] font-serif text-sm">{{ confirmingAction.faction.name }}</strong
-                  >. Sau khi gia nhập, các hiệu ứng chúc phúc và ràng buộc sẽ được kích hoạt lên nhân vật.
+                  >{{ tr('FactionSelectModal.sau_khi_gia_nhap_cac_hieu_ung_chuc_phuc_va_rang_buoc_se_duoc_kic') }}
                 </template>
                 <template v-else>
-                  Bạn đang chọn chuyển sang
+                  {{ tr('FactionSelectModal.ban_dang_chon_chuyen_sang') }}
                   <strong class="text-[#344f3b] font-serif text-sm">{{ confirmingAction.faction.name }}</strong
-                  >. Mọi hiệu ứng của phe hiện tại sẽ được thay thế bằng hiệu ứng của phe mới.
+                  >{{ tr('FactionSelectModal.moi_hieu_ung_cua_phe_hien_tai_se_duoc_thay_the_bang_hieu_ung_cua') }}
                 </template>
               </div>
             </div>
@@ -537,7 +540,7 @@ onMounted(() => {
                 :disabled="factionStore.actionLoading"
                 @click="cancelConfirm"
               >
-                Hủy bỏ
+                {{ tr('FactionSelectModal.huy_bo') }}
               </button>
               <button
                 type="button"
@@ -545,7 +548,7 @@ onMounted(() => {
                 :disabled="factionStore.actionLoading"
                 @click="executeConfirm"
               >
-                {{ factionStore.actionLoading ? "Đang xử lý..." : "Xác Nhận" }}
+                {{ factionStore.actionLoading ? tr('DailyAttendance.dang_xu_ly') : tr('FactionSelectModal.xac_nhan') }}
               </button>
             </div>
           </div>

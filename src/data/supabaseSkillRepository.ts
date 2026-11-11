@@ -1,3 +1,4 @@
+import { t as tr } from "../i18n";
 import supabase from "../database/connection";
 
 export interface Skill {
@@ -74,7 +75,7 @@ class SupabaseSkillRepository {
     const { data, error } = await supabase.rpc("upgrade_skill", { p_skill_id: skillId });
     if (error) throw new Error(error.message);
     if (data?.success !== true) {
-      throw new Error(data?.message || "Không thể nâng cấp kỹ năng.");
+      throw new Error(data?.message || tr('supabaseSkillRepository.khong_the_nang_cap_ky_nang'));
     }
     return data as UpgradeSkillResult;
   }

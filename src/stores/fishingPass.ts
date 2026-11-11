@@ -1,3 +1,4 @@
+import { t as tr } from "../i18n";
 import { defineStore } from "pinia";
 import { supabaseCurrencyRepository } from "../data/supabaseCurrencyRepository";
 import { supabaseFishingPassRepository, type FishingPass } from "../data/supabaseFishingPassRepository";
@@ -30,7 +31,7 @@ export const useFishingPassStore = defineStore("fishingPass", {
       try {
         this.currentPass = await supabaseFishingPassRepository.fetchCurrentPass();
       } catch (err) {
-        this.loadError = err instanceof Error ? err.message : "Không thể tải Fishing Pass.";
+        this.loadError = err instanceof Error ? err.message : tr('fishingPass.khong_the_tai_fishing_pass');
         throw err;
       } finally {
         this.loading = false;

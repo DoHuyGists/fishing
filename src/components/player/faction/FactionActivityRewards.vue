@@ -1,4 +1,6 @@
 <script setup lang="ts">
+import { t as tr } from "../../../i18n";
+
 import { computed } from "vue";
 import { FACTION_ACTIVITY_MILESTONES, type ActivityMilestone } from "../../../data/factionActivityMilestones.ts";
 import Hint from "../../shared/Hint.vue";
@@ -55,34 +57,34 @@ function isMilestoneReached(pointsRequired: number): boolean {
         <span class="text-lg text-emerald-700">⚡</span>
         <div>
           <div class="m-0 text-xs sm:text-sm font-bold uppercase tracking-wider font-serif text-emerald-900">
-            Phần Thưởng Năng Động Hàng Ngày
+            {{ tr('FactionActivityRewards.phan_thuong_nang_dong_hang_ngay') }}
           </div>
-          <div class="m-0 text-[11px] text-[#617565]">Tích lũy hoạt động trong ngày để mở khóa 10 mốc ban thưởng</div>
+          <div class="m-0 text-[11px] text-[#617565]">{{ tr('FactionActivityRewards.tich_luy_hoat_dong_trong_ngay_de_mo_khoa_10_moc_ban_thuong') }}</div>
         </div>
       </div>
 
       <!-- Huy hiệu điểm & Tiến độ mốc tiếp theo -->
       <div class="flex flex-col items-end gap-2 text-xs">
         <div class="px-3 py-1 rounded-full bg-[#eaf2e5] border border-[#cbd9c6] flex items-center gap-1.5 shadow-sm">
-          <span class="text-emerald-800 font-bold font-serif">Điểm:</span>
+          <span class="text-emerald-800 font-bold font-serif">{{ tr('FactionActivityRewards.diem') }}</span>
           <span class="font-bold text-emerald-700 font-mono text-sm sm:text-base">{{ safeCurrentPoints }}</span>
           <span class="text-[#617565] text-[11px]">/ {{ maxPoints }}</span>
-          <Hint text="Điểm có thể thu thập từ hoạt động câu cá" />
+          <Hint :text="tr('FactionActivityRewards.diem_co_the_thu_thap_tu_hoat_dong_cau_ca')" />
         </div>
 
         <div
           v-if="nextMilestone"
           class="hidden sm:flex items-center gap-1.5 px-3 py-1 rounded-full bg-[#eaf2e5] border border-[#cbd9c6] text-[11px] text-[#526a58]"
         >
-          <span class="text-[#617565]">(cần thêm {{ nextMilestone.points - safeCurrentPoints }} điểm)</span>
-          <span>để đạt mốc kế tiếp:</span>
-          <strong class="text-emerald-800">Mốc {{ nextMilestone.level }}</strong>
+          <span class="text-[#617565]">{{ tr('FactionActivityRewards.can_them') }} {{ nextMilestone.points - safeCurrentPoints }} {{ tr('FactionActivityRewards.diem_2') }}</span>
+          <span>{{ tr('FactionActivityRewards.de_dat_moc_ke_tiep') }}</span>
+          <strong class="text-emerald-800">{{ tr('FactionActivityRewards.moc') }} {{ nextMilestone.level }}</strong>
         </div>
         <div
           v-else
           class="hidden sm:flex items-center gap-1 px-3 py-1 rounded-full bg-emerald-100 border border-emerald-300 text-[11px] text-emerald-800 font-bold"
         >
-          <span>👑 Đã đại mốc tối đa</span>
+          <span>{{ tr('FactionActivityRewards.da_dai_moc_toi_da') }}</span>
         </div>
       </div>
     </div>
@@ -91,7 +93,7 @@ function isMilestoneReached(pointsRequired: number): boolean {
     <div class="space-y-1.5">
       <div class="flex items-center justify-between text-[11px] text-[#617565]">
         <span
-          >Tiến trình hoàn thành: <strong class="text-emerald-800">{{ completedMilestonesCount }}/10 Mốc</strong></span
+          >{{ tr('FactionActivityRewards.tien_trinh_hoan_thanh') }} <strong class="text-emerald-800">{{ completedMilestonesCount }}{{ tr('FactionActivityRewards.10_moc') }}</strong></span
         >
         <span class="font-mono text-emerald-700 font-bold">{{ overallProgressPercent }}%</span>
       </div>
@@ -124,7 +126,7 @@ function isMilestoneReached(pointsRequired: number): boolean {
             <div
               class="absolute transform rotate-45 bg-emerald-600 text-[8px] font-bold text-white py-0.5 right-[-20px] top-[4px] w-[55px] text-center uppercase tracking-tighter"
             >
-              ĐẠT
+              {{ tr('FactionActivityRewards.dat') }}
             </div>
           </div>
 
@@ -139,14 +141,14 @@ function isMilestoneReached(pointsRequired: number): boolean {
                     : 'bg-[#f5f9f0] text-[#526a58] border border-[#cbd9c6]'
                 "
               >
-                Mốc {{ item.level }}
+                {{ tr('FactionActivityRewards.moc') }} {{ item.level }}
               </span>
 
               <span
                 class="font-mono text-[11px] font-bold"
                 :class="isMilestoneReached(item.points) ? 'text-emerald-700' : 'text-[#617565]'"
               >
-                {{ item.points }} Đ
+                {{ item.points }} {{ tr('FactionActivityRewards.d') }}
               </span>
             </div>
 
@@ -189,10 +191,10 @@ function isMilestoneReached(pointsRequired: number): boolean {
               v-if="isMilestoneReached(item.points)"
               class="inline-flex items-center gap-1 text-[11px] font-bold text-emerald-700"
             >
-              <span class="text-xs">✓</span> Đã hoàn thành
+              <span class="text-xs">✓</span> {{ tr('FactionActivityRewards.da_hoan_thanh') }}
             </span>
             <span v-else class="inline-block text-[10px] text-[#617565] font-medium">
-              Cần thêm {{ item.points - safeCurrentPoints }} đ
+              {{ tr('FactionActivityRewards.can_them_2') }} {{ item.points - safeCurrentPoints }} {{ tr('FactionActivityRewards.d_2') }}
             </span>
           </div>
         </article>

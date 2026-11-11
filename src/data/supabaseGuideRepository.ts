@@ -1,3 +1,4 @@
+import { t as tr } from "../i18n";
 import supabase from "../database/connection";
 
 export interface GuideRow {
@@ -55,7 +56,7 @@ class SupabaseGuideRepository {
   async remove(id: string): Promise<void> {
     const { data, error } = await supabase.from("guides").delete().eq("id", id).select("id").single();
     if (error) throw new Error(error.message);
-    if (!data) throw new Error("Hướng dẫn không còn tồn tại hoặc bạn không có quyền xóa.");
+    if (!data) throw new Error(tr('supabaseGuideRepository.huong_dan_khong_con_ton_tai_hoac_ban_khong_co_quyen_xoa'));
   }
 }
 

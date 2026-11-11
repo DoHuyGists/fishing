@@ -1,4 +1,6 @@
 <script setup lang="ts">
+import { t as tr } from "../../i18n";
+
 import { computed, defineAsyncComponent, nextTick, ref, useId, watch } from "vue";
 import { EditorContent, mergeAttributes, useEditor, type Editor } from "@tiptap/vue-3";
 import StarterKit from "@tiptap/starter-kit";
@@ -15,8 +17,9 @@ const model = defineModel<string>({ required: true });
 const props = withDefaults(defineProps<{ disabled?: boolean; invalid?: boolean; label?: string }>(), {
   disabled: false,
   invalid: false,
-  label: "Nội dung hướng dẫn",
+  label: undefined,
 });
+const editorLabel = computed(() => props.label ?? tr('RichEditor.noi_dung_huong_dan'));
 const editorId = useId();
 const linkOpen = ref(false);
 const linkUrl = ref("");
@@ -100,7 +103,7 @@ const editor = useEditor({
     attributes: {
       id: editorId,
       role: "textbox",
-      "aria-label": props.label,
+      "aria-label": editorLabel.value,
       "aria-multiline": "true",
       class: "min-h-72 px-4 py-3 outline-none",
     },
@@ -110,17 +113,17 @@ const editor = useEditor({
 });
 
 const tools: { label: string; text: string; active?: string; run: (value: Editor) => void; enabled?: (value: Editor) => boolean }[] = [
-  { label: "In đậm (Ctrl+B)", text: "Đậm", active: "bold", run: (value) => { value.chain().focus().toggleBold().run(); } },
-  { label: "In nghiêng (Ctrl+I)", text: "Nghiêng", active: "italic", run: (value) => { value.chain().focus().toggleItalic().run(); } },
-  { label: "Gạch chân (Ctrl+U)", text: "Gạch chân", active: "underline", run: (value) => { value.chain().focus().toggleUnderline().run(); } },
-  { label: "Gạch ngang", text: "Gạch ngang", active: "strike", run: (value) => { value.chain().focus().toggleStrike().run(); } },
-  { label: "Danh sách dấu chấm", text: "• Danh sách", active: "bulletList", run: (value) => { value.chain().focus().toggleBulletList().run(); } },
-  { label: "Danh sách đánh số", text: "1. Danh sách", active: "orderedList", run: (value) => { value.chain().focus().toggleOrderedList().run(); } },
-  { label: "Trích dẫn", text: "Trích dẫn", active: "blockquote", run: (value) => { value.chain().focus().toggleBlockquote().run(); } },
-  { label: "Mã nội dòng", text: "Mã", active: "code", run: (value) => { value.chain().focus().toggleCode().run(); } },
-  { label: "Xóa định dạng", text: "Bỏ định dạng", run: (value) => { value.chain().focus().unsetAllMarks().clearNodes().run(); } },
-  { label: "Hoàn tác (Ctrl+Z)", text: "↶", run: (value) => { value.chain().focus().undo().run(); }, enabled: (value) => value.can().undo() },
-  { label: "Làm lại (Ctrl+Shift+Z)", text: "↷", run: (value) => { value.chain().focus().redo().run(); }, enabled: (value) => value.can().redo() },
+  { get label() { return tr('RichEditor.in_dam_ctrl_b'); }, get text() { return tr('RichEditor.dam'); }, active: "bold", run: (value) => { value.chain().focus().toggleBold().run(); } },
+  { get label() { return tr('RichEditor.in_nghieng_ctrl_i'); }, get text() { return tr('RichEditor.nghieng'); }, active: "italic", run: (value) => { value.chain().focus().toggleItalic().run(); } },
+  { get label() { return tr('RichEditor.gach_chan_ctrl_u'); }, get text() { return tr('RichEditor.gach_chan'); }, active: "underline", run: (value) => { value.chain().focus().toggleUnderline().run(); } },
+  { get label() { return tr('RichEditor.gach_ngang'); }, get text() { return tr('RichEditor.gach_ngang'); }, active: "strike", run: (value) => { value.chain().focus().toggleStrike().run(); } },
+  { get label() { return tr('RichEditor.danh_sach_dau_cham'); }, get text() { return tr('RichEditor.danh_sach'); }, active: "bulletList", run: (value) => { value.chain().focus().toggleBulletList().run(); } },
+  { get label() { return tr('RichEditor.danh_sach_danh_so'); }, get text() { return tr('RichEditor.1_danh_sach'); }, active: "orderedList", run: (value) => { value.chain().focus().toggleOrderedList().run(); } },
+  { get label() { return tr('RichEditor.trich_dan'); }, get text() { return tr('RichEditor.trich_dan'); }, active: "blockquote", run: (value) => { value.chain().focus().toggleBlockquote().run(); } },
+  { get label() { return tr('RichEditor.ma_noi_dong'); }, get text() { return tr('RichEditor.ma'); }, active: "code", run: (value) => { value.chain().focus().toggleCode().run(); } },
+  { get label() { return tr('RichEditor.xoa_dinh_dang'); }, get text() { return tr('RichEditor.bo_dinh_dang'); }, run: (value) => { value.chain().focus().unsetAllMarks().clearNodes().run(); } },
+  { get label() { return tr('RichEditor.hoan_tac_ctrl_z'); }, text: "↶", run: (value) => { value.chain().focus().undo().run(); }, enabled: (value) => value.can().undo() },
+  { get label() { return tr('RichEditor.lam_lai_ctrl_shift_z'); }, text: "↷", run: (value) => { value.chain().focus().redo().run(); }, enabled: (value) => value.can().redo() },
 ];
 const characterCount = computed(() => editor.value?.getText().trim().length ?? 0);
 
@@ -130,6 +133,7 @@ watch(model, (value) => {
   }
 });
 watch(() => props.disabled, (value) => editor.value?.setEditable(!value));
+watch(editorLabel, (value) => editor.value?.view.dom.setAttribute("aria-label", value));
 watch(() => props.invalid, (value) => editor.value?.view.dom.setAttribute("aria-invalid", String(value)));
 watch(mediaUrl, () => {
   knownMedia.value = null;
@@ -184,11 +188,11 @@ function applyLink() {
     const url = new URL(href);
     if (!["http:", "https:", "mailto:"].includes(url.protocol)) throw new Error();
   } catch {
-    linkError.value = "Nhập liên kết bắt đầu bằng https://, http:// hoặc mailto:.";
+    linkError.value = tr('RichEditor.nhap_lien_ket_bat_dau_bang_https_http_hoac_mailto');
     return;
   }
   if (!text) {
-    linkError.value = "Nhập văn bản hiển thị cho liên kết.";
+    linkError.value = tr('RichEditor.nhap_van_ban_hien_thi_cho_lien_ket');
     return;
   }
   const { from, to } = editor.value.state.selection;
@@ -227,11 +231,11 @@ function applyMedia() {
   if (!editor.value || props.disabled) return;
   const src = mediaUrl.value.trim();
   if (!isGuideMediaUrl(src)) {
-    mediaError.value = "Nhập liên kết ảnh/video hợp lệ bắt đầu bằng https:// hoặc http://.";
+    mediaError.value = tr('RichEditor.nhap_lien_ket_anh_video_hop_le_bat_dau_bang_https_hoac_http');
     return;
   }
   if (!mediaKind.value) {
-    mediaError.value = "Chưa nhận diện được loại tệp. Hãy chọn ảnh hoặc video.";
+    mediaError.value = tr('RichEditor.chua_nhan_dien_duoc_loai_tep_hay_chon_anh_hoac_video');
     return;
   }
   const description = mediaDescription.value.trim();
@@ -242,7 +246,7 @@ function applyMedia() {
       ? chain.updateAttributes("video", { src, title: description }).run()
       : chain.insertContent({ type: "video", attrs: { src, title: description } }).run();
   if (!inserted) {
-    mediaError.value = "Không thể chèn ảnh/video tại vị trí này. Hãy đặt con trỏ vào một đoạn văn.";
+    mediaError.value = tr('RichEditor.khong_the_chen_anh_video_tai_vi_tri_nay_hay_dat_con_tro_vao_mot_');
     return;
   }
   mediaOpen.value = false;
@@ -251,7 +255,7 @@ function applyMedia() {
 
 <template>
   <div class="overflow-hidden rounded-xl border border-[#cbd9c6] bg-white text-[#24352a] focus-within:ring-2 focus-within:ring-emerald-700/20" :class="{ 'opacity-60': disabled }">
-    <div role="group" aria-label="Định dạng nội dung" class="flex flex-wrap gap-1 border-b border-[#cbd9c6] bg-[#f5f9f0] p-2">
+    <div role="group" :aria-label="tr('RichEditor.dinh_dang_noi_dung')" class="flex flex-wrap gap-1 border-b border-[#cbd9c6] bg-[#f5f9f0] p-2">
       <button
         v-for="tool in tools" :key="tool.label" type="button" :title="tool.label" :aria-label="tool.label"
         :aria-pressed="tool.active ? editor?.isActive(tool.active) : undefined"
@@ -260,48 +264,48 @@ function applyMedia() {
         :class="tool.active && editor?.isActive(tool.active) ? 'border-emerald-700 bg-emerald-100 text-emerald-900' : 'border-transparent'"
         @mousedown.prevent @click="editor && tool.run(editor)"
       >{{ tool.text }}</button>
-      <button type="button" :disabled="disabled || !editor" :aria-expanded="linkOpen" :aria-pressed="editor?.isActive('link')" class="rounded-md border border-[#cbd9c6] px-2.5 py-1.5 text-xs font-semibold hover:bg-emerald-100 disabled:opacity-40" @mousedown.prevent @click="openLink">Liên kết</button>
-      <button type="button" :disabled="disabled || !editor" :aria-expanded="mediaOpen" :aria-controls="mediaPanelId" class="rounded-md border border-[#cbd9c6] px-2.5 py-1.5 text-xs font-semibold hover:bg-emerald-100 disabled:opacity-40" @mousedown.prevent @click="openMedia">Chèn ảnh/video</button>
+      <button type="button" :disabled="disabled || !editor" :aria-expanded="linkOpen" :aria-pressed="editor?.isActive('link')" class="rounded-md border border-[#cbd9c6] px-2.5 py-1.5 text-xs font-semibold hover:bg-emerald-100 disabled:opacity-40" @mousedown.prevent @click="openLink">{{ tr('RichEditor.lien_ket') }}</button>
+      <button type="button" :disabled="disabled || !editor" :aria-expanded="mediaOpen" :aria-controls="mediaPanelId" class="rounded-md border border-[#cbd9c6] px-2.5 py-1.5 text-xs font-semibold hover:bg-emerald-100 disabled:opacity-40" @mousedown.prevent @click="openMedia">{{ tr('RichEditor.chen_anh_video') }}</button>
     </div>
     <div v-if="linkOpen" class="space-y-2 border-b border-[#cbd9c6] bg-[#f5f9f0] p-3">
-      <label class="block text-xs font-semibold">Văn bản hiển thị
-        <input v-model="linkText" type="text" placeholder="Ví dụ: Xem hướng dẫn" :disabled="disabled" class="mt-1 w-full rounded-lg border border-[#cbd9c6] bg-white px-3 py-2 text-sm" @keydown.enter.prevent="applyLink" />
+      <label class="block text-xs font-semibold">{{ tr('RichEditor.van_ban_hien_thi') }}
+        <input v-model="linkText" type="text" :placeholder="tr('RichEditor.vi_du_xem_huong_dan')" :disabled="disabled" class="mt-1 w-full rounded-lg border border-[#cbd9c6] bg-white px-3 py-2 text-sm" @keydown.enter.prevent="applyLink" />
       </label>
-      <label class="block text-xs font-semibold">Địa chỉ liên kết
+      <label class="block text-xs font-semibold">{{ tr('RichEditor.dia_chi_lien_ket') }}
         <input ref="linkInput" v-model="linkUrl" type="url" placeholder="https://..." :disabled="disabled" class="mt-1 w-full rounded-lg border border-[#cbd9c6] bg-white px-3 py-2 text-sm" @keydown.enter.prevent="applyLink" />
       </label>
       <div v-if="linkError" role="alert" class="text-xs text-red-700">{{ linkError }}</div>
       <div class="flex flex-wrap gap-2">
-        <button type="button" :disabled="disabled || !editor" class="rounded-lg border border-[#cbd9c6] bg-white px-3 py-1.5 text-xs font-semibold hover:bg-emerald-100 disabled:opacity-40" @click="openAssets('link')">Chọn từ kho ảnh / video</button>
-        <button type="button" :disabled="disabled" class="rounded-lg bg-emerald-800 px-3 py-1.5 text-xs font-bold text-white disabled:opacity-40" @click="applyLink">Áp dụng</button>
-        <button type="button" :disabled="disabled || !editor?.isActive('link')" class="rounded-lg border border-[#cbd9c6] px-3 py-1.5 text-xs disabled:opacity-40" @click="removeLink">Gỡ liên kết</button>
-        <button type="button" class="rounded-lg border border-[#cbd9c6] px-3 py-1.5 text-xs" @click="linkOpen = false">Đóng</button>
+        <button type="button" :disabled="disabled || !editor" class="rounded-lg border border-[#cbd9c6] bg-white px-3 py-1.5 text-xs font-semibold hover:bg-emerald-100 disabled:opacity-40" @click="openAssets('link')">{{ tr('RichEditor.chon_tu_kho_anh_video') }}</button>
+        <button type="button" :disabled="disabled" class="rounded-lg bg-emerald-800 px-3 py-1.5 text-xs font-bold text-white disabled:opacity-40" @click="applyLink">{{ tr('RichEditor.ap_dung') }}</button>
+        <button type="button" :disabled="disabled || !editor?.isActive('link')" class="rounded-lg border border-[#cbd9c6] px-3 py-1.5 text-xs disabled:opacity-40" @click="removeLink">{{ tr('RichEditor.go_lien_ket') }}</button>
+        <button type="button" class="rounded-lg border border-[#cbd9c6] px-3 py-1.5 text-xs" @click="linkOpen = false">{{ tr('ChangePasswordModal.dong') }}</button>
       </div>
     </div>
     <div v-if="mediaOpen" :id="mediaPanelId" class="space-y-2 border-b border-[#cbd9c6] bg-[#f5f9f0] p-3" @keydown.esc.stop.prevent="mediaOpen = false">
-      <label class="block text-xs font-semibold">Liên kết ảnh/video
-        <input ref="mediaInput" v-model="mediaUrl" type="url" placeholder="https://example.com/anh.jpg hoặc video.mp4" :disabled="disabled" :aria-invalid="!!mediaError" class="mt-1 w-full rounded-lg border border-[#cbd9c6] bg-white px-3 py-2 text-sm" @keydown.enter.prevent="applyMedia" />
+      <label class="block text-xs font-semibold">{{ tr('RichEditor.lien_ket_anh_video') }}
+        <input ref="mediaInput" v-model="mediaUrl" type="url" :placeholder="tr('RichEditor.https_example_com_anh_jpg_hoac_video_mp4')" :disabled="disabled" :aria-invalid="!!mediaError" class="mt-1 w-full rounded-lg border border-[#cbd9c6] bg-white px-3 py-2 text-sm" @keydown.enter.prevent="applyMedia" />
       </label>
-      <label v-if="needsMediaKind" class="block text-xs font-semibold">Chưa nhận diện được loại tệp. Chọn loại nội dung
+      <label v-if="needsMediaKind" class="block text-xs font-semibold">{{ tr('RichEditor.chua_nhan_dien_duoc_loai_tep_chon_loai_noi_dung') }}
         <select v-model="manualMediaKind" :disabled="disabled" class="mt-1 block rounded-lg border border-[#cbd9c6] bg-white px-3 py-2 text-sm">
-          <option disabled value="">Chọn ảnh hoặc video</option>
-          <option value="image">Ảnh</option>
+          <option disabled value="">{{ tr('RichEditor.chon_anh_hoac_video') }}</option>
+          <option value="image">{{ tr('RichEditor.anh') }}</option>
           <option value="video">Video</option>
         </select>
       </label>
-      <div class="text-xs text-[#24352a]/70">Video dùng link trực tiếp đến tệp, ví dụ MP4 hoặc WebM. Chọn từ kho để tự nhận diện loại tệp.</div>
-      <label class="block text-xs font-semibold">Mô tả ảnh/video (tùy chọn)
-        <input v-model="mediaDescription" type="text" placeholder="Mô tả nội dung ảnh/video" :disabled="disabled" class="mt-1 w-full rounded-lg border border-[#cbd9c6] bg-white px-3 py-2 text-sm" @keydown.enter.prevent="applyMedia" />
+      <div class="text-xs text-[#24352a]/70">{{ tr('RichEditor.video_dung_link_truc_tiep_den_tep_vi_du_mp4_hoac_webm_chon_tu_kh') }}</div>
+      <label class="block text-xs font-semibold">{{ tr('RichEditor.mo_ta_anh_video_tuy_chon') }}
+        <input v-model="mediaDescription" type="text" :placeholder="tr('RichEditor.mo_ta_noi_dung_anh_video')" :disabled="disabled" class="mt-1 w-full rounded-lg border border-[#cbd9c6] bg-white px-3 py-2 text-sm" @keydown.enter.prevent="applyMedia" />
       </label>
       <div v-if="mediaError" role="alert" class="text-xs text-red-700">{{ mediaError }}</div>
       <div class="flex flex-wrap gap-2">
-        <button type="button" :disabled="disabled || !editor" class="rounded-lg border border-[#cbd9c6] bg-white px-3 py-1.5 text-xs font-semibold hover:bg-emerald-100 disabled:opacity-40" @click="openAssets('media')">Chọn ảnh/video từ kho</button>
-        <button type="button" :disabled="disabled" class="rounded-lg bg-emerald-800 px-3 py-1.5 text-xs font-bold text-white disabled:opacity-40" @click="applyMedia">{{ editor?.isActive('image') || editor?.isActive('video') ? 'Cập nhật ảnh/video' : 'Chèn vào nội dung' }}</button>
-        <button type="button" class="rounded-lg border border-[#cbd9c6] px-3 py-1.5 text-xs" @click="mediaOpen = false">Đóng</button>
+        <button type="button" :disabled="disabled || !editor" class="rounded-lg border border-[#cbd9c6] bg-white px-3 py-1.5 text-xs font-semibold hover:bg-emerald-100 disabled:opacity-40" @click="openAssets('media')">{{ tr('RichEditor.chon_anh_video_tu_kho') }}</button>
+        <button type="button" :disabled="disabled" class="rounded-lg bg-emerald-800 px-3 py-1.5 text-xs font-bold text-white disabled:opacity-40" @click="applyMedia">{{ editor?.isActive('image') || editor?.isActive('video') ? tr('RichEditor.cap_nhat_anh_video') : tr('RichEditor.chen_vao_noi_dung') }}</button>
+        <button type="button" class="rounded-lg border border-[#cbd9c6] px-3 py-1.5 text-xs" @click="mediaOpen = false">{{ tr('ChangePasswordModal.dong') }}</button>
       </div>
     </div>
     <EditorContent :editor="editor" class="guide-editor max-h-[55dvh] overflow-y-auto text-sm leading-7" />
-    <div class="border-t border-[#cbd9c6] px-3 py-2 text-xs text-[#24352a]/65">{{ characterCount }} ký tự · Enter để xuống đoạn, Shift+Enter để xuống dòng.</div>
+    <div class="border-t border-[#cbd9c6] px-3 py-2 text-xs text-[#24352a]/65">{{ characterCount }} {{ tr('RichEditor.ky_tu_enter_de_xuong_doan_shift_enter_de_xuong_dong') }}</div>
     <Teleport to="body">
       <AssetsManagementModal v-if="assetTarget" selection-mode :z-index="60" @select="selectAsset" @close="closeAssets" />
     </Teleport>

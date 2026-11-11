@@ -1,4 +1,7 @@
 <script setup lang="ts">
+import { getFormattingLocale } from '../../../i18n';
+import { t as tr } from "../../../i18n";
+
 import { computed, onMounted, ref } from "vue";
 import Modal from "../../shared/Modal.vue";
 import Cash from "../currency/Cash.vue";
@@ -61,7 +64,7 @@ const displayGroups = computed(() => {
 
   const groups = new Map<string, typeof filteredItems.value>();
   for (const item of filteredItems.value) {
-    const category = item.category?.trim() || "Khác";
+    const category = item.category?.trim() || tr('InventoryItems.khac');
     const items = groups.get(category) ?? [];
     items.push(item);
     groups.set(category, items);
@@ -108,10 +111,10 @@ async function buyItem() {
       currencyStore.fetchCurrency(),
       inventoryStore.loadShopItems(),
     ]);
-    notice.value = `Đã mua ${quantity.value} × ${itemName}.`;
+    notice.value = tr('ShopModal.da_mua_value0_value1', { value0: quantity.value, value1: itemName });
     selectedItemId.value = null;
   } catch (err) {
-    error.value = err instanceof Error ? err.message : "Không thể mua vật phẩm. Vui lòng thử lại.";
+    error.value = err instanceof Error ? err.message : tr('ShopModal.khong_the_mua_vat_pham_vui_long_thu_lai');
   } finally {
     busy.value = false;
   }
@@ -120,8 +123,8 @@ async function buyItem() {
 
 <template>
   <Modal
-    title="Cửa hàng vật phẩm"
-    sub-title="Chọn vật phẩm và số lượng muốn mua"
+    :title="tr('ShopModal.cua_hang_vat_pham')"
+    :sub-title="tr('ShopModal.chon_vat_pham_va_so_luong_muon_mua')"
     :on-refresh="inventoryStore.loadShopItems"
   >
     <div class="grid min-h-full gap-4 lg:grid-cols-[minmax(0,1fr)_18rem] text-[#24352a]">
@@ -132,29 +135,29 @@ async function buyItem() {
           <input
             v-model="search"
             type="search"
-            placeholder="Tìm vật phẩm..."
+            :placeholder="tr('ShopModal.tim_vat_pham')"
             class="rounded-lg border border-[#cbd9c6] bg-white px-3 py-2 text-sm outline-none focus:ring-2 focus:ring-emerald-700/30"
           />
           <select
             v-model="selectedClassification"
             class="rounded-lg border border-[#cbd9c6] bg-white px-3 py-2 text-sm"
           >
-            <option value="ALL">Mọi nhóm vật phẩm</option>
+            <option value="ALL">{{ tr('ShopModal.moi_nhom_vat_pham') }}</option>
             <option v-for="value in classifications" :key="value" :value="value">{{ value }}</option>
           </select>
           <select v-model="selectedCategory" class="rounded-lg border border-[#cbd9c6] bg-white px-3 py-2 text-sm">
-            <option value="ALL">Mọi loại vật phẩm</option>
+            <option value="ALL">{{ tr('ShopModal.moi_loai_vat_pham') }}</option>
             <option v-for="value in categories" :key="value" :value="value">{{ value }}</option>
           </select>
           <select v-model="sort" class="rounded-lg border border-[#cbd9c6] bg-white px-3 py-2 text-sm">
-            <option value="name">Tên A–Z</option>
-            <option value="price-asc">Giá thấp đến cao</option>
-            <option value="price-desc">Giá cao đến thấp</option>
+            <option value="name">{{ tr('ShopModal.ten_a_z') }}</option>
+            <option value="price-asc">{{ tr('ShopModal.gia_thap_den_cao') }}</option>
+            <option value="price-desc">{{ tr('ShopModal.gia_cao_den_thap') }}</option>
           </select>
           <div
             class="flex items-center justify-end gap-1 border-t border-[#cbd9c6]/70 pt-2 sm:col-span-2 xl:col-span-4"
             role="group"
-            aria-label="Chế độ hiển thị"
+            :aria-label="tr('CaughtModal.che_do_hien_thi')"
           >
             <button
               type="button"
@@ -163,7 +166,7 @@ async function buyItem() {
               :aria-pressed="viewMode === 'list'"
               @click="viewMode = 'list'"
             >
-              Danh sách
+              {{ tr('CaughtModal.danh_sach') }}
             </button>
             <button
               type="button"
@@ -172,7 +175,7 @@ async function buyItem() {
               :aria-pressed="viewMode === 'grid'"
               @click="viewMode = 'grid'"
             >
-              Lưới
+              {{ tr('CaughtModal.luoi') }}
             </button>
             <button
               type="button"
@@ -181,18 +184,18 @@ async function buyItem() {
               :aria-pressed="viewMode === 'group'"
               @click="viewMode = 'group'"
             >
-              Nhóm
+              {{ tr('ShopModal.nhom') }}
             </button>
           </div>
         </div>
         <div v-if="inventoryStore.shopLoading" class="py-16 text-center text-sm text-emerald-900/60">
-          Đang tải vật phẩm...
+          {{ tr('ShopModal.dang_tai_vat_pham') }}
         </div>
         <div
           v-else-if="!filteredItems.length"
           class="rounded-xl border border-dashed border-[#cbd9c6] py-16 text-center text-sm text-emerald-900/60"
         >
-          Không tìm thấy vật phẩm phù hợp.
+          {{ tr('ShopModal.khong_tim_thay_vat_pham_phu_hop') }}
         </div>
         <div v-else class="space-y-5">
           <section v-for="group in displayGroups" :key="group.category || 'all-items'">
@@ -240,12 +243,12 @@ async function buyItem() {
                     class="mt-auto flex items-center justify-between gap-1 border-t border-[#cbd9c6]/70 pt-2 text-xs"
                   >
                     <span class="rounded bg-emerald-50 px-1.5 py-0.5 text-emerald-900">{{
-                      item.category || "Vật phẩm"
+                      item.category || tr('ShopModal.vat_pham')
                     }}</span>
-                    <strong class="whitespace-nowrap text-amber-700">{{ item.price.toLocaleString("vi-VN") }} đ</strong>
+                    <strong class="whitespace-nowrap text-amber-700">{{ item.price.toLocaleString(getFormattingLocale()) }} {{ tr('currency.cashUnit') }}</strong>
                   </div>
                   <div v-if="item.quantity != null" class="m-0 mt-1 text-[10px] text-emerald-950/55">
-                    Còn {{ item.quantity.toLocaleString("vi-VN") }}
+                    {{ tr('Fishfarm.con') }} {{ item.quantity.toLocaleString(getFormattingLocale()) }}
                   </div>
                 </div>
               </button>
@@ -254,7 +257,7 @@ async function buyItem() {
         </div>
       </section>
       <aside class="h-fit rounded-xl border border-[#cbd9c6] bg-[#f5f9f0] p-4 lg:sticky lg:top-0">
-        <div class="m-0 text-base font-extrabold">Đơn hàng</div>
+        <div class="m-0 text-base font-extrabold">{{ tr('ShopModal.don_hang') }}</div>
         <div v-if="selectedItem" class="mt-4">
           <div class="flex items-center gap-3">
             <div
@@ -269,11 +272,11 @@ async function buyItem() {
             </div>
             <div class="min-w-0">
               <div class="m-0 truncate font-bold">{{ selectedItem.name }}</div>
-              <div class="m-0 text-xs text-emerald-950/60">{{ selectedItem.category || "Vật phẩm" }}</div>
+              <div class="m-0 text-xs text-emerald-950/60">{{ selectedItem.category || tr('ShopModal.vat_pham') }}</div>
             </div>
           </div>
           <label class="mt-5 block text-xs font-bold"
-            >Số lượng
+            >{{ tr('ShopModal.so_luong') }}
             <input
               v-model.number="quantity"
               type="number"
@@ -284,20 +287,20 @@ async function buyItem() {
           </label>
           <div class="mt-4 space-y-2 border-t border-[#cbd9c6] pt-3 text-sm">
             <div class="flex justify-between">
-              <span>Đơn giá</span><span>{{ selectedItem.price.toLocaleString("vi-VN") }} đ</span>
+              <span>{{ tr('ShopModal.don_gia') }}</span><span>{{ selectedItem.price.toLocaleString(getFormattingLocale()) }} {{ tr('currency.cashUnit') }}</span>
             </div>
             <div class="flex justify-between font-extrabold">
-              <span>Thành tiền</span><span>{{ totalPrice.toLocaleString("vi-VN") }} đ</span>
+              <span>{{ tr('ShopModal.thanh_tien') }}</span><span>{{ totalPrice.toLocaleString(getFormattingLocale()) }} {{ tr('currency.cashUnit') }}</span>
             </div>
             <div class="flex justify-between text-xs text-emerald-900/65">
-              <span>Số dư hiện tại</span><Cash :amount="currencyStore.formattedCash" />
+              <span>{{ tr('ShopModal.so_du_hien_tai') }}</span><Cash :amount="currencyStore.formattedCash" />
             </div>
           </div>
           <div v-if="selectedItem.quantity != null && selectedItem.quantity < 1" class="mt-3 text-xs text-red-700">
-            Vật phẩm đã hết hàng.
+            {{ tr('ShopModal.vat_pham_da_het_hang') }}
           </div>
           <div v-else-if="!canBuy && quantity > 0" class="mt-3 text-xs text-red-700">
-            {{ currencyStore.cash < totalPrice ? "Bạn không đủ tiền." : "Số lượng vượt quá tồn kho." }}
+            {{ currencyStore.cash < totalPrice ? tr('ShopModal.ban_khong_du_tien') : tr('ShopModal.so_luong_vuot_qua_ton_kho') }}
           </div>
           <button
             type="button"
@@ -305,10 +308,10 @@ async function buyItem() {
             :disabled="busy || !canBuy"
             @click="buyItem"
           >
-            {{ busy ? "Đang xử lý..." : "Mua vật phẩm" }}
+            {{ busy ? tr('DailyAttendance.dang_xu_ly') : tr('ShopModal.mua_vat_pham') }}
           </button>
         </div>
-        <div v-else class="mt-4 text-sm text-emerald-950/60">Chọn một vật phẩm để xem giá và mua.</div>
+        <div v-else class="mt-4 text-sm text-emerald-950/60">{{ tr('ShopModal.chon_mot_vat_pham_de_xem_gia_va_mua') }}</div>
         <div v-if="error" class="mt-3 rounded-lg border border-red-200 bg-red-50 p-2 text-xs text-red-700">{{ error }}</div>
         <div v-if="notice" class="mt-3 rounded-lg border border-emerald-200 bg-emerald-50 p-2 text-xs text-emerald-800">
           {{ notice }}
@@ -322,17 +325,17 @@ async function buyItem() {
       class="fixed inset-0 z-[10001] flex items-center justify-center bg-black/85 p-4"
       role="dialog"
       aria-modal="true"
-      :aria-label="`Xem ảnh ${previewImage.alt}`"
+      :aria-label="tr('ShopModal.xem_anh_value0', { value0: previewImage.alt })"
       @click.self="previewImage = null"
       @keydown.esc="previewImage = null"
     >
       <button
         type="button"
         class="absolute right-4 top-4 grid size-10 place-items-center rounded-full bg-white/15 text-3xl leading-none text-white hover:bg-white/25"
-        aria-label="Đóng ảnh"
+        :aria-label="tr('ShopModal.dong_anh')"
         @click="previewImage = null"
       >
-        &times;
+        ×
       </button>
       <img
         :src="previewImage.src"

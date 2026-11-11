@@ -1,3 +1,4 @@
+import { t as tr } from "../i18n";
 import supabase from "../database/connection";
 import { supabaseAvatarRepository } from "./supabaseAvatarRepository";
 
@@ -40,7 +41,7 @@ class SupabaseFriendRepository {
       .order("created_at", { ascending: false });
 
     if (error) {
-      throw new Error(error.message || "Không thể tải danh sách quan hệ bạn bè");
+      throw new Error(error.message || tr('supabaseFriendRepository.khong_the_tai_danh_sach_quan_he_ban_be'));
     }
 
     return (data ?? []) as UserFriend[];
@@ -56,7 +57,7 @@ class SupabaseFriendRepository {
       .order("level", { ascending: false });
 
     if (error) {
-      throw new Error(error.message || "Không thể tải danh sách người chơi");
+      throw new Error(error.message || tr('supabaseFriendRepository.khong_the_tai_danh_sach_nguoi_choi'));
     }
 
     return supabaseAvatarRepository.resolveProfiles((data ?? []) as FriendUserProfile[]);
@@ -71,7 +72,7 @@ class SupabaseFriendRepository {
     });
 
     if (error) {
-      throw new Error(error.message || "Không thể gửi yêu cầu kết bạn");
+      throw new Error(error.message || tr('supabaseFriendRepository.khong_the_gui_yeu_cau_ket_ban'));
     }
   }
 
@@ -85,7 +86,7 @@ class SupabaseFriendRepository {
     });
 
     if (error) {
-      throw new Error(error.message || `Không thể ${accept ? "chấp nhận" : "từ chối"} yêu cầu`);
+      throw new Error(error.message || tr('supabaseFriendRepository.khong_the_value0_yeu_cau', { value0: accept ? tr('supabaseFriendRepository.chap_nhan') : tr('supabaseFriendRepository.tu_choi') }));
     }
   }
 
@@ -98,7 +99,7 @@ class SupabaseFriendRepository {
     });
 
     if (error) {
-      throw new Error(error.message || "Không thể hủy lời mời kết bạn");
+      throw new Error(error.message || tr('supabaseFriendRepository.khong_the_huy_loi_moi_ket_ban'));
     }
   }
 
@@ -111,7 +112,7 @@ class SupabaseFriendRepository {
     });
 
     if (error) {
-      throw new Error(error.message || "Không thể xóa bạn bè");
+      throw new Error(error.message || tr('supabaseFriendRepository.khong_the_xoa_ban_be'));
     }
   }
 
@@ -125,7 +126,7 @@ class SupabaseFriendRepository {
       .eq("id", recordId);
 
     if (error) {
-      throw new Error(error.message || "Không thể xóa yêu cầu/bạn bè");
+      throw new Error(error.message || tr('supabaseFriendRepository.khong_the_xoa_yeu_cau_ban_be'));
     }
   }
 }

@@ -1,4 +1,6 @@
 <script setup lang="ts">
+import { t as tr } from "../../../i18n";
+
 import { computed, onBeforeUnmount, onMounted, ref, watch } from "vue";
 import { useWeatherStore } from "../../../stores/weather";
 import { utcToLocalMs } from "../../../utils/time";
@@ -14,11 +16,11 @@ let timer: number | undefined;
 let lastRefetch = 0;
 
 const RARITY_LABEL: Record<string, string> = {
-  COMMON: "Thường",
-  UNCOMMON: "Không phổ biến",
-  RARE: "Hiếm",
-  EPIC: "Sử thi",
-  LEGENDARY: "Huyền thoại",
+  get COMMON() { return tr('LatestCaughtList.thuong'); },
+  get UNCOMMON() { return tr('WeatherSection.khong_pho_bien'); },
+  get RARE() { return tr('WeatherSection.hiem'); },
+  get EPIC() { return tr('WeatherSection.su_thi'); },
+  get LEGENDARY() { return tr('WeatherSection.huyen_thoai'); },
 };
 
 // Video nền theo mã thời tiết (điền đường dẫn khi có asset), ví dụ: RAIN: "/videos/weather/rain.mp4"
@@ -147,7 +149,7 @@ onBeforeUnmount(() => {
     @click.stop="open = true"
   >
     <span class="text-sm leading-none">{{ hasWeather ? weatherIcon : "🌤️" }}</span>
-    <span>{{ hasWeather ? weather?.name : "Thời tiết" }}</span>
+    <span>{{ hasWeather ? weather?.name : tr('WeatherSection.thoi_tiet') }}</span>
     <span v-if="hasWeather && weatherStore.zone?.weather_expires_at" class="tabular-nums text-emerald-700">{{
       countdown
     }}</span>
@@ -173,7 +175,7 @@ onBeforeUnmount(() => {
             : 'max-h-[90vh] w-[min(720px,100%)] border-emerald-900/15 bg-white text-emerald-950'"
           :role="inline ? 'region' : 'dialog'"
           :aria-modal="inline ? undefined : true"
-          aria-label="Thời tiết khu vực"
+          :aria-label="tr('WeatherSection.thoi_tiet_khu_vuc')"
         >
           <!-- Placeholder video thời tiết làm nền: gán WEATHER_VIDEO[code] để bật -->
           <div v-if="!inline" class="pointer-events-none absolute inset-0" aria-hidden="true">
@@ -195,10 +197,10 @@ onBeforeUnmount(() => {
             v-if="!inline"
             type="button"
             class="absolute right-3 top-3 z-10 h-8 w-8 rounded-full border border-emerald-900/15 bg-white/80 leading-none text-emerald-950 hover:bg-white"
-            aria-label="Đóng"
+            :aria-label="tr('ChangePasswordModal.dong')"
             @click="open = false"
           >
-            &times;
+            ×
           </button>
 
           <div class="relative flex min-h-0 flex-1 flex-col">
@@ -224,7 +226,7 @@ onBeforeUnmount(() => {
                   {{ weatherStore.zone?.name ?? "—" }}
                 </div>
                 <div class="truncate text-xl font-bold leading-tight">
-                  {{ hasWeather ? weather?.name : "Chưa có thông tin thời tiết" }}
+                  {{ hasWeather ? weather?.name : tr('WeatherSection.chua_co_thong_tin_thoi_tiet') }}
                 </div>
                 <span
                   v-if="hasWeather"
@@ -237,7 +239,7 @@ onBeforeUnmount(() => {
                 class="ml-auto hidden w-fit min-w-0 sm:block"
               >
                 <div class="flex items-baseline justify-between text-xs gap-2 text-emerald-800">
-                  <span>Thời tiết {{ weather?.name }} kết thúc sau: </span>
+                  <span>{{ tr('WeatherSection.thoi_tiet') }} {{ weather?.name }} {{ tr('WeatherSection.ket_thuc_sau') }} </span>
                   <b class="text-base tabular-nums text-emerald-900">{{ countdown }}</b>
                 </div>
                 <div class="mt-1 h-1.5 overflow-hidden rounded-full bg-emerald-900/10">
@@ -250,19 +252,19 @@ onBeforeUnmount(() => {
             </div>
 
             <div v-if="weatherStore.loading && !weatherStore.zone" class="px-5 py-8 text-center text-sm text-emerald-800">
-              Đang tải...
+              {{ tr('WeatherSection.dang_tai') }}
             </div>
             <div v-else-if="weatherStore.error" class="px-5 py-8 text-center text-sm text-red-600">
               {{ weatherStore.error }}
             </div>
             <div v-else-if="!weatherStore.zone" class="px-5 py-8 text-center text-sm text-emerald-800">
-              Khu vực này chưa có dữ liệu môi trường.
+              {{ tr('WeatherSection.khu_vuc_nay_chua_co_du_lieu_moi_truong') }}
             </div>
 
             <template v-else>
               <div v-if="hasWeather && weatherStore.zone?.weather_expires_at" class="px-5 pt-3 sm:hidden">
                 <div class="flex items-baseline justify-between text-xs text-emerald-800">
-                  <span>Còn lại</span>
+                  <span>{{ tr('WeatherSection.con_lai') }}</span>
                   <b class="tabular-nums text-emerald-900">{{ countdown }}</b>
                 </div>
                 <div class="mt-1 h-1.5 overflow-hidden rounded-full bg-emerald-900/10">
@@ -277,7 +279,7 @@ onBeforeUnmount(() => {
                 <div
                   class="mb-2 flex items-baseline justify-between text-[11px] font-bold uppercase tracking-widest text-emerald-800"
                 >
-                  <span>Hiệu quả đang kích hoạt</span>
+                  <span>{{ tr('WeatherSection.hieu_qua_dang_kich_hoat') }}</span>
                   <span v-if="hasWeather && modifiers.length" class="tabular-nums">{{ modifiers.length }}</span>
                 </div>
                 <TransitionGroup
@@ -311,14 +313,14 @@ onBeforeUnmount(() => {
                     </div>
                   </div>
                 </TransitionGroup>
-                <div v-else class="py-4 text-center text-sm text-emerald-800">Chưa có hiệu ứng nào.</div>
+                <div v-else class="py-4 text-center text-sm text-emerald-800">{{ tr('WeatherSection.chua_co_hieu_ung_nao') }}</div>
               </div>
 
               <div
                 v-if="weather"
                 class="border-t border-emerald-900/10 px-5 py-2 text-center text-[11px] text-emerald-800"
               >
-                Thời tiết kéo dài {{ weather.duration_min }}–{{ weather.duration_max }} phút
+                {{ tr('WeatherSection.thoi_tiet_keo_dai') }} {{ weather.duration_min }}–{{ weather.duration_max }} {{ tr('WeatherSection.phut') }}
               </div>
             </template>
           </div>

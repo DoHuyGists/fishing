@@ -1,4 +1,7 @@
 <script setup lang="ts">
+import { getFormattingLocale } from '../../../i18n';
+import { t as tr } from "../../../i18n";
+
 import { onBeforeUnmount, onMounted, ref } from "vue";
 import { useAuthStore } from "../../../stores/auth";
 import { useFeedbackStore } from "../../../stores/feedback";
@@ -8,17 +11,17 @@ import OpinionFeedbackForm from "./OpinionFeedbackForm.vue";
 import ErrorFeedbackForm from "./ErrorFeedbackForm.vue";
 import Tab from "../../shared/Tab.vue";
 
-const SUCCESS_MESSAGE = "Cảm ơn bạn đã gửi phản hồi!";
+const SUCCESS_MESSAGE = tr('Feedbackmodal.cam_on_ban_da_gui_phan_hoi');
 const modalStore = useModalStore();
 const feedbackStore = useFeedbackStore();
 const auth = useAuthStore();
 const currentActiveTab = ref<"opinion" | "error" | "history">("opinion");
-const statusLabels = { pending: 'Chờ xử lý', processing: 'Đang xử lý', resolved: 'Đã giải quyết', closed: 'Đã đóng' };
+const statusLabels = { get pending() { return tr('Feedbackmodal.cho_xu_ly'); }, get processing() { return tr('Feedbackmodal.dang_xu_ly'); }, get resolved() { return tr('Feedbackmodal.da_giai_quyet'); }, get closed() { return tr('Feedbackmodal.da_dong'); } };
 onMounted(() => feedbackStore.watchMyErrors(auth.userId));
 const tabs = [
-  { key: "opinion", label: "Góp ý" },
-  { key: "error", label: "Báo lỗi" },
-  { key: "history", label: "Báo lỗi của tôi" },
+  { key: "opinion", get label() { return tr('Feedbackmodal.gop_y'); } },
+  { key: "error", get label() { return tr('Feedbackmodal.bao_loi'); } },
+  { key: "history", get label() { return tr('Feedbackmodal.bao_loi_cua_toi'); } },
 ];
 const toastVisible = ref(false);
 let toastTimer: ReturnType<typeof setTimeout> | undefined;
@@ -50,11 +53,11 @@ onBeforeUnmount(() => {
 </script>
 
 <template>
-  <Modal title="Phản hồi" sub-title="Chia sẻ ý kiến hoặc báo lỗi để chúng tôi cải thiện trò chơi." :on-refresh="() => feedbackStore.loadMyErrors(auth.userId)">
+  <Modal :title="tr('Feedbackmodal.phan_hoi')" :sub-title="tr('Feedbackmodal.chia_se_y_kien_hoac_bao_loi_de_chung_toi_cai_thien_tro_choi')" :on-refresh="() => feedbackStore.loadMyErrors(auth.userId)">
     <div
       role="dialog"
       aria-modal="true"
-      aria-label="Gửi phản hồi"
+      :aria-label="tr('Feedbackmodal.gui_phan_hoi')"
       class="flex w-full flex-col rounded-t-2xl bg-white sm:rounded-2xl"
     >
       <Tab v-model="currentActiveTab" :tabs="tabs">
@@ -66,16 +69,16 @@ onBeforeUnmount(() => {
         </template>
         <template #history>
           <section class="space-y-3 p-4 text-sm text-[#24352a]">
-            <button type="button" class="underline" :disabled="feedbackStore.historyLoading" @click="feedbackStore.loadMyErrors(auth.userId)">Tải lại</button>
+            <button type="button" class="underline" :disabled="feedbackStore.historyLoading" @click="feedbackStore.loadMyErrors(auth.userId)">{{ tr('Fishfarm.tai_lai') }}</button>
             <div v-if="feedbackStore.historyError" role="alert" class="text-red-700">{{ feedbackStore.historyError }}</div>
-            <div v-if="feedbackStore.historyLoading">Đang tải báo lỗi…</div>
-            <div v-else-if="!feedbackStore.myErrors.length && !feedbackStore.historyError">Bạn chưa gửi báo lỗi nào.</div>
+            <div v-if="feedbackStore.historyLoading">{{ tr('Feedbackmodal.dang_tai_bao_loi') }}</div>
+            <div v-else-if="!feedbackStore.myErrors.length && !feedbackStore.historyError">{{ tr('Feedbackmodal.ban_chua_gui_bao_loi_nao') }}</div>
             <article v-for="item in feedbackStore.myErrors" :key="item.id" class="rounded-lg border border-[#cbd9c6] bg-[#f5f9f0] p-4">
               <div class="flex flex-wrap justify-between gap-2"><div class="font-bold">{{ item.title }}</div><span>{{ statusLabels[item.status] || item.status }}</span></div>
               <div class="mt-2 whitespace-pre-wrap">{{ item.description }}</div>
-              <div class="mt-2 text-xs text-gray-600">Gửi: {{ new Date(item.created_at).toLocaleString('vi-VN') }} · Cập nhật: {{ new Date(item.updated_at).toLocaleString('vi-VN') }}</div>
+              <div class="mt-2 text-xs text-gray-600">{{ tr('Feedbackmodal.gui') }} {{ new Date(item.created_at).toLocaleString(getFormattingLocale()) }} {{ tr('Feedbackmodal.cap_nhat') }} {{ new Date(item.updated_at).toLocaleString(getFormattingLocale()) }}</div>
             </article>
-            <div class="flex items-center gap-4"><button :disabled="feedbackStore.page <= 1 || feedbackStore.historyLoading" class="underline disabled:opacity-40" @click="feedbackStore.loadMyErrors(auth.userId, feedbackStore.page - 1)">Trước</button><span>Trang {{ feedbackStore.page }}</span><button :disabled="!feedbackStore.hasNext || feedbackStore.historyLoading" class="underline disabled:opacity-40" @click="feedbackStore.loadMyErrors(auth.userId, feedbackStore.page + 1)">Sau</button></div>
+            <div class="flex items-center gap-4"><button :disabled="feedbackStore.page <= 1 || feedbackStore.historyLoading" class="underline disabled:opacity-40" @click="feedbackStore.loadMyErrors(auth.userId, feedbackStore.page - 1)">{{ tr('Fishfarm.truoc') }}</button><span>{{ tr('CaughtModal.trang') }} {{ feedbackStore.page }}</span><button :disabled="!feedbackStore.hasNext || feedbackStore.historyLoading" class="underline disabled:opacity-40" @click="feedbackStore.loadMyErrors(auth.userId, feedbackStore.page + 1)">{{ tr('Fishfarm.sau') }}</button></div>
           </section>
         </template>
       </Tab>
@@ -99,7 +102,7 @@ onBeforeUnmount(() => {
     <button
       type="button"
       class="-mr-1 rounded p-1 text-gray-400 hover:text-white focus:outline-none focus-visible:ring-2 focus-visible:ring-white"
-      aria-label="Đóng thông báo"
+      :aria-label="tr('Feedbackmodal.dong_thong_bao')"
       @click="toastVisible = false"
     >
       <svg class="h-4 w-4" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true">

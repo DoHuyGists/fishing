@@ -1,3 +1,5 @@
+import { getFormattingLocale } from '../i18n';
+import { t as tr } from "../i18n";
 import { defineStore } from 'pinia'
 import { useAuthStore } from './auth'
 import { useCurrencyStore } from './currency'
@@ -35,17 +37,17 @@ function restoreRequest(owner: string): PendingAction | null {
 }
 
 function errorMessage(error: unknown): string {
-  const message = error instanceof Error ? error.message : 'Không thể thực hiện thao tác. Vui lòng thử lại.'
+  const message = error instanceof Error ? error.message : tr('aquaculture.khong_the_thuc_hien_thao_tac_vui_long_thu_lai')
   const translations: Record<string, string> = {
-    'Not enough room in fish storage': 'Kho cá không đủ chỗ. Hãy dọn kho hoặc chọn ít cá hơn.',
-    'Maximum of 5 ponds reached': 'Bạn đã sở hữu tối đa 5 ao.',
-    'Insufficient or invalid wallet balance': 'Số dư không đủ hoặc chưa hợp lệ. Hãy kiểm tra lại tiền và vỏ sò.',
-    'Catch this species at least once before farming it': 'Hãy câu được loài này ít nhất một lần trước khi nuôi.',
-    'Total fish capacity must be strictly less than pond capacity': 'Ao không đủ chỗ. Tổng sức chứa cá phải nhỏ hơn sức chứa ao.',
-    'Every selected fish must belong to you and be ready': 'Một số cá chưa trưởng thành hoặc đã rời ao. Hãy tải lại nông trại.',
-    'Not enough food for the batch': 'Không đủ thức ăn trong chồng vật phẩm đã chọn.',
-    'Pond care is on cooldown': 'Ao vẫn đang trong thời gian chờ chăm sóc.',
-    'Feeding is on cooldown or quality is already full': 'Lứa cá đang chờ lượt cho ăn hoặc chất lượng đã đầy.',
+    get 'Not enough room in fish storage'() { return tr('aquaculture.kho_ca_khong_du_cho_hay_don_kho_hoac_chon_it_ca_hon'); },
+    get 'Maximum of 5 ponds reached'() { return tr('aquaculture.ban_da_so_huu_toi_da_5_ao'); },
+    get 'Insufficient or invalid wallet balance'() { return tr('aquaculture.so_du_khong_du_hoac_chua_hop_le_hay_kiem_tra_lai_tien_va_vo_so'); },
+    get 'Catch this species at least once before farming it'() { return tr('aquaculture.hay_cau_duoc_loai_nay_it_nhat_mot_lan_truoc_khi_nuoi'); },
+    get 'Total fish capacity must be strictly less than pond capacity'() { return tr('aquaculture.ao_khong_du_cho_tong_suc_chua_ca_phai_nho_hon_suc_chua_ao'); },
+    get 'Every selected fish must belong to you and be ready'() { return tr('aquaculture.mot_so_ca_chua_truong_thanh_hoac_da_roi_ao_hay_tai_lai_nong_trai'); },
+    get 'Not enough food for the batch'() { return tr('aquaculture.khong_du_thuc_an_trong_chong_vat_pham_da_chon'); },
+    get 'Pond care is on cooldown'() { return tr('aquaculture.ao_van_dang_trong_thoi_gian_cho_cham_soc'); },
+    get 'Feeding is on cooldown or quality is already full'() { return tr('aquaculture.lua_ca_dang_cho_luot_cho_an_hoac_chat_luong_da_day'); },
   }
   return translations[message] ?? message
 }
@@ -114,7 +116,7 @@ export const useAquacultureStore = defineStore('AquaculturePlayer', {
     notifyError(message: string) {
       if (this.error === message) return
       this.error = message
-      useToast().error(message, { title: 'Nông trại cá', position: 'bottom', duration: 8000 })
+      useToast().error(message, { get title() { return tr('AquacultureModal.nong_trai_ca'); }, position: 'bottom', duration: 8000 })
     },
     resetSession(userId = '') {
       const epoch = this.epoch + 1
@@ -125,7 +127,7 @@ export const useAquacultureStore = defineStore('AquaculturePlayer', {
       if (this.ownerId !== userId) this.resetSession(userId)
       if (userId) await this.refresh(true)
     },
-    speciesName(id: string) { return this.catalog.species.find(s => s.id === id)?.name ?? 'Loài cá' },
+    speciesName(id: string) { return this.catalog.species.find(s => s.id === id)?.name ?? tr('AquacultureStockForm.loai_ca') },
     speciesImage(id: string) { return this.catalog.species.find(s => s.id === id)?.image ?? null },
     maxStock(speciesId: string): number {
       const rule = this.farm?.species.find(s => s.species_id === speciesId && s.can_stock)
@@ -209,24 +211,24 @@ export const useAquacultureStore = defineStore('AquaculturePlayer', {
         if (result.batch_id && request.action === 'stock_aquaculture_batch') this.selectedBatchId = result.batch_id
         this.selectedFishIds = []
         const notice = request.action === 'sell_aquaculture_fish'
-          ? `Đã bán cá, nhận ${Number(result.cash_earned ?? 0).toLocaleString('vi-VN')} tiền.`
-          : request.action === 'transfer_aquaculture_fish' ? 'Đã chuyển cá vào kho cá của bạn.'
-          : request.action === 'release_aquaculture_fish' ? 'Đã thả cá và giải phóng sức chứa ao.'
-          : request.action === 'purchase_pond_slot' ? 'Đã mua ao mới với 300 vỏ sò.'
-          : request.action === 'stock_aquaculture_batch' ? 'Đã thả lứa cá mới. Cá vẫn lớn khi bạn rời nông trại.'
-          : 'Đã chăm sóc, chất lượng lứa cá được tăng thêm.'
-        useToast().success(notice, { title: 'Nông trại cá', position: 'bottom' })
+          ? tr('aquaculture.da_ban_ca_nhan_value0_tien', { value0: Number(result.cash_earned ?? 0).toLocaleString(getFormattingLocale()) })
+          : request.action === 'transfer_aquaculture_fish' ? tr('aquaculture.da_chuyen_ca_vao_kho_ca_cua_ban')
+          : request.action === 'release_aquaculture_fish' ? tr('aquaculture.da_tha_ca_va_giai_phong_suc_chua_ao')
+          : request.action === 'purchase_pond_slot' ? tr('aquaculture.da_mua_ao_moi_voi_300_vo_so')
+          : request.action === 'stock_aquaculture_batch' ? tr('aquaculture.da_tha_lua_ca_moi_ca_van_lon_khi_ban_roi_nong_trai')
+          : tr('aquaculture.da_cham_soc_chat_luong_lua_ca_duoc_tang_them')
+        useToast().success(notice, { get title() { return tr('AquacultureModal.nong_trai_ca'); }, position: 'bottom' })
         this.needsRefresh = true
         const refreshed = await this.refresh(true, true)
         if (this.epoch !== epoch) return true
-        if (!refreshed) this.notifyError('Thao tác đã thành công. Hãy làm mới để cập nhật dữ liệu.')
+        if (!refreshed) this.notifyError(tr('aquaculture.thao_tac_da_thanh_cong_hay_lam_moi_de_cap_nhat_du_lieu'))
         return true
       } catch (error) {
         if (this.epoch === epoch) {
           const uncertain = !(error instanceof AquacultureRpcError) || error.uncertain
           if (!uncertain) { this.pending = null; rememberRequest(owner, null) }
           this.notifyError(uncertain
-            ? 'Chưa nhận được kết quả từ máy chủ. Nhấn “Thử lại thao tác” để kiểm tra bằng cùng mã yêu cầu, tránh trừ tiền hai lần.'
+            ? tr('aquaculture.chua_nhan_duoc_ket_qua_tu_may_chu_nhan_thu_lai_thao_tac_de_kiem_')
             : errorMessage(error))
         }
         return false
@@ -236,7 +238,7 @@ export const useAquacultureStore = defineStore('AquaculturePlayer', {
     buyPond() { return this.perform('purchase_pond_slot', {}) },
     stock(speciesId: string, quantity: number, mode: CareMode) {
       if (!Number.isInteger(quantity) || quantity < 1 || quantity > this.maxStock(speciesId)) {
-        this.notifyError('Số lượng cá vượt sức chứa còn lại hoặc số dư hiện có.'); return Promise.resolve(false)
+        this.notifyError(tr('aquaculture.so_luong_ca_vuot_suc_chua_con_lai_hoac_so_du_hien_co')); return Promise.resolve(false)
       }
       return this.perform('stock_aquaculture_batch', { p_pond_id: this.selectedPondId, p_species_id: speciesId, p_quantity: quantity, p_mode: mode })
     },

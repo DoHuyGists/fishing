@@ -1,3 +1,4 @@
+import { t as tr } from "../i18n";
 import { defineStore } from "pinia";
 import {
   supabaseFriendRepository,
@@ -93,7 +94,7 @@ export const useFriendStore = defineStore("friend", {
         this.friends = friendsData;
         this.profiles = profilesData;
       } catch (err) {
-        this.error = err instanceof Error ? err.message : "Không thể tải dữ liệu bạn bè";
+        this.error = err instanceof Error ? err.message : tr('friend.khong_the_tai_du_lieu_ban_be');
       } finally {
         this.loading = false;
       }
@@ -110,7 +111,7 @@ export const useFriendStore = defineStore("friend", {
         await this.loadData(currentUserId);
         return true;
       } catch (err) {
-        this.error = err instanceof Error ? err.message : "Gửi lời mời kết bạn thất bại";
+        this.error = err instanceof Error ? err.message : tr('friend.gui_loi_moi_ket_ban_that_bai');
         throw err;
       } finally {
         this.actionLoadingId = null;
@@ -135,7 +136,7 @@ export const useFriendStore = defineStore("friend", {
         this.error =
           err instanceof Error
             ? err.message
-            : `Không thể ${accept ? "chấp nhận" : "từ chối"} lời mời`;
+            : tr('friend.khong_the_value0_loi_moi', { value0: accept ? tr('supabaseFriendRepository.chap_nhan') : tr('supabaseFriendRepository.tu_choi') });
         throw err;
       } finally {
         this.actionLoadingId = null;
@@ -156,7 +157,7 @@ export const useFriendStore = defineStore("friend", {
         await this.loadData(currentUserId);
         return true;
       } catch (err) {
-        this.error = err instanceof Error ? err.message : "Hủy lời mời kết bạn thất bại";
+        this.error = err instanceof Error ? err.message : tr('friend.huy_loi_moi_ket_ban_that_bai');
         throw err;
       } finally {
         this.actionLoadingId = null;
@@ -177,7 +178,7 @@ export const useFriendStore = defineStore("friend", {
         await this.loadData(currentUserId);
         return true;
       } catch (err) {
-        this.error = err instanceof Error ? err.message : "Xóa bạn bè thất bại";
+        this.error = err instanceof Error ? err.message : tr('friend.xoa_ban_be_that_bai');
         throw err;
       } finally {
         this.actionLoadingId = null;
@@ -196,7 +197,7 @@ export const useFriendStore = defineStore("friend", {
         await this.loadData(currentUserId);
         return true;
       } catch (err) {
-        this.error = err instanceof Error ? err.message : "Xóa yêu cầu/bạn bè thất bại";
+        this.error = err instanceof Error ? err.message : tr('friend.xoa_yeu_cau_ban_be_that_bai');
         throw err;
       } finally {
         this.actionLoadingId = null;

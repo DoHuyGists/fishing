@@ -1,4 +1,6 @@
 <script setup lang="ts">
+import { t as tr } from "../../../i18n";
+
 import { computed, ref, watch } from "vue";
 import type { Country } from "../../../stores/country.ts";
 import BookCover, { type BookVariant } from "./BookCover.vue";
@@ -46,7 +48,7 @@ function getBookVariant(countryCode: string, speciesCount: number): BookVariant 
         <input
           v-model="searchQuery"
           type="text"
-          placeholder="🔍 Tìm quốc gia"
+          :placeholder="tr('BookShelf.tim_quoc_gia')"
           class="w-full border border-amber-700/60 rounded-xl px-3 py-1.5 text-xs focus:outline-none focus:border-amber-400 shadow-inner"
         />
         <button
@@ -71,9 +73,9 @@ function getBookVariant(countryCode: string, speciesCount: number): BookVariant 
           <div class="w-[140px] h-[190px] flex items-center justify-center overflow-hidden my-1">
             <BookCover
               :title="country.name"
-              author="Nhật Ký Câu Cá"
+              :author="tr('BookShelf.nhat_ky_cau_ca')"
               :num-up="country.code"
-              :num-down="`${getSpeciesCount(country)} loài`"
+              :num-down="tr('CaughtModal.value0_loai', { value0: getSpeciesCount(country) })"
               :variant="getBookVariant(country.code, getSpeciesCount(country))"
               :scale="0.33"
             >
@@ -93,7 +95,7 @@ function getBookVariant(countryCode: string, speciesCount: number): BookVariant 
                   ? 'bg-emerald-900/80 text-white border border-emerald-600/40'
                   : 'bg-amber-950/60 text-amber-400/70 border border-amber-900/40'
               "
-              >{{ getSpeciesCount(country) }} loài cá</span
+              >{{ getSpeciesCount(country) }} {{ tr('BookShelf.loai_ca') }}</span
             >
           </div>
         </div>
@@ -103,7 +105,7 @@ function getBookVariant(countryCode: string, speciesCount: number): BookVariant 
         class="flex flex-col items-center justify-center p-12 text-amber-300/70"
       >
         <span class="text-4xl mb-2">🔍</span>
-        <div class="font-serif text-base">Không tìm thấy quốc gia phù hợp với "{{ searchQuery }}"</div>
+        <div class="font-serif text-base">{{ tr('BookShelf.khong_tim_thay_quoc_gia_phu_hop_voi') }}{{ searchQuery }}"</div>
       </div>
     </div>
 
@@ -114,7 +116,7 @@ function getBookVariant(countryCode: string, speciesCount: number): BookVariant 
         :disabled="shelfPage === 0"
         @click="shelfPage--"
       >
-        ◀ Trang trước
+        {{ tr('BookShelf.trang_truoc') }}
       </button>
       <span class="text-amber-300 font-bold">{{ shelfPage + 1 }} / {{ totalShelfPages }}</span>
       <button
@@ -123,7 +125,7 @@ function getBookVariant(countryCode: string, speciesCount: number): BookVariant 
         :disabled="shelfPage === totalShelfPages - 1"
         @click="shelfPage++"
       >
-        Trang sau ▶
+        {{ tr('BookShelf.trang_sau') }}
       </button>
     </div>
   </div>

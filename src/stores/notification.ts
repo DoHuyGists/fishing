@@ -1,3 +1,4 @@
+import { t as tr } from "../i18n";
 import { defineStore } from "pinia";
 import type { RealtimeChannel } from "@supabase/supabase-js";
 import { supabaseNotificationRepository, type NotificationRow } from "../data/supabaseNotificationRepository";
@@ -31,7 +32,7 @@ export const useNotificationStore = defineStore("notifications", {
         this.personal = notifications.personal;
         this.system = notifications.system;
       } catch (error) {
-        if (request === this.requestId) this.loadError = error instanceof Error ? error.message : "Không thể tải thông báo.";
+        if (request === this.requestId) this.loadError = error instanceof Error ? error.message : tr('notification.khong_the_tai_thong_bao');
       } finally {
         if (request === this.requestId) this.loading = false;
       }

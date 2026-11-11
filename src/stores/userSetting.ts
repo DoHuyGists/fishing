@@ -1,3 +1,4 @@
+import { t as tr } from "../i18n";
 import { defineStore } from "pinia";
 import { ref } from "vue";
 import { supabaseUserSettingRepository } from "../data/supabaseUserSettingRepository";
@@ -26,7 +27,7 @@ export const useUserSettingStore = defineStore("userSetting", () => {
       isFishingBackgroundSoundTurnOn.value = setting?.is_fishing_background_sound_turn_on ?? true;
       ready.value = true;
     } catch {
-      if (request === revision) error.value = "Không thể tải cài đặt âm thanh. Vui lòng thử lại.";
+      if (request === revision) error.value = tr('userSetting.khong_the_tai_cai_dat_am_thanh_vui_long_thu_lai');
     } finally {
       if (request === revision) loading.value = false;
     }
@@ -45,7 +46,7 @@ export const useUserSettingStore = defineStore("userSetting", () => {
     } catch {
       if (request !== revision) return;
       isFishingBackgroundSoundTurnOn.value = previous;
-      error.value = "Không thể lưu cài đặt âm thanh. Vui lòng thử lại.";
+      error.value = tr('userSetting.khong_the_luu_cai_dat_am_thanh_vui_long_thu_lai');
     } finally {
       if (request === revision) saving.value = false;
     }

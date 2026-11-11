@@ -1,5 +1,7 @@
 
 <script setup lang="ts">
+import { t as tr } from "../../i18n";
+
 import {
   computed,
   nextTick,
@@ -321,7 +323,7 @@ onUnmounted(() => {
           }"
         >
           <div class="guide-tour__progress">
-            HƯỚNG DẪN · {{ progress }}
+            {{ tr('GuideTour.huong_dan') }} {{ progress }}
           </div>
 
           <div class="guide-tour__title">{{ activeStep.title }}</div>
@@ -332,7 +334,7 @@ onUnmounted(() => {
               class="guide-tour__skip"
               @click="emit('finish')"
             >
-              Bỏ qua
+              {{ tr('GuideTour.bo_qua') }}
             </button>
 
             <div class="guide-tour__navigation">
@@ -341,7 +343,7 @@ onUnmounted(() => {
                 class="guide-tour__back"
                 @click="previous"
               >
-                Quay lại
+                {{ tr('Forbidden.quay_lai') }}
               </button>
 
               <button
@@ -350,8 +352,8 @@ onUnmounted(() => {
               >
                 {{
                   currentIndex === steps.length - 1
-                    ? (finishLabel ?? 'Hoàn tất')
-                    : 'Tiếp theo'
+                    ? (finishLabel ?? tr('GuideTour.hoan_tat'))
+                    : tr('GuideTour.tiep_theo')
                 }}
               </button>
             </div>

@@ -1,3 +1,4 @@
+import { t as tr } from "../i18n";
 import { defineStore } from "pinia";
 import { supabaseDiaryRepository, type Species, type CaughtDiary } from "../data/supabaseDiaryRepository";
 import { supabaseSpeciesInAreaRepository, type AreaSpecies } from "../data/supabaseSpeciesInAreaRepository";
@@ -89,7 +90,7 @@ export const useDiaryStore = defineStore("diary", {
         this.discoveredAreaSpecies = [...new Map(discovered.map((fish) => [fish.id, fish])).values()];
       } catch (err) {
         if (requestId !== this.areaSpeciesRequestId) return;
-        this.areaSpeciesError = err instanceof Error ? err.message : "Không thể tải danh sách cá trong hồ.";
+        this.areaSpeciesError = err instanceof Error ? err.message : tr('PrepareModal.khong_the_tai_danh_sach_ca_trong_ho');
       } finally {
         if (requestId === this.areaSpeciesRequestId) this.isLoadingAreaSpecies = false;
       }
@@ -104,7 +105,7 @@ export const useDiaryStore = defineStore("diary", {
         this.allSpecies = speciesData;
         this.caughtDiary = caughtData;
       } catch (err: any) {
-        this.error = err?.message || "Không thể tải dữ liệu nhật ký";
+        this.error = err?.message || tr('diary.khong_the_tai_du_lieu_nhat_ky');
         console.error("Failed to init diary:", err);
       } finally {
         this.isLoading = false;
@@ -128,7 +129,7 @@ export const useDiaryStore = defineStore("diary", {
         const speciesData = await supabaseDiaryRepository.fetchSpeciesByLocation(code, name);
         this.locationSpecies = speciesData;
       } catch (err: any) {
-        this.error = err?.message || "Không thể tải danh sách cá. Vui lòng thử lại.";
+        this.error = err?.message || tr('diary.khong_the_tai_danh_sach_ca_vui_long_thu_lai');
       } finally {
         this.isLoading = false;
       }

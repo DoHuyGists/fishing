@@ -1,3 +1,4 @@
+import { t as tr } from "../i18n";
 import { defineStore } from "pinia";
 import { supabaseFishingAreaRepository, type FishingAreaRow } from "../data/supabaseFishingAreaRepository";
 import { useCountryStore } from "./country";
@@ -34,7 +35,7 @@ export const useFishingAreaStore = defineStore("fishing_areas", {
           ...group,
           areas: normalizeSearch(group.name).includes(query)
             ? group.areas
-            : group.areas.filter((area) => normalizeSearch(area.title || "Bãi câu chưa đặt tên").includes(query)),
+            : group.areas.filter((area) => normalizeSearch(area.title || tr('FishingAnchor.bai_cau_chua_dat_ten')).includes(query)),
         }))
         .filter((group) => group.areas.length > 0);
     },
@@ -53,7 +54,7 @@ export const useFishingAreaStore = defineStore("fishing_areas", {
         const countryId = countries.has(area.countryId) ? area.countryId : "";
         let group = groups.get(countryId);
         if (!group) {
-          group = { id: countryId, name: countries.get(countryId) ?? "Chưa xác định quốc gia", areas: [] };
+          group = { id: countryId, name: countries.get(countryId) ?? tr('fishingArea.chua_xac_dinh_quoc_gia'), areas: [] };
           groups.set(countryId, group);
         }
         group.areas.push(area);
@@ -76,7 +77,7 @@ export const useFishingAreaStore = defineStore("fishing_areas", {
         this.fishingAreas = await supabaseFishingAreaRepository.fetchAreas();
         this.loaded = true;
       } catch (err) {
-        this.error = err instanceof Error ? err.message : "Không thể tải trang bị từ máy chủ";
+        this.error = err instanceof Error ? err.message : tr('equipment.khong_the_tai_trang_bi_tu_may_chu');
       } finally {
         this.loading = false;
       }

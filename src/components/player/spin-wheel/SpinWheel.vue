@@ -1,4 +1,6 @@
 <script setup lang="ts">
+import { t as tr } from "../../../i18n";
+
 /**
  * SpinningWheel.vue
  * -----------------------------------------------------------------------
@@ -125,10 +127,10 @@ async function getRandomIndex(): Promise<number> {
   }
   if (props.apiUrl) {
     const res = await fetch(props.apiUrl, { method: 'POST' })
-    if (!res.ok) throw new Error(`Request thất bại (status ${res.status})`)
+    if (!res.ok) throw new Error(tr('SpinWheel.request_that_bai_status_value0', { value0: res.status }))
     const data = await res.json()
     if (typeof data?.index !== 'number') {
-      throw new Error('Response không hợp lệ, thiếu trường "index"')
+      throw new Error(tr('SpinWheel.response_khong_hop_le_thieu_truong_index'))
     }
     return data.index
   }
@@ -155,7 +157,7 @@ async function spin() {
     rotateToIndex(safeIndex)
   } catch (err) {
     spinning.value = false
-    errorMsg.value = err instanceof Error ? err.message : 'Đã có lỗi xảy ra, vui lòng thử lại.'
+    errorMsg.value = err instanceof Error ? err.message : tr('SpinWheel.da_co_loi_xay_ra_vui_long_thu_lai')
     emit('error', errorMsg.value)
   }
 }
@@ -272,16 +274,16 @@ onBeforeUnmount(() => {
           aria-labelledby="spin-confirmation-title"
         >
           <div id="spin-confirmation-title" class="m-0 text-center text-lg font-bold">
-            Xác nhận quay?
+            {{ tr('SpinWheel.xac_nhan_quay') }}
           </div>
           <div class="mt-5 space-y-3 text-sm">
             <div class="flex items-center justify-between gap-3">
-              <span>Số dư hiện tại:</span>
+              <span>{{ tr('FishSellConfirm.so_du_hien_tai') }}</span>
               <Tickets :amount="spinConfirmation.currentBalance" />
             </div>
             <hr>
             <div class="flex items-center justify-between gap-3 font-semibold">
-              <span>Tổng chi phí lượt quay:</span>
+              <span>{{ tr('SpinWheel.tong_chi_phi_luot_quay') }}</span>
               <Tickets :amount="spinConfirmation.totalCost" />
             </div>
           </div>
@@ -291,14 +293,14 @@ onBeforeUnmount(() => {
               class="rounded-lg border border-gray-300 px-4 py-2 text-sm font-semibold text-gray-700 hover:bg-gray-100"
               @click="cancelSpin"
             >
-              Hủy
+              {{ tr('AccountInfoModal.huy') }}
             </button>
             <button
               type="button"
               class="rounded-lg bg-[#153221] px-4 py-2 text-sm font-semibold text-white hover:bg-[#1a3e29]"
               @click="confirmSpin"
             >
-              Xác nhận quay
+              {{ tr('SpinWheel.xac_nhan_quay_2') }}
             </button>
           </div>
         </section>
@@ -320,14 +322,14 @@ onBeforeUnmount(() => {
               :alt="resultReward.label"
               class="mx-auto mb-4 h-24 w-24 object-contain"
             />
-            <div class="mb-1 text-sm text-slate-500">Chúc mừng bạn đã nhận được</div>
+            <div class="mb-1 text-sm text-slate-500">{{ tr('SpinWheel.chuc_mung_ban_da_nhan_duoc') }}</div>
             <div class="mb-6 text-2xl font-bold text-slate-900">{{ resultReward?.label }}</div>
             <button
               type="button"
               class="rounded-full bg-slate-900 px-6 py-2 text-sm font-semibold text-white transition-colors hover:bg-slate-700"
               @click="closeResult"
             >
-              Nhận thưởng
+              {{ tr('DailyAttendance.nhan_thuong') }}
             </button>
           </div>
         </div>

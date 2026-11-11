@@ -1,3 +1,4 @@
+import { t as tr } from "../i18n";
 import { defineStore } from "pinia";
 import type { RealtimeChannel } from "@supabase/supabase-js";
 import { supabaseZoneRepository, type ZoneWeatherRow } from "../data/supabaseZoneRepository";
@@ -27,7 +28,7 @@ export const useWeatherStore = defineStore("weather", {
         return zone;
       } catch (err) {
         if (requestId !== this.requestId) return;
-        this.error = err instanceof Error ? err.message : "Không thể tải thông tin môi trường";
+        this.error = err instanceof Error ? err.message : tr('weather.khong_the_tai_thong_tin_moi_truong');
       } finally {
         if (requestId === this.requestId) this.loading = false;
       }
@@ -48,7 +49,7 @@ export const useWeatherStore = defineStore("weather", {
           if (requestId === this.requestId) this.zone = zone;
         } catch (err) {
           if (requestId !== this.requestId) return;
-          this.error = err instanceof Error ? err.message : "Không thể cập nhật môi trường";
+          this.error = err instanceof Error ? err.message : tr('weather.khong_the_cap_nhat_moi_truong');
         }
       });
     },
@@ -61,7 +62,7 @@ export const useWeatherStore = defineStore("weather", {
         if (requestId === this.requestId) this.zone = zone;
       } catch (err) {
         if (requestId !== this.requestId) return;
-        this.error = err instanceof Error ? err.message : "Không thể cập nhật môi trường";
+        this.error = err instanceof Error ? err.message : tr('weather.khong_the_cap_nhat_moi_truong');
       }
     },
 

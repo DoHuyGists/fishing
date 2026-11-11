@@ -1,3 +1,4 @@
+import { t as tr } from "../../i18n";
 import { defineStore } from "pinia";
 import { computed, ref, watch } from "vue";
 import { useTutorialSessionStore, type TutorialSessionConfig } from "../tutorialSession";
@@ -9,13 +10,13 @@ const lessonConfig: TutorialSessionConfig = {
   fishingBoundary: [{ x: 36, y: 48 }, { x: 77, y: 48 }, { x: 83, y: 53 }, { x: 99, y: 50 },
     { x: 99, y: 95 }, { x: 66, y: 95 }, { x: 56, y: 78 }, { x: 32, y: 76 }, { x: 27, y: 57 }],
   equipment: [
-    { id: "practice-rod", tool: "rod", name: "Cần câu tập luyện", image: "/items/rod/fishing-rob.png" },
-    { id: "practice-line", tool: "line", name: "Dây câu tập luyện", image: "/items/line/Fishing Line.png" },
-    { id: "practice-reel", tool: "reel", name: "Máy câu tập luyện", image: "/items/reel/Gold Spinning Reel.png" },
-    { id: "practice-hook", tool: "hook", name: "Lưỡi câu tập luyện", image: "/items/hook/Metallic Fishing Hook.png" },
-    { id: "practice-bait", tool: "bait", name: "Mồi giun đất", image: "/items/bait/Earthworm.png" },
+    { id: "practice-rod", tool: "rod", get name() { return tr('newPlayerFishing.can_cau_tap_luyen'); }, image: "/items/rod/fishing-rob.png" },
+    { id: "practice-line", tool: "line", get name() { return tr('newPlayerFishing.day_cau_tap_luyen'); }, image: "/items/line/Fishing Line.png" },
+    { id: "practice-reel", tool: "reel", get name() { return tr('newPlayerFishing.may_cau_tap_luyen'); }, image: "/items/reel/Gold Spinning Reel.png" },
+    { id: "practice-hook", tool: "hook", get name() { return tr('newPlayerFishing.luoi_cau_tap_luyen'); }, image: "/items/hook/Metallic Fishing Hook.png" },
+    { id: "practice-bait", tool: "bait", get name() { return tr('newPlayerFishing.moi_giun_dat'); }, image: "/items/bait/Earthworm.png" },
   ],
-  fish: { name: "Cá mú tập luyện", image: "/fish/VN/Grouper.png", weight: 1.2 },
+  fish: { get name() { return tr('newPlayerFishing.ca_mu_tap_luyen'); }, image: "/fish/VN/Grouper.png", weight: 1.2 },
   waitTimeMs: 2200,
   challenge: {
     seed: 20261111,
@@ -35,17 +36,17 @@ export const useNewPlayerFishingStore = defineStore("tutorial-new-player-fishing
   const attempt = ref(0);
   const objective = computed(() => session.castPhase === "caught" ? "complete"
     : !session.equipmentConfirmed ? "equipment" : session.castPhase === "bite" ? "fight" : "cast");
-  const objectives = ["Chọn trang bị", "Quăng cần", "Kéo cá lên"];
+  const objectives = computed(() => [tr('EquipmentMenu.chon_trang_bi'), tr('NewPlayerFishing.quang_can'), tr('newPlayerFishing.keo_ca_len')]);
   const objectiveIndex = computed(() => objective.value === "equipment" ? 0 : objective.value === "cast" ? 1 : 2);
   const guideSteps = computed(() => {
-    if (objective.value === "equipment") return [{ target: "#tutorial-equipment", title: "Chuẩn bị bộ trang bị",
-      description: "Chọn lần lượt cần, dây, máy, lưỡi và mồi. Sau khi chọn đủ 5 món, nhấn Sẵn sàng. Trang bị tập luyện đã được cấp sẵn." }];
-    if (objective.value === "fight") return [{ target: "#tutorial-tension", title: "Giữ và thả để kéo cá",
-      description: "Giữ nút thu dây hoặc phím Space để kéo cá. Thả khi lực căng tăng cao. Giữ lực căng trong vùng xanh và kéo khoảng cách về 0 m. Dây quá căng sẽ đứt, quá chùng thì cá thoát." }];
-    if (["casting", "waiting"].includes(session.castPhase)) return [{ target: "#tutorial-scene", title: "Chờ cá cắn câu",
-      description: "Quan sát phao trên mặt nước. Khi cá cắn câu, phần điều khiển giằng co sẽ xuất hiện. Bạn cũng có thể thu mồi để quăng lại." }];
-    return [{ target: "#tutorial-water-target", title: "Quăng cần xuống mặt nước",
-      description: "Chạm vào mặt nước hoặc nhấn nút Quăng cần. Tránh bầu trời và bờ đá. Chờ phao báo cá cắn câu; dùng Thu mồi nếu muốn chọn lại vị trí." }];
+    if (objective.value === "equipment") return [{ target: "#tutorial-equipment", get title() { return tr('newPlayerFishing.chuan_bi_bo_trang_bi'); },
+      get description() { return tr('newPlayerFishing.chon_lan_luot_can_day_may_luoi_va_moi_sau_khi_chon_du_5_mon_nhan'); } }];
+    if (objective.value === "fight") return [{ target: "#tutorial-tension", get title() { return tr('newPlayerFishing.giu_va_tha_de_keo_ca'); },
+      get description() { return tr('newPlayerFishing.giu_nut_thu_day_hoac_phim_space_de_keo_ca_tha_khi_luc_cang_tang_'); } }];
+    if (["casting", "waiting"].includes(session.castPhase)) return [{ target: "#tutorial-scene", get title() { return tr('newPlayerFishing.cho_ca_can_cau'); },
+      get description() { return tr('newPlayerFishing.quan_sat_phao_tren_mat_nuoc_khi_ca_can_cau_phan_dieu_khien_giang'); } }];
+    return [{ target: "#tutorial-water-target", get title() { return tr('newPlayerFishing.quang_can_xuong_mat_nuoc'); },
+      get description() { return tr('newPlayerFishing.cham_vao_mat_nuoc_hoac_nhan_nut_quang_can_tranh_bau_troi_va_bo_d'); } }];
   });
 
   function showGuide() {

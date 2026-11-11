@@ -1,4 +1,6 @@
 <script setup lang="ts">
+import { t as tr } from "../i18n";
+
 import { storeToRefs } from "pinia";
 import { computed, onBeforeUnmount, onMounted, ref, watch } from "vue";
 import { onBeforeRouteLeave, useRouter } from "vue-router";
@@ -157,19 +159,19 @@ onBeforeUnmount(() => {
 </script>
 
 <template>
-  <Loading v-if="!sessionReady && !sessionError" text="Đang chuẩn bị dữ liệu câu cá" />
+  <Loading v-if="!sessionReady && !sessionError" :text="tr('FishingView.dang_chuan_bi_du_lieu_cau_ca')" />
   <section
     v-else-if="!sessionReady"
     class="flex min-h-screen flex-col items-center justify-center gap-4 bg-[#f5f9f0] px-6 text-center text-[#24352a]"
     role="alert"
   >
-    <div>Không thể chuẩn bị phiên câu: {{ sessionError }}</div>
+    <div>{{ tr('FishingView.khong_the_chuan_bi_phien_cau') }} {{ sessionError }}</div>
     <button
       type="button"
       class="rounded-lg border border-[#cbd9c6] bg-white px-4 py-2 font-medium hover:bg-[#f5f9f0]"
       @click="retrySetup"
     >
-      Thử lại
+      {{ tr('Maintenance.thu_lai') }}
     </button>
     <button
       type="button"
@@ -177,7 +179,7 @@ onBeforeUnmount(() => {
       :disabled="fishingStore.isLeavingArea"
       @click="router.push({ name: 'home' })"
     >
-      Quay lại bản đồ
+      {{ tr('FishingView.quay_lai_ban_do') }}
     </button>
   </section>
   <main v-else class="w-full h-screen overflow-hidden touch-none overscroll-none bg-[#193224] text-[#e9f4e8]">
@@ -191,7 +193,7 @@ onBeforeUnmount(() => {
             :disabled="fishingStore.isLeavingArea"
             @click="showExitConfirmation = true"
           >
-            {{ fishingStore.isLeavingArea ? "Đang quay lại..." : "Kết thúc chuyến câu" }}
+            {{ fishingStore.isLeavingArea ? tr('FishingView.dang_quay_lai') : tr('FishingView.ket_thuc_chuyen_cau') }}
           </button>
         </div>
       </div>
@@ -202,7 +204,7 @@ onBeforeUnmount(() => {
       aria-haspopup="dialog"
       @click="settingsOpen = true"
     >
-      Cài đặt
+      {{ tr('FishingView.cai_dat') }}
     </button>
     <div class="grid grid-rows-[minmax(0,1fr)_auto] w-full h-dvh">
       <FishingScene :context="sceneContext" />
@@ -216,7 +218,7 @@ onBeforeUnmount(() => {
               aria-controls="equipment-menu"
               @click="toggleEquipment"
             >
-              {{ equipmentCollapsed ? "Mở" : "Thu gọn" }}
+              {{ equipmentCollapsed ? tr('MyTeamPanel.mo') : tr('FishingView.thu_gon') }}
             </button>
           </div>
           <div id="equipment-menu" :class="{ 'equipment-menu-collapsed': equipmentCollapsed }">
@@ -226,7 +228,7 @@ onBeforeUnmount(() => {
         <TensionChallenge v-if="fishingStore.tensionChallenge" />
         <section
           v-else
-          aria-label="Trạng thái câu cá"
+          :aria-label="tr('FishingView.trang_thai_cau_ca')"
           class="flex flex-col gap-3 rounded-[15px] border border-[#cbd9c6] bg-[#f5f9f0] p-3 text-[#24352a]"
         >
           <div role="status" class="text-xs">{{ fishingStore.castMessage }}</div>
@@ -236,7 +238,7 @@ onBeforeUnmount(() => {
             :disabled="!fishingStore.canReelIn"
             @click="fishingStore.reelInBait"
           >
-            Thu mồi
+            {{ tr('NewPlayerFishing.thu_moi') }}
           </button>
         </section>
       </section>
@@ -259,10 +261,9 @@ onBeforeUnmount(() => {
             aria-modal="true"
             aria-labelledby="confirm-exit-title"
           >
-            <div id="confirm-exit-title" class="m-0 text-lg font-bold text-[#e8bd62]">Kết thúc chuyến câu?</div>
+            <div id="confirm-exit-title" class="m-0 text-lg font-bold text-[#e8bd62]">{{ tr('FishingView.ket_thuc_chuyen_cau_2') }}</div>
             <div class="my-4 text-sm text-[#c8dccb] leading-relaxed">
-              Giỏ cá hiện có <strong class="text-white">{{ fishingStore.inventory.length }}</strong> con cá. Bạn có chắc
-              chắn muốn quay lại bản đồ không?
+              {{ tr('FishingView.gio_ca_hien_co') }} <strong class="text-white">{{ fishingStore.inventory.length }}</strong> {{ tr('FishingView.con_ca_ban_co_chac_chan_muon_quay_lai_ban_do_khong') }}
             </div>
             <div v-if="fishingStore.leaveAreaError" role="alert" class="my-3 text-sm text-red-300">
               {{ fishingStore.leaveAreaError }}
@@ -273,7 +274,7 @@ onBeforeUnmount(() => {
                 class="px-4 py-2 border border-[rgba(255,255,255,0.2)] rounded-xl bg-[rgba(255,255,255,0.1)] hover:bg-[rgba(255,255,255,0.2)] text-white text-xs font-semibold transition-colors cursor-pointer"
                 @click="showExitConfirmation = false"
               >
-                Ở lại câu
+                {{ tr('FishingView.o_lai_cau') }}
               </button>
               <button
                 type="button"
@@ -281,7 +282,7 @@ onBeforeUnmount(() => {
                 :disabled="fishingStore.isLeavingArea"
                 @click="router.push({ name: 'home' })"
               >
-                {{ fishingStore.isLeavingArea ? "Đang quay lại..." : "Kết thúc chuyến câu" }}
+                {{ fishingStore.isLeavingArea ? tr('FishingView.dang_quay_lai') : tr('FishingView.ket_thuc_chuyen_cau') }}
               </button>
             </div>
           </section>
@@ -302,20 +303,20 @@ onBeforeUnmount(() => {
           class="max-h-[85dvh] w-full max-w-lg overflow-y-auto rounded-xl border border-[#cbd9c6] bg-[#f5f9f0] p-4 text-[#24352a]"
         >
           <header class="mb-4 flex items-center justify-between gap-4 border-b pb-2">
-            <dib id="fishing-settings-title" class="text-lg font-bold">Cài đặt câu cá</dib>
+            <dib id="fishing-settings-title" class="text-lg font-bold">{{ tr('FishingView.cai_dat_cau_ca') }}</dib>
             <button
               type="button"
               class="flex size-8 shrink-0 items-center justify-center rounded-full border border-[#cbd9c6] text-2xl leading-none hover:bg-[#e2ecdc]"
-              aria-label="Đóng cài đặt"
+              :aria-label="tr('FishingView.dong_cai_dat')"
               @click="settingsOpen = false"
             >
-              &times;
+              ×
             </button>
           </header>
           <div class="flex items-center justify-between gap-4">
             <div>
-              <div id="fishing-sound-label" class="font-bold text-xl">Âm thanh nền</div>
-              <div class="mt-1 text-sm">Tiếng chim ngẫu nhiên với khoảng nghỉ giữa các lượt phát.</div>
+              <div id="fishing-sound-label" class="font-bold text-xl">{{ tr('FishingView.am_thanh_nen') }}</div>
+              <div class="mt-1 text-sm">{{ tr('FishingView.tieng_chim_ngau_nhien_voi_khoang_nghi_giua_cac_luot_phat') }}</div>
             </div>
             <button
               type="button"
@@ -334,7 +335,7 @@ onBeforeUnmount(() => {
             </button>
           </div>
           <div v-if="userSettingStore.loading || userSettingStore.saving" role="status" class="mt-3 text-sm">
-            {{ userSettingStore.loading ? "Đang tải cài đặt..." : "Đang lưu cài đặt..." }}
+            {{ userSettingStore.loading ? tr('FishingView.dang_tai_cai_dat') : tr('FishingView.dang_luu_cai_dat') }}
           </div>
           <div v-if="userSettingStore.error" role="alert" class="mt-3 text-sm text-red-700">
             <div>{{ userSettingStore.error }}</div>
@@ -344,7 +345,7 @@ onBeforeUnmount(() => {
               class="mt-2 underline"
               @click="userSettingStore.load(user?.id ?? null)"
             >
-              Thử lại
+              {{ tr('Maintenance.thu_lai') }}
             </button>
           </div>
         </section>

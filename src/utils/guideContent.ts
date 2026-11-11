@@ -1,3 +1,4 @@
+import { t as tr } from "../i18n";
 import DOMPurify from "dompurify";
 
 const supportedMarkup = /<\/?(?:div|p|h[1-6]|br|strong|b|em|i|u|s|strike|a|ul|ol|li|blockquote|pre|code|hr|img|video)(?:\s[^>]*|\s*\/?)>/i;
@@ -73,7 +74,7 @@ export function sanitizeGuideContent(content: string): string {
 export function guideContentText(content: string): string {
   const template = document.createElement("template");
   template.innerHTML = sanitizeGuideContent(content);
-  template.content.querySelectorAll("img").forEach((image) => image.replaceWith(`\n[${image.getAttribute("alt")?.trim() || "Hình ảnh"}]\n`));
+  template.content.querySelectorAll("img").forEach((image) => image.replaceWith(tr('guideContent.value0', { value0: image.getAttribute("alt")?.trim() || tr('guideContent.hinh_anh') })));
   template.content.querySelectorAll("video").forEach((video) => video.replaceWith(`\n[${video.getAttribute("title")?.trim() || "Video"}]\n`));
   template.content.querySelectorAll("br").forEach((element) => element.replaceWith("\n"));
   template.content.querySelectorAll("div, li, blockquote, pre").forEach((element) => element.append("\n"));

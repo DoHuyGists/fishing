@@ -1,3 +1,4 @@
+import { t as tr } from "../i18n";
 // Phát hiện truy cập trên tab khác, đảm bảo chỉ được dùng trên một màn hình
 
 import { ref, watch, onUnmounted} from 'vue';
@@ -39,7 +40,7 @@ export function useSingleSession(userId: string) {
       } else if (event.data?.type === 'PONG') {
         // Tab mới nhận phản hồi -> Phát hiện trùng tab cùng trình duyệt
         conflictType.value = 'SAME_BROWSER';
-        modalMessage.value = 'Ứng dụng đã được mở ở một tab khác trên trình duyệt này.';
+        modalMessage.value = tr('use_single_session.ung_dung_da_duoc_mo_o_mot_tab_khac_tren_trinh_duyet_nay');
         showConflictModal.value = true;
       }
     };
@@ -83,7 +84,7 @@ export function useSingleSession(userId: string) {
           // Nếu Session ID ở DB bị đổi sang giá trị khác -> Trình duyệt cũ bị kick
           if (newSessionId !== currentSessionId) {
             conflictType.value = 'CROSS_BROWSER';
-            modalMessage.value = 'Tài khoản của bạn vừa được đăng nhập trên một trình duyệt/thiết bị khác.';
+            modalMessage.value = tr('use_single_session.tai_khoan_cua_ban_vua_duoc_dang_nhap_tren_mot_trinh_duyet_thiet_');
             showConflictModal.value = true;
           }
         }

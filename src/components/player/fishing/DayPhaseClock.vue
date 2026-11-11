@@ -1,4 +1,7 @@
 <script setup lang="ts">
+import { getFormattingLocale } from '../../../i18n';
+import { t as tr } from "../../../i18n";
+
 import { computed, onBeforeUnmount, onMounted, ref } from "vue";
 import { useDayPhaseStore } from "../../../stores/dayPhase.ts";
 import WeatherSection from "./WeatherSection.vue";
@@ -10,7 +13,7 @@ const now = ref(new Date());
 let clockTimer: number | undefined;
 
 const timeLabel = computed(() =>
-  now.value.toLocaleTimeString("vi-VN", { hour: "2-digit", minute: "2-digit", second: "2-digit" }),
+  now.value.toLocaleTimeString(getFormattingLocale(), { hour: "2-digit", minute: "2-digit", second: "2-digit" }),
 );
 
 onMounted(() => {
@@ -23,7 +26,7 @@ onBeforeUnmount(() => {
 </script>
 
 <template>
-  <section class="flex" aria-label="Thời gian và thời tiết">
+  <section class="flex" :aria-label="tr('DayPhaseClock.thoi_gian_va_thoi_tiet')">
     <div class="w-20">
       <img :src="dayPhaseStore.currentPhase.icon" :alt="dayPhaseStore.currentPhase.label" />
     </div>

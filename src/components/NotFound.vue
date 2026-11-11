@@ -1,4 +1,6 @@
 <script setup lang="ts">
+import { t as tr } from "../i18n";
+
 const goBack = () => {
   if (window.history.length > 1) window.history.back()
   else window.location.href = '/'
@@ -19,11 +21,10 @@ const goBack = () => {
       </div>
 
       <div id="error-title" class="mt-10 text-2xl font-semibold tracking-tight sm:text-3xl">
-        Không tìm thấy trang
+        {{ tr('NotFound.khong_tim_thay_trang') }}
       </div>
       <div class="mt-3 max-w-md text-base leading-relaxed text-[#24352a]/70">
-        Địa chỉ này không tồn tại hoặc đã được chuyển đi. Hãy kiểm tra lại đường dẫn
-        hoặc quay về trang trước đó.
+        {{ tr('NotFound.dia_chi_nay_khong_ton_tai_hoac_da_duoc_chuyen_di_hay_kiem_tra_la') }}
       </div>
 
       <div class="mt-8 flex flex-wrap gap-3">
@@ -31,14 +32,14 @@ const goBack = () => {
           href="/"
           class="inline-flex items-center rounded-lg border border-[#24352a] bg-[#24352a] px-5 py-2.5 text-sm font-medium text-[#f5f9f0] transition-colors hover:bg-[#24352a]/90 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#24352a]"
         >
-          Về trang chủ
+          {{ tr('Maintenance.ve_trang_chu') }}
         </a>
         <button
           type="button"
           class="inline-flex items-center rounded-lg border border-[#cbd9c6] bg-[#f5f9f0] px-5 py-2.5 text-sm font-medium text-[#24352a] transition-colors hover:bg-[#cbd9c6]/40 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#24352a]"
           @click="goBack"
         >
-          Quay lại
+          {{ tr('Forbidden.quay_lai') }}
         </button>
       </div>
     </section>

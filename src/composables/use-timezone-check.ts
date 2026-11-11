@@ -1,3 +1,4 @@
+import { t as tr } from "../i18n";
 import supabase from "../database/connection";
 
 export async function useTimezoneCheck() {
@@ -15,7 +16,7 @@ export async function useTimezoneCheck() {
 
   // 3. Xử lý kết quả
   if (data.is_tampered) {
-    alert(`Đồng hồ trên máy bạn đang lệch ${data.diff_minutes} phút so với giờ chuẩn. Vui lòng cài lại giờ tự động và thử lại.`);
+    alert(tr('use_timezone_check.dong_ho_tren_may_ban_dang_lech_value0_phut_so_voi_gio_chuan_vui_', { value0: data.diff_minutes }));
     window.location.reload();
     return;
   }

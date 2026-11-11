@@ -1,3 +1,4 @@
+import { t as tr } from "../i18n";
 import supabase from "../database/connection";
 import { formatTime } from "../utils/time";
 
@@ -62,7 +63,7 @@ class SupabaseMissionRepository {
   async fetchDailyMissions(): Promise<DailyMissionData> {
     const { data, error } = await supabase.rpc("get_daily_missions");
     if (error) throw new Error(error.message);
-    if (!data) throw new Error("Không có dữ liệu nhiệm vụ hằng ngày.");
+    if (!data) throw new Error(tr('supabaseMissionRepository.khong_co_du_lieu_nhiem_vu_hang_ngay'));
     return data as DailyMissionData;
   }
 

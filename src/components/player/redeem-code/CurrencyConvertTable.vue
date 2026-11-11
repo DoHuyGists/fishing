@@ -1,4 +1,7 @@
 <script setup lang="ts">
+import { getFormattingLocale } from '../../../i18n';
+import { t as tr } from "../../../i18n";
+
 import { onMounted, ref } from "vue";
 import { useCurrencyStore } from "../../../stores/currency";
 import { useToast } from "../../../composables/useToast";
@@ -33,7 +36,7 @@ async function confirmConversion() {
   if (!currencyStore.canConvert(pending.rate)
     || currencyStore.conversionAmounts(pending.rate).batches !== pending.batches) {
     pendingConversion.value = null;
-    toast.warning("Thông tin quy đổi đã thay đổi. Vui lòng kiểm tra số gói và số dư rồi thử lại.");
+    toast.warning(tr('CurrencyConvertTable.thong_tin_quy_doi_da_thay_doi_vui_long_kiem_tra_so_goi_va_so_du_'));
     return;
   }
   await currencyStore.convertCurrency(pending.rate);
@@ -47,26 +50,26 @@ onMounted(() => {
 </script>
 
 <template>
-  <section aria-label="Quy đổi tiền tệ" class="min-w-0 w-full rounded-2xl border border-[#cbd9c6] bg-[#f5f9f0] p-4 text-[#24352a] sm:p-6">
-    <div class="text-lg font-bold">Quy đổi tiền tệ</div>
-    <div class="mt-1 text-sm">Chọn số gói muốn đổi. Mỗi gói áp dụng theo mệnh giá trong bảng.</div>
+  <section :aria-label="tr('CurrencyConvertTable.quy_doi_tien_te')" class="min-w-0 w-full rounded-2xl border border-[#cbd9c6] bg-[#f5f9f0] p-4 text-[#24352a] sm:p-6">
+    <div class="text-lg font-bold">{{ tr('CurrencyConvertTable.quy_doi_tien_te') }}</div>
+    <div class="mt-1 text-sm">{{ tr('CurrencyConvertTable.chon_so_goi_muon_doi_moi_goi_ap_dung_theo_menh_gia_trong_bang') }}</div>
 
-    <div v-if="currencyStore.conversionRatesLoading" role="status" class="mt-4 text-sm">Đang tải tỷ giá...</div>
+    <div v-if="currencyStore.conversionRatesLoading" role="status" class="mt-4 text-sm">{{ tr('CurrencyConvertTable.dang_tai_ty_gia') }}</div>
     <div v-else-if="currencyStore.conversionRatesError" role="alert" class="mt-4 text-sm text-red-700">
       {{ currencyStore.conversionRatesError }}
-      <button type="button" class="ml-2 underline" @click="currencyStore.fetchConversionRates()">Thử lại</button>
+      <button type="button" class="ml-2 underline" @click="currencyStore.fetchConversionRates()">{{ tr('Maintenance.thu_lai') }}</button>
     </div>
-    <div v-else-if="!currencyStore.conversionRates.length" class="mt-4 text-sm">Chưa có tỷ giá quy đổi được kích hoạt.</div>
+    <div v-else-if="!currencyStore.conversionRates.length" class="mt-4 text-sm">{{ tr('CurrencyConvertTable.chua_co_ty_gia_quy_doi_duoc_kich_hoat') }}</div>
     <div v-else class="mt-5 overflow-x-auto">
       <table class="w-full min-w-[680px] text-left text-sm">
-        <caption class="sr-only">Mệnh giá và số lượng quy đổi tiền, vỏ sò và vé</caption>
+        <caption class="sr-only">{{ tr('CurrencyConvertTable.menh_gia_va_so_luong_quy_doi_tien_vo_so_va_ve') }}</caption>
         <thead>
           <tr class="border-b border-[#cbd9c6]">
-            <th scope="col" class="w-[20%] whitespace-nowrap px-2 py-3">Chi mỗi gói</th>
-            <th scope="col" class="w-[18%] whitespace-nowrap px-2 py-3">Nhận mỗi gói</th>
-            <th scope="col" class="w-[16%] whitespace-nowrap px-2 py-3">Số gói</th>
-            <th scope="col" class="px-2 py-3">Tổng quy đổi</th>
-            <th scope="col" class="w-px px-2 py-3"><span class="sr-only">Thao tác</span></th>
+            <th scope="col" class="w-[20%] whitespace-nowrap px-2 py-3">{{ tr('CurrencyConvertTable.chi_moi_goi') }}</th>
+            <th scope="col" class="w-[18%] whitespace-nowrap px-2 py-3">{{ tr('CurrencyConvertTable.nhan_moi_goi') }}</th>
+            <th scope="col" class="w-[16%] whitespace-nowrap px-2 py-3">{{ tr('CurrencyConvertTable.so_goi') }}</th>
+            <th scope="col" class="px-2 py-3">{{ tr('CurrencyConvertTable.tong_quy_doi') }}</th>
+            <th scope="col" class="w-px px-2 py-3"><span class="sr-only">{{ tr('CurrencyConvertTable.thao_tac') }}</span></th>
           </tr>
         </thead>
         <tbody>
@@ -78,7 +81,7 @@ onMounted(() => {
                 :id="`convert-${rate.source_currency}-${rate.target_currency}`"
                 v-model.number="currencyStore.conversionBatches[`${rate.source_currency}-${rate.target_currency}`]"
                 type="number" min="1" step="1"
-                :aria-label="`Số gói ${rate.source_currency} sang ${rate.target_currency}`"
+                :aria-label="tr('CurrencyConvertTable.so_goi_value0_sang_value1', { value0: rate.source_currency, value1: rate.target_currency })"
                 :disabled="currencyStore.converting || !!pendingConversion"
                 class="min-h-11 w-20 rounded-lg border border-[#cbd9c6] bg-white px-2 py-2 outline-none focus:border-emerald-700 focus:ring-2 focus:ring-emerald-700/15 disabled:opacity-50"
               />
@@ -86,14 +89,14 @@ onMounted(() => {
             <td class="px-2 py-3">
               <div v-if="currencyStore.hasValidConversionAmounts(rate)" class="flex items-center gap-1 whitespace-nowrap">
                 <component :is="currencies[rate.source_currency]" :amount="currencyStore.conversionAmounts(rate).cost" :size="20" />
-                <span aria-label="đổi thành">→</span>
+                <span :aria-label="tr('CurrencyConvertTable.doi_thanh')">→</span>
                 <component :is="currencies[rate.target_currency]" :amount="currencyStore.conversionAmounts(rate).received" :size="20" />
               </div>
-              <span v-else class="text-xs text-red-700">Số gói phải là số nguyên dương và tổng quy đổi trong giới hạn cho phép.</span>
+              <span v-else class="text-xs text-red-700">{{ tr('CurrencyConvertTable.so_goi_phai_la_so_nguyen_duong_va_tong_quy_doi_trong_gioi_han_ch') }}</span>
             </td>
             <td class="px-2 py-3">
               <button type="button" :disabled="!currencyStore.canConvert(rate) || !!pendingConversion" class="min-h-11 whitespace-nowrap rounded-lg bg-emerald-800 px-3 py-2 font-bold text-white hover:bg-emerald-900 disabled:cursor-not-allowed disabled:opacity-50" @click="requestConversion(rate)">
-                {{ currencyStore.converting ? "Đang đổi..." : "Quy đổi" }}
+                {{ currencyStore.converting ? tr('CurrencyConvertTable.dang_doi') : tr('CurrencyConvertTable.quy_doi') }}
               </button>
             </td>
           </tr>
@@ -102,15 +105,15 @@ onMounted(() => {
     </div>
     <div v-if="currencyStore.error" role="alert" class="mt-4 text-sm text-red-700">
       {{ currencyStore.error }}
-      <button type="button" class="ml-2 underline" :disabled="currencyStore.loading" @click="currencyStore.fetchCurrency()">Tải lại số dư</button>
+      <button type="button" class="ml-2 underline" :disabled="currencyStore.loading" @click="currencyStore.fetchCurrency()">{{ tr('CurrencyConvertTable.tai_lai_so_du') }}</button>
     </div>
   </section>
   <Teleport to="body">
     <TwoOptionsModal
       v-if="pendingConversion"
-      title="Xác nhận quy đổi"
-      first-text="Hủy"
-      :second-text="currencyStore.converting ? 'Đang đổi...' : 'Xác nhận'"
+      :title="tr('CurrencyConvertTable.xac_nhan_quy_doi')"
+      :first-text="tr('AccountInfoModal.huy')"
+      :second-text="currencyStore.converting ? tr('CurrencyConvertTable.dang_doi') : tr('Fishfarm.xac_nhan')"
       :first-disabled="currencyStore.converting"
       :second-disabled="currencyStore.converting || !currencyStore.canConvert(pendingConversion.rate)"
       :on-first="dismissConfirmation"
@@ -118,10 +121,10 @@ onMounted(() => {
       :on-dismiss="dismissConfirmation"
     >
       <div class="space-y-3 text-sm text-[#24352a]">
-        <div>Bạn muốn quy đổi {{ pendingConversion.batches.toLocaleString('vi-VN') }} gói?</div>
+        <div>{{ tr('CurrencyConvertTable.ban_muon_quy_doi') }} {{ pendingConversion.batches.toLocaleString(getFormattingLocale()) }} {{ tr('CurrencyConvertTable.goi') }}</div>
         <div class="flex flex-wrap items-center gap-2 rounded-lg border border-[#cbd9c6] bg-[#f5f9f0] p-3">
           <component :is="currencies[pendingConversion.rate.source_currency]" :amount="pendingConversion.cost" :size="22" />
-          <span aria-label="đổi thành">→</span>
+          <span :aria-label="tr('CurrencyConvertTable.doi_thanh')">→</span>
           <component :is="currencies[pendingConversion.rate.target_currency]" :amount="pendingConversion.received" :size="22" />
         </div>
       </div>

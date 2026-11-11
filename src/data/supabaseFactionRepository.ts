@@ -1,3 +1,4 @@
+import { t as tr } from "../i18n";
 import supabase from "../database/connection";
 
 export type FactionEffectType = "BUFF" | "DEBUFF" | "UNIQUE";
@@ -165,7 +166,7 @@ class SupabaseFactionRepository {
       .select("faction_id");
 
     if (error) {
-      throw new Error(`Không thể lấy số lượng thành viên phe: ${error.message}`);
+      throw new Error(tr('supabaseFactionRepository.khong_the_lay_so_luong_thanh_vien_phe_value0', { value0: error.message }));
     }
 
     if (!data) return {};

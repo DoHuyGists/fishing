@@ -1,4 +1,6 @@
 <script lang="ts" setup>
+import { t as tr } from "../i18n";
+
 import { computed, defineAsyncComponent, ref } from "vue";
 import { useAdminGuideStore } from "../stores/adminGuide";
 
@@ -110,196 +112,196 @@ interface ModuleGroup {
 
 const groups: ModuleGroup[] = [
   {
-    title: "Nuôi cá",
+    get title() { return tr('AdminView.nuoi_ca'); },
     modules: [
       {
         key: "aquacultureSpecies",
         icon: "🐟",
-        label: "Cấu hình loài nuôi",
-        desc: "Sức chứa, thời gian nuôi, giá giống, giá bán và tỷ lệ cá đặc biệt.",
+        get label() { return tr('AdminView.cau_hinh_loai_nuoi'); },
+        get desc() { return tr('AdminView.suc_chua_thoi_gian_nuoi_gia_giong_gia_ban_va_ty_le_ca_dac_biet'); },
         component: moduleComponents.aquacultureSpecies,
       },
       {
         key: "aquacultureFood",
         icon: "🌾",
-        label: "Thức ăn theo loài",
-        desc: "Liên kết vật phẩm thức ăn và mức tăng chất lượng cho từng loài.",
+        get label() { return tr('AdminView.thuc_an_theo_loai'); },
+        get desc() { return tr('AdminView.lien_ket_vat_pham_thuc_an_va_muc_tang_chat_luong_cho_tung_loai'); },
         component: moduleComponents.aquacultureFood,
       },
     ],
   },
   {
-    title: "Dữ liệu trò chơi",
+    get title() { return tr('AdminView.du_lieu_tro_choi'); },
     modules: [
       {
         key: "assets",
         icon: "🖼️",
-        label: "Ảnh & video",
-        desc: "Tải lên, xem trước và sao chép link ảnh, video từ Storage.",
+        get label() { return tr('AdminView.anh_video'); },
+        get desc() { return tr('AdminView.tai_len_xem_truoc_va_sao_chep_link_anh_video_tu_storage'); },
         component: moduleComponents.assets,
       },
       {
         key: "blueprint",
         icon: "🛠️",
-        label: "Công thức chế tạo",
-        desc: "Quản lý bản vẽ, nguyên liệu, thành phẩm và phí chế tạo.",
+        get label() { return tr('AdminView.cong_thuc_che_tao'); },
+        get desc() { return tr('AdminView.quan_ly_ban_ve_nguyen_lieu_thanh_pham_va_phi_che_tao'); },
         component: moduleComponents.blueprint,
       },
       {
         key: "skill",
         icon: "✨",
-        label: "Kỹ năng",
-        desc: "Quản lý kỹ năng, cấp tối đa và hiệu ứng mỗi cấp.",
+        get label() { return tr('SkillModal.ky_nang'); },
+        get desc() { return tr('AdminView.quan_ly_ky_nang_cap_toi_da_va_hieu_ung_moi_cap'); },
         component: moduleComponents.skill,
       },
       {
         key: "area",
         icon: "🗺️",
-        label: "Bãi câu",
-        desc: "Thêm, sửa và xoá các bãi câu trong game.",
+        get label() { return tr('AdminView.bai_cau'); },
+        get desc() { return tr('AdminView.them_sua_va_xoa_cac_bai_cau_trong_game'); },
         component: moduleComponents.area,
       },
       {
         key: "depthScope",
         icon: "🗺️",
-        label: "Độ sâu",
-        desc: "Thêm, sửa và xoá các độ sâu cá ở.",
+        get label() { return tr('AdminView.do_sau'); },
+        get desc() { return tr('AdminView.them_sua_va_xoa_cac_do_sau_ca_o'); },
         component: moduleComponents.depthScope,
       },
       {
         key: "item",
         icon: "🎒",
-        label: "Vật phẩm",
-        desc: "Quản lý cần câu, mồi và các vật phẩm khác.",
+        get label() { return tr('ShopModal.vat_pham'); },
+        get desc() { return tr('AdminView.quan_ly_can_cau_moi_va_cac_vat_pham_khac'); },
         component: moduleComponents.item,
       },
       {
         key: "redeemCode",
         icon: "🎟️",
-        label: "Mã đổi thưởng",
-        desc: "Tạo mã nhận xu, đặt hạn dùng và bật hoặc tắt mã.",
+        get label() { return tr('RedeemCodeForm.ma_doi_thuong'); },
+        get desc() { return tr('AdminView.tao_ma_nhan_xu_dat_han_dung_va_bat_hoac_tat_ma'); },
         component: moduleComponents.redeemCode,
       },
       {
         key: "hourMission",
         icon: "⏰",
-        label: "Nhiệm vụ giờ",
-        desc: "Quản lý nhiệm vụ câu cá theo khung giờ và phần thưởng.",
+        get label() { return tr('AdminView.nhiem_vu_gio'); },
+        get desc() { return tr('AdminView.quan_ly_nhiem_vu_cau_ca_theo_khung_gio_va_phan_thuong'); },
         component: moduleComponents.hourMission,
       },
       {
         key: "dailyMissionTemplates",
         icon: "📋",
-        label: "Mẫu nhiệm vụ hằng ngày",
-        desc: "Quản lý mục tiêu, điểm, độ khó và cấu hình nhiệm vụ hằng ngày.",
+        get label() { return tr('AdminView.mau_nhiem_vu_hang_ngay'); },
+        get desc() { return tr('AdminView.quan_ly_muc_tieu_diem_do_kho_va_cau_hinh_nhiem_vu_hang_ngay'); },
         component: moduleComponents.dailyMissionTemplates,
       },
       {
         key: "dailyMissionRewards",
         icon: "🎁",
-        label: "Phần thưởng nhiệm vụ hằng ngày",
-        desc: "Thiết lập mốc điểm và phần thưởng nhiệm vụ hằng ngày.",
+        get label() { return tr('AdminView.phan_thuong_nhiem_vu_hang_ngay'); },
+        get desc() { return tr('AdminView.thiet_lap_moc_diem_va_phan_thuong_nhiem_vu_hang_ngay'); },
         component: moduleComponents.dailyMissionRewards,
       },
       {
         key: "notifications",
         icon: "🔔",
-        label: "Thông báo",
-        desc: "Tạo và quản lý thông báo cá nhân, thông báo hệ thống.",
+        get label() { return tr('NotificationModal.thong_bao'); },
+        get desc() { return tr('AdminView.tao_va_quan_ly_thong_bao_ca_nhan_thong_bao_he_thong'); },
         component: moduleComponents.notifications,
       },
       {
         key: "guides",
         icon: "📖",
-        label: "Hướng dẫn người chơi",
-        desc: "Soạn nội dung, sắp xếp và quản lý trạng thái xuất bản hướng dẫn.",
+        get label() { return tr('AdminView.huong_dan_nguoi_choi'); },
+        get desc() { return tr('AdminView.soan_noi_dung_sap_xep_va_quan_ly_trang_thai_xuat_ban_huong_dan'); },
         component: moduleComponents.guides,
       },
       {
         key: "fishingPass",
         icon: "🎫",
-        label: "Vé câu",
-        desc: "Quản lý giá, thời hạn và trạng thái vé câu.",
+        get label() { return tr('AdminView.ve_cau'); },
+        get desc() { return tr('AdminView.quan_ly_gia_thoi_han_va_trang_thai_ve_cau'); },
         component: moduleComponents.fishingPass,
       },
       {
         key: "fishingPassRewards",
         icon: "🎁",
-        label: "Phần thưởng vé câu",
-        desc: "Thiết lập vật phẩm FREE và PREMIUM theo từng ngày của vé.",
+        get label() { return tr('AdminView.phan_thuong_ve_cau'); },
+        get desc() { return tr('AdminView.thiet_lap_vat_pham_free_va_premium_theo_tung_ngay_cua_ve'); },
         component: moduleComponents.fishingPassRewards,
       },
       {
         key: "species",
         icon: "🐟",
-        label: "Loài cá",
-        desc: "Chỉnh thông tin và thuộc tính của từng loài cá.",
+        get label() { return tr('AquacultureStockForm.loai_ca'); },
+        get desc() { return tr('AdminView.chinh_thong_tin_va_thuoc_tinh_cua_tung_loai_ca'); },
         component: moduleComponents.species,
       },
       {
         key: "speciesInArea",
         icon: "🎯",
-        label: "Cá theo bãi câu",
-        desc: "Chọn loài cá xuất hiện ở mỗi bãi câu.",
+        get label() { return tr('AdminView.ca_theo_bai_cau'); },
+        get desc() { return tr('AdminView.chon_loai_ca_xuat_hien_o_moi_bai_cau'); },
         component: moduleComponents.speciesInArea,
       },
     ],
   },
   {
-    title: "Thời tiết",
+    get title() { return tr('WeatherSection.thoi_tiet'); },
     modules: [
       {
         key: "zone",
         icon: "🌊",
-        label: "Vùng",
-        desc: "Quản lý các vùng câu và thời tiết hiện tại.",
+        get label() { return tr('AdminView.vung'); },
+        get desc() { return tr('AdminView.quan_ly_cac_vung_cau_va_thoi_tiet_hien_tai'); },
         component: moduleComponents.zone,
       },
       {
         key: "weather",
         icon: "⛅",
-        label: "Thời tiết",
-        desc: "Quản lý các loại thời tiết và thời lượng.",
+        get label() { return tr('WeatherSection.thoi_tiet'); },
+        get desc() { return tr('AdminView.quan_ly_cac_loai_thoi_tiet_va_thoi_luong'); },
         component: moduleComponents.weather,
       },
       {
         key: "zoneWeather",
         icon: "🌦️",
-        label: "Thời tiết theo vùng",
-        desc: "Chọn thời tiết được phép ở mỗi vùng.",
+        get label() { return tr('AdminView.thoi_tiet_theo_vung'); },
+        get desc() { return tr('AdminView.chon_thoi_tiet_duoc_phep_o_moi_vung'); },
         component: moduleComponents.zoneWeather,
       },
       {
         key: "modifier",
         icon: "📊",
-        label: "Chỉ số",
-        desc: "Quản lý các chỉ số (modifiers).",
+        get label() { return tr('AdminView.chi_so'); },
+        get desc() { return tr('AdminView.quan_ly_cac_chi_so_modifiers'); },
         component: moduleComponents.modifier,
       },
       {
         key: "weatherModifier",
         icon: "🎚️",
-        label: "Chỉ số theo thời tiết",
-        desc: "Cấu hình khoảng giá trị chỉ số của thời tiết.",
+        get label() { return tr('AdminView.chi_so_theo_thoi_tiet'); },
+        get desc() { return tr('AdminView.cau_hinh_khoang_gia_tri_chi_so_cua_thoi_tiet'); },
         component: moduleComponents.weatherModifier,
       },
     ],
   },
   {
-    title: "Sự kiện",
+    get title() { return tr('EventModal.su_kien_2'); },
     modules: [
       {
         key: "event",
         icon: "🎉",
-        label: "Sự kiện",
-        desc: "Tạo và cập nhật nội dung các sự kiện.",
+        get label() { return tr('EventModal.su_kien_2'); },
+        get desc() { return tr('AdminView.tao_va_cap_nhat_noi_dung_cac_su_kien'); },
         component: moduleComponents.event,
       },
       {
         key: "schedule",
         icon: "🗓️",
-        label: "Lịch sự kiện",
-        desc: "Đặt thời gian bắt đầu và kết thúc cho sự kiện.",
+        get label() { return tr('AdminView.lich_su_kien'); },
+        get desc() { return tr('AdminView.dat_thoi_gian_bat_dau_va_ket_thuc_cho_su_kien'); },
         component: moduleComponents.schedule,
       },
     ],
@@ -339,13 +341,13 @@ const close = () => {
       class="hidden lg:sticky lg:top-0 lg:flex lg:h-dvh lg:w-64 lg:shrink-0 lg:self-start flex-col overflow-hidden bg-[#153221] text-emerald-50"
     >
       <div class="shrink-0 px-6 py-5 border-b border-white/10">
-        <div class="text-lg font-extrabold leading-tight">Quản trị</div>
-        <div class="text-xs text-emerald-200/70 mt-0.5">Hệ thống câu cá</div>
+        <div class="text-lg font-extrabold leading-tight">{{ tr('AdminView.quan_tri') }}</div>
+        <div class="text-xs text-emerald-200/70 mt-0.5">{{ tr('AdminView.he_thong_cau_ca') }}</div>
       </div>
 
       <nav
         class="min-h-0 flex-1 overflow-y-auto overscroll-contain px-3 py-4 space-y-5"
-        aria-label="Điều hướng quản trị"
+        :aria-label="tr('AdminView.dieu_huong_quan_tri')"
       >
         <section v-for="group in groups" :key="group.title">
           <div class="px-3 mb-1.5 text-xs font-semibold text-emerald-200/60">{{ group.title }}</div>
@@ -375,8 +377,8 @@ const close = () => {
         class="bg-white border-b border-slate-200 px-5 py-4 sm:px-8 flex flex-wrap items-center gap-4 justify-between"
       >
         <div>
-          <div class="text-xl font-extrabold text-[#153221]">Bảng điều khiển</div>
-          <div class="text-sm text-slate-500">Chọn một mục để quản lý dữ liệu.</div>
+          <div class="text-xl font-extrabold text-[#153221]">{{ tr('AdminView.bang_dieu_khien') }}</div>
+          <div class="text-sm text-slate-500">{{ tr('AdminView.chon_mot_muc_de_quan_ly_du_lieu') }}</div>
         </div>
 
         <div class="flex w-full flex-col gap-3 sm:w-auto sm:flex-row sm:flex-wrap sm:items-center sm:justify-end">
@@ -387,7 +389,7 @@ const close = () => {
             :aria-expanded="monitorOpen"
             @click="monitorOpen = true"
           >
-            📊 Giám sát bãi câu
+            {{ tr('AdminView.giam_sat_bai_cau') }}
           </button>
           <button
             type="button"
@@ -396,28 +398,28 @@ const close = () => {
             :aria-expanded="guideStore.isOpen"
             @click="guideStore.open"
           >
-            📘 Hướng dẫn quản trị
+            {{ tr('AdminView.huong_dan_quan_tri') }}
           </button>
           <button
             type="button"
             class="rounded-lg bg-emerald-700 px-4 py-2 text-sm font-semibold text-white hover:bg-emerald-800 focus-visible:outline-2 focus-visible:outline-emerald-600"
             @click="feedbackModal = 'opinion'"
           >
-            Xem góp ý
+            {{ tr('AdminView.xem_gop_y') }}
           </button>
           <button
             type="button"
             class="rounded-lg bg-amber-600 px-4 py-2 text-sm font-semibold text-white hover:bg-amber-700 focus-visible:outline-2 focus-visible:outline-amber-600"
             @click="feedbackModal = 'errors'"
           >
-            Xử lý báo lỗi
+            {{ tr('AdminView.xu_ly_bao_loi') }}
           </button>
           <label class="relative w-full sm:w-72">
-            <span class="sr-only">Tìm mục quản lý</span>
+            <span class="sr-only">{{ tr('AdminView.tim_muc_quan_ly') }}</span>
             <input
               v-model="keyword"
               type="search"
-              placeholder="Tìm mục quản lý..."
+              :placeholder="tr('AdminView.tim_muc_quan_ly_2')"
               class="w-full rounded-lg border border-slate-300 bg-white py-2 pl-9 pr-3 text-sm placeholder:text-slate-400 focus:border-emerald-600 focus:outline-none focus:ring-2 focus:ring-emerald-600/25"
             />
             <span class="pointer-events-none absolute left-3 top-1/2 -translate-y-1/2 text-slate-400" aria-hidden="true"
@@ -446,7 +448,7 @@ const close = () => {
                 {{ m.icon }}
               </span>
               <span class="min-w-0">
-                <span class="block text-sm font-bold text-[#153221]">Quản lý {{ m.label.toLowerCase() }}</span>
+                <span class="block text-sm font-bold text-[#153221]">{{ tr('AdminView.quan_ly') }} {{ m.label.toLowerCase() }}</span>
                 <span class="mt-1 block text-sm text-slate-500">{{ m.desc }}</span>
               </span>
             </button>
@@ -457,7 +459,7 @@ const close = () => {
           v-if="filteredGroups.length === 0"
           class="rounded-xl border border-dashed border-slate-300 bg-white p-8 text-center text-sm text-slate-500"
         >
-          Không có mục nào khớp với "{{ keyword }}". Hãy thử từ khoá khác.
+          {{ tr('AdminView.khong_co_muc_nao_khop_voi') }}{{ keyword }}{{ tr('AdminView.hay_thu_tu_khoa_khac') }}
         </div>
       </div>
     </main>

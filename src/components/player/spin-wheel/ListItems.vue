@@ -4,7 +4,7 @@
   >
     <header class="border-b border-[#cbd9c6] px-4 py-0">
       <div class="py-3 text-sm font-semibold">
-        Phần thưởng theo mùa · Nhấn vật phẩm để xem thông tin
+        {{ tr('ListItems.phan_thuong_theo_mua_nhan_vat_pham_de_xem_thong_tin') }}
       </div>
     </header>
 
@@ -26,17 +26,17 @@
         <input
           v-model="searchQuery"
           type="search"
-          placeholder="Tìm vật phẩm..."
-          aria-label="Tìm vật phẩm"
+          :placeholder="tr('ShopModal.tim_vat_pham')"
+          :aria-label="tr('ListItems.tim_vat_pham')"
           class="h-10 w-full min-w-0 bg-transparent text-sm text-[#24352a] outline-none placeholder:text-[#718174]"
         />
       </label>
       <select
         v-model="selectedCategory"
-        aria-label="Lọc theo loại vật phẩm"
+        :aria-label="tr('ListItems.loc_theo_loai_vat_pham')"
         class="h-10 max-w-36 rounded-lg border border-[#cbd9c6] bg-white px-2 text-sm text-[#24352a] outline-none focus:border-emerald-700"
       >
-        <option value="all">Tất cả loại</option>
+        <option value="all">{{ tr('ListItems.tat_ca_loai') }}</option>
         <option v-for="category in categories" :key="category" :value="category">{{ category }}</option>
       </select>
     </div>
@@ -48,7 +48,7 @@
         role="status"
       >
         <span class="h-5 w-5 animate-spin rounded-full border-2 border-emerald-700/25 border-t-emerald-700" />
-        Đang tải vật phẩm...
+        {{ tr('ShopModal.dang_tai_vat_pham') }}
       </div>
       <div v-else-if="spinWheelStore.error" class="flex h-full min-h-32 flex-col items-center justify-center gap-3 text-center">
         <div class="text-sm text-rose-700">{{ spinWheelStore.error }}</div>
@@ -57,14 +57,14 @@
           class="text-sm font-semibold text-emerald-800 hover:text-emerald-900"
           @click="spinWheelStore.setReward()"
         >
-          Thử tải lại
+          {{ tr('ListItems.thu_tai_lai') }}
         </button>
       </div>
       <div
         v-else-if="visibleRewards.length === 0"
         class="flex h-full min-h-32 items-center justify-center px-4 text-center text-sm text-[#617565]"
       >
-        {{ spinWheelStore.season ? 'Không tìm thấy vật phẩm phù hợp.' : 'Chưa có mùa quay đang diễn ra.' }}
+        {{ spinWheelStore.season ? tr('ShopModal.khong_tim_thay_vat_pham_phu_hop') : tr('ListItems.chua_co_mua_quay_dang_dien_ra') }}
       </div>
       <div v-else class="grid grid-cols-3 gap-2 sm:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6">
         <button
@@ -72,7 +72,7 @@
           :key="item.id"
           type="button"
           class="group cursor-pointer relative flex flex-col items-center gap-1 rounded-lg border border-[#cbd9c6] bg-white/70 px-2 py-2 text-center transition-colors hover:border-emerald-300 hover:bg-[#eaf2e5]"
-          :aria-label="`Thông tin về ${item.label}`"
+          :aria-label="tr('ListItems.thong_tin_ve_value0', { value0: item.label })"
           @click="showInformation(item)"
         >
           <img v-if="item.image" :src="item.image" :alt="''" class="h-10 w-10 shrink-0 object-contain" />
@@ -88,13 +88,15 @@
     </div>
 
     <footer class="flex items-center justify-between border-t border-[#cbd9c6] px-5 py-3 text-xs text-[#617565]">
-      <span>{{ visibleRewards.length }} vật phẩm</span>
+      <span>{{ visibleRewards.length }} {{ tr('ListItems.vat_pham') }}</span>
       <span>{{ spinWheelStore.season?.name }}</span>
     </footer>
   </section>
 </template>
 
 <script lang="ts" setup>
+import { t as tr } from "../../../i18n";
+
 import { computed, onMounted, ref } from "vue";
 import { useSpinWheelStore } from "../../../stores/spinWheel.ts";
 import type { Reward } from "./SpinWheel.vue";
@@ -118,7 +120,7 @@ function showInformation(item: Reward) {
   open({
     name: item.label,
     image: item.image ?? "",
-    description: item.information || "Chưa có thông tin về vật phẩm này.",
+    description: item.information || tr('ListItems.chua_co_thong_tin_ve_vat_pham_nay'),
   });
 }
 

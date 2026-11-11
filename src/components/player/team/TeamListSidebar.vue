@@ -1,4 +1,6 @@
 <script lang="ts" setup>
+import { t as tr } from "../../../i18n";
+
 import { computed, ref } from "vue";
 import PlayerIdentity from "../../shared/PlayerIdentity.vue";
 import type { FriendUserProfile } from "../../../data/supabaseFriendRepository";
@@ -22,18 +24,18 @@ const emit = defineEmits<{
 const search = ref("");
 const status = ref("ALL");
 const statusTabs: TabItem[] = [
-  { key: "ALL", label: "Tất cả" },
-  { key: "OPEN", label: "Mở" },
-  { key: "FULL", label: "Đầy" },
-  { key: "FISHING", label: "Đang câu" },
-  { key: "CLOSED", label: "Đã đóng" },
+  { key: "ALL", get label() { return tr('Achievement.tat_ca'); } },
+  { key: "OPEN", get label() { return tr('MyTeamPanel.mo'); } },
+  { key: "FULL", get label() { return tr('MyTeamPanel.day'); } },
+  { key: "FISHING", get label() { return tr('MyTeamPanel.dang_cau'); } },
+  { key: "CLOSED", get label() { return tr('Feedbackmodal.da_dong'); } },
 ];
 const statusLabel: Record<string, string> = {
-  PENDING: "Chờ duyệt",
-  OPEN: "Mở",
-  FULL: "Đầy",
-  FISHING: "Đang câu",
-  CLOSED: "Đã đóng",
+  get PENDING() { return tr('MyTeamPanel.cho_duyet'); },
+  get OPEN() { return tr('MyTeamPanel.mo'); },
+  get FULL() { return tr('MyTeamPanel.day'); },
+  get FISHING() { return tr('MyTeamPanel.dang_cau'); },
+  get CLOSED() { return tr('Feedbackmodal.da_dong'); },
 };
 const statusClass: Record<string, string> = {
   PENDING: "bg-[#f0e0e0] text-[#8a2020] border border-[#e8a0a0]",
@@ -52,38 +54,38 @@ const filteredTeams = computed(() => {
 
 function joinTypeLabel(team: UserTeam) {
   return team.join_type === "everyone"
-    ? "Ai cũng có thể tham gia"
+    ? tr('TeamListSidebar.ai_cung_co_the_tham_gia')
     : team.join_type === "friend"
-      ? "Chỉ bạn bè của trưởng nhóm"
-      : "Chỉ người được mời";
+      ? tr('TeamListSidebar.chi_ban_be_cua_truong_nhom')
+      : tr('TeamListSidebar.chi_nguoi_duoc_moi');
 }
 </script>
 
 <template>
   <aside class="flex min-h-0 flex-col gap-3 rounded-2xl border border-[#cde0c9] bg-[#f5f9f0] p-3 sm:max-h-[62vh]">
     <div class="flex items-center justify-between gap-2">
-      <div class="m-0 text-base font-bold text-[#1a3a1a]">Tổ đội hiện hành</div>
+      <div class="m-0 text-base font-bold text-[#1a3a1a]">{{ tr('TeamListSidebar.to_doi_hien_hanh') }}</div>
       <button
         class="inline-flex items-center justify-center rounded-lg bg-linear-to-br from-[#3b7a57] to-[#2e6644] px-3 py-2 text-[0.8rem] font-bold text-white transition-all hover:from-[#2e6644] hover:to-[#245236]"
         @click="emit('create')"
       >
-        + Tạo
+        {{ tr('TeamListSidebar.tao') }}
       </button>
     </div>
     <input
       v-model="search"
       type="search"
-      aria-label="Tìm tổ đội"
-      placeholder="Tìm tổ đội..."
+      :aria-label="tr('TeamListSidebar.tim_to_doi')"
+      :placeholder="tr('TeamListSidebar.tim_to_doi_2')"
       class="min-w-0 rounded-lg border border-[#c0d8b8] bg-[#fafefc] px-3 py-2 text-[0.85rem] text-[#1a3a1a]"
     />
-    <Tab v-model="status" :tabs="statusTabs" aria-label="Lọc tổ đội theo trạng thái" class="min-h-0">
+    <Tab v-model="status" :tabs="statusTabs" :aria-label="tr('TeamListSidebar.loc_to_doi_theo_trang_thai')" class="min-h-0">
       <template v-for="tab in statusTabs" :key="tab.key" #[tab.key]>
         <div v-if="teams.length === 0" class="m-0 py-8 text-center text-[0.85rem] text-[#778877]">
-          Chưa có tổ đội nào.
+          {{ tr('TeamListSidebar.chua_co_to_doi_nao') }}
         </div>
         <div v-else-if="filteredTeams.length === 0" class="m-0 py-8 text-center text-[0.85rem] text-[#778877]">
-          Không tìm thấy tổ đội phù hợp.
+          {{ tr('TeamListSidebar.khong_tim_thay_to_doi_phu_hop') }}
         </div>
         <div v-else class="m-0 flex min-h-0 list-none flex-col gap-2 overflow-y-auto p-0 pr-1">
           <div v-for="team in filteredTeams" :key="team.id" class="rounded-xl border border-[#cde0c9] bg-white p-3">
@@ -96,14 +98,14 @@ function joinTypeLabel(team: UserTeam) {
             <div v-if="team.description" class="my-1 line-clamp-2 text-[0.78rem] text-[#556655]">
               {{ team.description }}
             </div>
-            <div class="my-1 text-[0.72rem] text-[#778877]">{{ joinTypeLabel(team) }} · tối đa {{ team.max_members }}</div>
-            <div class="mt-2 text-[11px] text-[#556655]">Trưởng nhóm</div>
+            <div class="my-1 text-[0.72rem] text-[#778877]">{{ joinTypeLabel(team) }} {{ tr('TeamListSidebar.toi_da') }} {{ team.max_members }}</div>
+            <div class="mt-2 text-[11px] text-[#556655]">{{ tr('TeamListSidebar.truong_nhom') }}</div>
             <PlayerIdentity :user-id="team.leader_id" :profile="profiles.get(team.leader_id)" class="mt-1" />
             <div class="mt-2 flex justify-end">
               <span
                 v-if="team.id === currentTeamId"
                 class="rounded-full bg-[#e8f5e2] px-2 py-1 text-[0.68rem] font-bold text-[#2e6644]"
-                >Đội của bạn</span
+                >{{ tr('TeamListSidebar.doi_cua_ban') }}</span
               >
               <button
                 v-else-if="canJoin(team)"
@@ -111,7 +113,7 @@ function joinTypeLabel(team: UserTeam) {
                 class="rounded-lg bg-[#3b7a57] px-3 py-1.5 text-[0.76rem] font-bold text-white disabled:opacity-55"
                 @click="emit('join', team.id)"
               >
-                Tham gia
+                {{ tr('TeamListSidebar.tham_gia') }}
               </button>
               <span v-else class="rounded-full bg-[#fde8cc] px-2 py-1 text-[0.68rem] font-bold text-[#8a4500]">
                 {{ joinRestrictionLabel(team) }}

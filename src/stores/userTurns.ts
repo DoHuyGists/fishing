@@ -1,3 +1,4 @@
+import { t as tr } from "../i18n";
 import { defineStore } from "pinia";
 import { supabaseUserInAreaRepository, type UserTurnStatus } from "../data/supabaseUserInAreaRepository";
 
@@ -30,7 +31,7 @@ export const useUserTurnsStore = defineStore("userTurns", {
         this.status = await supabaseUserInAreaRepository.fetchTurnStatus();
         this.updateTimeLeft();
       } catch (err) {
-        this.error = err instanceof Error ? err.message : "Không thể lấy số lượt câu cá";
+        this.error = err instanceof Error ? err.message : tr('userTurns.khong_the_lay_so_luot_cau_ca');
       } finally {
         this.loading = false;
         this.refreshing = false;

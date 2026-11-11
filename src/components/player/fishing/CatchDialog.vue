@@ -1,4 +1,6 @@
 <script setup lang="ts">
+import { t as tr } from "../../../i18n";
+
 import { computed } from "vue";
 import { useFishingStore } from "../../../stores/fishing";
 
@@ -33,7 +35,7 @@ const variantFrameClass = computed(() => {
           aria-labelledby="catch-title"
         >
           <div class="mt-[19px] mb-2.5 text-[#e8bd62] text-[10px] font-black tracking-[0.16em] uppercase">
-            Cú câu thành công
+            {{ tr('CatchDialog.cu_cau_thanh_cong') }}
           </div>
           <img
             :src="caught.image"
@@ -49,7 +51,7 @@ const variantFrameClass = computed(() => {
             <span
               v-if="caught.isShiny"
               class="inline-block ml-1 px-2 py-1 rounded-full bg-[#fff1a8] text-[#6b4b00] text-[9px] font-black tracking-widest"
-              >CÁ XỊN</span
+              >{{ tr('CatchDialog.ca_xin') }}</span
             >
             <div
               v-if="caught.starRating !== undefined"
@@ -68,7 +70,7 @@ const variantFrameClass = computed(() => {
             class="w-[calc(100%-40px)] mx-5 mt-1 mb-5 p-3 border-0 rounded-[10px] bg-[#e1aa49] text-[#173223] cursor-pointer font-black"
             @click="store.closeCatchDialog"
           >
-            Câu tiếp
+            {{ tr('CatchDialog.cau_tiep') }}
           </button>
         </section>
       </div>

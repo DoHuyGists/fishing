@@ -1,3 +1,4 @@
+import { t as tr } from "../i18n";
 import supabase from "../database/connection";
 
 export interface BlueprintMaterial {
@@ -9,11 +10,11 @@ function normalizeMaterials(value: unknown): BlueprintMaterial[] {
   if (!Array.isArray(value)) return [];
 
   return value.flatMap((entry) => {
-    if (!entry || typeof entry !== "object") throw new Error("Công thức chứa nguyên liệu không hợp lệ.");
+    if (!entry || typeof entry !== "object") throw new Error(tr('supabaseBlueprintRepository.cong_thuc_chua_nguyen_lieu_khong_hop_le'));
     const material = entry as Record<string, unknown>;
     const itemId = material.item_id;
     const quantity = Number(material.quantity);
-    if (typeof itemId !== "string" || !itemId || !Number.isSafeInteger(quantity) || quantity <= 0) throw new Error("Công thức chứa nguyên liệu hoặc số lượng không hợp lệ.");
+    if (typeof itemId !== "string" || !itemId || !Number.isSafeInteger(quantity) || quantity <= 0) throw new Error(tr('supabaseBlueprintRepository.cong_thuc_chua_nguyen_lieu_hoac_so_luong_khong_hop_le'));
     return [{ item_id: itemId, quantity }];
   });
 }
@@ -42,7 +43,7 @@ class SupabaseBlueprintRepository {
       p_quantity: quantity,
     });
     if (error) throw new Error(error.message);
-    if (data?.success === false) throw new Error(data.message || "Không thể chế tạo vật phẩm.");
+    if (data?.success === false) throw new Error(data.message || tr('WorkBenchModal.khong_the_che_tao_vat_pham'));
     return data;
   }
 

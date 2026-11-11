@@ -1,4 +1,7 @@
 <script setup lang="ts">
+import { getFormattingLocale } from '../../../i18n';
+import { t as tr } from "../../../i18n";
+
 import { ref, computed, watch } from "vue";
 import type { DiaryFishEntry } from "../../../stores/diary";
 
@@ -50,7 +53,7 @@ function formatDate(dateStr?: string): string {
   if (!dateStr) return "";
   try {
     const d = new Date(dateStr);
-    return d.toLocaleDateString("vi-VN", {
+    return d.toLocaleDateString(getFormattingLocale(), {
       day: "2-digit",
       month: "2-digit",
       year: "numeric",
@@ -152,12 +155,11 @@ function getSheetZIndex(sheetIndex: number): number {
 
               <!-- Country Overview Card -->
               <div class="bg-amber-900/10 p-4 rounded-sm border border-amber-900/20 mb-4">
-                <div class="m-0 font-serif font-bold text-sm text-amber-950 mb-2">Tổng Quan</div>
+                <div class="m-0 font-serif font-bold text-sm text-amber-950 mb-2">{{ tr('FlipBook.tong_quan') }}</div>
                 <div class="m-0 text-amber-900/80 leading-relaxed italic text-sm">
                   {{
                     country.information ||
-                    `Vùng biển và hồ nước tại khu vực ${country.name} là nơi cư trú của nhiều
-                  loài sinh vật độc đáo.`
+                    tr('FlipBook.vung_bien_va_ho_nuoc_tai_khu_vuc_value0_la_noi_cu_tru_cua_nhieu_', { value0: country.name })
                   }}
                 </div>
               </div>
@@ -166,8 +168,8 @@ function getSheetZIndex(sheetIndex: number): number {
                 class="bg-linear-to-r from-amber-100 to-emerald-100/80 p-4 rounded-sm border border-emerald-700/30 text-amber-950 shadow-sm"
               >
                 <div class="flex items-center justify-between mb-2">
-                  <span class="font-serif font-bold text-xs">Tiến độ sưu tầm</span>
-                  <span class="font-bold text-xs text-emerald-800">{{ stats.caught }}/{{ stats.total }} loài</span>
+                  <span class="font-serif font-bold text-xs">{{ tr('FlipBook.tien_do_suu_tam') }}</span>
+                  <span class="font-bold text-xs text-emerald-800">{{ stats.caught }}/{{ stats.total }} {{ tr('FlipBook.loai') }}</span>
                 </div>
                 <div class="w-full bg-amber-900/20 h-2.5 rounded-full overflow-hidden border border-amber-900/20">
                   <div
@@ -176,7 +178,7 @@ function getSheetZIndex(sheetIndex: number): number {
                   ></div>
                 </div>
                 <div class="m-0 text-[10px] text-amber-900/70 mt-2 text-right italic font-serif">
-                  Hoàn thành {{ stats.percentage }}%
+                  {{ tr('FlipBook.hoan_thanh') }} {{ stats.percentage }}%
                 </div>
               </div>
             </div>
@@ -186,7 +188,7 @@ function getSheetZIndex(sheetIndex: number): number {
               v-if="currentSheetIndex > 0"
               class="absolute inset-y-0 left-0 w-1/5 cursor-pointer group hover:bg-amber-900/5 transition-colors z-20 flex items-center justify-start pl-2"
               @click="flipPrev"
-              title="Lật trang trước"
+              :title="tr('FlipBook.lat_trang_truoc')"
             >
               <div
                 class="w-8 h-8 rounded-full bg-amber-900/40 text-amber-100 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center font-bold text-sm shadow"
@@ -211,10 +213,10 @@ function getSheetZIndex(sheetIndex: number): number {
                 <div class="p-6 text-center text-amber-950/80 flex flex-col items-center justify-center">
                   <span class="text-4xl mb-3">⚓</span>
                   <div class="m-0 font-serif font-bold text-base text-amber-950 mb-1">
-                    Đã xem hết nhật ký {{ country.name }}
+                    {{ tr('FlipBook.da_xem_het_nhat_ky') }} {{ country.name }}
                   </div>
                   <div class="m-0 text-xs text-amber-900/70 italic max-w-xs">
-                    Hãy di chuyển đến các bãi câu thuộc {{ country.name }} để tiếp tục chinh phục những loài cá mới!
+                    {{ tr('FlipBook.hay_di_chuyen_den_cac_bai_cau_thuoc') }} {{ country.name }} {{ tr('FlipBook.de_tiep_tuc_chinh_phuc_nhung_loai_ca_moi') }}
                   </div>
                 </div>
               </div>
@@ -225,7 +227,7 @@ function getSheetZIndex(sheetIndex: number): number {
               v-if="currentSheetIndex < totalSheets"
               class="absolute inset-y-0 right-0 w-1/5 cursor-pointer group hover:bg-amber-900/5 transition-colors z-20 flex items-center justify-end pr-2"
               @click="flipNext"
-              title="Lật trang kế tiếp"
+              :title="tr('FlipBook.lat_trang_ke_tiep')"
             >
               <div
                 class="w-8 h-8 rounded-full bg-amber-900/40 text-amber-100 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center font-bold text-sm shadow"
@@ -236,7 +238,7 @@ function getSheetZIndex(sheetIndex: number): number {
 
             <!-- Page Number -->
             <div class="pt-1 border-t border-amber-900/20 text-[10px] text-amber-900/60 font-serif text-right mt-3">
-              End
+              {{ tr('FlipBook.end') }}
             </div>
           </div>
 
@@ -311,14 +313,14 @@ function getSheetZIndex(sheetIndex: number): number {
                                 : 'bg-gray-200 text-gray-700 border-gray-300',
                             ]"
                           >
-                            {{ entry.isCaught ? entry.species.status || "Đã câu" : "Chưa bắt" }}
+                            {{ entry.isCaught ? entry.species.status || tr('FlipBook.da_cau') : tr('FlipBook.chua_bat') }}
                           </span>
                         </div>
                         <div class="m-0 text-md text-white lg:text-amber-900/80 line-clamp-1 leading-tight italic mt-0.5">
                           {{
                             entry.isCaught
-                              ? entry.species.information || "Chưa có thông tin sinh thái."
-                              : "Chưa khám phá."
+                              ? entry.species.information || tr('FlipBook.chua_co_thong_tin_sinh_thai')
+                              : tr('FlipBook.chua_kham_pha')
                           }}
                         </div>
                       </div>
@@ -338,7 +340,7 @@ function getSheetZIndex(sheetIndex: number): number {
                     }"
                     class="p-1.5 text-center text-amber-900/40 italic border border-dashed border-amber-900/20 rounded-lg text-xs flex items-center justify-center"
                   >
-                    Trống
+                    {{ tr('FlipBook.trong') }}
                   </div>
                 </div>
               </div>
@@ -355,7 +357,7 @@ function getSheetZIndex(sheetIndex: number): number {
 
               <!-- Footer -->
               <div class="pt-1 border-t border-amber-900/20 text-[10px] text-amber-900/60 font-serif text-right mt-3">
-                Trang {{ sheetIdx * 2 + 1 }}
+                {{ tr('CaughtModal.trang') }} {{ sheetIdx * 2 + 1 }}
               </div>
             </div>
 
@@ -416,7 +418,7 @@ function getSheetZIndex(sheetIndex: number): number {
                                 : 'bg-gray-200 text-gray-700 border-gray-300',
                             ]"
                           >
-                            {{ entry.isCaught ? entry.species.status || "Đã câu" : "Chưa bắt" }}
+                            {{ entry.isCaught ? entry.species.status || tr('FlipBook.da_cau') : tr('FlipBook.chua_bat') }}
                           </span>
                         </div>
                         <div
@@ -424,8 +426,8 @@ function getSheetZIndex(sheetIndex: number): number {
                         >
                           {{
                             entry.isCaught
-                              ? entry.species.information || "Chưa có thông tin sinh thái."
-                              : "Chưa khám phá."
+                              ? entry.species.information || tr('FlipBook.chua_co_thong_tin_sinh_thai')
+                              : tr('FlipBook.chua_kham_pha')
                           }}
                         </div>
                       </div>
@@ -445,7 +447,7 @@ function getSheetZIndex(sheetIndex: number): number {
                     }"
                     class="p-1.5 text-center text-amber-900/40 italic border border-dashed border-amber-900/20 rounded-lg text-xs flex items-center justify-center min-h-[44px]"
                   >
-                    Trống
+                    {{ tr('FlipBook.trong') }}
                   </div>
                 </div>
               </div>
@@ -462,7 +464,7 @@ function getSheetZIndex(sheetIndex: number): number {
 
               <!-- Footer -->
               <div class="pt-1 border-t border-amber-900/20 text-[10px] text-amber-900/60 font-serif text-left mt-3">
-                Trang {{ sheetIdx * 2 + 2 }}
+                {{ tr('CaughtModal.trang') }} {{ sheetIdx * 2 + 2 }}
               </div>
             </div>
           </div>
@@ -480,7 +482,7 @@ function getSheetZIndex(sheetIndex: number): number {
         :class="currentSheetIndex === 0 ? 'invisible' : 'visible'"
       >
         <span>◀</span>
-        <span>Trang trước</span>
+        <span>{{ tr('FlipBook.trang_truoc') }}</span>
       </button>
 
       <div class="text-xs font-serif font-bold">{{ currentSheetIndex }} / {{ totalSheets }}</div>
@@ -492,7 +494,7 @@ function getSheetZIndex(sheetIndex: number): number {
         @click="flipNext"
         :class="currentSheetIndex >= totalSheets ? 'invisible' : 'visible'"
       >
-        <span>Trang kế tiếp</span>
+        <span>{{ tr('FlipBook.trang_ke_tiep') }}</span>
         <span>▶</span>
       </button>
     </div>

@@ -1,4 +1,6 @@
 <script setup lang="ts">
+import { t as tr } from "../../../i18n";
+
 import { ref } from "vue";
 import supabase from "../../../database/connection.ts";
 import { useToast } from "../../../composables/useToast.ts";
@@ -20,11 +22,11 @@ async function redeemCode() {
     if (error) throw error;
 
     code.value = "";
-    toast.success("Đổi mã thành công!");
+    toast.success(tr('RedeemCodeForm.doi_ma_thanh_cong'));
     // Keep the returned value available for RPCs that provide a reward message.
     void data;
   } catch (error) {
-    toast.error(error instanceof Error ? error.message : "Không thể đổi mã. Vui lòng thử lại.");
+    toast.error(error instanceof Error ? error.message : tr('RedeemCodeForm.khong_the_doi_ma_vui_long_thu_lai'));
   } finally {
     isSubmitting.value = false;
   }
@@ -36,7 +38,7 @@ async function redeemCode() {
     class="min-w-0 w-full rounded-2xl border border-[#cbd9c6] bg-white p-5 shadow-sm sm:p-6"
     @submit.prevent="redeemCode"
   >
-    <label for="redeem-code" class="mb-2 block text-sm font-bold">Mã đổi thưởng</label>
+    <label for="redeem-code" class="mb-2 block text-sm font-bold">{{ tr('RedeemCodeForm.ma_doi_thuong') }}</label>
     <input
       id="redeem-code"
       v-model="code"
@@ -45,7 +47,7 @@ async function redeemCode() {
       autocomplete="off"
       required
       :disabled="isSubmitting"
-      placeholder="Nhập mã của bạn"
+      :placeholder="tr('RedeemCodeForm.nhap_ma_cua_ban')"
       class="w-full rounded-lg border border-[#cbd9c6] px-3 py-3 text-sm outline-none transition focus:border-emerald-700 focus:ring-2 focus:ring-emerald-700/15 disabled:bg-gray-100"
     />
 
@@ -55,7 +57,7 @@ async function redeemCode() {
         class="min-h-11 rounded-lg bg-emerald-800 px-4 py-2 text-sm font-bold text-white transition hover:bg-emerald-900 disabled:cursor-not-allowed disabled:opacity-50"
         :disabled="isSubmitting || !code.trim()"
       >
-        {{ isSubmitting ? "Đang đổi mã..." : "Đổi mã" }}
+        {{ isSubmitting ? tr('RedeemCodeForm.dang_doi_ma') : tr('RedeemCodeForm.doi_ma') }}
       </button>
     </div>
   </form>

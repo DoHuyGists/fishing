@@ -1,4 +1,6 @@
 <script setup lang="ts">
+import { t as tr } from "../../i18n";
+
 import { computed, ref, watch } from "vue";
 import { useCountryStore } from "../../stores/country";
 
@@ -15,7 +17,7 @@ watch(() => props.profile?.avatar_url, () => { failedAvatar.value = false; });
 <template>
   <div class="flex min-w-0 items-center gap-3 text-[#24352a]">
     <div class="flex size-10 shrink-0 items-center justify-center overflow-hidden rounded-full bg-[#3b7a57] text-sm font-bold text-white">
-      <img v-if="profile?.avatar_url && !failedAvatar" :src="profile.avatar_url" :alt="`Ảnh đại diện của ${displayName}`" class="size-full object-cover" referrerpolicy="no-referrer" @error="failedAvatar = true" />
+      <img v-if="profile?.avatar_url && !failedAvatar" :src="profile.avatar_url" :alt="tr('PlayerIdentity.anh_dai_dien_cua_value0', { value0: displayName })" class="size-full object-cover" referrerpolicy="no-referrer" @error="failedAvatar = true" />
       <span v-else>{{ (profile?.display_name?.trim() || userId).slice(0, 2).toUpperCase() }}</span>
     </div>
     <div class="min-w-0 flex-1">
