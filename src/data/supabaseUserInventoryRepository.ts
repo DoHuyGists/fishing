@@ -48,8 +48,10 @@ class SupabaseUserInventoryRepository {
     }
     return data;
   }
-  async deleteInventory(userId: string, inventoryIds: string[]) {
-    const { error } = await supabase.from("user_inventory").delete().in("id", inventoryIds).eq("user_id", userId);
+  async deleteInventory(_userId: string, inventoryIds: string[]) {
+    const { error } = await supabase.rpc("delete_inventory_items", {
+      p_inventory_ids: inventoryIds,
+    });
     if (error) {
       throw new Error(error.message);
     }

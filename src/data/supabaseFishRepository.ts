@@ -207,7 +207,7 @@ class SupabaseFishRepository {
   }
 
   async deleteInNetFishes(): Promise<void> {
-    const { error } = await supabase.from("caught").delete().eq("status", "in-net");
+    const { error } = await supabase.rpc("release_in_net_fishes");
 
     if (error) throw new Error(error.message);
   }

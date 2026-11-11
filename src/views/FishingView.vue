@@ -38,7 +38,9 @@ const showExitConfirmation = ref(false);
 const sceneContext = computed<FishingSceneContext>(() => ({
   state: fishingStore,
   sceneImage: dayPhaseStore.currentScenePhace,
-  rodImage: equipmentStore.variants.rod.find((rod) => rod.id === fishingStore.equipmentLoadout.rod)?.image || "/fishing-rob.png",
+  rodImage:
+    equipmentStore.variants.rod.find((rod) => rod.id === fishingStore.equipmentLoadout.rod)?.image ||
+    "/fishing-rob.png",
 }));
 let fishingSessionSubscription: RealtimeChannel | null = null;
 let subscribedSessionId: string | null = null;
@@ -54,7 +56,7 @@ function unsubscribeFishingSession() {
 }
 
 watch(
-  () => sessionReady.value ? fishingStore.sessionId : null,
+  () => (sessionReady.value ? fishingStore.sessionId : null),
   (sessionId) => {
     unsubscribeFishingSession();
     if (!sessionId) return;
@@ -179,6 +181,21 @@ onBeforeUnmount(() => {
     </button>
   </section>
   <main v-else class="w-full h-screen overflow-hidden touch-none overscroll-none bg-[#193224] text-[#e9f4e8]">
+    <div class="fixed top-3 left-3 text-white flex justify-between items-start">
+      <div class="flex flex-col gap-2">
+        <DayPhaseClock :area-id="userInAreaStore.userInArea?.area_id" />
+        <div class="backdrop-blur-2xl h-fit w-fit rounded p-1">
+          <button
+            type="button"
+            class="text-sm text-red-500 bg-transparent border-0 cursor-pointer font-medium p-0 hover:underline disabled:opacity-50"
+            :disabled="fishingStore.isLeavingArea"
+            @click="showExitConfirmation = true"
+          >
+            {{ fishingStore.isLeavingArea ? "Đang quay lại..." : "Kết thúc chuyến câu" }}
+          </button>
+        </div>
+      </div>
+    </div>
     <button
       type="button"
       class="fixed right-3 top-3 z-20 rounded-lg border border-[#cbd9c6] bg-[#f5f9f0] px-3 py-1.5 text-xs font-bold text-[#24352a] hover:bg-[#e2ecdc]"
@@ -188,23 +205,7 @@ onBeforeUnmount(() => {
       Cài đặt
     </button>
     <div class="grid grid-rows-[minmax(0,1fr)_auto] w-full h-dvh">
-      <FishingScene :context="sceneContext">
-        <div class="absolute top-2 left-2 text-white flex justify-between items-start">
-          <div class="flex flex-col gap-2">
-            <DayPhaseClock :area-id="userInAreaStore.userInArea?.area_id" />
-            <div class="backdrop-blur-2xl h-fit w-fit rounded p-1">
-              <button
-                type="button"
-                class="text-sm text-red-500 bg-transparent border-0 cursor-pointer font-medium p-0 hover:underline disabled:opacity-50"
-                :disabled="fishingStore.isLeavingArea"
-                @click="showExitConfirmation = true"
-              >
-                {{ fishingStore.isLeavingArea ? "Đang quay lại..." : "Kết thúc chuyến câu" }}
-              </button>
-            </div>
-          </div>
-        </div>
-      </FishingScene>
+      <FishingScene :context="sceneContext" />
       <section class="control-deck p-2" :class="{ 'control-deck--tension': fishingStore.tensionChallenge }">
         <div class="side-panel">
           <div class="flex justify-between items-center mx-[3px]">
@@ -223,7 +224,11 @@ onBeforeUnmount(() => {
           </div>
         </div>
         <TensionChallenge v-if="fishingStore.tensionChallenge" />
-        <section v-else aria-label="Trạng thái câu cá" class="flex flex-col gap-3 rounded-[15px] border border-[#cbd9c6] bg-[#f5f9f0] p-3 text-[#24352a]">
+        <section
+          v-else
+          aria-label="Trạng thái câu cá"
+          class="flex flex-col gap-3 rounded-[15px] border border-[#cbd9c6] bg-[#f5f9f0] p-3 text-[#24352a]"
+        >
           <p role="status" class="text-xs">{{ fishingStore.castMessage }}</p>
           <button
             type="button"
@@ -303,7 +308,9 @@ onBeforeUnmount(() => {
               class="flex size-8 shrink-0 items-center justify-center rounded-full border border-[#cbd9c6] text-2xl leading-none hover:bg-[#e2ecdc]"
               aria-label="Đóng cài đặt"
               @click="settingsOpen = false"
-            >&times;</button>
+            >
+              &times;
+            </button>
           </header>
           <div class="flex items-center justify-between gap-4">
             <div>
@@ -320,7 +327,10 @@ onBeforeUnmount(() => {
               :class="userSettingStore.isFishingBackgroundSoundTurnOn ? 'bg-[#426b3e]' : 'bg-[#cbd9c6]'"
               @click="userSettingStore.toggleFishingBackgroundSound"
             >
-              <span class="h-5 w-5 rounded-full bg-white shadow transition-transform" :class="userSettingStore.isFishingBackgroundSoundTurnOn ? 'translate-x-6' : 'translate-x-1'" />
+              <span
+                class="h-5 w-5 rounded-full bg-white shadow transition-transform"
+                :class="userSettingStore.isFishingBackgroundSoundTurnOn ? 'translate-x-6' : 'translate-x-1'"
+              />
             </button>
           </div>
           <p v-if="userSettingStore.loading || userSettingStore.saving" role="status" class="mt-3 text-sm">
@@ -328,7 +338,12 @@ onBeforeUnmount(() => {
           </p>
           <div v-if="userSettingStore.error" role="alert" class="mt-3 text-sm text-red-700">
             <p>{{ userSettingStore.error }}</p>
-            <button v-if="!userSettingStore.ready" type="button" class="mt-2 underline" @click="userSettingStore.load(user?.id ?? null)">
+            <button
+              v-if="!userSettingStore.ready"
+              type="button"
+              class="mt-2 underline"
+              @click="userSettingStore.load(user?.id ?? null)"
+            >
               Thử lại
             </button>
           </div>
@@ -336,7 +351,11 @@ onBeforeUnmount(() => {
       </div>
     </Teleport>
   </main>
-  <p v-if="!sessionReady && fishingStore.leaveAreaError" role="alert" class="fixed bottom-4 left-4 right-4 z-50 rounded-lg bg-[#f5f9f0] p-3 text-center text-red-700">
+  <p
+    v-if="!sessionReady && fishingStore.leaveAreaError"
+    role="alert"
+    class="fixed bottom-4 left-4 right-4 z-50 rounded-lg bg-[#f5f9f0] p-3 text-center text-red-700"
+  >
     {{ fishingStore.leaveAreaError }}
   </p>
 </template>

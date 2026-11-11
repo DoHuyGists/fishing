@@ -139,7 +139,6 @@ function castAt(event: MouseEvent) {
       @click="castAt"
     />
     <div class="scene-shade"></div>
-    <slot />
 
     <!-- <div class="scene-instruction">Chạm mặt hồ để vung cần đến điểm đó</div> -->
     <div class="water-glow"></div>

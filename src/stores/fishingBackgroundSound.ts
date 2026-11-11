@@ -1,10 +1,12 @@
 import { defineStore } from "pinia";
 
-const birdSounds = Object.values(import.meta.glob<string>("/public/sound/bird/*.mp3", {
-  eager: true,
-  query: "?url",
-  import: "default",
-}));
+const birdSounds = Object.values(
+  import.meta.glob<string>("/sound/bird/*.mp3", {
+    eager: true,
+    query: "?url",
+    import: "default",
+  }),
+);
 
 export const useFishingBackgroundSoundStore = defineStore("fishingBackgroundSound", () => {
   let active = false;

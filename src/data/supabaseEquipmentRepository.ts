@@ -41,7 +41,7 @@ class SupabaseEquipmentRepository {
     };
   }
   async fetchAllEquipmentSet(): Promise<EquipmentSet[]> {
-    const { data, error } = await supabase.rpc("get_all_user_equipment_sets");;
+    const { data, error } = await supabase.rpc("get_all_user_equipment_sets");
 
     if (error) throw new Error(error.message);
 
@@ -59,7 +59,7 @@ class SupabaseEquipmentRepository {
   }
 
   async CreateNewSet() {
-    const { data, error } = await supabase.rpc('buy_equipment_set');
+    const { data, error } = await supabase.rpc("buy_equipment_set");
 
     if (error) {
       if (error) throw new Error(error.message);
@@ -67,23 +67,20 @@ class SupabaseEquipmentRepository {
     return data;
   }
 
-  async UpdateSet(userId: string, set: EquipmentSet) {
+  async UpdateSet(_userId: string, set: EquipmentSet) {
     const inventoryItems = (items: { inventory_id?: string }[]) =>
       items.map((item) => {
         if (!item.inventory_id) throw new Error("Vật phẩm trong set không có inventory_id.");
-        return { inventory_id: item.inventory_id, is_used: false };
+        return { inventory_id: item.inventory_id };
       });
-    const { error } = await supabase
-      .from("user_equipments")
-      .update({
-        rod: inventoryItems(set.rod),
-        line: inventoryItems(set.line),
-        reel: inventoryItems(set.reel),
-        hook: inventoryItems(set.hook),
-        bait: inventoryItems(set.bait),
-      })
-      .eq("id", set.id)
-      .eq("user_id", userId);
+    const { error } = await supabase.rpc("save_equipment_set", {
+      p_set_id: set.id,
+      p_rod: inventoryItems(set.rod),
+      p_line: inventoryItems(set.line),
+      p_reel: inventoryItems(set.reel),
+      p_hook: inventoryItems(set.hook),
+      p_bait: inventoryItems(set.bait),
+    });
     if (error) throw new Error(error.message);
   }
 

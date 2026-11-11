@@ -114,7 +114,9 @@ class SupabaseMarketRepository {
   }
 
   async cancelListing(marketId: string): Promise<void> {
-    const { error: marketError } = await supabase.from("species_market").update({ status: "cancelled" }).eq("id", marketId);
+    const { error: marketError } = await supabase.rpc("cancel_market_listing", {
+      p_market_id: marketId,
+    });
 
     if (marketError) throw new Error(marketError.message);
   }
