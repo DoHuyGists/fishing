@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { storeToRefs } from "pinia";
-import { onBeforeUnmount, onMounted, ref, watch } from "vue";
+import { computed, onBeforeUnmount, onMounted, ref, watch } from "vue";
 import { onBeforeRouteLeave, useRouter } from "vue-router";
 import EquipmentMenu from "../components/player/fishing/EquipmentMenu.vue";
 import CatchDialog from "../components/player/fishing/CatchDialog.vue";
@@ -15,6 +15,12 @@ import { useAuthStore } from "../stores/auth";
 import { useEquipmentStore } from "../stores/equipment";
 import { useUserSettingStore } from "../stores/userSetting";
 import { useFishingBackgroundSoundStore } from "../stores/fishingBackgroundSound";
+import DayPhaseClock from "../components/player/fishing/DayPhaseClock.vue";
+import { useDayPhaseStore } from "../stores/dayPhase";
+import { useUserInAreaStore } from "../stores/userInArea";
+import { supabaseFishingAreaRepository } from "../data/supabaseFishingAreaRepository";
+import type { RealtimeChannel } from "@supabase/supabase-js";
+import type { FishingSceneContext } from "../data/fishingGameplay";
 
 const authStore = useAuthStore();
 const router = useRouter();
@@ -22,10 +28,62 @@ const fishingStore = useFishingStore();
 const equipmentStore = useEquipmentStore();
 const userSettingStore = useUserSettingStore();
 const backgroundSoundStore = useFishingBackgroundSoundStore();
+const dayPhaseStore = useDayPhaseStore();
+const userInAreaStore = useUserInAreaStore();
 const { user } = storeToRefs(authStore);
 const { sessionReady, sessionError } = storeToRefs(fishingStore);
 const equipmentCollapsed = ref(true);
 const settingsOpen = ref(false);
+const showExitConfirmation = ref(false);
+const sceneContext = computed<FishingSceneContext>(() => ({
+  state: fishingStore,
+  sceneImage: dayPhaseStore.currentScenePhace,
+  rodImage: equipmentStore.variants.rod.find((rod) => rod.id === fishingStore.equipmentLoadout.rod)?.image || "/fishing-rob.png",
+}));
+let fishingSessionSubscription: RealtimeChannel | null = null;
+let subscribedSessionId: string | null = null;
+let handledBiteSessionId: string | null = null;
+
+function unsubscribeFishingSession() {
+  subscribedSessionId = null;
+  handledBiteSessionId = null;
+  if (fishingSessionSubscription) {
+    void supabaseFishingAreaRepository.unsubscribe(fishingSessionSubscription);
+    fishingSessionSubscription = null;
+  }
+}
+
+watch(
+  () => sessionReady.value ? fishingStore.sessionId : null,
+  (sessionId) => {
+    unsubscribeFishingSession();
+    if (!sessionId) return;
+    subscribedSessionId = sessionId;
+    fishingSessionSubscription = supabaseFishingAreaRepository.subscribeToFishingSession(sessionId, (session) => {
+      if (subscribedSessionId !== sessionId || handledBiteSessionId === sessionId) return;
+      handledBiteSessionId = sessionId;
+      void fishingStore.startChallengeForSession(session.id);
+    });
+  },
+  { immediate: true },
+);
+
+watch(
+  () => fishingStore.currentArea,
+  (area) => dayPhaseStore.setCurrentScenePhase(area),
+  { immediate: true },
+);
+
+watch(
+  () => fishingStore.leaveAreaError,
+  (error) => {
+    if (error) showExitConfirmation.value = true;
+  },
+);
+
+watch(sessionReady, (ready) => {
+  if (!ready) showExitConfirmation.value = false;
+});
 
 function toggleEquipment() {
   equipmentCollapsed.value = !equipmentCollapsed.value;
@@ -84,6 +142,7 @@ onMounted(() => {
 });
 
 onBeforeUnmount(() => {
+  unsubscribeFishingSession();
   backgroundSoundStore.stop();
   fishingStore.resetSession();
   equipmentStore.reset();
@@ -129,7 +188,23 @@ onBeforeUnmount(() => {
       Cài đặt
     </button>
     <div class="grid grid-rows-[minmax(0,1fr)_auto] w-full h-dvh">
-      <FishingScene />
+      <FishingScene :context="sceneContext">
+        <div class="absolute top-2 left-2 text-white flex justify-between items-start">
+          <div class="flex flex-col gap-2">
+            <DayPhaseClock :area-id="userInAreaStore.userInArea?.area_id" />
+            <div class="backdrop-blur-2xl h-fit w-fit rounded p-1">
+              <button
+                type="button"
+                class="text-sm text-red-500 bg-transparent border-0 cursor-pointer font-medium p-0 hover:underline disabled:opacity-50"
+                :disabled="fishingStore.isLeavingArea"
+                @click="showExitConfirmation = true"
+              >
+                {{ fishingStore.isLeavingArea ? "Đang quay lại..." : "Kết thúc chuyến câu" }}
+              </button>
+            </div>
+          </div>
+        </div>
+      </FishingScene>
       <section class="control-deck p-2" :class="{ 'control-deck--tension': fishingStore.tensionChallenge }">
         <div class="side-panel">
           <div class="flex justify-between items-center mx-[3px]">
@@ -165,6 +240,49 @@ onBeforeUnmount(() => {
     <FishingBag />
     <FishingPlayers />
     <LakeFishGuide />
+    <Teleport to="body">
+      <Transition name="exit-dialog">
+        <div
+          v-if="showExitConfirmation"
+          class="fixed z-[40] inset-0 grid place-items-center p-5 bg-[rgba(4,17,11,0.72)] backdrop-blur-[7px]"
+          role="presentation"
+          @click.self="showExitConfirmation = false"
+        >
+          <section
+            class="w-[min(380px,100%)] p-5 border border-[rgba(255,226,149,0.5)] rounded-[20px] bg-[linear-gradient(145deg,#1b4531,#0f2e1f)] shadow-[0_24px_70px_rgba(0,0,0,0.6)] text-[#f4f0df] text-center"
+            role="dialog"
+            aria-modal="true"
+            aria-labelledby="confirm-exit-title"
+          >
+            <div id="confirm-exit-title" class="m-0 text-lg font-bold text-[#e8bd62]">Kết thúc chuyến câu?</div>
+            <div class="my-4 text-sm text-[#c8dccb] leading-relaxed">
+              Giỏ cá hiện có <strong class="text-white">{{ fishingStore.inventory.length }}</strong> con cá. Bạn có chắc
+              chắn muốn quay lại bản đồ không?
+            </div>
+            <div v-if="fishingStore.leaveAreaError" role="alert" class="my-3 text-sm text-red-300">
+              {{ fishingStore.leaveAreaError }}
+            </div>
+            <div class="flex justify-center gap-3 mt-5">
+              <button
+                type="button"
+                class="px-4 py-2 border border-[rgba(255,255,255,0.2)] rounded-xl bg-[rgba(255,255,255,0.1)] hover:bg-[rgba(255,255,255,0.2)] text-white text-xs font-semibold transition-colors cursor-pointer"
+                @click="showExitConfirmation = false"
+              >
+                Ở lại câu
+              </button>
+              <button
+                type="button"
+                class="px-4 py-2 border border-[#e65c5c] rounded-xl bg-[#c23b3b] hover:bg-[#d94848] text-white text-xs font-bold shadow-[0_4px_12px_rgba(194,59,59,0.4)] transition-colors cursor-pointer disabled:opacity-50"
+                :disabled="fishingStore.isLeavingArea"
+                @click="router.push({ name: 'home' })"
+              >
+                {{ fishingStore.isLeavingArea ? "Đang quay lại..." : "Kết thúc chuyến câu" }}
+              </button>
+            </div>
+          </section>
+        </div>
+      </Transition>
+    </Teleport>
     <Teleport to="body">
       <div
         v-if="settingsOpen"
@@ -224,6 +342,16 @@ onBeforeUnmount(() => {
 </template>
 
 <style scoped>
+.exit-dialog-enter-active,
+.exit-dialog-leave-active {
+  transition: opacity 0.18s ease;
+}
+
+.exit-dialog-enter-from,
+.exit-dialog-leave-to {
+  opacity: 0;
+}
+
 .control-deck {
   z-index: 5;
   display: grid;

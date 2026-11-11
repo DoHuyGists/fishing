@@ -1,71 +1,10 @@
 <script setup lang="ts">
 import { computed, onBeforeUnmount, onMounted, ref, watch } from "vue";
 import { isPointInWater } from "../../../data/fishingMap.ts";
-import { useFishingStore } from "../../../stores/fishing.ts";
-import { useEquipmentStore } from "../../../stores/equipment.ts";
-import { useRouter } from "vue-router";
-import DayPhaseClock from "./DayPhaseClock.vue";
-import { supabaseFishingAreaRepository } from "../../../data/supabaseFishingAreaRepository.ts";
-import type { RealtimeChannel } from "@supabase/supabase-js";
-import { useDayPhaseStore } from "../../../stores/dayPhase.ts";
-import { useUserInAreaStore } from "../../../stores/userInArea.ts";
 import type { FishingSceneContext } from "../../../data/fishingGameplay";
 
-const props = defineProps<{ context?: FishingSceneContext }>();
-const router = useRouter();
-// Local practice never initializes live stores or subscribes to a fishing session.
-const live = props.context ? null : {
-  fishing: useFishingStore(), equipment: useEquipmentStore(),
-  dayPhase: useDayPhaseStore(), userInArea: useUserInAreaStore(),
-};
-const fishingStore = props.context?.state ?? live!.fishing;
-const sceneImage = computed(() => props.context?.sceneImage ?? live?.dayPhase.currentScenePhace);
-const isLeaving = computed(() => live?.fishing.isLeavingArea ?? false);
-const showExitConfirmation = ref(false);
-const tripCaughtCount = computed(() => live?.fishing.inventory.length ?? 0);
-let fishingSessionSubscription: RealtimeChannel | null = null;
-let subscribedSessionId: string | null = null;
-let handledBiteSessionId: string | null = null;
-
-watch(
-  () => live?.fishing.sessionId,
-  (sessionId) => {
-    if (fishingSessionSubscription) {
-      void supabaseFishingAreaRepository.unsubscribe(fishingSessionSubscription);
-      fishingSessionSubscription = null;
-    }
-    subscribedSessionId = sessionId ?? null;
-    handledBiteSessionId = null;
-    if (!sessionId) return;
-
-    const activeSessionId = sessionId;
-    fishingSessionSubscription = supabaseFishingAreaRepository.subscribeToFishingSession(activeSessionId, (session) => {
-      if (subscribedSessionId !== activeSessionId || handledBiteSessionId === activeSessionId) return;
-      handledBiteSessionId = activeSessionId;
-      void live?.fishing.startChallengeForSession(session.id);
-    });
-  },
-  { immediate: true },
-);
-
-function handleBackToMap() {
-  void router.push({ name: "home" });
-}
-
-watch(
-  () => live?.fishing.leaveAreaError,
-  (error) => {
-    if (error) showExitConfirmation.value = true;
-  },
-);
-
-watch(
-  () => live?.fishing.currentArea,
-  (newArea) => {
-    if (live) live.dayPhase.setCurrentScenePhase(newArea);
-  },
-  { immediate: true },
-);
+const props = defineProps<{ context: FishingSceneContext }>();
+const sceneState = computed(() => props.context.state);
 
 const sceneElement = ref<HTMLElement | null>(null);
 const rodLineAnchor = ref<HTMLElement | null>(null);
@@ -80,14 +19,9 @@ const rodLineOffset = {
 };
 const ripple = ref(false);
 const invalidTap = ref(false);
-const castClass = computed(() => `phase-${fishingStore.castPhase}`);
-const selectedRodImage = computed(() => {
-  if (props.context) return props.context.rodImage;
-  const selectedRod = live?.equipment.variants.rod.find((rod) => rod.id === live.fishing.equipmentLoadout.rod);
-  return selectedRod?.image || "/fishing-rob.png";
-});
+const castClass = computed(() => `phase-${sceneState.value.castPhase}`);
 const linePath = computed(() => {
-  const { x, y } = fishingStore.baitPosition;
+  const { x, y } = sceneState.value.baitPosition;
   const endX = x + biteOffset.value.x;
   const endY = y + biteOffset.value.y;
   const { x: rodX, y: rodY } = fishingRod.value;
@@ -102,7 +36,7 @@ let biteMotionFrame: number | undefined;
 let biteMotionStartedAt: number | undefined;
 
 function animateBiteMotion(timestamp: number) {
-  if (fishingStore.castPhase !== "bite") {
+  if (sceneState.value.castPhase !== "bite") {
     biteMotionFrame = undefined;
     biteMotionStartedAt = undefined;
     biteOffset.value = { x: 0, y: 0 };
@@ -119,7 +53,7 @@ function animateBiteMotion(timestamp: number) {
 }
 
 watch(
-  () => fishingStore.castPhase,
+  () => sceneState.value.castPhase,
   (phase) => {
     if (phase === "bite") {
       biteMotionStartedAt = undefined;
@@ -134,6 +68,7 @@ watch(
     biteMotionStartedAt = undefined;
     biteOffset.value = { x: 0, y: 0 };
   },
+  { immediate: true },
 );
 
 let rodPositionFrame: number | undefined;
@@ -163,19 +98,14 @@ onMounted(() => {
 onBeforeUnmount(() => {
   clearTimeout(invalidTapTimer);
   clearTimeout(rippleTimer);
-  subscribedSessionId = null;
   if (rodPositionFrame) window.cancelAnimationFrame(rodPositionFrame);
   if (biteMotionFrame !== undefined) window.cancelAnimationFrame(biteMotionFrame);
   window.removeEventListener("resize", updateRodPosition);
-  if (fishingSessionSubscription) {
-    void supabaseFishingAreaRepository.unsubscribe(fishingSessionSubscription);
-    fishingSessionSubscription = null;
-  }
 });
 
 function castAt(event: MouseEvent) {
-  if (!fishingStore.canCast) {
-    fishingStore.castTo(fishingStore.baitPosition.x, fishingStore.baitPosition.y);
+  if (!sceneState.value.canCast) {
+    sceneState.value.castTo(sceneState.value.baitPosition.x, sceneState.value.baitPosition.y);
     return;
   }
 
@@ -183,15 +113,15 @@ function castAt(event: MouseEvent) {
   const bounds = scene.getBoundingClientRect();
   const x = ((event.clientX - bounds.left) / bounds.width) * 100;
   const y = ((event.clientY - bounds.top) / bounds.height) * 100;
-  const boundary = fishingStore.currentArea?.fishingBoundary;
+  const boundary = sceneState.value.currentArea?.fishingBoundary;
   if (Array.isArray(boundary) && boundary.length >= 3 && !isPointInWater({ x, y }, boundary)) {
     invalidTap.value = true;
-    fishingStore.rejectCast();
+    sceneState.value.rejectCast();
     clearTimeout(invalidTapTimer);
     invalidTapTimer = setTimeout(() => (invalidTap.value = false), 520);
     return;
   }
-  fishingStore.castTo(x, y);
+  sceneState.value.castTo(x, y);
   ripple.value = true;
   clearTimeout(rippleTimer);
   rippleTimer = setTimeout(() => (ripple.value = false), 900);
@@ -201,7 +131,7 @@ function castAt(event: MouseEvent) {
 <template>
   <section class="fishing-scene" @contextmenu.prevent="">
     <img
-      :src="sceneImage"
+      :src="context.sceneImage"
       alt="Khung cảnh bãi câu"
       class="pond-image"
       draggable="false"
@@ -209,21 +139,7 @@ function castAt(event: MouseEvent) {
       @click="castAt"
     />
     <div class="scene-shade"></div>
-    <div v-if="live" class="absolute top-2 left-2 text-white flex justify-between items-start">
-      <div class="flex flex-col gap-2">
-        <DayPhaseClock :area-id="live.userInArea.userInArea?.area_id" />
-        <div class="backdrop-blur-2xl h-fit w-fit rounded p-1">
-          <button
-            type="button"
-            class="text-sm text-red-500 bg-transparent border-0 cursor-pointer font-medium p-0 hover:underline disabled:opacity-50"
-            :disabled="isLeaving"
-            @click="showExitConfirmation = true"
-          >
-            {{ isLeaving ? "Đang quay lại..." : "Kết thúc chuyến câu" }}
-          </button>
-        </div>
-      </div>
-    </div>
+    <slot />
 
     <!-- <div class="scene-instruction">Chạm mặt hồ để vung cần đến điểm đó</div> -->
     <div class="water-glow"></div>
@@ -231,7 +147,7 @@ function castAt(event: MouseEvent) {
     <div
       v-if="ripple"
       class="ripple"
-      :style="{ left: `${fishingStore.baitPosition.x}%`, top: `${fishingStore.baitPosition.y}%` }"
+      :style="{ left: `${sceneState.baitPosition.x}%`, top: `${sceneState.baitPosition.y}%` }"
     ></div>
     <svg
       class="casting-line"
@@ -247,77 +163,24 @@ function castAt(event: MouseEvent) {
       class="bait-float"
       :class="castClass"
       :style="{
-        left: `${fishingStore.baitPosition.x + biteOffset.x}%`,
-        top: `${fishingStore.baitPosition.y + biteOffset.y}%`,
+        left: `${sceneState.baitPosition.x + biteOffset.x}%`,
+        top: `${sceneState.baitPosition.y + biteOffset.y}%`,
       }"
     >
       <span></span>
     </div>
     <div class="rod-holder" :class="castClass" aria-hidden="true">
-      <img :src="selectedRodImage" alt="" class="fishing-rod" />
+      <img :src="context.rodImage" alt="" class="fishing-rod" />
       <span ref="rodLineAnchor" class="rod-line-anchor"></span>
     </div>
-    <div class="bite-alert" :class="{ visible: fishingStore.castPhase === 'bite' }">! CÁ CẮN CÂU !</div>
-    <div class="scene-status" :class="{ active: fishingStore.castPhase !== 'idle' }">
-      <span class="status-dot"></span>{{ fishingStore.castMessage }}
+    <div class="bite-alert" :class="{ visible: sceneState.castPhase === 'bite' }">! CÁ CẮN CÂU !</div>
+    <div class="scene-status" :class="{ active: sceneState.castPhase !== 'idle' }">
+      <span class="status-dot"></span>{{ sceneState.castMessage }}
     </div>
-    <Teleport to="body">
-      <Transition name="exit-dialog">
-        <div
-          v-if="live && showExitConfirmation"
-          class="fixed z-[40] inset-0 grid place-items-center p-5 bg-[rgba(4,17,11,0.72)] backdrop-blur-[7px]"
-          role="presentation"
-          @click.self="showExitConfirmation = false"
-        >
-          <section
-            class="w-[min(380px,100%)] p-5 border border-[rgba(255,226,149,0.5)] rounded-[20px] bg-[linear-gradient(145deg,#1b4531,#0f2e1f)] shadow-[0_24px_70px_rgba(0,0,0,0.6)] text-[#f4f0df] text-center"
-            role="dialog"
-            aria-modal="true"
-            aria-labelledby="confirm-exit-title"
-          >
-            <div id="confirm-exit-title" class="m-0 text-lg font-bold text-[#e8bd62]">Kết thúc chuyến câu?</div>
-            <div class="my-4 text-sm text-[#c8dccb] leading-relaxed">
-              Giỏ cá hiện có <strong class="text-white">{{ tripCaughtCount }}</strong> con cá. Bạn có chắc
-              chắn muốn quay lại bản đồ không?
-            </div>
-            <div v-if="live.fishing.leaveAreaError" role="alert" class="my-3 text-sm text-red-300">
-              {{ live.fishing.leaveAreaError }}
-            </div>
-            <div class="flex justify-center gap-3 mt-5">
-              <button
-                type="button"
-                class="px-4 py-2 border border-[rgba(255,255,255,0.2)] rounded-xl bg-[rgba(255,255,255,0.1)] hover:bg-[rgba(255,255,255,0.2)] text-white text-xs font-semibold transition-colors cursor-pointer"
-                @click="showExitConfirmation = false"
-              >
-                Ở lại câu
-              </button>
-              <button
-                type="button"
-                class="px-4 py-2 border border-[#e65c5c] rounded-xl bg-[#c23b3b] hover:bg-[#d94848] text-white text-xs font-bold shadow-[0_4px_12px_rgba(194,59,59,0.4)] transition-colors cursor-pointer disabled:opacity-50"
-                :disabled="isLeaving"
-                @click="handleBackToMap"
-              >
-                {{ isLeaving ? "Đang quay lại..." : "Kết thúc chuyến câu" }}
-              </button>
-            </div>
-          </section>
-        </div>
-      </Transition>
-    </Teleport>
   </section>
 </template>
 
 <style lang="css" scoped>
-.exit-dialog-enter-active,
-.exit-dialog-leave-active {
-  transition: opacity 0.18s ease;
-}
-
-.exit-dialog-enter-from,
-.exit-dialog-leave-to {
-  opacity: 0;
-}
-
 .fishing-scene {
   position: relative;
   min-height: 0;
