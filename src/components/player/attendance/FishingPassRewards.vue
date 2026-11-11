@@ -47,9 +47,9 @@ async function claimReward(rewardId: string) {
   claimingRewardId.value = rewardId;
   try {
     await fishingPassStore.claimReward(rewardId);
-    toast.success(tr('FishingPassRewards.da_nhan_phan_thuong_fishing_pass'), { get title() { return tr('AttendanceModal.thanh_cong'); }, position: "bottom" });
+    toast.success(tr('FishingPassRewards.da_nhan_phan_thuong_fishing_pass'), { get title() { return tr('AttendanceModal.thanh_cong'); } });
   } catch (err) {
-    toast.error(err instanceof Error ? err.message : tr('AttendanceModal.khong_the_nhan_phan_thuong_vui_long_thu_lai'), { get title() { return tr('AttendanceModal.nhan_thuong_that_bai'); }, position: "bottom" });
+    toast.error(err instanceof Error ? err.message : tr('AttendanceModal.khong_the_nhan_phan_thuong_vui_long_thu_lai'), { get title() { return tr('AttendanceModal.nhan_thuong_that_bai'); } });
   } finally {
     claimingRewardId.value = null;
   }
@@ -67,7 +67,8 @@ async function claimReward(rewardId: string) {
           <div class="min-w-max space-y-2">
             <div class="flex w-max gap-2">
               <div class="sticky left-0 z-10 flex w-24 shrink-0 items-center justify-center rounded-lg border border-[#cbd9c6] bg-[#f5f9f0] px-2 py-2 text-center text-xs font-black text-[#24352a]">{{ tr('FishingPassRewards.ngay_nhan') }}</div>
-              <div v-for="day in rewardsByDay" :key="`day-${day.day}`" class="w-24 shrink-0 rounded-lg border px-2 py-2 text-center text-xs font-bold text-[#24352a]" :class="day.unlocked ? 'border-[#cbd9c6] bg-[#f5f9f0]' : 'border-slate-200 bg-slate-50 text-slate-500'">{{ tr('FishingPassRewards.ngay') }} {{ day.day }}</div>
+              <div v-for="day in rewardsByDay" :key="`day-${day.day}`" class="w-24 shrink-0 rounded-lg border px-2 py-2 text-center text-xs font-bold text-[#24352a]" :class="day.unlocked ? 'border-[#cbd9c6] bg-[#f5f9f0]' : 'border-slate-200 bg-slate-50 text-slate-500'">{{
+                tr('FishingPassRewards.ngay') }} {{ day.day }}</div>
             </div>
             <div class="flex w-max gap-2">
               <div class="sticky left-0 z-10 flex w-24 shrink-0 flex-col items-center justify-center gap-2 rounded-lg bg-amber-100 px-2 text-center text-xs font-black uppercase text-amber-900">
@@ -84,8 +85,13 @@ async function claimReward(rewardId: string) {
                 <span v-else class="my-2 block text-[10px] text-slate-500">{{ tr('FishingPassRewards.chua_co_qua') }}</span>
                 <div class="flex h-7 items-center justify-center">
                   <span v-if="day.passReward?.claimed_at" class="text-[10px] font-bold text-emerald-700" :title="tr('FishingPassRewards.da_nhan_luc_value0', { value0: new Date(day.passReward.claimed_at).toLocaleString(getFormattingLocale()) })">{{ tr('AttendanceModal.da_nhan') }}</span>
-                  <button v-else-if="day.passReward && day.unlocked && fishingPassStore.hasFishingPass" type="button" class="rounded-md bg-amber-700 px-2 py-1 text-[10px] font-bold text-white hover:bg-amber-800 disabled:cursor-not-allowed disabled:opacity-50" :disabled="claimingRewardId !== null" @click="claimReward(day.passReward.id)">{{ claimingRewardId === day.passReward.id ? tr('FishingPassRewards.dang_nhan') : tr('FishingPassRewards.nhan') }}</button>
-                  <span v-else-if="!fishingPassStore.hasFishingPass" class="text-slate-500" :aria-label="tr('FishingPassRewards.khoa_fishing_pass')" :title="tr('FishingPassRewards.can_co_fishing_pass_de_nhan')"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="h-4 w-4" aria-hidden="true"><rect x="4" y="10" width="16" height="11" rx="2" /><path stroke-linecap="round" stroke-linejoin="round" d="M8 10V7a4 4 0 1 1 8 0v3" /></svg></span>
+                  <button v-else-if="day.passReward && day.unlocked && fishingPassStore.hasFishingPass" type="button" class="rounded-md bg-amber-700 px-2 py-1 text-[10px] font-bold text-white hover:bg-amber-800 disabled:cursor-not-allowed disabled:opacity-50" :disabled="claimingRewardId !== null"
+                    @click="claimReward(day.passReward.id)">{{ claimingRewardId === day.passReward.id ? tr('FishingPassRewards.dang_nhan') : tr('FishingPassRewards.nhan') }}</button>
+                  <span v-else-if="!fishingPassStore.hasFishingPass" class="text-slate-500" :aria-label="tr('FishingPassRewards.khoa_fishing_pass')" :title="tr('FishingPassRewards.can_co_fishing_pass_de_nhan')"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none"
+                      stroke="currentColor" stroke-width="2" class="h-4 w-4" aria-hidden="true">
+                      <rect x="4" y="10" width="16" height="11" rx="2" />
+                      <path stroke-linecap="round" stroke-linejoin="round" d="M8 10V7a4 4 0 1 1 8 0v3" />
+                    </svg></span>
                   <span v-else class="text-[10px] font-bold text-slate-500">{{ tr('FishingPassRewards.chua_mo') }}</span>
                 </div>
               </article>
@@ -100,7 +106,8 @@ async function claimReward(rewardId: string) {
                 </template>
                 <span v-else class="my-2 block text-[10px] text-slate-500">{{ tr('FishingPassRewards.chua_co_qua') }}</span>
                 <div class="flex h-7 items-center justify-center">
-                  <button v-if="day.freeReward && day.unlocked && !day.freeReward.claimed_at" type="button" class="rounded-md bg-emerald-700 px-2 py-1 text-[10px] font-bold text-white hover:bg-emerald-800 disabled:cursor-not-allowed disabled:opacity-50" :disabled="claimingRewardId !== null" @click="claimReward(day.freeReward.id)">{{ claimingRewardId === day.freeReward.id ? tr('FishingPassRewards.dang_nhan') : tr('FishingPassRewards.nhan') }}</button>
+                  <button v-if="day.freeReward && day.unlocked && !day.freeReward.claimed_at" type="button" class="rounded-md bg-emerald-700 px-2 py-1 text-[10px] font-bold text-white hover:bg-emerald-800 disabled:cursor-not-allowed disabled:opacity-50" :disabled="claimingRewardId !== null"
+                    @click="claimReward(day.freeReward.id)">{{ claimingRewardId === day.freeReward.id ? tr('FishingPassRewards.dang_nhan') : tr('FishingPassRewards.nhan') }}</button>
                   <span v-else-if="day.freeReward?.claimed_at" class="text-[10px] font-bold text-emerald-700">{{ tr('AttendanceModal.da_nhan') }}</span>
                   <span v-else class="text-[10px] font-bold text-slate-500">{{ day.unlocked ? tr('FishingPassRewards.dang_mo') : tr('FishingPassRewards.khoa') }}</span>
                 </div>
@@ -114,7 +121,7 @@ async function claimReward(rewardId: string) {
             <div v-if="fishingPassStore.currentPass.description" class="text-sm text-emerald-900/75">{{ fishingPassStore.currentPass.description }}</div>
             <div class="flex items-center gap-1">
               <div>{{ tr('FishingPassRewards.fishing_pass_co_gia') }}</div>
-              <Shells :amount="fishingPassStore.price"/>
+              <Shells :amount="fishingPassStore.price" />
             </div>
             <div>{{ tr('FishingPassRewards.thoi_gian') }} <span class="bg-white p-1 rounded-2xl">{{ formatDateTime(fishingPassStore.currentPass.start_at) }}</span> – <span class="bg-white p-1 rounded-2xl">{{ formatDateTime(fishingPassStore.currentPass.end_at) }}</span></div>
           </div>

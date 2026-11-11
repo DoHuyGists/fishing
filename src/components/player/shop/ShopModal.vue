@@ -1,17 +1,19 @@
 <script setup lang="ts">
-import { getFormattingLocale } from '../../../i18n';
 import { t as tr } from "../../../i18n";
 
 import { computed, onMounted, ref } from "vue";
 import Modal from "../../shared/Modal.vue";
-import Cash from "../currency/Cash.vue";
+import ShopItemCard from "./ShopItemCard.vue";
+import ShopPurchaseForm from "./ShopPurchaseForm.vue";
 import { useInventoryStore } from "../../../stores/inventory.ts";
 import { useCurrencyStore } from "../../../stores/currency.ts";
 import { useAuthStore } from "../../../stores/auth.ts";
+import { useToast } from "../../../composables/useToast";
 
 const inventoryStore = useInventoryStore();
 const currencyStore = useCurrencyStore();
 const authStore = useAuthStore();
+const toast = useToast();
 const search = ref("");
 const selectedClassification = ref("ALL");
 const selectedCategory = ref("ALL");
@@ -20,8 +22,6 @@ const viewMode = ref<"list" | "grid" | "group">("grid");
 const selectedItemId = ref<string | null>(null);
 const quantity = ref(1);
 const busy = ref(false);
-const error = ref("");
-const notice = ref("");
 const previewImage = ref<{ src: string; alt: string } | null>(null);
 
 const classifications = computed(() =>
@@ -76,45 +76,46 @@ const displayGroups = computed(() => {
 });
 const selectedItem = computed(() => inventoryStore.shopItems.find((item) => item.id === selectedItemId.value) ?? null);
 const totalPrice = computed(() => (selectedItem.value?.price ?? 0) * quantity.value);
+const totalReceived = computed(() => (selectedItem.value?.quantity ?? 1) * quantity.value);
 const canBuy = computed(
   () =>
     !!selectedItem.value &&
     selectedItem.value.price >= 0 &&
+    Number.isInteger(quantity.value) &&
     quantity.value > 0 &&
-    (selectedItem.value.quantity == null || selectedItem.value.quantity >= quantity.value) &&
     currencyStore.cash >= totalPrice.value,
 );
 
 onMounted(() => {
   void inventoryStore.loadShopItems();
+  if (authStore.userId) {
+    void inventoryStore.setUserInventory(authStore.userId).catch((err: unknown) => {
+      toast.error(err instanceof Error ? err.message : tr('ShopModal.khong_the_tai_tui_do'), { position: "bottom" });
+    });
+  }
 });
 
 function selectItem(id: string) {
   selectedItemId.value = id;
   quantity.value = 1;
-  error.value = "";
-  notice.value = "";
-}
-function openImagePreview(event: Event, src: string, alt: string) {
-  event.stopPropagation();
-  previewImage.value = { src, alt };
 }
 async function buyItem() {
-  if (!selectedItem.value || !canBuy.value) return;
-  error.value = "";
+  if (busy.value || !selectedItem.value || !canBuy.value) return;
+  const item = selectedItem.value;
+  const purchaseQuantity = quantity.value;
+  const receivedQuantity = (item.quantity ?? 1) * purchaseQuantity;
   busy.value = true;
   try {
-    await inventoryStore.purchaseItem(selectedItem.value.id, quantity.value);
-    const itemName = selectedItem.value.name;
+    await inventoryStore.purchaseItem(item.id, purchaseQuantity);
     await Promise.all([
       authStore.userId ? inventoryStore.setUserInventory(authStore.userId) : Promise.resolve(),
       currencyStore.fetchCurrency(),
       inventoryStore.loadShopItems(),
     ]);
-    notice.value = tr('ShopModal.da_mua_value0_value1', { value0: quantity.value, value1: itemName });
+    toast.success(tr('ShopModal.da_mua_value0_value1', { value0: receivedQuantity, value1: item.name }), { position: "bottom" });
     selectedItemId.value = null;
   } catch (err) {
-    error.value = err instanceof Error ? err.message : tr('ShopModal.khong_the_mua_vat_pham_vui_long_thu_lai');
+    toast.error(err instanceof Error ? err.message : tr('ShopModal.khong_the_mua_vat_pham_vui_long_thu_lai'), { position: "bottom" });
   } finally {
     busy.value = false;
   }
@@ -207,116 +208,30 @@ async function buyItem() {
               <span class="rounded-full bg-emerald-100 px-2 py-0.5 text-[10px]">{{ group.items.length }}</span>
             </div>
             <div :class="viewMode === 'list' ? 'flex flex-col gap-3' : 'grid grid-cols-1 gap-3 sm:grid-cols-2'">
-              <button
+              <ShopItemCard
                 v-for="item in group.items"
                 :key="item.id"
-                type="button"
-                class="group flex w-full min-w-0 overflow-hidden rounded-xl border bg-white text-left shadow-sm transition hover:-translate-y-0.5 hover:shadow-md"
-                :class="
-                  selectedItemId === item.id ? 'border-emerald-700 ring-2 ring-emerald-700/20' : 'border-[#cbd9c6]'
-                "
-                @click="selectItem(item.id)"
-              >
-                <div class="grid h-28 w-24 shrink-0 place-items-center overflow-hidden bg-[#f5f9f0] sm:h-32 sm:w-28">
-                  <img
-                    v-if="item.image"
-                    :src="item.image"
-                    :alt="item.name"
-                    loading="lazy"
-                    class="block h-full w-full cursor-zoom-in object-contain p-2"
-                    :class="{ 'scale-[2.5]': item.category?.trim().toLocaleLowerCase() === 'hook' }"
-                    @click.stop="openImagePreview($event, item.image, item.name)"
-                    draggable="false"
-                  />
-                  <span v-else class="text-5xl">{{ item.icon || "🎁" }}</span>
-                </div>
-                <div class="flex min-w-0 flex-1 flex-col p-3">
-                  <div
-                    v-if="item.classification"
-                    class="m-0 text-[10px] font-bold uppercase tracking-wide text-emerald-800"
-                  >
-                    {{ item.classification }}
-                  </div>
-                  <div class="m-0 truncate text-sm font-extrabold" :title="item.name">{{ item.name }}</div>
-                  <div class="m-0 mt-1 line-clamp-2 text-xs text-emerald-950/65">{{ item.information }}</div>
-                  <div
-                    class="mt-auto flex items-center justify-between gap-1 border-t border-[#cbd9c6]/70 pt-2 text-xs"
-                  >
-                    <span class="rounded bg-emerald-50 px-1.5 py-0.5 text-emerald-900">{{
-                      item.category || tr('ShopModal.vat_pham')
-                    }}</span>
-                    <strong class="whitespace-nowrap text-amber-700">{{ item.price.toLocaleString(getFormattingLocale()) }} {{ tr('currency.cashUnit') }}</strong>
-                  </div>
-                  <div v-if="item.quantity != null" class="m-0 mt-1 text-[10px] text-emerald-950/55">
-                    {{ tr('Fishfarm.con') }} {{ item.quantity.toLocaleString(getFormattingLocale()) }}
-                  </div>
-                </div>
-              </button>
+                :item="item"
+                :selected="selectedItemId === item.id"
+                :owned-quantity="authStore.userId ? inventoryStore.ownedQuantitiesByItemId.get(item.id) ?? 0 : 0"
+                @select="selectItem"
+                @preview="previewImage = $event"
+              />
             </div>
           </section>
         </div>
       </section>
-      <aside class="h-fit rounded-xl border border-[#cbd9c6] bg-[#f5f9f0] p-4 lg:sticky lg:top-0">
-        <div class="m-0 text-base font-extrabold">{{ tr('ShopModal.don_hang') }}</div>
-        <div v-if="selectedItem" class="mt-4">
-          <div class="flex items-center gap-3">
-            <div
-              class="grid size-14 shrink-0 place-items-center overflow-hidden rounded-lg border border-[#cbd9c6] bg-white text-2xl"
-            >
-              <img
-                v-if="selectedItem.image"
-                :src="selectedItem.image"
-                :alt="selectedItem.name"
-                class="h-full w-full object-contain"
-              /><span v-else>{{ selectedItem.icon || "🎁" }}</span>
-            </div>
-            <div class="min-w-0">
-              <div class="m-0 truncate font-bold">{{ selectedItem.name }}</div>
-              <div class="m-0 text-xs text-emerald-950/60">{{ selectedItem.category || tr('ShopModal.vat_pham') }}</div>
-            </div>
-          </div>
-          <label class="mt-5 block text-xs font-bold"
-            >{{ tr('ShopModal.so_luong') }}
-            <input
-              v-model.number="quantity"
-              type="number"
-              min="1"
-              :max="selectedItem.quantity ?? undefined"
-              class="mt-1 w-full rounded-lg border border-[#cbd9c6] bg-white px-3 py-2 text-sm"
-            />
-          </label>
-          <div class="mt-4 space-y-2 border-t border-[#cbd9c6] pt-3 text-sm">
-            <div class="flex justify-between">
-              <span>{{ tr('ShopModal.don_gia') }}</span><span>{{ selectedItem.price.toLocaleString(getFormattingLocale()) }} {{ tr('currency.cashUnit') }}</span>
-            </div>
-            <div class="flex justify-between font-extrabold">
-              <span>{{ tr('ShopModal.thanh_tien') }}</span><span>{{ totalPrice.toLocaleString(getFormattingLocale()) }} {{ tr('currency.cashUnit') }}</span>
-            </div>
-            <div class="flex justify-between text-xs text-emerald-900/65">
-              <span>{{ tr('ShopModal.so_du_hien_tai') }}</span><Cash :amount="currencyStore.formattedCash" />
-            </div>
-          </div>
-          <div v-if="selectedItem.quantity != null && selectedItem.quantity < 1" class="mt-3 text-xs text-red-700">
-            {{ tr('ShopModal.vat_pham_da_het_hang') }}
-          </div>
-          <div v-else-if="!canBuy && quantity > 0" class="mt-3 text-xs text-red-700">
-            {{ currencyStore.cash < totalPrice ? tr('ShopModal.ban_khong_du_tien') : tr('ShopModal.so_luong_vuot_qua_ton_kho') }}
-          </div>
-          <button
-            type="button"
-            class="mt-4 w-full rounded-lg bg-[#24352a] px-4 py-2.5 text-sm font-bold text-white transition hover:bg-emerald-900 disabled:cursor-not-allowed disabled:opacity-45"
-            :disabled="busy || !canBuy"
-            @click="buyItem"
-          >
-            {{ busy ? tr('DailyAttendance.dang_xu_ly') : tr('ShopModal.mua_vat_pham') }}
-          </button>
-        </div>
-        <div v-else class="mt-4 text-sm text-emerald-950/60">{{ tr('ShopModal.chon_mot_vat_pham_de_xem_gia_va_mua') }}</div>
-        <div v-if="error" class="mt-3 rounded-lg border border-red-200 bg-red-50 p-2 text-xs text-red-700">{{ error }}</div>
-        <div v-if="notice" class="mt-3 rounded-lg border border-emerald-200 bg-emerald-50 p-2 text-xs text-emerald-800">
-          {{ notice }}
-        </div>
-      </aside>
+      <ShopPurchaseForm
+        v-model:quantity="quantity"
+        :selected-item="selectedItem"
+        :total-price="totalPrice"
+        :total-received="totalReceived"
+        :can-buy="canBuy"
+        :cash="currencyStore.cash"
+        :formatted-cash="currencyStore.formattedCash"
+        :busy="busy"
+        @buy="buyItem"
+      />
     </div>
   </Modal>
   <Teleport to="body">

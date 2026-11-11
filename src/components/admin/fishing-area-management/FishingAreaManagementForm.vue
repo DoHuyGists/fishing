@@ -25,7 +25,7 @@ const sceneImageUrl = computed(() => {
 
 function toggleAnchorMode() {
   if (!worldStore.anchorable) {
-    toast.info("Mở khóa form để thao tác", { title: "Nhắc nhở", position: "bottom", duration: 2000 });
+    toast.info("Mở khóa form để thao tác", { title: "Nhắc nhở" });
     return;
   }
   worldStore.toggleAnchorMode();

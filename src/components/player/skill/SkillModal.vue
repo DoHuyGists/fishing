@@ -15,7 +15,7 @@ const toast = useToast();
 async function refresh() {
   if (skillStore.upgradingId) return;
   if (!await skillStore.fetchSkills() && skillStore.error) {
-    toast.error(skillStore.error, { get title() { return tr('SkillModal.khong_the_tai_ky_nang'); }, position: "bottom" });
+    toast.error(skillStore.error, { get title() { return tr('SkillModal.khong_the_tai_ky_nang'); } });
   }
 }
 
@@ -24,9 +24,9 @@ watch(() => authStore.user?.id, refresh, { immediate: true });
 async function upgrade(skillId: string) {
   const result = await skillStore.upgradeSkill(skillId);
   if (result) {
-    toast.success(tr('SkillModal.da_nang_value0_len_cap_value1', { value0: result.skill_name, value1: result.current_level }), { get title() { return tr('SkillModal.nang_cap_thanh_cong'); }, position: "bottom" });
+    toast.success(tr('SkillModal.da_nang_value0_len_cap_value1', { value0: result.skill_name, value1: result.current_level }), { get title() { return tr('SkillModal.nang_cap_thanh_cong'); } });
   } else if (skillStore.upgradeError) {
-    toast.error(skillStore.upgradeError, { get title() { return tr('SkillModal.nang_cap_that_bai'); }, position: "bottom" });
+    toast.error(skillStore.upgradeError, { get title() { return tr('SkillModal.nang_cap_that_bai'); } });
   }
 }
 </script>
@@ -47,14 +47,7 @@ async function upgrade(skillId: string) {
       </div>
 
       <div class="grid grid-cols-[repeat(auto-fit,minmax(min(100%,18rem),1fr))] gap-3">
-        <SkillCard
-          v-for="skill in skillStore.skillCards"
-          :key="skill.id"
-          :skill="skill"
-          :disabled="skillStore.loading || !!skillStore.upgradingId || !!skillStore.error"
-          :upgrading="skillStore.upgradingId === skill.id"
-          @upgrade="upgrade"
-        />
+        <SkillCard v-for="skill in skillStore.skillCards" :key="skill.id" :skill="skill" :disabled="skillStore.loading || !!skillStore.upgradingId || !!skillStore.error" :upgrading="skillStore.upgradingId === skill.id" @upgrade="upgrade" />
       </div>
     </section>
   </Modal>

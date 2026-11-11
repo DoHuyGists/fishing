@@ -50,7 +50,7 @@ async function loadData() {
     const nextClaimAt = await supabaseCurrencyRepository.getNextDailyRewardAt();
     nextClaimDailyRewardAt.value = nextClaimAt ? new Date(nextClaimAt) : null;
   } catch (err) {
-    toast.error(err instanceof Error ? err.message : tr('AttendanceModal.khong_the_tai_trang_thai_diem_danh'), { get title() { return tr('AttendanceModal.tai_that_bai'); }, position: "bottom" });
+    toast.error(err instanceof Error ? err.message : tr('AttendanceModal.khong_the_tai_trang_thai_diem_danh'), { get title() { return tr('AttendanceModal.tai_that_bai'); } });
   }
 }
 
@@ -79,9 +79,9 @@ async function claimDailyReward() {
     };
     nextClaimDailyRewardAt.value = result.next_claim_daily_reward_at ? new Date(result.next_claim_daily_reward_at) : new Date(Date.now() + 24 * 60 * 60 * 1000);
     await currencyStore.fetchCurrency();
-    toast.success(tr('AttendanceModal.da_nhan_phan_thuong_diem_danh'), { get title() { return tr('AttendanceModal.thanh_cong'); }, position: "bottom" });
+    toast.success(tr('AttendanceModal.da_nhan_phan_thuong_diem_danh'), { get title() { return tr('AttendanceModal.thanh_cong'); } });
   } catch (err) {
-    toast.error(err instanceof Error ? err.message : tr('AttendanceModal.khong_the_nhan_phan_thuong_vui_long_thu_lai'), { get title() { return tr('AttendanceModal.nhan_thuong_that_bai'); }, position: "bottom" });
+    toast.error(err instanceof Error ? err.message : tr('AttendanceModal.khong_the_nhan_phan_thuong_vui_long_thu_lai'), { get title() { return tr('AttendanceModal.nhan_thuong_that_bai'); } });
   } finally {
     isClaimingDailyReward.value = false;
   }

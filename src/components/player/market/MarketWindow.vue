@@ -91,7 +91,7 @@ function cancelBuy() {
 async function handleBuyFish() {
   if (!itemToBuy.value) return;
   if (!authStore.userId) {
-    toast.error(tr('MarketWindow.ban_chua_dang_nhap'), { get title() { return tr('MarketWindow.khong_the_mua_ca'); }, position: "bottom" });
+    toast.error(tr('MarketWindow.ban_chua_dang_nhap'), { get title() { return tr('MarketWindow.khong_the_mua_ca'); } });
     return;
   }
 
@@ -102,12 +102,11 @@ async function handleBuyFish() {
     await marketStore.loadMarketListings();
     await caughtStore.loadCaughtFishes();
     cancelBuy();
-    toast.success(tr('MarketWindow.mua_value0_thanh_cong', { value0: fishName }), { get title() { return tr('FishingPassPurchaseModal.giao_dich_thanh_cong'); }, position: "bottom" });
+    toast.success(tr('MarketWindow.mua_value0_thanh_cong', { value0: fishName }), { get title() { return tr('FishingPassPurchaseModal.giao_dich_thanh_cong'); } });
   } catch (err: any) {
     console.error("Lỗi khi mua cá:", err);
     toast.error(err?.message || tr('MarketWindow.khong_the_mua_ca_vui_long_thu_lai'), {
-      get title() { return tr('MarketWindow.mua_ca_that_bai'); },
-      position: "bottom",
+      get title() { return tr('MarketWindow.mua_ca_that_bai'); }
     });
   } finally {
     isBuying.value = false;
@@ -121,10 +120,10 @@ async function handleCancelListing(item: MarketListing) {
     await supabaseMarketRepository.cancelListing(item.id);
     await marketStore.loadMarketListings();
     await caughtStore.loadCaughtFishes();
-    toast.success(tr('MarketWindow.da_go_tin_ban_ca'), { get title() { return tr('AttendanceModal.thanh_cong'); }, position: "bottom" });
+    toast.success(tr('MarketWindow.da_go_tin_ban_ca'), { get title() { return tr('AttendanceModal.thanh_cong'); } });
   } catch (err) {
     console.error("Lỗi khi gỡ cá:", err);
-    toast.error(tr('MarketWindow.ban_chua_dang_nhap'), { get title() { return tr('MarketWindow.khong_the_mua_ca'); }, position: "bottom" });
+    toast.error(tr('MarketWindow.ban_chua_dang_nhap'), { get title() { return tr('MarketWindow.khong_the_mua_ca'); } });
   } finally {
     isCancellingListing.value = false;
   }
@@ -165,266 +164,154 @@ onUnmounted(() => marketStore.stopRealtime());
     <div v-if="marketStore.error" role="alert" class="mb-3 rounded bg-red-50 p-3 text-red-700">{{ marketStore.error }}</div>
     <Tab v-model="activeMarketTab" :tabs="marketTabs" :aria-label="tr('MarketWindow.cho_ca')" lazy>
       <template #all>
-      <!-- Filter & Search Toolbar (shown for 'all' tab) -->
-      <div
-        v-if="activeMarketTab === 'all'"
-        class="mt-2 bg-white border-b border-gray-100 flex flex-wrap items-center gap-3 flex-shrink-0"
-      >
-        <!-- Search input -->
-        <div class="relative flex-1 min-w-[200px]">
-          <input
-            v-model="marketSearch"
-            type="text"
-            :placeholder="tr('MarketWindow.tim_kiem_ca_rao_ban')"
-            class="w-full pl-8 pr-3 py-1.5 text-xs border border-gray-300 rounded-lg focus:outline-none focus:border-gray-300 bg-gray-50/70"
-          />
-          <svg
-            class="w-3.5 h-3.5 absolute left-2.5 top-2.5 text-gray-400"
-            fill="none"
-            stroke="currentColor"
-            viewBox="0 0 24 24"
-          >
-            <path
-              stroke-linecap="round"
-              stroke-linejoin="round"
-              stroke-width="2"
-              d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"
-            />
-          </svg>
-        </div>
-
-        <!-- Rarity filter -->
-        <div class="flex items-center gap-1 text-xs">
-          <span class="text-gray-500 font-medium text-[11px]">{{ tr('MarketWindow.do_hiem') }}</span>
-          <select
-            v-model="marketRarity"
-            class="px-2 py-1 border border-gray-300 rounded-lg text-xs bg-white text-gray-700 focus:outline-none"
-          >
-            <option value="ALL">{{ tr('Achievement.tat_ca') }}</option>
-            <option value="HUYỀN THOẠI">{{ tr('WeatherSection.huyen_thoai') }}</option>
-            <option value="SỬ THI">{{ tr('WeatherSection.su_thi') }}</option>
-            <option value="HIẾM">{{ tr('WeatherSection.hiem') }}</option>
-            <option value="THƯỜNG">{{ tr('LatestCaughtList.thuong') }}</option>
-          </select>
-        </div>
-
-        <div
-          class="ml-auto flex rounded-lg border border-gray-200 bg-white p-0.5"
-          role="group"
-          :aria-label="tr('CaughtModal.che_do_hien_thi')"
-        >
-          <button
-            type="button"
-            class="rounded-md px-2 py-1 text-[11px] font-bold"
-            :class="viewMode === 'list' ? 'bg-[#153221] text-white' : 'text-gray-600 hover:bg-gray-100'"
-            :aria-pressed="viewMode === 'list'"
-            @click="viewMode = 'list'"
-          >
-            {{ tr('CaughtModal.danh_sach') }}
-          </button>
-          <button
-            type="button"
-            class="rounded-md px-2 py-1 text-[11px] font-bold"
-            :class="viewMode === 'grid' ? 'bg-[#153221] text-white' : 'text-gray-600 hover:bg-gray-100'"
-            :aria-pressed="viewMode === 'grid'"
-            @click="viewMode = 'grid'"
-          >
-            {{ tr('CaughtModal.luoi') }}
-          </button>
-          <button
-            type="button"
-            class="rounded-md px-2 py-1 text-[11px] font-bold"
-            :class="viewMode === 'species' ? 'bg-[#153221] text-white' : 'text-gray-600 hover:bg-gray-100'"
-            :aria-pressed="viewMode === 'species'"
-            @click="viewMode = 'species'"
-          >
-            {{ tr('CaughtModal.theo_loai') }}
-          </button>
-        </div>
-        <!-- Sort dropdown -->
-        <div class="flex items-center gap-1 text-xs">
-          <span class="text-gray-500 font-medium text-[11px]">{{ tr('MarketWindow.sap_xep') }}</span>
-          <select
-            v-model="marketSort"
-            class="px-2 py-1 border border-gray-300 rounded-lg text-xs bg-white text-gray-700 focus:outline-none"
-          >
-            <option value="newest">{{ tr('MarketWindow.moi_nhat') }}</option>
-            <option value="price-asc">{{ tr('MarketWindow.gia_thap_cao') }}</option>
-            <option value="price-desc">{{ tr('MarketWindow.gia_cao_thap') }}</option>
-          </select>
-        </div>
-      </div>
-
-      <!-- Content Area -->
-      <div class="flex-1 mt-2 bg-gray-50/50">
-        <!-- Tab 1: Sàn Giao Dịch -->
-        <div v-if="activeMarketTab === 'all'">
-          <div
-            v-if="marketStore.isLoadingMarket"
-            class="py-16 text-center text-gray-500 text-xs flex flex-col items-center gap-2"
-          >
-            <div class="w-8 h-8 border border-emerald-600 border-t-transparent rounded-full animate-spin"></div>
-            <span>{{ tr('MarketWindow.dang_tai_cac_ca_dang_giao_dich') }}</span>
+        <!-- Filter & Search Toolbar (shown for 'all' tab) -->
+        <div v-if="activeMarketTab === 'all'" class="mt-2 bg-white border-b border-gray-100 flex flex-wrap items-center gap-3 flex-shrink-0">
+          <!-- Search input -->
+          <div class="relative flex-1 min-w-[200px]">
+            <input v-model="marketSearch" type="text" :placeholder="tr('MarketWindow.tim_kiem_ca_rao_ban')" class="w-full pl-8 pr-3 py-1.5 text-xs border border-gray-300 rounded-lg focus:outline-none focus:border-gray-300 bg-gray-50/70" />
+            <svg class="w-3.5 h-3.5 absolute left-2.5 top-2.5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+            </svg>
           </div>
 
-          <div v-else-if="!filteredMarketListings.length" class="py-16 text-center text-gray-400 text-xs">
-            <span class="text-3xl block mb-2">🎣</span>
-            <div class="m-0 font-medium">
-              {{
-                marketSearch || marketRarity !== "ALL"
-                  ? tr('MarketWindow.khong_tim_thay_con_ca_nao_phu_hop_voi_bo_loc')
-                  : tr('MarketWindow.hien_chua_co_ca_nao_duoc_dang_ban_tren_thi_truong')
-              }}
+          <!-- Rarity filter -->
+          <div class="flex items-center gap-1 text-xs">
+            <span class="text-gray-500 font-medium text-[11px]">{{ tr('MarketWindow.do_hiem') }}</span>
+            <select v-model="marketRarity" class="px-2 py-1 border border-gray-300 rounded-lg text-xs bg-white text-gray-700 focus:outline-none">
+              <option value="ALL">{{ tr('Achievement.tat_ca') }}</option>
+              <option value="HUYỀN THOẠI">{{ tr('WeatherSection.huyen_thoai') }}</option>
+              <option value="SỬ THI">{{ tr('WeatherSection.su_thi') }}</option>
+              <option value="HIẾM">{{ tr('WeatherSection.hiem') }}</option>
+              <option value="THƯỜNG">{{ tr('LatestCaughtList.thuong') }}</option>
+            </select>
+          </div>
+
+          <div class="ml-auto flex rounded-lg border border-gray-200 bg-white p-0.5" role="group" :aria-label="tr('CaughtModal.che_do_hien_thi')">
+            <button type="button" class="rounded-md px-2 py-1 text-[11px] font-bold" :class="viewMode === 'list' ? 'bg-[#153221] text-white' : 'text-gray-600 hover:bg-gray-100'" :aria-pressed="viewMode === 'list'" @click="viewMode = 'list'">
+              {{ tr('CaughtModal.danh_sach') }}
+            </button>
+            <button type="button" class="rounded-md px-2 py-1 text-[11px] font-bold" :class="viewMode === 'grid' ? 'bg-[#153221] text-white' : 'text-gray-600 hover:bg-gray-100'" :aria-pressed="viewMode === 'grid'" @click="viewMode = 'grid'">
+              {{ tr('CaughtModal.luoi') }}
+            </button>
+            <button type="button" class="rounded-md px-2 py-1 text-[11px] font-bold" :class="viewMode === 'species' ? 'bg-[#153221] text-white' : 'text-gray-600 hover:bg-gray-100'" :aria-pressed="viewMode === 'species'" @click="viewMode = 'species'">
+              {{ tr('CaughtModal.theo_loai') }}
+            </button>
+          </div>
+          <!-- Sort dropdown -->
+          <div class="flex items-center gap-1 text-xs">
+            <span class="text-gray-500 font-medium text-[11px]">{{ tr('MarketWindow.sap_xep') }}</span>
+            <select v-model="marketSort" class="px-2 py-1 border border-gray-300 rounded-lg text-xs bg-white text-gray-700 focus:outline-none">
+              <option value="newest">{{ tr('MarketWindow.moi_nhat') }}</option>
+              <option value="price-asc">{{ tr('MarketWindow.gia_thap_cao') }}</option>
+              <option value="price-desc">{{ tr('MarketWindow.gia_cao_thap') }}</option>
+            </select>
+          </div>
+        </div>
+
+        <!-- Content Area -->
+        <div class="flex-1 mt-2 bg-gray-50/50">
+          <!-- Tab 1: Sàn Giao Dịch -->
+          <div v-if="activeMarketTab === 'all'">
+            <div v-if="marketStore.isLoadingMarket" class="py-16 text-center text-gray-500 text-xs flex flex-col items-center gap-2">
+              <div class="w-8 h-8 border border-emerald-600 border-t-transparent rounded-full animate-spin"></div>
+              <span>{{ tr('MarketWindow.dang_tai_cac_ca_dang_giao_dich') }}</span>
             </div>
-          </div>
 
-          <div
-            v-else-if="viewMode === 'species'"
-            class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-4"
-          >
-            <section
-              v-for="group in groupedListings"
-              :key="group.id"
-              class="overflow-hidden rounded-xl border border-gray-200 bg-white shadow-sm"
-            >
-              <div class="flex items-center justify-between gap-2 border-b border-gray-100 px-3 py-2">
-                <span class="truncate text-xs font-bold">{{
-                  group.listings[0]?.caught?.fish?.name || tr('CaughtModal.ca_chua_ro_ten')
-                }}</span>
-                <span class="shrink-0 rounded-full bg-emerald-100 px-2 py-0.5 text-[10px] font-bold text-emerald-800"
-                  >{{ group.listings.length }} {{ tr('MarketWindow.tin') }}</span
-                >
+            <div v-else-if="!filteredMarketListings.length" class="py-16 text-center text-gray-400 text-xs">
+              <span class="text-3xl block mb-2">🎣</span>
+              <div class="m-0 font-medium">
+                {{
+                  marketSearch || marketRarity !== "ALL"
+                    ? tr('MarketWindow.khong_tim_thay_con_ca_nao_phu_hop_voi_bo_loc')
+                    : tr('MarketWindow.hien_chua_co_ca_nao_duoc_dang_ban_tren_thi_truong')
+                }}
               </div>
-              <div class="space-y-2 p-2">
-                <article
-                  v-for="item in group.listings"
-                  :key="item.id"
-                  class="flex items-center gap-2 rounded-lg border border-gray-100 p-2"
-                >
-                  <img
-                    :src="item.caught?.fish?.image || '/fish/VN/fish.jpg'"
-                    :alt="item.caught?.fish?.name"
-                    class="h-12 w-14 shrink-0 rounded object-cover"
-                  />
-                  <div class="min-w-0 flex-1">
-                    <div class="truncate text-[11px] text-gray-500">
-                      {{ item.caught?.fish?.weight }} kg · {{ formatDate(item.created_at) }}
+            </div>
+
+            <div v-else-if="viewMode === 'species'" class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-4">
+              <section v-for="group in groupedListings" :key="group.id" class="overflow-hidden rounded-xl border border-gray-200 bg-white shadow-sm">
+                <div class="flex items-center justify-between gap-2 border-b border-gray-100 px-3 py-2">
+                  <span class="truncate text-xs font-bold">{{
+                    group.listings[0]?.caught?.fish?.name || tr('CaughtModal.ca_chua_ro_ten')
+                  }}</span>
+                  <span class="shrink-0 rounded-full bg-emerald-100 px-2 py-0.5 text-[10px] font-bold text-emerald-800">{{ group.listings.length }} {{ tr('MarketWindow.tin') }}</span>
+                </div>
+                <div class="space-y-2 p-2">
+                  <article v-for="item in group.listings" :key="item.id" class="flex items-center gap-2 rounded-lg border border-gray-100 p-2">
+                    <img :src="item.caught?.fish?.image || '/fish/VN/fish.jpg'" :alt="item.caught?.fish?.name" class="h-12 w-14 shrink-0 rounded object-cover" />
+                    <div class="min-w-0 flex-1">
+                      <div class="truncate text-[11px] text-gray-500">
+                        {{ item.caught?.fish?.weight }} kg · {{ formatDate(item.created_at) }}
+                      </div>
+                      <div class="text-xs font-bold text-amber-700">{{ item.price.toLocaleString(getFormattingLocale()) }} {{ tr('currency.cashUnit') }}</div>
                     </div>
-                    <div class="text-xs font-bold text-amber-700">{{ item.price.toLocaleString(getFormattingLocale()) }} {{ tr('currency.cashUnit') }}</div>
+                    <button v-if="item.user_id === authStore.userId" type="button" disabled class="rounded bg-gray-100 px-2 py-1 text-[10px] text-gray-400">
+                      {{ tr('MarketWindow.da_dang') }}
+                    </button>
+                    <button v-else type="button" class="rounded bg-[#153221] px-2 py-1 text-[10px] font-bold text-white" @click="confirmBuy(item)">
+                      {{ tr('InventoryModal.mua') }}
+                    </button>
+                  </article>
+                </div>
+              </section>
+            </div>
+
+            <div v-else :class="viewMode === 'grid'
+              ? 'grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-4'
+              : 'flex flex-col gap-2'
+              ">
+              <div v-for="item in filteredMarketListings" :key="item.id" class="bg-white border border-gray-200 hover:border-emerald-500/50 rounded-xl p-3 shadow-2xs hover:shadow-md transition-all relative group"
+                :class="viewMode === 'grid' ? 'flex flex-col justify-between' : 'flex items-center gap-3'">
+                <div :class="viewMode === 'list' ? 'flex min-w-0 flex-1 items-center gap-3' : ''">
+                  <!-- Header hình cá -->
+                  <div class="relative rounded-lg overflow-hidden bg-gray-100 mb-2 border border-gray-100" :class="viewMode === 'grid' ? 'w-full h-32' : 'h-20 w-28 shrink-0'">
+                    <img :src="item.caught?.fish?.image || '/fish/VN/fish.jpg'" :alt="item.caught?.fish?.name" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300" />
+
+                    <span class="absolute top-2 right-2 px-2 py-0.5 text-[9px] font-extrabold rounded border uppercase shadow-xs backdrop-blur-xs" :class="getRarityBadgeClass(item.caught?.fish?.rarity)">
+                      {{ item.caught?.fish?.rarity }}
+                    </span>
+
+                    <!-- Badge nếu là cá của bản thân -->
+                    <span v-if="item.user_id === authStore.userId" class="absolute top-2 left-2 px-2 py-0.5 bg-amber-500 text-white font-extrabold text-[9px] rounded shadow-xs">
+                      {{ tr('MarketWindow.ca_cua_ban') }}
+                    </span>
                   </div>
-                  <button
-                    v-if="item.user_id === authStore.userId"
-                    type="button"
-                    disabled
-                    class="rounded bg-gray-100 px-2 py-1 text-[10px] text-gray-400"
-                  >
+
+                  <!-- Thông tin chi tiết -->
+                  <div class="flex flex-col gap-1 mb-3" :class="viewMode === 'list' ? 'min-w-0 flex-1' : ''">
+                    <div class="m-0 font-bold text-sm text-[#263238] truncate">{{ item.caught?.fish?.name }}</div>
+                    <div class="flex items-center gap-2 text-[11px] text-gray-500 font-medium">
+                      <span>⚖️
+                        {{
+                          typeof item.caught?.fish?.weight === "number"
+                            ? item.caught.fish.weight + " kg"
+                            : item.caught?.fish?.weight
+                        }}</span>
+                    </div>
+                    <div class="text-[10px] text-gray-400 mt-0.5">{{ tr('MarketWindow.dang_ban') }} {{ formatDate(item.created_at) }}</div>
+                  </div>
+                </div>
+
+                <!-- Footer Giá & Nút Mua -->
+                <div class="pt-2 border-t border-gray-100 flex items-center justify-between gap-2 mt-auto" :class="viewMode === 'list' ? 'border-t-0 border-l pl-3' : ''">
+                  <div class="flex flex-col">
+                    <span class="text-[10px] text-gray-400 uppercase font-bold">{{ tr('MarketWindow.gia_ban') }}</span>
+                    <span class="text-sm font-extrabold text-amber-600">{{ item.price.toLocaleString(getFormattingLocale()) }} {{ tr('currency.cashUnit') }}</span>
+                  </div>
+
+                  <button v-if="item.user_id === authStore.userId" type="button" disabled class="px-3 py-1.5 bg-gray-100 text-gray-400 font-bold text-xs rounded-lg cursor-not-allowed">
                     {{ tr('MarketWindow.da_dang') }}
                   </button>
-                  <button
-                    v-else
-                    type="button"
-                    class="rounded bg-[#153221] px-2 py-1 text-[10px] font-bold text-white"
-                    @click="confirmBuy(item)"
-                  >
-                    {{ tr('InventoryModal.mua') }}
+
+                  <button v-else type="button" @click="confirmBuy(item)" class="px-3 py-1.5 bg-[#153221] hover:bg-[#1a3e29] text-white font-bold text-xs rounded-lg transition-colors shadow-xs cursor-pointer flex items-center gap-1">
+                    <span>{{ tr('MarketWindow.mua_ca') }}</span>
                   </button>
-                </article>
-              </div>
-            </section>
-          </div>
-
-          <div
-            v-else
-            :class="
-              viewMode === 'grid'
-                ? 'grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-4'
-                : 'flex flex-col gap-2'
-            "
-          >
-            <div
-              v-for="item in filteredMarketListings"
-              :key="item.id"
-              class="bg-white border border-gray-200 hover:border-emerald-500/50 rounded-xl p-3 shadow-2xs hover:shadow-md transition-all relative group"
-              :class="viewMode === 'grid' ? 'flex flex-col justify-between' : 'flex items-center gap-3'"
-            >
-              <div :class="viewMode === 'list' ? 'flex min-w-0 flex-1 items-center gap-3' : ''">
-                <!-- Header hình cá -->
-                <div
-                  class="relative rounded-lg overflow-hidden bg-gray-100 mb-2 border border-gray-100"
-                  :class="viewMode === 'grid' ? 'w-full h-32' : 'h-20 w-28 shrink-0'"
-                >
-                  <img
-                    :src="item.caught?.fish?.image || '/fish/VN/fish.jpg'"
-                    :alt="item.caught?.fish?.name"
-                    class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
-                  />
-
-                  <span
-                    class="absolute top-2 right-2 px-2 py-0.5 text-[9px] font-extrabold rounded border uppercase shadow-xs backdrop-blur-xs"
-                    :class="getRarityBadgeClass(item.caught?.fish?.rarity)"
-                  >
-                    {{ item.caught?.fish?.rarity }}
-                  </span>
-
-                  <!-- Badge nếu là cá của bản thân -->
-                  <span
-                    v-if="item.user_id === authStore.userId"
-                    class="absolute top-2 left-2 px-2 py-0.5 bg-amber-500 text-white font-extrabold text-[9px] rounded shadow-xs"
-                  >
-                    {{ tr('MarketWindow.ca_cua_ban') }}
-                  </span>
                 </div>
-
-                <!-- Thông tin chi tiết -->
-                <div class="flex flex-col gap-1 mb-3" :class="viewMode === 'list' ? 'min-w-0 flex-1' : ''">
-                  <div class="m-0 font-bold text-sm text-[#263238] truncate">{{ item.caught?.fish?.name }}</div>
-                  <div class="flex items-center gap-2 text-[11px] text-gray-500 font-medium">
-                    <span
-                      >⚖️
-                      {{
-                        typeof item.caught?.fish?.weight === "number"
-                          ? item.caught.fish.weight + " kg"
-                          : item.caught?.fish?.weight
-                      }}</span
-                    >
-                  </div>
-                  <div class="text-[10px] text-gray-400 mt-0.5">{{ tr('MarketWindow.dang_ban') }} {{ formatDate(item.created_at) }}</div>
-                </div>
-              </div>
-
-              <!-- Footer Giá & Nút Mua -->
-              <div
-                class="pt-2 border-t border-gray-100 flex items-center justify-between gap-2 mt-auto"
-                :class="viewMode === 'list' ? 'border-t-0 border-l pl-3' : ''"
-              >
-                <div class="flex flex-col">
-                  <span class="text-[10px] text-gray-400 uppercase font-bold">{{ tr('MarketWindow.gia_ban') }}</span>
-                  <span class="text-sm font-extrabold text-amber-600">{{ item.price.toLocaleString(getFormattingLocale()) }} {{ tr('currency.cashUnit') }}</span>
-                </div>
-
-                <button
-                  v-if="item.user_id === authStore.userId"
-                  type="button"
-                  disabled
-                  class="px-3 py-1.5 bg-gray-100 text-gray-400 font-bold text-xs rounded-lg cursor-not-allowed"
-                >
-                  {{ tr('MarketWindow.da_dang') }}
-                </button>
-
-                <button
-                  v-else
-                  type="button"
-                  @click="confirmBuy(item)"
-                  class="px-3 py-1.5 bg-[#153221] hover:bg-[#1a3e29] text-white font-bold text-xs rounded-lg transition-colors shadow-xs cursor-pointer flex items-center gap-1"
-                >
-                  <span>{{ tr('MarketWindow.mua_ca') }}</span>
-                </button>
               </div>
             </div>
           </div>
-        </div>
 
-      </div>
+        </div>
       </template>
       <template #my>
         <div>
@@ -436,33 +323,14 @@ onUnmounted(() => marketStore.stopRealtime());
             </div>
           </div>
 
-          <div
-            v-else
-            :class="
-              viewMode === 'grid' ? 'grid grid-cols-1 sm:grid-cols-3 md:grid-cols-5 gap-4' : 'flex flex-col gap-2'
-            "
-          >
-            <div
-              v-for="item in myMarketListings"
-              :key="item.id"
-              class="bg-white border border-gray-200 rounded-xl p-3 shadow-2xs"
-              :class="viewMode === 'grid' ? 'flex flex-col justify-between' : 'flex items-center gap-3'"
-            >
+          <div v-else :class="viewMode === 'grid' ? 'grid grid-cols-1 sm:grid-cols-3 md:grid-cols-5 gap-4' : 'flex flex-col gap-2'
+            ">
+            <div v-for="item in myMarketListings" :key="item.id" class="bg-white border border-gray-200 rounded-xl p-3 shadow-2xs" :class="viewMode === 'grid' ? 'flex flex-col justify-between' : 'flex items-center gap-3'">
               <div>
-                <div
-                  class="relative rounded-lg overflow-hidden bg-gray-100 mb-2 border border-gray-100"
-                  :class="viewMode === 'grid' ? 'w-full h-32' : 'h-20 w-28 shrink-0'"
-                >
-                  <img
-                    :src="item.caught?.fish?.image || '/fish/VN/fish.jpg'"
-                    :alt="item.caught?.fish?.name"
-                    class="w-full h-full object-cover"
-                  />
+                <div class="relative rounded-lg overflow-hidden bg-gray-100 mb-2 border border-gray-100" :class="viewMode === 'grid' ? 'w-full h-32' : 'h-20 w-28 shrink-0'">
+                  <img :src="item.caught?.fish?.image || '/fish/VN/fish.jpg'" :alt="item.caught?.fish?.name" class="w-full h-full object-cover" />
 
-                  <span
-                    class="absolute top-2 right-2 px-2 py-0.5 text-[9px] font-extrabold rounded border uppercase shadow-xs"
-                    :class="getRarityBadgeClass(item.caught?.fish?.rarity)"
-                  >
+                  <span class="absolute top-2 right-2 px-2 py-0.5 text-[9px] font-extrabold rounded border uppercase shadow-xs" :class="getRarityBadgeClass(item.caught?.fish?.rarity)">
                     {{ item.caught?.fish?.rarity }}
                   </span>
                 </div>
@@ -470,14 +338,12 @@ onUnmounted(() => marketStore.stopRealtime());
                 <div class="flex flex-col gap-1 mb-3">
                   <div class="m-0 font-bold text-sm text-[#263238] truncate">{{ item.caught?.fish?.name }}</div>
                   <div class="flex items-center gap-2 text-[11px] text-gray-500 font-medium">
-                    <span
-                      >⚖️
+                    <span>⚖️
                       {{
                         typeof item.caught?.fish?.weight === "number"
                           ? item.caught.fish.weight + " kg"
                           : item.caught?.fish?.weight
-                      }}</span
-                    >
+                      }}</span>
                   </div>
                   <div class="text-[10px] text-gray-400">{{ tr('MarketWindow.ngay_dang') }} {{ formatDate(item.created_at) }}</div>
                 </div>
@@ -489,12 +355,7 @@ onUnmounted(() => marketStore.stopRealtime());
                   <span class="text-sm font-extrabold text-amber-600">{{ item.price.toLocaleString(getFormattingLocale()) }} {{ tr('currency.cashUnit') }}</span>
                 </div>
 
-                <button
-                  type="button"
-                  @click="handleCancelListing(item)"
-                  :disabled="isCancellingListing"
-                  class="px-3 py-1.5 border border-red-200 bg-red-50 hover:bg-red-100 text-red-600 font-bold text-xs rounded-lg transition-colors cursor-pointer"
-                >
+                <button type="button" @click="handleCancelListing(item)" :disabled="isCancellingListing" class="px-3 py-1.5 border border-red-200 bg-red-50 hover:bg-red-100 text-red-600 font-bold text-xs rounded-lg transition-colors cursor-pointer">
                   {{ isCancellingListing ? tr('MarketWindow.dang_go') : tr('MarketWindow.go_ban') }}
                 </button>
               </div>
@@ -528,23 +389,19 @@ onUnmounted(() => marketStore.stopRealtime());
             </div>
           </div>
           <nav v-if="marketStore.history.length || marketStore.historyPage > 1" :aria-label="tr('MarketWindow.phan_trang_lich_su_mua_ban')" class="flex items-center justify-between gap-3 text-xs">
-            <button type="button" :disabled="marketStore.historyLoading || marketStore.historyPage <= 1" class="rounded-lg border border-[#cbd9c6] px-3 py-1.5 hover:bg-[#f5f9f0] disabled:cursor-not-allowed disabled:opacity-40" @click="marketStore.loadHistory(authStore.userId, marketStore.historyPage - 1)">{{ tr('Fishfarm.truoc') }}</button>
+            <button type="button" :disabled="marketStore.historyLoading || marketStore.historyPage <= 1" class="rounded-lg border border-[#cbd9c6] px-3 py-1.5 hover:bg-[#f5f9f0] disabled:cursor-not-allowed disabled:opacity-40"
+              @click="marketStore.loadHistory(authStore.userId, marketStore.historyPage - 1)">{{ tr('Fishfarm.truoc') }}</button>
             <span class="text-gray-500">{{ tr('CaughtModal.trang') }} {{ marketStore.historyPage }}</span>
-            <button type="button" :disabled="marketStore.historyLoading || !marketStore.historyHasNext" class="rounded-lg border border-[#cbd9c6] px-3 py-1.5 hover:bg-[#f5f9f0] disabled:cursor-not-allowed disabled:opacity-40" @click="marketStore.loadHistory(authStore.userId, marketStore.historyPage + 1)">{{ tr('Fishfarm.sau') }}</button>
+            <button type="button" :disabled="marketStore.historyLoading || !marketStore.historyHasNext" class="rounded-lg border border-[#cbd9c6] px-3 py-1.5 hover:bg-[#f5f9f0] disabled:cursor-not-allowed disabled:opacity-40"
+              @click="marketStore.loadHistory(authStore.userId, marketStore.historyPage + 1)">{{ tr('Fishfarm.sau') }}</button>
           </nav>
         </section>
       </template>
     </Tab>
   </Modal>
   <!-- Confirm Buy Dialog -->
-  <div
-    v-if="itemToBuy"
-    class="fixed inset-0 z-[10001] flex items-center justify-center bg-black/50 p-4 backdrop-blur-xs"
-    @click.self="cancelBuy"
-  >
-    <div
-      class="w-full max-w-sm bg-white border border-gray-300 rounded-xl p-5 shadow-[0_12px_32px_rgba(38,50,56,0.3)] text-center relative"
-    >
+  <div v-if="itemToBuy" class="fixed inset-0 z-[10001] flex items-center justify-center bg-black/50 p-4 backdrop-blur-xs" @click.self="cancelBuy">
+    <div class="w-full max-w-sm bg-white border border-gray-300 rounded-xl p-5 shadow-[0_12px_32px_rgba(38,50,56,0.3)] text-center relative">
       <div class="m-0 text-base font-bold text-[#263238]">{{ tr('MarketWindow.xac_nhan_mua_ca') }}</div>
 
       <div class="my-4 p-3 bg-emerald-50 border border-emerald-200 rounded-xl flex items-center gap-3 text-left">
@@ -579,19 +436,10 @@ onUnmounted(() => marketStore.stopRealtime());
       </div>
 
       <div class="flex justify-center gap-3 mt-4">
-        <button
-          type="button"
-          class="py-1.5 px-4 rounded-lg border border-gray-300 bg-transparent text-[#263238] text-xs font-bold cursor-pointer hover:bg-[#eef3f1]"
-          @click="cancelBuy"
-        >
+        <button type="button" class="py-1.5 px-4 rounded-lg border border-gray-300 bg-transparent text-[#263238] text-xs font-bold cursor-pointer hover:bg-[#eef3f1]" @click="cancelBuy">
           {{ tr('AccountInfoModal.huy') }}
         </button>
-        <button
-          type="button"
-          class="py-1.5 px-4 rounded-lg border border-gray-300 bg-[#153221] text-white text-xs font-bold cursor-pointer hover:bg-[#1a3e29] shadow-sm disabled:opacity-50"
-          :disabled="isBuying"
-          @click="handleBuyFish"
-        >
+        <button type="button" class="py-1.5 px-4 rounded-lg border border-gray-300 bg-[#153221] text-white text-xs font-bold cursor-pointer hover:bg-[#1a3e29] shadow-sm disabled:opacity-50" :disabled="isBuying" @click="handleBuyFish">
           {{ isBuying ? tr('DailyAttendance.dang_xu_ly') : tr('InventoryModal.mua') }}
         </button>
       </div>

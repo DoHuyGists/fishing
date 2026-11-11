@@ -94,9 +94,7 @@ async function move(from: Side) {
   try {
     await caughtStore.moveFishes(ids, from === "net" ? "normal" : "in-net");
     selected[from].clear();
-    toast.success(from === "net" ? tr('PostProduction.da_chuyen_value0_ca_vao_kho', { value0: ids.length }) : tr('PostProduction.da_chuyen_value0_ca_ra_luoi', { value0: ids.length }), {
-      position: "bottom",
-    });
+    toast.success(from === "net" ? tr('PostProduction.da_chuyen_value0_ca_vao_kho', { value0: ids.length }) : tr('PostProduction.da_chuyen_value0_ca_ra_luoi', { value0: ids.length }));
   } catch (err) {
     toast.error(err instanceof Error ? err.message : tr('PostProduction.khong_the_chuyen_ca'), { position: "bottom" });
   } finally {

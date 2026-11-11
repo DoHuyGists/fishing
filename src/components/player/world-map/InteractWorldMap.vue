@@ -63,7 +63,7 @@ onMounted(async () => {
 
 function togglePick() {
   if (!worldStore.anchorable) {
-    toast.info(tr('InteractWorldMap.mo_khoa_form_de_thao_tac'), { get title() { return tr('InteractWorldMap.nhac_nho'); }, position: "bottom", duration: 2000 });
+    toast.info(tr('InteractWorldMap.mo_khoa_form_de_thao_tac'), { get title() { return tr('InteractWorldMap.nhac_nho'); } });
     return;
   }
   worldStore.toggleAnchorMode();

@@ -68,7 +68,7 @@ export function useToast() {
       variant,
       duration: options.duration ?? 4000,
       dismissible: options.dismissible ?? true,
-      position: options.position ?? "top-right",
+      position: options.position ?? "bottom",
       ...(options.title ? { title: options.title } : {}),
       ...(options.action ? { action: options.action } : {}),
     };

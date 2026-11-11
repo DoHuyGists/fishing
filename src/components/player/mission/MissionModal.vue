@@ -63,7 +63,7 @@ function canSelectCaught(caught: CaughtFish) {
 
 function toggleCaught(caught: CaughtFish) {
   if (caught.status === "on-market") {
-    toast.error(tr('MissionModal.con_nay_dang_o_duoc_bay_ban'), { get title() { return tr('MissionModal.khong_the_chon'); }, position: "bottom" });
+    toast.error(tr('MissionModal.con_nay_dang_o_duoc_bay_ban'), { get title() { return tr('MissionModal.khong_the_chon'); } });
     return;
   }
 
@@ -112,7 +112,7 @@ async function claimMission() {
     statusMessage.value = "";
     selectedCaughtIds.value = [];
     await Promise.all([caughtStore.loadCaughtFishes(), missionStore.SetMission()]);
-    toast.success(tr('MissionModal.nhan_value0', { value0: reward }), { get title() { return tr('MissionModal.nhiem_vu_hoan_tat'); }, position: "bottom" });
+    toast.success(tr('MissionModal.nhan_value0', { value0: reward }), { get title() { return tr('MissionModal.nhiem_vu_hoan_tat'); } });
   } catch (error) {
     statusIsError.value = true;
     statusMessage.value = error instanceof Error ? error.message : tr('MissionModal.khong_the_nhan_nhiem_vu');
@@ -132,31 +132,10 @@ onMounted(() => void loadMissionData(true));
           <div v-if="isLoading || isRefreshing" class="grid h-full place-items-center text-sm text-emerald-900/70">
             {{ tr('MissionModal.dang_tai_ca_va_nhiem_vu') }}
           </div>
-          <div
-            v-else
-            class="grid grid-rows-[minmax(0,1fr)_minmax(0,1fr)] md:grid-rows-1 md:grid-cols-[minmax(0,1fr)_minmax(0,1fr)] h-full flex-1"
-          >
-            <CaughtFishList
-              :caught-fishes="caughtStore.caughtFishes"
-              :selected-caught-ids="selectedCaughtIds"
-              :required-fish-counts="requiredFishCounts"
-              :selected-fish-counts="selectedFishCounts"
-              @toggle="toggleCaught"
-            />
-            <MissionList
-              :missions="missionStore.missions"
-              :selected-mission="selectedMission"
-              :selected-mission-id="selectedMissionId"
-              :selected-caught-ids="selectedCaughtIds"
-              :required-fish-counts="requiredFishCounts"
-              :selected-fish-counts="selectedFishCounts"
-              :status-message="statusMessage"
-              :status-is-error="statusIsError"
-              :is-mission-complete="isMissionComplete"
-              :is-claiming="isClaiming"
-              @select="selectMission"
-              @claim="claimMission"
-            />
+          <div v-else class="grid grid-rows-[minmax(0,1fr)_minmax(0,1fr)] md:grid-rows-1 md:grid-cols-[minmax(0,1fr)_minmax(0,1fr)] h-full flex-1">
+            <CaughtFishList :caught-fishes="caughtStore.caughtFishes" :selected-caught-ids="selectedCaughtIds" :required-fish-counts="requiredFishCounts" :selected-fish-counts="selectedFishCounts" @toggle="toggleCaught" />
+            <MissionList :missions="missionStore.missions" :selected-mission="selectedMission" :selected-mission-id="selectedMissionId" :selected-caught-ids="selectedCaughtIds" :required-fish-counts="requiredFishCounts" :selected-fish-counts="selectedFishCounts" :status-message="statusMessage"
+              :status-is-error="statusIsError" :is-mission-complete="isMissionComplete" :is-claiming="isClaiming" @select="selectMission" @claim="claimMission" />
           </div>
         </template>
         <template #daily>
