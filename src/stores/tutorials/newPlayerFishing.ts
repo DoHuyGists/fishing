@@ -7,8 +7,7 @@ const lessonConfig: TutorialSessionConfig = {
   slug: "new-player-fishing",
   sceneImage: "/tutorial/new-player-fishing/scene/day.png",
   // Percent coordinates in the supplied scene: exclude sky, rocks and the shore.
-  fishingBoundary: [{ x: 36, y: 48 }, { x: 77, y: 48 }, { x: 83, y: 53 }, { x: 99, y: 50 },
-    { x: 99, y: 95 }, { x: 66, y: 95 }, { x: 56, y: 78 }, { x: 32, y: 76 }, { x: 27, y: 57 }],
+  fishingBoundary: [{ x: 100, y: 100 },{ x: 0, y: 100 },{ x: 0, y: 30 },{ x: 100, y: 30 },{ x: 100, y: 100 }],
   equipment: [
     { id: "practice-rod", tool: "rod", get name() { return tr('newPlayerFishing.can_cau_tap_luyen'); }, image: "/items/rod/fishing-rob.png" },
     { id: "practice-line", tool: "line", get name() { return tr('newPlayerFishing.day_cau_tap_luyen'); }, image: "/items/line/Fishing Line.png" },

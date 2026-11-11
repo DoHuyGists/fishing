@@ -74,8 +74,12 @@ onBeforeUnmount(() => lesson.stop());
           <button type="button" class="w-full rounded-lg bg-emerald-800 px-4 py-2 text-sm font-bold text-white disabled:opacity-40" :disabled="!session.equipmentReady" @click="session.confirmEquipment">{{ tr('TensionChallenge.san_sang') }}</button>
         </div>
         <div v-else-if="session.tensionChallenge" id="tutorial-tension" :key="`fight-${lesson.attempt}`">
-          <TensionChallenge :controller="session" untimed-start />
-          <div class="mt-2 text-center text-xs">{{ tr('NewPlayerFishing.giu_nut_hoac_space_de_thu_day_tha_de_giam_luc_cang_keo_ve_0_m') }}</div>
+          <div class="flex justify-end">
+            <div class="w-xl">
+              <TensionChallenge :controller="session" untimed-start />
+              <div class="mt-2 text-center text-xs">{{ tr('NewPlayerFishing.giu_nut_hoac_space_de_thu_day_tha_de_giam_luc_cang_keo_ve_0_m') }}</div>
+            </div>
+          </div>
         </div>
         <div v-else class="flex flex-wrap items-center justify-between gap-3">
           <div role="status" class="text-sm">{{ session.castMessage }}</div>

@@ -52,7 +52,7 @@ onMounted(() => store.load());
         <button v-for="lesson in store.tutorials" :key="lesson.id" type="button" :disabled="opening" :aria-label="tr('TutorialModal.choi_man_value0', { value0: lesson.title })"
           class="overflow-hidden rounded-2xl border border-[#cbd9c6] bg-[#f5f9f0] text-left transition hover:border-[#70a77e] hover:shadow-md focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-emerald-700 disabled:opacity-50"
           :class="store.viewMode === 'list' ? 'flex flex-col sm:flex-row' : ''" @click="enterLesson(lesson.slug)">
-          <img :src="lesson.thumbnail" alt="" loading="lazy" class="object-cover" :class="store.viewMode === 'list' ? 'h-40 w-full sm:h-auto sm:w-56' : 'aspect-video w-full'">
+          <img :src="lesson.thumbnail" alt="" loading="lazy" class="object-cover" :class="store.viewMode === 'list' ? 'h-40 w-full sm:h-auto sm:w-56' : 'aspect-video w-full'" draggable="false">
           <div class="flex flex-1 flex-col gap-3 p-4">
             <div class="text-xs font-semibold text-[#61745d]">{{ tr('TutorialModal.khoang') }} {{ lesson.duration_minutes }} {{ tr('TutorialModal.phut_tap_luyen_tu_do') }}</div>
             <div class="text-lg font-bold">{{ lesson.title }}</div>
