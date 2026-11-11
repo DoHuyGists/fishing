@@ -1,0 +1,30 @@
+.slide-fade-in {
+  --slide-distance: 120px;
+  --from-x: calc(-1 * var(--slide-distance));
+  --from-y: 0px;
+  --duration: 1.2s;
+  opacity: 0;
+  animation: slideFadeIn var(--duration) cubic-bezier(0.22, 1, 0.36, 1) forwards;
+}
+
+@keyframes slideFadeIn {
+  from { opacity: 0; transform: translate(var(--from-x), var(--from-y)); }
+  to   { opacity: 1; transform: none; }
+}
+
+.slide-fade-in.from-left { --from-x: calc(-1 * var(--slide-distance)); }
+.slide-fade-in.from-right { --from-x: var(--slide-distance); }
+.slide-fade-in.from-top { --from-x: 0px; --from-y: calc(-1 * var(--slide-distance)); }
+.slide-fade-in.from-bottom { --from-x: 0px; --from-y: var(--slide-distance); }
+.slide-fade-in.from-top-left { --from-x: calc(-1 * var(--slide-distance)); --from-y: calc(-1 * var(--slide-distance)); }
+.slide-fade-in.from-top-right { --from-x: var(--slide-distance); --from-y: calc(-1 * var(--slide-distance)); }
+.slide-fade-in.from-bottom-left { --from-x: calc(-1 * var(--slide-distance)); --from-y: var(--slide-distance); }
+.slide-fade-in.from-bottom-right { --from-x: var(--slide-distance); --from-y: var(--slide-distance); }
+
+@media (prefers-reduced-motion: reduce) {
+  .slide-fade-in {
+    animation: none;
+    opacity: 1;
+    transform: none;
+  }
+}

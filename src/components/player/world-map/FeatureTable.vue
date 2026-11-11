@@ -7,6 +7,8 @@ const configStore = useConfigStore();
 const modalStore = useModalStore();
 const notificationStore = useNotificationStore();
 
+const buttonDirections = ['from-top-left', 'from-top-right', 'from-bottom-left', 'from-bottom-right'];
+
 type LobbyAction = {
   modal: NonNullable<Parameters<typeof modalStore.open>[0]>;
   label: string;
@@ -59,7 +61,7 @@ const actionGroups: { key: string; label: string; iconClass: string; actions: Lo
 ];
 
 const supportActions: LobbyAction[] = [
-  { modal: 'redeem', label: 'Đổi mã', icon: '🎟️' },
+  { modal: 'redeem', label: 'Quy đổi', icon: '🎟️' },
   { modal: 'feedback', label: 'Phản hồi', icon: '💬' },
   { modal: 'donation', label: 'Ủng hộ', icon: '💚', requiresUnlock: true },
 ];
@@ -80,11 +82,12 @@ const supportActions: LobbyAction[] = [
       </div>
       <div class="grid grid-cols-2 gap-1.5">
         <button
-          v-for="action in utilityActions"
+          v-for="(action, actionIndex) in utilityActions"
           :id="action.tourId"
           :key="action.modal"
           type="button"
-          class="lobby-menu__button relative flex min-h-9 min-w-0 flex-wrap items-center justify-center gap-x-1 gap-y-0.5 rounded-lg border border-[#cbd9c6] bg-white/85 px-1 py-1.5 text-[11px] leading-4"
+          class="slide-fade-in lobby-menu__button relative flex min-h-9 min-w-0 flex-wrap items-center justify-center gap-x-1 gap-y-0.5 rounded-lg border border-[#cbd9c6] bg-white/85 px-1 py-1.5 text-[11px] leading-4"
+          :class="buttonDirections[actionIndex % buttonDirections.length]"
           aria-haspopup="dialog"
           @click="modalStore.open(action.modal)"
         >
@@ -106,7 +109,7 @@ const supportActions: LobbyAction[] = [
       class="lobby-menu__body min-h-0 flex-1 space-y-3 overflow-x-hidden overflow-y-auto overscroll-contain px-2.5 py-2 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-[#527547]"
     >
       <section
-        v-for="group in actionGroups"
+        v-for="(group, groupIndex) in actionGroups"
         :key="group.key"
         :aria-labelledby="`lobby-group-${group.key}`"
       >
@@ -116,12 +119,13 @@ const supportActions: LobbyAction[] = [
         </div>
         <div class="grid grid-cols-3 gap-1.5">
           <button
-            v-for="action in group.actions"
+            v-for="(action, actionIndex) in group.actions"
             :id="action.tourId"
             :key="action.modal"
             type="button"
             :disabled="action.requiresUnlock && !configStore.isUnlocked(action.modal)"
-            class="lobby-menu__button flex min-h-14 min-w-0 flex-col items-center justify-center gap-1 rounded-lg border border-[#d9e3d3] bg-white px-1 py-1.5 text-center shadow-[0_2px_0_#e2e9dc]"
+            class="slide-fade-in lobby-menu__button flex min-h-14 min-w-0 flex-col items-center justify-center gap-1 rounded-lg border border-[#d9e3d3] bg-white px-1 py-1.5 text-center shadow-[0_2px_0_#e2e9dc]"
+            :class="buttonDirections[(actionIndex + groupIndex) % buttonDirections.length]"
             aria-haspopup="dialog"
             @click="modalStore.open(action.modal)"
           >
@@ -142,11 +146,12 @@ const supportActions: LobbyAction[] = [
 
     <div class="grid shrink-0 grid-cols-3 gap-1 border-t border-[#cbd9c6] bg-[#edf3e7] px-2 py-1">
       <button
-        v-for="action in supportActions"
+        v-for="(action, actionIndex) in supportActions"
         :key="action.modal"
         type="button"
         :disabled="action.requiresUnlock && !configStore.isUnlocked(action.modal)"
-        class="lobby-menu__button flex min-h-9 min-w-0 flex-wrap items-center justify-center gap-1 rounded-lg border border-transparent px-1 py-1 text-[11px] leading-4"
+        class="slide-fade-in lobby-menu__button flex min-h-9 min-w-0 flex-wrap items-center justify-center gap-1 rounded-lg border border-transparent px-1 py-1 text-[11px] leading-4"
+        :class="buttonDirections[(actionIndex + 2) % buttonDirections.length]"
         aria-haspopup="dialog"
         @click="modalStore.open(action.modal)"
       >
@@ -169,6 +174,7 @@ const supportActions: LobbyAction[] = [
 }
 
 .lobby-menu__button {
+  --slide-distance: 24px;
   transition: background-color 150ms ease, border-color 150ms ease, box-shadow 150ms ease;
 }
 

@@ -6,7 +6,7 @@ class SupabaseCountryRepository {
   async fetchMyUnlockedCountries(playerId: string): Promise<Country[]> {
     const { data, error } = await supabase
       .from("player_unlocked_countries")
-      .select("country:countries!inner(id, name, code, information, created_at, updated_at)")
+      .select("country:countries!inner(id, name, code, information, created_at, updated_at, location)")
       .eq("player_id", playerId)
       .returns<{ country: Country }[]>();
     if (error) throw new Error(error.message);
@@ -33,7 +33,7 @@ class SupabaseCountryRepository {
   async fetchCountries(): Promise<Country[]> {
     const { data, error } = await supabase
       .from("countries")
-      .select("id, name, code, information, created_at, updated_at")
+      .select("id, name, code, information, created_at, updated_at, location")
       .order("name", { ascending: true });
     if (error) throw new Error(error.message);
     return (data ?? []) as Country[];

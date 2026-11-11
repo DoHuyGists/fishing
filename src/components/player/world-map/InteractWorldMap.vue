@@ -147,15 +147,16 @@ function zoomTo(k: number) {
 <template>
   <div class="grid grid-cols-1 h-fit gap-2" :class="{ 'md:grid-cols-[auto_1fr]': isMapVisible }">
     <FishingAnchor
+      class="slide-fade-in from-top-left"
       :collapsible="collapsible"
       :map-visible="isMapVisible"
       @toggle-map="worldStore.toggleMapVisibility()"
     />
     <div v-if="isMapVisible" class="flex flex-col gap-2">
-      <div class="w-full h-fit overflow-hidden grid place-items-center border border-gray-300 rounded-xl">
+      <div class="slide-fade-in from-top-right w-full h-fit overflow-hidden grid place-items-center border border-gray-300 rounded-xl">
         <WorldMap
           ref="mapRef"
-          :areas="fishingAreaStore.fishingAreas"
+          :areas="fishingAreaStore.visibleMapAreas"
           :selected-area-id="selectedArea?.id ?? null"
           :pick-enabled="pickEnabled"
           :anchor="anchor"
@@ -165,7 +166,7 @@ function zoomTo(k: number) {
           @select-area="onSelectArea"
         >
           <template #popup="{ area }">
-            <div class="flex flex-col gap-1.5 rounded-lg bg-white p-2 text-xs text-gray-800 shadow-lg">
+            <div class="slide-fade-in from-bottom-left flex flex-col gap-1.5 rounded-lg bg-white p-2 text-xs text-gray-800 shadow-lg" style="--slide-distance: 16px; --duration: 0.3s">
               <div class="flex items-center justify-between gap-2 font-bold">
                 <span class="whitespace-nowrap">{{ area.title }}</span>
                 <button type="button" class="text-base leading-none text-gray-500" @click="worldStore.targetArea({})">
@@ -200,7 +201,7 @@ function zoomTo(k: number) {
       <p v-else-if="fogEnabled && countryStore.isLoadingUnlocked" class="text-xs text-[#24352a]" role="status">
         Đang tải quốc gia đã mở khóa...
       </p>
-      <div class="flex gap-2">
+      <div class="slide-fade-in from-bottom-right flex gap-2">
         <button @click="zoomTo(3)" class="border border-gray-300 rounded-md px-3">3x</button>
         <button @click="zoomTo(6)" class="border border-gray-300 rounded-md px-3">6x</button>
         <button @click="zoomTo(12)" class="border border-gray-300 rounded-md px-3">12x</button>

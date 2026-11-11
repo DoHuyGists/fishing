@@ -1,4 +1,5 @@
 import { defineStore } from "pinia";
+import { useCountryStore } from "./country";
 
 interface Location {
   k: number;
@@ -16,6 +17,7 @@ export const useWorldStore = defineStore("worldMap", {
   state: () => ({
     isMapVisible: localStorage.getItem(MAP_VISIBLE_STORAGE_KEY) !== "false",
     selectedArea: {} as any,
+    visibleAreaCountryId: null as string | null,
     k: 1,
     lon: 0,
     lat: 0,
@@ -37,6 +39,7 @@ export const useWorldStore = defineStore("worldMap", {
     },
 
     resetDefault() {
+      this.visibleAreaCountryId = null;
       this.isAnchorMode = false;
       this.zoomable = true;
       this.anchorable = true;
@@ -79,6 +82,18 @@ export const useWorldStore = defineStore("worldMap", {
 
     targetArea(anchor: any) {
       this.selectedArea = anchor;
+      if (anchor?.id && anchor.countryId) this.visibleAreaCountryId = anchor.countryId;
+    },
+
+    handleMoveToCountry(countryId: string) {
+      this.visibleAreaCountryId = countryId || null;
+      this.targetArea({});
+      const location = useCountryStore().countries.find((country) => country.id === countryId)?.location;
+      if (!location || !Number.isFinite(location.k) || location.k <= 0
+        || !Number.isFinite(location.lon) || !Number.isFinite(location.lat)) return;
+
+      this.setMapLocation(location);
+      this.moveMapToCachedLocation();
     },
 
     handleMoveToArea(fishingArea: any) {
@@ -110,6 +125,7 @@ export const useWorldStore = defineStore("worldMap", {
     },
 
     resetLocation() {
+      this.visibleAreaCountryId = null;
       this.k = MIN_ZOOM;
       this.lon = 0;
       this.lat = 0;

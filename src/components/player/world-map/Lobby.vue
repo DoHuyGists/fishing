@@ -18,7 +18,6 @@ import SkillPoints from "../currency/SkillPoints.vue";
 import TeamMembersSticky from "../team/TeamMembersSticky.vue";
 import PrepareModal from "./PrepareModal.vue";
 import FeatureTable from "./FeatureTable.vue";
-import Fishingfightdemo from "../fishing-challenge/TensionChallenge.vue";
 import GuideTour from "../../shared/GuideTour.vue";
 import { useOnboardingStore } from "../../../stores/onboarding";
 
@@ -92,14 +91,15 @@ onUnmounted(() => {
 </script>
 
 <template>
-  <div class="w-screen min-h-screen p-3 relative flex flex-col gap-2 overflow-x-hidden">
+  <div class="w-screen min-h-screen p-3 relative flex flex-col gap-2 overflow-hidden">
     <TeamMembersSticky
       v-if="configStore.showTeam && teamStore.myTeamMembers.length"
+      class="slide-fade-in from-right"
       :members="teamStore.myTeamMembers"
       @open-team="modalStore.open('team')"
     />
     <header
-      class="flex flex-wrap items-center justify-between gap-3 rounded-xl border border-[#cbd9c6] bg-[#f5f9f0] px-4 py-2.5 text-[#24352a]"
+      class="slide-fade-in from-top flex flex-wrap items-center justify-between gap-3 rounded-xl border border-[#cbd9c6] bg-[#f5f9f0] px-4 py-2.5 text-[#24352a]"
     >
       <span class="font-bold">Bản đồ thế giới</span>
       <div class="flex flex-wrap items-center justify-end gap-2">
@@ -113,11 +113,11 @@ onUnmounted(() => {
 
     <main class="grid flex-1 grid-cols-1 gap-2 md:grid-cols-2">
       <!-- Khung Bản đồ trung tâm -->
-      <div id="first-play-map" class="">
+      <div id="first-play-map">
         <InteractWorldMap2 collapsible />
       </div>
       <div class="grid grid-cols-1 md:grid-cols-2 gap-2">
-        <div>
+        <div class="slide-fade-in from-bottom-left">
           <LatestCaughtList />
         </div>
         <FeatureTable />

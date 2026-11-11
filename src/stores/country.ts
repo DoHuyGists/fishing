@@ -10,6 +10,7 @@ export interface Country {
   information: string;
   created_at: string; // timestamp with time zone (ISO string)
   updated_at: string; // timestamp with time zone (ISO string)
+  location: { k: number; lon: number; lat: number } | null;
 }
 
 export const useCountryStore = defineStore("Country", {

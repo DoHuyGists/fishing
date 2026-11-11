@@ -39,19 +39,30 @@ onMounted(() => {
         <span aria-hidden="true">{{ mapVisible ? '🙈' : '🗺️' }}</span>
       </button>
     </header>
+    <div v-if="mapVisible" class="relative mt-3">
+      <input
+        v-model="fishingAreaStore.searchQuery"
+        type="search"
+        aria-label="Tìm quốc gia hoặc bãi câu"
+        placeholder="Tìm quốc gia, bãi câu..."
+        class="w-full rounded-lg border border-[#cbd9c6] bg-white px-3 py-2 text-xs text-[#24352a] placeholder:text-[#607176] focus-visible:outline-2 focus-visible:outline-[#24352a]"
+      />
+    </div>
     <div v-if="mapVisible" class="mt-5 flex-1 overflow-y-auto">
       <div id="fishing-anchor-heading" class="m-0 text-[13px] font-bold">Danh sách bãi câu</div>
-      <ul
-        v-if="fishingAreaStore.fishingAreas.length"
+      <div
+        v-if="fishingAreaStore.filteredAreasByCountry.length"
+        role="list"
         aria-labelledby="fishing-anchor-heading"
         class="mt-3 mb-0 grid list-none gap-2 p-0"
       >
-        <li v-for="group in fishingAreaStore.areasByCountry" :key="group.id" class="min-w-0">
+        <div v-for="group in fishingAreaStore.filteredAreasByCountry" :key="group.id" role="listitem" class="min-w-0">
           <details
             class="group"
-            :open="group.areas.some((area) => area.id === worldStore.selectedArea?.id)"
+            :open="Boolean(fishingAreaStore.normalizedSearchQuery) || group.areas.some((area) => area.id === worldStore.selectedArea?.id)"
           >
             <summary
+              @click="worldStore.handleMoveToCountry(group.id)"
               class="flex cursor-pointer list-none items-center gap-2 rounded-lg px-2 py-2 text-xs font-bold hover:bg-[#e5eddf] focus-visible:outline-2 focus-visible:outline-[#24352a] [&::-webkit-details-marker]:hidden"
             >
               <svg
@@ -69,8 +80,8 @@ onMounted(() => {
                 {{ group.areas.length }}
               </span>
             </summary>
-            <ul class="mt-1 mb-0 ml-3 grid list-none gap-1 border-l border-[#cbd9c6] py-1 pr-0 pl-3">
-              <li v-for="area in group.areas" :key="area.id" class="min-w-0">
+            <div role="list" class="mt-1 mb-0 ml-3 grid list-none gap-1 border-l border-[#cbd9c6] py-1 pr-0 pl-3">
+              <div v-for="area in group.areas" :key="area.id" role="listitem" class="min-w-0">
                 <button
                   type="button"
                   :aria-current="worldStore.selectedArea?.id === area.id ? 'true' : undefined"
@@ -81,11 +92,11 @@ onMounted(() => {
                   <span aria-hidden="true" class="mt-1 h-2 w-2 shrink-0 rounded-full bg-[#d84315]"></span>
                   <span class="min-w-0 wrap-break-word">{{ area.title || "Bãi câu chưa đặt tên" }}</span>
                 </button>
-              </li>
-            </ul>
+              </div>
+            </div>
           </details>
-        </li>
-      </ul>
+        </div>
+      </div>
       <div v-if="fishingAreaStore.loading" class="mt-2 mb-0 text-[#607176] text-xs" role="status">
         Đang tải bãi câu...
       </div>
@@ -95,6 +106,9 @@ onMounted(() => {
       </div>
       <div v-else-if="!fishingAreaStore.fishingAreas.length" class="mt-2 mb-0 text-[#607176] text-xs">
         Chưa có bãi câu
+      </div>
+      <div v-else-if="!fishingAreaStore.filteredAreasByCountry.length" class="mt-2 text-xs text-[#607176]" role="status">
+        Không tìm thấy quốc gia hoặc bãi câu phù hợp.
       </div>
     </div>
   </aside>

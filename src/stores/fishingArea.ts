@@ -1,8 +1,19 @@
 import { defineStore } from "pinia";
 import { supabaseFishingAreaRepository, type FishingAreaRow } from "../data/supabaseFishingAreaRepository";
 import { useCountryStore } from "./country";
+import { useWorldStore } from "./worldMap";
 
 export type FishingArea = Pick<FishingAreaRow, "id" | "countryId" | "title" | "location" | "scenePath">;
+
+interface FishingAreaCountryGroup {
+  id: string;
+  name: string;
+  areas: FishingArea[];
+}
+
+function normalizeSearch(value: string): string {
+  return value.toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "").replace(/đ/g, "d");
+}
 
 export const useFishingAreaStore = defineStore("fishing_areas", {
   state: () => ({
@@ -10,11 +21,33 @@ export const useFishingAreaStore = defineStore("fishing_areas", {
     loading: false,
     loaded: false,
     error: "",
+    searchQuery: "",
   }),
   getters: {
-    areasByCountry(state) {
+    normalizedSearchQuery: (state): string => normalizeSearch(state.searchQuery.trim()),
+
+    filteredAreasByCountry(): FishingAreaCountryGroup[] {
+      const query = this.normalizedSearchQuery;
+      if (!query) return this.areasByCountry;
+      return this.areasByCountry
+        .map((group) => ({
+          ...group,
+          areas: normalizeSearch(group.name).includes(query)
+            ? group.areas
+            : group.areas.filter((area) => normalizeSearch(area.title || "Bãi câu chưa đặt tên").includes(query)),
+        }))
+        .filter((group) => group.areas.length > 0);
+    },
+
+    visibleMapAreas(state): FishingArea[] {
+      const countryId = useWorldStore().visibleAreaCountryId;
+      if (!countryId) return [];
+      return state.fishingAreas.filter((area) => area.countryId === countryId);
+    },
+
+    areasByCountry(state): FishingAreaCountryGroup[] {
       const countries = new Map(useCountryStore().countries.map((country) => [country.id, country.name]));
-      const groups = new Map<string, { id: string; name: string; areas: FishingArea[] }>();
+      const groups = new Map<string, FishingAreaCountryGroup>();
 
       for (const area of state.fishingAreas) {
         const countryId = countries.has(area.countryId) ? area.countryId : "";
@@ -51,6 +84,7 @@ export const useFishingAreaStore = defineStore("fishing_areas", {
 
     reset() {
       this.fishingAreas = [];
+      this.searchQuery = "";
       this.loaded = false;
       this.error = "";
     },
