@@ -7,6 +7,8 @@
 - Avoid duplication, unrelated changes, and oversimplification. Preserve existing behavior and validate changes when practical.
 - No using <ul>, <ol>, <li>, <p>, <h1>, <h2>, <h3>, ...
 - Notice that this project is using vue-i18n so except for the content in /components/admin/*, we need to support multiple languages following the current configuration.
+- Prioritize breaking down large components into smaller ones for better structure and recognition.
+- Try to limit using basic state management variables if it can be done better when using Pinia store or composables
 - Type references in the 'types' folder, take a look before intending to make a new type.
 - Always run a build check after changing code.
 

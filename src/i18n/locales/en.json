@@ -881,6 +881,7 @@
     "go_value0_khoi_set": "Remove {value0} from set"
   },
   "InventoryItemCard": {
+    "xem_chi_tiet": "View details",
     "tai_trong_toi_da": "Maximum weight",
     "suc_keo": "Pull strength",
     "do_ben": "Line durability",

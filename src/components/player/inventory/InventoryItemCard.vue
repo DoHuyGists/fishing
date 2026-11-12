@@ -2,11 +2,13 @@
 import type { UserInventory } from "../../../types/model/userInventory";
 import { computed } from "vue";
 import { getFormattingLocale, t as tr } from "../../../i18n";
+import { useInformationModal } from "../../../composables/useInformationModal";
 
 import type { ItemData } from "../../../stores/equipment";
 import { useInventoryTableContext } from "./useInventoryTable";
 
 const props = defineProps<{ item: UserInventory; list?: boolean }>();
+const { open } = useInformationModal();
 const { LABELS, active, isCompatible, isInActiveSlot, itemName, pickItem, selected, toggleSelect } =
   useInventoryTableContext();
 
@@ -43,6 +45,19 @@ const details = computed(() => {
   }
   return rows;
 });
+
+function showDetails() {
+  open({
+    name: name.value,
+    image: typeof data.value.image === "string" ? data.value.image : undefined,
+    description: [
+      category.value,
+      classification.value,
+      description.value,
+      ...details.value.map(({ label, value }) => `${label}: ${value}`),
+    ].filter(Boolean).join("\n\n"),
+  });
+}
 </script>
 
 <template>
@@ -72,7 +87,13 @@ const details = computed(() => {
         <div class="break-words text-xs text-slate-500">{{ category }}</div>
         <div v-if="classification" class="mt-1 break-words text-xs font-semibold text-teal-700">{{ classification }}</div>
       </div>
-      <div v-if="description" class="mt-2 whitespace-pre-line break-words text-xs leading-relaxed text-slate-600">{{ description }}</div>
+      <div class="mt-2" :class="list ? '' : 'text-center'">
+        <button type="button"
+          class="cursor-pointer rounded border border-[#cbd9c6] bg-[#f5f9f0] px-2 py-1 text-xs text-[#24352a] hover:bg-[#cbd9c6]/50 focus-visible:outline-2 focus-visible:outline-offset-2"
+          @click.stop="showDetails">
+          {{ tr('InventoryItemCard.xem_chi_tiet') }}
+        </button>
+      </div>
       <div v-if="details.length" class="mt-2 space-y-1 border-t border-[#cbd9c6] pt-2 text-xs">
         <div v-for="detail in details" :key="detail.label" class="flex flex-wrap justify-between gap-x-2 gap-y-0.5">
           <span class="text-slate-500">{{ detail.label }}</span>

@@ -109,7 +109,7 @@ const displayedGroups = computed(() =>
       </div>
     </header>
 
-    <div class="flex-1 p-4">
+    <div class="min-h-0 max-h-[60dvh] flex-1 overflow-y-scroll p-4">
       <div v-if="pagedItems.length === 0" class="py-12 text-center text-sm text-slate-500">
         {{ inventoryStore.items.length === 0 ? tr('InventoryItems.kho_do_dang_trong') : tr('InventoryItems.khong_co_vat_pham_nao_khop_voi_tim_kiem') }}
       </div>

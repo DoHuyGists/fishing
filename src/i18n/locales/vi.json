@@ -885,6 +885,7 @@
     "go_value0_khoi_set": "Gỡ {value0} khỏi set"
   },
   "InventoryItemCard": {
+    "xem_chi_tiet": "Xem chi tiết",
     "tai_trong_toi_da": "Tải trọng tối đa",
     "suc_keo": "Sức kéo",
     "do_ben": "Độ bền dây",

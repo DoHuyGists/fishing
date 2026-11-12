@@ -223,6 +223,8 @@ export function useInventoryTable() {
       await equipmentStore.saveSet(userId.value, set);
       savedSnapshot.value = { ...savedSnapshot.value, [set.id]: snapshotOf(set) };
       savedSetInventoryIds.value = { ...savedSetInventoryIds.value, [set.id]: inventoryIdsInSet(set) };
+      active.value = null;
+      selected.value = new Set();
       toast.success(tr('useInventoryTable.da_luu_set'));
     } catch (error) {
       toast.error((error as Error).message);
