@@ -2,6 +2,7 @@
 import { t as tr } from "../../../i18n";
 
 import { computed } from "vue";
+import InventoryItemCard from "./InventoryItemCard.vue";
 import { useInventoryTableContext } from "./useInventoryTable.ts";
 
 defineEmits<{ "request-delete": [] }>();
@@ -13,16 +14,11 @@ const {
   allOnPageSelected,
   hasRpc,
   inventoryStore,
-  isCompatible,
-  isInActiveSlot,
-  itemName,
   itemPage,
   itemPages,
   itemSearch,
   pagedItems,
-  pickItem,
   selected,
-  toggleSelect,
   toggleSelectPage,
   useSelectedItem,
   usingItemId,
@@ -124,39 +120,7 @@ const displayedGroups = computed(() =>
           <span class="font-normal text-slate-500">({{ group.items.length }})</span>
         </div>
         <div :class="viewMode === 'list' ? 'flex flex-col gap-2' : 'grid grid-cols-2 gap-3 sm:grid-cols-3 xl:grid-cols-4'">
-        <div v-for="item in group.items" :key="item.id" :class="[
-          'relative cursor-pointer rounded-md border bg-white transition',
-          viewMode === 'list' ? 'flex items-center gap-3 px-3 py-2' : 'p-3',
-          selected.has(item.id) ? 'border-red-400 bg-red-50' : 'border-slate-200 hover:border-slate-400',
-          active && isCompatible(item) ? 'ring-2 ring-teal-400' : '',
-          active && !isCompatible(item) ? 'opacity-40' : '',
-        ]" @click="pickItem(item)">
-          <input type="checkbox" class="h-4 w-4 accent-red-600"
-            :class="viewMode !== 'list' ? 'absolute left-2 top-2' : 'shrink-0'" :checked="selected.has(item.id)"
-            :aria-label="tr('InventoryItems.chon_value0_de_xoa', { value0: itemName(item.data, item.id) })" @click.stop
-            @change="toggleSelect(item.id)" />
-
-          <div :class="[
-            'flex items-center justify-center overflow-hidden rounded bg-slate-100 text-slate-400',
-            viewMode !== 'list' ? 'mx-auto mb-2 h-16 w-16' : 'h-10 w-10 shrink-0',
-          ]">
-            <img v-if="item.data.image" :src="item.data.image" :alt="itemName(item.data)"
-              class="h-full w-full object-cover" />
-            <span v-else class="text-lg font-semibold">
-              {{ itemName(item.data, item.id).charAt(0).toUpperCase() }}
-            </span>
-          </div>
-
-          <div :class="viewMode !== 'list' ? 'text-center' : 'min-w-0 flex-1'">
-            <div class="truncate text-sm font-medium">{{ itemName(item.data, item.id) }}</div>
-            <div class="truncate text-xs text-slate-500">{{ categoryName(item.data.category) }}</div>
-          </div>
-
-          <span v-if="isInActiveSlot(item)" class="text-xs font-medium text-teal-700"
-            :class="viewMode !== 'list' ? 'mt-1 block text-center' : ''">
-            {{ tr('InventoryItems.da_them') }}
-          </span>
-        </div>
+          <InventoryItemCard v-for="item in group.items" :key="item.id" :item="item" :list="viewMode === 'list'" />
         </div>
       </div>
     </div>

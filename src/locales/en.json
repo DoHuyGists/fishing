@@ -871,6 +871,14 @@
     "luu_set": "Save set",
     "go_value0_khoi_set": "Remove {value0} from set"
   },
+  "InventoryItemCard": {
+    "tai_trong_toi_da": "Maximum weight",
+    "suc_keo": "Pull strength",
+    "do_ben": "Line durability",
+    "bonus_moc_ca": "Hook rate bonus",
+    "may_man": "Luck bonus",
+    "nhom_ca": "Attracted fish groups"
+  },
   "InventoryItems": {
     "kho_do": "Inventory",
     "kieu_hien_thi": "Display style",

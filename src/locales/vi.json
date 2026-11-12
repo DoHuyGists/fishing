@@ -875,6 +875,14 @@
     "luu_set": "Lưu set",
     "go_value0_khoi_set": "Gỡ {value0} khỏi set"
   },
+  "InventoryItemCard": {
+    "tai_trong_toi_da": "Tải trọng tối đa",
+    "suc_keo": "Sức kéo",
+    "do_ben": "Độ bền dây",
+    "bonus_moc_ca": "Thưởng tỷ lệ móc cá",
+    "may_man": "May mắn",
+    "nhom_ca": "Nhóm cá thu hút"
+  },
   "InventoryItems": {
     "kho_do": "Kho đồ",
     "kieu_hien_thi": "Kiểu hiển thị",

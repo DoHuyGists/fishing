@@ -18,7 +18,7 @@ BEGIN
     END IF;
 
     -- 2. Lấy thông tin item và kiểm tra trạng thái
-    SELECT id, name, price, quantity, "isDisabled", information, image, icon, category, classification, rpc, storage_type
+    SELECT id, name, price, quantity, "isDisabled", information, image, icon, category, classification, rpc, storage_type, data
     INTO v_item
     FROM public.items
     WHERE id = p_item_id;
@@ -61,7 +61,7 @@ BEGIN
     WHERE user_id = v_user_id;
 
     -- 6. Cộng dồn item dạng stack hoặc tạo record mới
-    v_item_data := jsonb_build_object(
+    v_item_data := COALESCE(v_item.data, '{}'::jsonb) || jsonb_build_object(
         'id', v_item.id,
         'name', v_item.name,
         'image', v_item.image,

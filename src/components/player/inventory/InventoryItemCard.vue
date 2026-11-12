@@ -1,0 +1,86 @@
+<script setup lang="ts">
+import { computed } from "vue";
+import { getFormattingLocale, t as tr } from "../../../i18n";
+import type { UserInventory } from "../../../data/supabaseUserInventoryRepository";
+import type { ItemData } from "../../../stores/equipment";
+import { useInventoryTableContext } from "./useInventoryTable";
+
+const props = defineProps<{ item: UserInventory; list?: boolean }>();
+const { LABELS, active, isCompatible, isInActiveSlot, itemName, pickItem, selected, toggleSelect } =
+  useInventoryTableContext();
+
+const data = computed(() => props.item.data as ItemData);
+const name = computed(() => itemName(data.value, props.item.id));
+const category = computed(() => LABELS[data.value.category] ?? data.value.category);
+const description = computed(() => {
+  const value = data.value.information || data.value.detail;
+  return typeof value === "string" ? value : "";
+});
+const classification = computed(() =>
+  typeof data.value.classification === "string" ? data.value.classification : "",
+);
+const icon = computed(() => typeof data.value.icon === "string" ? data.value.icon : "");
+const details = computed(() => {
+  const rows: { label: string; value: string }[] = [];
+  const addNumber = (key: string, label: string, style: "decimal" | "percent" = "decimal", unit = "") => {
+    const value = data.value[key];
+    if (typeof value !== "number" || !Number.isFinite(value)) return;
+    rows.push({ label, value: `${value.toLocaleString(getFormattingLocale(), { style, maximumFractionDigits: 2 })}${unit}` });
+  };
+
+  addNumber("quantity", tr('ShopModal.so_luong'));
+  addNumber("max_weight", tr('InventoryItemCard.tai_trong_toi_da'), "decimal", " kg");
+  addNumber("pull_strength", tr('InventoryItemCard.suc_keo'));
+  addNumber("durability", tr('InventoryItemCard.do_ben'));
+  addNumber("catch_rate", tr('InventoryItemCard.bonus_moc_ca'), "percent");
+  addNumber("luck_bonus", tr('InventoryItemCard.may_man'));
+
+  const fishTypes = data.value.fish_type;
+  if (Array.isArray(fishTypes)) {
+    const value = fishTypes.filter((type): type is string => typeof type === "string" && type.trim() !== "").join(", ");
+    if (value) rows.push({ label: tr('InventoryItemCard.nhom_ca'), value });
+  }
+  return rows;
+});
+</script>
+
+<template>
+  <div :class="[
+    'relative min-w-0 cursor-pointer rounded-md border text-[#24352a] transition',
+    list ? 'flex items-start gap-3 px-3 py-2' : 'p-3',
+    selected.has(item.id) ? 'border-red-400 bg-red-50' : 'border-[#cbd9c6] bg-white hover:bg-[#f5f9f0]',
+    active && isCompatible(item) ? 'ring-2 ring-teal-400' : '',
+    active && !isCompatible(item) ? 'opacity-40' : '',
+  ]" @click="pickItem(item)">
+    <input type="checkbox" class="h-4 w-4 accent-red-600"
+      :class="list ? 'mt-1 shrink-0' : 'absolute left-2 top-2'" :checked="selected.has(item.id)"
+      :aria-label="tr('InventoryItems.chon_value0_de_xoa', { value0: name })" @click.stop
+      @change="toggleSelect(item.id)" />
+
+    <div :class="[
+      'flex items-center justify-center overflow-hidden rounded bg-[#f5f9f0] text-slate-400',
+      list ? 'h-12 w-12 shrink-0' : 'mx-auto mb-2 h-16 w-16',
+    ]">
+      <img v-if="data.image" :src="data.image" :alt="name" loading="lazy" class="h-full w-full object-contain" />
+      <span v-else class="text-lg font-semibold">{{ icon || name.charAt(0).toUpperCase() }}</span>
+    </div>
+
+    <div class="min-w-0 flex-1">
+      <div :class="list ? '' : 'text-center'">
+        <div class="break-words text-sm font-medium">{{ name }}</div>
+        <div class="break-words text-xs text-slate-500">{{ category }}</div>
+        <div v-if="classification" class="mt-1 break-words text-xs font-semibold text-teal-700">{{ classification }}</div>
+      </div>
+      <div v-if="description" class="mt-2 whitespace-pre-line break-words text-xs leading-relaxed text-slate-600">{{ description }}</div>
+      <div v-if="details.length" class="mt-2 space-y-1 border-t border-[#cbd9c6] pt-2 text-xs">
+        <div v-for="detail in details" :key="detail.label" class="flex flex-wrap justify-between gap-x-2 gap-y-0.5">
+          <span class="text-slate-500">{{ detail.label }}</span>
+          <span class="min-w-0 break-words font-medium">{{ detail.value }}</span>
+        </div>
+      </div>
+      <div v-if="isInActiveSlot(item)" class="mt-2 text-xs font-medium text-teal-700" :class="list ? '' : 'text-center'">
+        {{ tr('InventoryItems.da_them') }}
+      </div>
+    </div>
+  </div>
+</template>
