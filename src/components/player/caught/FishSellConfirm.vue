@@ -2,7 +2,7 @@
 import { t as tr } from "../../../i18n";
 
 import { computed, ref, watch } from "vue";
-import Cash from "../currency/Cash.vue";
+import PaymentConfirmation from "../../shared/PaymentConfirmation.vue";
 import { useCurrencyStore } from "../../../stores/currency.ts";
 
 const props = defineProps<{ fish: any; isLoading?: boolean; error?: string }>();
@@ -21,65 +21,41 @@ watch(
   },
 );
 function confirm() {
-  if (Number(price.value) > 0) emit("confirm", Number(price.value));
+  if (!props.isLoading && Number.isSafeInteger(Number(price.value)) && Number(price.value) > 0 && currencyStore.cash >= listedPrice + balanceFee.value) emit("confirm", Number(price.value));
 }
 </script>
 
 <template>
-  <div
+  <PaymentConfirmation
     v-if="fish"
-    class="fixed inset-0 z-[10000] flex items-center justify-center bg-black/50 p-4 backdrop-blur-xs"
-    @click.self="emit('cancel')"
+    :title="tr('FishSellConfirm.dang_ban_ca')"
+    :balance="currencyStore.cash"
+    :total="listedPrice + balanceFee"
+    :total-label="tr('FishSellConfirm.tong_phi')"
+    :costs="[
+      { label: tr('FishSellConfirm.phi_niem_yet_thi_truong'), amount: listedPrice },
+      { label: tr('FishSellConfirm.phi_can_bang_thi_truong'), amount: balanceFee },
+    ]"
+    :confirm-text="tr('CaughtModal.dang_ban')"
+    :busy="isLoading"
+    :disabled="!Number.isSafeInteger(Number(price)) || Number(price) <= 0"
+    :error="error || (price !== '' && Number(price) <= 0 ? tr('FishSellConfirm.gia_ban_phai_lon_hon_0') : '')"
+    @cancel="emit('cancel')"
+    @confirm="confirm"
   >
-    <div class="relative w-full max-w-sm rounded-xl border border-gray-300 bg-white p-5 text-center shadow-xl">
-      <div class="m-0 text-base font-bold text-[#263238]">{{ tr('FishSellConfirm.dang_ban_ca') }}</div>
-      <div class="my-3 text-xs leading-relaxed text-gray-600">
-        {{ tr('CaughtModal.dang_ban') }} <strong class="text-[#153221]">{{ fish.species?.name }}</strong> {{ tr('FishSellConfirm.len_thi_truong') }}
-      </div>
-      <div class="my-4 text-left">
-        <input
-          v-model.number="price"
-          type="number"
-          min="1"
-          :placeholder="tr('FishSellConfirm.nhap_gia_ban')"
-          class="w-full rounded-lg border border-gray-300 px-3 py-2 text-xs focus:outline-none"
-          @keydown="
-            (e: KeyboardEvent) => {
-              if (['e', 'E', '+', '-', '.'].includes(e.key)) e.preventDefault();
-            }
-          "
-          @keyup.enter="confirm"
-        />
-        <div v-if="error" class="mt-1 text-[11px] font-medium text-red-500">{{ error }}</div>
-        <div v-else-if="price !== '' && Number(price) <= 0" class="mt-1 text-[11px] font-medium text-red-500">
-          {{ tr('FishSellConfirm.gia_ban_phai_lon_hon_0') }}
-        </div>
-      </div>
-      <div class="space-y-2 text-left text-xs">
-        <div class="flex items-center gap-2"><span>{{ tr('FishSellConfirm.so_du_hien_tai') }}</span><Cash :amount="currencyStore.cash" /></div>
-        <hr />
-        <div class="flex items-center gap-2"><span>{{ tr('FishSellConfirm.phi_niem_yet_thi_truong') }}</span><Cash :amount="listedPrice" /></div>
-        <div class="flex items-center gap-2"><span>{{ tr('FishSellConfirm.phi_can_bang_thi_truong') }}</span><Cash :amount="balanceFee" /></div>
-        <hr />
-        <div class="flex items-center gap-2"><span>{{ tr('FishSellConfirm.tong_phi') }}</span><Cash :amount="listedPrice + balanceFee" /></div>
-      </div>
-      <div class="mt-5 flex justify-center gap-3">
-        <button
-          type="button"
-          class="rounded-lg border border-gray-300 px-4 py-1.5 text-xs font-bold hover:bg-gray-100"
-          @click="emit('cancel')"
-        >
-          {{ tr('AccountInfoModal.huy') }}
-        </button>
-        <button
-          type="button"
-          class="rounded-lg bg-[#153221] px-4 py-1.5 text-xs font-bold text-white hover:bg-[#1a3e29] disabled:opacity-50"
-          :disabled="isLoading || Number(price) <= 0"
-          @click="confirm"
-        >
-          {{ isLoading ? tr('DailyAttendance.dang_xu_ly') : tr('CaughtModal.dang_ban') }}
-        </button>
-      </div>
+    <div class="text-sm text-emerald-900/70">
+      {{ tr('CaughtModal.dang_ban') }} <strong>{{ fish.species?.name }}</strong> {{ tr('FishSellConfirm.len_thi_truong') }}
     </div>
-  </div>
+    <input
+      v-model.number="price"
+      type="number"
+      min="1"
+      step="1"
+      required
+      :aria-label="tr('FishSellConfirm.nhap_gia_ban')"
+      :placeholder="tr('FishSellConfirm.nhap_gia_ban')"
+      class="w-full rounded-lg border border-[#cbd9c6] px-3 py-2 text-sm focus-visible:outline-2 focus-visible:outline-emerald-700"
+      @keydown="(e: KeyboardEvent) => { if (['e', 'E', '+', '-', '.'].includes(e.key)) e.preventDefault(); }"
+    />
+  </PaymentConfirmation>
 </template>

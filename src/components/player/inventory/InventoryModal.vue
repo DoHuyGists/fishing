@@ -5,7 +5,7 @@ import { provide } from "vue";
 import EquipmentSets from "./EquipmentSets.vue";
 import InventoryItems from "./InventoryItems.vue";
 import Modal from "../../shared/Modal.vue";
-import Cash from "../currency/Cash.vue";
+import PaymentConfirmation from "../../shared/PaymentConfirmation.vue";
 import { inventoryTableContextKey, useInventoryTable } from "./useInventoryTable.ts";
 
 const inventory = useInventoryTable();
@@ -46,38 +46,30 @@ const guildeSteps = [
         <EquipmentSets @request-buy="modal = 'buy'" />
       </div>
 
-      <div v-if="modal" class="fixed inset-0 z-40 flex items-center justify-center bg-slate-900/50 p-4" role="dialog"
+      <PaymentConfirmation
+        v-if="modal === 'buy'"
+        :title="tr('InventoryModal.mua_them_set_trang_bi')"
+        :balance="currencyStore.cash"
+        :total="SET_PRICE"
+        :busy="busy"
+        :confirm-text="tr('InventoryModal.mua')"
+        @cancel="modal = null"
+        @confirm="buySet"
+      />
+      <div v-if="modal === 'delete'" class="fixed inset-0 z-40 flex items-center justify-center bg-slate-900/50 p-4" role="dialog"
         aria-modal="true" @click.self="modal = null" @keydown.esc="modal = null">
         <div class="w-full max-w-sm rounded-lg bg-white p-5 shadow-xl">
-          <template v-if="modal === 'buy'">
-            <div class="text-base font-semibold">{{ tr('InventoryModal.mua_them_set_trang_bi') }}</div>
-            <div class="mt-2 flex items-center gap-2 text-sm text-slate-600">
-              <span>{{ tr('InventoryModal.ban_se_them_1_set_trang_bi_voi_gia') }}</span>
-              <Cash :amount="SET_PRICE" />
-            </div>
-            <div class="mt-2 flex items-center gap-2 text-sm text-slate-600">
-              <span>{{ tr('FishSellConfirm.so_du_hien_tai') }}</span>
-              <Cash :amount="currencyStore.cash" />
-            </div>
-          </template>
-          <template v-else>
-            <div class="text-base font-semibold">{{ tr('InventoryModal.xoa') }} {{ selected.size }} {{ tr('InventoryModal.vat_pham') }}</div>
-            <div class="mt-2 text-sm text-slate-600">
-              {{ tr('InventoryModal.khong_the_xoa_vat_pham_dang_co_trong_set_hay_go_vat_pham_va_luu_') }}
-            </div>
-          </template>
+          <div class="text-base font-semibold">{{ tr('InventoryModal.xoa') }} {{ selected.size }} {{ tr('InventoryModal.vat_pham') }}</div>
+          <div class="mt-2 text-sm text-slate-600">
+            {{ tr('InventoryModal.khong_the_xoa_vat_pham_dang_co_trong_set_hay_go_vat_pham_va_luu_') }}
+          </div>
 
           <div class="mt-5 flex justify-end gap-2">
             <button type="button" class="rounded-md border border-slate-300 px-3 py-1.5 text-sm hover:bg-slate-100"
               :disabled="busy" @click="modal = null">
               {{ tr('AccountInfoModal.huy') }}
             </button>
-            <button v-if="modal === 'buy'" type="button"
-              class="rounded-md bg-teal-700 px-3 py-1.5 text-sm text-white hover:bg-teal-800 disabled:opacity-50"
-              :disabled="busy" @click="buySet">
-              {{ busy ? tr('InventoryModal.dang_xu_ly') : tr('InventoryModal.mua') }}
-            </button>
-            <button v-else type="button"
+            <button type="button"
               class="rounded-md bg-red-600 px-3 py-1.5 text-sm text-white hover:bg-red-700 disabled:opacity-50"
               :disabled="busy" @click="deleteSelected">
               {{ busy ? tr('InventoryModal.dang_xoa') : tr('InventoryModal.xoa') }}

@@ -8,6 +8,7 @@ import { useCurrencyStore } from '../../../stores/currency'
 import { useModalStore } from '../../../stores/modal'
 import { batchProgress } from '../../../data/aquaculture';
 import TwoOptionsModal from '../../shared/TwoOptionsModal.vue'
+import PaymentConfirmation from '../../shared/PaymentConfirmation.vue'
 import Cash from '../currency/Cash.vue'
 import AquacultureStockForm from './AquacultureStockForm.vue'
 import FishPond from './FishPond.vue'
@@ -156,7 +157,21 @@ async function confirm() {
       </div>
     </template>
     <div v-if="farm.busy" class="mx-4 pb-3 text-xs text-emerald-700" role="status">{{ tr('Fishfarm.dang_xu_ly_thao_tac') }}</div>
-    <TwoOptionsModal v-if="confirmation" :title="tr('Fishfarm.xac_nhan_thao_tac')" :sub-text="confirmation.detail" :second-text="tr('Fishfarm.xac_nhan')" :first-disabled="farm.busy" :second-disabled="!farm.canMutate" :on-first="() => confirmation = null" :on-second="confirm" :on-dismiss="() => confirmation = null">
+    <PaymentConfirmation
+      v-if="confirmation?.kind === 'buy'"
+      :title="tr('Fishfarm.xac_nhan_thao_tac')"
+      currency="shells"
+      :balance="currency.shells"
+      :total="300"
+      :busy="farm.busy"
+      :disabled="!farm.canMutate"
+      @cancel="confirmation = null"
+      @confirm="confirm"
+    >
+      <div class="text-sm">{{ confirmation.message }}</div>
+      <div class="text-xs text-emerald-900/70">{{ confirmation.detail }}</div>
+    </PaymentConfirmation>
+    <TwoOptionsModal v-else-if="confirmation" :title="tr('Fishfarm.xac_nhan_thao_tac')" :sub-text="confirmation.detail" :second-text="tr('Fishfarm.xac_nhan')" :first-disabled="farm.busy" :second-disabled="!farm.canMutate" :on-first="() => confirmation = null" :on-second="confirm" :on-dismiss="() => confirmation = null">
       <div class="flex flex-wrap items-center gap-1 text-sm text-[#24352a]">{{ confirmation.message }}<template v-if="confirmation.kind === 'sell'"><Cash :amount="confirmation.cash" :size="20" />?</template></div>
     </TwoOptionsModal>
     <Teleport to="body">

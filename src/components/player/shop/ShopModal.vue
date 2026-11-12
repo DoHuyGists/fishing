@@ -228,7 +228,6 @@ async function buyItem() {
         :total-received="totalReceived"
         :can-buy="canBuy"
         :cash="currencyStore.cash"
-        :formatted-cash="currencyStore.formattedCash"
         :busy="busy"
         @buy="buyItem"
       />

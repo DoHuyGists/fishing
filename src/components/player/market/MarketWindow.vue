@@ -12,6 +12,7 @@ import { useCaughtStore } from "../../../stores/caught.ts";
 import Cash from "../currency/Cash.vue";
 import Modal from "../../shared/Modal.vue";
 import Tab from "../../shared/Tab.vue";
+import PaymentConfirmation from "../../shared/PaymentConfirmation.vue";
 import { useToast } from "../../../composables/useToast.ts";
 
 const authStore = useAuthStore();
@@ -86,11 +87,12 @@ function confirmBuy(item: MarketListing) {
 }
 
 function cancelBuy() {
+  if (isBuying.value) return;
   itemToBuy.value = null;
 }
 
 async function handleBuyFish() {
-  if (!itemToBuy.value) return;
+  if (!itemToBuy.value || isBuying.value || currencyStore.cash < LISTED_PRICE + balanceFee.value + itemToBuy.value.price) return;
   if (!authStore.userId) {
     toast.error(tr('MarketWindow.ban_chua_dang_nhap'), { get title() { return tr('MarketWindow.khong_the_mua_ca'); } });
     return;
@@ -102,7 +104,7 @@ async function handleBuyFish() {
     await supabaseMarketRepository.buyFish(itemToBuy.value.id);
     await marketStore.loadMarketListings();
     await caughtStore.loadCaughtFishes();
-    cancelBuy();
+    itemToBuy.value = null;
     toast.success(tr('MarketWindow.mua_value0_thanh_cong', { value0: fishName }), { get title() { return tr('FishingPassPurchaseModal.giao_dich_thanh_cong'); } });
   } catch (err: any) {
     console.error("Lỗi khi mua cá:", err);
@@ -400,50 +402,27 @@ onUnmounted(() => marketStore.stopRealtime());
       </template>
     </Tab>
   </Modal>
-  <!-- Confirm Buy Dialog -->
-  <div v-if="itemToBuy" class="fixed inset-0 z-[10001] flex items-center justify-center bg-black/50 p-4 backdrop-blur-xs" @click.self="cancelBuy">
-    <div class="w-full max-w-sm bg-white border border-gray-300 rounded-xl p-5 shadow-[0_12px_32px_rgba(38,50,56,0.3)] text-center relative">
-      <div class="m-0 text-base font-bold text-[#263238]">{{ tr('MarketWindow.xac_nhan_mua_ca') }}</div>
-
-      <div class="my-4 p-3 bg-emerald-50 border border-emerald-200 rounded-xl flex items-center gap-3 text-left">
-        <img :src="itemToBuy.caught?.fish?.image || '/fish/VN/fish.jpg'" class="h-12 rounded-lg object-cover" />
-        <div class="flex-1 min-w-0">
-          <div class="m-0 text-xs font-bold text-[#263238] truncate">{{ itemToBuy.caught?.fish?.name }}</div>
-          <div class="m-0 text-xs font-bold text-[#263238] truncate">{{ itemToBuy.caught?.fish?.weight }} kg</div>
-        </div>
-      </div>
-
-      <div class="flex items-center gap-2 text-xs text-gray-600 leading-relaxed">
-        <span>{{ tr('MarketWindow.so_du_hien_co') }} </span>
-        <Cash :amount="currencyStore.formattedCash" />
-      </div>
-      <hr class="my-2" />
-      <div class="flex items-center gap-2 text-xs text-gray-600 leading-relaxed">
-        <span>{{ tr('MarketWindow.gia') }}</span>
-        <Cash :amount="itemToBuy.price" />
-      </div>
-      <div class="flex items-center gap-2 text-xs">
-        <span>{{ tr('FishSellConfirm.phi_niem_yet_thi_truong') }}</span>
-        <Cash :amount="LISTED_PRICE" />
-      </div>
-      <div class="flex items-center gap-2 text-xs">
-        <span>{{ tr('FishSellConfirm.phi_can_bang_thi_truong') }} </span>
-        <Cash :amount="balanceFee" />
-      </div>
-      <hr class="my-2" />
-      <div class="flex items-center gap-2 text-xs">
-        <span>{{ tr('FishSellConfirm.tong_phi') }} </span>
-        <Cash :amount="LISTED_PRICE + balanceFee + itemToBuy.price" />
-      </div>
-
-      <div class="flex justify-center gap-3 mt-4">
-        <button type="button" class="py-1.5 px-4 rounded-lg border border-gray-300 bg-transparent text-[#263238] text-xs font-bold cursor-pointer hover:bg-[#eef3f1]" @click="cancelBuy">
-          {{ tr('AccountInfoModal.huy') }}
-        </button>
-        <button type="button" class="py-1.5 px-4 rounded-lg border border-gray-300 bg-[#153221] text-white text-xs font-bold cursor-pointer hover:bg-[#1a3e29] shadow-sm disabled:opacity-50" :disabled="isBuying" @click="handleBuyFish">
-          {{ isBuying ? tr('DailyAttendance.dang_xu_ly') : tr('InventoryModal.mua') }}
-        </button>
+  <PaymentConfirmation
+    v-if="itemToBuy"
+    :title="tr('MarketWindow.xac_nhan_mua_ca')"
+    :balance="currencyStore.cash"
+    :total="LISTED_PRICE + balanceFee + itemToBuy.price"
+    :costs="[
+      { label: tr('MarketWindow.gia'), amount: itemToBuy.price },
+      { label: tr('FishSellConfirm.phi_niem_yet_thi_truong'), amount: LISTED_PRICE },
+      { label: tr('FishSellConfirm.phi_can_bang_thi_truong'), amount: balanceFee },
+    ]"
+    :confirm-text="tr('InventoryModal.mua')"
+    :busy="isBuying"
+    @cancel="cancelBuy"
+    @confirm="handleBuyFish"
+  >
+    <div class="flex items-center gap-3 rounded-xl border border-[#cbd9c6] bg-[#f5f9f0] p-3">
+      <img :src="itemToBuy.caught?.fish?.image || '/fish/VN/fish.jpg'" :alt="itemToBuy.caught?.fish?.name || ''" class="h-12 rounded-lg object-cover" />
+      <div class="min-w-0 text-sm">
+        <div class="truncate font-bold">{{ itemToBuy.caught?.fish?.name }}</div>
+        <div>{{ itemToBuy.caught?.fish?.weight }} kg</div>
       </div>
     </div>
-  </div>
+  </PaymentConfirmation>
 </template>

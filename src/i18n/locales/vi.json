@@ -1,4 +1,7 @@
 {
+  "PaymentConfirmation": {
+    "insufficientBalance": "Số dư không đủ để thực hiện giao dịch."
+  },
   "FeatureAvailability": {
     "title": "Tính khả dụng của tính năng",
     "maintenance": "Tính năng đang khóa. Vui lòng thử lại sau.",

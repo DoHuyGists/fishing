@@ -19,7 +19,7 @@ import { t as tr } from "../../../i18n";
  * -----------------------------------------------------------------------
  */
 import { ref, computed, onBeforeUnmount } from 'vue'
-import Tickets from '../currency/Tickets.vue'
+import PaymentConfirmation from '../../shared/PaymentConfirmation.vue'
 
 const props = withDefaults(defineProps<Props>(), {
   spinConfirmation: undefined,
@@ -232,52 +232,19 @@ onBeforeUnmount(() => {
 
     <div v-if="errorMsg" role="alert" class="text-sm font-medium text-red-500">{{ errorMsg }}</div>
 
-    <Teleport to="body">
-      <div
-        v-if="showSpinConfirmation && spinConfirmation"
-        class="fixed inset-0 z-[10000] flex items-center justify-center bg-black/60 px-4"
-        role="presentation"
-        @click.self="cancelSpin"
-      >
-        <section
-          class="w-full max-w-sm rounded-2xl bg-white p-6 text-slate-900 shadow-2xl"
-          role="dialog"
-          aria-modal="true"
-          aria-labelledby="spin-confirmation-title"
-        >
-          <div id="spin-confirmation-title" class="m-0 text-center text-lg font-bold">
-            {{ tr('SpinWheel.xac_nhan_quay') }}
-          </div>
-          <div class="mt-5 space-y-3 text-sm">
-            <div class="flex items-center justify-between gap-3">
-              <span>{{ tr('FishSellConfirm.so_du_hien_tai') }}</span>
-              <Tickets :amount="spinConfirmation.currentBalance" />
-            </div>
-            <hr>
-            <div class="flex items-center justify-between gap-3 font-semibold">
-              <span>{{ tr('SpinWheel.tong_chi_phi_luot_quay') }}</span>
-              <Tickets :amount="spinConfirmation.totalCost" />
-            </div>
-          </div>
-          <div class="mt-6 flex justify-center gap-3">
-            <button
-              type="button"
-              class="rounded-lg border border-gray-300 px-4 py-2 text-sm font-semibold text-gray-700 hover:bg-gray-100"
-              @click="cancelSpin"
-            >
-              {{ tr('AccountInfoModal.huy') }}
-            </button>
-            <button
-              type="button"
-              class="rounded-lg bg-[#153221] px-4 py-2 text-sm font-semibold text-white hover:bg-[#1a3e29]"
-              @click="confirmSpin"
-            >
-              {{ tr('SpinWheel.xac_nhan_quay_2') }}
-            </button>
-          </div>
-        </section>
-      </div>
-    </Teleport>
+    <PaymentConfirmation
+      v-if="showSpinConfirmation && spinConfirmation"
+      :title="tr('SpinWheel.xac_nhan_quay')"
+      currency="tickets"
+      :balance="spinConfirmation.currentBalance"
+      :total="spinConfirmation.totalCost"
+      :total-label="tr('SpinWheel.tong_chi_phi_luot_quay')"
+      :confirm-text="tr('SpinWheel.xac_nhan_quay_2')"
+      :disabled="disabled || rewards.length === 0"
+      :busy="spinning"
+      @cancel="cancelSpin"
+      @confirm="confirmSpin"
+    />
 
     <!-- Popup thông báo kết quả -->
     <Teleport to="body">

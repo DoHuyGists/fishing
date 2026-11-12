@@ -61,8 +61,8 @@ function selectionClass(caught: CaughtFish) {
 </script>
 
 <template>
-  <section class="flex h-full flex-col border-b border-emerald-950/10 md:border-b-0 md:border-r">
-    <div class="flex flex-wrap items-center justify-between gap-2 border-b border-emerald-950/10 px-5 py-3 sm:px-6">
+  <section class="flex h-full min-h-0 flex-col border-b border-emerald-950/10 md:border-b-0 md:border-r">
+    <div class="flex shrink-0 flex-wrap items-center justify-between gap-2 border-b border-emerald-950/10 px-5 py-3 sm:px-6">
       <div class="m-0 text-sm font-bold">{{ tr('FishingPlayers.ca_da_cau') }}</div>
       <span class="text-xs text-emerald-900/60">{{ caughtFishes.length }} {{ tr('UserProfile.con') }}</span>
       <div

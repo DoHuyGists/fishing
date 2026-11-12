@@ -1,4 +1,7 @@
 {
+  "PaymentConfirmation": {
+    "insufficientBalance": "Insufficient balance for this transaction."
+  },
   "FeatureAvailability": {
     "title": "Feature availability",
     "maintenance": "This feature is locked. Please try again later.",

@@ -127,12 +127,12 @@ onMounted(() => void loadMissionData(true));
 <template>
   <Modal :title="tr('MissionModal.bang_nhiem_vu')" :sub-title="tr('MissionModal.nhiem_vu_theo_gio_va_hang_ngay')" :on-refresh="loadMissionData">
     <div class="h-full">
-      <Tab v-model="activeTab" :tabs="tabs" :aria-label="tr('MissionModal.loai_nhiem_vu')" lazy>
+      <Tab v-model="activeTab" :tabs="tabs" :aria-label="tr('MissionModal.loai_nhiem_vu')" lazy contained>
         <template #hourly>
           <div v-if="isLoading || isRefreshing" class="grid h-full place-items-center text-sm text-emerald-900/70">
             {{ tr('MissionModal.dang_tai_ca_va_nhiem_vu') }}
           </div>
-          <div v-else class="grid grid-rows-[minmax(0,1fr)_minmax(0,1fr)] md:grid-rows-1 md:grid-cols-[minmax(0,1fr)_minmax(0,1fr)] h-full flex-1">
+          <div v-else class="grid min-h-0 grid-rows-[minmax(0,1fr)_minmax(0,1fr)] md:grid-rows-1 md:grid-cols-[minmax(0,1fr)_minmax(0,1fr)] h-full">
             <CaughtFishList :caught-fishes="caughtStore.caughtFishes" :selected-caught-ids="selectedCaughtIds" :required-fish-counts="requiredFishCounts" :selected-fish-counts="selectedFishCounts" @toggle="toggleCaught" />
             <MissionList :missions="missionStore.missions" :selected-mission="selectedMission" :selected-mission-id="selectedMissionId" :selected-caught-ids="selectedCaughtIds" :required-fish-counts="requiredFishCounts" :selected-fish-counts="selectedFishCounts" :status-message="statusMessage"
               :status-is-error="statusIsError" :is-mission-complete="isMissionComplete" :is-claiming="isClaiming" @select="selectMission" @claim="claimMission" />

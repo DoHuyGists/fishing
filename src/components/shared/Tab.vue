@@ -18,12 +18,15 @@ interface Props {
   tabs: TabItem[]
   /** Chỉ render nội dung tab khi tab đó được mở lần đầu. */
   lazy?: boolean
+  /** Giới hạn nội dung trong chiều cao còn lại bên dưới thanh tab. */
+  contained?: boolean
   /** Nhãn aria cho cả danh sách tab. */
   ariaLabel?: string
 }
 
 const props = withDefaults(defineProps<Props>(), {
   lazy: false,
+  contained: false,
   ariaLabel: undefined,
 })
 
@@ -95,12 +98,12 @@ async function onKeydown(e: KeyboardEvent, index: number) {
 </script>
 
 <template>
-  <div class="w-full h-full">
+  <div class="w-full h-full" :class="{ 'flex min-h-0 flex-col': contained }">
     <!-- Danh sách tab -->
     <div
       role="tablist"
       :aria-label="ariaLabel"
-      class="flex gap-1 overflow-x-auto border-b border-green-200"
+      class="flex shrink-0 gap-1 overflow-x-auto border-b border-green-200"
     >
       <button
         v-for="(tab, index) in tabs"
@@ -156,7 +159,8 @@ async function onKeydown(e: KeyboardEvent, index: number) {
         role="tabpanel"
         :aria-labelledby="tabId(tab.key)"
         tabindex="0"
-        class="h-full py-4 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-green-500"
+        class="py-4 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-green-500"
+        :class="contained ? 'min-h-0 flex-1 overflow-hidden' : 'h-full'"
       >
         <slot :name="tab.key" :active="tab.key === activeKey" />
       </div>

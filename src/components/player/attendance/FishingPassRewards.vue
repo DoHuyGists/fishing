@@ -42,6 +42,23 @@ const rewardsByDay = computed(() => {
   });
 });
 
+function scrollRewardsHorizontally(event: WheelEvent) {
+  if (event.ctrlKey || event.shiftKey || Math.abs(event.deltaX) >= Math.abs(event.deltaY)) return;
+
+  const container = event.currentTarget as HTMLElement;
+  const maxScrollLeft = container.scrollWidth - container.clientWidth;
+  if (maxScrollLeft <= 0 || !event.cancelable) return;
+
+  const deltaScale = event.deltaMode === WheelEvent.DOM_DELTA_LINE
+    ? 16
+    : event.deltaMode === WheelEvent.DOM_DELTA_PAGE ? container.clientWidth : 1;
+  const nextScrollLeft = Math.min(maxScrollLeft, Math.max(0, container.scrollLeft + event.deltaY * deltaScale));
+  if (nextScrollLeft === container.scrollLeft) return;
+
+  event.preventDefault();
+  container.scrollLeft = nextScrollLeft;
+}
+
 async function claimReward(rewardId: string) {
   if (claimingRewardId.value) return;
   claimingRewardId.value = rewardId;
@@ -63,7 +80,7 @@ async function claimReward(rewardId: string) {
     <div v-else-if="!fishingPassStore.currentPass" class="rounded-2xl border border-[#cbd9c6] bg-white p-6 text-center text-sm text-[#24352a]">{{ tr('FishingPassRewards.hien_chua_co_fishing_pass_dang_dien_ra') }}</div>
     <template v-else>
       <div class="flex gap-2">
-        <div class="overflow-x-auto rounded-2xl border border-[#cbd9c6] bg-white p-3 sm:p-5">
+        <div class="min-w-0 overflow-x-auto rounded-2xl border border-[#cbd9c6] bg-white p-3 sm:p-5" @wheel="scrollRewardsHorizontally">
           <div class="min-w-max space-y-2">
             <div class="flex w-max gap-2">
               <div class="sticky left-0 z-10 flex w-24 shrink-0 items-center justify-center rounded-lg border border-[#cbd9c6] bg-[#f5f9f0] px-2 py-2 text-center text-xs font-black text-[#24352a]">{{ tr('FishingPassRewards.ngay_nhan') }}</div>

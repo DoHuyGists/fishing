@@ -7,7 +7,7 @@ import { onMounted, ref } from "vue";
 import { useCurrencyStore } from "../../../stores/currency";
 import { useToast } from "../../../composables/useToast";
 
-import TwoOptionsModal from "../../shared/TwoOptionsModal.vue";
+import PaymentConfirmation from "../../shared/PaymentConfirmation.vue";
 import Cash from "../currency/Cash.vue";
 import Shells from "../currency/Shells.vue";
 import Tickets from "../currency/Tickets.vue";
@@ -127,26 +127,26 @@ onMounted(() => {
       <button type="button" class="ml-2 underline" :disabled="currencyStore.loading" @click="currencyStore.fetchCurrency()">{{ tr('CurrencyConvertTable.tai_lai_so_du') }}</button>
     </div>
   </section>
-  <Teleport to="body">
-    <TwoOptionsModal
-      v-if="pendingConversion"
-      :title="tr('CurrencyConvertTable.xac_nhan_quy_doi')"
-      :first-text="tr('AccountInfoModal.huy')"
-      :second-text="currencyStore.converting ? tr('CurrencyConvertTable.dang_doi') : tr('Fishfarm.xac_nhan')"
-      :first-disabled="currencyStore.converting"
-      :second-disabled="currencyStore.converting || !currencyStore.canConvert(pendingConversion.rate)"
-      :on-first="dismissConfirmation"
-      :on-second="confirmConversion"
-      :on-dismiss="dismissConfirmation"
-    >
-      <div class="space-y-3 text-sm text-[#24352a]">
-        <div>{{ tr('CurrencyConvertTable.ban_muon_quy_doi') }} {{ pendingConversion.batches.toLocaleString(getFormattingLocale()) }} {{ tr('CurrencyConvertTable.goi') }}</div>
-        <div class="flex flex-wrap items-center gap-2 rounded-lg border border-[#cbd9c6] bg-[#f5f9f0] p-3">
-          <component :is="currencies[pendingConversion.rate.source_currency]" :amount="pendingConversion.cost" :size="22" />
-          <span :aria-label="tr('CurrencyConvertTable.doi_thanh')">→</span>
-          <component :is="currencies[pendingConversion.rate.target_currency]" :amount="pendingConversion.received" :size="22" />
-        </div>
+  <PaymentConfirmation
+    v-if="pendingConversion"
+    :title="tr('CurrencyConvertTable.xac_nhan_quy_doi')"
+    :currency="pendingConversion.rate.source_currency"
+    :balance="currencyStore[pendingConversion.rate.source_currency]"
+    :total="pendingConversion.cost"
+    :confirm-text="tr('Fishfarm.xac_nhan')"
+    :busy-text="tr('CurrencyConvertTable.dang_doi')"
+    :busy="currencyStore.converting"
+    :disabled="!currencyStore.canConvert(pendingConversion.rate)"
+    @cancel="dismissConfirmation"
+    @confirm="confirmConversion"
+  >
+    <div class="text-sm">{{ tr('CurrencyConvertTable.ban_muon_quy_doi') }} {{ pendingConversion.batches.toLocaleString(getFormattingLocale()) }} {{ tr('CurrencyConvertTable.goi') }}</div>
+    <template #after-summary>
+      <div class="flex flex-wrap items-center gap-2 rounded-lg border border-[#cbd9c6] bg-[#f5f9f0] p-3 text-sm">
+        <component :is="currencies[pendingConversion.rate.source_currency]" :amount="pendingConversion.cost" :size="22" :interactive="false" />
+        <span :aria-label="tr('CurrencyConvertTable.doi_thanh')">→</span>
+        <component :is="currencies[pendingConversion.rate.target_currency]" :amount="pendingConversion.received" :size="22" :interactive="false" />
       </div>
-    </TwoOptionsModal>
-  </Teleport>
+    </template>
+  </PaymentConfirmation>
 </template>
