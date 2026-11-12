@@ -2,6 +2,7 @@
 import { computed, onMounted } from 'vue'
 import AdminCrudScreen, { type CrudColumn, type CrudField } from '../AdminCrudScreen.vue'
 import { useAdminAquacultureFoodStore } from './admin-aquaculture-food-store'
+import AquacultureFoodManagementForm from './AquacultureFoodManagementForm.vue'
 
 const emit = defineEmits<{ close: [] }>()
 const store = useAdminAquacultureFoodStore()
@@ -26,5 +27,9 @@ const fields = computed<CrudField[]>(() => [
 
 <template>
   <AdminCrudScreen title="Thức ăn theo loài nuôi" subtitle="Số phần ăn = làm tròn lên (tổng điểm cá trong lứa / điểm mỗi phần). Tên, giá và trạng thái vật phẩm được quản lý tại mục Vật phẩm." icon="🌾"
-    :columns="columns" :fields="fields" :items="store.items" :loading="store.loading" :error="store.error" :save="store.save" :remove="store.remove" @refresh="store.fetchAll()" @close="emit('close')" />
+    :columns="columns" :fields="fields" :items="store.items" :loading="store.loading" :error="store.error" :save="store.save" :remove="store.remove" @refresh="store.fetchAll()" @close="emit('close')">
+    <template #form-fields="{ form, editing }">
+      <AquacultureFoodManagementForm :form="form" :editing="editing" :fields="fields" />
+    </template>
+  </AdminCrudScreen>
 </template>

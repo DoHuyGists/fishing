@@ -198,6 +198,7 @@ async function confirmDelete() {
       <form class="bg-white rounded-xl w-full max-w-lg max-h-[90vh] flex flex-col shadow-xl" @submit.prevent="submit">
         <div class="px-5 py-3 border-b border-gray-200 font-extrabold text-sm">{{ editingId ? "Cập nhật" : "Thêm mới" }} - {{ title }}</div>
         <fieldset :disabled="saving" class="m-0 min-w-0 border-0 p-5 overflow-auto flex flex-col gap-3">
+          <slot name="form-fields" :form="form" :editing="editingId !== null">
           <label v-for="f in fields" :key="f.key" class="flex flex-col gap-1 text-xs font-bold text-gray-600">
             <span>{{ f.label }}<span v-if="f.required && !isReadonly(f)" class="text-red-500"> *</span></span>
             <input v-if="isReadonly(f)" :value="readonlyDisplay(f)" disabled class="px-2 py-1.5 border border-gray-200 rounded-lg bg-gray-100 text-gray-500 font-normal" />
@@ -210,6 +211,7 @@ async function confirmDelete() {
             <input v-else-if="f.type === 'datetime'" v-model="form[f.key]" type="datetime-local" class="px-2 py-1.5 border border-gray-300 rounded-lg font-normal" />
             <input v-else v-model="form[f.key]" type="text" class="px-2 py-1.5 border border-gray-300 rounded-lg font-normal" />
           </label>
+          </slot>
           <div v-if="formError" class="px-3 py-2 text-xs rounded-lg bg-red-50 border border-red-200 text-red-700">{{ formError }}</div>
         </fieldset>
         <div class="px-5 py-3 border-t border-gray-200 flex justify-end gap-2">

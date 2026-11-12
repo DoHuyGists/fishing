@@ -34,6 +34,9 @@ export const useAdminAquacultureFoodStore = defineStore('AdminAquacultureFood', 
       }
       if (!this.rules.some(r => r.species_id === payload.species_id)) throw new Error('Loài cần có cấu hình nuôi trước khi thêm thức ăn.')
       if (!this.sourceItems.some(i => i.id === payload.item_id)) throw new Error('Hãy chọn vật phẩm thức ăn hợp lệ.')
+      if (!current && this.items.some(r => r.species_id === payload.species_id && r.item_id === payload.item_id)) {
+        throw new Error('Vật phẩm này đã được cấu hình cho loài đã chọn. Hãy sửa cấu hình hiện có.')
+      }
       const row = current ? await repository.update(payload) : await repository.create(payload)
       this.items = [...this.items.filter(r => r.id !== row.id), row]
       return row

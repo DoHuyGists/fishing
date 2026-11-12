@@ -64,22 +64,79 @@ const onboarding = useOnboardingStore();
 const features = useFeatureAvailabilityStore();
 
 const firstPlaySteps = [
-  { target: '#first-play-account', get title() { return tr('Lobby.chao_mung_ban_den_voi_ho_cau'); }, get description() { return tr('Lobby.trong_tai_khoan_chon_ten_anh_dai_dien_va_quoc_gia_de_bat_dau_han'); } },
-  { target: '#first-play-inventory', get title() { return tr('Lobby.chuan_bi_trang_bi'); }, get description() { return tr('Lobby.mo_tui_do_va_chon_du_can_day_may_luoi_moi_trong_mot_set_vao_cua_'); } },
-  { target: '#first-play-map', get title() { return tr('Lobby.chon_bai_cau'); }, get description() { return tr('Lobby.mo_mot_quoc_gia_tren_ban_do_chon_bai_cau_roi_kiem_tra_trang_bi_t'); } },
-  { target: '#first-play-map', get title() { return tr('Lobby.tha_cau_va_keo_ca'); }, get description() { return tr('Lobby.o_bai_cau_chinh_do_sau_tha_can_va_cho_ca_can_lam_theo_huong_dan_'); } },
-  { target: '#first-play-storage', get title() { return tr('Lobby.giu_lai_thanh_qua'); }, get description() { return tr('Lobby.khi_ve_sanh_mo_luoi_ca_va_chuyen_ca_muon_giu_vao_kho_ca_ca_con_t'); } },
-  { target: '#first-play-market', get title() { return tr('Lobby.ban_ca_va_tiep_tuc_kham_pha'); }, get description() { return tr('Lobby.trong_kho_ca_ban_co_the_ban_ca_hoac_dang_len_cho_ca_tien_kiem_du'); } },
+  {
+    target: "#first-play-account",
+    get title() {
+      return tr("Lobby.chao_mung_ban_den_voi_ho_cau");
+    },
+    get description() {
+      return tr("Lobby.trong_tai_khoan_chon_ten_anh_dai_dien_va_quoc_gia_de_bat_dau_han");
+    },
+  },
+  {
+    target: "#first-play-inventory",
+    get title() {
+      return tr("Lobby.chuan_bi_trang_bi");
+    },
+    get description() {
+      return tr("Lobby.mo_tui_do_va_chon_du_can_day_may_luoi_moi_trong_mot_set_vao_cua_");
+    },
+  },
+  {
+    target: "#first-play-map",
+    get title() {
+      return tr("Lobby.chon_bai_cau");
+    },
+    get description() {
+      return tr("Lobby.mo_mot_quoc_gia_tren_ban_do_chon_bai_cau_roi_kiem_tra_trang_bi_t");
+    },
+  },
+  {
+    target: "#first-play-map",
+    get title() {
+      return tr("Lobby.tha_cau_va_keo_ca");
+    },
+    get description() {
+      return tr("Lobby.o_bai_cau_chinh_do_sau_tha_can_va_cho_ca_can_lam_theo_huong_dan_");
+    },
+  },
+  {
+    target: "#first-play-storage",
+    get title() {
+      return tr("Lobby.giu_lai_thanh_qua");
+    },
+    get description() {
+      return tr("Lobby.khi_ve_sanh_mo_luoi_ca_va_chuyen_ca_muon_giu_vao_kho_ca_ca_con_t");
+    },
+  },
+  {
+    target: "#first-play-market",
+    get title() {
+      return tr("Lobby.ban_ca_va_tiep_tuc_kham_pha");
+    },
+    get description() {
+      return tr("Lobby.trong_kho_ca_ban_co_the_ban_ca_hoac_dang_len_cho_ca_tien_kiem_du");
+    },
+  },
 ];
-watch(() => [authStore.user?.id, userProfileStore.profile?.onboarding_completed, modalStore.isModalOpening], () => {
-  if (authStore.user?.id && !modalStore.isModalOpening) onboarding.offer(authStore.user.id);
-}, { immediate: true });
+watch(
+  () => [authStore.user?.id, userProfileStore.profile?.onboarding_completed, modalStore.isModalOpening],
+  () => {
+    if (authStore.user?.id && !modalStore.isModalOpening) onboarding.offer(authStore.user.id);
+  },
+  { immediate: true },
+);
 
-
-watch(() => [authStore.user?.id, features.isAvailable('notifications')] as const, ([userId, enabled], _, onCleanup) => {
-  if (userId && enabled) notificationStore.subscribeToNewNotifications(userId, () => {});
-  onCleanup(() => { void notificationStore.unsubscribeFromNewNotifications(); });
-}, { immediate: true });
+watch(
+  () => [authStore.user?.id, features.isAvailable("notifications")] as const,
+  ([userId, enabled], _, onCleanup) => {
+    if (userId && enabled) notificationStore.subscribeToNewNotifications(userId, () => {});
+    onCleanup(() => {
+      void notificationStore.unsubscribeFromNewNotifications();
+    });
+  },
+  { immediate: true },
+);
 
 onMounted(() => {
   void userTurnsStore.fetchStatus().then(() => userTurnsStore.startCountdown());
@@ -108,7 +165,7 @@ onUnmounted(() => {
     <header
       class="slide-fade-in from-top flex flex-wrap items-center justify-between gap-3 rounded-xl border border-[#cbd9c6] bg-[#f5f9f0] px-4 py-2.5 text-[#24352a]"
     >
-      <span class="font-bold">{{ tr('Lobby.ban_do_the_gioi') }}</span>
+      <span class="font-bold">{{ tr("Lobby.tieu_de") }}</span>
       <div class="flex flex-wrap items-center justify-end gap-2">
         <Cash :amount="currencyStore.formattedCash" />
         <Shells :amount="currencyStore.formattedShells" />
@@ -131,8 +188,14 @@ onUnmounted(() => {
       </div>
     </main>
 
-    <div v-if="onboarding.error" role="alert" class="text-sm text-red-700">{{ onboarding.error }} <button class="underline" @click="onboarding.finish()">{{ tr('Lobby.luu_lai') }}</button></div>
-    <GuideTour v-if="onboarding.visible && !modalStore.isModalOpening" :steps="firstPlaySteps" @finish="onboarding.finish()" />
+    <div v-if="onboarding.error" role="alert" class="text-sm text-red-700">
+      {{ onboarding.error }} <button class="underline" @click="onboarding.finish()">{{ tr("Lobby.luu_lai") }}</button>
+    </div>
+    <GuideTour
+      v-if="onboarding.visible && !modalStore.isModalOpening"
+      :steps="firstPlaySteps"
+      @finish="onboarding.finish()"
+    />
     <Teleport to="body">
       <Transition
         enter-active-class="transition-opacity duration-200 ease-out"
