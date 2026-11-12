@@ -1,7 +1,10 @@
 import { t as tr } from "../i18n";
 import { defineStore } from "pinia";
+import type { RealtimeChannel } from "@supabase/supabase-js";
 import { supabaseUserProfileRepository, type UserProfile } from "../data/supabaseUserProfileRepository";
 import { supabaseAvatarRepository } from "../data/supabaseAvatarRepository";
+
+let progressChannel: RealtimeChannel | null = null;
 
 export const useUserProfileStore = defineStore("userProfile", {
   state: () => ({
@@ -17,6 +20,20 @@ export const useUserProfileStore = defineStore("userProfile", {
     speciesStorageCapacity: (state) => state.profile?.species_storage_capacity ?? 0,
   },
   actions: {
+    subscribeToProgress(userId: string) {
+      this.stopProgressSubscription();
+      const channel = supabaseUserProfileRepository.subscribeToProgress(userId, (profile) => {
+        if (progressChannel !== channel || this.profile?.id !== userId) return;
+        this.profile.level = profile.level;
+        this.profile.experience_point = profile.experience_point;
+        this.profile.skill_points = profile.skill_points;
+      });
+      progressChannel = channel;
+    },
+    stopProgressSubscription() {
+      if (progressChannel) void supabaseUserProfileRepository.unsubscribe(progressChannel);
+      progressChannel = null;
+    },
     async updateIdentity(displayName: string, avatarUrl: string | null, file?: File) {
       const name = displayName.trim();
       if (name.length < 2 || name.length > 40) throw new Error(tr('userProfile.ten_hien_thi_can_tu_2_den_40_ky_tu'));

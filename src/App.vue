@@ -9,6 +9,8 @@ import { useLocaleStore } from "./stores/locale";
 import { useFeatureAvailabilityStore } from "./stores/featureAvailability";
 import { useModalStore } from "./stores/modal";
 import { modalFeatures } from "./data/featureAvailability";
+import ConfettiCannon from "./components/shared/ConfettiCannon.vue";
+
 useLocaleStore();
 const auth = useAuthStore();
 const router = useRouter();
@@ -46,6 +48,7 @@ watch(() => auth.recoveringPassword, (recovering) => {
 </script>
 
 <template>
+  <ConfettiCannon ref="confetti" />
   <Toast />
   <router-view />
   <InformationModal />
