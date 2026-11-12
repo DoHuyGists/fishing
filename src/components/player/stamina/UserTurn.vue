@@ -8,7 +8,7 @@ const { open } = useInformationModal();
 function showInformation() {
   open({
     get name() { return tr('UserTurn.luot_cau'); },
-    image: "/items/rod/fishing-rob.png",
+    image: "/currency/turn.svg",
     get description() { return tr('UserTurn.luot_cau_dung_de_thuc_hien_cac_lan_cau_ca_khi_chua_dat_gioi_han_'); },
   });
 }
@@ -21,7 +21,7 @@ const userTurnsStore = useUserTurnsStore();
     <span class="font-bold">
       {{ userTurnsStore.status?.turns ?? "—" }} / {{ userTurnsStore.status?.max_turns ?? "—" }}
     </span>
-    <span aria-hidden="true">🎣</span>
+    <img src="/currency/turn.svg" :width="20" alt="">
     <span v-if="userTurnsStore.status && userTurnsStore.status.turns < userTurnsStore.status.max_turns" class="text-xs w-20 text-[#617565]">
       {{ tr('UserTurn.1_sau') }} {{ userTurnsStore.countdown }}
     </span>
