@@ -44,5 +44,16 @@ const save = (payload: any, id: string | null) => {
     :remove="store.remove"
     @close="emit('close')"
     @refresh="store.fetchAll()"
-  />
+  >
+    <template #cell-image="{ item, value }">
+      <img
+        v-if="value"
+        :src="value"
+        :alt="item.name"
+        loading="lazy"
+        class="size-16 rounded-md border border-[#cbd9c6] bg-[#f5f9f0] object-contain"
+      />
+      <span v-else class="text-gray-400">Chưa có ảnh</span>
+    </template>
+  </AdminCrudScreen>
 </template>
