@@ -4,7 +4,7 @@ import * as d3 from "d3";
 import * as topojson from "topojson-client";
 import type { GeometryCollection, Topology } from "topojson-specification";
 import world from "world-atlas/countries-110m.json";
-import supabase from "../../../database/connection";
+import { useCountryStore } from "../../../stores/country";
 import { createWorldMapCloudTexture } from "../../../utils/worldMapClouds";
 
 interface CountryValueRow {
@@ -370,13 +370,10 @@ function draw() {
 watch(() => [props.anchor, props.pickEnabled], updateTip, { deep: true });
 
 async function loadColors() {
-  const { data, error } = await supabase
-    .from("country_values")
-    .select("country_id, color")
-    .returns<CountryValueRow[]>();
-
-  if (error) {
-    console.error("Không tải được country_values:", error.message);
+  let data: CountryValueRow[];
+  try { data = await useCountryStore().fetchMapColors(); }
+  catch (error) {
+    console.error("Không tải được country_values:", error);
     return;
   }
 

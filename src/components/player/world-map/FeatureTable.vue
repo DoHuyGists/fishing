@@ -4,10 +4,12 @@ import { t as tr } from "../../../i18n";
 import { useConfigStore } from "../../../stores/config.ts";
 import { useModalStore } from "../../../stores/modal.ts";
 import { useNotificationStore } from "../../../stores/notification.ts";
+import { useFeatureAvailabilityStore } from "../../../stores/featureAvailability";
 
 const configStore = useConfigStore();
 const modalStore = useModalStore();
 const notificationStore = useNotificationStore();
+const features = useFeatureAvailabilityStore();
 
 const buttonDirections = ['from-top-left', 'from-top-right', 'from-bottom-left', 'from-bottom-right'];
 
@@ -88,13 +90,15 @@ const supportActions: LobbyAction[] = [
           :id="action.tourId"
           :key="action.modal"
           type="button"
+          :data-locked="!features.isAvailable(action.modal)"
           class="slide-fade-in lobby-menu__button relative flex min-h-9 min-w-0 flex-wrap items-center justify-center gap-x-1 gap-y-0.5 rounded-lg border border-[#cbd9c6] bg-white/85 px-1 py-1.5 text-[11px] leading-4"
           :class="buttonDirections[actionIndex % buttonDirections.length]"
           aria-haspopup="dialog"
-          @click="modalStore.open(action.modal)"
+          @click="features.isAvailable(action.modal) ? modalStore.open(action.modal) : features.showDetails(action.modal)"
         >
           <span aria-hidden="true" class="text-sm">{{ action.icon }}</span>
           <span>{{ action.label }}</span>
+          <span v-if="!features.isAvailable(action.modal)" class="w-full text-[9px] underline underline-offset-2">{{ tr('FeatureAvailability.maintenanceBadge') }}</span>
           <span
             v-if="action.modal === 'notifications' && notificationStore.unreadCount"
             class="absolute -right-1 -top-1 flex min-h-4 min-w-4 items-center justify-center rounded-full bg-[#b84436] px-1 text-[9px] font-bold leading-4 text-white ring-2 ring-[#f5f9f0]"
@@ -125,11 +129,12 @@ const supportActions: LobbyAction[] = [
             :id="action.tourId"
             :key="action.modal"
             type="button"
-            :disabled="action.requiresUnlock && !configStore.isUnlocked(action.modal)"
+            :disabled="features.isAvailable(action.modal) && action.requiresUnlock && !configStore.isUnlocked(action.modal)"
+            :data-locked="!features.isAvailable(action.modal)"
             class="slide-fade-in lobby-menu__button flex min-h-14 min-w-0 flex-col items-center justify-center gap-1 rounded-lg border border-[#d9e3d3] bg-white px-1 py-1.5 text-center shadow-[0_2px_0_#e2e9dc]"
             :class="buttonDirections[(actionIndex + groupIndex) % buttonDirections.length]"
             aria-haspopup="dialog"
-            @click="modalStore.open(action.modal)"
+            @click="features.isAvailable(action.modal) ? modalStore.open(action.modal) : features.showDetails(action.modal)"
           >
             <span
               aria-hidden="true"
@@ -138,7 +143,11 @@ const supportActions: LobbyAction[] = [
             >{{ action.icon }}</span>
             <span class="text-[11px] font-semibold leading-4">{{ action.label }}</span>
             <span
-              v-if="action.requiresUnlock && !configStore.isUnlocked(action.modal)"
+              v-if="!features.isAvailable(action.modal)"
+              class="rounded bg-amber-100 px-1 py-0.5 text-[9px] leading-3 text-amber-900 underline underline-offset-2"
+            >{{ tr('FeatureAvailability.maintenanceBadge') }}</span>
+            <span
+              v-else-if="action.requiresUnlock && !configStore.isUnlocked(action.modal)"
               class="inline-flex items-center gap-0.5 rounded bg-[#eef1e9] px-1 py-0.5 text-[9px] leading-3 text-[#64715e]"
             ><span aria-hidden="true">🔒</span> {{ tr('FishPond.cap') }} {{ configStore.requiredLevel(action.modal) }}</span>
           </button>
@@ -151,16 +160,21 @@ const supportActions: LobbyAction[] = [
         v-for="(action, actionIndex) in supportActions"
         :key="action.modal"
         type="button"
-        :disabled="action.requiresUnlock && !configStore.isUnlocked(action.modal)"
+        :disabled="features.isAvailable(action.modal) && action.requiresUnlock && !configStore.isUnlocked(action.modal)"
+        :data-locked="!features.isAvailable(action.modal)"
         class="slide-fade-in lobby-menu__button flex min-h-9 min-w-0 flex-wrap items-center justify-center gap-1 rounded-lg border border-transparent px-1 py-1 text-[11px] leading-4"
         :class="buttonDirections[(actionIndex + 2) % buttonDirections.length]"
         aria-haspopup="dialog"
-        @click="modalStore.open(action.modal)"
+        @click="features.isAvailable(action.modal) ? modalStore.open(action.modal) : features.showDetails(action.modal)"
       >
         <span aria-hidden="true" class="text-sm">{{ action.icon }}</span>
         <span>{{ action.label }}</span>
         <span
-          v-if="action.requiresUnlock && !configStore.isUnlocked(action.modal)"
+          v-if="!features.isAvailable(action.modal)"
+          class="w-full text-[9px] text-amber-900 underline underline-offset-2"
+        >{{ tr('FeatureAvailability.maintenanceBadge') }}</span>
+        <span
+          v-else-if="action.requiresUnlock && !configStore.isUnlocked(action.modal)"
           class="w-full text-[9px] leading-3 text-[#64715e]"
         ><span aria-hidden="true">🔒</span> {{ tr('FishPond.cap') }} {{ configStore.requiredLevel(action.modal) }}</span>
       </button>
@@ -178,6 +192,18 @@ const supportActions: LobbyAction[] = [
 .lobby-menu__button {
   --slide-distance: 24px;
   transition: background-color 150ms ease, border-color 150ms ease, box-shadow 150ms ease;
+}
+
+.lobby-menu__button[data-locked="true"] {
+  cursor: pointer;
+  border-style: dashed;
+  background-color: #f1f3ed;
+  box-shadow: none;
+}
+
+.lobby-menu__button[data-locked="true"] > [aria-hidden="true"] {
+  filter: grayscale(1);
+  opacity: 0.6;
 }
 
 .lobby-menu__button:not(:disabled):hover {

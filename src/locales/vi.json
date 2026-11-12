@@ -1,4 +1,13 @@
 {
+  "FeatureAvailability": {
+    "title": "Tính khả dụng của tính năng",
+    "maintenance": "Tính năng đang khóa. Vui lòng thử lại sau.",
+    "maintenanceBadge": "Đang khóa",
+    "loading": "Đang kiểm tra tính khả dụng của tính năng…",
+    "loadError": "Không thể kiểm tra trạng thái tính năng. Vui lòng thử lại.",
+    "gacha": "Gacha",
+    "adminDescription": "Bật, tắt tính năng và cập nhật thông báo bảo trì cho người chơi."
+  },
   "donationPayment": {
     "thankYouTitle": "Cảm ơn bạn đã ủng hộ!",
     "thankYouDescription": "Đã nhận khoản ủng hộ {amount} của bạn.\nSự đồng hành của bạn giúp duy trì máy chủ và tiếp tục phát triển game.",

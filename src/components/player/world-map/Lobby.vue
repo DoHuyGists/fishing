@@ -22,6 +22,7 @@ import PrepareModal from "./PrepareModal.vue";
 import FeatureTable from "./FeatureTable.vue";
 import GuideTour from "../../shared/GuideTour.vue";
 import { useOnboardingStore } from "../../../stores/onboarding";
+import { useFeatureAvailabilityStore } from "../../../stores/featureAvailability";
 
 const InteractWorldMap2 = defineAsyncComponent(() => import("./InteractWorldMap.vue"));
 const AccountInfoModal = defineAsyncComponent(() => import("../account/AccountInfoModal.vue"));
@@ -60,6 +61,7 @@ const teamStore = useTeamStore();
 const currencyStore = useCurrencyStore();
 const userProfileStore = useUserProfileStore();
 const onboarding = useOnboardingStore();
+const features = useFeatureAvailabilityStore();
 
 const firstPlaySteps = [
   { target: '#first-play-account', get title() { return tr('Lobby.chao_mung_ban_den_voi_ho_cau'); }, get description() { return tr('Lobby.trong_tai_khoan_chon_ten_anh_dai_dien_va_quoc_gia_de_bat_dau_han'); } },
@@ -74,14 +76,17 @@ watch(() => [authStore.user?.id, userProfileStore.profile?.onboarding_completed,
 }, { immediate: true });
 
 
+watch(() => [authStore.user?.id, features.isAvailable('notifications')] as const, ([userId, enabled], _, onCleanup) => {
+  if (userId && enabled) notificationStore.subscribeToNewNotifications(userId, () => {});
+  onCleanup(() => { void notificationStore.unsubscribeFromNewNotifications(); });
+}, { immediate: true });
+
 onMounted(() => {
   void userTurnsStore.fetchStatus().then(() => userTurnsStore.startCountdown());
   if (authStore.userId) {
     caughtStore.loadCaughtFishes();
     void teamStore.loadData(authStore.userId);
     teamStore.subscribeRealtime(authStore.userId);
-    notificationStore.subscribeToNewNotifications(authStore.userId, () => {
-    });
   }
 });
 
@@ -95,7 +100,7 @@ onUnmounted(() => {
 <template>
   <div class="w-screen min-h-screen p-3 relative flex flex-col gap-2 overflow-hidden">
     <TeamMembersSticky
-      v-if="configStore.showTeam && teamStore.myTeamMembers.length"
+      v-if="features.isAvailable('team') && configStore.showTeam && teamStore.myTeamMembers.length"
       class="slide-fade-in from-right"
       :members="teamStore.myTeamMembers"
       @open-team="modalStore.open('team')"

@@ -3,6 +3,12 @@ import type { Country } from "../stores/country";
 import { createUuid } from "../utils/uuid";
 
 class SupabaseCountryRepository {
+  async fetchMapColors(): Promise<{ country_id: number; color: string | null }[]> {
+    const { data, error } = await supabase.from("country_values").select("country_id,color");
+    if (error) throw new Error(error.message);
+    return data ?? [];
+  }
+
   async fetchMyUnlockedCountries(playerId: string): Promise<Country[]> {
     const { data, error } = await supabase
       .from("player_unlocked_countries")

@@ -17,6 +17,7 @@ export interface Country {
 export const useCountryStore = defineStore("Country", {
   state: () => ({
     countries: [] as Country[],
+    mapColors: [] as { country_id: number; color: string | null }[],
     isLoading: false,
     loaded: false,
     unlockedCountries: [] as Country[],
@@ -34,6 +35,10 @@ export const useCountryStore = defineStore("Country", {
       .filter((id): id is string => id !== null),
   },
   actions: {
+    async fetchMapColors() {
+      this.mapColors = await supabaseCountryRepository.fetchMapColors();
+      return this.mapColors;
+    },
     async fetchCountries(force = false) {
       if (this.loaded && !force) return;
       this.isLoading = true;

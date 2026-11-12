@@ -2,7 +2,7 @@ import { defineStore } from "pinia";
 
 export interface InformationModalContent {
   name: string;
-  image: string;
+  image?: string;
   description: string;
 }
 

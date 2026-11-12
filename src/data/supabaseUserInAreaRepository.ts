@@ -35,9 +35,7 @@ class SupabaseUserInAreaRepository {
       p_area_id: areaId,
     });
 
-    if (error) {
-      console.error(error);
-    }
+    if (error) throw new Error(error.message);
   }
 
   async setUserLeaveArea() {

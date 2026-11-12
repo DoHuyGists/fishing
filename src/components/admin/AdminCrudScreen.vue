@@ -34,6 +34,8 @@ const props = defineProps<{
   items: any[];
   loading: boolean;
   error: string;
+  allowCreate?: boolean;
+  allowDelete?: boolean;
   save: (payload: Record<string, unknown>, id: string | null) => Promise<unknown>;
   remove: (id: string) => Promise<unknown>;
 }>();
@@ -146,13 +148,14 @@ async function confirmDelete() {
     :title="title"
     :icon="icon"
     :subtitle="subtitle"
+    :close-disabled="saving"
     @close="emit('close')"
   >
 
     <div class="px-6 py-3 bg-gray-50 border-b border-gray-200 flex items-center gap-3 shrink-0">
       <input v-model="search" type="text" placeholder="Tìm kiếm..." class="flex-1 px-3 py-1.5 text-xs border border-gray-300 rounded-lg bg-white focus:outline-none" />
-      <button type="button" class="px-3 py-1.5 border border-gray-300 rounded-lg bg-white hover:bg-gray-100 text-xs font-bold cursor-pointer" @click="emit('refresh')">Làm mới</button>
-      <button type="button" class="px-3 py-1.5 rounded-lg bg-[#153221] hover:bg-emerald-800 text-white text-xs font-bold cursor-pointer" @click="openForm()">+ Thêm mới</button>
+      <button type="button" :disabled="isOpen || loading" class="px-3 py-1.5 border border-gray-300 rounded-lg bg-white hover:bg-gray-100 text-xs font-bold cursor-pointer disabled:opacity-50" @click="emit('refresh')">Làm mới</button>
+      <button v-if="allowCreate !== false" type="button" class="px-3 py-1.5 rounded-lg bg-[#153221] hover:bg-emerald-800 text-white text-xs font-bold cursor-pointer" @click="openForm()">+ Thêm mới</button>
     </div>
 
     <div v-if="error || actionError" class="mx-6 mt-3 shrink-0 px-3 py-2 text-xs rounded-lg bg-red-50 border border-red-200 text-red-700">{{ error || actionError }}</div>
@@ -169,7 +172,9 @@ async function confirmDelete() {
           </thead>
           <tbody>
             <tr v-for="r in filtered" :key="r.item.id" class="hover:bg-gray-50 border-b border-gray-100">
-              <td v-for="(cell, i) in r.cells" :key="i" class="px-3 py-2 text-gray-700">{{ cell }}</td>
+              <td v-for="(cell, i) in r.cells" :key="i" class="px-3 py-2 text-gray-700">
+                <slot :name="`cell-${columns[i]!.key}`" :item="r.item" :value="cell">{{ cell }}</slot>
+              </td>
               <td class="px-3 py-2 text-right whitespace-nowrap">
                 <template v-if="confirmDeleteId === r.item.id">
                   <button type="button" class="px-2 py-1 rounded bg-red-600 text-white font-bold cursor-pointer" @click="confirmDelete">Xác nhận</button>
@@ -177,7 +182,7 @@ async function confirmDelete() {
                 </template>
                 <template v-else>
                   <button type="button" class="px-2 py-1 rounded border border-gray-300 hover:bg-gray-100 font-bold cursor-pointer" @click="openForm(r.item)">Sửa</button>
-                  <button type="button" class="ml-1 px-2 py-1 rounded border border-red-300 text-red-600 hover:bg-red-50 font-bold cursor-pointer" @click="confirmDeleteId = r.item.id">Xoá</button>
+                  <button v-if="allowDelete !== false" type="button" class="ml-1 px-2 py-1 rounded border border-red-300 text-red-600 hover:bg-red-50 font-bold cursor-pointer" @click="confirmDeleteId = r.item.id">Xoá</button>
                 </template>
               </td>
             </tr>
@@ -192,7 +197,7 @@ async function confirmDelete() {
     <div v-if="isOpen" class="fixed inset-0 z-60 bg-black/40 grid place-items-center p-4">
       <form class="bg-white rounded-xl w-full max-w-lg max-h-[90vh] flex flex-col shadow-xl" @submit.prevent="submit">
         <div class="px-5 py-3 border-b border-gray-200 font-extrabold text-sm">{{ editingId ? "Cập nhật" : "Thêm mới" }} - {{ title }}</div>
-        <div class="p-5 overflow-auto flex flex-col gap-3">
+        <fieldset :disabled="saving" class="m-0 min-w-0 border-0 p-5 overflow-auto flex flex-col gap-3">
           <label v-for="f in fields" :key="f.key" class="flex flex-col gap-1 text-xs font-bold text-gray-600">
             <span>{{ f.label }}<span v-if="f.required && !isReadonly(f)" class="text-red-500"> *</span></span>
             <input v-if="isReadonly(f)" :value="readonlyDisplay(f)" disabled class="px-2 py-1.5 border border-gray-200 rounded-lg bg-gray-100 text-gray-500 font-normal" />
@@ -206,9 +211,9 @@ async function confirmDelete() {
             <input v-else v-model="form[f.key]" type="text" class="px-2 py-1.5 border border-gray-300 rounded-lg font-normal" />
           </label>
           <div v-if="formError" class="px-3 py-2 text-xs rounded-lg bg-red-50 border border-red-200 text-red-700">{{ formError }}</div>
-        </div>
+        </fieldset>
         <div class="px-5 py-3 border-t border-gray-200 flex justify-end gap-2">
-          <button type="button" class="px-3 py-1.5 border border-gray-300 rounded-lg text-xs font-bold cursor-pointer" @click="isOpen = false">Huỷ</button>
+          <button type="button" :disabled="saving" class="px-3 py-1.5 border border-gray-300 rounded-lg text-xs font-bold cursor-pointer" @click="isOpen = false">Huỷ</button>
           <button type="submit" :disabled="saving" class="px-3 py-1.5 rounded-lg bg-[#153221] text-white text-xs font-bold cursor-pointer disabled:opacity-50">{{ saving ? "Đang lưu..." : "Lưu" }}</button>
         </div>
       </form>

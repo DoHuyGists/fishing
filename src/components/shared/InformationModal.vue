@@ -35,7 +35,7 @@ watch([content, dialog], () => {
           class="absolute right-2 top-2 flex size-8 cursor-pointer items-center justify-center rounded-full text-2xl hover:bg-[#cbd9c6]/50 focus-visible:outline-2 focus-visible:outline-offset-2"
           @click="close"
         >×</button>
-        <img :src="content.image" :alt="content.name" class="mx-auto mb-4 size-16 object-contain" draggable="false">
+        <img v-if="content.image" :src="content.image" :alt="content.name" class="mx-auto mb-4 size-16 object-contain" draggable="false">
         <div id="information-modal-title" class="text-lg font-bold">{{ content.name }}</div>
         <div id="information-modal-description" class="mt-2 whitespace-pre-line text-sm leading-relaxed">{{ content.description }}</div>
       </div>

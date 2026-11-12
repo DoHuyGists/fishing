@@ -22,6 +22,12 @@ Deno.serve(async (request) => {
     if (!bearer) throw new HttpError(401, 'AUTH_REQUIRED');
     const { data: { user }, error: authError } = await db.auth.getUser(bearer);
     if (authError || !user) throw new HttpError(401, 'AUTH_REQUIRED');
+    // Service-role calls bypass the Data API hook, so check before any PayPal operation.
+    stage = 'check_feature_availability';
+    const { data: donationFlag, error: flagError } = await db.from('feature_flags')
+      .select('enabled').eq('feature_key', 'donation').maybeSingle();
+    if (flagError) throw databaseFailure(flagError, stage);
+    if (donationFlag?.enabled !== true) throw new HttpError(403, 'FEATURE_DISABLED');
     let body;
     try { body = await request.json(); } catch { throw new HttpError(400, 'INVALID_REQUEST'); }
     if (!body || !['create', 'capture', 'status'].includes(body.action) ||

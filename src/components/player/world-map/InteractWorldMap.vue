@@ -12,6 +12,7 @@ import { useToast } from "../../../composables/useToast.ts";
 import FishingAnchor from "./FishingAnchor.vue";
 import { useModalStore } from "../../../stores/modal.ts";
 import { useCountryStore } from "../../../stores/country.ts";
+import { useFeatureAvailabilityStore } from "../../../stores/featureAvailability";
 
 const props = withDefaults(defineProps<{ fogEnabled?: boolean; collapsible?: boolean }>(), {
   fogEnabled: true,
@@ -21,6 +22,7 @@ const props = withDefaults(defineProps<{ fogEnabled?: boolean; collapsible?: boo
 const toast = useToast();
 const authStore = useAuthStore();
 const countryStore = useCountryStore();
+const features = useFeatureAvailabilityStore();
 const userInAreaStore = useUserInAreaStore();
 const dayPhaseStore = useDayPhaseStore();
 const fishingAreaStore = useFishingAreaStore();
@@ -43,7 +45,7 @@ watch(isMapVisible, async (visible) => {
 });
 
 watch(
-  () => [props.fogEnabled, authStore.user?.id ?? null] as const,
+  () => [props.fogEnabled && features.isAvailable('world-map'), authStore.user?.id ?? null] as const,
   ([enabled, playerId], _, onCleanup) => {
     if (enabled) onCleanup(countryStore.watchUnlockedCountries(playerId));
   },
@@ -57,9 +59,17 @@ onMounted(async () => {
   if (worldStore.k !== 1 || worldStore.lon !== 0 || worldStore.lat !== 0) {
     mapRef.value?.setView({ lon: worldStore.lon, lat: worldStore.lat, k: worldStore.k });
   }
-  if (!fishingAreaStore.loaded) fishingAreaStore.fetchArea();
   userInAreaStore.setCurrentUserInArea(authStore.userId);
 });
+
+watch(() => features.isAvailable('world-map'), async enabled => {
+  if (enabled && !fishingAreaStore.loaded) void fishingAreaStore.fetchArea();
+  if (!enabled) { pendingArea.value = null; worldStore.isAnchorMode = false; }
+  else {
+    await nextTick();
+    mapRef.value?.setView(worldStore.getLocation());
+  }
+}, { immediate: true });
 
 function togglePick() {
   if (!worldStore.anchorable) {
@@ -70,6 +80,7 @@ function togglePick() {
 }
 
 function onSelectArea(area: any) {
+  if (!features.isAvailable('world-map')) return;
   worldStore.targetArea(area);
 }
 
@@ -100,6 +111,8 @@ watch(
 );
 
 function openPrepare(area: any) {
+  const blocked = ['world-map', 'enter-area'].find(key => !features.isAvailable(key));
+  if (blocked) { features.notify(blocked); return; }
   if (!userInAreaStore.canEnterFishingArea) {
     toast.error(tr('InteractWorldMap.can_ket_thuc_xu_ly_ca_trong_luoi_truoc'), { get title() { return tr('InteractWorldMap.thao_tac_bi_chan'); }, position: "top" });
     return;
@@ -147,7 +160,7 @@ function zoomTo(k: number) {
 </script>
 
 <template>
-  <div class="grid grid-cols-1 h-fit gap-2" :class="{ 'md:grid-cols-[auto_1fr]': isMapVisible }">
+  <div v-if="features.isAvailable('world-map')" class="grid grid-cols-1 h-fit gap-2" :class="{ 'md:grid-cols-[auto_1fr]': isMapVisible }">
     <FishingAnchor
       class="slide-fade-in from-top-left"
       :collapsible="collapsible"
@@ -186,9 +199,11 @@ function zoomTo(k: number) {
                 type="button"
                 class="w-full rounded-lg bg-green-500 px-2 py-1.5 font-bold text-white hover:bg-green-600 disabled:opacity-70"
                 :disabled="isEntering"
-                @click="openPrepare(area)"
+                aria-haspopup="dialog"
+                :class="{ 'underline underline-offset-2': !features.isAvailable('enter-area') }"
+                @click="features.isAvailable('enter-area') ? openPrepare(area) : features.showDetails('enter-area')"
               >
-                {{ isEntering ? tr('InteractWorldMap.dang_vao') : tr('InteractWorldMap.di_den_bai_cau') }}
+                {{ !features.isAvailable('enter-area') ? tr('FeatureAvailability.maintenanceBadge') : isEntering ? tr('InteractWorldMap.dang_vao') : tr('InteractWorldMap.di_den_bai_cau') }}
               </button>
             </div>
           </template>
@@ -209,6 +224,12 @@ function zoomTo(k: number) {
         <button @click="zoomTo(12)" class="border border-gray-300 rounded-md px-3">12x</button>
         <button @click="zoomTo(24)" class="border border-gray-300 rounded-md px-3">24x</button>
       </div>
+    </div>
+  </div>
+  <div v-else class="rounded-xl border border-[#cbd9c6] bg-[#f5f9f0] p-4 text-sm text-[#24352a]" role="status">
+    <div class="font-semibold">
+      {{ tr('FishingAnchor.ban_do') }} ·
+      <button type="button" class="cursor-pointer underline underline-offset-2" aria-haspopup="dialog" @click="features.showDetails('world-map')">{{ tr('FeatureAvailability.maintenanceBadge') }}</button>
     </div>
   </div>
 </template>

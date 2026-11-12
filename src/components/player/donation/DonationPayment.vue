@@ -67,6 +67,7 @@ let disposed = false;
 let eligibilityRequest = 0;
 const errorKey = computed(() => {
   const code = donation.errorCode;
+  if (code === 'FEATURE_DISABLED' || code === 'FEATURE_FLAGS_UNAVAILABLE') return 'FeatureAvailability.maintenance';
   if (code === 'INVALID_AMOUNT') return 'donationPayment.invalidAmount';
   if (code === 'AUTH_REQUIRED') return 'donationPayment.signIn';
   if (code === 'RATE_LIMITED') return 'donationPayment.rateLimited';

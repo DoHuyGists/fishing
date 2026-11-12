@@ -1,4 +1,13 @@
 {
+  "FeatureAvailability": {
+    "title": "Feature availability",
+    "maintenance": "This feature is locked. Please try again later.",
+    "maintenanceBadge": "Locked",
+    "loading": "Checking feature availability…",
+    "loadError": "Unable to check feature availability. Please try again.",
+    "gacha": "Gacha",
+    "adminDescription": "Enable or disable features and update maintenance messages for players."
+  },
   "donationPayment": {
     "thankYouTitle": "Thank you for your support!",
     "thankYouDescription": "Your contribution of {amount} has been confirmed.\nYour support helps keep the servers running and the game growing.",

@@ -10,6 +10,7 @@ const DashboarModal = defineAsyncComponent(() => import("../components/admin/mon
 const monitorOpen = ref(false);
 
 type ModuleKey =
+  | "featureAvailability"
   | "blueprint"
   | "skill"
   | "zone"
@@ -45,6 +46,7 @@ interface AdminModule {
 }
 
 const moduleComponents = {
+  featureAvailability: defineAsyncComponent(() => import("../components/admin/feature-management/FeatureManagement.vue")),
   assets: defineAsyncComponent(() => import("../components/admin/assets/AssetsManagementModal.vue")),
   guides: defineAsyncComponent(() => import("../components/admin/guides-management/GuidesManagementModal.vue")),
   blueprint: defineAsyncComponent(() => import("../components/admin/blueprint-management/BlueprintManagement.vue")),
@@ -111,6 +113,15 @@ interface ModuleGroup {
 }
 
 const groups: ModuleGroup[] = [
+  {
+    get title() { return tr('FeatureAvailability.title'); },
+    modules: [{
+      key: "featureAvailability", icon: "🛑",
+      get label() { return tr('FeatureAvailability.title'); },
+      get desc() { return tr('FeatureAvailability.adminDescription'); },
+      component: moduleComponents.featureAvailability,
+    }],
+  },
   {
     get title() { return tr('AdminView.nuoi_ca'); },
     modules: [

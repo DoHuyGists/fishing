@@ -1,4 +1,6 @@
 import { defineStore } from "pinia";
+import { useFeatureAvailabilityStore } from "./featureAvailability";
+import { modalFeatures } from "../data/featureAvailability";
 
 const STORAGE_KEY = "fishing.modalOpening";
 const modalNames = [
@@ -67,6 +69,11 @@ export const useModalStore = defineStore("Modal", {
             this.quickActions.visible = false;
         },
         open(name: ModalName) {
+            if (name) {
+                const features = useFeatureAvailabilityStore();
+                const blocked = modalFeatures(name).find(key => !features.isAvailable(key));
+                if (blocked) { features.notify(blocked); return false; }
+            }
             this.hideQuickActions();
             this.modalOpening = name;
             try {
@@ -83,7 +90,7 @@ export const useModalStore = defineStore("Modal", {
             this.open(null);
         },
         isOpening(name: ModalName){
-            return this.modalOpening == name;
+            return this.modalOpening == name && (!name || useFeatureAvailabilityStore().canOpen(name));
         }
     }
 })

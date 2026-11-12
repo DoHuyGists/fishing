@@ -38,6 +38,7 @@ let authCalls = 0;
 let handler;
 let prepareError;
 let prepareAsArray = true;
+let donationEnabled = true;
 let providerFailureAt = '';
 const errorLogs = [];
 const id = '12345678-1234-4123-8123-123456789abc';
@@ -61,14 +62,15 @@ const db = {
     row.paypal_capture_id = args.p_capture_id;
     return { data: row.status, error: null };
   },
-  from: () => {
+  from: table => {
     const filters = [];
     let update;
     const query = {
       select: () => query,
       update: values => { update = values; return query; },
       eq: (key, value) => { filters.push([key, value]); return query; },
-      maybeSingle: async () => ({ data: row && filters.every(([key, value]) => row[key] === value) ? { ...row } : null, error: null }),
+      maybeSingle: async () => table === 'feature_flags' ? { data: { enabled: donationEnabled }, error: null }
+        : { data: row && filters.every(([key, value]) => row[key] === value) ? { ...row } : null, error: null },
       then: resolve => { if (row && filters.every(([key, value]) => row[key] === value)) Object.assign(row, update); resolve({ error: null }); },
     };
     return query;
@@ -133,6 +135,15 @@ for (const amountCents of [0, 99, 100001, 500.5, '500', null]) {
   assert.equal((await invoke({ action: 'create', donationId: id, amountCents })).status, 400);
 }
 assert.equal(createCalls, 0);
+donationEnabled = false;
+for (const action of ['create', 'capture', 'status']) {
+  const blocked = await invoke({ action, donationId: id, amountCents: 500 });
+  assert.equal(blocked.status, 403);
+  assert.equal((await blocked.json()).code, 'FEATURE_DISABLED');
+}
+assert.equal(createCalls, 0);
+assert.equal(captureCalls, 0);
+donationEnabled = true;
 prepareError = { code: 'PGRST202', message: 'RPC missing from schema cache' };
 let failure = await invoke({ action: 'create', donationId: id, amountCents: 500 });
 assert.equal(failure.status, 503);

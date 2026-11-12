@@ -15,6 +15,7 @@ import TwoOptionsModal from "../components/shared/TwoOptionsModal.vue";
 import { useConfigStore } from "../stores/config.ts";
 import { useUserProfileStore } from "../stores/userProfile";
 import { useFishingStore } from "../stores/fishing";
+import { useFeatureAvailabilityStore } from "../stores/featureAvailability";
 
 const router = useRouter();
 const authStore = useAuthStore();
@@ -23,6 +24,7 @@ const userInAreaStore = useUserInAreaStore();
 const configStore = useConfigStore();
 const userProfileStore = useUserProfileStore();
 const fishingStore = useFishingStore();
+const features = useFeatureAvailabilityStore();
 let currencyChannel: RealtimeChannel | null = null;
 let userInAreaChannel: ReturnType<typeof supabaseUserInAreaRepository.subscribeToAreaUsers> | null = null;
 
@@ -86,7 +88,13 @@ watch(
 
 <template>
   <div>
-    <router-view />
+    <router-view v-if="features.ready" />
+    <div v-else class="m-4 rounded-xl border border-[#cbd9c6] bg-[#f5f9f0] p-4 text-[#24352a]" role="status">
+      {{ tr(features.error ? 'FeatureAvailability.loadError' : 'FeatureAvailability.loading') }}
+      <button v-if="features.error" type="button" class="ml-2 underline disabled:opacity-50" :disabled="features.loading" @click="features.load(true)">
+        {{ tr('Maintenance.thu_lai') }}
+      </button>
+    </div>
 
     <!-- Dialog Cảnh Báo Trùng Tab / Cross-Browser -->
     <Teleport to="body">
