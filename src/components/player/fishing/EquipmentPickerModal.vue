@@ -83,7 +83,7 @@ onBeforeUnmount(() => window.removeEventListener("keydown", onKeydown));
       @click.self="emit('close')"
     >
       <section
-        class="flex max-h-[92dvh] w-[min(920px,100%)] flex-col overflow-hidden rounded-2xl border border-[#cbd9c6] bg-[#f5f9f0] text-[#24352a] shadow-[0_24px_70px_rgba(0,0,0,0.4)]"
+        class="player-popup-in flex max-h-[92dvh] w-[min(920px,100%)] flex-col overflow-hidden rounded-2xl border border-[#cbd9c6] bg-[#f5f9f0] text-[#24352a] shadow-[0_24px_70px_rgba(0,0,0,0.4)]"
         role="dialog"
         aria-modal="true"
         :aria-label="tr('EquipmentMenu.chon_trang_bi')"

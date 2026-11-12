@@ -68,7 +68,7 @@ function getBookVariant(countryCode: string, speciesCount: number): BookVariant 
         <div
           v-for="country in paginatedCountries"
           :key="country.code"
-          class="group relative select-none flex flex-col items-center justify-between p-3 rounded-2xl transition-all duration-300 cursor-pointer"
+          class="slide-fade-in from-bottom player-content-in group relative select-none flex flex-col items-center justify-between p-3 rounded-2xl transition-all duration-300 cursor-pointer"
           @click="emit('selectCountry', country)"
         >
           <div class="w-[140px] h-[190px] flex items-center justify-center overflow-hidden my-1">

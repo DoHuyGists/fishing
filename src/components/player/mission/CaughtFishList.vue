@@ -108,7 +108,7 @@ function selectionClass(caught: CaughtFish) {
         <section
           v-for="group in groupedBySpecies"
           :key="group.key"
-          class="overflow-hidden rounded-lg border border-[#cbd9c6] bg-[#f5f9f0]"
+          class="slide-fade-in from-bottom player-content-in overflow-hidden rounded-lg border border-[#cbd9c6] bg-[#f5f9f0]"
         >
           <button
             type="button"
@@ -165,7 +165,7 @@ function selectionClass(caught: CaughtFish) {
           v-for="caught in caughtFishes"
           :key="caught.id"
           type="button"
-          class="w-full rounded-lg border text-left transition-colors disabled:cursor-not-allowed"
+          class="slide-fade-in from-bottom player-content-in w-full rounded-lg border text-left transition-colors disabled:cursor-not-allowed"
           :class="[
             selectionClass(caught),
             viewMode === 'grid'

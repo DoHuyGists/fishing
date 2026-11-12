@@ -15,7 +15,7 @@ const emit = defineEmits<{
 </script>
 
 <template>
-  <article class="skill-card relative flex min-w-0 flex-col rounded-xl border shadow-[0_1px_2px_#24352a08] p-3 sm:p-4" :class="skill.isMaxLevel ? 'skill-card-mastered border-[#c9ad61] bg-[linear-gradient(145deg,#fff9e6,#f5f9f0_65%)]' : 'border-[#cbd9c6] bg-[#f5f9f0]'">
+  <article class="slide-fade-in from-bottom player-content-in skill-card relative flex min-w-0 flex-col rounded-xl border shadow-[0_1px_2px_#24352a08] p-3 sm:p-4" :class="skill.isMaxLevel ? 'skill-card-mastered border-[#c9ad61] bg-[linear-gradient(145deg,#fff9e6,#f5f9f0_65%)]' : 'border-[#cbd9c6] bg-[#f5f9f0]'">
     <div class="mb-3 flex items-center justify-between gap-2 text-[10px] font-extrabold uppercase tracking-widest">
       <span :class="skill.isMaxLevel ? 'text-[#8b651b]' : skill.level > 0 ? 'text-emerald-700' : 'text-[#75826e]'">{{ skill.isMaxLevel ? tr('SkillCard.da_tinh_thong') : skill.level > 0 ? tr('SkillCard.dang_ren_luyen') : tr('SkillCard.chua_hoc') }}</span>
       <span class="rounded-md border border-[#cbd9c6] bg-white/80 px-2 py-0.5 tabular-nums">{{ tr('FishPond.cap') }} {{ skill.level }}<span class="text-[#83917c]"> / {{ skill.max_level }}</span></span>

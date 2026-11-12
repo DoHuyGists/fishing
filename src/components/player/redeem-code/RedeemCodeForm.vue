@@ -35,7 +35,7 @@ async function redeemCode() {
 
 <template>
   <form
-    class="min-w-0 w-full rounded-2xl border border-[#cbd9c6] bg-white p-5 shadow-sm sm:p-6"
+    class="slide-fade-in from-right player-content-in min-w-0 w-full rounded-2xl border border-[#cbd9c6] bg-white p-5 shadow-sm sm:p-6"
     @submit.prevent="redeemCode"
   >
     <label for="redeem-code" class="mb-2 block text-sm font-bold">{{ tr('RedeemCodeForm.ma_doi_thuong') }}</label>

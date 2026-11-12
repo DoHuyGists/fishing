@@ -254,7 +254,7 @@ async function buyItem() {
       <img
         :src="previewImage.src"
         :alt="previewImage.alt"
-        class="max-h-[calc(100vh-2rem)] max-w-[calc(100vw-2rem)] object-contain"
+        class="player-popup-in max-h-[calc(100vh-2rem)] max-w-[calc(100vw-2rem)] object-contain"
       />
       <div
         class="absolute bottom-3 left-1/2 max-w-[90vw] -translate-x-1/2 truncate rounded-full bg-black/50 px-4 py-1.5 text-sm text-white"

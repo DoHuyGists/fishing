@@ -62,7 +62,7 @@ function showDetails() {
 
 <template>
   <div :class="[
-    'relative min-w-0 cursor-pointer rounded-md border text-[#24352a] transition',
+    'slide-fade-in from-bottom player-content-in relative min-w-0 cursor-pointer rounded-md border text-[#24352a] transition',
     list ? 'flex items-start gap-3 px-3 py-2' : 'p-3',
     selected.has(item.id) ? 'border-red-400 bg-red-50' : 'border-[#cbd9c6] bg-white hover:bg-[#f5f9f0]',
     active && isCompatible(item) ? 'ring-2 ring-teal-400' : '',

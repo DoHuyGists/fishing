@@ -80,7 +80,7 @@ async function claimReward(rewardId: string) {
     <div v-else-if="!fishingPassStore.currentPass" class="rounded-2xl border border-[#cbd9c6] bg-white p-6 text-center text-sm text-[#24352a]">{{ tr('FishingPassRewards.hien_chua_co_fishing_pass_dang_dien_ra') }}</div>
     <template v-else>
       <div class="flex gap-2">
-        <div class="min-w-0 overflow-x-auto rounded-2xl border border-[#cbd9c6] bg-white p-3 sm:p-5" @wheel="scrollRewardsHorizontally">
+        <div class="slide-fade-in from-left player-content-in min-w-0 overflow-x-auto rounded-2xl border border-[#cbd9c6] bg-white p-3 sm:p-5" @wheel="scrollRewardsHorizontally">
           <div class="min-w-max space-y-2">
             <div class="flex w-max gap-2">
               <div class="sticky left-0 z-10 flex w-24 shrink-0 items-center justify-center rounded-lg border border-[#cbd9c6] bg-[#f5f9f0] px-2 py-2 text-center text-xs font-black text-[#24352a]">{{ tr('FishingPassRewards.ngay_nhan') }}</div>
@@ -132,7 +132,7 @@ async function claimReward(rewardId: string) {
             </div>
           </div>
         </div>
-        <aside class="rounded-2xl border border-[#cbd9c6] bg-[#f5f9f0] px-5 py-3" aria-labelledby="fishing-pass-info-title">
+        <aside class="slide-fade-in from-right player-content-in rounded-2xl border border-[#cbd9c6] bg-[#f5f9f0] px-5 py-3" aria-labelledby="fishing-pass-info-title">
           <div class="mb-0 mt-2 text-sm text-emerald-900/75 space-y-3">
             <div id="fishing-pass-info-title" class="text-base font-extrabold text-[#24352a]">{{ fishingPassStore.currentPass.name }}</div>
             <div v-if="fishingPassStore.currentPass.description" class="text-sm text-emerald-900/75">{{ fishingPassStore.currentPass.description }}</div>

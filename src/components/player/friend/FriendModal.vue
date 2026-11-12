@@ -221,7 +221,7 @@ async function executeDelete() {
     <div class="w-full min-w-0 space-y-3 pb-6 sm:space-y-4 sm:pb-10">
       <!-- ID Người chơi hiện tại & Banner -->
       <div
-        class="bg-linear-to-r from-[#173223] via-[#1c3f2d] to-[#122b1e] rounded-2xl p-3 sm:p-5 border border-emerald-800/40 shadow-md text-emerald-50 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 sm:gap-4"
+        class="slide-fade-in from-top player-content-in bg-linear-to-r from-[#173223] via-[#1c3f2d] to-[#122b1e] rounded-2xl p-3 sm:p-5 border border-emerald-800/40 shadow-md text-emerald-50 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 sm:gap-4"
       >
         <div class="flex items-center gap-3.5 min-w-0">
           <div
@@ -429,7 +429,7 @@ async function executeDelete() {
           <div
             v-for="record in filteredFriends"
             :key="record.id"
-            class="p-4 rounded-2xl border border-emerald-900/10 bg-white/95 shadow-sm hover:shadow-md transition-shadow flex flex-col justify-between gap-3"
+            class="slide-fade-in from-bottom player-content-in p-4 rounded-2xl border border-emerald-900/10 bg-white/95 shadow-sm hover:shadow-md transition-shadow flex flex-col justify-between gap-3"
           >
             <div class="flex items-start justify-between gap-3">
               <div class="flex items-center gap-3 min-w-0">
@@ -512,7 +512,7 @@ async function executeDelete() {
           <div
             v-for="record in receivedRequests"
             :key="record.id"
-            class="p-4 rounded-2xl border border-amber-200/60 bg-amber-50/40 shadow-sm flex flex-col sm:flex-row sm:items-center justify-between gap-3"
+            class="slide-fade-in from-bottom player-content-in p-4 rounded-2xl border border-amber-200/60 bg-amber-50/40 shadow-sm flex flex-col sm:flex-row sm:items-center justify-between gap-3"
           >
             <div class="flex items-center gap-3 min-w-0">
               <div
@@ -609,7 +609,7 @@ async function executeDelete() {
           <div
             v-for="record in sentRequests"
             :key="record.id"
-            class="p-4 rounded-2xl border border-emerald-900/10 bg-white/95 shadow-sm flex flex-col sm:flex-row sm:items-center justify-between gap-3"
+            class="slide-fade-in from-bottom player-content-in p-4 rounded-2xl border border-emerald-900/10 bg-white/95 shadow-sm flex flex-col sm:flex-row sm:items-center justify-between gap-3"
           >
             <div class="flex items-center gap-3 min-w-0">
               <div
@@ -684,7 +684,7 @@ async function executeDelete() {
           <div
             v-for="player in filteredPlayers"
             :key="player.id"
-            class="p-4 rounded-2xl border border-emerald-900/10 bg-white/95 shadow-sm hover:shadow-md transition-shadow flex flex-col justify-between gap-3"
+            class="slide-fade-in from-bottom player-content-in p-4 rounded-2xl border border-emerald-900/10 bg-white/95 shadow-sm hover:shadow-md transition-shadow flex flex-col justify-between gap-3"
           >
             <div class="flex items-start justify-between gap-3">
               <div class="flex items-center gap-3 min-w-0">
@@ -822,7 +822,7 @@ async function executeDelete() {
     <!-- Hộp thoại xác nhận xóa (Modal xác nhận bên trong) -->
     <div v-if="deleteConfirmTarget" class="fixed inset-0 z-50 bg-black/50 flex items-center justify-center p-4">
       <div
-        class="bg-white rounded-2xl max-w-sm w-full p-5 shadow-2xl border border-gray-200 space-y-4 animate-in fade-in zoom-in duration-150"
+        class="bg-white rounded-2xl max-w-sm w-full p-5 shadow-2xl border border-gray-200 space-y-4 player-popup-in"
       >
         <div class="flex items-center gap-3 text-red-600">
           <div class="size-10 rounded-full bg-red-100 flex items-center justify-center text-lg shrink-0">⚠️</div>

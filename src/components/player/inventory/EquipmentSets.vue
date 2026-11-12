@@ -51,7 +51,7 @@ const {
       </div>
 
       <article v-for="{ set, index: setIndex } in pagedSets" :key="set.id"
-        class="rounded-md border border-slate-200 bg-white p-3">
+        class="slide-fade-in from-bottom player-content-in rounded-md border border-slate-200 bg-white p-3">
         <div class="mb-3 flex items-center justify-between">
           <div class="text-sm font-semibold">
             Set {{ setIndex + 1 }}

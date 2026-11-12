@@ -197,12 +197,7 @@ onUnmounted(() => {
       @finish="onboarding.finish()"
     />
     <Teleport to="body">
-      <Transition
-        enter-active-class="transition-opacity duration-200 ease-out"
-        enter-from-class="opacity-0"
-        leave-active-class="transition-opacity duration-150 ease-in"
-        leave-to-class="opacity-0"
-      >
+      <Transition name="player-window" :duration="{ enter: 220, leave: 150 }">
         <div v-if="modalStore.isModalOpening">
           <AccountInfoModal v-if="modalStore.isOpening('account')" />
           <GuideModal v-if="modalStore.isOpening('guide')" />

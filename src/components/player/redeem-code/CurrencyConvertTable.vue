@@ -51,7 +51,7 @@ onMounted(() => {
 </script>
 
 <template>
-  <section :aria-label="tr('CurrencyConvertTable.quy_doi_tien_te')" class="min-w-0 w-full rounded-2xl border border-[#cbd9c6] bg-[#f5f9f0] p-4 text-[#24352a] sm:p-6">
+  <section :aria-label="tr('CurrencyConvertTable.quy_doi_tien_te')" class="slide-fade-in from-left player-content-in min-w-0 w-full rounded-2xl border border-[#cbd9c6] bg-[#f5f9f0] p-4 text-[#24352a] sm:p-6">
     <div class="text-lg font-bold">{{ tr('CurrencyConvertTable.quy_doi_tien_te') }}</div>
     <div class="mt-1 text-sm">{{ tr('CurrencyConvertTable.chon_so_goi_muon_doi_moi_goi_ap_dung_theo_menh_gia_trong_bang') }}</div>
 

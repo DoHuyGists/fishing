@@ -84,7 +84,7 @@ const statusClass: Record<string, string> = {
       {{ tr('MyTeamPanel.ban_chua_co_loi_moi_nao') }}
     </div>
     <div v-else class="m-0 flex list-none flex-col gap-3 p-0">
-      <div v-for="invite in invites" :key="invite.id" class="rounded-xl border border-[#cbd9c6] bg-[#f5f9f0] p-3">
+      <div v-for="invite in invites" :key="invite.id" class="slide-fade-in from-bottom player-content-in rounded-xl border border-[#cbd9c6] bg-[#f5f9f0] p-3">
         <div class="m-0 font-bold text-[#24352a]">{{ invite.team?.name ?? tr('MyTeamPanel.to_doi_khong_ton_tai') }}</div>
         <div v-if="invite.team?.description" class="m-0 text-[0.8rem] text-[#556655]">{{ invite.team.description }}</div>
         <div class="m-0 mt-1 text-[0.75rem] text-[#556655]">
@@ -115,7 +115,7 @@ const statusClass: Record<string, string> = {
   <template v-else>
   <section v-if="team" class="flex flex-col gap-4">
     <div
-      class="flex items-start justify-between gap-3 rounded-2xl border border-[#b8dab0] bg-linear-to-br from-[#e8f5e2] to-[#d4edcc] p-4"
+      class="slide-fade-in from-top player-content-in flex items-start justify-between gap-3 rounded-2xl border border-[#b8dab0] bg-linear-to-br from-[#e8f5e2] to-[#d4edcc] p-4"
     >
       <div>
         <div class="m-0 mb-1 text-[1.1rem] font-extrabold text-[#1a3a1a]">{{ team.name }}</div>
@@ -127,7 +127,7 @@ const statusClass: Record<string, string> = {
       <span class="font-bold text-[#2e6644]">{{ members.length }} / {{ team.max_members }}</span>
     </div>
     <div class="m-0 grid list-none grid-cols-1 gap-3 p-0 sm:grid-cols-2">
-      <div v-for="member in members" :key="member.id" class="rounded-xl border border-[#daefd4] bg-white p-3">
+      <div v-for="member in members" :key="member.id" class="slide-fade-in from-bottom player-content-in rounded-xl border border-[#daefd4] bg-white p-3">
         <PlayerIdentity :user-id="member.user_id" :profile="member.user_profile">
             <span class="text-[0.72rem] font-bold text-[#2e6644]">{{
               member.role === "LEADER" ? tr('MyTeamPanel.truong_nhom') : tr('MyTeamPanel.thanh_vien')
@@ -156,7 +156,7 @@ const statusClass: Record<string, string> = {
     </div>
     <form
       v-if="isLeader && team.join_type === 'invited' && showInviteForm"
-      class="flex flex-wrap gap-2 rounded-xl border border-[#cbd9c6] bg-[#f5f9f0] p-3"
+      class="flex flex-wrap gap-2 slide-fade-in from-bottom player-content-in rounded-xl border border-[#cbd9c6] bg-[#f5f9f0] p-3"
       @submit.prevent="submitInvite"
     >
       <input
@@ -212,7 +212,7 @@ const statusClass: Record<string, string> = {
   </section>
   <section
     v-else
-    class="flex min-h-[240px] flex-col items-center justify-center rounded-2xl border border-dashed border-[#c0d8b8] bg-[#fafefc] p-6 text-center"
+    class="slide-fade-in from-bottom player-content-in flex min-h-[240px] flex-col items-center justify-center rounded-2xl border border-dashed border-[#c0d8b8] bg-[#fafefc] p-6 text-center"
   >
     <div class="m-0 text-lg font-bold text-[#1a3a1a]">{{ tr('MyTeamPanel.ban_chua_tham_gia_to_doi') }}</div>
     <div class="mb-4 text-sm text-[#556655]">{{ tr('MyTeamPanel.chon_mot_to_doi_o_ben_trai_hoac_tu_tao_to_doi_moi') }}</div>

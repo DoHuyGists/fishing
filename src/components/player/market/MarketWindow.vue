@@ -232,7 +232,7 @@ onUnmounted(() => marketStore.stopRealtime());
             </div>
 
             <div v-else-if="viewMode === 'species'" class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-4">
-              <section v-for="group in groupedListings" :key="group.id" class="overflow-hidden rounded-xl border border-gray-200 bg-white shadow-sm">
+              <section v-for="group in groupedListings" :key="group.id" class="slide-fade-in from-bottom player-content-in overflow-hidden rounded-xl border border-gray-200 bg-white shadow-sm">
                 <div class="flex items-center justify-between gap-2 border-b border-gray-100 px-3 py-2">
                   <span class="truncate text-xs font-bold">{{
                     group.listings[0]?.caught?.fish?.name || tr('CaughtModal.ca_chua_ro_ten')
@@ -263,7 +263,7 @@ onUnmounted(() => marketStore.stopRealtime());
               ? 'grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-4'
               : 'flex flex-col gap-2'
               ">
-              <div v-for="item in filteredMarketListings" :key="item.id" class="bg-white border border-gray-200 hover:border-emerald-500/50 rounded-xl p-3 shadow-2xs hover:shadow-md transition-all relative group"
+              <div v-for="item in filteredMarketListings" :key="item.id" class="slide-fade-in from-bottom player-content-in bg-white border border-gray-200 hover:border-emerald-500/50 rounded-xl p-3 shadow-2xs hover:shadow-md transition-all relative group"
                 :class="viewMode === 'grid' ? 'flex flex-col justify-between' : 'flex items-center gap-3'">
                 <div :class="viewMode === 'list' ? 'flex min-w-0 flex-1 items-center gap-3' : ''">
                   <!-- Header hình cá -->
@@ -328,7 +328,7 @@ onUnmounted(() => marketStore.stopRealtime());
 
           <div v-else :class="viewMode === 'grid' ? 'grid grid-cols-1 sm:grid-cols-3 md:grid-cols-5 gap-4' : 'flex flex-col gap-2'
             ">
-            <div v-for="item in myMarketListings" :key="item.id" class="bg-white border border-gray-200 rounded-xl p-3 shadow-2xs" :class="viewMode === 'grid' ? 'flex flex-col justify-between' : 'flex items-center gap-3'">
+            <div v-for="item in myMarketListings" :key="item.id" class="slide-fade-in from-bottom player-content-in bg-white border border-gray-200 rounded-xl p-3 shadow-2xs" :class="viewMode === 'grid' ? 'flex flex-col justify-between' : 'flex items-center gap-3'">
               <div>
                 <div class="relative rounded-lg overflow-hidden bg-gray-100 mb-2 border border-gray-100" :class="viewMode === 'grid' ? 'w-full h-32' : 'h-20 w-28 shrink-0'">
                   <img :src="item.caught?.fish?.image || '/fish/VN/fish.jpg'" :alt="item.caught?.fish?.name" class="w-full h-full object-cover" />
@@ -377,7 +377,7 @@ onUnmounted(() => marketStore.stopRealtime());
             <div class="font-semibold">{{ tr('MarketWindow.chua_co_giao_dich_mua_ban') }}</div>
             <div class="mt-1 text-xs text-gray-500">{{ tr('MarketWindow.cac_giao_dich_da_hoan_tat_se_xuat_hien_tai_day') }}</div>
           </div>
-          <div v-if="marketStore.history.length" class="max-h-[min(50dvh,26rem)] overflow-y-auto rounded-xl border border-[#cbd9c6]" :class="marketStore.historyLoading ? 'opacity-60' : ''">
+          <div v-if="marketStore.history.length" class="slide-fade-in from-bottom player-content-in max-h-[min(50dvh,26rem)] overflow-y-auto rounded-xl border border-[#cbd9c6]" :class="marketStore.historyLoading ? 'opacity-60' : ''">
             <div class="divide-y divide-[#cbd9c6]/60">
               <div v-for="entry in marketStore.history" :key="entry.id" class="flex items-center gap-2 bg-[#f5f9f0]/60 px-3 py-2.5 sm:gap-3">
                 <span class="shrink-0 rounded-md px-2 py-1 text-[11px] font-semibold" :class="entry.buyer_id === authStore.userId ? 'bg-blue-50 text-blue-700' : 'bg-emerald-100 text-emerald-800'">

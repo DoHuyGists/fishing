@@ -62,7 +62,7 @@ function clearFilters() {
   <Modal :title="tr('Achievement.huy_hieu')" :on-refresh="loadBadges">
     <section aria-labelledby="badges-title">
       <div
-        class="relative isolate overflow-hidden rounded-2xl border border-[#cbd9c6] bg-linear-to-br from-[#f5f9f0] via-white to-emerald-50 p-3 shadow-sm sm:p-4"
+        class="slide-fade-in from-top player-content-in relative isolate overflow-hidden rounded-2xl border border-[#cbd9c6] bg-linear-to-br from-[#f5f9f0] via-white to-emerald-50 p-3 shadow-sm sm:p-4"
       >
         <div
           aria-hidden="true"
@@ -239,7 +239,7 @@ function clearFilters() {
             v-for="(badge, index) in filteredBadges"
             :key="badge.badge_id"
             type="button"
-            class="group relative flex min-h-32 cursor-pointer flex-col items-center overflow-hidden rounded-xl border p-1.5 text-center transition duration-300 hover:-translate-y-0.5 hover:shadow-md focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-emerald-700 sm:min-h-36 sm:rounded-2xl sm:p-2"
+            class="slide-fade-in from-bottom player-content-in group relative flex min-h-32 cursor-pointer flex-col items-center overflow-hidden rounded-xl border p-1.5 text-center transition duration-300 hover:-translate-y-0.5 hover:shadow-md focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-emerald-700 sm:min-h-36 sm:rounded-2xl sm:p-2"
             :class="
               badge.is_earned
                 ? 'border-emerald-200 bg-white hover:border-emerald-400'
@@ -321,7 +321,7 @@ function clearFilters() {
             role="dialog"
             aria-modal="true"
             aria-labelledby="badge-detail-title"
-            class="relative w-full max-w-sm overflow-hidden rounded-3xl border border-white/70 bg-[#f5f9f0] p-6 text-center shadow-2xl"
+            class="player-popup-in relative w-full max-w-sm overflow-hidden rounded-3xl border border-white/70 bg-[#f5f9f0] p-6 text-center shadow-2xl"
           >
             <div
               aria-hidden="true"

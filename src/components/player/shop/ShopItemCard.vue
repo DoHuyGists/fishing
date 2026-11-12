@@ -18,7 +18,7 @@ const emit = defineEmits<{
 <template>
   <button
     type="button"
-    class="group flex w-full min-w-0 overflow-hidden rounded-xl border bg-white text-left shadow-sm transition hover:-translate-y-0.5 hover:shadow-md"
+    class="slide-fade-in from-bottom player-content-in group flex w-full min-w-0 overflow-hidden rounded-xl border bg-white text-left shadow-sm transition hover:-translate-y-0.5 hover:shadow-md"
     :class="
       selected ? 'border-emerald-700 ring-2 ring-emerald-700/20' : 'border-[#cbd9c6]'
     "

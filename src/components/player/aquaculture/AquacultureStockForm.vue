@@ -23,7 +23,7 @@ async function submit() {
 </script>
 
 <template>
-  <details class="rounded-xl border border-[#cbd9c6] bg-white" :open="!farm.activePond?.fish.length">
+  <details class="slide-fade-in from-right player-content-in rounded-xl border border-[#cbd9c6] bg-white" :open="!farm.activePond?.fish.length">
     <summary class="cursor-pointer px-4 py-3 text-sm font-bold">{{ tr('AquacultureStockForm.tha_mot_lua_moi') }}</summary>
     <form class="space-y-3 border-t border-[#cbd9c6] p-4 text-xs" @submit.prevent="submit">
       <div class="m-0 leading-relaxed text-stone-600">{{ tr('AquacultureStockForm.moi_lua_mot_loai_ban_co_the_tha_nhieu_loai_chung_ao_neu_con_suc_') }}</div>

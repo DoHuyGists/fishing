@@ -81,14 +81,14 @@ onBeforeUnmount(() => {
 
 <template>
   <Teleport to="body">
-    <Transition name="depth-dialog">
+    <Transition name="player-popup" :duration="{ enter: 220, leave: 150 }">
       <div
         v-if="store.depthAdjusterOpen && store.canAdjustLakeDepth"
         class="fixed inset-0 z-[45] grid place-items-center overflow-y-auto bg-[rgba(3,15,11,0.78)] p-3 backdrop-blur-[7px] sm:p-5"
         @click.self="close"
       >
         <section
-          class="depth-panel w-[min(980px,100%)] overflow-hidden rounded-[22px] border border-[#315b4d] bg-[#071f1a] text-[#e8f2ed] shadow-[0_28px_90px_rgba(0,0,0,0.58)]"
+          class="player-popup-panel depth-panel w-[min(980px,100%)] overflow-hidden rounded-[22px] border border-[#315b4d] bg-[#071f1a] text-[#e8f2ed] shadow-[0_28px_90px_rgba(0,0,0,0.58)]"
           role="dialog"
           aria-modal="true"
           aria-labelledby="depth-title"
@@ -481,23 +481,6 @@ onBeforeUnmount(() => {
   border-color: #5cbd8a;
   background: #28694b;
   color: #f0fff3;
-}
-
-.depth-dialog-enter-active,
-.depth-dialog-leave-active {
-  transition:
-    opacity 0.18s ease,
-    transform 0.18s ease;
-}
-
-.depth-dialog-enter-from,
-.depth-dialog-leave-to {
-  opacity: 0;
-}
-
-.depth-dialog-enter-from .depth-panel,
-.depth-dialog-leave-to .depth-panel {
-  transform: translateY(8px) scale(0.99);
 }
 
 @media (max-width: 639px) {

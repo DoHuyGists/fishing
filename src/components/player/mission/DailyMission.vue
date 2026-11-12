@@ -73,7 +73,7 @@ onMounted(() => void loadDailyMissions());
       <button type="button" class="ml-2 font-bold underline" @click="loadDailyMissions">{{ tr('Maintenance.thu_lai') }}</button>
     </div>
     <template v-else-if="missionStore.dailyMissions">
-      <header class="shrink-0 rounded-2xl border border-[#cbd9c6] bg-[#f5f9f0] px-4 py-3 sm:px-5">
+      <header class="slide-fade-in from-top player-content-in shrink-0 rounded-2xl border border-[#cbd9c6] bg-[#f5f9f0] px-4 py-3 sm:px-5">
         <div class="flex flex-wrap items-center justify-between gap-3">
           <div>
             <div class="m-0 text-lg font-extrabold">{{ tr('DailyMission.nhiem_vu_hang_ngay') }}</div>
@@ -89,7 +89,7 @@ onMounted(() => void loadDailyMissions());
       </header>
 
       <div class="grid shrink-0 gap-4 lg:min-h-0 lg:flex-1 lg:grid-cols-[minmax(280px,0.9fr)_minmax(0,2fr)] xl:gap-6">
-        <section :aria-label="tr('DailyMission.moc_thuong')" class="order-1 flex min-h-0 min-w-0 flex-col gap-3 rounded-2xl border border-[#cbd9c6] bg-[#f5f9f0] p-4 lg:overflow-y-auto xl:p-5">
+        <section :aria-label="tr('DailyMission.moc_thuong')" class="slide-fade-in from-left player-content-in order-1 flex min-h-0 min-w-0 flex-col gap-3 rounded-2xl border border-[#cbd9c6] bg-[#f5f9f0] p-4 lg:overflow-y-auto xl:p-5">
           <div class="flex items-end justify-between gap-2">
             <div>
               <div class="m-0 text-sm font-extrabold">{{ tr('DailyMission.moc_thuong') }}</div>
@@ -136,7 +136,7 @@ onMounted(() => void loadDailyMissions());
         <section :aria-label="tr('DailyMission.danh_sach_nhiem_vu')" class="order-2 flex min-h-0 min-w-0 flex-col gap-3">
           <div class="m-0 text-sm font-extrabold">{{ tr('DailyMission.tien_do_nhiem_vu') }} <span class="font-medium text-emerald-900/60">({{ missionStore.dailyMissions.missions.length }}/{{ missionStore.dailyMissions.mission_count }})</span></div>
           <div class="min-h-0 flex-1 space-y-3 pb-1 pr-2 lg:overflow-y-auto">
-            <article v-for="mission in missionStore.dailyMissions.missions" :key="mission.id" class="rounded-xl border border-[#cbd9c6] bg-white p-3.5 xl:p-4">
+            <article v-for="mission in missionStore.dailyMissions.missions" :key="mission.id" class="slide-fade-in from-bottom player-content-in rounded-xl border border-[#cbd9c6] bg-white p-3.5 xl:p-4">
               <div class="flex flex-wrap items-start justify-between gap-3">
                 <div class="min-w-0 flex-1">
                   <div class="flex flex-wrap items-center gap-2">

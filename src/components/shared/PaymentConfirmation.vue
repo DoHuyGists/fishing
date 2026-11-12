@@ -86,7 +86,7 @@ function handleKeydown(event: KeyboardEvent) {
   >
     <form
       class="min-w-0 space-y-4"
-      :class="embedded ? 'w-full' : 'my-auto w-full max-w-sm rounded-2xl border border-[#cbd9c6] bg-white p-5 shadow-xl'"
+      :class="embedded ? 'w-full' : 'player-popup-in my-auto w-full max-w-sm rounded-2xl border border-[#cbd9c6] bg-white p-5 shadow-xl'"
       @submit.prevent="confirm"
     >
       <div role="heading" aria-level="2" class="text-base font-extrabold">{{ title }}</div>

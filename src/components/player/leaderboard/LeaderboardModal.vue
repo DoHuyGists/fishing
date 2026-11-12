@@ -61,7 +61,7 @@ watch(() => authStore.userId, load, { immediate: true });
                     <div
                       v-for="entry in board.leaders"
                       :key="entry.id"
-                      class="min-w-0 rounded-2xl border p-2 text-center sm:p-4"
+                      class="slide-fade-in from-bottom player-content-in min-w-0 rounded-2xl border p-2 text-center sm:p-4"
                       :class="[
                         entry.rank === 1 ? 'border-amber-300 bg-amber-50' : 'border-[#cbd9c6] bg-[#f5f9f0]',
                         entry.userId && entry.userId === authStore.userId ? 'ring-2 ring-inset ring-emerald-600' : '',
@@ -106,7 +106,7 @@ watch(() => authStore.userId, load, { immediate: true });
                 </div>
               </div>
 
-              <aside class="order-first rounded-2xl border border-[#cbd9c6] bg-[#f5f9f0] p-4 lg:order-last" :aria-label="tr('LeaderboardModal.thu_hang_ca_nhan')">
+              <aside class="slide-fade-in from-right player-content-in order-first rounded-2xl border border-[#cbd9c6] bg-[#f5f9f0] p-4 lg:order-last" :aria-label="tr('LeaderboardModal.thu_hang_ca_nhan')">
                 <div class="m-0 text-sm font-bold">{{ tr('LeaderboardModal.thu_hang_cua_ban') }}</div>
                 <div v-if="board.isMock" class="mb-0 mt-2 text-sm leading-relaxed text-[#52654f]">
                   {{ tr('LeaderboardModal.thu_hang_ca_nhan_se_hien_thi_khi_tieu_chi_nay_co_du_lieu_thuc_te') }}

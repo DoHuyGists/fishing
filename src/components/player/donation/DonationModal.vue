@@ -10,7 +10,7 @@
         </div>
 
         <div class="grid items-stretch gap-5 lg:grid-cols-2">
-          <section aria-labelledby="donation-bank-title" class="flex min-w-0 flex-col overflow-hidden rounded-2xl border border-[#cbd9c6] bg-white">
+          <section aria-labelledby="donation-bank-title" class="slide-fade-in from-left player-content-in flex min-w-0 flex-col overflow-hidden rounded-2xl border border-[#cbd9c6] bg-white">
             <div class="flex items-center gap-3 border-b border-[#cbd9c6] bg-[#edf3e7] px-5 py-4">
               <div class="flex size-10 shrink-0 items-center justify-center rounded-xl border border-[#cbd9c6] bg-white text-[#36513f]">
                 <svg aria-hidden="true" class="size-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
@@ -65,7 +65,7 @@
           <DonationPayment />
         </div>
 
-        <section aria-labelledby="donation-instructions" class="rounded-2xl border border-[#cbd9c6] bg-white p-5">
+        <section aria-labelledby="donation-instructions" class="slide-fade-in from-bottom player-content-in rounded-2xl border border-[#cbd9c6] bg-white p-5">
           <div id="donation-instructions" role="heading" aria-level="2" class="font-bold">{{ tr('DonationModal.bankInstructions') }}</div>
           <div class="mt-4 grid gap-3 text-sm leading-6 text-[#52634f] md:grid-cols-3">
             <div class="rounded-xl bg-[#f5f9f0] p-4">{{ tr('DonationModal.1_mo_ung_dung_ngan_hang_va_quet_ma_qr_trong_cua_so_nay') }}</div>

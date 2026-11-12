@@ -9,19 +9,14 @@ const undiscoveredFishes = computed(() => store.areaSpeciesDiary?.fishes.filter(
 </script>
 <template>
   <Teleport to="body">
-    <Transition
-      enter-active-class="[transition:opacity_0.18s_ease]"
-      leave-active-class="[transition:opacity_0.18s_ease]"
-      enter-from-class="opacity-0"
-      leave-to-class="opacity-0"
-    >
+    <Transition name="player-popup" :duration="{ enter: 220, leave: 150 }">
       <div
         v-if="store.lakeGuideOpen"
         class="fixed z-[31] inset-0 grid place-items-center p-5 bg-[rgba(4,17,11,0.72)] backdrop-blur-[7px]"
         @click.self="store.closeLakeGuide"
       >
         <section
-          class="w-[min(500px,100%)] overflow-hidden border border-[rgba(255,226,149,0.68)] rounded-[20px] bg-[linear-gradient(145deg,#173d2b,#0e281b)] shadow-[0_24px_70px_rgba(0,0,0,0.48)] text-[#f4f0df]"
+          class="player-popup-panel w-[min(500px,100%)] overflow-hidden border border-[rgba(255,226,149,0.68)] rounded-[20px] bg-[linear-gradient(145deg,#173d2b,#0e281b)] shadow-[0_24px_70px_rgba(0,0,0,0.48)] text-[#f4f0df]"
           role="dialog"
           aria-modal="true"
         >

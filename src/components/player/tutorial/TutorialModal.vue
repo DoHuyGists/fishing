@@ -33,7 +33,7 @@ onMounted(() => store.load());
 <template>
   <Modal :title="tr('TutorialModal.thuc_hanh_cau_ca')" :sub-title="tr('TutorialModal.hoc_co_che_qua_cac_man_choi_huong_dan')" :show-count-data="false" :on-refresh="store.load">
     <div class="space-y-4 p-2 text-[#24352a] sm:p-4">
-      <div class="flex flex-wrap items-center justify-between gap-3 rounded-xl border border-[#cbd9c6] bg-[#f5f9f0] p-4">
+      <div class="slide-fade-in from-top player-content-in flex flex-wrap items-center justify-between gap-3 rounded-xl border border-[#cbd9c6] bg-[#f5f9f0] p-4">
         <div class="max-w-2xl text-sm leading-6">{{ tr('TutorialModal.tap_luyen_voi_trang_bi_co_san_ca_moi_va_tien_do_trong_man_huong_') }}</div>
         <div class="flex gap-1 rounded-lg border border-[#cbd9c6] bg-white p-1" role="group" :aria-label="tr('CaughtModal.che_do_hien_thi')">
           <button v-for="mode in modes" :key="mode.value" type="button" :aria-pressed="store.viewMode === mode.value"
@@ -50,7 +50,7 @@ onMounted(() => store.load());
       <div v-else-if="!store.tutorials.length" class="py-12 text-center">{{ tr('TutorialModal.chua_co_man_huong_dan_nao') }}</div>
       <div v-else class="grid gap-4" :class="store.viewMode === 'grid' ? 'grid-cols-2 md:grid-cols-3 lg:grid-cols-4' : 'grid-cols-1'" :aria-label="tr('TutorialModal.cac_man_huong_dan')">
         <button v-for="lesson in store.tutorials" :key="lesson.id" type="button" :disabled="opening" :aria-label="tr('TutorialModal.choi_man_value0', { value0: lesson.title })"
-          class="overflow-hidden rounded-2xl border border-[#cbd9c6] bg-[#f5f9f0] text-left transition hover:border-[#70a77e] hover:shadow-md focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-emerald-700 disabled:opacity-50"
+          class="slide-fade-in from-bottom player-content-in overflow-hidden rounded-2xl border border-[#cbd9c6] bg-[#f5f9f0] text-left transition hover:border-[#70a77e] hover:shadow-md focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-emerald-700 disabled:opacity-50"
           :class="store.viewMode === 'list' ? 'flex flex-col sm:flex-row' : ''" @click="enterLesson(lesson.slug)">
           <img :src="lesson.thumbnail" alt="" loading="lazy" class="object-cover" :class="store.viewMode === 'list' ? 'h-40 w-full sm:h-auto sm:w-56' : 'aspect-video w-full'" draggable="false">
           <div class="flex flex-1 flex-col gap-3 p-4">

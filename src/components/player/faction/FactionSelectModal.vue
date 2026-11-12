@@ -149,7 +149,7 @@ onMounted(() => {
     <div class="faction-screen [font-family:inherit]! min-h-full p-5 sm:p-8 space-y-6 bg-[#f5f9f0] text-[#24352a]">
       <!-- Thanh trạng thái người chơi -->
       <section
-        class="flex flex-wrap items-center justify-between gap-3 px-4 py-3 rounded-lg border border-[#cbd9c6] bg-[#f5f9f0] text-[#24352a] shadow-inner"
+        class="slide-fade-in from-top player-content-in flex flex-wrap items-center justify-between gap-3 px-4 py-3 rounded-lg border border-[#cbd9c6] bg-[#f5f9f0] text-[#24352a] shadow-inner"
       >
         <div class="flex items-center gap-2 text-xs sm:text-sm">
           <span class="text-[#526a58] font-serif">❖</span>
@@ -201,7 +201,7 @@ onMounted(() => {
         <section
           v-if="activeFaction"
           ref="topSectionRef"
-          class="top-faction-card rounded-xl border border-[#cbd9c6] bg-[#f5f9f0] text-[#24352a] p-5 sm:p-7 shadow-xl relative overflow-hidden"
+          class="slide-fade-in from-bottom player-content-in top-faction-card rounded-xl border border-[#cbd9c6] bg-[#f5f9f0] text-[#24352a] p-5 sm:p-7 shadow-xl relative overflow-hidden"
         >
           <!-- Nền hoa văn mờ trang nghiêm -->
           <!-- <div
@@ -423,7 +423,7 @@ onMounted(() => {
             <article
               v-for="faction in otherFactions"
               :key="faction.id"
-              class="rounded-xl border border-[#cbd9c6] bg-[#f5f9f0] hover:border-[#8eaa91] p-4 flex flex-col justify-between transition-all duration-200 shadow-sm hover:shadow-md"
+              class="slide-fade-in from-bottom player-content-in rounded-xl border border-[#cbd9c6] bg-[#f5f9f0] hover:border-[#8eaa91] p-4 flex flex-col justify-between transition-all duration-200 shadow-sm hover:shadow-md"
             >
               <div>
                 <!-- Header card: Symbol, Name, Element -->
@@ -509,7 +509,7 @@ onMounted(() => {
       <Teleport to="body">
         <div v-if="confirmingAction" class="fixed inset-0 z-[10001] bg-black/75 flex items-center justify-center p-4">
           <div
-            class="w-full max-w-md rounded-xl border border-[#cbd9c6] bg-[#f5f9f0] text-[#24352a] p-6 shadow-2xl space-y-4 animate-scale-in"
+            class="w-full max-w-md rounded-xl border border-[#cbd9c6] bg-[#f5f9f0] text-[#24352a] p-6 shadow-2xl space-y-4 player-popup-in"
           >
             <div class="text-center space-y-2">
               <div

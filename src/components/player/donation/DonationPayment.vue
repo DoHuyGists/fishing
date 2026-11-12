@@ -1,5 +1,5 @@
 <template>
-  <section class="flex min-w-0 flex-col overflow-hidden rounded-2xl border border-[#cbd9c6] bg-white text-[#24352a]" aria-labelledby="donation-payment-title">
+  <section class="slide-fade-in from-right player-content-in flex min-w-0 flex-col overflow-hidden rounded-2xl border border-[#cbd9c6] bg-white text-[#24352a]" aria-labelledby="donation-payment-title">
     <div class="flex items-center gap-3 border-b border-[#cbd9c6] bg-[#edf3e7] px-5 py-4">
       <div class="flex size-10 shrink-0 items-center justify-center rounded-xl border border-[#cbd9c6] bg-white text-[#36513f]">
         <svg aria-hidden="true" class="size-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">

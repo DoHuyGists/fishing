@@ -87,7 +87,7 @@ async function confirm() {
             <FishPond :pond="farm.activePond" :swimmers="farm.pondSwimmers" :paused="paused" />
           </div>
 
-          <section class="rounded-xl border border-[#cbd9c6] bg-white p-4">
+          <section class="slide-fade-in from-bottom player-content-in rounded-xl border border-[#cbd9c6] bg-white p-4">
             <div class="mb-3 flex items-center justify-between gap-2"><div class="m-0 text-sm font-bold">{{ tr('Fishfarm.cac_lua_trong_ao') }}</div><span class="text-xs text-stone-500">{{ tr('Fishfarm.chon_mot_lua_de_cham_hoac_thu_ca') }}</span></div>
             <div v-if="!farm.activePond.batches.length" class="m-0 text-xs text-stone-500">{{ tr('Fishfarm.ao_trong_chon_loai_ban_da_cau_duoc_de_bat_dau') }}</div>
             <div class="grid gap-2 sm:grid-cols-2">
@@ -103,7 +103,7 @@ async function confirm() {
 
         <aside class="min-w-0 space-y-4" :aria-label="tr('Fishfarm.quan_ly_ao_ca')">
           <AquacultureStockForm />
-          <section v-if="farm.activePond.batches.some(b => b.mode === 'advanced' && b.status === 'growing')" class="panel p-4 border border-[#cbd9c6] rounded-xl bg-white space-y-3">
+          <section v-if="farm.activePond.batches.some(b => b.mode === 'advanced' && b.status === 'growing')" class="slide-fade-in from-right player-content-in panel p-4 border border-[#cbd9c6] rounded-xl bg-white space-y-3">
             <div class="m-0 text-sm font-bold">{{ tr('Fishfarm.cham_ao') }}</div>
             <div class="m-0 text-xs text-stone-500">{{ tr('Fishfarm.tang_chat_luong_cho_cac_lua_cham_chut_dang_lon_hai_viec_dung_chu') }}</div>
             <div class="grid grid-cols-2 gap-2">
@@ -113,7 +113,7 @@ async function confirm() {
             <div v-if="Date.parse(farm.activePond.care_available_at) > farm.now" class="m-0 text-xs text-amber-800">{{ tr('Fishfarm.luot_cham_tiep_theo_sau') }} {{ formatDuration((Date.parse(farm.activePond.care_available_at) - farm.now) / 1000) }}.</div>
           </section>
 
-          <section v-if="farm.activeBatch" class="panel p-4 border border-[#cbd9c6] rounded-xl bg-white space-y-3">
+          <section v-if="farm.activeBatch" class="slide-fade-in from-right player-content-in panel p-4 border border-[#cbd9c6] rounded-xl bg-white space-y-3">
             <div class="flex flex-wrap items-center justify-between gap-2"><div class="m-0 text-sm font-bold">{{ farm.speciesName(farm.activeBatch.species_id) }}</div><span class="text-xs text-emerald-700">{{ remaining(farm.activeBatch) }}</span></div>
             <div class="m-0 text-xs text-stone-500">{{ farm.batchFish.length }} / {{ farm.activeBatch.initial_fish_count }} {{ tr('Fishfarm.ca_con_trong_lua') }} {{ farm.activeBatch.mode === 'simple' ? tr('AquacultureStockForm.thong_tha') : tr('AquacultureStockForm.cham_chut') }}</div>
             <div v-if="farm.activeBatch.mode === 'advanced'" class="space-y-2 rounded-lg bg-[#f5f9f0] p-3 text-xs">
@@ -175,7 +175,7 @@ async function confirm() {
       <div class="flex flex-wrap items-center gap-1 text-sm text-[#24352a]">{{ confirmation.message }}<template v-if="confirmation.kind === 'sell'"><Cash :amount="confirmation.cash" :size="20" />?</template></div>
     </TwoOptionsModal>
     <Teleport to="body">
-      <dialog ref="recordsDialog" aria-labelledby="aquaculture-records-title" class="fixed inset-0 m-auto max-h-[80dvh] w-[calc(100%-2rem)] max-w-md overflow-y-auto rounded-2xl border border-[#cbd9c6] bg-[#f5f9f0] p-0 text-[#24352a] shadow-xl backdrop:bg-black/40" @click.self="recordsDialog?.close()">
+      <dialog ref="recordsDialog" aria-labelledby="aquaculture-records-title" class="player-popup-in fixed inset-0 m-auto max-h-[80dvh] w-[calc(100%-2rem)] max-w-md overflow-y-auto rounded-2xl border border-[#cbd9c6] bg-[#f5f9f0] p-0 text-[#24352a] shadow-xl backdrop:bg-black/40" @click.self="recordsDialog?.close()">
         <div class="p-4" @click.stop>
           <header class="mb-4 flex items-center justify-between gap-3">
             <div id="aquaculture-records-title" class="m-0 text-base font-bold">{{ tr('Fishfarm.thanh_qua_nuoi_ca') }}</div>

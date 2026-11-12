@@ -124,7 +124,7 @@ onMounted(() => {
     <div class="flex h-full flex-col gap-2">
       <div class="flex min-h-0 grow flex-col gap-2 md:flex-row">
         <template v-for="(panel, index) in panels" :key="panel.key">
-          <section class="flex min-w-0 flex-1 flex-col rounded-lg border border-emerald-900/15 bg-white">
+          <section class="slide-fade-in from-bottom player-content-in flex min-w-0 flex-1 flex-col rounded-lg border border-emerald-900/15 bg-white">
             <div class="flex flex-wrap items-center gap-2 border-b border-emerald-900/10 p-2">
               <div class="m-0 text-sm font-bold text-emerald-950">
                 {{ panel.title }} ({{ panel.total

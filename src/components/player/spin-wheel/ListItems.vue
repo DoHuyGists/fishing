@@ -1,6 +1,6 @@
 <template>
   <section
-    class="flex h-full min-h-0 w-full flex-col overflow-hidden rounded-xl border border-[#cbd9c6] bg-[#f5f9f0] text-[#24352a]"
+    class="slide-fade-in from-left player-content-in flex h-full min-h-0 w-full flex-col overflow-hidden rounded-xl border border-[#cbd9c6] bg-[#f5f9f0] text-[#24352a]"
   >
     <header class="border-b border-[#cbd9c6] px-4 py-0">
       <div class="py-3 text-sm font-semibold">

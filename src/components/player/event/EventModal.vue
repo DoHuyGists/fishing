@@ -92,7 +92,7 @@ onMounted(loadSchedules);
               v-for="item in activeSchedules"
               :key="item.id"
               type="button"
-              class="w-full cursor-pointer rounded-lg p-3 text-left transition-colors"
+              class="slide-fade-in from-bottom player-content-in w-full cursor-pointer rounded-lg p-3 text-left transition-colors"
               :class="selectedId === item.id ? 'bg-gray-50' : ''"
               @click="selectSchedule(item)"
             >
@@ -131,7 +131,7 @@ onMounted(loadSchedules);
 
         <!-- Chi tiết sự kiện -->
         <section class="min-h-0">
-          <article v-if="selectedSchedule" class="mx-auto p-5 sm:p-8 overflow-y-scroll h-full">
+          <article v-if="selectedSchedule" class="slide-fade-in from-right player-content-in mx-auto p-5 sm:p-8 overflow-y-scroll h-full">
             <img
               v-if="selectedSchedule.eventImage"
               :src="selectedSchedule.eventImage"

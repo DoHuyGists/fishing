@@ -26,7 +26,7 @@ onBeforeUnmount(() => {
 </script>
 
 <template>
-  <section class="flex" :aria-label="tr('DayPhaseClock.thoi_gian_va_thoi_tiet')">
+  <section class="slide-fade-in from-top player-content-in flex" :aria-label="tr('DayPhaseClock.thoi_gian_va_thoi_tiet')">
     <div class="w-20">
       <img :src="dayPhaseStore.currentPhase.icon" :alt="dayPhaseStore.currentPhase.label" />
     </div>

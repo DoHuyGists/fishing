@@ -24,7 +24,7 @@ const displayedGroups = computed(() => inventoryViewStore.displayedGroups(props.
 </script>
 
 <template>
-  <aside id="workbench-palette" class="flex min-h-0 flex-col rounded-lg border border-[#cbd9c6] bg-[#f5f9f0] p-3">
+  <aside id="workbench-palette" class="slide-fade-in from-left player-content-in flex min-h-0 flex-col rounded-lg border border-[#cbd9c6] bg-[#f5f9f0] p-3">
     <div class="mb-3 text-sm font-bold">{{ tr('WorkBenchModal.vat_pham_trong_tui') }}</div>
     <div role="group" :aria-label="tr('InventoryItems.kieu_hien_thi')" class="mb-3 flex flex-wrap gap-1">
       <button

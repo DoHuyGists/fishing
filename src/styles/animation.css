@@ -21,10 +21,55 @@
 .slide-fade-in.from-bottom-left { --from-x: calc(-1 * var(--slide-distance)); --from-y: var(--slide-distance); }
 .slide-fade-in.from-bottom-right { --from-x: var(--slide-distance); --from-y: var(--slide-distance); }
 
+.slide-fade-in.player-content-in {
+  --slide-distance: 20px;
+  --duration: 0.4s;
+  opacity: 1;
+  /* Release transform after entry so hover effects and fixed descendants still work. */
+  animation-fill-mode: backwards;
+}
+
+.player-popup-in {
+  animation: playerPopupIn 0.22s cubic-bezier(0.22, 1, 0.36, 1) backwards;
+}
+
+@keyframes playerPopupIn {
+  from { transform: translateY(12px) scale(0.96); }
+  to { transform: none; }
+}
+
+.player-popup-enter-active > .player-popup-panel {
+  transition: transform 0.22s cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+.player-popup-leave-active > .player-popup-panel {
+  transition: transform 0.15s ease-in;
+}
+
+.player-popup-enter-from > .player-popup-panel,
+.player-popup-leave-to > .player-popup-panel {
+  transform: translateY(12px) scale(0.96);
+}
+
+.player-window-enter-active .player-window-panel { transition: transform 0.22s ease-out; }
+.player-window-leave-active .player-window-panel { transition: transform 0.15s ease-in; }
+.player-window-enter-from .player-window-panel,
+.player-window-leave-to .player-window-panel { transform: translateY(20px); }
+
 @media (prefers-reduced-motion: reduce) {
   .slide-fade-in {
     animation: none;
     opacity: 1;
+    transform: none;
+  }
+
+  .player-popup-in,
+  .player-popup-enter-active > .player-popup-panel,
+  .player-popup-leave-active > .player-popup-panel,
+  .player-window-enter-active .player-window-panel,
+  .player-window-leave-active .player-window-panel {
+    animation: none;
+    transition: none;
     transform: none;
   }
 }

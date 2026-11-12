@@ -32,7 +32,7 @@ const waitTime = computed(() => {
 
 <template>
   <section class="space-y-5">
-    <div class="flex flex-wrap items-center justify-between gap-3 rounded-2xl border border-[#cbd9c6] bg-[#f5f9f0] p-4 sm:p-5">
+    <div class="slide-fade-in from-top player-content-in flex flex-wrap items-center justify-between gap-3 rounded-2xl border border-[#cbd9c6] bg-[#f5f9f0] p-4 sm:p-5">
       <div>
         <div class="m-0 text-lg font-extrabold text-[#24352a]">{{ tr('DailyAttendance.qua_diem_danh_ngay') }}</div>
         <div class="mb-0 mt-1 text-sm text-emerald-900/65">{{ tr('DailyAttendance.moi_ngay_chi_nhan_mot_phan_thuong_ngau_nhien_trong_danh_sach') }}</div>
@@ -53,7 +53,7 @@ const waitTime = computed(() => {
       </div>
       <div v-else-if="!attendanceStore.possibleRewards.length" class="m-0 rounded-2xl border border-[#cbd9c6] bg-[#f5f9f0] p-5 text-center text-sm text-[#24352a]">{{ tr('DailyAttendance.hien_chua_co_phan_qua_de_xem_truoc') }}</div>
       <div v-else class="m-0 grid list-none grid-cols-2 gap-3 p-0 sm:grid-cols-3 lg:grid-cols-4">
-        <div v-for="item in attendanceStore.possibleRewards" :key="item.id" class="flex flex-col items-center gap-3 rounded-2xl border border-[#cbd9c6] bg-[#f5f9f0] p-4 text-center">
+        <div v-for="item in attendanceStore.possibleRewards" :key="item.id" class="slide-fade-in from-bottom player-content-in flex flex-col items-center gap-3 rounded-2xl border border-[#cbd9c6] bg-[#f5f9f0] p-4 text-center">
           <div class="flex h-16 w-16 items-center justify-center rounded-xl bg-white/80">
             <img v-if="item.image" :src="item.image" alt="" loading="lazy" class="h-12 w-12 object-contain" />
             <span v-else class="text-4xl" aria-hidden="true">{{ item.icon || "🎁" }}</span>
@@ -62,7 +62,7 @@ const waitTime = computed(() => {
         </div>
       </div>
     </section>
-    <div v-if="reward" class="flex items-center gap-4 rounded-2xl border border-amber-300 bg-amber-50 p-4" role="status">
+    <div v-if="reward" class="slide-fade-in from-bottom player-content-in flex items-center gap-4 rounded-2xl border border-amber-300 bg-amber-50 p-4" role="status">
       <span class="text-4xl" aria-hidden="true">{{ reward.icon }}</span>
       <div>
         <div class="m-0 text-xs font-bold uppercase tracking-wide text-amber-800">{{ tr('DailyAttendance.ban_nhan_duoc') }}</div>

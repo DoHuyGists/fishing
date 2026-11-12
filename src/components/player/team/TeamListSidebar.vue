@@ -64,7 +64,7 @@ function joinTypeLabel(team: UserTeam) {
 </script>
 
 <template>
-  <aside class="flex min-h-0 flex-col gap-3 rounded-2xl border border-[#cde0c9] bg-[#f5f9f0] p-3 sm:max-h-[62vh]">
+  <aside class="slide-fade-in from-left player-content-in flex min-h-0 flex-col gap-3 rounded-2xl border border-[#cde0c9] bg-[#f5f9f0] p-3 sm:max-h-[62vh]">
     <div class="flex items-center justify-between gap-2">
       <div class="m-0 text-base font-bold text-[#1a3a1a]">{{ tr('TeamListSidebar.to_doi_hien_hanh') }}</div>
       <button

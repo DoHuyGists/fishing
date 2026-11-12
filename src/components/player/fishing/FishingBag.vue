@@ -63,12 +63,7 @@ function getRewardEffect(variant: "NORMAL" | "GOLDEN" | "MUTATED") {
 
 <template>
   <Teleport to="body">
-    <Transition
-      enter-active-class="[transition:opacity_0.18s_ease]"
-      leave-active-class="[transition:opacity_0.18s_ease]"
-      enter-from-class="opacity-0"
-      leave-to-class="opacity-0"
-    >
+    <Transition name="player-popup" :duration="{ enter: 220, leave: 150 }">
       <div
         v-if="store.bagOpen"
         class="fixed z-[31] inset-0 grid place-items-center p-5 bg-[rgba(4,17,11,0.72)] backdrop-blur-[7px]"
@@ -76,7 +71,7 @@ function getRewardEffect(variant: "NORMAL" | "GOLDEN" | "MUTATED") {
         @click.self="store.closeBag"
       >
         <section
-          class="w-[min(460px,100%)] max-h-[min(580px,80vh)] overflow-auto border border-[rgba(255,226,149,0.68)] rounded-[20px] bg-[linear-gradient(145deg,#173d2b,#0e281b)] shadow-[0_24px_70px_rgba(0,0,0,0.48)] text-[#f4f0df]"
+          class="player-popup-panel w-[min(460px,100%)] max-h-[min(580px,80vh)] overflow-auto border border-[rgba(255,226,149,0.68)] rounded-[20px] bg-[linear-gradient(145deg,#173d2b,#0e281b)] shadow-[0_24px_70px_rgba(0,0,0,0.48)] text-[#f4f0df]"
           role="dialog"
           aria-modal="true"
           aria-labelledby="bag-title"
@@ -222,12 +217,7 @@ function getRewardEffect(variant: "NORMAL" | "GOLDEN" | "MUTATED") {
     </Transition>
 
     <!-- Dialog xác nhận thả cá -->
-    <Transition
-      enter-active-class="[transition:opacity_0.18s_ease]"
-      leave-active-class="[transition:opacity_0.18s_ease]"
-      enter-from-class="opacity-0"
-      leave-to-class="opacity-0"
-    >
+    <Transition name="player-popup" :duration="{ enter: 220, leave: 150 }">
       <div
         v-if="selectedFishToRelease"
         class="fixed z-[32] inset-0 grid place-items-center p-5 bg-[rgba(4,17,11,0.82)] backdrop-blur-[8px]"
@@ -235,7 +225,7 @@ function getRewardEffect(variant: "NORMAL" | "GOLDEN" | "MUTATED") {
         @click.self="cancelRelease"
       >
         <div
-          class="w-[min(380px,100%)] p-5 border border-[rgba(255,226,149,0.5)] rounded-[20px] bg-[linear-gradient(145deg,#1b4531,#0f2e1f)] shadow-[0_24px_70px_rgba(0,0,0,0.6)] text-[#f4f0df] text-center"
+          class="player-popup-panel w-[min(380px,100%)] p-5 border border-[rgba(255,226,149,0.5)] rounded-[20px] bg-[linear-gradient(145deg,#1b4531,#0f2e1f)] shadow-[0_24px_70px_rgba(0,0,0,0.6)] text-[#f4f0df] text-center"
           role="dialog"
           aria-modal="true"
           aria-labelledby="confirm-release-title"

@@ -20,12 +20,7 @@ const variantFrameClass = computed(() => {
 
 <template>
   <Teleport to="body">
-    <Transition
-      enter-active-class="[transition:opacity_0.2s_ease] [&_.catch-card]:[transition:transform_0.2s_ease,opacity_0.2s_ease]"
-      leave-active-class="[transition:opacity_0.2s_ease] [&_.catch-card]:[transition:transform_0.2s_ease,opacity_0.2s_ease]"
-      enter-from-class="opacity-0 [&_.catch-card]:opacity-0 [&_.catch-card]:[transform:translateY(16px)_scale(0.96)]"
-      leave-to-class="opacity-0 [&_.catch-card]:opacity-0 [&_.catch-card]:[transform:translateY(16px)_scale(0.96)]"
-    >
+    <Transition name="player-popup" :duration="{ enter: 220, leave: 150 }">
       <div
         v-if="store.catchDialogOpen && caught"
         class="fixed z-30 inset-0 grid place-items-center p-5 bg-[rgba(4,17,11,0.72)] backdrop-blur-[7px]"
@@ -33,7 +28,7 @@ const variantFrameClass = computed(() => {
         @click.self="store.closeCatchDialog"
       >
         <section
-          class="catch-card w-[min(360px,100%)] overflow-hidden border-2 rounded-[22px] bg-[linear-gradient(145deg,#173d2b,#0e281b)] shadow-[0_24px_70px_rgba(0,0,0,0.48)] text-center text-[#f4f0df]"
+          class="player-popup-panel catch-card w-[min(360px,100%)] overflow-hidden border-2 rounded-[22px] bg-[linear-gradient(145deg,#173d2b,#0e281b)] shadow-[0_24px_70px_rgba(0,0,0,0.48)] text-center text-[#f4f0df]"
           :class="variantFrameClass"
           role="dialog"
           aria-modal="true"

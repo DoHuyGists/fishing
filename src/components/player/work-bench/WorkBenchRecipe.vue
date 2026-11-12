@@ -25,7 +25,7 @@ const emit = defineEmits<{
 </script>
 
 <template>
-  <section id="workbench-recipe" class="min-h-72 rounded-lg border border-[#cbd9c6] bg-[#f5f9f0] p-4 lg:min-h-0 lg:overflow-y-auto">
+  <section id="workbench-recipe" class="slide-fade-in from-right player-content-in min-h-72 rounded-lg border border-[#cbd9c6] bg-[#f5f9f0] p-4 lg:min-h-0 lg:overflow-y-auto">
     <template v-if="selectedBlueprint">
       <div class="flex flex-col items-center border-b border-[#cbd9c6] pb-5 text-center">
         <span class="relative grid size-24 place-items-center rounded-xl border border-[#cbd9c6] bg-white text-3xl">

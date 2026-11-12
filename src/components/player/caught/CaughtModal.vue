@@ -214,7 +214,7 @@ async function handleRelease() {
           }}
         </div>
         <template v-else-if="viewMode === 'species'">
-          <article v-for="group in paginatedFishGroups" :key="group.id" class="min-w-0 overflow-hidden h-fit border border-gray-200 hover:border-emerald-300 rounded-xl bg-gray-50/70 transition-all shadow-sm">
+          <article v-for="group in paginatedFishGroups" :key="group.id" class="slide-fade-in from-bottom player-content-in min-w-0 overflow-hidden h-fit border border-gray-200 hover:border-emerald-300 rounded-xl bg-gray-50/70 transition-all shadow-sm">
             <img :src="group.fishes[0].species?.image || '/fish/VN/fish.jpg'" :alt="group.fishes[0].species?.name || tr('CaughtModal.ca')" class="object-cover bg-gray-200 w-full h-36 border-b border-gray-200" />
             <div class="min-w-0 flex-1 p-2">
               <div class="flex items-start justify-between gap-2">
@@ -257,7 +257,7 @@ async function handleRelease() {
             </div>
           </article>
         </template>
-        <div v-else v-for="item in paginatedCaughtFishes" :key="item.id" class="min-w-0 p-2 border border-gray-200 hover:border-emerald-300 rounded-xl bg-gray-50/70 hover:bg-emerald-50/30 transition-all shadow-sm" :class="viewMode === 'grid' ? 'flex flex-col gap-2' : 'flex items-center gap-3'">
+        <div v-else v-for="item in paginatedCaughtFishes" :key="item.id" class="slide-fade-in from-bottom player-content-in min-w-0 p-2 border border-gray-200 hover:border-emerald-300 rounded-xl bg-gray-50/70 hover:bg-emerald-50/30 transition-all shadow-sm" :class="viewMode === 'grid' ? 'flex flex-col gap-2' : 'flex items-center gap-3'">
           <img :src="item.species?.image || '/fish/VN/fish.jpg'" :alt="item.species?.name" class="rounded-lg object-cover border border-gray-200 bg-gray-200" :class="viewMode === 'grid' ? 'w-full h-36' : 'w-fit h-20 shrink-0'" />
           <div class="flex flex-1 min-w-0 gap-2" :class="viewMode === 'grid' ? 'flex-col' : 'items-center justify-between'">
             <div class="flex-1 min-w-0 flex flex-col gap-0.5">

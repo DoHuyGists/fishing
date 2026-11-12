@@ -50,7 +50,7 @@ withDefaults(
     @click.self="onDismiss?.()"
   >
     <div
-      class="w-[90%] max-w-[420px] rounded-xl bg-white p-6 shadow-[0_20px_25px_-5px_rgba(0,0,0,0.1)]"
+      class="player-popup-in w-[90%] max-w-[420px] rounded-xl bg-white p-6 shadow-[0_20px_25px_-5px_rgba(0,0,0,0.1)]"
     >
       <div>
         <div class="mb-3 text-xl leading-normal font-bold text-[#b91c1c]">

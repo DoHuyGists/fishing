@@ -248,18 +248,13 @@ onBeforeUnmount(() => {
 
     <!-- Popup thông báo kết quả -->
     <Teleport to="body">
-      <Transition
-      enter-active-class="[transition:opacity_0.2s_ease]"
-      leave-active-class="[transition:opacity_0.2s_ease]"
-      enter-from-class="opacity-0"
-      leave-to-class="opacity-0"
-    >
+      <Transition name="player-popup" :duration="{ enter: 220, leave: 150 }">
         <div
           v-if="showResult"
           class="fixed inset-0 z-[10000] flex items-center justify-center bg-black/60 px-4"
           @click.self="closeResult"
         >
-          <div class="w-full max-w-sm rounded-2xl bg-white p-8 text-center shadow-2xl">
+          <div class="player-popup-panel w-full max-w-sm rounded-2xl bg-white p-8 text-center shadow-2xl">
             <img
               v-if="resultReward?.image"
               :src="resultReward.image"

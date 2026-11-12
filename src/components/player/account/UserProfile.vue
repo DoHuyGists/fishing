@@ -123,7 +123,7 @@ const userInitial = computed(() => {
 
 <template>
   <div class="flex flex-col gap-5">
-    <div class="flex items-center gap-4 bg-linear-to-r from-emerald-50 to-teal-50/70 border border-emerald-100/80 rounded-xl p-4">
+    <div class="slide-fade-in from-top player-content-in flex items-center gap-4 bg-linear-to-r from-emerald-50 to-teal-50/70 border border-emerald-100/80 rounded-xl p-4">
       <div class="w-14 h-14 rounded-full bg-emerald-600 text-white flex items-center justify-center text-xl font-black shadow-md shrink-0">
         <img v-if="userProfileStore.profile?.avatar_url" :src="userProfileStore.profile.avatar_url" :alt="tr('UpdateIdentityModal.anh_dai_dien')" class="h-full w-full rounded-full object-cover" referrerpolicy="no-referrer" />
         <span v-else>{{ userInitial }}</span>
@@ -145,7 +145,7 @@ const userInitial = computed(() => {
 
     <div>
       <div class="text-xs font-bold text-gray-400 uppercase tracking-wider mb-2">{{ tr('UserProfile.chi_so_can_thu') }}</div>
-      <div class="grid grid-cols-2 gap-2.5">
+      <div class="slide-fade-in from-bottom player-content-in grid grid-cols-2 gap-2.5">
         <div class="bg-gray-50 border border-gray-100 rounded-xl p-3 flex flex-col gap-1">
           <div class="flex items-center gap-1.5 text-gray-500 text-[11px] font-medium">
             <span>🎒</span><span>{{ tr('UserProfile.suc_chua_tui_do') }}</span>
@@ -181,7 +181,7 @@ const userInitial = computed(() => {
 
     <div>
       <div class="text-xs font-bold text-gray-400 uppercase tracking-wider mb-2">{{ tr('UserProfile.chi_tiet_tai_khoan') }}</div>
-      <div class="bg-gray-50 border border-gray-100 rounded-xl divide-y divide-gray-100 text-xs">
+      <div class="slide-fade-in from-bottom player-content-in bg-gray-50 border border-gray-100 rounded-xl divide-y divide-gray-100 text-xs">
         <div class="flex justify-between items-center gap-3 px-3.5 py-2.5">
           <span class="text-gray-500 font-medium">{{ tr('UserProfile.quoc_gia') }}</span>
           <span class="text-right font-semibold text-[#24352a]">{{ currentCountry?.name || (countryStore.isLoading ? tr('UserProfile.dang_tai_quoc_gia') : tr('UserProfile.chua_co_thong_tin')) }}</span>

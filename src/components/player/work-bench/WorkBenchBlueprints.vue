@@ -17,7 +17,7 @@ const emit = defineEmits<{
 </script>
 
 <template>
-  <aside id="workbench-blueprints" class="flex min-h-0 flex-col rounded-lg border border-[#cbd9c6] bg-[#f5f9f0] p-3">
+  <aside id="workbench-blueprints" class="slide-fade-in from-bottom player-content-in flex min-h-0 flex-col rounded-lg border border-[#cbd9c6] bg-[#f5f9f0] p-3">
     <div class="mb-3 text-sm font-bold">{{ tr('WorkBenchModal.ban_ve') }}</div>
     <div v-if="loading" class="py-4 text-center text-xs opacity-60">{{ tr('WorkBenchModal.dang_tai_ban_ve') }}</div>
     <div v-else class="flex max-h-[min(65vh,44rem)] flex-col gap-2 overflow-y-auto lg:min-h-0 lg:max-h-none lg:flex-1">

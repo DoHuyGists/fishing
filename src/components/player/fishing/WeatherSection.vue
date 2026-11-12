@@ -156,12 +156,7 @@ onBeforeUnmount(() => {
   </button>
 
   <Teleport to="body" :disabled="inline">
-    <Transition
-      enter-active-class="transition-opacity duration-200"
-      leave-active-class="transition-opacity duration-200"
-      enter-from-class="opacity-0"
-      leave-to-class="opacity-0"
-    >
+    <Transition :name="inline ? undefined : 'player-popup'" :duration="inline ? 0 : { enter: 220, leave: 150 }">
       <div
         v-if="inline || open"
         :class="inline ? 'w-full shrink-0' : 'fixed inset-0 z-1000 grid place-items-center bg-emerald-950/60 p-4'"
@@ -169,9 +164,9 @@ onBeforeUnmount(() => {
         @contextmenu.prevent
       >
         <div
-          class="relative flex flex-col overflow-hidden rounded-xl border"
+          class="player-popup-panel relative flex flex-col overflow-hidden rounded-xl border"
           :class="inline
-            ? 'w-full border-[#cbd9c6] bg-[#f5f9f0] text-[#24352a] shadow-sm'
+            ? 'slide-fade-in from-top player-content-in w-full border-[#cbd9c6] bg-[#f5f9f0] text-[#24352a] shadow-sm'
             : 'max-h-[90vh] w-[min(720px,100%)] border-emerald-900/15 bg-white text-emerald-950'"
           :role="inline ? 'region' : 'dialog'"
           :aria-modal="inline ? undefined : true"

@@ -35,7 +35,7 @@ async function handleSubmit() {
 
 <template>
   <form class="flex min-h-0 flex-1 flex-col" novalidate @submit.prevent="handleSubmit">
-    <div class="flex-1 space-y-5 overflow-y-auto px-6 py-5">
+    <div class="slide-fade-in from-bottom player-content-in flex-1 space-y-5 overflow-y-auto px-6 py-5">
       <div>
         <label for="fb-like" class="mb-1.5 block text-sm font-medium text-gray-800"
           >{{ tr('OpinionFeedbackForm.ban_thich_dieu_gi') }} <span class="text-red-500">*</span></label

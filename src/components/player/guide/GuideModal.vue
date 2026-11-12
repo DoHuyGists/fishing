@@ -28,7 +28,7 @@ onMounted(() => guideStore.loadGuides());
     :on-refresh="guideStore.loadGuides"
   >
     <div class="flex h-full min-h-0 flex-col">
-    <div class="mb-3 flex shrink-0 flex-wrap items-center justify-between gap-3 rounded-xl border border-[#cbd9c6] bg-[#f5f9f0] p-3 text-[#24352a]">
+    <div class="slide-fade-in from-top player-content-in mb-3 flex shrink-0 flex-wrap items-center justify-between gap-3 rounded-xl border border-[#cbd9c6] bg-[#f5f9f0] p-3 text-[#24352a]">
       <div class="text-sm">{{ tr('GuideModal.xem_huong_dan_tung_buoc_ngay_tai_sanh') }}</div>
       <button
         type="button"
@@ -69,7 +69,7 @@ onMounted(() => guideStore.loadGuides());
             {{ guide.title }}
           </button>
         </nav>
-        <article id="guide-content" aria-live="polite" class="min-h-0 min-w-0 flex-1 overflow-y-auto p-4 sm:p-6">
+        <article id="guide-content" aria-live="polite" class="slide-fade-in from-bottom player-content-in min-h-0 min-w-0 flex-1 overflow-y-auto p-4 sm:p-6">
           <template v-if="guideStore.selectedGuide">
             <div class="break-words text-xl font-bold">{{ guideStore.selectedGuide.title }}</div>
             <RichTextContent class="mt-4" :content="guideStore.selectedGuide.content" />

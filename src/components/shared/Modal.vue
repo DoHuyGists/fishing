@@ -81,7 +81,7 @@ onUnmounted(() => {
 <template>
   <div class="fixed inset-0 z-9999" :class="compact ? 'flex items-center justify-center bg-black/40 p-3 backdrop-blur-xs' : ''">
   <div
-    class="flex flex-col bg-white"
+    class="player-window-panel flex flex-col bg-white"
     :class="compact
       ? 'max-h-[calc(100dvh-1.5rem)] w-full max-w-3xl overflow-hidden rounded-2xl border border-[#cbd9c6] shadow-xl'
       : 'h-[100vh] w-screen supports-[height:100dvh]:h-[100dvh]'"

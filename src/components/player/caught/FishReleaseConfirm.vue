@@ -9,7 +9,7 @@ const emit = defineEmits<{ cancel: []; confirm: [] }>();
 
 <template>
   <div v-if="fish" class="fixed inset-0 z-[10000] flex items-center justify-center bg-black/50 p-4 backdrop-blur-xs" @click.self="emit('cancel')">
-    <div class="w-full max-w-sm rounded-xl border border-gray-300 bg-white p-5 text-center shadow-xl">
+    <div class="player-popup-in w-full max-w-sm rounded-xl border border-gray-300 bg-white p-5 text-center shadow-xl">
       <div class="m-0 text-base font-bold text-[#263238]">{{ tr('FishReleaseConfirm.xac_nhan_tha_ca') }}</div>
       <div class="my-4 text-xs leading-relaxed text-gray-600">
         {{ tr('FishReleaseConfirm.ban_co_chac_chan_muon_tha') }} <strong class="text-[#153221]">{{ fish.species?.name }}</strong> {{ tr('FishReleaseConfirm.ve_lai_tu_nhien_khong') }}

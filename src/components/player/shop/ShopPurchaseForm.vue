@@ -18,7 +18,7 @@ const emit = defineEmits<{ buy: [] }>();
 </script>
 
 <template>
-  <aside class="h-fit rounded-xl border border-[#cbd9c6] bg-[#f5f9f0] p-4 lg:sticky lg:top-0">
+  <aside class="slide-fade-in from-right player-content-in h-fit rounded-xl border border-[#cbd9c6] bg-[#f5f9f0] p-4 lg:sticky lg:top-0">
     <PaymentConfirmation
       v-if="selectedItem"
       embedded

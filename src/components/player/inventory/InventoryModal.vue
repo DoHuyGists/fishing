@@ -58,7 +58,7 @@ const guildeSteps = [
       />
       <div v-if="modal === 'delete'" class="fixed inset-0 z-40 flex items-center justify-center bg-slate-900/50 p-4" role="dialog"
         aria-modal="true" @click.self="modal = null" @keydown.esc="modal = null">
-        <div class="w-full max-w-sm rounded-lg bg-white p-5 shadow-xl">
+        <div class="player-popup-in w-full max-w-sm rounded-lg bg-white p-5 shadow-xl">
           <div class="text-base font-semibold">{{ tr('InventoryModal.xoa') }} {{ selected.size }} {{ tr('InventoryModal.vat_pham') }}</div>
           <div class="mt-2 text-sm text-slate-600">
             {{ tr('InventoryModal.khong_the_xoa_vat_pham_dang_co_trong_set_hay_go_vat_pham_va_luu_') }}

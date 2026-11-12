@@ -36,7 +36,7 @@ const emit = defineEmits<{
         v-for="mission in missions"
         :key="mission.id"
         type="button"
-        class="w-full p-3 rounded-lg border text-left transition-colors"
+        class="slide-fade-in from-bottom player-content-in w-full p-3 rounded-lg border text-left transition-colors"
         :class="
           selectedMissionId === mission.id
             ? 'border-emerald-700 bg-emerald-100'

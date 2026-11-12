@@ -231,7 +231,7 @@ async function confirm() {
 
         <section
           :aria-label="tr('EquipmentMenu.ca_trong_ho')"
-          class="shrink-0 overflow-hidden rounded-lg border border-[#cbd9c6] bg-[#f5f9f0] shadow-sm"
+          class="slide-fade-in from-top player-content-in shrink-0 overflow-hidden rounded-lg border border-[#cbd9c6] bg-[#f5f9f0] shadow-sm"
         >
           <header class="flex flex-wrap items-center justify-between gap-2 border-b border-[#cbd9c6] bg-[#eaf2e5] p-3">
             <div>
@@ -306,7 +306,7 @@ async function confirm() {
         <!-- Content -->
         <template v-else>
           <!-- EQUIPMENT SETS LIST & ITEMS IN USED SET -->
-          <div class="flex flex-col gap-1.5 bg-[#eaf2e5] border border-[#cbd9c6] rounded-lg p-2 shadow-sm">
+          <div class="slide-fade-in from-left player-content-in flex flex-col gap-1.5 bg-[#eaf2e5] border border-[#cbd9c6] rounded-lg p-2 shadow-sm">
             <div class="flex items-center flex-wrap justify-between gap-2 border-b border-[#cbd9c6] pb-1.5">
               <div class="flex items-center gap-2.5">
                 <span class="w-2.5 h-2.5 rounded-full bg-[#8eaa91] shrink-0"></span>

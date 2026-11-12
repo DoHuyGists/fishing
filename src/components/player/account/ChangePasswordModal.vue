@@ -34,7 +34,7 @@ async function changePassword() {
 <template>
   <div class="fixed inset-0 z-[10000] flex items-center justify-center bg-black/60 p-4 backdrop-blur-sm" @click.self="close" @keydown.esc.stop="close">
     <section
-      class="max-h-[90dvh] w-full max-w-md overflow-y-auto rounded-2xl border border-[#cbd9c6] bg-[#f5f9f0] p-5 text-sm text-[#24352a] shadow-2xl"
+      class="player-popup-in max-h-[90dvh] w-full max-w-md overflow-y-auto rounded-2xl border border-[#cbd9c6] bg-[#f5f9f0] p-5 text-sm text-[#24352a] shadow-2xl"
       role="dialog"
       aria-modal="true"
       aria-labelledby="change-password-title"

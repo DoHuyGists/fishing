@@ -311,7 +311,7 @@ onMounted(async () => {
       <div v-if="view === 'list' && teamStore.myTeam" class="flex flex-col gap-4">
         <!-- Room header -->
         <div
-          class="flex items-start justify-between gap-3 p-4 bg-linear-to-br from-[#e8f5e2] to-[#d4edcc] rounded-2xl border border-[#b8dab0]"
+          class="slide-fade-in from-top player-content-in flex items-start justify-between gap-3 p-4 bg-linear-to-br from-[#e8f5e2] to-[#d4edcc] rounded-2xl border border-[#b8dab0]"
         >
           <div>
             <div class="m-0 mb-1 text-[1.1rem] font-extrabold text-[#1a3a1a]">{{ teamStore.myTeam.name }}</div>
@@ -342,7 +342,7 @@ onMounted(async () => {
           <div
             v-for="member in teamStore.myTeamMembers"
             :key="member.id"
-            class="flex flex-col gap-3 p-4 bg-linear-to-br from-white to-[#f5faf2] border border-[#daefd4] rounded-2xl shadow-sm"
+            class="slide-fade-in from-bottom player-content-in flex flex-col gap-3 p-4 bg-linear-to-br from-white to-[#f5faf2] border border-[#daefd4] rounded-2xl shadow-sm"
           >
             <div class="flex items-center gap-3 min-w-0">
               <PlayerIdentity :user-id="member.user_id" :profile="member.user_profile" class="flex-1" />
@@ -489,7 +489,7 @@ onMounted(async () => {
           <div
             v-for="team in filteredTeams"
             :key="team.id"
-            class="bg-[#f5f9f0] border border-[#cde0c9] rounded-xl overflow-hidden transition-shadow hover:shadow-[0_4px_16px_rgba(59,122,87,0.12)]"
+            class="slide-fade-in from-bottom player-content-in bg-[#f5f9f0] border border-[#cde0c9] rounded-xl overflow-hidden transition-shadow hover:shadow-[0_4px_16px_rgba(59,122,87,0.12)]"
           >
             <div class="px-4 py-[14px]">
               <div class="flex items-center justify-between gap-2 mb-1">
@@ -675,12 +675,10 @@ onMounted(async () => {
       <div
         v-if="showLeaveOptions"
         class="fixed inset-0 z-[10000] bg-black/45 flex items-center justify-center p-4"
-        style="animation: fadeIn 0.18s ease"
         @click.self="showLeaveOptions = false"
       >
         <div
-          class="bg-white rounded-2xl px-6 py-7 max-w-[380px] w-full shadow-[0_20px_60px_rgba(0,0,0,0.22)]"
-          style="animation: slideUp 0.2s ease"
+          class="player-popup-in bg-white rounded-2xl px-6 py-7 max-w-[380px] w-full shadow-[0_20px_60px_rgba(0,0,0,0.22)]"
         >
           <div class="m-0 mb-2 text-[1.05rem] font-extrabold text-[#1a3a1a]">{{ tr('TeamModal.ban_la_truong_nhom') }}</div>
           <div class="m-0 mb-4 text-[0.88rem] text-[#445544]">
@@ -729,12 +727,10 @@ onMounted(async () => {
       <div
         v-if="showTransferModal"
         class="fixed inset-0 z-[10000] bg-black/45 flex items-center justify-center p-4"
-        style="animation: fadeIn 0.18s ease"
         @click.self="showTransferModal = false"
       >
         <div
-          class="bg-white rounded-2xl px-6 py-7 max-w-[380px] w-full shadow-[0_20px_60px_rgba(0,0,0,0.22)]"
-          style="animation: slideUp 0.2s ease"
+          class="player-popup-in bg-white rounded-2xl px-6 py-7 max-w-[380px] w-full shadow-[0_20px_60px_rgba(0,0,0,0.22)]"
         >
           <div class="m-0 mb-2 text-[1.05rem] font-extrabold text-[#1a3a1a]">{{ tr('TeamModal.chuyen_quyen_truong_nhom') }}</div>
           <div class="m-0 mb-4 text-[0.88rem] text-[#445544]">
@@ -789,24 +785,3 @@ onMounted(async () => {
     </Teleport>
   </Modal>
 </template>
-
-<style>
-@keyframes fadeIn {
-  from {
-    opacity: 0;
-  }
-  to {
-    opacity: 1;
-  }
-}
-@keyframes slideUp {
-  from {
-    transform: translateY(20px);
-    opacity: 0;
-  }
-  to {
-    transform: translateY(0);
-    opacity: 1;
-  }
-}
-</style>

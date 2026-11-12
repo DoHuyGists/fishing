@@ -105,7 +105,7 @@ onUnmounted(() => {
               </span>
             </button>
           </aside>
-          <article class="hidden min-w-0 flex-1 overflow-y-auto p-5 sm:block sm:p-8">
+          <article class="slide-fade-in from-right player-content-in hidden min-w-0 flex-1 overflow-y-auto p-5 sm:block sm:p-8">
             <div v-if="selected">
               <div class="mb-4 flex flex-wrap items-center gap-2">
                 <span class="rounded-full bg-emerald-50 px-2.5 py-1 text-xs font-bold text-emerald-800">{{
@@ -171,7 +171,7 @@ onUnmounted(() => {
               </span>
             </button>
           </aside>
-          <article class="hidden min-w-0 flex-1 overflow-y-auto p-5 sm:block sm:p-8">
+          <article class="slide-fade-in from-right player-content-in hidden min-w-0 flex-1 overflow-y-auto p-5 sm:block sm:p-8">
             <div v-if="selected">
               <div class="mb-4 flex flex-wrap items-center gap-2">
                 <span class="rounded-full bg-emerald-50 px-2.5 py-1 text-xs font-bold text-emerald-800">{{

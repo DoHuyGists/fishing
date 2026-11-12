@@ -47,7 +47,7 @@ function isMilestoneReached(pointsRequired: number): boolean {
 
 <template>
   <section
-    class="activity-section rounded-xl border border-[#cbd9c6] bg-[#f5f9f0] text-[#24352a] p-4 sm:p-5 shadow-lg space-y-4"
+    class="slide-fade-in from-bottom player-content-in activity-section rounded-xl border border-[#cbd9c6] bg-[#f5f9f0] text-[#24352a] p-4 sm:p-5 shadow-lg space-y-4"
   >
     <!-- Header của Section Năng Động -->
     <div class="flex flex-wrap items-center justify-between gap-3 border-b border-[#cbd9c6] pb-3">

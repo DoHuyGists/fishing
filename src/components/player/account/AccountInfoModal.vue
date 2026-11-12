@@ -88,7 +88,7 @@ async function signOut() {
       @click.self="!isSigningOut && (showSignOutConfirm = false)"
     >
       <section
-        class="w-[min(380px,100%)] rounded-2xl border border-gray-200 bg-white p-5 shadow-2xl"
+        class="player-popup-in w-[min(380px,100%)] rounded-2xl border border-gray-200 bg-white p-5 shadow-2xl"
         role="dialog"
         aria-modal="true"
         aria-labelledby="sign-out-title"

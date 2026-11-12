@@ -174,7 +174,7 @@ function zoomTo(k: number) {
           @select-area="onSelectArea"
         >
           <template #popup="{ area }">
-            <div class="slide-fade-in from-bottom-left flex flex-col gap-1.5 rounded-lg bg-white p-2 text-xs text-gray-800 shadow-lg" style="--slide-distance: 16px; --duration: 0.3s">
+            <div class="player-popup-in flex flex-col gap-1.5 rounded-lg bg-white p-2 text-xs text-gray-800 shadow-lg">
               <div class="flex items-center justify-between gap-2 font-bold">
                 <span class="whitespace-nowrap">{{ area.title }}</span>
                 <button type="button" class="text-base leading-none text-gray-500" @click="worldStore.targetArea({})">
