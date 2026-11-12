@@ -10,7 +10,7 @@ function flatten(value, prefix = '') {
 }
 const catalogs = {};
 for (const locale of ['vi', 'en']) {
-  const file = `src/locales/${locale}.json`;
+  const file = `src/i18n/locales/${locale}.json`;
   const source = fs.readFileSync(file, 'utf8');
   assert.notEqual(source.charCodeAt(0), 0xfeff, `${file}: unexpected BOM`);
   catalogs[locale] = flatten(JSON.parse(source));

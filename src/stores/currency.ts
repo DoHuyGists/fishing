@@ -26,6 +26,14 @@ export const useCurrencyStore = defineStore("currency", {
     formattedTickets: (state): string => state.tickets.toLocaleString(getFormattingLocale()),
   },
   actions: {
+    adjustConversionBatches(rate: CurrencyConversionRate, change: number) {
+      if (this.converting) return;
+      const key = `${rate.source_currency}-${rate.target_currency}`;
+      const current = Number(this.conversionBatches[key]);
+      this.conversionBatches[key] = Number.isFinite(current)
+        ? Math.min(Number.MAX_SAFE_INTEGER, Math.max(1, Math.floor(current) + change))
+        : 1;
+    },
     async fetchConversionRates() {
       if (this.conversionRatesLoading) return;
       this.conversionRatesLoading = true;

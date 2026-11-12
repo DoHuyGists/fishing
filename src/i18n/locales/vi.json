@@ -1076,6 +1076,8 @@
     "chon_mot_thong_bao_o_danh_sach_ben_trai_de_xem_noi_dung": "Chọn một thông báo ở danh sách bên trái để xem nội dung."
   },
   "CurrencyConvertTable": {
+    "giam_so_goi": "Giảm số gói",
+    "tang_so_goi": "Tăng số gói",
     "thong_tin_quy_doi_da_thay_doi_vui_long_kiem_tra_so_goi_va_so_du_": "Thông tin quy đổi đã thay đổi. Vui lòng kiểm tra số gói và số dư rồi thử lại.",
     "quy_doi_tien_te": "Quy đổi tiền tệ",
     "chon_so_goi_muon_doi_moi_goi_ap_dung_theo_menh_gia_trong_bang": "Chọn số gói muốn đổi. Mỗi gói áp dụng theo mệnh giá trong bảng.",
@@ -1106,8 +1108,7 @@
     "doi_ma": "Đổi mã"
   },
   "RedeemCodeModal": {
-    "doi_ma_qua_tang": "Đổi mã quà tặng",
-    "nhap_ma_de_nhan_phan_thuong": "Nhập mã để nhận phần thưởng"
+    "doi_ma_qua_tang": "Chuyển đổi"
   },
   "ShopModal": {
     "da_mua_value0_value1": "Đã mua {value0} × {value1}.",

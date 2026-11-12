@@ -241,7 +241,7 @@ const repository = { request: async (action, donationId, amountCents) => {
   return { donationId, orderId: 'STORE-ORDER', status: action === 'create' ? 'CREATED' : resultStatus };
 } };
 const { useInformationModalStore } = load('src/stores/informationModal.ts');
-const translations = JSON.parse(fs.readFileSync('src/locales/vi.json', 'utf8'));
+const translations = JSON.parse(fs.readFileSync('src/i18n/locales/vi.json', 'utf8'));
 const { useDonationStore } = load('src/stores/donation.ts', {
   '../data/supabaseDonationRepository': { supabaseDonationRepository: repository },
   '../i18n': { getFormattingLocale: () => 'vi-VN', t: (key, values = {}) => {

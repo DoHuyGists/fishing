@@ -1072,6 +1072,8 @@
     "chon_mot_thong_bao_o_danh_sach_ben_trai_de_xem_noi_dung": "Select a notification from the list on the left to view its content."
   },
   "CurrencyConvertTable": {
+    "giam_so_goi": "Decrease bundle quantity",
+    "tang_so_goi": "Increase bundle quantity",
     "thong_tin_quy_doi_da_thay_doi_vui_long_kiem_tra_so_goi_va_so_du_": "Conversion details have changed. Check the number of bundles and your balance, then try again.",
     "quy_doi_tien_te": "Currency exchange",
     "chon_so_goi_muon_doi_moi_goi_ap_dung_theo_menh_gia_trong_bang": "Choose the number of bundles to exchange. Each bundle uses the denominations shown in the table.",
@@ -1102,8 +1104,7 @@
     "doi_ma": "Redeem"
   },
   "RedeemCodeModal": {
-    "doi_ma_qua_tang": "Redeem gift code",
-    "nhap_ma_de_nhan_phan_thuong": "Enter a code to receive rewards"
+    "doi_ma_qua_tang": "Convert"
   },
   "ShopModal": {
     "da_mua_value0_value1": "Purchased {value0} × {value1}.",

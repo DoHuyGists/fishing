@@ -13,7 +13,7 @@ assert.equal(new Set(catalog.map(row => row.key)).size, catalog.length);
 const menu = fs.readFileSync('src/components/player/world-map/FeatureTable.vue', 'utf8');
 for (const match of menu.matchAll(/modal: '([^']+)'/g)) assert.ok(catalog.some(row => row.key === match[1]), `Missing flag for ${match[1]}`);
 for (const locale of ['vi', 'en']) {
-  const messages = JSON.parse(fs.readFileSync(`src/locales/${locale}.json`, 'utf8'));
+  const messages = JSON.parse(fs.readFileSync(`src/i18n/locales/${locale}.json`, 'utf8'));
   for (const feature of catalog) assert.ok(feature.labelKey.split('.').reduce((value, key) => value?.[key], messages), feature.labelKey);
 }
 

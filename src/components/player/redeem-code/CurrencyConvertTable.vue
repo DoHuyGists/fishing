@@ -78,14 +78,32 @@ onMounted(() => {
             <td class="px-2 py-3"><component :is="currencies[rate.source_currency]" :amount="rate.source_amount" :size="22" /></td>
             <td class="px-2 py-3"><component :is="currencies[rate.target_currency]" :amount="rate.target_amount" :size="22" /></td>
             <td class="px-2 py-3">
-              <input
-                :id="`convert-${rate.source_currency}-${rate.target_currency}`"
-                v-model.number="currencyStore.conversionBatches[`${rate.source_currency}-${rate.target_currency}`]"
-                type="number" min="1" step="1"
-                :aria-label="tr('CurrencyConvertTable.so_goi_value0_sang_value1', { value0: rate.source_currency, value1: rate.target_currency })"
-                :disabled="currencyStore.converting || !!pendingConversion"
-                class="min-h-11 w-20 rounded-lg border border-[#cbd9c6] bg-white px-2 py-2 outline-none focus:border-emerald-700 focus:ring-2 focus:ring-emerald-700/15 disabled:opacity-50"
-              />
+              <div class="flex items-center gap-1">
+                <button
+                  type="button"
+                  :aria-label="tr('CurrencyConvertTable.giam_so_goi')"
+                  :aria-controls="`convert-${rate.source_currency}-${rate.target_currency}`"
+                  :disabled="currencyStore.converting || !!pendingConversion || currencyStore.conversionAmounts(rate).batches <= 1"
+                  class="flex size-11 shrink-0 items-center justify-center rounded-lg border border-[#cbd9c6] bg-white text-lg font-bold hover:bg-[#e7efdf] focus-visible:outline-2 focus-visible:outline-emerald-700 disabled:cursor-not-allowed disabled:opacity-50"
+                  @click="currencyStore.adjustConversionBatches(rate, -1)"
+                >−</button>
+                <input
+                  :id="`convert-${rate.source_currency}-${rate.target_currency}`"
+                  v-model.number="currencyStore.conversionBatches[`${rate.source_currency}-${rate.target_currency}`]"
+                  type="number" min="1" step="1"
+                  :aria-label="tr('CurrencyConvertTable.so_goi_value0_sang_value1', { value0: rate.source_currency, value1: rate.target_currency })"
+                  :disabled="currencyStore.converting || !!pendingConversion"
+                  class="min-h-11 w-20 rounded-lg border border-[#cbd9c6] bg-white px-2 py-2 text-center outline-none focus:border-emerald-700 focus:ring-2 focus:ring-emerald-700/15 disabled:opacity-50"
+                />
+                <button
+                  type="button"
+                  :aria-label="tr('CurrencyConvertTable.tang_so_goi')"
+                  :aria-controls="`convert-${rate.source_currency}-${rate.target_currency}`"
+                  :disabled="currencyStore.converting || !!pendingConversion || currencyStore.conversionAmounts(rate).batches >= Number.MAX_SAFE_INTEGER"
+                  class="flex size-11 shrink-0 items-center justify-center rounded-lg border border-[#cbd9c6] bg-white text-lg font-bold hover:bg-[#e7efdf] focus-visible:outline-2 focus-visible:outline-emerald-700 disabled:cursor-not-allowed disabled:opacity-50"
+                  @click="currencyStore.adjustConversionBatches(rate, 1)"
+                >+</button>
+              </div>
             </td>
             <td class="px-2 py-3">
               <div v-if="currencyStore.hasValidConversionAmounts(rate)" class="flex items-center gap-1 whitespace-nowrap">
