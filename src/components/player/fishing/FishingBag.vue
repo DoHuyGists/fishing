@@ -63,7 +63,12 @@ function getRewardEffect(variant: "NORMAL" | "GOLDEN" | "MUTATED") {
 
 <template>
   <Teleport to="body">
-    <Transition name="bag-dialog">
+    <Transition
+      enter-active-class="[transition:opacity_0.18s_ease]"
+      leave-active-class="[transition:opacity_0.18s_ease]"
+      enter-from-class="opacity-0"
+      leave-to-class="opacity-0"
+    >
       <div
         v-if="store.bagOpen"
         class="fixed z-[31] inset-0 grid place-items-center p-5 bg-[rgba(4,17,11,0.72)] backdrop-blur-[7px]"
@@ -217,7 +222,12 @@ function getRewardEffect(variant: "NORMAL" | "GOLDEN" | "MUTATED") {
     </Transition>
 
     <!-- Dialog xác nhận thả cá -->
-    <Transition name="bag-dialog">
+    <Transition
+      enter-active-class="[transition:opacity_0.18s_ease]"
+      leave-active-class="[transition:opacity_0.18s_ease]"
+      enter-from-class="opacity-0"
+      leave-to-class="opacity-0"
+    >
       <div
         v-if="selectedFishToRelease"
         class="fixed z-[32] inset-0 grid place-items-center p-5 bg-[rgba(4,17,11,0.82)] backdrop-blur-[8px]"
@@ -258,15 +268,3 @@ function getRewardEffect(variant: "NORMAL" | "GOLDEN" | "MUTATED") {
     </Transition>
   </Teleport>
 </template>
-
-<style scoped>
-.bag-dialog-enter-active,
-.bag-dialog-leave-active {
-  transition: opacity 0.18s ease;
-}
-
-.bag-dialog-enter-from,
-.bag-dialog-leave-to {
-  opacity: 0;
-}
-</style>

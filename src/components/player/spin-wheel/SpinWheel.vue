@@ -281,7 +281,12 @@ onBeforeUnmount(() => {
 
     <!-- Popup thông báo kết quả -->
     <Teleport to="body">
-      <Transition name="reward-fade">
+      <Transition
+      enter-active-class="[transition:opacity_0.2s_ease]"
+      leave-active-class="[transition:opacity_0.2s_ease]"
+      enter-from-class="opacity-0"
+      leave-to-class="opacity-0"
+    >
         <div
           v-if="showResult"
           class="fixed inset-0 z-[10000] flex items-center justify-center bg-black/60 px-4"
@@ -309,14 +314,3 @@ onBeforeUnmount(() => {
     </Teleport>
   </div>
 </template>
-
-<style scoped>
-.reward-fade-enter-active,
-.reward-fade-leave-active {
-  transition: opacity 0.2s ease;
-}
-.reward-fade-enter-from,
-.reward-fade-leave-to {
-  opacity: 0;
-}
-</style>

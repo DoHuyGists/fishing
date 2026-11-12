@@ -33,7 +33,7 @@ async function upgrade(skillId: string) {
 
 <template>
   <Modal :title="tr('SkillModal.ky_nang')" :sub-title="tr('SkillModal.ren_luyen_ky_nang_can_thu')" :on-refresh="refresh">
-    <section class="skill-board min-h-full w-full space-y-4 rounded-2xl p-3 text-[#24352a] sm:p-4" :aria-busy="skillStore.loading">
+    <section class="skill-board bg-[#edf2e6] bg-[radial-gradient(#b6c6a84d_0.7px,transparent_0.7px)] bg-size-[12px_12px] min-h-full w-full space-y-4 rounded-2xl p-3 text-[#24352a] sm:p-4" :aria-busy="skillStore.loading">
       <button v-if="skillStore.error" type="button" class="cursor-pointer text-sm font-bold text-emerald-800 underline disabled:opacity-50" :disabled="skillStore.loading || !!skillStore.upgradingId" @click="refresh">{{ tr('SkillModal.tai_lai_ky_nang') }}</button>
       <div v-if="skillStore.loading" role="status" class="py-4 text-center text-sm">{{ tr('SkillModal.dang_tai_ky_nang') }}</div>
       <div v-else-if="!skillStore.error && !skillStore.skillCards.length" class="rounded-xl border border-dashed border-[#cbd9c6] p-8 text-center text-sm">{{ tr('SkillModal.chua_co_ky_nang_nao') }}</div>
@@ -52,11 +52,3 @@ async function upgrade(skillId: string) {
     </section>
   </Modal>
 </template>
-
-<style scoped>
-.skill-board {
-  background-color: #edf2e6;
-  background-image: radial-gradient(#b6c6a84d 0.7px, transparent 0.7px);
-  background-size: 12px 12px;
-}
-</style>

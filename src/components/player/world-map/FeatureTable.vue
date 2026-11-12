@@ -84,7 +84,7 @@ const supportActions: LobbyAction[] = [
           :key="action.modal"
           type="button"
           :data-locked="!features.isAvailable(action.modal)"
-          class="slide-fade-in lobby-menu__button relative flex min-h-9 min-w-0 flex-wrap items-center justify-center gap-x-1 gap-y-0.5 rounded-lg border border-[#cbd9c6] bg-white/85 px-1 py-1.5 text-[11px] leading-4"
+          class="slide-fade-in lobby-menu__button [--slide-distance:24px]! [transition:background-color_150ms_ease,border-color_150ms_ease,box-shadow_150ms_ease] [&[data-locked=true]]:cursor-pointer [&[data-locked=true]]:border-dashed [&[data-locked=true]]:bg-[#f1f3ed] [&[data-locked=true]]:shadow-none [&[data-locked=true]>[aria-hidden=true]]:grayscale [&[data-locked=true]>[aria-hidden=true]]:opacity-60 enabled:hover:border-[#8bab7a] enabled:hover:bg-[#edf5e5] enabled:hover:shadow-[0_2px_0_#cbd9c6] enabled:active:bg-[#e2edd8] enabled:active:shadow-[inset_0_1px_3px_#cbd9c6] focus-visible:outline-2 focus-visible:outline-[#527547] focus-visible:outline-offset-2 disabled:cursor-not-allowed! disabled:border-dashed disabled:bg-[#f1f3ed] disabled:shadow-none [&:disabled>[aria-hidden=true]]:grayscale [&:disabled>[aria-hidden=true]]:opacity-60 motion-reduce:transition-none relative flex min-h-9 min-w-0 flex-wrap items-center justify-center gap-x-1 gap-y-0.5 rounded-lg border border-[#cbd9c6] bg-white/85 px-1 py-1.5 text-[11px] leading-4"
           :class="buttonDirections[actionIndex % buttonDirections.length]"
           aria-haspopup="dialog"
           @click="features.isAvailable(action.modal) ? modalStore.open(action.modal) : features.showDetails(action.modal)"
@@ -105,7 +105,7 @@ const supportActions: LobbyAction[] = [
       role="region"
       :aria-label="tr('FeatureTable.danh_sach_chuc_nang')"
       tabindex="0"
-      class="lobby-menu__body min-h-0 flex-1 space-y-3 overflow-x-hidden overflow-y-auto overscroll-contain px-2.5 py-2 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-[#527547]"
+      class="lobby-menu__body [scrollbar-width:thin] [scrollbar-color:#b7cbb4_transparent] scroll-py-2 min-h-0 flex-1 space-y-3 overflow-x-hidden overflow-y-auto overscroll-contain px-2.5 py-2 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-[#527547]"
     >
       <section
         v-for="(group, groupIndex) in actionGroups"
@@ -124,7 +124,7 @@ const supportActions: LobbyAction[] = [
             type="button"
             :disabled="features.isAvailable(action.modal) && action.requiresUnlock && !configStore.isUnlocked(action.modal)"
             :data-locked="!features.isAvailable(action.modal)"
-            class="slide-fade-in lobby-menu__button flex min-h-14 min-w-0 flex-col items-center justify-center gap-1 rounded-lg border border-[#d9e3d3] bg-white px-1 py-1.5 text-center shadow-[0_2px_0_#e2e9dc]"
+            class="slide-fade-in lobby-menu__button [--slide-distance:24px]! [transition:background-color_150ms_ease,border-color_150ms_ease,box-shadow_150ms_ease] [&[data-locked=true]]:cursor-pointer [&[data-locked=true]]:border-dashed [&[data-locked=true]]:bg-[#f1f3ed] [&[data-locked=true]]:shadow-none [&[data-locked=true]>[aria-hidden=true]]:grayscale [&[data-locked=true]>[aria-hidden=true]]:opacity-60 enabled:hover:border-[#8bab7a] enabled:hover:bg-[#edf5e5] enabled:hover:shadow-[0_2px_0_#cbd9c6] enabled:active:bg-[#e2edd8] enabled:active:shadow-[inset_0_1px_3px_#cbd9c6] focus-visible:outline-2 focus-visible:outline-[#527547] focus-visible:outline-offset-2 disabled:cursor-not-allowed! disabled:border-dashed disabled:bg-[#f1f3ed] disabled:shadow-none [&:disabled>[aria-hidden=true]]:grayscale [&:disabled>[aria-hidden=true]]:opacity-60 motion-reduce:transition-none flex min-h-14 min-w-0 flex-col items-center justify-center gap-1 rounded-lg border border-[#d9e3d3] bg-white px-1 py-1.5 text-center shadow-[0_2px_0_#e2e9dc]"
             :class="buttonDirections[(actionIndex + groupIndex) % buttonDirections.length]"
             aria-haspopup="dialog"
             @click="features.isAvailable(action.modal) ? modalStore.open(action.modal) : features.showDetails(action.modal)"
@@ -155,7 +155,7 @@ const supportActions: LobbyAction[] = [
         type="button"
         :disabled="features.isAvailable(action.modal) && action.requiresUnlock && !configStore.isUnlocked(action.modal)"
         :data-locked="!features.isAvailable(action.modal)"
-        class="slide-fade-in lobby-menu__button flex min-h-9 min-w-0 flex-wrap items-center justify-center gap-1 rounded-lg border border-transparent px-1 py-1 text-[11px] leading-4"
+        class="slide-fade-in lobby-menu__button [--slide-distance:24px]! [transition:background-color_150ms_ease,border-color_150ms_ease,box-shadow_150ms_ease] [&[data-locked=true]]:cursor-pointer [&[data-locked=true]]:border-dashed [&[data-locked=true]]:bg-[#f1f3ed] [&[data-locked=true]]:shadow-none [&[data-locked=true]>[aria-hidden=true]]:grayscale [&[data-locked=true]>[aria-hidden=true]]:opacity-60 enabled:hover:border-[#8bab7a] enabled:hover:bg-[#edf5e5] enabled:hover:shadow-[0_2px_0_#cbd9c6] enabled:active:bg-[#e2edd8] enabled:active:shadow-[inset_0_1px_3px_#cbd9c6] focus-visible:outline-2 focus-visible:outline-[#527547] focus-visible:outline-offset-2 disabled:cursor-not-allowed! disabled:border-dashed disabled:bg-[#f1f3ed] disabled:shadow-none [&:disabled>[aria-hidden=true]]:grayscale [&:disabled>[aria-hidden=true]]:opacity-60 motion-reduce:transition-none flex min-h-9 min-w-0 flex-wrap items-center justify-center gap-1 rounded-lg border border-transparent px-1 py-1 text-[11px] leading-4"
         :class="buttonDirections[(actionIndex + 2) % buttonDirections.length]"
         aria-haspopup="dialog"
         @click="features.isAvailable(action.modal) ? modalStore.open(action.modal) : features.showDetails(action.modal)"
@@ -174,62 +174,3 @@ const supportActions: LobbyAction[] = [
     </div>
   </nav>
 </template>
-
-<style scoped>
-.lobby-menu__body {
-  scrollbar-width: thin;
-  scrollbar-color: #b7cbb4 transparent;
-  scroll-padding-block: 0.5rem;
-}
-
-.lobby-menu__button {
-  --slide-distance: 24px;
-  transition: background-color 150ms ease, border-color 150ms ease, box-shadow 150ms ease;
-}
-
-.lobby-menu__button[data-locked="true"] {
-  cursor: pointer;
-  border-style: dashed;
-  background-color: #f1f3ed;
-  box-shadow: none;
-}
-
-.lobby-menu__button[data-locked="true"] > [aria-hidden="true"] {
-  filter: grayscale(1);
-  opacity: 0.6;
-}
-
-.lobby-menu__button:not(:disabled):hover {
-  border-color: #8bab7a;
-  background-color: #edf5e5;
-  box-shadow: 0 2px 0 #cbd9c6;
-}
-
-.lobby-menu__button:not(:disabled):active {
-  background-color: #e2edd8;
-  box-shadow: inset 0 1px 3px #cbd9c6;
-}
-
-.lobby-menu__button:focus-visible {
-  outline: 2px solid #527547;
-  outline-offset: 2px;
-}
-
-.lobby-menu__button:disabled {
-  cursor: not-allowed;
-  border-style: dashed;
-  background-color: #f1f3ed;
-  box-shadow: none;
-}
-
-.lobby-menu__button:disabled > [aria-hidden="true"] {
-  filter: grayscale(1);
-  opacity: 0.6;
-}
-
-@media (prefers-reduced-motion: reduce) {
-  .lobby-menu__button {
-    transition: none;
-  }
-}
-</style>

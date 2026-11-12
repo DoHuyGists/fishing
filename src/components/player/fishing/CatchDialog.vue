@@ -20,7 +20,12 @@ const variantFrameClass = computed(() => {
 
 <template>
   <Teleport to="body">
-    <Transition name="catch-dialog">
+    <Transition
+      enter-active-class="[transition:opacity_0.2s_ease] [&_.catch-card]:[transition:transform_0.2s_ease,opacity_0.2s_ease]"
+      leave-active-class="[transition:opacity_0.2s_ease] [&_.catch-card]:[transition:transform_0.2s_ease,opacity_0.2s_ease]"
+      enter-from-class="opacity-0 [&_.catch-card]:opacity-0 [&_.catch-card]:[transform:translateY(16px)_scale(0.96)]"
+      leave-to-class="opacity-0 [&_.catch-card]:opacity-0 [&_.catch-card]:[transform:translateY(16px)_scale(0.96)]"
+    >
       <div
         v-if="store.catchDialogOpen && caught"
         class="fixed z-30 inset-0 grid place-items-center p-5 bg-[rgba(4,17,11,0.72)] backdrop-blur-[7px]"
@@ -77,28 +82,3 @@ const variantFrameClass = computed(() => {
     </Transition>
   </Teleport>
 </template>
-
-<style scoped>
-.catch-dialog-enter-active,
-.catch-dialog-leave-active {
-  transition: opacity 0.2s ease;
-}
-
-.catch-dialog-enter-active .catch-card,
-.catch-dialog-leave-active .catch-card {
-  transition:
-    transform 0.2s ease,
-    opacity 0.2s ease;
-}
-
-.catch-dialog-enter-from,
-.catch-dialog-leave-to {
-  opacity: 0;
-}
-
-.catch-dialog-enter-from .catch-card,
-.catch-dialog-leave-to .catch-card {
-  opacity: 0;
-  transform: translateY(16px) scale(0.96);
-}
-</style>

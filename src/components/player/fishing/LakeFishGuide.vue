@@ -9,7 +9,12 @@ const undiscoveredFishes = computed(() => store.areaSpeciesDiary?.fishes.filter(
 </script>
 <template>
   <Teleport to="body">
-    <Transition name="guide-dialog">
+    <Transition
+      enter-active-class="[transition:opacity_0.18s_ease]"
+      leave-active-class="[transition:opacity_0.18s_ease]"
+      enter-from-class="opacity-0"
+      leave-to-class="opacity-0"
+    >
       <div
         v-if="store.lakeGuideOpen"
         class="fixed z-[31] inset-0 grid place-items-center p-5 bg-[rgba(4,17,11,0.72)] backdrop-blur-[7px]"
@@ -127,14 +132,3 @@ const undiscoveredFishes = computed(() => store.areaSpeciesDiary?.fishes.filter(
     </Transition>
   </Teleport>
 </template>
-<style scoped>
-.guide-dialog-enter-active,
-.guide-dialog-leave-active {
-  transition: opacity 0.18s ease;
-}
-
-.guide-dialog-enter-from,
-.guide-dialog-leave-to {
-  opacity: 0;
-}
-</style>

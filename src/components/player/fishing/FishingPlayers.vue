@@ -8,7 +8,12 @@ const store = useFishingStore();
 
 <template>
   <Teleport to="body">
-    <Transition name="players-dialog">
+    <Transition
+      enter-active-class="[transition:opacity_0.18s_ease]"
+      leave-active-class="[transition:opacity_0.18s_ease]"
+      enter-from-class="opacity-0"
+      leave-to-class="opacity-0"
+    >
       <div
         v-if="store.playersOpen"
         class="fixed z-[31] inset-0 grid place-items-center p-5 bg-[rgba(4,17,11,0.72)] backdrop-blur-[7px]"
@@ -106,15 +111,3 @@ const store = useFishingStore();
     </Transition>
   </Teleport>
 </template>
-
-<style scoped>
-.players-dialog-enter-active,
-.players-dialog-leave-active {
-  transition: opacity 0.18s ease;
-}
-
-.players-dialog-enter-from,
-.players-dialog-leave-to {
-  opacity: 0;
-}
-</style>
