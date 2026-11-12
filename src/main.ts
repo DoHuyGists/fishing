@@ -1,5 +1,5 @@
 import { createApp } from "vue";
-import "./style.css";
+import "./styles/index.css";
 import "./styles/reward.css";
 import "./styles/animation.css";
 import App from "./App.vue";

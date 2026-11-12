@@ -241,7 +241,7 @@ const changed = ['src/data/featureCatalog.json', 'src/data/featureAvailability.t
   'src/components/player/world-map/FeatureTable.vue', 'src/components/player/world-map/InteractWorldMap.vue',
   'src/database/featureRequestGate.ts', 'src/data/supabaseFeatureFlagRepository.ts',
   'src/components/admin/feature-management/admin-feature-store.ts', 'src/components/admin/feature-management/FeatureManagement.vue',
-  'scripts/supabase/migrations/20261112_feature_flags.sql', 'src/locales/vi.json', 'src/locales/en.json'];
+  'scripts/supabase/migrations/20261112_feature_flags.sql', 'src/i18n/locales/vi.json', 'src/i18n/locales/en.json'];
 for (const file of changed) {
   const content = fs.readFileSync(file, 'utf8');
   assert.notEqual(content.charCodeAt(0), 0xfeff, `${file}: BOM`);
