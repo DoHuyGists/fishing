@@ -1449,7 +1449,8 @@
     "dong_thong_tin": "Đóng thông tin"
   },
   "Modal": {
-    "lam_moi": "Làm mới"
+    "lam_moi": "Làm mới",
+    "thoat": "Thoát"
   },
   "PlayerIdentity": {
     "anh_dai_dien_cua_value0": "Ảnh đại diện của {value0}"

@@ -1445,7 +1445,8 @@
     "dong_thong_tin": "Close information"
   },
   "Modal": {
-    "lam_moi": "Refresh"
+    "lam_moi": "Refresh",
+    "thoat": "Exit"
   },
   "PlayerIdentity": {
     "anh_dai_dien_cua_value0": "Avatar of {value0}"

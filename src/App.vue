@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import Toast from "./components/shared/Toast.vue";
 import InformationModal from "./components/shared/InformationModal.vue";
+import ModalQuickActions from "./components/shared/ModalQuickActions.vue";
 import { watch } from "vue";
 import { useRouter } from "vue-router";
 import { useAuthStore } from "./stores/auth";
@@ -17,4 +18,5 @@ watch(() => auth.recoveringPassword, (recovering) => {
   <Toast />
   <router-view />
   <InformationModal />
+  <ModalQuickActions />
 </template>
