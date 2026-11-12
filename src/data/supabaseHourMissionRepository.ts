@@ -1,23 +1,7 @@
+import type { HourMissionRow, HourMissionPayload } from "../types/table/hourMission";
+import type { MissionFish } from "../types/model/mission";
 import supabase from "../database/connection";
-import type { MissionFish } from "./supabaseMissionRepository";
 
-export interface HourMissionRow {
-  id: string;
-  createdAt: string;
-  content: MissionFish[];
-  start: string | null;
-  end: string | null;
-  isDisabled: boolean;
-  cash: number | null;
-}
-
-export interface HourMissionPayload {
-  content: MissionFish[];
-  start: string | null;
-  end: string | null;
-  is_disabled: boolean;
-  cash: number | null;
-}
 
 const COLUMNS = 'id, created_at, content, start, "end", is_disabled, cash';
 

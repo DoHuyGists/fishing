@@ -1,4 +1,5 @@
 <script lang="ts" setup>
+import type { PickPoint } from "../../../types/model/worldMap";
 import { t as tr } from "../../../i18n";
 
 import { computed, nextTick, onMounted, ref, watch } from "vue";
@@ -119,14 +120,6 @@ function openPrepare(area: any) {
   }
   pendingArea.value = area;
   modalStore.open("prepare");
-}
-
-interface PickPoint {
-  screen: { x: number; y: number }; // px trên canvas
-  map: { x: number; y: number }; // toạ độ trong hệ chưa zoom
-  lon: number | null;
-  lat: number | null;
-  k: number;
 }
 
 function onZoom(s: { center: [number, number] | null; k: number }) {

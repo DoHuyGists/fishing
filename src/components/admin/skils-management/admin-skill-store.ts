@@ -1,6 +1,8 @@
+import type { Skill } from "../../../types/model/skill";
+import type { SkillPayload } from "../../../types/table/skill";
 import { computed, ref } from "vue";
 import { defineStore } from "pinia";
-import { supabaseSkillRepository, type Skill, type SkillPayload } from "../../../data/supabaseSkillRepository";
+import { supabaseSkillRepository } from "../../../data/supabaseSkillRepository";
 
 type SkillDraft = Omit<SkillPayload, "effect_per_level"> & { effectsJson: string };
 

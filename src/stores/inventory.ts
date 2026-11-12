@@ -1,8 +1,10 @@
+import type { UserInventory } from "../types/model/userInventory";
+import type { ShopItem } from "../types/model/item";
 import { defineStore } from "pinia";
-import { supabaseUserInventoryRepository, type UserInventory } from "../data/supabaseUserInventoryRepository";
+import { supabaseUserInventoryRepository } from "../data/supabaseUserInventoryRepository";
 import { supabaseEquipmentRepository } from "../data/supabaseEquipmentRepository";
 import type { EquipmentSet } from "./equipment";
-import { supabaseItemRepository, type ShopItem } from "../data/supabaseItemRepository";
+import { supabaseItemRepository } from "../data/supabaseItemRepository";
 
 export const useInventoryStore = defineStore("Inventory", {
     state: () => ({

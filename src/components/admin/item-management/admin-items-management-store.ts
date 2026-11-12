@@ -1,6 +1,7 @@
+import type { AdminItemRow, ItemPayload } from "../../../types/table/item";
 import { computed, ref } from "vue";
 import { defineStore } from "pinia";
-import { supabaseItemRepository, type AdminItemRow, type ItemPayload } from "../../../data/supabaseItemRepository";
+import { supabaseItemRepository } from "../../../data/supabaseItemRepository";
 
 export const useAdminItemsManagementStore = defineStore("admin-items-management", () => {
   const items = ref<AdminItemRow[]>([]);

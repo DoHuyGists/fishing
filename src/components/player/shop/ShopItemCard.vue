@@ -1,6 +1,7 @@
 <script setup lang="ts">
+import type { ShopItem } from "../../../types/model/item";
 import { getFormattingLocale, t as tr } from "../../../i18n";
-import type { ShopItem } from "../../../data/supabaseItemRepository";
+
 
 defineProps<{
   item: ShopItem;

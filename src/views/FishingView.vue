@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import type { FishingSceneContext } from "../types/model/fishingGameplay";
 import { t as tr } from "../i18n";
 
 import { storeToRefs } from "pinia";
@@ -22,7 +23,7 @@ import { useDayPhaseStore } from "../stores/dayPhase";
 import { useUserInAreaStore } from "../stores/userInArea";
 import { supabaseFishingAreaRepository } from "../data/supabaseFishingAreaRepository";
 import type { RealtimeChannel } from "@supabase/supabase-js";
-import type { FishingSceneContext } from "../data/fishingGameplay";
+
 
 const authStore = useAuthStore();
 const router = useRouter();

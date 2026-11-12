@@ -1,9 +1,6 @@
+import type { FishingAreaPayload, FishingAreaRow } from "../../../types/table/fishingArea";
 import { defineStore } from "pinia";
-import {
-  supabaseFishingAreaRepository,
-  type FishingAreaPayload,
-  type FishingAreaRow,
-} from "../../../data/supabaseFishingAreaRepository";
+import { supabaseFishingAreaRepository } from "../../../data/supabaseFishingAreaRepository";
 
 export const useAdminFishingAreaStore = defineStore("AdminFishingArea", {
   state: () => ({

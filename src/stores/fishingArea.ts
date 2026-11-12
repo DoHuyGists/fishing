@@ -1,6 +1,7 @@
+import type { FishingAreaRow } from "../types/table/fishingArea";
 import { t as tr } from "../i18n";
 import { defineStore } from "pinia";
-import { supabaseFishingAreaRepository, type FishingAreaRow } from "../data/supabaseFishingAreaRepository";
+import { supabaseFishingAreaRepository } from "../data/supabaseFishingAreaRepository";
 import { useCountryStore } from "./country";
 import { useWorldStore } from "./worldMap";
 

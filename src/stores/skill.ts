@@ -1,7 +1,8 @@
+import type { Skill, UserSkill } from "../types/model/skill";
 import { t as tr } from "../i18n";
 import { computed, ref, watch } from "vue";
 import { acceptHMRUpdate, defineStore } from "pinia";
-import { supabaseSkillRepository, type Skill, type UserSkill } from "../data/supabaseSkillRepository";
+import { supabaseSkillRepository } from "../data/supabaseSkillRepository";
 import { useAuthStore } from "./auth";
 import { useUserProfileStore } from "./userProfile";
 

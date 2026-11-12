@@ -1,14 +1,5 @@
+import type { FeatureDefinition } from "../types/model/featureAvailability";
 import rawCatalog from "./featureCatalog.json";
-
-interface FeatureDefinition {
-  key: string;
-  labelKey: string;
-  rpcs: string[];
-  tables: string[];
-  writeTables: string[];
-  functions: string[];
-  storageBuckets: string[];
-}
 const catalog: FeatureDefinition[] = rawCatalog;
 
 export const FEATURE_CATALOG = catalog;

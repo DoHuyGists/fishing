@@ -1,6 +1,7 @@
+import type { DailyMissionData, HourMission } from "../types/model/mission";
 import { defineStore } from "pinia";
 import { supabaseMissionRepository } from "../data/supabaseMissionRepository";
-import type { DailyMissionData, HourMission } from "../data/supabaseMissionRepository";
+
 
 export const useMissionStore = defineStore("Mission", {
   state: () => ({

@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import type { TensionController } from "../../../types/model/fishingGameplay";
 import { t as tr } from "../../../i18n";
 
 import { computed, onBeforeUnmount, onMounted, ref } from "vue";
@@ -6,7 +7,7 @@ import { useFishingStore } from "../../../stores/fishing.ts";
 import { TENSION_SCALE } from "../../../data/tensionChallenge.ts";
 import LineTensionMeter from "./LineTensionMeter.vue";
 import Hint from "../../shared/Hint.vue";
-import type { TensionController } from "../../../data/fishingGameplay";
+
 
 const props = defineProps<{ controller?: TensionController; untimedStart?: boolean }>();
 const store = props.controller ?? useFishingStore();

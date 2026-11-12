@@ -1,8 +1,7 @@
 <script setup lang="ts">
-import type { FishingAreaRow } from "../../../data/supabaseFishingAreaRepository";
-import type { SpeciesRow } from "../../../data/supabaseSpeciesRepository";
-import type { DepthScopeRow } from "../../../data/supabaseDepthScopeRepository";
-
+import type { FishingAreaRow } from "../../../types/table/fishingArea";
+import type { SpeciesRow } from "../../../types/table/species";
+import type { DepthScopeRow } from "../../../types/table/depthScope";
 interface FormData {
   originalAreaId: string | null;
   originalSpeciesId: string | null;

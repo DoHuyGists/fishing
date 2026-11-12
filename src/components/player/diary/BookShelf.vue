@@ -1,9 +1,10 @@
 <script setup lang="ts">
+import type { BookVariant } from "../../../types/model/diary";
 import { t as tr } from "../../../i18n";
 
 import { computed, ref, watch } from "vue";
 import type { Country } from "../../../stores/country.ts";
-import BookCover, { type BookVariant } from "./BookCover.vue";
+import BookCover from "./BookCover.vue";
 
 const props = defineProps<{ countries: Country[]; speciesCountByLocation: Record<string, number> }>();
 const emit = defineEmits<{ selectCountry: [country: Country] }>();

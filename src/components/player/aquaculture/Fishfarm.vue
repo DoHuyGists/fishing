@@ -1,11 +1,12 @@
 <script setup lang="ts">
+import type { AquacultureBatch } from "../../../types/model/aquaculture";
 import { t as tr } from "../../../i18n";
 
 import { computed, ref, watch } from 'vue'
 import { useAquacultureStore } from '../../../stores/aquaculture'
 import { useCurrencyStore } from '../../../stores/currency'
 import { useModalStore } from '../../../stores/modal'
-import { batchProgress, type AquacultureBatch } from '../../../data/aquaculture'
+import { batchProgress } from '../../../data/aquaculture';
 import TwoOptionsModal from '../../shared/TwoOptionsModal.vue'
 import Cash from '../currency/Cash.vue'
 import AquacultureStockForm from './AquacultureStockForm.vue'

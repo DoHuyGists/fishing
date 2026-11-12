@@ -1,7 +1,9 @@
+import type { Species, CaughtDiary } from "../types/model/diary";
+import type { AreaSpecies } from "../types/model/speciesInArea";
 import { t as tr } from "../i18n";
 import { defineStore } from "pinia";
-import { supabaseDiaryRepository, type Species, type CaughtDiary } from "../data/supabaseDiaryRepository";
-import { supabaseSpeciesInAreaRepository, type AreaSpecies } from "../data/supabaseSpeciesInAreaRepository";
+import { supabaseDiaryRepository } from "../data/supabaseDiaryRepository";
+import { supabaseSpeciesInAreaRepository } from "../data/supabaseSpeciesInAreaRepository";
 
 export interface DiaryFishEntry {
   species: Species;

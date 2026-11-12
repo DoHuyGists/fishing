@@ -1,8 +1,9 @@
 <script setup lang="ts">
+import type { AssetRow } from "../../../types/table/asset";
 import { nextTick, onMounted, ref, useId, watch } from "vue";
 import AdminModal from "../AdminModal.vue";
 import TwoOptionsModal from "../../shared/TwoOptionsModal.vue";
-import { ASSET_MIME_TYPES, type AssetRow } from "../../../data/supabaseAssetRepository";
+import { ASSET_MIME_TYPES } from "../../../data/supabaseAssetRepository";
 import { useAdminAssetsStore } from "./admin-assets-store";
 
 const props = withDefaults(defineProps<{

@@ -95,11 +95,12 @@
 </template>
 
 <script lang="ts" setup>
+import type { SpinWheelReward as Reward } from "../../../types/model/spinWheel";
 import { t as tr } from "../../../i18n";
 
 import { computed, onMounted, ref } from "vue";
 import { useSpinWheelStore } from "../../../stores/spinWheel.ts";
-import type { Reward } from "./SpinWheel.vue";
+
 import { useInformationModal } from "../../../composables/useInformationModal";
 
 const spinWheelStore = useSpinWheelStore();

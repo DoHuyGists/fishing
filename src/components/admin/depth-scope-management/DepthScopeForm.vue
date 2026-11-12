@@ -1,6 +1,7 @@
 <script setup lang="ts">
+import type { DepthScopePayload } from "../../../types/table/depthScope";
 import { computed, ref, watch } from "vue";
-import type { DepthScopePayload } from "../../../data/supabaseDepthScopeRepository";
+
 import { useDepthScopeStore } from "./admin-depth-scope-store";
 
 const store = useDepthScopeStore();

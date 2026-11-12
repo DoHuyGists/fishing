@@ -1,5 +1,6 @@
+import type { UserProfile } from "../types/model/userProfile";
 import { defineStore } from "pinia";
-import type { UserProfile } from "../data/supabaseUserProfileRepository";
+
 
 export const REQUIRE_LEVEL = {
     market: 1,

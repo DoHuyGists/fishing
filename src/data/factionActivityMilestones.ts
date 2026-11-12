@@ -1,11 +1,5 @@
+import type { ActivityMilestone } from "../types/model/factionActivityMilestones";
 import { t as tr } from "../i18n";
-export interface ActivityMilestone {
-  readonly level: number;
-  readonly points: number;
-  readonly title: string;
-  readonly reward: string;
-  readonly icon: string;
-}
 
 /**
  * 10 mốc phần thưởng năng động với điểm lũy tiến (mốc càng cao càng cần nhiều điểm hơn mốc trước).

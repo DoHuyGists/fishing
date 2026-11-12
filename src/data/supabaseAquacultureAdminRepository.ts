@@ -1,16 +1,6 @@
+import type { AquacultureRuleRow, AquacultureRulePayload, AquacultureFoodPayload, AquacultureFoodRow } from "../types/table/aquacultureAdmin";
 import supabase from '../database/connection'
-import type { AquacultureRules } from './aquaculture'
 
-export type AquacultureRuleRow = AquacultureRules & { id: string; updated_at: string }
-export type AquacultureRulePayload = Omit<AquacultureRules, 'rules_version'>
-export interface AquacultureFoodPayload {
-  species_id: string
-  item_id: string
-  enabled: boolean
-  capacity_units_per_item: number
-  quality_gain: number
-}
-export type AquacultureFoodRow = AquacultureFoodPayload & { id: string }
 const ruleRow = (r: any): AquacultureRuleRow => ({ ...r, id: r.species_id })
 const foodRow = (r: any): AquacultureFoodRow => ({ ...r, id: r.species_id + ':' + r.item_id })
 

@@ -1,6 +1,7 @@
 <script setup lang="ts">
+import type { SpeciesRow } from "../../../types/table/species";
 import { onMounted, onUnmounted, ref } from "vue";
-import type { SpeciesRow } from "../../../data/supabaseSpeciesRepository";
+
 import SpeciesPickModal from "./SpeciesPickModal.vue";
 import { useAdminHourMissionStore } from "./admin-hour-mission-store";
 

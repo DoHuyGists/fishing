@@ -1,6 +1,7 @@
 <script lang="ts" setup>
+import type { AdminItemRow, ItemPayload } from "../../../types/table/item";
 import { reactive, watch } from 'vue';
-import type { AdminItemRow, ItemPayload } from '../../../data/supabaseItemRepository';
+
 
 const props = defineProps<{
 	item: AdminItemRow | null;

@@ -1,7 +1,8 @@
+import type { FeatureFlagRow } from "../types/table/featureFlag";
 import { defineStore } from "pinia";
 import { i18n, t as tr } from "../i18n";
 import { FEATURE_CATALOG, modalFeatures } from "../data/featureAvailability";
-import { supabaseFeatureFlagRepository as repository, type FeatureFlagRow } from "../data/supabaseFeatureFlagRepository";
+import { supabaseFeatureFlagRepository as repository } from "../data/supabaseFeatureFlagRepository";
 import { useToast } from "../composables/useToast";
 import { useInformationModalStore } from "./informationModal";
 import type { RealtimeChannel } from "@supabase/supabase-js";

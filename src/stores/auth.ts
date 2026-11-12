@@ -1,9 +1,10 @@
+import type { UserProfile } from "../types/model/userProfile";
 import { t as tr } from "../i18n";
 import type { Session, User } from "@supabase/supabase-js";
 import { defineStore } from "pinia";
 import supabase from "../database/connection";
 import { supabaseAuthRepository } from "../data/supabaseAuthRepository";
-import { supabaseUserProfileRepository, type UserProfile } from "../data/supabaseUserProfileRepository";
+import { supabaseUserProfileRepository } from "../data/supabaseUserProfileRepository";
 
 type Credentials = {
   email: string;

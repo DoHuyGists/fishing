@@ -1,8 +1,11 @@
 <script lang="ts" setup>
+import type { Blueprint } from "../../../types/model/blueprint";
+import type { Item } from "../../../types/model/item";
+import type { WorkBenchMaterial } from "../../../types/model/workBench";
 import { t as tr } from "../../../i18n";
-import type { Blueprint } from "../../../data/supabaseBlueprintRepository";
-import type { Item } from "../../../data/supabaseItemRepository";
-import type { WorkBenchMaterial } from "./types";
+
+
+
 
 const craftQuantity = defineModel<number>("craftQuantity", { required: true });
 defineProps<{

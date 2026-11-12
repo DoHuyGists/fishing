@@ -1,7 +1,8 @@
+import type { FishingPass } from "../types/model/fishingPass";
 import { t as tr } from "../i18n";
 import { defineStore } from "pinia";
 import { supabaseCurrencyRepository } from "../data/supabaseCurrencyRepository";
-import { supabaseFishingPassRepository, type FishingPass } from "../data/supabaseFishingPassRepository";
+import { supabaseFishingPassRepository } from "../data/supabaseFishingPassRepository";
 import { useCurrencyStore } from "./currency";
 
 export const useFishingPassStore = defineStore("fishingPass", {

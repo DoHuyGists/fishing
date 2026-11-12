@@ -1,6 +1,7 @@
+import type { CurrencyConversionRate } from "../types/model/currency";
 import { getFormattingLocale, t as tr } from "../i18n";
 import { defineStore } from "pinia";
-import { supabaseCurrencyRepository, type CurrencyConversionRate } from "../data/supabaseCurrencyRepository";
+import { supabaseCurrencyRepository } from "../data/supabaseCurrencyRepository";
 import { useAuthStore } from "./auth";
 import { useToast } from "../composables/useToast";
 

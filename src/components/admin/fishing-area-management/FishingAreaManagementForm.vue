@@ -1,7 +1,8 @@
 <script lang="ts" setup>
+import type { FishingAreaPayload } from "../../../types/table/fishingArea";
 import { computed, onMounted, onUnmounted, ref, watch } from "vue";
 import { useCountryStore } from "../../../stores/country.ts";
-import type { FishingAreaPayload } from "../../../data/supabaseFishingAreaRepository.ts";
+
 import { useWorldStore } from "../../../stores/worldMap.ts";
 import { useToast } from "../../../composables/useToast.ts";
 import { useAdminZoneStore } from "../zone-management/admin-zone-store.ts";

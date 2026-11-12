@@ -1,6 +1,7 @@
+import type { FeatureFlagRow } from "../../../types/table/featureFlag";
 import { defineStore } from "pinia";
 import { FEATURE_CATALOG } from "../../../data/featureAvailability";
-import { supabaseFeatureFlagRepository as repository, type FeatureFlagRow } from "../../../data/supabaseFeatureFlagRepository";
+import { supabaseFeatureFlagRepository as repository } from "../../../data/supabaseFeatureFlagRepository";
 import { useFeatureAvailabilityStore } from "../../../stores/featureAvailability";
 import { t as tr } from "../../../i18n";
 

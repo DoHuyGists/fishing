@@ -1,7 +1,8 @@
+import type { NotificationRow } from "../types/table/notification";
 import { t as tr } from "../i18n";
 import { defineStore } from "pinia";
 import type { RealtimeChannel } from "@supabase/supabase-js";
-import { supabaseNotificationRepository, type NotificationRow } from "../data/supabaseNotificationRepository";
+import { supabaseNotificationRepository } from "../data/supabaseNotificationRepository";
 
 type NotificationKind = "personal" | "system";
 

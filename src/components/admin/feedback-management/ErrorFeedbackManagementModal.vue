@@ -1,7 +1,8 @@
 <script setup lang="ts">
+import type { ErrorFeedbackStatus } from "../../../types/model/feedback";
 import AdminModal from "../AdminModal.vue";
 import { onMounted, ref, watch } from "vue";
-import type { ErrorFeedbackStatus } from "../../../data/supabaseFeedbackRepository";
+
 import { useErrorFeedbackManagementStore } from "./admin-error-feedback-store";
 
 const emit = defineEmits<{ close: [] }>();

@@ -1,20 +1,6 @@
+import type { EquipmentVariant } from "../types/model/equipment";
 import { t as tr } from "../i18n";
 import type { FishingTool } from "../stores/fishing";
-
-export interface EquipmentVariant {
-  id: string;
-  name: string;
-  detail: string;
-  icon: string;
-  image?: string | null;
-  is_used?: boolean;
-  rodMaxWeight?: number;
-  lineMaxWeight?: number;
-  reelDurability?: number;
-  hookStrength?: number;
-  baitName?: string;
-  quantity?: number | null;
-}
 
 export const equipmentCategories: { id: FishingTool; name: string; icon: string}[] = [
   { id: "rod", get name() { return tr('useInventoryTable.can_cau'); }, icon: "/icons/items/rod.svg"},

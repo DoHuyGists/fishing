@@ -1,35 +1,8 @@
+import type { FishingSessionRow, FishingAreaRow, FishingAreaPayload } from "../types/table/fishingArea";
+import type { TensionSubmission } from "../types/model/tensionChallenge";
 import supabase from "../database/connection";
 import type { RealtimeChannel } from "@supabase/supabase-js";
-import type { TensionSubmission } from "./tensionChallenge";
 
-export interface FishingSessionRow {
-  id: string;
-  status: string;
-}
-
-export interface FishingAreaRow {
-  id: string;
-  createdAt: string;
-  countryId: string;
-  isAvailable: boolean;
-  title: string | null;
-  location: any;
-  scenePath: string | null;
-  fishingBoundary: any[];
-  zoneId: string | null;
-  maxDepth: number | null;
-}
-
-export interface FishingAreaPayload {
-  countryId: string;
-  isAvailable: boolean;
-  title: string | null;
-  location: any;
-  scenePath: string | null;
-  fishingBoundary: any[];
-  zoneId: string | null;
-  maxDepth: number | null;
-}
 
 function mapRow(row: any): FishingAreaRow {
   return {

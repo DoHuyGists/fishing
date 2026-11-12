@@ -1,10 +1,7 @@
+import type { CurrentFactionEffect, Faction } from "../types/model/faction";
 import { t as tr } from "../i18n";
 import { defineStore } from "pinia";
-import {
-  supabaseFactionRepository,
-  type CurrentFactionEffect,
-  type Faction,
-} from "../data/supabaseFactionRepository";
+import { supabaseFactionRepository } from "../data/supabaseFactionRepository";
 
 export const useFactionStore = defineStore("faction", {
   state: () => ({

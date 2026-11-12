@@ -1,10 +1,11 @@
 <script lang="ts" setup>
+import type { MarketListing } from "../../../types/model/market";
 import { getFormattingLocale } from '../../../i18n';
 import { t as tr } from "../../../i18n";
 
 import { computed, onMounted, onUnmounted, ref } from "vue";
 import { useCurrencyStore } from "../../../stores/currency.ts";
-import { supabaseMarketRepository, type MarketListing } from "../../../data/supabaseMarketRepository.ts";
+import { supabaseMarketRepository } from "../../../data/supabaseMarketRepository.ts";
 import { useAuthStore } from "../../../stores/auth.ts";
 import { useMarketStore } from "../../../stores/market.ts";
 import { useCaughtStore } from "../../../stores/caught.ts";

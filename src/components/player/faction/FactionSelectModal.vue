@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import type { Faction, FactionEffect, CurrentFactionEffect } from "../../../types/model/faction";
 import { getFormattingLocale } from '../../../i18n';
 import { t as tr } from "../../../i18n";
 
@@ -8,7 +9,7 @@ import FactionActivityRewards from "./FactionActivityRewards.vue";
 import { useFactionStore } from "../../../stores/faction.ts";
 import { useAuthStore } from "../../../stores/auth.ts";
 import { useToast } from "../../../composables/useToast.ts";
-import type { Faction, FactionEffect, CurrentFactionEffect } from "../../../data/supabaseFactionRepository.ts";
+
 
 const factionStore = useFactionStore();
 const authStore = useAuthStore();

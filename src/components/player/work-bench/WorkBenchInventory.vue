@@ -1,9 +1,10 @@
 <script lang="ts" setup>
+import type { WorkBenchInventoryItem } from "../../../types/model/workBench";
 import { t as tr } from "../../../i18n";
 import { computed } from "vue";
 import { storeToRefs } from "pinia";
 import { useWorkBenchInventoryStore, type WorkBenchInventoryViewMode } from "../../../stores/workBenchInventory";
-import type { WorkBenchInventoryItem } from "./types";
+
 
 const searchQuery = defineModel<string>("searchQuery", { required: true });
 const props = defineProps<{

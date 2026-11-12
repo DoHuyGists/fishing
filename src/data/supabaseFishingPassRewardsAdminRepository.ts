@@ -1,10 +1,6 @@
+import type { AdminFishingPass, AdminFishingPassItem } from "../types/model/fishingPassRewardsAdmin";
+import type { FishingPassRewardRow, FishingPassRewardPayload } from "../types/table/fishingPassRewardsAdmin";
 import supabase from "../database/connection";
-
-export type PassRewardType = "FREE" | "PREMIUM";
-export interface AdminFishingPass { id: string; name: string; totalDays: number }
-export interface AdminFishingPassItem { id: string; name: string; category: string | null; icon: string | null; image: string | null }
-export interface FishingPassRewardRow { id: string; passId: string; passName: string; dayNumber: number; rewardType: PassRewardType; itemId: string; itemName: string; itemIcon: string | null; quantity: number; createdAt: string }
-export interface FishingPassRewardPayload { passId: string; dayNumber: number; rewardType: PassRewardType; itemId: string; quantity: number }
 const mapReward = (row: any): FishingPassRewardRow => ({ id: row.id, passId: row.pass_id, passName: row.pass?.name ?? "(Vé đã xoá)", dayNumber: row.day_number, rewardType: row.reward_type, itemId: row.item_id, itemName: row.item?.name ?? "(Vật phẩm không tồn tại)", itemIcon: row.item?.icon ?? row.item?.image ?? null, quantity: Number(row.quantity), createdAt: row.created_at });
 const rewardSelect = "id,pass_id,day_number,reward_type,item_id,quantity,created_at,pass:fishing_passes(name),item:items(name,icon,image)";
 export const supabaseFishingPassRewardsAdminRepository = {

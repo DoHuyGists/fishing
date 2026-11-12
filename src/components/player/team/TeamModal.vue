@@ -1,4 +1,5 @@
 <script lang="ts" setup>
+import type { TeamView as View, TeamJoinType, TeamStatus } from "../../../types/model/team";
 import { getFormattingLocale } from '../../../i18n';
 import { t as tr } from "../../../i18n";
 
@@ -9,7 +10,7 @@ import { useCountryStore } from "../../../stores/country.ts";
 import { useTeamStore } from "../../../stores/team.ts";
 import { useAuthStore } from "../../../stores/auth.ts";
 import { useFriendStore } from "../../../stores/friend.ts";
-import type { TeamJoinType, TeamStatus } from "../../../data/supabaseTeamRepository.ts";
+
 import TeamListSidebar from "./TeamListSidebar.vue";
 import MyTeamPanel from "./MyTeamPanel.vue";
 import TwoOptionsModal from "../../shared/TwoOptionsModal.vue";
@@ -58,12 +59,6 @@ function joinRestrictionLabel(team: (typeof teamStore.teams)[number]) {
   if (team.join_type === "invited") return tr('TeamListSidebar.chi_nguoi_duoc_moi');
   return "";
 }
-
-// ─── Views ───────────────────────────────────────────────────────────────────
-// 'list'  → danh sách nhóm
-// 'create'→ form tạo nhóm
-// 'room'  → phòng nhóm đang tham gia
-type View = "list" | "create" | "edit" | "room";
 // Khởi tạo mặc định 'list'; onMounted() sẽ cập nhật sang 'room' nếu đang trong nhóm
 const view = ref<View>("list");
 

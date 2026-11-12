@@ -1,9 +1,7 @@
+import type { ErrorFeedbackRow } from "../../../types/table/feedback";
+import type { ErrorFeedbackStatus } from "../../../types/model/feedback";
 import { defineStore } from "pinia";
-import {
-  supabaseFeedbackRepository,
-  type ErrorFeedbackRow,
-  type ErrorFeedbackStatus,
-} from "../../../data/supabaseFeedbackRepository";
+import { supabaseFeedbackRepository } from "../../../data/supabaseFeedbackRepository";
 
 export const useErrorFeedbackManagementStore = defineStore("error-feedback-management", {
   state: () => ({

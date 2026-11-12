@@ -1,5 +1,5 @@
-import type { BlueprintMaterial } from "../../../data/supabaseBlueprintRepository";
-import type { Item } from "../../../data/supabaseItemRepository";
+import type { BlueprintMaterial } from "./blueprint";
+import type { Item } from "./item";
 
 export interface WorkBenchInventoryItem {
   id: string;

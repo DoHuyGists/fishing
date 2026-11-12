@@ -1,11 +1,6 @@
+import type { CrudRepository } from "../types/model/weather";
+import type { ModifierRow, ModifierPayload, WeatherRow, WeatherPayload, ZoneRow, ZonePayload, ZoneWeatherRow, ZoneWeatherPayload, WeatherModifierRow, WeatherModifierPayload } from "../types/table/weather";
 import supabase from "../database/connection";
-
-export interface CrudRepository<Row extends { id: string }, Payload> {
-  fetchAll(): Promise<Row[]>;
-  create(payload: Payload): Promise<Row>;
-  update(id: string, payload: Payload): Promise<Row>;
-  remove(id: string): Promise<void>;
-}
 
 function createRepository<Row extends { id: string }, Payload>(
   table: string,
@@ -35,46 +30,12 @@ function createRepository<Row extends { id: string }, Payload>(
     },
   };
 }
-
-// ---- modifiers ----
-export interface ModifierRow {
-  id: string;
-  code: string;
-  name: string;
-  unit: string | null;
-  createdAt: string;
-}
-export interface ModifierPayload {
-  code: string;
-  name: string;
-  unit: string | null;
-}
 export const supabaseModifierRepository = createRepository<ModifierRow, ModifierPayload>(
   "modifiers",
   (r) => ({ id: r.id, code: r.code, name: r.name, unit: r.unit, createdAt: r.created_at }),
   (p) => ({ code: p.code, name: p.name, unit: p.unit }),
   "code",
 );
-
-// ---- weathers ----
-export interface WeatherRow {
-  id: string;
-  code: string;
-  name: string;
-  rarityTier: string;
-  durationMin: number;
-  durationMax: number;
-  image: string | null;
-  createdAt: string;
-}
-export interface WeatherPayload {
-  code: string;
-  name: string;
-  rarityTier: string;
-  durationMin: number;
-  durationMax: number;
-  image: string | null;
-}
 export const supabaseWeatherRepository = createRepository<WeatherRow, WeatherPayload>(
   "weathers",
   (r) => ({
@@ -97,26 +58,6 @@ export const supabaseWeatherRepository = createRepository<WeatherRow, WeatherPay
   }),
   "code",
 );
-
-// ---- zones ----
-export interface ZoneRow {
-  id: string;
-  code: string;
-  name: string;
-  createdAt: string;
-  weatherId: string | null;
-  weatherExpiresAt: string | null;
-  weatherActiveModifiers: unknown;
-  weatherSeed: number;
-  weatherUpdatedAt: string | null;
-}
-export interface ZonePayload {
-  code: string;
-  name: string;
-  weatherId: string | null;
-  weatherExpiresAt: string | null;
-  weatherActiveModifiers: unknown;
-}
 export const supabaseZoneRepository = createRepository<ZoneRow, ZonePayload>(
   "zones",
   (r) => ({
@@ -139,42 +80,12 @@ export const supabaseZoneRepository = createRepository<ZoneRow, ZonePayload>(
   }),
   "code",
 );
-
-// ---- zone_allowed_weathers ----
-export interface ZoneWeatherRow {
-  id: string;
-  zoneId: string;
-  weatherId: string;
-  weightModifier: number | null;
-}
-export interface ZoneWeatherPayload {
-  zoneId: string;
-  weatherId: string;
-  weightModifier: number | null;
-}
 export const supabaseZoneWeatherRepository = createRepository<ZoneWeatherRow, ZoneWeatherPayload>(
   "zone_allowed_weathers",
   (r) => ({ id: r.id, zoneId: r.zone_id, weatherId: r.weather_id, weightModifier: r.weight_modifier }),
   (p) => ({ zone_id: p.zoneId, weather_id: p.weatherId, weight_modifier: p.weightModifier }),
   "zone_id",
 );
-
-// ---- weather_modifiers ----
-export interface WeatherModifierRow {
-  id: string;
-  weatherId: string;
-  modifierId: string;
-  minValue: number;
-  maxValue: number;
-  baseChance: number | null;
-}
-export interface WeatherModifierPayload {
-  weatherId: string;
-  modifierId: string;
-  minValue: number;
-  maxValue: number;
-  baseChance: number | null;
-}
 export const supabaseWeatherModifierRepository = createRepository<WeatherModifierRow, WeatherModifierPayload>(
   "weather_modifiers",
   (r) => ({

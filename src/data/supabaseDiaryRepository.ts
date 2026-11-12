@@ -1,21 +1,5 @@
+import type { Species, CaughtDiary } from "../types/model/diary";
 import supabase from "../database/connection";
-
-export interface Species {
-  id: string;
-  created_at: string;
-  information: string | null;
-  location: string | null;
-  status: string | null;
-  name: string;
-  image: string | null;
-}
-
-export interface CaughtDiary {
-  id: string;
-  created_at: string;
-  user_id: string;
-  species_id: string;
-}
 
 class SupabaseDiaryRepository {
   /**

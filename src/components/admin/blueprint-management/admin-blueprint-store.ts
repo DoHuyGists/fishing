@@ -1,6 +1,7 @@
+import type { AdminItemRow } from "../../../types/table/item";
 import { defineStore } from "pinia";
 import { supabaseBlueprintRepository } from "../../../data/supabaseBlueprintRepository";
-import { supabaseItemRepository, type AdminItemRow } from "../../../data/supabaseItemRepository";
+import { supabaseItemRepository } from "../../../data/supabaseItemRepository";
 
 interface BlueprintRow { id: string; result_item_id: string; result_quantity: number; required_materials: { item_id: string; quantity: number }[]; gold_cost: number }
 export const useAdminBlueprintStore = defineStore("admin-blueprints", {

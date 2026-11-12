@@ -1,7 +1,8 @@
+import type { UserProfile } from "../types/model/userProfile";
 import { t as tr } from "../i18n";
 import { defineStore } from "pinia";
 import type { RealtimeChannel } from "@supabase/supabase-js";
-import { supabaseUserProfileRepository, type UserProfile } from "../data/supabaseUserProfileRepository";
+import { supabaseUserProfileRepository } from "../data/supabaseUserProfileRepository";
 import { supabaseAvatarRepository } from "../data/supabaseAvatarRepository";
 
 let progressChannel: RealtimeChannel | null = null;

@@ -1,9 +1,10 @@
 <script setup lang="ts">
+import type { FishingSceneContext } from "../../../types/model/fishingGameplay";
 import { t as tr } from "../../../i18n";
 
 import { computed, onBeforeUnmount, onMounted, ref, watch } from "vue";
 import { isPointInWater } from "../../../data/fishingMap.ts";
-import type { FishingSceneContext } from "../../../data/fishingGameplay";
+
 
 const props = defineProps<{ context: FishingSceneContext }>();
 const sceneState = computed(() => props.context.state);

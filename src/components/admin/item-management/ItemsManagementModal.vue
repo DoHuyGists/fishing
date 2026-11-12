@@ -2,7 +2,7 @@
 import AdminModal from "../AdminModal.vue";
 import { onMounted } from "vue";
 import { storeToRefs } from "pinia";
-import type { AdminItemRow } from "../../../data/supabaseItemRepository";
+
 import { useAdminItemsManagementStore } from "./admin-items-management-store";
 import ItemForm from "./ItemsFormModal.vue";
 

@@ -1,6 +1,7 @@
 <script setup lang="ts">
+import type { SpeciesRow } from "../../../types/table/species";
 import { computed, onMounted, ref, watch } from "vue";
-import type { SpeciesRow } from "../../../data/supabaseSpeciesRepository";
+
 import { useAdminHourMissionStore } from "./admin-hour-mission-store";
 
 const props = defineProps<{ selectedIds: string[] }>();

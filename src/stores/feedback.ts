@@ -1,7 +1,8 @@
+import type { ErrorFeedbackRow } from "../types/table/feedback";
 import { t as tr } from "../i18n";
 import { defineStore } from "pinia";
 import supabase from "../database/connection";
-import { supabaseFeedbackRepository, type ErrorFeedbackRow } from "../data/supabaseFeedbackRepository";
+import { supabaseFeedbackRepository } from "../data/supabaseFeedbackRepository";
 let myErrorsChannel: ReturnType<typeof supabaseFeedbackRepository.subscribeMyErrors> | null = null;
 
 export const useFeedbackStore = defineStore("feedback", {

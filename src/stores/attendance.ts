@@ -1,6 +1,7 @@
+import type { DailyRewardPreview } from "../types/model/dailyReward";
 import { t as tr } from "../i18n";
 import { defineStore } from "pinia";
-import { supabaseDailyRewardRepository, type DailyRewardPreview } from "../data/supabaseDailyRewardRepository";
+import { supabaseDailyRewardRepository } from "../data/supabaseDailyRewardRepository";
 
 export const useAttendanceStore = defineStore("attendance", {
   state: () => ({

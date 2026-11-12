@@ -1,11 +1,11 @@
 <script setup lang="ts">
+import type { FishingBagViewMode as ViewMode } from "../../../types/model/fishingBag";
 import { t as tr } from "../../../i18n";
 
 import { computed, ref, watch } from "vue";
 import { useFishingStore, type CaughtFish } from "../../../stores/fishing";
 
 const store = useFishingStore();
-type ViewMode = "list" | "grid" | "group";
 const viewModes: { value: ViewMode; label: string; ariaLabel: string }[] = [
   { value: "list", get label() { return tr('CaughtModal.danh_sach'); }, get ariaLabel() { return tr('CaughtModal.hien_thi_dang_danh_sach'); } },
   { value: "grid", get label() { return tr('CaughtModal.luoi'); }, get ariaLabel() { return tr('CaughtModal.hien_thi_dang_luoi'); } },

@@ -1,6 +1,7 @@
 <script lang="ts" setup>
+import type { SpeciesPayload, SpeciesRow } from "../../../types/table/species";
 import { reactive, ref, watch } from "vue";
-import type { SpeciesPayload, SpeciesRow } from "../../../data/supabaseSpeciesRepository";
+
 import { useAdminSpeciesStore } from "./admin-species-store";
 
 const props = defineProps<{

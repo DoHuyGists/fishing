@@ -1,7 +1,10 @@
+import type { FishingAreaRow } from "../../../types/table/fishingArea";
+import type { SpeciesInAreaPayload, SpeciesInAreaRow } from "../../../types/table/speciesInArea";
+import type { SpeciesRow } from "../../../types/table/species";
 import { defineStore } from "pinia";
-import { supabaseFishingAreaRepository, type FishingAreaRow } from "../../../data/supabaseFishingAreaRepository";
-import { supabaseSpeciesInAreaRepository, type SpeciesInAreaPayload, type SpeciesInAreaRow } from "../../../data/supabaseSpeciesInAreaRepository";
-import { supabaseSpeciesRepository, type SpeciesRow } from "../../../data/supabaseSpeciesRepository";
+import { supabaseFishingAreaRepository } from "../../../data/supabaseFishingAreaRepository";
+import { supabaseSpeciesInAreaRepository } from "../../../data/supabaseSpeciesInAreaRepository";
+import { supabaseSpeciesRepository } from "../../../data/supabaseSpeciesRepository";
 
 export const useSpeciesInAreaStore = defineStore("speciesInArea", {
   state: () => ({

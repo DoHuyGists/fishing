@@ -1,12 +1,10 @@
 <script lang="ts" setup>
+import type { EventScheduleRow } from "../../../types/table/eventSchedule";
 import { getFormattingLocale } from '../../../i18n';
 import { t as tr } from "../../../i18n";
 
 import { computed, onMounted, ref } from "vue";
-import {
-  supabaseEventScheduleRepository,
-  type EventScheduleRow,
-} from "../../../data/supabaseEventScheduleRepository.ts";
+import { supabaseEventScheduleRepository } from "../../../data/supabaseEventScheduleRepository.ts";
 import EventThumbnail from "./EventThumbnail.vue";
 import Modal from "../../shared/Modal.vue";
 

@@ -1,7 +1,8 @@
 <script setup lang="ts">
+import type { UserTeamMember } from "../../../types/model/team";
 import { t as tr } from "../../../i18n";
 
-import type { UserTeamMember } from "../../../data/supabaseTeamRepository.ts";
+
 
 defineProps<{
   members: UserTeamMember[];

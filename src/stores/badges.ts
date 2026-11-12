@@ -1,6 +1,7 @@
+import type { UserBadgeStatus } from "../types/model/badge";
 import { t as tr } from "../i18n";
 import { defineStore } from "pinia";
-import { supabaseBadgeRepository, type UserBadgeStatus } from "../data/supabaseBadgeRepository";
+import { supabaseBadgeRepository } from "../data/supabaseBadgeRepository";
 import { useCurrencyStore } from "./currency";
 
 export const useBadgesStore = defineStore("badges", {

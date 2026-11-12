@@ -1,8 +1,9 @@
 <script setup lang="ts">
+import type { EquipmentVariant } from "../../../types/model/equipment";
 import { t as tr } from "../../../i18n";
 
 import { computed, onBeforeUnmount, onMounted, ref, watch } from "vue";
-import { equipmentCategories, type EquipmentVariant } from "../../../data/equipmentCatalog.ts";
+import { equipmentCategories } from "../../../data/equipmentCatalog.ts";
 import { useEquipmentStore } from "../../../stores/equipment.ts";
 import { useFishingStore, type FishingTool } from "../../../stores/fishing.ts";
 import Tab, { type TabItem } from "../../shared/Tab.vue";

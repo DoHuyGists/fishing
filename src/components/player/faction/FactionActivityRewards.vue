@@ -1,13 +1,11 @@
 <script setup lang="ts">
+import type { FactionActivityRewardsProps as Props } from "../../../types/model/faction";
+import type { ActivityMilestone } from "../../../types/model/factionActivityMilestones";
 import { t as tr } from "../../../i18n";
 
 import { computed } from "vue";
-import { FACTION_ACTIVITY_MILESTONES, type ActivityMilestone } from "../../../data/factionActivityMilestones.ts";
+import { FACTION_ACTIVITY_MILESTONES } from "../../../data/factionActivityMilestones.ts";
 import Hint from "../../shared/Hint.vue";
-
-interface Props {
-  currentPoints: number;
-}
 
 const props = withDefaults(defineProps<Props>(), {
   currentPoints: 0,

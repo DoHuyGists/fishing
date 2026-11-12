@@ -1,11 +1,10 @@
+import type { HourMissionPayload, HourMissionRow } from "../../../types/table/hourMission";
+import type { SpeciesRow } from "../../../types/table/species";
+import type { MissionFish } from "../../../types/model/mission";
 import { defineStore } from "pinia";
-import {
-  supabaseHourMissionRepository,
-  type HourMissionPayload,
-  type HourMissionRow,
-} from "../../../data/supabaseHourMissionRepository";
-import { supabaseSpeciesRepository, type SpeciesRow } from "../../../data/supabaseSpeciesRepository";
-import type { MissionFish } from "../../../data/supabaseMissionRepository";
+import { supabaseHourMissionRepository } from "../../../data/supabaseHourMissionRepository";
+import { supabaseSpeciesRepository } from "../../../data/supabaseSpeciesRepository";
+
 
 export type HourMissionStatusFilter = "ALL" | "ACTIVE" | "DISABLED";
 

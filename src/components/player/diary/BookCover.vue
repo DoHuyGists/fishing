@@ -1,28 +1,6 @@
 <script lang="ts" setup>
+import type { BookVariant, BookProps } from "../../../types/model/diary";
 import { computed } from 'vue'
-
-export type BookVariant = 'default' | 'ocean' | 'gold' | 'dark' | 'emerald'
-
-export interface BookProps {
-  /** Tiêu đề hiển thị trên gáy sách và bìa */
-  title?: string
-  /** Tên tác giả / chủ sở hữu */
-  author?: string
-  /** Số / Ký hiệu góc trên (Xoay 90 độ) */
-  numUp?: string | number
-  /** Số / Ký hiệu góc dưới (Xoay 90 độ) */
-  numDown?: string | number
-  /** Theme màu sắc có sẵn: 'default' | 'ocean' | 'gold' | 'dark' | 'emerald' */
-  variant?: BookVariant
-  /** Override màu nền/gradient bìa sách tùy chỉnh */
-  coverBg?: string
-  /** Override màu gáy sách tùy chỉnh */
-  spineBg?: string
-  /** Override màu chữ tùy chỉnh */
-  textColor?: string
-  /** Tỷ lệ thu phóng kích thước (Default: 1) */
-  scale?: number
-}
 
 const props = withDefaults(defineProps<BookProps>(), {
   title: '1984',

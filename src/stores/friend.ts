@@ -1,10 +1,7 @@
+import type { FriendUserProfile, UserFriend } from "../types/model/friend";
 import { t as tr } from "../i18n";
 import { defineStore } from "pinia";
-import {
-  supabaseFriendRepository,
-  type FriendUserProfile,
-  type UserFriend,
-} from "../data/supabaseFriendRepository";
+import { supabaseFriendRepository } from "../data/supabaseFriendRepository";
 
 export type FriendshipRelation =
   | { type: "SELF" }

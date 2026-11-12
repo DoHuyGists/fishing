@@ -1,54 +1,8 @@
+import type { TensionResult, TensionChallenge, TensionFight } from "../types/model/tensionChallenge";
 // Protocol v1: fixed-point arithmetic and Park-Miller RNG must match
 // replay_tension_challenge in submit_tension_challenge.sql exactly.
 export const TENSION_SCALE = 10_000;
 const RNG_MODULUS = 2_147_483_647;
-
-export type TensionResult = "fighting" | "won" | "snapped" | "escaped" | "timeout";
-export type TensionInput = { tick: number; reeling: boolean };
-export type TensionSubmission = {
-  sessionId: string;
-  inputs: TensionInput[];
-  totalTicks: number;
-  claimedResult: Exclude<TensionResult, "fighting">;
-};
-export type TensionChallenge = {
-  sessionId: string;
-  type: "tension-challenge";
-  version: 1;
-  seed: number;
-  startedAt: number;
-  expiresAt: number;
-  activatedAt?: number;
-  config: {
-    tickRate: number;
-    safeMin: number;
-    safeMax: number;
-    maxTension: number;
-    startTension: number;
-    startDistance: number;
-    reelRate: number;
-    releaseRate: number;
-    reelSpeed: number;
-    slackEscapeSeconds: number;
-    slackThresholdRatio: number;
-    slackDistanceRate: number;
-    fishPullMultiplier: number;
-    minimumStrength: number;
-  };
-  fish: {
-    id: string;
-    baseStrength: number;
-    burstChance: number;
-    burstMin: number;
-    burstMax: number;
-    staminaDrain: number;
-    basePull: number;
-    pullAmplitude: number;
-    pullPeriodTicks: number;
-    burstMinTicks: number;
-    burstMaxTicks: number;
-  };
-};
 
 export function isTensionChallenge(value: unknown): value is TensionChallenge {
   if (!value || typeof value !== "object") return false;
@@ -89,7 +43,6 @@ export function createTensionFight(c: TensionChallenge) {
     result: "fighting" as TensionResult,
   };
 }
-export type TensionFight = ReturnType<typeof createTensionFight>;
 
 export function stepTensionFight(c: TensionChallenge, s: TensionFight, reeling: boolean) {
   if (s.result !== "fighting") return;

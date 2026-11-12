@@ -1,13 +1,5 @@
+import type { Blueprint } from "../types/model/blueprintCatalog";
 import { t as tr } from "../i18n";
-export type ItemCategory = (typeof import("./items.ts").items)[number]["category"];
-
-export interface Blueprint {
-  id: string;
-  name: string;
-  result: { category: ItemCategory; name: string; quantity: number };
-  // Lưới công thức theo từng hàng; null là ô trống. Vị trí tuyệt đối không quan trọng, chỉ cần đúng hình dạng.
-  pattern: (ItemCategory | null)[][];
-}
 
 // Mock tạm, sẽ thay bằng dữ liệu thật sau.
 export const blueprints: Blueprint[] = [

@@ -1,10 +1,9 @@
 <script setup lang="ts">
+import type { AttendanceReward as Reward } from "../../../types/model/attendance";
 import { t as tr } from "../../../i18n";
 
 import { computed, onMounted, onUnmounted, ref } from "vue";
 import { useAttendanceStore } from "../../../stores/attendance";
-
-type Reward = { name: string; icon: string; amount?: number };
 
 const props = defineProps<{
   reward: Reward | null;

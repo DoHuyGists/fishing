@@ -1,9 +1,10 @@
 <script lang="ts" setup>
+import type { HourMissionRow } from "../../../types/table/hourMission";
 import AdminModal from "../AdminModal.vue";
 import { computed, onMounted, onUnmounted, ref, type ComponentPublicInstance } from "vue";
 import HourMissionForm from "./HourMissionForm.vue";
 import { toTimeInput, useAdminHourMissionStore } from "./admin-hour-mission-store";
-import type { HourMissionRow } from "../../../data/supabaseHourMissionRepository";
+
 
 const emit = defineEmits(["close"]);
 const store = useAdminHourMissionStore();

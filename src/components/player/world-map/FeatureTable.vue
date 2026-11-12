@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import type { LobbyAction } from "../../../types/model/worldMap";
 import { t as tr } from "../../../i18n";
 
 import { useConfigStore } from "../../../stores/config.ts";
@@ -12,14 +13,6 @@ const notificationStore = useNotificationStore();
 const features = useFeatureAvailabilityStore();
 
 const buttonDirections = ['from-top-left', 'from-top-right', 'from-bottom-left', 'from-bottom-right'];
-
-type LobbyAction = {
-  modal: NonNullable<Parameters<typeof modalStore.open>[0]>;
-  label: string;
-  icon: string;
-  tourId?: string;
-  requiresUnlock?: boolean;
-};
 
 const utilityActions: LobbyAction[] = [
   { modal: 'account', get label() { return tr('FeatureTable.tai_khoan'); }, icon: '⚙️', tourId: 'first-play-account' },

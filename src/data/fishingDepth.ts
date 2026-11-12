@@ -1,3 +1,4 @@
+import type { DepthConfig } from "../types/model/fishingDepth";
 import { t as tr } from "../i18n";
 export const DEFAULT_MAX_DEPTH_METERS = 30;
 export const DEPTH_STEP_METERS = 0.5;
@@ -26,8 +27,6 @@ export function buildDepthConfig(maxDepth: unknown) {
     ],
   };
 }
-
-export type DepthConfig = ReturnType<typeof buildDepthConfig>;
 
 export function getDepthLayer(depth: number, config: DepthConfig = buildDepthConfig(DEFAULT_MAX_DEPTH_METERS)) {
   const layers = config.layers;

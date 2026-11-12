@@ -1,27 +1,7 @@
+import type { AreaSpecies } from "../types/model/speciesInArea";
+import type { SpeciesInAreaRow, SpeciesInAreaPayload } from "../types/table/speciesInArea";
 import supabase from "../database/connection";
-import type { SpeciesRow } from "./supabaseSpeciesRepository";
 
-export type AreaSpecies = Pick<SpeciesRow, "id" | "name" | "image" | "rarity" | "information" | "weight_min" | "weight_max">;
-
-export interface SpeciesInAreaRow {
-  id: string;
-  areaId: string;
-  speciesId: string;
-  depthScopeId: string | null;
-  weightRate: number;
-  areaTitle: string | null;
-  areaCountryId: string | null;
-  speciesName: string | null;
-  speciesImage: string | null;
-  speciesRarity: string | null;
-}
-
-export interface SpeciesInAreaPayload {
-  areaId: string;
-  speciesId: string;
-  weightRate: number;
-  depthScopeId: string | null;
-}
 
 const SELECT_QUERY = "*, area:fishing_areas(id, title, country_id), species:species(id, name, image, rarity)";
 

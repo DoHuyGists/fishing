@@ -1,15 +1,9 @@
+import type { UserTeam, UserTeamMember, TeamStatus, TeamJoinType, UserTeamInvite } from "../types/model/team";
 import { t as tr } from "../i18n";
 import { defineStore } from "pinia";
 import type { RealtimeChannel } from "@supabase/supabase-js";
 import supabase from "../database/connection";
-import {
-  supabaseTeamRepository,
-  type UserTeam,
-  type UserTeamMember,
-  type TeamStatus,
-  type TeamJoinType,
-  type UserTeamInvite,
-} from "../data/supabaseTeamRepository";
+import { supabaseTeamRepository } from "../data/supabaseTeamRepository";
 
 // Module-level: không đưa vào Pinia state để tránh serialize warning
 let _channel: RealtimeChannel | null = null;

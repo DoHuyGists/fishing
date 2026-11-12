@@ -1,8 +1,8 @@
+import type { SpeciesRow } from "../../../types/table/species";
+import type { AquacultureRuleRow, AquacultureRulePayload } from "../../../types/table/aquacultureAdmin";
 import { defineStore } from 'pinia'
-import { supabaseSpeciesRepository, type SpeciesRow } from '../../../data/supabaseSpeciesRepository'
-import {
-  supabaseAquacultureRulesAdminRepository as repository, type AquacultureRuleRow, type AquacultureRulePayload,
-} from '../../../data/supabaseAquacultureAdminRepository'
+import { supabaseSpeciesRepository } from '../../../data/supabaseSpeciesRepository';
+import { supabaseAquacultureRulesAdminRepository as repository } from '../../../data/supabaseAquacultureAdminRepository';
 
 export function numberField(payload: Record<string, unknown>, key: string, min: number, max = Infinity, integer = false): number {
   const raw = payload[key], value = Number(raw)

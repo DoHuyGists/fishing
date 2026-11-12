@@ -1,3 +1,4 @@
+import type { AssetRow, AssetRecord } from "../types/table/asset";
 import { t as tr } from "../i18n";
 import supabase from "../database/connection";
 import { createUuid } from "../utils/uuid";
@@ -9,20 +10,6 @@ export const ASSET_MIME_TYPES: Record<string, string> = {
   "image/webp": "webp", "image/avif": "avif",
   "video/mp4": "mp4", "video/webm": "webm", "video/quicktime": "mov",
 };
-export interface AssetRow {
-  id: string;
-  path: string;
-  folder: string;
-  name: string;
-  url: string;
-  kind: "image" | "video";
-  size: number;
-  createdAt: string;
-}
-
-interface AssetRecord extends Omit<AssetRow, "url" | "createdAt"> {
-  created_at: string;
-}
 
 const bucket = "admin-assets";
 const columns = "id, path, folder, name, kind, size, created_at";

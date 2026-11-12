@@ -1,7 +1,8 @@
 <script setup lang="ts">
+import type { UserInventory } from "../../../types/model/userInventory";
 import { computed } from "vue";
 import { getFormattingLocale, t as tr } from "../../../i18n";
-import type { UserInventory } from "../../../data/supabaseUserInventoryRepository";
+
 import type { ItemData } from "../../../stores/equipment";
 import { useInventoryTableContext } from "./useInventoryTable";
 

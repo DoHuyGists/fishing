@@ -1,6 +1,7 @@
+import type { EquipmentVariant } from "../types/model/equipment";
 import { t as tr } from "../i18n";
 import { defineStore } from "pinia";
-import { defaultEquipmentVariants, type EquipmentVariant } from "../data/equipmentCatalog";
+import { defaultEquipmentVariants } from "../data/equipmentCatalog";
 
 import { supabaseEquipmentRepository } from "../data/supabaseEquipmentRepository";
 import { useFishingStore, type FishingTool } from "./fishing";

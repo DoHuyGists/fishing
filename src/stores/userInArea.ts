@@ -1,5 +1,6 @@
+import type { UserInAreaRow } from "../types/table/userInArea";
 import { defineStore } from "pinia";
-import { supabaseUserInAreaRepository, type UserInAreaRow } from "../data/supabaseUserInAreaRepository";
+import { supabaseUserInAreaRepository } from "../data/supabaseUserInAreaRepository";
 
 export const useUserInAreaStore = defineStore("UserInArea", {
     state: ()=> ({

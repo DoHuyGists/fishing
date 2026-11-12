@@ -1,6 +1,8 @@
+import type { AquacultureCatalog, AquacultureFarm, FarmAction, FarmActionResult } from "../types/model/aquaculture";
+import type { AquacultureRecord } from "../types/table/aquaculture";
 import { t as tr } from "../i18n";
 import supabase from '../database/connection'
-import type { AquacultureCatalog, AquacultureFarm, AquacultureRecord, FarmAction, FarmActionResult } from './aquaculture'
+
 
 export class AquacultureRpcError extends Error {
   readonly uncertain: boolean

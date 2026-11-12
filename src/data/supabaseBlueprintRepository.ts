@@ -1,10 +1,6 @@
+import type { BlueprintMaterial, Blueprint } from "../types/model/blueprint";
 import { t as tr } from "../i18n";
 import supabase from "../database/connection";
-
-export interface BlueprintMaterial {
-  item_id: string;
-  quantity: number;
-}
 
 function normalizeMaterials(value: unknown): BlueprintMaterial[] {
   if (!Array.isArray(value)) return [];
@@ -17,14 +13,6 @@ function normalizeMaterials(value: unknown): BlueprintMaterial[] {
     if (typeof itemId !== "string" || !itemId || !Number.isSafeInteger(quantity) || quantity <= 0) throw new Error(tr('supabaseBlueprintRepository.cong_thuc_chua_nguyen_lieu_hoac_so_luong_khong_hop_le'));
     return [{ item_id: itemId, quantity }];
   });
-}
-
-export interface Blueprint {
-  id: string;
-  resultItemId: string;
-  resultQuantity: number;
-  requiredMaterials: BlueprintMaterial[];
-  goldCost: number;
 }
 
 class SupabaseBlueprintRepository {

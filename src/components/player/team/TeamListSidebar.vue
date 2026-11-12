@@ -1,10 +1,12 @@
 <script lang="ts" setup>
+import type { FriendUserProfile } from "../../../types/model/friend";
+import type { UserTeam } from "../../../types/model/team";
 import { t as tr } from "../../../i18n";
 
 import { computed, ref } from "vue";
 import PlayerIdentity from "../../shared/PlayerIdentity.vue";
-import type { FriendUserProfile } from "../../../data/supabaseFriendRepository";
-import type { UserTeam } from "../../../data/supabaseTeamRepository";
+
+
 import Tab, { type TabItem } from "../../shared/Tab.vue";
 
 const props = defineProps<{

@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import type { FriendTab as ActiveTab, FriendUserProfile, UserFriend } from "../../../types/model/friend";
 import { getFormattingLocale } from '../../../i18n';
 import { t as tr } from "../../../i18n";
 
@@ -8,9 +9,7 @@ import { useCountryStore } from "../../../stores/country.ts";
 import { useAuthStore } from "../../../stores/auth.ts";
 import { useFriendStore, type FriendshipRelation } from "../../../stores/friend.ts";
 import { useToast } from "../../../composables/useToast.ts";
-import type { FriendUserProfile, UserFriend } from "../../../data/supabaseFriendRepository.ts";
 
-type ActiveTab = "friends" | "received" | "sent" | "discover";
 
 const authStore = useAuthStore();
 const friendStore = useFriendStore();

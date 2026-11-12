@@ -1,10 +1,10 @@
+import type { SpeciesRow } from "../../../types/table/species";
+import type { AdminItemRow } from "../../../types/table/item";
+import type { AquacultureFoodRow, AquacultureRuleRow } from "../../../types/table/aquacultureAdmin";
 import { defineStore } from 'pinia'
-import { supabaseSpeciesRepository, type SpeciesRow } from '../../../data/supabaseSpeciesRepository'
-import { supabaseItemRepository, type AdminItemRow } from '../../../data/supabaseItemRepository'
-import {
-  supabaseAquacultureFoodsAdminRepository as repository, supabaseAquacultureRulesAdminRepository,
-  type AquacultureFoodRow, type AquacultureRuleRow,
-} from '../../../data/supabaseAquacultureAdminRepository'
+import { supabaseSpeciesRepository } from '../../../data/supabaseSpeciesRepository';
+import { supabaseItemRepository } from '../../../data/supabaseItemRepository';
+import { supabaseAquacultureFoodsAdminRepository as repository, supabaseAquacultureRulesAdminRepository } from '../../../data/supabaseAquacultureAdminRepository';
 import { enabledField, numberField } from '../aquaculture-species-management/admin-aquaculture-species-store'
 
 export const useAdminAquacultureFoodStore = defineStore('AdminAquacultureFood', {

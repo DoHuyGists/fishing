@@ -1,6 +1,7 @@
+import type { AssetRow } from "../../../types/table/asset";
 import { computed, ref, watch } from "vue";
 import { defineStore } from "pinia";
-import { supabaseAssetRepository, type AssetRow } from "../../../data/supabaseAssetRepository";
+import { supabaseAssetRepository } from "../../../data/supabaseAssetRepository";
 import { useToast } from "../../../composables/useToast";
 import {
   assetFolderAncestors, assetFolderName, assetFolderParent, normalizeAssetFolder, replaceAssetFolderPrefix,

@@ -1,16 +1,6 @@
+import type { DailyRewardPreview } from "../types/model/dailyReward";
+import type { DailyRewardRow } from "../types/table/dailyReward";
 import supabase from "../database/connection";
-
-export interface DailyRewardPreview {
-  id: string;
-  name: string;
-  image: string | null;
-  icon: string | null;
-}
-
-interface DailyRewardRow {
-  id: string;
-  item: Omit<DailyRewardPreview, "id">;
-}
 
 class SupabaseDailyRewardRepository {
   async fetchRewards(): Promise<DailyRewardPreview[]> {

@@ -1,6 +1,7 @@
+import type { MarketListing, MarketHistory } from "../types/model/market";
 import { t as tr } from "../i18n";
 import { defineStore } from "pinia";
-import { supabaseMarketRepository, type MarketListing, type MarketHistory } from "../data/supabaseMarketRepository";
+import { supabaseMarketRepository } from "../data/supabaseMarketRepository";
 import type { RealtimeChannel } from "@supabase/supabase-js";
 let channel: RealtimeChannel | null = null;
 let refreshTimer: ReturnType<typeof setTimeout> | undefined;

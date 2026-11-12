@@ -1,6 +1,7 @@
+import type { GuideRow } from "../types/table/guide";
 import { t as tr } from "../i18n";
 import { defineStore } from "pinia";
-import { supabaseGuideRepository, type GuideRow } from "../data/supabaseGuideRepository";
+import { supabaseGuideRepository } from "../data/supabaseGuideRepository";
 
 export const useGuideStore = defineStore("guide", {
   state: () => ({

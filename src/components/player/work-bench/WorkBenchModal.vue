@@ -1,4 +1,7 @@
 <script lang="ts" setup>
+import type { WorkBenchInventoryItem } from "../../../types/model/workBench";
+import type { UserInventory } from "../../../types/model/userInventory";
+import type { Blueprint } from "../../../types/model/blueprint";
 import { t as tr } from "../../../i18n";
 
 import { computed, onMounted, ref } from "vue";
@@ -6,13 +9,13 @@ import Modal from "../../shared/Modal.vue";
 import WorkBenchInventory from "./WorkBenchInventory.vue";
 import WorkBenchBlueprints from "./WorkBenchBlueprints.vue";
 import WorkBenchRecipe from "./WorkBenchRecipe.vue";
-import type { WorkBenchInventoryItem } from "./types";
+
 import { useAuthStore } from "../../../stores/auth";
 import { useInventoryStore } from "../../../stores/inventory";
 import { useBlueprintStore } from "../../../stores/blueprint";
 import { useCurrencyStore } from "../../../stores/currency";
-import type { UserInventory } from "../../../data/supabaseUserInventoryRepository";
-import type { Blueprint } from "../../../data/supabaseBlueprintRepository";
+
+
 
 const authStore = useAuthStore();
 const inventoryStore = useInventoryStore();

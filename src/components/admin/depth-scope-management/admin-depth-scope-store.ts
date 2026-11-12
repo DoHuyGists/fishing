@@ -1,5 +1,6 @@
+import type { DepthScopePayload, DepthScopeRow } from "../../../types/table/depthScope";
 import { defineStore } from "pinia";
-import { supabaseDepthScopeRepository, type DepthScopePayload, type DepthScopeRow } from "../../../data/supabaseDepthScopeRepository";
+import { supabaseDepthScopeRepository } from "../../../data/supabaseDepthScopeRepository";
 
 function buildDepthCurve({ minDepth, maxDepth, peakDepth, curvePower }: DepthScopeRow) {
   if (

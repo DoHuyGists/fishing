@@ -1,9 +1,12 @@
+import type { MapPoint } from "../types/model/fishingMap";
+import type { FishingPhase, FishingSceneContext } from "../types/model/fishingGameplay";
+import type { TensionChallenge, TensionFight } from "../types/model/tensionChallenge";
 import { t as tr } from "../i18n";
 import { defineStore } from "pinia";
 import { computed, ref } from "vue";
-import { isPointInWater, type MapPoint } from "../data/fishingMap";
-import type { FishingPhase, FishingSceneContext } from "../data/fishingGameplay";
-import { createTensionFight, stepTensionFight, tensionMaxTicks, type TensionChallenge, type TensionFight } from "../data/tensionChallenge";
+import { isPointInWater } from "../data/fishingMap";
+
+import { createTensionFight, stepTensionFight, tensionMaxTicks } from "../data/tensionChallenge";
 
 export type TutorialTool = "rod" | "line" | "reel" | "hook" | "bait";
 export interface TutorialEquipment {

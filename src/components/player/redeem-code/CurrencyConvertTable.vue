@@ -1,11 +1,12 @@
 <script setup lang="ts">
+import type { CurrencyConversionRate } from "../../../types/model/currency";
 import { getFormattingLocale } from '../../../i18n';
 import { t as tr } from "../../../i18n";
 
 import { onMounted, ref } from "vue";
 import { useCurrencyStore } from "../../../stores/currency";
 import { useToast } from "../../../composables/useToast";
-import type { CurrencyConversionRate } from "../../../data/supabaseCurrencyRepository";
+
 import TwoOptionsModal from "../../shared/TwoOptionsModal.vue";
 import Cash from "../currency/Cash.vue";
 import Shells from "../currency/Shells.vue";

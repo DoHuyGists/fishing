@@ -1,9 +1,7 @@
+import type { AdminNotificationRow } from "../../../types/table/notification";
+import type { NotificationKind } from "../../../types/model/notification";
 import { defineStore } from "pinia";
-import {
-  supabaseNotificationRepository,
-  type AdminNotificationRow,
-  type NotificationKind,
-} from "../../../data/supabaseNotificationRepository";
+import { supabaseNotificationRepository } from "../../../data/supabaseNotificationRepository";
 
 const emptyForm = () => ({ title: "", body: "", type: "", userId: "", expiresAt: "" });
 

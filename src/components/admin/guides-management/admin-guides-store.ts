@@ -1,6 +1,7 @@
+import type { AdminGuideRow, GuidePayload } from "../../../types/table/guide";
 import { computed, ref } from "vue";
 import { defineStore } from "pinia";
-import { supabaseGuideRepository, type AdminGuideRow, type GuidePayload } from "../../../data/supabaseGuideRepository";
+import { supabaseGuideRepository } from "../../../data/supabaseGuideRepository";
 import { guideContentText, sanitizeGuideContent } from "../../../utils/guideContent";
 import { useToast } from "../../../composables/useToast";
 

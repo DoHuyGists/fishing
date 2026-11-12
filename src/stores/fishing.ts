@@ -1,3 +1,5 @@
+import type { AreaSpeciesDiaryResponse, FishDepthPreviewResponse } from "../types/model/fish";
+import type { TensionChallenge, TensionFight, TensionInput, TensionSubmission } from "../types/model/tensionChallenge";
 import { t as tr } from "../i18n";
 import { defineStore } from "pinia";
 import { useAuthStore } from "./auth";
@@ -5,13 +7,12 @@ import { useEquipmentStore } from "./equipment";
 import { useUserInAreaStore } from "./userInArea";
 import { useDayPhaseStore } from "./dayPhase";
 import { supabaseEquipmentRepository } from "../data/supabaseEquipmentRepository";
-import { supabaseFishRepository, type AreaSpeciesDiaryResponse, type FishDepthPreviewResponse } from "../data/supabaseFishRepository";
+import { supabaseFishRepository } from "../data/supabaseFishRepository";
 import { supabaseUserInAreaRepository } from "../data/supabaseUserInAreaRepository";
 import supabase from "../database/connection";
 import { supabaseFishingAreaRepository } from "../data/supabaseFishingAreaRepository";
 import { buildDepthConfig, DEPTH_STEP_METERS } from "../data/fishingDepth";
-import { createTensionFight, isTensionChallenge, stepTensionFight, tensionMaxTicks,
-  type TensionChallenge, type TensionFight, type TensionInput, type TensionSubmission } from "../data/tensionChallenge";
+import { createTensionFight, isTensionChallenge, stepTensionFight, tensionMaxTicks } from "../data/tensionChallenge";
 export type FishingTool = "rod" | "line" | "reel" | "hook" | "bait";
 export type CastPhase = "idle" | "casting" | "waiting" | "bite" | "submitting" | "caught" | "lost";
 export type CaughtFish = {

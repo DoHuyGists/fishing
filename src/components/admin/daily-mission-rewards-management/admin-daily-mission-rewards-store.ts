@@ -1,5 +1,6 @@
+import type { DailyMissionRewardRow, RewardPayload } from "../../../types/table/dailyMissionAdmin";
 import { defineStore } from "pinia";
-import { supabaseDailyMissionRewardRepository, type DailyMissionRewardRow, type RewardPayload } from "../../../data/supabaseDailyMissionAdminRepository";
+import { supabaseDailyMissionRewardRepository } from "../../../data/supabaseDailyMissionAdminRepository";
 
 const emptyForm = () => ({ id: null as string | null, required_points: 1, reward_data: "[]", is_active: true });
 const messageOf = (error: unknown) => error instanceof Error ? error.message : "Không thể thực hiện thao tác.";

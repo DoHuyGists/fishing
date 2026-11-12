@@ -1,5 +1,4 @@
-export type MapPoint = { x: number; y: number };
-
+import type { MapPoint } from "../types/model/fishingMap";
 export function isPointInWater(point: MapPoint, boundary: any[]) {
   let inside = false;
 

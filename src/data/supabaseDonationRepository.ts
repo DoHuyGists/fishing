@@ -1,7 +1,5 @@
+import type { DonationResult } from "../types/model/donation";
 import supabase from '../database/connection';
-
-export type DonationStatus = 'CREATED' | 'APPROVED' | 'PENDING' | 'COMPLETED' | 'DECLINED' | 'FAILED' | 'REFUNDED' | 'PARTIALLY_REFUNDED' | 'REVERSED';
-export interface DonationResult { donationId: string; orderId: string; status: DonationStatus }
 
 class SupabaseDonationRepository {
   async request(action: 'create' | 'capture' | 'status', donationId: string, amountCents?: number): Promise<DonationResult> {

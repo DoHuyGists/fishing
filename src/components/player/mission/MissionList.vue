@@ -1,7 +1,8 @@
 <script setup lang="ts">
+import type { HourMission } from "../../../types/model/mission";
 import { t as tr } from "../../../i18n";
 
-import type { HourMission } from "../../../data/supabaseMissionRepository.ts";
+
 import Cash from "../currency/Cash.vue";
 
 defineProps<{

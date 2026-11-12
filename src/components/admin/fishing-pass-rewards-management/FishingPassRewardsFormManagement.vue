@@ -1,6 +1,8 @@
 <script setup lang="ts">
+import type { AdminFishingPass, AdminFishingPassItem } from "../../../types/model/fishingPassRewardsAdmin";
+import type { FishingPassRewardPayload, FishingPassRewardRow } from "../../../types/table/fishingPassRewardsAdmin";
 import { computed, reactive, watch } from "vue";
-import type { AdminFishingPass, AdminFishingPassItem, FishingPassRewardPayload, FishingPassRewardRow } from "../../../data/supabaseFishingPassRewardsAdminRepository";
+
 
 const props = defineProps<{ reward: FishingPassRewardRow | null; passes: AdminFishingPass[]; items: AdminFishingPassItem[]; saving: boolean }>();
 const emit = defineEmits<{ save: [payload: FishingPassRewardPayload]; cancel: [] }>();

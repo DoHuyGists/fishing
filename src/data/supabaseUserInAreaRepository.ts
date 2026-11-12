@@ -1,21 +1,7 @@
+import type { UserInAreaRow } from "../types/table/userInArea";
+import type { UserTurnStatus } from "../types/model/userInArea";
 import supabase from "../database/connection";
 import type { RealtimeChannel } from "@supabase/supabase-js";
-
-export type UserInAreaRow = {
-  id: string;
-  created_at: string;
-  area_id: string | null;
-  user_id: string;
-  updated_at: string;
-  status: string | null;
-};
-
-export type UserTurnStatus = {
-  turns: number;
-  max_turns: number;
-  last_recharge_at: string | null;
-  cooldown_seconds: number;
-};
 
 class SupabaseUserInAreaRepository {
   async fetchTurnStatus(): Promise<UserTurnStatus> {

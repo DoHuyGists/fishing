@@ -1,5 +1,6 @@
+import type { DonationStatus } from "../types/model/donation";
 import { defineStore } from 'pinia';
-import { supabaseDonationRepository, type DonationStatus } from '../data/supabaseDonationRepository';
+import { supabaseDonationRepository } from '../data/supabaseDonationRepository';
 import { getFormattingLocale, t as tr } from '../i18n';
 import { useInformationModalStore } from './informationModal';
 

@@ -1,5 +1,6 @@
+import type { GuideSection } from "../types/model/tensionChallengeGuide";
 import { defineStore } from "pinia";
-import { tensionGuideBaseline, tensionGuideEntries, tensionGuidePresets, type GuideSection } from "../data/tensionChallengeGuide";
+import { tensionGuideBaseline, tensionGuideEntries, tensionGuidePresets } from "../data/tensionChallengeGuide";
 
 const getPreset = (id: string) => tensionGuidePresets.find((preset) => preset.id === id) ?? tensionGuidePresets[0]!;
 

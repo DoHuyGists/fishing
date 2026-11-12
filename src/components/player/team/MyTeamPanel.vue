@@ -1,11 +1,13 @@
 <script lang="ts" setup>
+import type { FriendUserProfile } from "../../../types/model/friend";
+import type { UserTeam, UserTeamInvite, UserTeamMember } from "../../../types/model/team";
 import { getFormattingLocale } from '../../../i18n';
 import { t as tr } from "../../../i18n";
 
 import { ref } from "vue";
 import PlayerIdentity from "../../shared/PlayerIdentity.vue";
-import type { FriendUserProfile } from "../../../data/supabaseFriendRepository";
-import type { UserTeam, UserTeamInvite, UserTeamMember } from "../../../data/supabaseTeamRepository";
+
+
 
 defineProps<{
   profiles: Map<string, FriendUserProfile>;

@@ -1,9 +1,6 @@
+import type { RedeemCodePayload, RedeemCodeRow } from "../../../types/table/redeemCode";
 import { defineStore } from "pinia";
-import {
-  supabaseRedeemCodeRepository,
-  type RedeemCodePayload,
-  type RedeemCodeRow,
-} from "../../../data/supabaseRedeemCodeRepository";
+import { supabaseRedeemCodeRepository } from "../../../data/supabaseRedeemCodeRepository";
 
 export type RedeemStatusFilter = "ALL" | "ACTIVE" | "DISABLED" | "EXPIRED";
 

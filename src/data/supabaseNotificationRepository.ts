@@ -1,32 +1,7 @@
+import type { NotificationRow, AdminNotificationRow, AdminNotificationPayload } from "../types/table/notification";
+import type { NotificationKind } from "../types/model/notification";
 import type { RealtimeChannel } from "@supabase/supabase-js";
 import supabase from "../database/connection";
-
-export interface NotificationRow {
-  id: string;
-  title: string;
-  body: string;
-  type: string | null;
-  data: Record<string, unknown> | null;
-  created_at: string;
-  expires_at?: string | null;
-  is_read: boolean;
-}
-
-export type NotificationKind = "personal" | "system";
-
-export interface AdminNotificationRow {
-  id: string;
-  title: string;
-  body: string;
-  type: string | null;
-  data: Record<string, unknown> | null;
-  created_at: string;
-  user_id?: string;
-  expires_at?: string | null;
-  is_read?: boolean;
-}
-
-export type AdminNotificationPayload = Partial<Record<string, string | null>>;
 
 const adminTable = (kind: NotificationKind) => (kind === "system" ? "system_notifications" : "personal_notifications");
 

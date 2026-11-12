@@ -1,6 +1,7 @@
+import type { WorkBenchInventoryItem } from "../types/model/workBench";
 import { defineStore } from "pinia";
 import { t as tr } from "../i18n";
-import type { WorkBenchInventoryItem } from "../components/player/work-bench/types";
+
 
 export type WorkBenchInventoryViewMode = "list" | "grid" | "group";
 

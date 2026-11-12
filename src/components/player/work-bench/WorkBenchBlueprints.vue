@@ -1,7 +1,9 @@
 <script lang="ts" setup>
+import type { Blueprint } from "../../../types/model/blueprint";
+import type { Item } from "../../../types/model/item";
 import { t as tr } from "../../../i18n";
-import type { Blueprint } from "../../../data/supabaseBlueprintRepository";
-import type { Item } from "../../../data/supabaseItemRepository";
+
+
 
 defineProps<{
   blueprints: Blueprint[];

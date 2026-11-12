@@ -1,6 +1,22 @@
 <script setup lang="ts">
 import { onBeforeUnmount, onMounted, ref } from 'vue'
 
+// Một khẩu pháo bắn thẳng lên từ giữa
+// confetti.value?.fire({ x: 0.5, angle: 90, spread: 70, count: 150 })
+
+// Bắn từ vị trí con trỏ chuột
+// const onClick = (e: MouseEvent) =>
+//   confetti.value?.fire({
+//     x: e.clientX / window.innerWidth,
+//     y: e.clientY / window.innerHeight,
+//     spread: 360, // nổ tròn
+//     power: 15,
+//     count: 60,
+//   })
+
+// Bảng màu riêng
+// confetti.value?.fire({ colors: ['#fde047', '#f59e0b', '#ffffff'] })
+
 interface Particle {
   x: number
   y: number

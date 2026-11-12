@@ -1,8 +1,9 @@
 <script lang="ts" setup>
+import type { SpeciesRow } from "../../../types/table/species";
 import AdminModal from "../AdminModal.vue";
 import { onMounted, ref } from "vue";
 import { storeToRefs } from "pinia";
-import type { SpeciesRow } from "../../../data/supabaseSpeciesRepository";
+
 import { useAdminSpeciesStore } from "./admin-species-store.ts";
 import SpeciesManagementForm from "./SpeciesManagementForm.vue";
 

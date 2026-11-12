@@ -1,67 +1,6 @@
+import type { ItemRow, AdminItemRow, ItemPayload } from "../types/table/item";
+import type { ShopItem, Item } from "../types/model/item";
 import supabase from "../database/connection";
-
-export interface ItemRow {
-  id: string;
-  createdAt: string;
-  category: string;
-  name: string;
-  information: string;
-  image: string;
-  updatedAt: string;
-  isDisabled: boolean;
-}
-
-export interface AdminItemRow {
-  id: string;
-  createdAt: string;
-  category: string | null;
-  name: string;
-  information: string;
-  image: string | null;
-  updatedAt: string | null;
-  isDisabled: boolean | null;
-  icon: string | null;
-  classification: string | null;
-  quantity: number | null;
-  price: number;
-  rpc: string | null;
-}
-
-export interface ShopItem {
-  id: string;
-  category: string | null;
-  classification: string | null;
-  name: string;
-  information: string;
-  image: string | null;
-  icon: string | null;
-  quantity: number | null;
-  price: number;
-  rpc: string | null;
-}
-
-export interface Item {
-  id: string;
-  category: string | null;
-  name: string;
-  information: string;
-  image: string | null;
-  icon: string | null;
-  price: number;
-}
-
-export interface ItemPayload {
-  category: string | null;
-  name: string;
-  information: string;
-  image: string | null;
-  isDisabled: boolean;
-  icon: string | null;
-  classification: string | null;
-  quantity: number | null;
-  price: number;
-  rpc: string | null;
-}
 
 class SupabaseItemRepository {
   async fetchByIds(ids: string[]): Promise<Item[]> {

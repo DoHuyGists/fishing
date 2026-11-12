@@ -1,10 +1,8 @@
+import type { EventSchedulePayload, EventScheduleRow } from "../../../types/table/eventSchedule";
+import type { EventRow } from "../../../types/table/event";
 import { defineStore } from "pinia";
-import {
-  supabaseEventScheduleRepository,
-  type EventSchedulePayload,
-  type EventScheduleRow,
-} from "../../../data/supabaseEventScheduleRepository";
-import { supabaseEventRepository, type EventRow } from "../../../data/supabaseEventRepository";
+import { supabaseEventScheduleRepository } from "../../../data/supabaseEventScheduleRepository";
+import { supabaseEventRepository } from "../../../data/supabaseEventRepository";
 
 const emptyForm = () => ({
   id: null as string | null,

@@ -1,15 +1,6 @@
+import type { FeatureFlagRow, FeatureFlagUpdate } from "../types/table/featureFlag";
 import supabase from "../database/connection";
 import type { RealtimeChannel } from "@supabase/supabase-js";
-
-export interface FeatureFlagRow {
-  feature_key: string;
-  enabled: boolean;
-  message_vi: string;
-  message_en: string;
-  updated_at: string;
-  updated_by: string | null;
-}
-export type FeatureFlagUpdate = Pick<FeatureFlagRow, "enabled" | "message_vi" | "message_en">;
 const columns = "feature_key,enabled,message_vi,message_en,updated_at,updated_by";
 
 class SupabaseFeatureFlagRepository {

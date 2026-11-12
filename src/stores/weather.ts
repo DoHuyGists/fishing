@@ -1,7 +1,8 @@
+import type { ZoneWeatherRow } from "../types/table/zone";
 import { t as tr } from "../i18n";
 import { defineStore } from "pinia";
 import type { RealtimeChannel } from "@supabase/supabase-js";
-import { supabaseZoneRepository, type ZoneWeatherRow } from "../data/supabaseZoneRepository";
+import { supabaseZoneRepository } from "../data/supabaseZoneRepository";
 
 let channel: RealtimeChannel | null = null;
 

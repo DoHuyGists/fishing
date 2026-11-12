@@ -1,9 +1,11 @@
+import type { InventoryTableContext } from "../../../types/model/inventory";
+import type { UserInventory } from "../../../types/model/userInventory";
 import { t as tr } from "../../../i18n";
 import { inject, type InjectionKey } from "vue";
 import { computed, onMounted, ref, watch } from "vue";
 import { useAuthStore } from "../../../stores/auth.ts";
 import { useInventoryStore } from "../../../stores/inventory.ts";
-import type { UserInventory } from "../../../data/supabaseUserInventoryRepository.ts";
+
 import { useEquipmentStore, type Category, type EquipmentSet, type ItemData } from "../../../stores/equipment.ts";
 import { useCurrencyStore } from "../../../stores/currency.ts";
 import { useToast } from "../../../composables/useToast.ts";
@@ -300,8 +302,6 @@ export function useInventoryTable() {
     buySet,
   };
 }
-
-export type InventoryTableContext = ReturnType<typeof useInventoryTable>;
 export const inventoryTableContextKey: InjectionKey<InventoryTableContext> = Symbol("InventoryTableContext");
 
 export function useInventoryTableContext() {

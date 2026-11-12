@@ -1,11 +1,9 @@
 <script setup lang="ts">
+import type { FishingPassRewardPayload, FishingPassRewardRow } from "../../../types/table/fishingPassRewardsAdmin";
 import AdminModal from "../AdminModal.vue";
 import { computed, onMounted, ref } from "vue";
 import { useAdminFishingPassRewardsStore } from "./admin-fishing-pass-rewards-store.ts";
-import type {
-  FishingPassRewardPayload,
-  FishingPassRewardRow,
-} from "../../../data/supabaseFishingPassRewardsAdminRepository.ts";
+
 import FishingPassRewardsForm from "./FishingPassRewardsFormManagement.vue";
 
 const emit = defineEmits<{ close: [] }>();

@@ -1,7 +1,9 @@
+import type { Blueprint } from "../types/model/blueprint";
+import type { Item } from "../types/model/item";
 import { t as tr } from "../i18n";
 import { defineStore } from "pinia";
-import { supabaseBlueprintRepository, type Blueprint } from "../data/supabaseBlueprintRepository";
-import { supabaseItemRepository, type Item } from "../data/supabaseItemRepository";
+import { supabaseBlueprintRepository } from "../data/supabaseBlueprintRepository";
+import { supabaseItemRepository } from "../data/supabaseItemRepository";
 import { useCurrencyStore } from "./currency";
 import { useInventoryStore } from "./inventory";
 

@@ -1,44 +1,7 @@
+import type { MonitorAreaRow, MonitorPlayerRow, MonitorCurrencyRow, MonitorPresenceRow } from "../types/table/adminMonitor";
+import type { MonitorSubscriptionHandlers } from "../types/model/adminMonitor";
 import type { RealtimeChannel } from "@supabase/supabase-js";
 import supabase from "../database/connection";
-
-export interface MonitorAreaRow {
-  id: string;
-  title: string | null;
-  country_id: string;
-  is_available: boolean;
-}
-
-export interface MonitorPlayerRow {
-  id: string;
-  area_id: string;
-}
-
-export interface MonitorCurrencyRow {
-  id: string;
-  user_id: string;
-  cash: string;
-  shells: string;
-}
-
-interface MonitorPresenceRow {
-  id: string;
-  area_id: string | null;
-  status: string | null;
-}
-
-export interface MonitorPlayerChange {
-  id: string;
-  areaId: string | null;
-}
-
-export type MonitorRealtimeStatus = "connecting" | "connected" | "disconnected" | "error";
-
-interface MonitorSubscriptionHandlers {
-  onPlayerChange: (change: MonitorPlayerChange) => void;
-  onCurrencyRefresh: () => void;
-  onRefresh: () => void;
-  onStatus: (status: MonitorRealtimeStatus) => void;
-}
 
 const PAGE_SIZE = 500;
 

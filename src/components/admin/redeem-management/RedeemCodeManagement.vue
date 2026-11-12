@@ -1,7 +1,8 @@
 <script lang="ts" setup>
+import type { RedeemCodeRow } from "../../../types/table/redeemCode";
 import AdminModal from "../AdminModal.vue";
 import { onMounted } from "vue";
-import type { RedeemCodeRow } from "../../../data/supabaseRedeemCodeRepository";
+
 import RedeemCodeDeleteModal from "./RedeemCodeDeleteModal.vue";
 import RedeemCodeFormModal from "./RedeemCodeFormModal.vue";
 import { isRedeemCodeExpired, useAdminRedeemCodeStore } from "./admin-redeem-code-store";

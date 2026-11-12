@@ -1,47 +1,8 @@
+import type { OpinionFeedbackPayload, ErrorFeedbackPayload, OpinionFeedbackRow, ErrorFeedbackRow } from "../types/table/feedback";
+import type { ErrorFeedbackAttachment, ErrorFeedbackStatus } from "../types/model/feedback";
 import { t as tr } from "../i18n";
 import supabase from "../database/connection";
 import { createUuid } from "../utils/uuid";
-
-export interface OpinionFeedbackPayload {
-  userId: string;
-  like: string;
-  dislike: string;
-  contribute: string | null;
-}
-
-export interface ErrorFeedbackAttachment {
-  type: "image" | "video";
-  path: string;
-}
-
-export interface ErrorFeedbackPayload {
-  userId: string;
-  title: string;
-  description: string | null;
-  files: File[];
-}
-
-export interface OpinionFeedbackRow {
-  id: string;
-  user_id: string | null;
-  like: string;
-  dislike: string;
-  contribute: string | null;
-  created_at: string;
-}
-
-export type ErrorFeedbackStatus = "pending" | "processing" | "resolved" | "closed";
-
-export interface ErrorFeedbackRow {
-  id: string;
-  user_id: string | null;
-  title: string;
-  description: string | null;
-  attachments: ErrorFeedbackAttachment[];
-  status: ErrorFeedbackStatus;
-  created_at: string;
-  updated_at: string;
-}
 
 class SupabaseFeedbackRepository {
   async fetchMyErrors(userId: string, page: number): Promise<ErrorFeedbackRow[]> {

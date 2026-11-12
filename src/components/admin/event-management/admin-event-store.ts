@@ -1,5 +1,6 @@
+import type { EventPayload, EventRow } from "../../../types/table/event";
 import { defineStore } from "pinia";
-import { supabaseEventRepository, type EventPayload, type EventRow } from "../../../data/supabaseEventRepository";
+import { supabaseEventRepository } from "../../../data/supabaseEventRepository";
 
 const emptyForm = () => ({
   id: null as string | null,

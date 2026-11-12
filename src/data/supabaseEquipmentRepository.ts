@@ -1,7 +1,9 @@
+import type { EquipmentRow } from "../types/table/equipment";
+import type { EquipmentVariant } from "../types/model/equipment";
 import { t as tr } from "../i18n";
 import type { FishingTool } from "../stores/fishing";
 import supabase from "../database/connection";
-import { type EquipmentVariant } from "./equipmentCatalog";
+
 import type { EquipmentSet } from "../stores/equipment";
 
 const COLUMN_BY_TOOL: Record<FishingTool, string> = {
@@ -11,8 +13,6 @@ const COLUMN_BY_TOOL: Record<FishingTool, string> = {
   hook: "hook",
   bait: "bait",
 };
-
-type EquipmentRow = Record<(typeof COLUMN_BY_TOOL)[FishingTool], EquipmentVariant[] | null>;
 
 class SupabaseEquipmentRepository {
   async fetchEquipment(): Promise<Record<FishingTool, EquipmentVariant[]>> {

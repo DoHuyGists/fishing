@@ -1,15 +1,15 @@
 <script setup lang="ts">
+import type { NotificationKind } from "../../../types/model/notification";
+import type { NotificationRow } from "../../../types/table/notification";
 import { t as tr } from "../../../i18n";
 
 import { computed, onMounted, onUnmounted, ref } from "vue";
 import Modal from "../../shared/Modal.vue";
 import { useAuthStore } from "../../../stores/auth.ts";
 import { useNotificationStore } from "../../../stores/notification.ts";
-import type { NotificationRow } from "../../../data/supabaseNotificationRepository.ts";
+
 import Tab from "../../shared/Tab.vue";
 import { formatDateTime } from "../../../utils/time.ts";
-
-type NotificationKind = "personal" | "system";
 const currentTabActive = ref("personal");
 const unreadPersonalNotifyCount = computed(() => notifications.personal.filter((x) => !x.is_read).length);
 const unreadASystemNotifyCount = computed(() => notifications.system.filter((x) => !x.is_read).length);

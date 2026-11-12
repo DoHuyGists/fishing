@@ -1,5 +1,6 @@
+import type { CrudRepository } from "../../types/model/weather";
 import { defineStore } from "pinia";
-import type { CrudRepository } from "../../data/supabaseWeatherRepository";
+
 
 // Builds a Pinia store exposing CRUD actions over a repository.
 export function defineCrudStore<Row extends { id: string }, Payload>(

@@ -1,10 +1,9 @@
 <script setup lang="ts">
+import type { CaughtFishViewMode as ViewMode } from "../../../types/model/mission";
 import { t as tr } from "../../../i18n";
 
 import { computed, reactive, ref } from "vue";
 import type { CaughtFish } from "../../../stores/caught";
-
-type ViewMode = "list" | "grid" | "species";
 
 const props = defineProps<{
   caughtFishes: CaughtFish[];

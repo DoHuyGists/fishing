@@ -1,9 +1,10 @@
 <script setup lang="ts">
+import type { CareMode } from "../../../types/model/aquaculture";
 import { t as tr } from "../../../i18n";
 
 import { computed, ref, watch } from 'vue'
 import { useAquacultureStore } from '../../../stores/aquaculture'
-import type { CareMode } from '../../../data/aquaculture'
+
 import { formatDuration } from './pondPresentation'
 import Cash from '../currency/Cash.vue'
 

@@ -1,9 +1,5 @@
+import type { UserSetting } from "../types/model/userSetting";
 import supabase from "../database/connection";
-
-export interface UserSetting {
-  id: string;
-  is_fishing_background_sound_turn_on: boolean;
-}
 
 class SupabaseUserSettingRepository {
   async fetch(userId: string): Promise<UserSetting | null> {

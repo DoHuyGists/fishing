@@ -1,23 +1,8 @@
 <script setup lang="ts">
+import type { EventThumbnailProps as Props } from "../../../types/model/event";
 import { t as tr } from "../../../i18n";
 
 import { computed, ref, watch } from "vue";
-
-interface Props {
-  /** Đường dẫn ảnh. Bỏ trống hoặc ảnh lỗi => hiện placeholder */
-  src?: string | null;
-  alt?: string;
-  /** Chiều rộng khung (px) */
-  width?: number;
-  /** Chiều cao khung (px) */
-  height?: number;
-  /** Góc nghiêng (độ): âm = nghiêng trái, dương = nghiêng phải */
-  rotate?: number;
-  /** Bo góc (px) */
-  radius?: number;
-  /** Độ dày viền trắng (px) */
-  border?: number;
-}
 
 const props = withDefaults(defineProps<Props>(), {
   src: "",

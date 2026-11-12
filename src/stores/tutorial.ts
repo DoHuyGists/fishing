@@ -1,6 +1,7 @@
+import type { TutorialRow } from "../types/table/tutorial";
 import { t as tr } from "../i18n";
 import { defineStore } from "pinia";
-import { supabaseTutorialRepository, type TutorialRow } from "../data/supabaseTutorialRepository";
+import { supabaseTutorialRepository } from "../data/supabaseTutorialRepository";
 
 export const useTutorialStore = defineStore("tutorial", {
   state: () => ({

@@ -1,5 +1,6 @@
+import type { DailyMissionTemplateRow, TemplatePayload } from "../../../types/table/dailyMissionAdmin";
 import { defineStore } from "pinia";
-import { supabaseDailyMissionTemplateRepository, type DailyMissionTemplateRow, type TemplatePayload } from "../../../data/supabaseDailyMissionAdminRepository";
+import { supabaseDailyMissionTemplateRepository } from "../../../data/supabaseDailyMissionAdminRepository";
 
 const emptyForm = () => ({ id: null as string | null, code: "", name: "", description: "", event_type: "", target_value: 1, mission_points: 1, difficulty: "EASY", weight: 1, config: "{}", is_active: true });
 const messageOf = (error: unknown) => error instanceof Error ? error.message : "Không thể thực hiện thao tác.";

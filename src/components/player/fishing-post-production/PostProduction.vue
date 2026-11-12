@@ -1,4 +1,5 @@
 <script lang="ts" setup>
+import type { PostProductionSide as Side } from "../../../types/model/postProduction";
 import { t as tr } from "../../../i18n";
 
 import { computed, onMounted, reactive, ref } from "vue";
@@ -9,8 +10,6 @@ import { useUserProfileStore } from "../../../stores/userProfile.ts";
 import { useModalStore } from "../../../stores/modal.ts";
 import { useToast } from "../../../composables/useToast.ts";
 import TwoOptionsModal from "../../shared/TwoOptionsModal.vue";
-
-type Side = "net" | "stored";
 
 const caughtStore = useCaughtStore();
 const userProfileStore = useUserProfileStore();

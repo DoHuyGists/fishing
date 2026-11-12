@@ -1,26 +1,6 @@
-﻿import supabase from "../database/connection";
+import type { ZoneWeatherRow } from "../types/table/zone";
+import supabase from "../database/connection";
 import type { RealtimeChannel } from "@supabase/supabase-js";
-
-export type WeatherRow = {
-  id: string;
-  code: string;
-  name: string;
-  rarity_tier: string;
-  duration_min: number;
-  duration_max: number;
-  image: string | null;
-};
-
-export type ZoneWeatherRow = {
-  id: string;
-  code: string;
-  name: string;
-  weather_id: string | null;
-  weather_expires_at: string | null;
-  weather_active_modifiers: any[] | null;
-  weather_updated_at: string | null;
-  weather: WeatherRow | null;
-};
 
 const ZONE_SELECT =
   "id, code, name, weather_id, weather_expires_at, weather_active_modifiers, weather_updated_at, weather:weather_id(id, code, name, rarity_tier, duration_min, duration_max, image)";

@@ -1,3 +1,6 @@
+import type { UserInventory } from "../types/model/userInventory";
+import type { AquacultureCatalog, AquacultureFarm, CareMode, FarmAction, AquaculturePond, AquacultureBatch, AquacultureFish, PondSwimmer, FarmFoodOption } from "../types/model/aquaculture";
+import type { AquacultureRecord } from "../types/table/aquaculture";
 import { getFormattingLocale } from '../i18n';
 import { t as tr } from "../i18n";
 import { defineStore } from 'pinia'
@@ -6,14 +9,10 @@ import { useCurrencyStore } from './currency'
 import { useInventoryStore } from './inventory'
 import { useUserProfileStore } from './userProfile'
 import { supabaseCurrencyRepository } from '../data/supabaseCurrencyRepository'
-import { supabaseUserInventoryRepository, type UserInventory } from '../data/supabaseUserInventoryRepository'
+import { supabaseUserInventoryRepository } from '../data/supabaseUserInventoryRepository';
 import { supabaseUserProfileRepository } from '../data/supabaseUserProfileRepository'
 import { AquacultureRpcError, supabaseAquacultureRepository as repository } from '../data/supabaseAquacultureRepository'
-import {
-  batchProgress, fishSaleCash, maxStockQuantity, type AquacultureCatalog, type AquacultureFarm, type AquacultureRecord,
-  type CareMode, type FarmAction, type AquaculturePond, type AquacultureBatch, type AquacultureFish,
-  type PondSwimmer, type FarmFoodOption,
-} from '../data/aquaculture'
+import { batchProgress, fishSaleCash, maxStockQuantity } from '../data/aquaculture';
 import { createUuid } from '../utils/uuid'
 import { useToast } from '../composables/useToast'
 

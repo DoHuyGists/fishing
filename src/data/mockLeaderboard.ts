@@ -1,11 +1,5 @@
+import type { MockLeaderboardCriterion, MockLeaderboardEntry } from "../types/model/mockLeaderboard";
 import { t as tr } from "../i18n";
-export type MockLeaderboardCriterion = "catches" | "largest" | "collection";
-
-export interface MockLeaderboardEntry {
-  id: string;
-  displayName: string;
-  value: number;
-}
 
 // Fixtures for criteria without a leaderboard endpoint. IDs do not refer to real users.
 export const mockLeaderboards: Record<MockLeaderboardCriterion, MockLeaderboardEntry[]> = {

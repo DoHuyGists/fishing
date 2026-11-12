@@ -1,26 +1,5 @@
+import type { EventScheduleRow, EventSchedulePayload } from "../types/table/eventSchedule";
 import supabase from "../database/connection";
-
-export interface EventScheduleRow {
-  id: string;
-  created_at: string;
-  eventId: string;
-  start: string;
-  end: string;
-  isDisabled: boolean;
-  viewCount: number;
-  eventName: string | null;
-  eventThumbnail: string | null;
-  eventImage: string | null;
-  eventDescription: string | null;
-}
-
-export interface EventSchedulePayload {
-  eventId: string;
-  start: string;
-  end: string;
-  isDisabled: boolean;
-  viewCount: number;
-}
 
 const SELECT_QUERY = "*, event:event(id, name, thumbnail, image, description)";
 

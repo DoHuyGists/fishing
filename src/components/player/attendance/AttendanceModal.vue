@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import type { AttendanceReward as Reward, MonthReward } from "../../../types/model/attendance";
 import { getFormattingLocale } from '../../../i18n';
 import { t as tr } from "../../../i18n";
 
@@ -12,9 +13,6 @@ import FishingPassPurchaseModal from "./FishingPassPurchaseModal.vue";
 import FishingPassRewards from "./FishingPassRewards.vue";
 import DailyAttendance from "./DailyAttendance.vue";
 import { useFishingPassStore } from "../../../stores/fishingPass";
-
-type Reward = { name: string; icon: string; amount?: number };
-type MonthReward = { day: number; freeReward: Reward; passReward: Reward; freeClaimed: boolean; passClaimed: boolean; unlocked: boolean };
 
 const tabs = [
   { key: "daily", get label() { return tr('AttendanceModal.diem_danh_ngay'); } },

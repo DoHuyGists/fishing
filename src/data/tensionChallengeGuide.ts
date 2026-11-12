@@ -1,15 +1,5 @@
-import type { TensionChallenge } from "./tensionChallenge";
-
-export type GuideSection = "config" | "fish";
-type GuideEntry = {
-  name: string;
-  unit: string;
-  meaning: string;
-  mechanism: string;
-  tuning: string;
-  example: string;
-};
-
+import type { GuideEntry } from "../types/model/tensionChallengeGuide";
+import type { TensionChallenge } from "../types/model/tensionChallenge";
 export const tensionGuideBaseline: Pick<TensionChallenge, "config" | "fish"> = {
   config: {
     tickRate: 60, safeMin: 35, safeMax: 70, maxTension: 100,

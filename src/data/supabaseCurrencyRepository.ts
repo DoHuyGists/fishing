@@ -1,23 +1,7 @@
+import type { CurrencyRow } from "../types/table/currency";
+import type { CurrencyConversionRate } from "../types/model/currency";
 import supabase from "../database/connection";
 import type { RealtimeChannel } from "@supabase/supabase-js";
-
-export interface CurrencyRow {
-  id: string;
-  created_at: string;
-  user_id: string;
-  cash: number;
-  shells: number;
-  tickets: number;
-}
-
-export type CurrencyKind = "cash" | "shells" | "tickets";
-
-export interface CurrencyConversionRate {
-  source_currency: CurrencyKind;
-  target_currency: CurrencyKind;
-  source_amount: number;
-  target_amount: number;
-}
 
 class SupabaseCurrencyRepository {
   async fetchConversionRates(): Promise<CurrencyConversionRate[]> {

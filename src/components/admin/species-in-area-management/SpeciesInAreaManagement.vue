@@ -1,8 +1,9 @@
 <script lang="ts" setup>
+import type { SpeciesInAreaPayload, SpeciesInAreaRow } from "../../../types/table/speciesInArea";
 import AdminModal from "../AdminModal.vue";
 import { computed, onMounted, reactive, ref } from "vue";
 import { storeToRefs } from "pinia";
-import type { SpeciesInAreaPayload, SpeciesInAreaRow } from "../../../data/supabaseSpeciesInAreaRepository";
+
 import { useSpeciesInAreaStore } from "./admin-species-in-area-store.ts";
 import { mapData } from "../../../data/map";
 import { useDepthScopeStore } from "../depth-scope-management/admin-depth-scope-store.ts";

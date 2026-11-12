@@ -1,13 +1,7 @@
+import type { UserInventory } from "../types/model/userInventory";
+import type { SpinWheelResult } from "../types/model/spinWheel";
 import supabase from "../database/connection";
-import type { SpinWheelResult } from "./supabaseSpinWheelRepository";
 
-export interface UserInventory {
-  id: string;
-  data: any;
-  userId: string;
-  createdAt: any;
-  rpc: string | null;
-}
 
 class SupabaseUserInventoryRepository {
   async fetchUserInventory(userId: string): Promise<UserInventory[]> {

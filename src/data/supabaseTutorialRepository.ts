@@ -1,14 +1,5 @@
+import type { TutorialRow } from "../types/table/tutorial";
 import supabase from "../database/connection";
-
-export interface TutorialRow {
-  id: string;
-  slug: string;
-  title: string;
-  description: string;
-  thumbnail: string;
-  duration_minutes: number;
-  sort_order: number;
-}
 
 class SupabaseTutorialRepository {
   async fetchPublished(): Promise<TutorialRow[]> {

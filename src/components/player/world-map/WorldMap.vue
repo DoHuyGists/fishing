@@ -1,4 +1,6 @@
 <script setup lang="ts">
+import type { CountryValueRow } from "../../../types/table/worldMap";
+import type { ViewTarget, ZoomState, PickPoint, AreaPoint } from "../../../types/model/worldMap";
 import { computed, onBeforeUnmount, onMounted, ref, watch } from "vue";
 import * as d3 from "d3";
 import * as topojson from "topojson-client";
@@ -6,41 +8,6 @@ import type { GeometryCollection, Topology } from "topojson-specification";
 import world from "world-atlas/countries-110m.json";
 import { useCountryStore } from "../../../stores/country";
 import { createWorldMapCloudTexture } from "../../../utils/worldMapClouds";
-
-interface CountryValueRow {
-  country_id: number;
-  color: string | null;
-}
-
-interface ViewTarget {
-  lon?: number; // bỏ trống = giữ tâm hiện tại
-  lat?: number;
-  k?: number; // bỏ trống = giữ mức zoom hiện tại
-  duration?: number; // ms, 0 = nhảy ngay, >0 = bay mượt
-}
-
-interface ZoomState {
-  x: number; // dịch chuyển ngang (px)
-  y: number; // dịch chuyển dọc (px)
-  k: number; // mức zoom (1 = ban đầu)
-  center: [number, number] | null; // [kinh độ, vĩ độ] tại tâm khung nhìn
-  fromUser: boolean;
-}
-
-interface PickPoint {
-  screen: { x: number; y: number }; // px trên canvas
-  map: { x: number; y: number }; // toạ độ trong hệ chưa zoom
-  lon: number | null;
-  lat: number | null;
-  k: number;
-}
-
-interface AreaPoint {
-  id: string;
-  title?: string | null;
-  location?: { lon?: number; lat?: number } | null;
-  [key: string]: any;
-}
 
 const emit = defineEmits<{
   zoom: [state: ZoomState];

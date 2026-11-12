@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import type { AssetRow } from "../../types/table/asset";
 import { t as tr } from "../../i18n";
 
 import { computed, defineAsyncComponent, nextTick, ref, useId, watch } from "vue";
@@ -9,7 +10,7 @@ import { BulletList, OrderedList, ListItem } from "@tiptap/extension-list";
 import Image from "@tiptap/extension-image";
 import { isGuideMediaUrl, sanitizeGuideContent } from "../../utils/guideContent";
 import { GuideVideo } from "./guideVideo";
-import type { AssetRow } from "../../data/supabaseAssetRepository";
+
 
 const AssetsManagementModal = defineAsyncComponent(() => import("../admin/assets/AssetsManagementModal.vue"));
 

@@ -1,7 +1,9 @@
+import type { LeaderboardEntry } from "../types/model/leaderboard";
+import type { MockLeaderboardCriterion } from "../types/model/mockLeaderboard";
 import { t as tr } from "../i18n";
 import { defineStore } from "pinia";
-import { supabaseLeaderboardRepository, type LeaderboardEntry } from "../data/supabaseLeaderboardRepository";
-import { mockLeaderboards, type MockLeaderboardCriterion } from "../data/mockLeaderboard";
+import { supabaseLeaderboardRepository } from "../data/supabaseLeaderboardRepository";
+import { mockLeaderboards } from "../data/mockLeaderboard";
 
 type LeaderboardCriterion = "score" | MockLeaderboardCriterion;
 

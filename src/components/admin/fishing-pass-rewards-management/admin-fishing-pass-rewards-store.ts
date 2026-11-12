@@ -1,6 +1,8 @@
+import type { AdminFishingPass, AdminFishingPassItem } from "../../../types/model/fishingPassRewardsAdmin";
+import type { FishingPassRewardPayload, FishingPassRewardRow } from "../../../types/table/fishingPassRewardsAdmin";
 import { defineStore } from "pinia";
 import { ref } from "vue";
-import { supabaseFishingPassRewardsAdminRepository, type AdminFishingPass, type AdminFishingPassItem, type FishingPassRewardPayload, type FishingPassRewardRow } from "../../../data/supabaseFishingPassRewardsAdminRepository";
+import { supabaseFishingPassRewardsAdminRepository } from "../../../data/supabaseFishingPassRewardsAdminRepository";
 
 export const useAdminFishingPassRewardsStore = defineStore("admin-fishing-pass-rewards", () => {
   const rewards = ref<FishingPassRewardRow[]>([]);

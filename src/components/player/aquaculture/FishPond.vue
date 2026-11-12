@@ -1,7 +1,8 @@
 <script setup lang="ts">
+import type { AquaculturePond } from "../../../types/model/aquaculture";
 import { t as tr } from "../../../i18n";
 
-import type { AquaculturePond } from '../../../data/aquaculture'
+
 import { fishImageUrl } from './pondPresentation'
 
 defineProps<{

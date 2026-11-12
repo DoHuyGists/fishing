@@ -1,9 +1,6 @@
+import type { SpeciesPayload, SpeciesRow } from "../../../types/table/species";
 import { defineStore } from "pinia";
-import {
-  supabaseSpeciesRepository,
-  type SpeciesPayload,
-  type SpeciesRow,
-} from "../../../data/supabaseSpeciesRepository";
+import { supabaseSpeciesRepository } from "../../../data/supabaseSpeciesRepository";
 
 function sortSpecies(species: SpeciesRow[]) {
   return species.sort((left, right) => left.name.localeCompare(right.name));

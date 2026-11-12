@@ -1,14 +1,10 @@
+import type { MonitorAreaRow, MonitorCurrencyRow } from "../../../types/table/adminMonitor";
+import type { MonitorPlayerChange, MonitorRealtimeStatus } from "../../../types/model/adminMonitor";
 import { computed, ref } from "vue";
 import { defineStore } from "pinia";
 import type { RealtimeChannel } from "@supabase/supabase-js";
 import type { ChartData } from "chart.js";
-import {
-  supabaseAdminMonitorRepository,
-  type MonitorAreaRow,
-  type MonitorCurrencyRow,
-  type MonitorPlayerChange,
-  type MonitorRealtimeStatus,
-} from "../../../data/supabaseAdminMonitorRepository";
+import { supabaseAdminMonitorRepository } from "../../../data/supabaseAdminMonitorRepository";
 
 export interface AreaAttendance {
   id: string;

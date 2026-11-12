@@ -1,6 +1,7 @@
+import type { UserTurnStatus } from "../types/model/userInArea";
 import { t as tr } from "../i18n";
 import { defineStore } from "pinia";
-import { supabaseUserInAreaRepository, type UserTurnStatus } from "../data/supabaseUserInAreaRepository";
+import { supabaseUserInAreaRepository } from "../data/supabaseUserInAreaRepository";
 
 const RECHARGE_INTERVAL_MS = 300_000;
 
