@@ -12,7 +12,7 @@ import { useUserProfileStore } from "../../../stores/userProfile.ts";
 import { useToast } from "../../../composables/useToast.ts";
 import { usePagedListFilters } from '../../../composables/usePagedListFilters';
 import { useHealthStore } from '../../../stores/health';
-import { healthEquipment } from '../../../data/healthEquipment';
+import { healthEquipment, healthSlots } from '../../../data/healthEquipment';
 
 const SLOTS: Category[] = ["rod", "line", "reel", "hook", "bait"];
 const LABELS: Record<Category, string> = {
@@ -38,6 +38,15 @@ export function useInventoryTable(initialTab: InventoryTab = 'fishing') {
   const usingItemId = ref<string | null>(null);
   const authStore = useAuthStore();
   const inventoryStore = useInventoryStore();
+  const itemClassification = computed(() => activeTab.value === 'health' ? 'body' : 'fishing');
+  if (inventoryStore.viewClassification !== itemClassification.value) {
+    inventoryStore.viewPage = 1;
+    inventoryStore.viewItems = [];
+    inventoryStore.viewTotal = 0;
+    inventoryStore.ownedTotal = 0;
+    ++inventoryStore.viewRequest;
+  }
+  inventoryStore.viewClassification = itemClassification.value;
   const equipmentStore = useEquipmentStore();
   const userProfileStore = useUserProfileStore();
   const equipmentCapacity = computed(() => userProfileStore.equipmentCapacity);
@@ -93,10 +102,22 @@ export function useInventoryTable(initialTab: InventoryTab = 'fishing') {
   const pagedItems = computed(() => inventoryStore.viewItems);
   async function loadItemsPage(page?: number) {
     const query = itemSearch.value.trim().toLowerCase();
-    const categories = query ? SLOTS.filter(slot => LABELS[slot].toLowerCase().includes(query)) : [];
+    const categories = query ? activeTab.value === 'health'
+      ? healthSlots.filter(slot => tr(`Health.slot_${slot}`).toLowerCase().includes(query))
+      : SLOTS.filter(slot => LABELS[slot].toLowerCase().includes(query)) : [];
     await inventoryStore.loadViewPage(categories, page);
   }
   usePagedListFilters([itemSearch], () => { void loadItemsPage(1).catch(error => toast.error(error.message)); }, () => { ++inventoryStore.viewRequest; });
+  watch(activeTab, () => {
+    inventoryStore.viewClassification = itemClassification.value;
+    inventoryStore.viewPage = 1;
+    inventoryStore.viewItems = [];
+    inventoryStore.viewTotal = 0;
+    inventoryStore.ownedTotal = 0;
+    selected.value = new Set(); selectedRecords.clear();
+    if (modal.value === 'delete') modal.value = null;
+    void loadItemsPage(1).catch(error => toast.error(error.message));
+  }, { flush: 'sync' });
 
   const toggleSelect = (id: string) => {
     const next = new Set(selected.value);

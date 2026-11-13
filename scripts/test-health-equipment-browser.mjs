@@ -11,9 +11,9 @@ const executablePath = process.env.HEALTH_TEST_BROWSER ?? [
 ].find(existsSync);
 const owner = '11111111-1111-4111-8111-111111111111';
 const rows = [
-  { id: 'hat', user_id: owner, data: { name: 'Mũ sinh tồn', category: 'head', health_bonuses: { morale: 15 }, quantity: 1 } },
-  { id: 'vest', user_id: owner, data: { name: 'Áo bảo hộ', category: 'torso', health_bonuses: { vitality: 20 }, quantity: 1 } },
-  { id: 'rod', user_id: owner, data: { name: 'Cần câu', category: 'rod', quantity: 1, max_weight: 30, pull_strength: 5, durability: 80, catch_rate: 0.05, luck_bonus: 2 } },
+  { id: 'hat', user_id: owner, data: { name: 'Mũ sinh tồn', category: 'head', classification: 'body', health_bonuses: { morale: 15 }, quantity: 1 } },
+  { id: 'vest', user_id: owner, data: { name: 'Áo bảo hộ', category: 'torso', classification: 'body', health_bonuses: { vitality: 20 }, quantity: 1 } },
+  { id: 'rod', user_id: owner, data: { name: 'Cần câu', category: 'rod', classification: 'fishing', quantity: 1, max_weight: 30, pull_strength: 5, durability: 80, catch_rate: 0.05, luck_bonus: 2 } },
 ];
 const makeSet = (id, used = false) => ({ id, user_id: owner, created_at: '2026-11-13', is_used: used, head: [], torso: [], hands: [], legs: [], feet: [], accessory: [] });
 const bodySets = [makeSet('body-1', true), makeSet('body-2')];
@@ -96,7 +96,9 @@ try {
     }
     if (url.includes('/user_inventory?')) {
       reads.push(url);
-      return route.fulfill({ status: 200, contentType: 'application/json', headers: { 'Content-Range': '0-2/3' }, body: request.method() === 'HEAD' ? '' : JSON.stringify(rows) });
+      const classification = new URL(url).searchParams.get('data->>classification')?.replace(/^eq\./, '');
+      const filtered = classification ? rows.filter(row => row.data.classification === classification) : rows;
+      return route.fulfill({ status: 200, contentType: 'application/json', headers: { 'Content-Range': `0-${Math.max(0, filtered.length - 1)}/${filtered.length}`, 'Access-Control-Expose-Headers': 'Content-Range' }, body: request.method() === 'HEAD' ? '' : JSON.stringify(filtered) });
     }
     return route.fulfill({ status: 200, contentType: 'application/json', body: '[]' });
   });
@@ -106,6 +108,8 @@ try {
   await fishingTab.waitFor();
   assert.equal(await fishingTab.getAttribute('aria-selected'), 'true');
   assert.equal(await page.locator('#user-inventory').count(), 1);
+  assert.deepEqual(await page.evaluate(() => window.inventory.viewItems.map(item => item.id)), ['rod']);
+  assert.ok(reads.some(url => new URL(url).searchParams.get('data->>classification') === 'eq.fishing'));
   const fishingSummary = page.getByRole('region', { name: 'Chỉ số trang bị câu', exact: true });
   assert.equal(await fishingSummary.locator('output').count(), 5);
   assert.equal(await fishingSummary.locator('output[aria-label="Tải trọng tối đa"]').textContent(), '0 kg');
@@ -129,10 +133,17 @@ try {
   await page.waitForFunction(() => window.inventory.activeFishingStats.max_weight === 30);
   await page.locator('#set-0-slot-0').click(); await rodCard.click();
   const readsBefore = reads.length;
+  await page.getByRole('checkbox', { name: 'Chọn Cần câu để xóa', exact: true }).check();
+  await page.evaluate(() => { window.inventory.viewPage = 3; });
   await page.evaluate(() => { window.sharedListNode = document.querySelector('#user-inventory'); });
   await healthTab.click();
   assert.equal(await page.evaluate(() => window.sharedListNode === document.querySelector('#user-inventory')), true);
-  assert.equal(reads.length, readsBefore);
+  await page.waitForFunction(() => window.inventory.viewItems.length === 2 && window.inventory.viewItems.every(item => item.data.classification === 'body'));
+  assert.ok(reads.length > readsBefore);
+  assert.ok(reads.some(url => new URL(url).searchParams.get('data->>classification') === 'eq.body'));
+  assert.equal(await page.evaluate(() => window.inventory.viewPage), 1);
+  assert.equal(await page.getByRole('button', { name: /Xóa đã chọn/ }).isDisabled(), true);
+  assert.equal(await page.locator('#user-inventory .font-medium').getByText('Cần câu', { exact: true }).count(), 0);
   assert.equal(await page.locator('output:visible').count(), 5);
   assert.equal(await page.locator('svg[viewBox="0 0 200 470"]').count(), 0);
   assert.ok(await page.evaluate(() => window.health.stats.every(stat => stat.value === 0)));
@@ -166,6 +177,7 @@ try {
   await page.getByRole('button', { name: 'Thêm set', exact: true }).click();
   await page.waitForFunction(() => window.health.sets.length === 3);
   await fishingTab.click();
+  await page.waitForFunction(() => window.inventory.viewItems.length === 1 && window.inventory.viewItems[0].data.classification === 'fishing');
   assert.equal(await page.evaluate(() => window.inventory.equipmentSets[0].rod.length), 1);
   await healthTab.click();
   await page.screenshot({ path: join(tmpdir(), 'fishing-health-equipment-desktop.png'), fullPage: true });

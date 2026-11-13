@@ -2,20 +2,26 @@ import type { UserInventory } from "../types/model/userInventory";
 import type { SpinWheelResult } from "../types/model/spinWheel";
 import supabase from "../database/connection";
 import { escapeLike, listPage, pageRange } from './pagination';
+import type { InventoryClassification } from '../types/model/inventory';
 
 const mapInventory = (row: any): UserInventory => ({ id: row.id, data: row.data, userId: row.user_id, createdAt: row.created_at, rpc: row.rpc });
 
 
 class SupabaseUserInventoryRepository {
-  async fetchPage(userId: string, page: number, search: string, categories: string[]) {
+  async fetchPage(userId: string, page: number, search: string, categories: string[], classification?: InventoryClassification) {
     let query = supabase.from('user_inventory').select('*', { count: 'exact' }).eq('user_id', userId);
+    let totalQuery = supabase.from('user_inventory').select('id', { count: 'exact', head: true }).eq('user_id', userId);
+    if (classification) {
+      query = query.eq('data->>classification', classification);
+      totalQuery = totalQuery.eq('data->>classification', classification);
+    }
     if (search.trim()) {
       const pattern = `"%${escapeLike(search).replace(/"/g, '\\"')}%"`;
       query = query.or(`data->>name.ilike.${pattern},data->>category.ilike.${pattern}${categories.length ? `,data->>category.in.(${categories.join(',')})` : ''}`);
     }
     const [result, total] = await Promise.all([
       query.order('created_at', { ascending: false }).order('id').range(...pageRange(page)),
-      supabase.from('user_inventory').select('id', { count: 'exact', head: true }).eq('user_id', userId),
+      totalQuery,
     ]);
     if (result.error) throw new Error(result.error.message);
     if (total.error) throw new Error(total.error.message);

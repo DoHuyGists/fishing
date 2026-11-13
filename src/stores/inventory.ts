@@ -6,6 +6,7 @@ import { defineStore } from "pinia";
 import { supabaseUserInventoryRepository } from "../data/supabaseUserInventoryRepository";
 import { supabaseEquipmentRepository } from "../data/supabaseEquipmentRepository";
 import type { EquipmentSet } from "./equipment";
+import type { InventoryClassification } from '../types/model/inventory';
 
 export const useInventoryStore = defineStore("Inventory", {
     state: () => ({
@@ -18,6 +19,7 @@ export const useInventoryStore = defineStore("Inventory", {
         viewPage: 1,
         viewPageSize: 10,
         viewSearch: '',
+        viewClassification: undefined as InventoryClassification | undefined,
         viewTotal: 0,
         ownedTotal: 0,
         viewLoading: false,
@@ -65,7 +67,7 @@ export const useInventoryStore = defineStore("Inventory", {
             const current = () => request === this.viewRequest && auth.user?.id === userId && auth.sessionGeneration === generation;
             this.viewLoading = true; this.viewError = '';
             try {
-                const result = await supabaseUserInventoryRepository.fetchPage(userId, page, this.viewSearch, categories);
+                const result = await supabaseUserInventoryRepository.fetchPage(userId, page, this.viewSearch, categories, this.viewClassification);
                 if (!current()) return;
                 this.viewItems = result.items; this.viewPage = page; this.viewTotal = result.total; this.ownedTotal = result.ownedTotal;
                 if (!result.items.length && page > 1) await this.loadViewPage(categories, Math.max(1, Math.ceil(result.total / this.viewPageSize)));

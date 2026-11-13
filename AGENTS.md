@@ -10,6 +10,7 @@
 - Prioritize breaking down large components into smaller ones for better structure and recognition.
 - Try to limit using basic state management variables if it can be done better when using Pinia store or composables
 - Type references in the 'types' folder, take a look before intending to make a new type.
+- Choose the right animation from animation.css if the component not have yet.
 - Always run a build check after changing code.
 
 
