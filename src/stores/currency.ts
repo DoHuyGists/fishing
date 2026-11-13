@@ -1,4 +1,5 @@
 import { useGameCatalogStore } from './gameCatalog';
+import { useReadCacheStore } from './readCache';
 import type { CurrencyConversionRate } from "../types/model/currency";
 import { getFormattingLocale, t as tr } from "../i18n";
 import { defineStore } from "pinia";
@@ -98,7 +99,9 @@ export const useCurrencyStore = defineStore("currency", {
       const userId = auth.user?.id;
       const generation = auth.sessionGeneration;
       if (!userId) return;
+      if (invalidate) await useReadCacheStore().invalidate(['wallet']);
       const current = () => auth.user?.id === userId && auth.sessionGeneration === generation;
+      if (!current()) return;
       this.loading = true; this.error = '';
       try {
         const wallet = await refreshWallet(userId + ':' + generation,

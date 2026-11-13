@@ -4,6 +4,8 @@ import { defineStore } from "pinia";
 import { defaultEquipmentVariants } from "../data/equipmentCatalog";
 
 import { supabaseEquipmentRepository } from "../data/supabaseEquipmentRepository";
+import { useReadCacheStore } from './readCache';
+import { useAuthStore } from './auth';
 import { useFishingStore, type FishingTool } from "./fishing";
 
 export type Category = "rod" | "line" | "reel" | "hook" | "bait";
@@ -54,10 +56,15 @@ export const useEquipmentStore = defineStore("equipment", {
       Object.assign(useFishingStore().equipmentLoadout, selected);
     },
     async fetchEquipment(userId: string, force = false) {
+      const auth = useAuthStore(), generation = auth.sessionGeneration;
+      const current = () => auth.user?.id === userId && auth.sessionGeneration === generation;
+      if (!current()) return;
+      if (force) await useReadCacheStore().invalidate(['equipment']);
+      if (!current()) return;
       if (pendingRequest?.userId === userId && pendingRequest.requestId === this.requestId) {
         const requestId = this.requestId;
         await pendingRequest.promise;
-        if (requestId === this.requestId && this.loaded && this.userId === userId) this.syncLoadout();
+        if (current() && requestId === this.requestId && this.loaded && this.userId === userId) this.syncLoadout();
         return;
       }
       if (!force && this.loaded && this.userId === userId) {
@@ -70,17 +77,17 @@ export const useEquipmentStore = defineStore("equipment", {
       const promise = (async () => {
         try {
           const variants = await supabaseEquipmentRepository.fetchEquipment();
-          if (requestId !== this.requestId) return;
+          if (!current() || requestId !== this.requestId) return;
           this.variants = variants;
           this.userId = userId;
           this.loaded = true;
           this.syncLoadout();
         } catch (err) {
-          if (requestId !== this.requestId) return;
+          if (!current() || requestId !== this.requestId) return;
           this.loaded = false;
           this.error = err instanceof Error ? err.message : tr('equipment.khong_the_tai_trang_bi_tu_may_chu');
         } finally {
-          if (requestId === this.requestId) this.loading = false;
+          if (current() && requestId === this.requestId) this.loading = false;
         }
       })();
       pendingRequest = { userId, requestId, promise };

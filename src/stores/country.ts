@@ -1,4 +1,5 @@
 import { useGameCatalogStore } from './gameCatalog';
+import { useReadCacheStore } from './readCache';
 import { t as tr } from "../i18n";
 import { defineStore } from "pinia";
 import { supabaseCountryRepository } from "../data/supabaseCountryRepository";
@@ -52,6 +53,8 @@ export const useCountryStore = defineStore("Country", {
     },
     async fetchMyUnlockedCountries(playerId = useAuthStore().user?.id ?? null, invalidate = false) {
       const generation = useAuthStore().sessionGeneration;
+      if (invalidate) await useReadCacheStore().invalidate(['unlocked']);
+      if (useAuthStore().sessionGeneration !== generation) return;
       const request = ++this.unlockedRequest;
       if (this.unlockedPlayerId !== playerId || !playerId) this.unlockedCountries = [];
       this.unlockedPlayerId = playerId; this.unlockedError = ''; this.isLoadingUnlocked = Boolean(playerId);

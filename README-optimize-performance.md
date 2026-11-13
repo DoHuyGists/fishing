@@ -4,6 +4,8 @@ Ngày đánh giá ban đầu: **12/11/2026**. Phạm vi: mã nguồn Vue/Pinia, 
 
 **Cập nhật 13/11/2026:** đã thay subscription của 14 bảng bằng snapshot/refresh trong client, giữ `fishing_sessions` và `active_sessions`. Đánh giá tại mục 9, kết quả triển khai tại mục 10; định hướng này thay thế các đề xuất giữ/thu hẹp subscription tại mục 5 và 7. Đã chuẩn bị migration gỡ publication, chưa áp dụng lên Supabase. Cache catalog Pinia + IndexedDB đã triển khai phía client theo mục 11; kết quả và cách bật RPC có kiểm tra revision tại mục 12. Hai migration mới chưa áp dụng lên Supabase.
 
+**Mở rộng cache modal:** mục 13 ghi nhận cache TTL ngắn cho snapshot cá nhân (gồm Kho cá/Túi đồ) và IndexedDB cho catalog bổ sung; có invalidation sau thao tác ghi, xóa dữ liệu khi đổi tài khoản và các ngoại lệ vẫn lấy mới từ server.
+
 ## 1. Hiện tại đáp ứng được khoảng bao nhiêu người chơi?
 
 **Ước lượng để lập kế hoạch ban đầu: khoảng 20–50 người chơi đồng thời trên Free/Nano; khoảng 50–150 trên Pro/Micro với mã hiện tại.** Đây là khoảng chọn để bắt đầu kiểm thử, độ tin cậy thấp, không phải kết quả benchmark hoặc cam kết chịu tải. Hệ thống có thể chậm trước các mốc này nếu truy vấn thiếu index, RLS nặng, chợ sôi động hoặc cơ chế xử lý cá cắn giữ transaction lâu; cũng có thể vượt chúng nếu dữ liệu ít và người chơi thao tác thưa.
@@ -573,7 +575,7 @@ Trình tự triển khai:
 
 ### 12.4. Kiểm tra cache khi vẫn thấy nhiều request
 
-Cache chỉ bao phủ 10 domain catalog ở mục 12.1, chưa bao phủ toàn bộ dữ liệu của modal. Mở modal mới lần đầu vẫn tải catalog; mở Kho cá/Túi đồ/Đội vẫn GET dữ liệu riêng của người chơi. Sảnh tiếp tục polling trạng thái khu 15 giây, feature flags 30 giây, đội 30 giây, ví/profile/thông báo 60 giây, có jitter và tạm dừng khi tab ẩn/offline. Không kết luận cache hỏng từ tổng request trong Network; lọc `/rest/v1/` để tách khỏi module Vue/JS/CSS lazy load và ảnh trong môi trường dev.
+Ở đợt đầu, cache chỉ bao phủ 10 domain catalog tại mục 12.1. **Đã mở rộng cache cho các luồng đọc của modal tại mục 13**, gồm Kho cá/Túi đồ/Đội. Sảnh tiếp tục polling trạng thái khu 15 giây, feature flags 30 giây, đội 30 giây, ví/profile/thông báo 60 giây, có jitter và tạm dừng khi tab ẩn/offline. TTL ngắn không thay thế các lịch đối soát này. Không kết luận cache hỏng từ tổng request trong Network; lọc `/rest/v1/` để tách khỏi module Vue/JS/CSS lazy load và ảnh trong môi trường dev.
 
 Đã sửa `team.startRefreshing`/`stopRefreshing`: đổi consumer sảnh/panel chỉ thay chu kỳ polling, không tự GET ngay khi đóng panel; đăng ký lặp cùng consumer không khởi động lại vòng polling. Panel vẫn tải dữ liệu mới khi mở và giao dịch vẫn đối soát như trước.
 
@@ -592,3 +594,77 @@ console.table(window.gameCatalogCache.inspect().recent)
 - `entries` cho biết revision và TTL còn lại. Mở lại cùng modal trong TTL phải tăng hit, không tăng `network` cho catalog đó nếu chưa có invalidation. Reload trong TTL phải có `indexedDbHit` khi storage khả dụng.
 
 Bộ đếm chỉ ghi trong dev, giữ tối đa 100 sự kiện gần nhất, reset khi đổi phiên; không ghi payload, user ID hoặc token. API Console không được gắn vào `window` ở bản production. Nếu `error` ở `_manifest`/catalog lặp lại khi chế độ `versioned` bật, đối chiếu migration/RPC/grants và response lỗi; không coi việc bật biến môi trường là đã triển khai SQL. Những kiểm thử cục bộ xác nhận cơ chế cache, chưa xác nhận request của phiên trình duyệt người dùng nếu chưa có Network/diagnostic thực tế.
+
+## 13. Mở rộng cache cho dữ liệu modal — 13/11/2026
+
+Đã triển khai thêm [readCache.ts](src/stores/readCache.ts) sở hữu cache trong Pinia và [readCacheRequests.ts](src/database/readCacheRequests.ts) áp dụng cho danh sách endpoint đọc cụ thể. Các repository Supabase tiếp tục là nơi tạo query; component không tự quản lý cache hoặc query mới. Phần này hoạt động ở cả chế độ legacy/versioned, không thêm RPC, migration, realtime hoặc dependency. Không thay `.env`, không deploy frontend và không chạy SQL trên DB thật.
+
+### 13.1. Dữ liệu được cache thêm
+
+TTL tập trung tại [readCachePolicies.ts](src/data/readCachePolicies.ts). Các snapshot cá nhân chỉ giữ trong RAM, không lưu IndexedDB và không trả stale sau TTL:
+
+| Nhóm | Endpoint/bảng tiêu biểu | TTL RAM |
+|---|---|---:|
+| Kho cá và cá từ ao đã chuyển về kho | `get_caught_in_home`, `caught` | 30 giây |
+| Túi đồ, danh sách bộ trang bị | `user_inventory`, `user_equipments`, `get_all_user_equipment_sets` | 30 giây |
+| Số dư hiển thị | `currency`, `get_my_currency` | 10 giây |
+| Profile, hồ sơ trong danh sách bạn bè/đội | `user_profile` theo đúng query/projection | 30 giây |
+| Cấp kỹ năng đã học | `user_skills` | 30 giây |
+| Thành tích nhật ký, quốc gia đã mở khóa | `caught_diary`, `player_unlocked_countries` | 60 giây |
+| Thông báo và trạng thái đã đọc | `personal_notifications`, `system_notifications`, `system_notification_reads` | 15 giây |
+| Đội, thành viên, lời mời | `user_teams`, `user_team_members`, `user_team_invite` | 15 giây |
+| Bạn bè/lời mời | `user_friends` | 30 giây |
+| Chợ, lịch sử giao dịch | `species_market`, `market_history` | 5 / 15 giây |
+| Nhiệm vụ giờ/ngày | `get_current_hour_missions`, `get_daily_missions` | 30 giây; đổi key khi sang giờ mới |
+| Nội dung thưởng pass, trạng thái đã mua/nhận | `fishing_pass_rewards`, `user_fishing_passes`, `user_fishing_pass_claims` | 30 giây; đổi key khi sang giờ mới |
+| Huy hiệu, trạng thái/hiệu ứng/điểm hoạt động phe | `get_user_badges_status`, `user_factions`, `get_current_faction_effects`, `get_my_faction_daily_activity` | 30 giây |
+| Bảng xếp hạng, lịch sử báo lỗi, hồ sơ nuôi cá | `leaderboard`, `error_feedback`, `aquaculture_records` | 30 giây |
+| Danh sách thưởng vòng quay theo mùa | `get_spin_wheel_rewards` | 60 giây |
+
+Catalog bổ sung được giữ trong RAM và IndexedDB để dùng qua reload trong TTL:
+
+| Nhóm | Bảng | TTL |
+|---|---|---:|
+| Tutorial đã xuất bản | `tutorials` | 6 giờ |
+| Sự kiện và lịch sự kiện | `event`, `event_schedule` | 60 giây |
+| Preview phần thưởng điểm danh | `daily_rewards` cùng projection vật phẩm | 1 giờ |
+| Danh mục phe và cấu hình hiệu ứng | `factions` cùng `faction_effects` được join | 1 giờ |
+
+Đây là cache cho dữ liệu hiển thị. Cache mới không bổ sung revision guard cho những catalog ngoài 10 domain tại mục 12; giao dịch vẫn do RPC hiện có kiểm tra trên server. Cache mới hết TTL sẽ tải lại hoặc báo lỗi/cooldown, không fallback sang snapshot cá nhân cũ. Những thay đổi từ server/client khác không phát tín hiệu trong trình duyệt này được đối soát khi hết TTL/polling hoặc người dùng làm mới.
+
+### 13.2. Gộp request, invalidation và đổi tài khoản
+
+- Cùng user, endpoint, method, query, RPC arguments và các header ảnh hưởng kết quả sẽ dùng chung promise/cache. Key bao gồm phân trang, bộ lọc, projection, `Range`, `Prefer`/count, định dạng và ngôn ngữ. Giữ `Content-Range` khi trả cache để không làm sai phân trang/count.
+- Snapshot thông báo được cache thêm ở mức store để timestamp trong query hạn dùng không tạo cache miss mỗi lần mở. Mỗi lần áp dụng snapshot vẫn lọc thông báo hết hạn và đặt lại bộ đếm hạn theo thời gian hiện tại; force và feature gate vẫn có hiệu lực.
+- Chụp user/session trước khi chờ feature guard hoặc đọc Request body; response phiên cũ không được ghi vào cache phiên mới. Kiểm tra token gửi đi thuộc đúng user vì SDK lấy token bất đồng bộ trước custom fetch; vẫn chấp nhận token mới của cùng user. Không đưa token vào key, log hoặc IndexedDB; server tiếp tục xác thực JWT.
+- Feature guard vẫn chạy trước cache hit. Màn hình admin lấy mới dữ liệu; thao tác admin vẫn vô hiệu hóa cache liên quan. Chưa đăng nhập và schema ngoài `public` không dùng cache mới.
+- Ghi REST hoặc RPC gameplay thành công sẽ bỏ các snapshot RAM cá nhân trước khi luồng đối soát ví/profile hiện có chạy. Xử lý cả response `201`/`204` không có body. Các catalog IndexedDB chỉ bị loại bỏ khi sửa bảng liên quan, kể cả metadata vật phẩm/hiệu ứng được join.
+- Lỗi mạng/HTTP 5xx hoặc 408 khi ghi có thể có kết quả không chắc chắn, nên bỏ snapshot trước thao tác đó. Không tự retry mutation. Business failure rõ ràng `success: false` không được coi là ghi thành công.
+- Invalidation trong lúc GET đang chạy làm loại response trước mutation và gộp một lượt đọc tiếp để lấy trạng thái mới. BroadcastChannel đồng bộ bỏ cache giữa các tab cùng user; không phát payload hoặc mở realtime.
+- Nút Làm mới của `Modal` bỏ cache đọc mới trước khi gọi loader. Các action có cờ force/invalidate vẫn tải mới domain tương ứng; `Cache-Control: no-cache` và fetch cache mode tương đương cũng bỏ cache trước khi đọc.
+- [playerSnapshotReset.ts](src/stores/playerSnapshotReset.ts) xóa snapshot đang hiển thị của các store cá nhân đã tải khi đổi user/logout, không eager-load tất cả modal. Kiểm tra session ở Kho cá/Túi đồ ngăn response cũ ghi lại vào store. Refresh token của cùng user không xóa cache.
+- Dùng lại timeout, coalescing và backoff của `gameCache.ts`; lỗi 429/5xx tôn trọng `Retry-After`. Lỗi quyền/response không hợp lệ/business failure không được lưu như dữ liệu thành công. Response JSON quá lớn hơn giới hạn 5 Mi ký tự không được cache; request gốc vẫn được trả cho repository.
+
+### 13.3. Những lượt đọc vẫn lấy mới có chủ đích
+
+Không cache `active_sessions`, `fishing_sessions`, trạng thái vào khu/`user_in_area`, `get_user_status`, `get_user_equipment_set_using`, `get_caught_in_area`, `preview_fish_by_depth`, `get_area_species_diary`, `get_aquaculture_farm` và query môi trường/thời tiết. Các dữ liệu này tham gia điều phối phiên hoặc phản ánh trạng thái hiện hành của khu/ao.
+
+Kiểm tra quyền admin bỏ cache profile trước khi đọc; chuẩn bị chế tạo đối soát ví mới. Query chọn Fishing Pass đang hiệu lực theo thời điểm hiện tại vẫn lấy mới; chỉ các phần thưởng và trạng thái user đi kèm được cache ngắn. `user_flag`/trạng thái điểm danh, preferences, auth và Storage/signed URL không thuộc whitelist cache mới. Feature flags giữ cơ chế Pinia 30 giây và polling hiện có, không lưu IndexedDB.
+
+### 13.4. Xác minh và cách quan sát
+
+- `npm run test:read-cache`: **19 kiểm thử qua**, gồm store Kho cá thật: 10 caller cùng lúc và mở lại trong TTL chỉ gọi `get_caught_in_home` một lần; force tải lại. Bao phủ TTL, khóa query/header, quyền, lỗi/cooldown, mutation thành công/thất bại/kết quả không chắc chắn, GET đua với mutation, đổi login trong feature guard/SDK lấy token, abort một caller, reset dữ liệu đang hiển thị và thông báo hết hạn trong TTL.
+- Đã chạy lại `npm run test:game-cache` (27 kiểm thử qua), `npm run test:data-refresh` (13 kiểm thử qua), build TypeScript/Vite và i18n sau phần mở rộng. Build còn cảnh báo vendor 616,49 kB có từ trước; không thêm lỗi dịch hoặc dependency mới.
+- `npm run test:game-cache:browser`: đã bổ sung ca cache đọc mới trên Edge + IndexedDB thật: catalog dùng lại sau reload, kho cá chỉ cache RAM, không có snapshot `caught` trong IndexedDB và invalidation giữa tab sau thao tác gameplay/admin.
+- Kiểm thử dùng transport/response nghiệp vụ mô phỏng, không gửi request tới Supabase production; chưa xác minh JWT/RLS hay benchmark tải thực tế của phần mở rộng.
+
+Chạy dev, reload sau cập nhật rồi mở/đóng Kho cá hai lần trong 30 giây, không bấm Làm mới hoặc thực hiện mutation giữa hai lần. Kiểm tra:
+
+```js
+console.table(window.gameReadCache.inspect().counts)
+console.table(window.gameReadCache.inspect().recent)
+```
+
+Domain `caught` phải tăng `ramHit`/`joined` và giữ nguyên `network` khi còn TTL. Sau reload, dữ liệu cá nhân tải mới; catalog bổ sung có thể có `indexedDbHit`. Bộ đếm mới và `gameCatalogCache` ở mục 12 theo dõi hai lớp cache khác nhau. Chỉ có API Console ở dev; việc vẫn còn GET cho các luồng ngoại lệ ở 13.3, feature flags hoặc polling đến hạn là hành vi dự kiến.
+
+`network` đếm lượt loader chạy, không phải tổng HTTP toàn ứng dụng: snapshot thông báo mức store có thể gom nhiều GET con. Đối chiếu Network đã lọc endpoint để đo số HTTP thực tế.

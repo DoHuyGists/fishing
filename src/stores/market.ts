@@ -3,6 +3,7 @@ import { t as tr } from "../i18n";
 import { defineStore } from "pinia";
 import { supabaseMarketRepository } from "../data/supabaseMarketRepository";
 import { useAuthStore } from './auth';
+import { useReadCacheStore } from './readCache';
 import { createKeyedRefreshTask } from '../utils/refreshTask';
 import { startVisibleRefresh } from '../utils/visibleRefresh';
 const refreshListings = createKeyedRefreshTask<MarketListing[]>();
@@ -28,6 +29,7 @@ export const useMarketStore = defineStore("species_market", {
       const current = () => request === this.historyRequest && auth.user?.id === userId && auth.sessionGeneration === generation;
       this.historyLoading = true; this.historyError = '';
       try {
+        if (invalidate) { await useReadCacheStore().invalidate(['history']); if (!current()) return; }
         const rows = await refreshHistory(userId + ':' + generation + ':' + page,
           () => supabaseMarketRepository.fetchHistory(userId, page), invalidate);
         if (!current()) return;
@@ -73,6 +75,7 @@ export const useMarketStore = defineStore("species_market", {
       const current = () => request === this.listingRequest && auth.user?.id === userId && auth.sessionGeneration === generation;
       this.isLoadingMarket = true; this.error = '';
       try {
+        if (invalidate) { await useReadCacheStore().invalidate(['market', 'caught']); if (!current()) return; }
         const rows = await refreshListings(userId + ':' + generation + ':' + JSON.stringify(query),
           () => supabaseMarketRepository.fetchActiveListings(query), invalidate);
         if (!current()) return;

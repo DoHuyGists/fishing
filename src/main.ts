@@ -14,9 +14,13 @@ import { setMutationRefreshHandler } from './database/mutationRefresh';
 import { usePlayerRefreshStore } from './stores/playerRefresh';
 import { useGameCatalogStore } from './stores/gameCatalog';
 import { setCatalogMutationHandler } from './database/catalogRequests';
+import { setReadCacheHandler } from './database/readCacheRequests';
+import { useReadCacheStore } from './stores/readCache';
+import { resetPlayerSnapshots } from './stores/playerSnapshotReset';
 
 const app = createApp(App);
 const pinia = createPinia();
+pinia.use(resetPlayerSnapshots);
 
 app.use(pinia);
 setMutationRefreshHandler(snapshots => {
@@ -33,8 +37,14 @@ setMutationRefreshHandler(snapshots => {
 });
 app.use(i18n);
 const catalogs = useGameCatalogStore(pinia);
+const readCache = useReadCacheStore(pinia);
+setReadCacheHandler(() => {
+  const context = readCache.capture();
+  return context ? { ...context, bypassReads: router.currentRoute.value.name === 'admin' } : undefined;
+});
 if (import.meta.env.DEV) {
   Object.defineProperty(window, 'gameCatalogCache', { configurable: true, value: { inspect: () => catalogs.inspectCache() } });
+  Object.defineProperty(window, 'gameReadCache', { configurable: true, value: { inspect: () => readCache.inspect() } });
 }
 setCatalogMutationHandler(domains => {
   const generation = useAuthStore(pinia).sessionGeneration;

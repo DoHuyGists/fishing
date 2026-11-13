@@ -46,7 +46,7 @@ export const useBlueprintStore = defineStore("blueprint", {
       this.crafting = true;
       try {
         const currency = useCurrencyStore();
-        await currency.fetchCurrency();
+        await currency.fetchCurrency(true);
         if (currency.error) throw new Error(currency.error);
         if (!Number.isSafeInteger(blueprint.goldCost) || blueprint.goldCost < 0 || !Number.isFinite(currency.cash) || currency.cash < blueprint.goldCost * quantity) throw new Error(tr('WorkBenchModal.khong_du_tien_che_tao'));
         const inventory = useInventoryStore();

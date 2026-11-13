@@ -1,4 +1,5 @@
 import type { UserProfile } from "../types/model/userProfile";
+import { useReadCacheStore } from './readCache';
 import { t as tr } from "../i18n";
 import { defineStore } from "pinia";
 import { useAuthStore } from "./auth";
@@ -53,6 +54,8 @@ export const useUserProfileStore = defineStore("userProfile", {
       const generation = auth.sessionGeneration;
       if (auth.user?.id !== userId) return;
       const current = () => auth.user?.id === userId && auth.sessionGeneration === generation;
+      if (invalidate) await useReadCacheStore().invalidate(['profile']);
+      if (!current()) return;
       this.loading = true; this.error = '';
       try {
         const data = await refreshProfile(userId + ':' + generation,

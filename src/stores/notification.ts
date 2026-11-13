@@ -2,6 +2,7 @@ import type { NotificationRow } from "../types/table/notification";
 import { t as tr } from "../i18n";
 import { defineStore } from "pinia";
 import { useAuthStore } from './auth';
+import { useReadCacheStore } from './readCache';
 import { createKeyedRefreshTask } from '../utils/refreshTask';
 import { startVisibleRefresh } from '../utils/visibleRefresh';
 import { supabaseNotificationRepository } from "../data/supabaseNotificationRepository";
@@ -35,7 +36,7 @@ export const useNotificationStore = defineStore("notifications", {
       this.loading = true; this.loadError = '';
       try {
         const notifications = await refreshNotifications(userId + ':' + generation,
-          () => supabaseNotificationRepository.fetchNotifications(userId), invalidate);
+          () => useReadCacheStore().get('notifications', 'list', () => supabaseNotificationRepository.fetchNotifications(userId), invalidate), invalidate);
         if (!current()) return;
         this.personal = notifications.personal; this.system = notifications.system;
         this.expireNotifications();

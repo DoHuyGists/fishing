@@ -5,6 +5,7 @@ import { defineStore } from "pinia";
 import supabase from "../database/connection";
 import { supabaseAuthRepository } from "../data/supabaseAuthRepository";
 import { supabaseUserProfileRepository } from "../data/supabaseUserProfileRepository";
+import { useReadCacheStore } from './readCache';
 
 type Credentials = {
   email: string;
@@ -130,6 +131,9 @@ export const useAuthStore = defineStore("auth", {
       const request = ++adminStatusRequest;
       this.adminLoading = true;
       try {
+        // Role checks are authority reads, not cached profile display data.
+        await useReadCacheStore().invalidate(['profile']);
+        if (this.user?.id !== userId || request !== adminStatusRequest) return;
         const profile = await supabaseUserProfileRepository.fetchUserProfile(userId);
         if (this.user?.id === userId && request === adminStatusRequest) {
           this.isAdmin = profile?.is_admin ?? false;

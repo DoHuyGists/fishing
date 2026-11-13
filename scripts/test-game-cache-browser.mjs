@@ -21,6 +21,8 @@ const server = await createServer({ configFile: false, envDir: false, server: { 
       import { useFeatureAvailabilityStore } from '/src/stores/featureAvailability.ts';
       import { catalogPolicies } from '/src/data/gameCachePolicies.ts';
       import { supabaseGameCatalogRepository as repository } from '/src/data/supabaseGameCatalogRepository.ts';
+      import { useReadCacheStore } from '/src/stores/readCache.ts';
+      import { createReadCacheFetch, setReadCacheHandler } from '/src/database/readCacheRequests.ts';
       export async function setup() {
         setActivePinia(createPinia());
         const auth = useAuthStore(); auth.applySession({ user: { id: 'browser-a' } });
@@ -31,6 +33,21 @@ const server = await createServer({ configFile: false, envDir: false, server: { 
         window.catalog = useGameCatalogStore(); window.country = useCountryStore(); window.auth = auth;
         window.catalog.activate(['countries']);
         await window.country.fetchCountries();
+      }
+      export function setupReads() {
+        setActivePinia(createPinia());
+        window.readAuth = useAuthStore(); window.readAuth.applySession({ user: { id: 'read-browser' } });
+        useFeatureAvailabilityStore().checkRequests = async () => null;
+        window.readCache = useReadCacheStore(); window.readCalls = { tutorials: 0, caught: 0 };
+        setReadCacheHandler(() => window.readCache.capture());
+        window.readFetch = createReadCacheFetch('https://cache-test.supabase.co', async (input, init) => {
+          if (['PATCH','DELETE'].includes(init?.method)) return new Response(null, { status: 204 });
+          const domain = String(input).includes('/tutorials') ? 'tutorials' : 'caught';
+          window.readCalls[domain]++;
+          return Response.json([{ id: domain, version: window.readCalls[domain] }]);
+        });
+        window.readTutorials = () => window.readFetch('https://cache-test.supabase.co/rest/v1/tutorials?select=*');
+        window.readCaught = () => window.readFetch('https://cache-test.supabase.co/rest/v1/rpc/get_caught_in_home', { method: 'POST', body: '{}' });
       }
     `; },
   }],
@@ -131,6 +148,37 @@ try {
   await page.evaluate(() => window.auth.applySession(null));
   assert.equal(await page.evaluate(() => window.country.countries.length), 0);
   await other.waitForFunction(() => window.country.countries.length === 0);
+  await page.evaluate(async () => {
+    const { setupReads } = await import('/__cache_fixture.ts'); setupReads();
+    await window.readTutorials(); await window.readCaught(); await window.readCaught();
+  });
+  assert.deepEqual(await page.evaluate(() => window.readCalls), { tutorials: 1, caught: 1 });
+  await page.reload();
+  await page.evaluate(async () => {
+    const { setupReads } = await import('/__cache_fixture.ts'); setupReads();
+    await window.readTutorials(); await window.readCaught();
+  });
+  assert.deepEqual(await page.evaluate(() => window.readCalls), { tutorials: 0, caught: 1 });
+  assert.equal(await page.evaluate(() => window.readCache.inspect().counts.tutorials.indexedDbHit), 1);
+  await other.evaluate(async () => {
+    const { setupReads } = await import('/__cache_fixture.ts'); setupReads();
+    await window.readFetch('https://cache-test.supabase.co/rest/v1/caught?id=eq.fish', { method: 'DELETE' });
+  });
+  await page.waitForFunction(() => window.readCache.inspect().counts.caught.invalidated > 0);
+  await page.evaluate(() => window.readCaught());
+  assert.equal(await page.evaluate(() => window.readCalls.caught), 2);
+  await other.evaluate(() => window.readFetch('https://cache-test.supabase.co/rest/v1/tutorials?id=eq.tutorial', { method: 'PATCH', body: '{}' }));
+  await page.waitForFunction(() => window.readCache.inspect().counts.tutorials.invalidated > 0);
+  await page.evaluate(() => window.readTutorials());
+  assert.equal(await page.evaluate(() => window.readCalls.tutorials), 1);
+  const persistedDomains = await page.evaluate(async () => {
+    const db = await new Promise((resolve, reject) => { const open = indexedDB.open('fishing-game-cache', 1); open.onsuccess = () => resolve(open.result); open.onerror = () => reject(open.error); });
+    try { return await new Promise((resolve, reject) => { const request = db.transaction('entries').objectStore('entries').getAll(); request.onsuccess = () => resolve(request.result.map(row => row.domain)); request.onerror = () => reject(request.error); }); }
+    finally { db.close(); }
+  });
+  assert.equal(persistedDomains.includes('caught'), false, 'Private fish snapshots must never enter IndexedDB');
+  await page.evaluate(() => window.readAuth.applySession(null));
   console.log('PASS: real Edge IndexedDB: concurrent reads, reload TTL, cross-tab generation, stale cooldown, schema validation, blocked/quota storage fallback; real Pinia hydration, BroadcastChannel invalidation, active-view resume and logout.');
+  console.log('PASS: HTTP read cache: static catalogs survive reload, personal snapshots stay RAM-only, and cross-tab gameplay/admin mutations invalidate cached reads.');
   await context.close();
 } finally { await browser?.close(); await server.close(); }

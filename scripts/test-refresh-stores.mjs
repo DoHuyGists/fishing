@@ -98,6 +98,8 @@ test('snapshot stores preserve the selected page and login under reordered respo
       setActivePinia(createPinia());
       const auth = useAuthStore(); auth.applySession(session('a'));
       const store = useNotificationStore();
+      const { useFeatureAvailabilityStore } = await server.ssrLoadModule('/src/stores/featureAvailability.ts');
+      useFeatureAvailabilityStore().checkRequests = async () => null;
       const read = deferred();
       let calls = 0;
       notificationRepo.fetchNotifications = () => { calls++; return read.promise; };

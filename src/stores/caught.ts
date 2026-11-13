@@ -1,6 +1,7 @@
 import { defineStore } from "pinia";
 import { useAuthStore } from "./auth";
 import { supabaseFishRepository } from "../data/supabaseFishRepository";
+import { useReadCacheStore } from './readCache';
 export interface CaughtFish {
   id: string;
   created_at: string;
@@ -27,7 +28,6 @@ export interface CaughtFish {
   } | null;
 }
 
-const authStore = useAuthStore();
 export const useCaughtStore = defineStore("Caught", {
   state: () => ({
     isLoadingCaught: false,
@@ -39,28 +39,36 @@ export const useCaughtStore = defineStore("Caught", {
   },
   actions: {
     async moveFishes(ids: string[], status: "normal" | "in-net") {
+      const auth = useAuthStore(), generation = auth.sessionGeneration;
       await supabaseFishRepository.updateCaughtStatus(ids, status);
+      if (auth.sessionGeneration !== generation) return;
       const set = new Set(ids);
       this.caughtFishes.forEach((f) => {
         if (set.has(f.id)) f.status = status;
       });
     },
     async finishFishing() {
+      const auth = useAuthStore(), generation = auth.sessionGeneration;
       await supabaseFishRepository.deleteInNetFishes();
+      if (auth.sessionGeneration !== generation) return;
       this.caughtFishes = this.caughtFishes.filter((f) => f.status !== "in-net");
       await supabaseFishRepository.completeFishing();
     },
-    async loadCaughtFishes() {
-      const userId = authStore.userId;
+    async loadCaughtFishes(force = false) {
+      const authStore = useAuthStore();
+      const userId = authStore.user?.id, generation = authStore.sessionGeneration;
       if (!userId) return;
+      const current = () => authStore.user?.id === userId && authStore.sessionGeneration === generation;
+      if (force) await useReadCacheStore().invalidate(['caught']);
+      if (!current()) return;
       this.isLoadingCaught = true;
       try {
         const fishes = await supabaseFishRepository.fetchAllCaughtFishes(userId);
-        if (authStore.user?.id === userId) this.caughtFishes = fishes;
+        if (current()) this.caughtFishes = fishes;
       } catch (err) {
         console.error("Lỗi khi tải danh sách cá:", err);
       } finally {
-        this.isLoadingCaught = false;
+        if (current()) this.isLoadingCaught = false;
       }
     },
   },

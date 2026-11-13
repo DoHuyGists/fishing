@@ -28,10 +28,14 @@ export const useInventoryStore = defineStore("Inventory", {
     },
     actions: {
         async setUserInventory(userId: string) {
-            this.items = await supabaseUserInventoryRepository.fetchUserInventory(userId);
+            const auth = useAuthStore(), generation = auth.sessionGeneration;
+            const items = await supabaseUserInventoryRepository.fetchUserInventory(userId);
+            if (auth.user?.id === userId && auth.sessionGeneration === generation) this.items = items;
         },
         async setEquipmentSet() {
-            this.equipmentSets = await supabaseEquipmentRepository.fetchAllEquipmentSet();
+            const auth = useAuthStore(), generation = auth.sessionGeneration, userId = auth.user?.id;
+            const sets = await supabaseEquipmentRepository.fetchAllEquipmentSet();
+            if (auth.user?.id === userId && auth.sessionGeneration === generation) this.equipmentSets = sets;
         },
         async removeItem(userId: string, inventoryIds: string[]) {
             await supabaseUserInventoryRepository.deleteInventory(userId,inventoryIds)

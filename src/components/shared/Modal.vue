@@ -11,6 +11,7 @@ import GuideTour from "./GuideTour.vue";
 import UserTurn from "../player/stamina/UserTurn.vue";
 import Shells from "../player/currency/Shells.vue";
 import Tickets from "../player/currency/Tickets.vue";
+import { useReadCacheStore } from '../../stores/readCache';
 
 defineOptions({ inheritAttrs: false });
 
@@ -40,10 +41,12 @@ const isRefreshing = ref<boolean>(false);
 const refreshCooldown = ref(0);
 const showGuide = ref(false);
 
-function handleRefresh() {
-  onRefresh?.();
+async function handleRefresh() {
+  if (isRefreshing.value) return;
   isRefreshing.value = true;
   refreshCooldown.value = REFRESH_COOLDOWN;
+  await useReadCacheStore().invalidate();
+  onRefresh?.();
 }
 
 function handleGuide() {

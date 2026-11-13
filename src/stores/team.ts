@@ -2,6 +2,7 @@ import type { UserTeam, UserTeamMember, TeamStatus, TeamJoinType, UserTeamInvite
 import { t as tr } from "../i18n";
 import { defineStore } from "pinia";
 import { useAuthStore } from './auth';
+import { useReadCacheStore } from './readCache';
 import { createKeyedRefreshTask } from '../utils/refreshTask';
 import { startVisibleRefresh } from '../utils/visibleRefresh';
 import { supabaseTeamRepository } from "../data/supabaseTeamRepository";
@@ -43,6 +44,7 @@ export const useTeamStore = defineStore("team", {
       const generation = auth.sessionGeneration;
       return refreshMembership(userId + ':' + generation, async () => {
         try {
+          if (invalidate) { await useReadCacheStore().invalidate(['team', 'profile']); if (auth.user?.id !== userId || auth.sessionGeneration !== generation) return; }
           const [myTeamData, invites] = await Promise.all([
             supabaseTeamRepository.fetchMyTeam(userId), supabaseTeamRepository.fetchMyInvites(userId),
           ]);
@@ -65,6 +67,7 @@ export const useTeamStore = defineStore("team", {
       const generation = auth.sessionGeneration;
       return refreshDirectory(userId + ':' + generation, async () => {
         try {
+          if (invalidate) { await useReadCacheStore().invalidate(['team']); if (auth.user?.id !== userId || auth.sessionGeneration !== generation) return; }
           const teams = await supabaseTeamRepository.fetchTeams();
           if (auth.user?.id === userId && auth.sessionGeneration === generation) {
             this.teams = teams; this.directoryError = ''; this.error = this.membershipError;
