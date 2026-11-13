@@ -1,4 +1,4 @@
-import type { CacheEntry, CacheReadOptions, CacheResult, CacheStorage } from '../types/model/gameCache';
+import type { CacheEntry, CacheEvent, CacheEventKind, CacheReadOptions, CacheResult, CacheStorage } from '../types/model/gameCache';
 import { isTemporaryReadError, RepositoryError } from '../data/repositoryError';
 
 export class CacheUnavailableError extends Error {
@@ -14,9 +14,11 @@ export function createGameCache(storage: CacheStorage, dependencies: {
   timeoutMs?: number;
   onResult?: (key: string, result: CacheResult<unknown>) => void;
   onInvalidate?: (scope: string, domains?: string[]) => void;
+  onEvent?: (event: CacheEvent) => void;
 } = {}) {
   const now = dependencies.now ?? Date.now;
   const random = dependencies.random ?? Math.random;
+  const report = (domain: string, kind: CacheEventKind, detail?: string) => dependencies.onEvent?.({ domain, kind, at: now(), detail });
   const entries = new Map<string, CacheEntry>();
   const pending = new Map<string, Promise<CacheResult<unknown>>>();
   const epochs = new Map<string, number>();
@@ -32,9 +34,11 @@ export function createGameCache(storage: CacheStorage, dependencies: {
     const value: CacheResult<T> = { data: row.data as T, state: stale ? 'stale' : 'fresh', fetchedAt: row.fetchedAt, revision: row.revision,
       refreshError: error instanceof Error ? error.message : undefined };
     dependencies.onResult?.(key, value);
+    if (stale) report(row.domain, 'stale');
     return value;
   };
   function forget(scope: string, domains?: string[]) {
+    for (const domain of domains ?? ['*']) report(domain, 'invalidated');
     for (const domain of domains ?? ['']) {
       const key = domain ? scope + ':' + domain : scope;
       epochs.set(key, (epochs.get(key) ?? 0) + 1);
@@ -55,7 +59,7 @@ export function createGameCache(storage: CacheStorage, dependencies: {
     if (options.current?.() === false) return Promise.reject(new CacheContextChangedError());
     // Install the promise before storage/network awaits; all callers join hydration too.
     const existing = pending.get(key);
-    if (existing) return existing as Promise<CacheResult<T>>;
+    if (existing) { report(domain, 'joined'); return existing as Promise<CacheResult<T>>; }
     const work = Promise.resolve().then(async () => {
       for (let attempt = 0; attempt < 4; attempt++) {
         await barriers.get(scope);
@@ -69,15 +73,16 @@ export function createGameCache(storage: CacheStorage, dependencies: {
           && (!options.expectedRevision || typeof value.revision === 'string' && /^\d+$/.test(value.revision)
             && /^\d+$/.test(options.expectedRevision) && BigInt(value.revision) >= BigInt(options.expectedRevision))
           && Object.hasOwn(value, 'data') && options.validate(value.data));
-        if (valid(row) && !options.force && now() < row.expiresAt) { remember(row); return result(key, row); }
+        if (valid(row) && !options.force && now() < row.expiresAt) { report(domain, 'ramHit'); remember(row); return result(key, row); }
         const persisted = await storage.read(scope, domain, key);
+        if (persisted.available === false) report(domain, 'storageUnavailable');
         if (!current()) { if (options.current?.() === false) throw new CacheContextChangedError(); continue; }
         // Even if storage fails to persist an invalidation, this runtime must
         // never hydrate the previously rejected snapshot again.
         const canHydrate = started === '0:0' || persistedEpochs.get(scope + ':' + domain) === started;
         if (canHydrate && persisted.available !== false && (!row || row.generation !== persisted.token.generation || row.scopeGeneration !== persisted.token.scopeGeneration)) row = persisted.entry as CacheEntry<T> | undefined;
         const usable = valid(row);
-        if (usable && !options.force && now() < row!.expiresAt) { remember(row!); return result(key, row!); }
+        if (usable && !options.force && now() < row!.expiresAt) { report(domain, 'indexedDbHit'); remember(row!); return result(key, row!); }
         const stale = () => usable && policy.maxAge > policy.ttl && now() < row!.staleUntil;
         const cooling = row && Number.isFinite(row.retryAt) && Number.isFinite(row.accessedAt) && row.accessedAt <= now() && row.retryAt > now();
         if (cooling || (typeof navigator !== 'undefined' && navigator.onLine === false)) {
@@ -87,6 +92,8 @@ export function createGameCache(storage: CacheStorage, dependencies: {
         const controller = new AbortController();
         let timer: ReturnType<typeof setTimeout> | undefined;
         try {
+          report(domain, 'network');
+          if (options.force) report(domain, 'forced');
           const snapshot = await Promise.race([
             Promise.resolve().then(() => options.load(controller.signal)),
             new Promise<never>((_, reject) => { timer = setTimeout(() => {
@@ -99,6 +106,7 @@ export function createGameCache(storage: CacheStorage, dependencies: {
           const next: CacheEntry<T> = { ...persisted.token, key, scope, domain, schemaVersion: 1, data: snapshot.data, revision: snapshot.revision,
             fetchedAt, expiresAt: fetchedAt + policy.ttl, staleUntil: fetchedAt + policy.maxAge, retryAt: 0, failureCount: 0, accessedAt: fetchedAt };
           const saved = await storage.write(next);
+          if (!saved) report(domain, 'storageUnavailable');
           if (!current()) { if (options.current?.() === false) throw new CacheContextChangedError(); continue; }
           // Detect an invalidate committed by another tab during the network request.
           const check = await storage.read(scope, domain, key);
@@ -107,6 +115,7 @@ export function createGameCache(storage: CacheStorage, dependencies: {
           remember(next);
           return result(key, next);
         } catch (error) {
+          report(domain, 'error', error instanceof RepositoryError ? `${error.code ?? ''} HTTP ${error.status ?? '?'}` : error instanceof Error ? error.name : 'UnknownError');
           if (error instanceof CacheContextChangedError) throw error;
           if (!current()) { if (options.current?.() === false) throw new CacheContextChangedError(); continue; }
           if (!isTemporaryReadError(error)) {

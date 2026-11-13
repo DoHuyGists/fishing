@@ -111,5 +111,34 @@ test('snapshot stores preserve the selected page and login under reordered respo
       assert.equal(store.loading, false);
       store.stopRefreshing('modal');
     });
+
+    await t.test('closing the team panel changes the polling interval without fetching again', async () => {
+      const previousDocument = globalThis.document, previousWindow = globalThis.window;
+      globalThis.document = Object.assign(new EventTarget(), { visibilityState: 'visible' });
+      globalThis.window = new EventTarget();
+      const { useTeamStore } = await server.ssrLoadModule('/src/stores/team.ts');
+      const { supabaseTeamRepository: teamRepo } = await server.ssrLoadModule('/src/data/supabaseTeamRepository.ts');
+      setActivePinia(createPinia());
+      useAuthStore().applySession(session('a'));
+      const store = useTeamStore(); let calls = 0;
+      teamRepo.fetchMyTeam = async () => { calls++; return null; };
+      teamRepo.fetchMyInvites = async () => [];
+      teamRepo.fetchTeams = async () => [];
+      try {
+        store.startRefreshing('a', 'lobby'); await flush();
+        assert.equal(calls, 1);
+        store.startRefreshing('a', 'panel');
+        await store.loadData('a', false);
+        assert.equal(calls, 2);
+        store.stopRefreshing('panel'); await flush();
+        assert.equal(calls, 2, 'Closing must not issue another membership request');
+        store.startRefreshing('a', 'lobby'); await flush();
+        assert.equal(calls, 2, 'Registering an existing consumer must not restart polling');
+      } finally {
+        store.stopRefreshing('panel'); store.stopRefreshing('lobby');
+        if (previousDocument === undefined) delete globalThis.document; else globalThis.document = previousDocument;
+        if (previousWindow === undefined) delete globalThis.window; else globalThis.window = previousWindow;
+      }
+    });
   } finally { await server.close(); }
 });

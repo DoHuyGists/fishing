@@ -90,16 +90,20 @@ export const useTeamStore = defineStore("team", {
         stopRefresh?.(); stopRefresh = null; consumers.clear();
         this.$reset(); this.ownerId = userId;
       }
+      if (consumers.get(consumer) === userId && stopRefresh) return;
+      const alreadyRefreshing = Boolean(stopRefresh);
       consumers.set(consumer, userId);
-      this.restartRefresh(userId);
+      // The panel explicitly loads its data on mount. Changing polling speed
+      // must not start another immediate read alongside that load.
+      this.restartRefresh(userId, !alreadyRefreshing);
     },
     stopRefreshing(consumer: 'lobby' | 'panel') {
       consumers.delete(consumer);
       stopRefresh?.(); stopRefresh = null;
       const owner = consumers.values().next().value;
-      if (owner) this.restartRefresh(owner);
+      if (owner) this.restartRefresh(owner, false);
     },
-    restartRefresh(userId: string) {
+    restartRefresh(userId: string, immediate = true) {
       stopRefresh?.();
       let lastDirectoryAt = 0;
       stopRefresh = startVisibleRefresh(async () => {
@@ -110,7 +114,7 @@ export const useTeamStore = defineStore("team", {
         }
         await Promise.all(jobs);
         if (this.error) throw new Error(this.error);
-      }, consumers.has('panel') ? 15_000 : 30_000);
+      }, consumers.has('panel') ? 15_000 : 30_000, immediate);
     },
 
     async createTeam(

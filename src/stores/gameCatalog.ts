@@ -9,7 +9,7 @@ import { indexedDbCacheRepository } from '../data/indexedDbCacheRepository';
 import { catalogPolicies, expandCatalogDomains, validateCatalog } from '../data/gameCachePolicies';
 import { RepositoryError } from '../data/repositoryError';
 import { supabaseGameCatalogRepository as repository, versionedCatalogEnabled } from '../data/supabaseGameCatalogRepository';
-import type { CacheResult, CatalogDomain, GameCatalogData } from '../types/model/gameCache';
+import type { CacheEvent, CacheEventKind, CacheResult, CatalogDomain, GameCatalogData } from '../types/model/gameCache';
 
 export const useGameCatalogStore = defineStore('gameCatalog', () => {
   const auth = useAuthStore();
@@ -21,12 +21,32 @@ export const useGameCatalogStore = defineStore('gameCatalog', () => {
   const active = new Map<CatalogDomain, number>();
   let lastNotice = 0;
   let channel: BroadcastChannel | undefined;
+  const cacheEvents: CacheEvent[] = [];
+  const cacheCounts: Record<string, Partial<Record<CacheEventKind, number>>> = {};
+  function inspectCache() {
+    return {
+      mode: versionedCatalogEnabled ? 'versioned' : 'legacy',
+      counts: structuredClone(cacheCounts),
+      recent: structuredClone(cacheEvents),
+      entries: Object.entries(results).map(([key, value]) => {
+        const domain = JSON.parse(key)[1] as string;
+        const ttl = domain === '_manifest' ? 300_000 : catalogPolicies[domain as CatalogDomain]?.ttl ?? 0;
+        return { domain, state: value.state, revision: value.revision, fetchedAt: new Date(value.fetchedAt).toISOString(),
+          expiresInSeconds: Math.max(0, Math.ceil((value.fetchedAt + ttl - Date.now()) / 1000)) };
+      }),
+    };
+  }
   function displayError(error: unknown) {
     if (error instanceof RepositoryError && error.code === 'CATALOG_SCHEMA_MISMATCH') return new RepositoryError({ code: error.code, message: tr('GameCache.updateClient') });
     if (error instanceof CacheUnavailableError) return new RepositoryError({ code: 'CATALOG_UNAVAILABLE', message: tr('GameCache.unavailable') });
     return error;
   }
-  const cache = createGameCache(indexedDbCacheRepository, { onInvalidate(owner, domains) {
+  const cache = createGameCache(indexedDbCacheRepository, { onEvent: import.meta.env.DEV ? event => {
+    const counts = cacheCounts[event.domain] ??= {};
+    counts[event.kind] = (counts[event.kind] ?? 0) + 1;
+    cacheEvents.push(event);
+    if (cacheEvents.length > 100) cacheEvents.shift();
+  } : undefined, onInvalidate(owner, domains) {
     if (owner === scope()) clearLocal(domains as CatalogDomain[] | undefined);
   }, onResult(key, result) {
     if (JSON.parse(key)[0] !== scope()) return;
@@ -60,6 +80,8 @@ export const useGameCatalogStore = defineStore('gameCatalog', () => {
     const oldScopes = new Set(Object.keys(results).map(key => JSON.parse(key)[0] as string));
     oldScopes.add(scope());
     clearLocal(); bindings.clear(); used.clear();
+    cacheEvents.length = 0;
+    for (const domain of Object.keys(cacheCounts)) delete cacheCounts[domain];
     for (const owner of oldScopes) {
       void cache.invalidate(owner).then(() => channel?.postMessage({ scope: owner }));
     }
@@ -178,5 +200,5 @@ export const useGameCatalogStore = defineStore('gameCatalog', () => {
       for (const domain of domains) active.set(domain, Math.max(0, (active.get(domain) ?? 0) - 1));
     };
   }
-  return { results, get, state, invalidate, action, resume, activate };
+  return { results, get, state, invalidate, action, resume, activate, inspectCache };
 });

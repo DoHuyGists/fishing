@@ -33,6 +33,9 @@ setMutationRefreshHandler(snapshots => {
 });
 app.use(i18n);
 const catalogs = useGameCatalogStore(pinia);
+if (import.meta.env.DEV) {
+  Object.defineProperty(window, 'gameCatalogCache', { configurable: true, value: { inspect: () => catalogs.inspectCache() } });
+}
 setCatalogMutationHandler(domains => {
   const generation = useAuthStore(pinia).sessionGeneration;
   return () => {

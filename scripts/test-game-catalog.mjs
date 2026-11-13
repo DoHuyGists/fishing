@@ -29,6 +29,11 @@ test('Pinia catalogs preserve feature gates, login isolation and transaction ret
       const data = await Promise.all(Array.from({ length: 10 }, () => catalog.get('countries')));
       assert.equal(calls, 1); data[0][0].name = 'mutated';
       assert.equal((await catalog.get('countries'))[0].name, 'Country');
+      const diagnostic = catalog.inspectCache();
+      assert.equal(diagnostic.counts.countries.network, 1);
+      assert.equal(diagnostic.counts.countries.joined, 9);
+      assert.equal(diagnostic.counts.countries.ramHit, 1);
+      assert.equal(diagnostic.entries.find(row => row.domain === 'countries').expiresInSeconds > 0, true);
     });
     await t.test('feature-store bindings clear on logout; a late response cannot paint the next account', async () => {
       const { auth } = init(); const country = useCountryStore();

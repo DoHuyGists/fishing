@@ -560,11 +560,35 @@ Trình tự triển khai:
 4. Smoke test cold/warm/reload, hai tab, đổi user, bảo trì, sửa/xóa catalog và các RPC ở trên; theo dõi request/byte/p95/lỗi/lock. Client cũ vẫn gọi RPC cũ nên chưa có guard revision; cần rollout/refresh client cũ để hoàn tất case 3 cho toàn bộ người chơi.
 5. Nếu cần rollback frontend, bỏ cờ và build lại hoặc quay về bản trước. Giữ migration/RPC wrapper/revision trong DB trong giai đoạn rollback; không xóa các function khi còn client versioned. Chưa thay đổi `.env`, chưa deploy frontend, chưa chạy SQL live trong lần cập nhật này.
 
+Đã sửa cảnh báo Vue khi mở Tủ cá: `Modal.vue` có nhiều node gốc nên cần `inheritAttrs: false` và truyền `$attrs` trực tiếp vào khung modal. Class từ caller được giữ lại đúng phần tử, không truyền sang `GuideTour`.
+
 ### 12.3. Xác minh đã hoàn thành và phần còn chờ
 
 - `npm run build`: TypeScript + Vite qua. Cảnh báo vendor 616,49 kB vượt ngưỡng 600 kB đã có từ trước vẫn còn.
 - `npm run check:i18n`: 1.702 key mỗi locale và kiểm tra runtime Việt/Anh qua; các thông báo cache mới có đủ bản dịch.
 - `npm run test:game-cache`: **27 kiểm thử qua**, gồm core cache, Pinia thật qua Vite SSR và migration thực thi trên PostgreSQL in-memory PGlite. Có ca 10 caller/1 fetch, reload TTL, timeout/stale/cooldown/Retry-After, cache/storage hỏng, đổi user, invalidation khi đang đọc, mismatch rồi yêu cầu bấm lại, RLS/projection, trigger rollback, RPC argument guards và receipt ưu tiên trước revision. RPC nghiệp vụ trong fixture SQL được mô phỏng; chưa replay logic gameplay production.
-- `npm run test:data-refresh`: **12 kiểm thử hồi quy qua**; wrapper mới vẫn ánh xạ refresh ví/profile đúng, chặn response phiên cũ và giữ feature gate.
+- `npm run test:data-refresh`: **13 kiểm thử hồi quy qua**; wrapper mới vẫn ánh xạ refresh ví/profile đúng, chặn response phiên cũ và giữ feature gate. Bổ sung ca đóng modal đội không tự GET thêm khi chuyển về chu kỳ polling ở sảnh.
 - `npm run test:game-cache:browser`: **Edge headless thật + IndexedDB thật qua**, gồm reload không fetch lại, transaction generation giữa tab, cooldown sau reload, schema sai, storage bị chặn/hết quota; Pinia hydrate từ disk, BroadcastChannel invalidate, resume màn hình đang dùng và logout. Dùng Edge/Chromium cài sẵn; có thể đặt `CACHE_TEST_BROWSER` đến executable phù hợp. Hai dependency kiểm thử `playwright-core`/PGlite chỉ nằm ở devDependencies, không vào bundle game.
 - Kiểm thử không gửi request tới Supabase thật. Chưa kiểm tra Firefox/Safari, chính sách thu hồi storage thực tế của từng thiết bị, JWT/RLS/trigger/signature production, contention nhiều connection hoặc benchmark CCU. Chưa có số đo p95/egress/CPU trước–sau; không suy ra phần trăm cải thiện hoặc mức CCU mới từ các test chức năng.
+
+### 12.4. Kiểm tra cache khi vẫn thấy nhiều request
+
+Cache chỉ bao phủ 10 domain catalog ở mục 12.1, chưa bao phủ toàn bộ dữ liệu của modal. Mở modal mới lần đầu vẫn tải catalog; mở Kho cá/Túi đồ/Đội vẫn GET dữ liệu riêng của người chơi. Sảnh tiếp tục polling trạng thái khu 15 giây, feature flags 30 giây, đội 30 giây, ví/profile/thông báo 60 giây, có jitter và tạm dừng khi tab ẩn/offline. Không kết luận cache hỏng từ tổng request trong Network; lọc `/rest/v1/` để tách khỏi module Vue/JS/CSS lazy load và ảnh trong môi trường dev.
+
+Đã sửa `team.startRefreshing`/`stopRefreshing`: đổi consumer sảnh/panel chỉ thay chu kỳ polling, không tự GET ngay khi đóng panel; đăng ký lặp cùng consumer không khởi động lại vòng polling. Panel vẫn tải dữ liệu mới khi mở và giao dịch vẫn đối soát như trước.
+
+Khi chạy `npm run dev`, reload trang sau cập nhật rồi mở/đóng **cùng modal Hướng dẫn hoặc Shop hai lần**, không nhấn Làm mới. Chạy trong Console:
+
+```js
+console.table(window.gameCatalogCache.inspect().counts)
+console.table(window.gameCatalogCache.inspect().entries)
+console.table(window.gameCatalogCache.inspect().recent)
+```
+
+- `ramHit`/`indexedDbHit`: dùng cache trong RAM/IndexedDB; `joined`: dùng chung lượt đọc đang chạy.
+- `network`: số lượt tải catalog thực sự; ở chế độ legacy, một lượt có thể gồm nhiều HTTP request phân trang. `_manifest` là kiểm tra revision, cache 5 phút.
+- `forced`: tải do yêu cầu làm mới/chuẩn bị giao dịch; `stale`: trả dữ liệu cũ trong giới hạn policy; `invalidated`: cache bị loại bỏ.
+- `error`: mã lỗi và HTTP status nếu repository có cung cấp; `storageUnavailable`: storage không đọc/ghi được hoặc từ chối ghi. RAM vẫn có thể dùng trong phiên hiện tại.
+- `entries` cho biết revision và TTL còn lại. Mở lại cùng modal trong TTL phải tăng hit, không tăng `network` cho catalog đó nếu chưa có invalidation. Reload trong TTL phải có `indexedDbHit` khi storage khả dụng.
+
+Bộ đếm chỉ ghi trong dev, giữ tối đa 100 sự kiện gần nhất, reset khi đổi phiên; không ghi payload, user ID hoặc token. API Console không được gắn vào `window` ở bản production. Nếu `error` ở `_manifest`/catalog lặp lại khi chế độ `versioned` bật, đối chiếu migration/RPC/grants và response lỗi; không coi việc bật biến môi trường là đã triển khai SQL. Những kiểm thử cục bộ xác nhận cơ chế cache, chưa xác nhận request của phiên trình duyệt người dùng nếu chưa có Network/diagnostic thực tế.

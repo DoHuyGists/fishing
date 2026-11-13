@@ -12,6 +12,8 @@ import UserTurn from "../player/stamina/UserTurn.vue";
 import Shells from "../player/currency/Shells.vue";
 import Tickets from "../player/currency/Tickets.vue";
 
+defineOptions({ inheritAttrs: false });
+
 const {
   title = "",
   subTitle = "",
@@ -79,7 +81,7 @@ onUnmounted(() => {
 </script>
 
 <template>
-  <div class="fixed inset-0 z-9999" :class="compact ? 'flex items-center justify-center bg-black/40 p-3 backdrop-blur-xs' : ''">
+  <div v-bind="$attrs" class="fixed inset-0 z-9999" :class="compact ? 'flex items-center justify-center bg-black/40 p-3 backdrop-blur-xs' : ''">
   <div
     class="player-window-panel flex flex-col bg-white"
     :class="compact

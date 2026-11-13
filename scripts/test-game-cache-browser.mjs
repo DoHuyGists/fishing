@@ -120,6 +120,10 @@ try {
   await other.evaluate(async () => { const { setup } = await import('/__cache_fixture.ts'); await setup(); });
   assert.equal(await page.evaluate(() => window.catalogCalls), 1);
   assert.equal(await other.evaluate(() => window.catalogCalls), 0);
+  assert.equal(await other.evaluate(() => window.catalog.inspectCache().counts.countries.indexedDbHit), 1);
+  await other.evaluate(() => window.country.fetchCountries());
+  assert.equal(await other.evaluate(() => window.catalog.inspectCache().counts.countries.ramHit), 1);
+  assert.equal(await other.evaluate(() => window.catalogCalls), 0);
   await other.evaluate(() => window.catalog.invalidate(['countries']));
   await page.waitForFunction(() => window.country.countries.length === 0);
   await page.evaluate(async () => { window.countryName = 'updated'; await window.catalog.resume(); });

@@ -21,6 +21,8 @@ export interface GameCatalogData {
   rates: CurrencyConversionRate[];
 }
 export type CatalogDomain = keyof GameCatalogData;
+export type CacheEventKind = 'ramHit' | 'indexedDbHit' | 'joined' | 'network' | 'forced' | 'error' | 'stale' | 'invalidated' | 'storageUnavailable';
+export interface CacheEvent { domain: string; kind: CacheEventKind; at: number; detail?: string }
 export interface CachePolicy { ttl: number; maxAge: number; feature?: string }
 export interface CacheToken { generation: string; scopeGeneration: string }
 export interface CacheEntry<T = unknown> extends CacheToken {
