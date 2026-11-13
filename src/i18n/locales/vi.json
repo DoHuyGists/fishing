@@ -680,6 +680,7 @@
     "thoi_gian_va_thoi_tiet": "Thời gian và thời tiết"
   },
   "EquipmentMenu": {
+    "nhan_vat": "Nhân vật",
     "dung_cu_cau_ca": "Dụng cụ câu cá",
     "chon_trang_bi": "Chọn trang bị",
     "khong_the_dieu_chinh_do_sau_luc_nay": "Không thể điều chỉnh độ sâu lúc này",
@@ -706,6 +707,8 @@
     "xong": "Xong"
   },
   "FishingBag": {
+    "capacity_usage": "Giỏ cá: {count}/{capacity} con",
+    "capacity_reached": "Giỏ cá đã đạt sức chứa {capacity} con. Hãy thả bớt cá hoặc kết thúc chuyến câu.",
     "thanh_qua_cau_duoc": "Thành quả câu được",
     "dong_tui_ca": "Đóng túi cá",
     "tui_con_trong_hay_ra_ho_cau_mot_con_ca": "Túi còn trống. Hãy ra hồ câu một con cá!",
@@ -890,6 +893,8 @@
     "chon_mot_chi_dan_de_xem_noi_dung": "Chọn một chỉ dẫn để xem nội dung."
   },
   "EquipmentSets": {
+    "capacity_usage": "{count}/{capacity} trang bị",
+    "capacity_reached": "Mỗi set chỉ chứa tối đa {capacity} trang bị. Hãy gỡ bớt trang bị để tiếp tục.",
     "set_trang_bi": "Set trang bị",
     "mua_them_set": "Mua thêm set",
     "tim_theo_so_set_hoac_ten_vat_pham": "Tìm theo số set hoặc tên vật phẩm",

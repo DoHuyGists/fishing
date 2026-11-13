@@ -21,6 +21,7 @@ import TeamMembersSticky from "../team/TeamMembersSticky.vue";
 import PrepareModal from "./PrepareModal.vue";
 import FeatureTable from "./FeatureTable.vue";
 import GuideTour from "../../shared/GuideTour.vue";
+import Modal from "../../shared/Modal.vue";
 import { useOnboardingStore } from "../../../stores/onboarding";
 import { useFeatureAvailabilityStore } from "../../../stores/featureAvailability";
 
@@ -31,6 +32,7 @@ const ShopModal = defineAsyncComponent(() => import("../shop/ShopModal.vue"));
 const CatchDiaryModal = defineAsyncComponent(() => import("../diary/CatchDiaryModal.vue"));
 const SpinWheelModal = defineAsyncComponent(() => import("../spin-wheel/SpinWheelModal.vue"));
 const InventoryModal = defineAsyncComponent(() => import("../inventory/InventoryModal.vue"));
+const Character = defineAsyncComponent(() => import("../body/Character.vue"));
 const Feedbackmodal = defineAsyncComponent(() => import("../feedback/Feedbackmodal.vue"));
 const MissionModal = defineAsyncComponent(() => import("../mission/MissionModal.vue"));
 const EventModal = defineAsyncComponent(() => import("../event/EventModal.vue"));
@@ -210,6 +212,9 @@ onUnmounted(() => {
           <CatchDiaryModal v-if="modalStore.isOpening('diary')" />
           <SpinWheelModal v-if="configStore.isUnlocked('gacha') && modalStore.isOpening('gacha')" />
           <InventoryModal v-if="modalStore.isOpening('inventory')" />
+          <Modal v-if="modalStore.isOpening('body')" :title="tr('EquipmentMenu.nhan_vat')" role="dialog" aria-modal="true" :aria-label="tr('EquipmentMenu.nhan_vat')">
+            <Character />
+          </Modal>
           <SkillModal v-if="modalStore.isOpening('skill')" />
           <AquacultureModal v-if="modalStore.isOpening('aquaculture')" />
           <Feedbackmodal v-if="modalStore.isOpening('feedback')" />

@@ -8,6 +8,7 @@ import { useInventoryStore } from "../../../stores/inventory.ts";
 
 import { useEquipmentStore, type Category, type EquipmentSet, type ItemData } from "../../../stores/equipment.ts";
 import { useCurrencyStore } from "../../../stores/currency.ts";
+import { useUserProfileStore } from "../../../stores/userProfile.ts";
 import { useToast } from "../../../composables/useToast.ts";
 import { usePagedListFilters } from '../../../composables/usePagedListFilters';
 
@@ -33,6 +34,8 @@ export function useInventoryTable() {
   const authStore = useAuthStore();
   const inventoryStore = useInventoryStore();
   const equipmentStore = useEquipmentStore();
+  const userProfileStore = useUserProfileStore();
+  const equipmentCapacity = computed(() => userProfileStore.equipmentCapacity);
   const currencyStore = useCurrencyStore();
   const toast = useToast();
 
@@ -201,6 +204,9 @@ export function useInventoryTable() {
     }
     const list = activeSet.value[active.value.slot];
     if (list.some((setItem) => setItem.inventory_id === item.id)) return;
+    if (equipmentStore.countSetItems(activeSet.value) >= equipmentCapacity.value) {
+      return toast.error(tr('EquipmentSets.capacity_reached', { capacity: equipmentCapacity.value }));
+    }
     list.push({
       ...item.data,
       id: typeof item.data.id === "string" ? item.data.id : item.id,
@@ -265,6 +271,8 @@ export function useInventoryTable() {
     allOnPageSelected,
     busy,
     currencyStore,
+    equipmentStore,
+    equipmentCapacity,
     deleteSelected,
     filteredItems,
     hasRpc,

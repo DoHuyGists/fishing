@@ -81,6 +81,9 @@ function getRewardEffect(variant: "NORMAL" | "GOLDEN" | "MUTATED") {
           >
             <div>
               <div id="bag-title" class="m-0 text-xl">{{ tr('FishingBag.thanh_qua_cau_duoc') }}</div>
+              <div class="mt-1 text-xs text-[#b7cfb9]">
+                {{ tr('FishingBag.capacity_usage', { count: store.inventory.length, capacity: store.fishingNetCapacity }) }}
+              </div>
             </div>
             <button
               type="button"

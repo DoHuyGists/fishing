@@ -7,9 +7,13 @@ import { useFishingStore } from "../../../stores/fishing.ts";
 import { ref, watch } from "vue";
 import EquipmentPickerModal from "./EquipmentPickerModal.vue";
 import AdjusDepth from "./AdjusDepth.vue";
+import Character from "../body/Character.vue";
+import Modal from "../../shared/Modal.vue";
+import { useModalStore } from "../../../stores/modal";
 
 const store = useFishingStore();
 const equipmentStore = useEquipmentStore();
+const modalStore = useModalStore();
 const pickerOpen = ref(false);
 const selectedBait = computed(() =>
   equipmentStore.variants.bait?.find((bait) => bait.id === store.equipmentLoadout.bait),
@@ -69,11 +73,15 @@ watch(
         </span>
       </button>
       <AdjusDepth />
+      <button type="button" class="slide-fade-in from-top player-content-in flex items-center gap-2 rounded-lg border border-[#cbd9c6] bg-[#f5f9f0] min-h-7 px-3 py-[3px] text-[11px] font-bold text-[#24352a] transition hover:border-[#70a77e] hover:bg-[#eaf5e8]" @click="modalStore.open('body')">
+        <span aria-hidden="true" class="text-base">🧍</span>
+        {{ tr('EquipmentMenu.nhan_vat') }}
+      </button>
       <button type="button" class="slide-fade-in from-top player-content-in relative flex items-center gap-2 rounded-lg border border-[#cbd9c6] bg-[#f5f9f0] min-h-7 px-3 py-[3px] text-[11px] font-bold text-[#24352a] transition hover:border-[#70a77e] hover:bg-[#eaf5e8]" @click="store.openBag">
         <span aria-hidden="true" class="text-base">🕸️</span>
         {{ tr('CaughtModal.tui_ca') }}
         <b class="absolute -top-2 right-2 grid h-[17px] min-w-[17px] place-items-center rounded-full border border-[#cbd9c6] bg-white px-1 text-[9px] font-bold leading-none text-[#24352a] shadow-sm" :aria-label="tr('EquipmentMenu.so_ca_trong_tui')">
-          {{ store.inventory.length }}
+          {{ store.inventory.length }}/{{ store.fishingNetCapacity }}
         </b>
       </button>
       <button type="button" class="slide-fade-in from-top player-content-in relative flex items-center gap-2 rounded-lg border border-[#cbd9c6] bg-[#f5f9f0] min-h-7 px-3 py-[3px] text-[11px] font-bold text-[#24352a] transition hover:border-[#70a77e] hover:bg-[#eaf5e8]" @click="store.openLakeGuide">
@@ -99,4 +107,19 @@ watch(
       </div>
     </div>
   </div>
+  <Teleport to="body">
+    <Modal
+      v-if="modalStore.isOpening('body')"
+      compact
+      :show-count-data="false"
+      :title="tr('EquipmentMenu.nhan_vat')"
+      role="dialog"
+      aria-modal="true"
+      :aria-label="tr('EquipmentMenu.nhan_vat')"
+      @click.self="modalStore.close"
+      @keydown.esc="modalStore.close"
+    >
+      <Character />
+    </Modal>
+  </Teleport>
 </template>

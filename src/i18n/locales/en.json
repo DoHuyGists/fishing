@@ -676,6 +676,7 @@
     "thoi_gian_va_thoi_tiet": "Time and weather"
   },
   "EquipmentMenu": {
+    "nhan_vat": "Character",
     "dung_cu_cau_ca": "Fishing tools",
     "chon_trang_bi": "Choose equipment",
     "khong_the_dieu_chinh_do_sau_luc_nay": "Unable to adjust the depth right now",
@@ -702,6 +703,8 @@
     "xong": "Done"
   },
   "FishingBag": {
+    "capacity_usage": "Fish bag: {count}/{capacity} fish",
+    "capacity_reached": "Your fish bag has reached its capacity of {capacity} fish. Release some fish or finish your fishing trip.",
     "thanh_qua_cau_duoc": "Your catches",
     "dong_tui_ca": "Close fish bag",
     "tui_con_trong_hay_ra_ho_cau_mot_con_ca": "Your bag is empty. Catch a fish at the lake!",
@@ -886,6 +889,8 @@
     "chon_mot_chi_dan_de_xem_noi_dung": "Choose a guide to view its content."
   },
   "EquipmentSets": {
+    "capacity_usage": "{count}/{capacity} equipment items",
+    "capacity_reached": "Each set can hold up to {capacity} equipment items. Remove equipment to continue.",
     "set_trang_bi": "Equipment sets",
     "mua_them_set": "Buy another set",
     "tim_theo_so_set_hoac_ten_vat_pham": "Search by set number or item name",

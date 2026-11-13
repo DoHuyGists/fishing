@@ -233,6 +233,9 @@ onBeforeUnmount(() => {
           class="flex flex-col gap-3 rounded-[15px] border border-[#cbd9c6] bg-[#f5f9f0] p-3 text-[#24352a]"
         >
           <div role="status" class="text-xs">{{ fishingStore.castMessage }}</div>
+          <div v-if="fishingStore.isFishingNetFull" role="status" class="text-xs font-bold text-amber-800">
+            {{ tr('FishingBag.capacity_reached', { capacity: fishingStore.fishingNetCapacity }) }}
+          </div>
           <button
             type="button"
             class="rounded-[10px] border border-[#cbd9c6] bg-white px-3 py-2 text-xs font-bold enabled:hover:bg-[#e2ecdc] disabled:cursor-not-allowed disabled:opacity-45"

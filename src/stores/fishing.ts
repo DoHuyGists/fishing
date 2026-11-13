@@ -3,6 +3,7 @@ import type { TensionChallenge, TensionFight, TensionInput, TensionSubmission } 
 import { t as tr } from "../i18n";
 import { defineStore } from "pinia";
 import { useAuthStore } from "./auth";
+import { useUserProfileStore } from "./userProfile";
 import { useEquipmentStore } from "./equipment";
 import { useUserInAreaStore } from "./userInArea";
 import { useDayPhaseStore } from "./dayPhase";
@@ -133,7 +134,14 @@ export const useFishingStore = defineStore("fishing", {
     areaSpeciesDiaryRequestId: 0,
   }),
   getters: {
-    canCast: (s) => s.sessionReady && !s.isLeavingArea && !s.hasLeftArea && (s.castPhase === "idle" || s.castPhase === "lost"),
+    fishingNetCapacity: () => useUserProfileStore().fishingNetCapacity,
+    isFishingNetFull(): boolean {
+      return this.inventory.length >= this.fishingNetCapacity;
+    },
+    canCast(): boolean {
+      return this.sessionReady && !this.isLeavingArea && !this.hasLeftArea && !this.isFishingNetFull &&
+        (this.castPhase === "idle" || this.castPhase === "lost");
+    },
     canReelIn: (s) => !s.isLeavingArea && !s.hasLeftArea && ["casting", "waiting", "bite"].includes(s.castPhase) && (!s.tensionChallenge || s.tensionStartedAt === null),
     canAdjustDepth: (s) => s.sessionReady && !s.isLeavingArea && !s.hasLeftArea && (s.castPhase === "idle" || s.castPhase === "lost"),
     canAdjustLakeDepth: (s) =>
@@ -166,9 +174,13 @@ export const useFishingStore = defineStore("fishing", {
         const [area] = await Promise.all([
           useUserInAreaStore().setCurrentUserInArea(userId),
           useEquipmentStore().fetchEquipment(userId, true),
+          useUserProfileStore().fetchProfile(userId, true),
         ]);
         if (requestId !== this.sessionRequestId) return;
         if (useEquipmentStore().error) throw new Error(useEquipmentStore().error);
+        const profileStore = useUserProfileStore();
+        if (profileStore.error) throw new Error(profileStore.error);
+        if (profileStore.profile?.id !== userId) throw new Error(tr('userProfile.khong_tim_thay_ho_so'));
         if (area?.status !== "enter" || !area.area_id) throw new Error(tr('fishing.ban_chua_o_trong_bai_cau'));
         await this.initializeFishingArea(area.area_id);
         if (requestId !== this.sessionRequestId) return;
@@ -406,6 +418,9 @@ export const useFishingStore = defineStore("fishing", {
         if (requestId !== this.sessionRequestId) return;
         this.inventoryRequestId++;
         this.inventory = this.inventory.filter((item) => item.id !== caughtId);
+        if (!this.isFishingNetFull && (this.castPhase === "idle" || this.castPhase === "lost")) {
+          this.castMessage = tr('fishing.cham_mat_ho_de_cau_tiep');
+        }
       } catch (err) {
         console.error("Lỗi khi thả cá khỏi túi:", err);
         throw err;
@@ -442,6 +457,10 @@ export const useFishingStore = defineStore("fishing", {
       }
     },
     async castTo(x: number, y: number) {
+      if (this.sessionReady && this.isFishingNetFull) {
+        this.rejectCast(tr('FishingBag.capacity_reached', { capacity: this.fishingNetCapacity }));
+        return;
+      }
       if (!this.canCast) {
         this.rejectCast(tr('fishing.hay_thu_moi_truoc_khi_quang_moi_lai'));
         return;

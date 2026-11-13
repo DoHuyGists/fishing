@@ -9,6 +9,8 @@ const {
   SLOTS,
   LABELS,
   inventoryStore,
+  equipmentStore,
+  equipmentCapacity,
   isActiveSlot,
   isDirty,
   itemName,
@@ -55,6 +57,10 @@ const {
         <div class="mb-3 flex items-center justify-between">
           <div class="text-sm font-semibold">
             Set {{ setIndex + 1 }}
+            <span class="ml-2 text-xs font-normal"
+              :class="equipmentStore.countSetItems(set) >= equipmentCapacity ? 'text-amber-600' : 'text-slate-500'">
+              {{ tr('EquipmentSets.capacity_usage', { count: equipmentStore.countSetItems(set), capacity: equipmentCapacity }) }}
+            </span>
             <span v-if="isDirty(set)" class="ml-2 text-xs font-normal text-amber-600">{{ tr('EquipmentSets.chua_luu') }}</span>
           </div>
           <div class="select-none flex gap-2">
@@ -64,11 +70,15 @@ const {
               {{ tr('EquipmentSets.su_dung') }}
             </label>
           </div>
-          <button type="button" :disabled="!isDirty(set) || savingId === set.id"
+          <button type="button" :disabled="!isDirty(set) || savingId === set.id || equipmentStore.countSetItems(set) > equipmentCapacity"
             class="rounded-md bg-slate-800 px-3 py-1 text-sm text-white hover:bg-slate-900 disabled:cursor-not-allowed disabled:bg-slate-200 disabled:text-slate-400"
             @click="saveSet(set)">
             {{ savingId === set.id ? tr('ChangePasswordModal.dang_luu') : tr('EquipmentSets.luu_set') }}
           </button>
+        </div>
+
+        <div v-if="equipmentStore.countSetItems(set) > equipmentCapacity" class="mb-3 text-xs text-amber-600" role="status">
+          {{ tr('EquipmentSets.capacity_reached', { capacity: equipmentCapacity }) }}
         </div>
 
         <div class="grid grid-cols-2 gap-2 xl:grid-cols-5">

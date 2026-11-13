@@ -26,6 +26,7 @@ const actionGroups: { key: string; label: string; iconClass: string; actions: Lo
     key: 'equipment', get label() { return tr('FeatureTable.hanh_trang'); }, iconClass: 'bg-[#e7f0df]',
     actions: [
       { modal: 'inventory', get label() { return tr('InventoryModal.tui_do'); }, icon: '🎒', tourId: 'first-play-inventory' },
+      { modal: 'body', get label() { return tr('EquipmentMenu.nhan_vat'); }, icon: '🧍' },
       { modal: 'caught', get label() { return tr('FeatureTable.kho_ca'); }, icon: '🐟', tourId: 'first-play-storage' },
       { modal: 'shop', get label() { return tr('FeatureTable.cua_hang'); }, icon: '🛒' },
       { modal: 'skill', get label() { return tr('SkillModal.ky_nang'); }, icon: '✨' },
@@ -83,15 +84,15 @@ const supportActions: LobbyAction[] = [
           :id="action.tourId"
           :key="action.modal"
           type="button"
-          :data-locked="!features.isAvailable(action.modal)"
+          :data-locked="!features.canOpen(action.modal)"
           class="slide-fade-in lobby-menu__button [--slide-distance:24px]! [transition:background-color_150ms_ease,border-color_150ms_ease,box-shadow_150ms_ease] [&[data-locked=true]]:cursor-pointer [&[data-locked=true]]:border-dashed [&[data-locked=true]]:bg-[#f1f3ed] [&[data-locked=true]]:shadow-none [&[data-locked=true]>[aria-hidden=true]]:grayscale [&[data-locked=true]>[aria-hidden=true]]:opacity-60 enabled:hover:border-[#8bab7a] enabled:hover:bg-[#edf5e5] enabled:hover:shadow-[0_2px_0_#cbd9c6] enabled:active:bg-[#e2edd8] enabled:active:shadow-[inset_0_1px_3px_#cbd9c6] focus-visible:outline-2 focus-visible:outline-[#527547] focus-visible:outline-offset-2 disabled:cursor-not-allowed! disabled:border-dashed disabled:bg-[#f1f3ed] disabled:shadow-none [&:disabled>[aria-hidden=true]]:grayscale [&:disabled>[aria-hidden=true]]:opacity-60 motion-reduce:transition-none relative flex min-h-9 min-w-0 flex-wrap items-center justify-center gap-x-1 gap-y-0.5 rounded-lg border border-[#cbd9c6] bg-white/85 px-1 py-1.5 text-[11px] leading-4"
           :class="buttonDirections[actionIndex % buttonDirections.length]"
           aria-haspopup="dialog"
-          @click="features.isAvailable(action.modal) ? modalStore.open(action.modal) : features.showDetails(action.modal)"
+          @click="features.canOpen(action.modal) ? modalStore.open(action.modal) : features.showDetails(action.modal)"
         >
           <span aria-hidden="true" class="text-sm">{{ action.icon }}</span>
           <span>{{ action.label }}</span>
-          <span v-if="!features.isAvailable(action.modal)" class="w-full text-[9px] underline underline-offset-2">{{ tr('FeatureAvailability.maintenanceBadge') }}</span>
+          <span v-if="!features.canOpen(action.modal)" class="w-full text-[9px] underline underline-offset-2">{{ tr('FeatureAvailability.maintenanceBadge') }}</span>
           <span
             v-if="action.modal === 'notifications' && notificationStore.unreadCount"
             class="absolute -right-1 -top-1 flex min-h-4 min-w-4 items-center justify-center rounded-full bg-[#b84436] px-1 text-[9px] font-bold leading-4 text-white ring-2 ring-[#f5f9f0]"
@@ -122,12 +123,12 @@ const supportActions: LobbyAction[] = [
             :id="action.tourId"
             :key="action.modal"
             type="button"
-            :disabled="features.isAvailable(action.modal) && action.requiresUnlock && !configStore.isUnlocked(action.modal)"
-            :data-locked="!features.isAvailable(action.modal)"
+            :disabled="features.canOpen(action.modal) && action.requiresUnlock && !configStore.isUnlocked(action.modal)"
+            :data-locked="!features.canOpen(action.modal)"
             class="slide-fade-in lobby-menu__button [--slide-distance:24px]! [transition:background-color_150ms_ease,border-color_150ms_ease,box-shadow_150ms_ease] [&[data-locked=true]]:cursor-pointer [&[data-locked=true]]:border-dashed [&[data-locked=true]]:bg-[#f1f3ed] [&[data-locked=true]]:shadow-none [&[data-locked=true]>[aria-hidden=true]]:grayscale [&[data-locked=true]>[aria-hidden=true]]:opacity-60 enabled:hover:border-[#8bab7a] enabled:hover:bg-[#edf5e5] enabled:hover:shadow-[0_2px_0_#cbd9c6] enabled:active:bg-[#e2edd8] enabled:active:shadow-[inset_0_1px_3px_#cbd9c6] focus-visible:outline-2 focus-visible:outline-[#527547] focus-visible:outline-offset-2 disabled:cursor-not-allowed! disabled:border-dashed disabled:bg-[#f1f3ed] disabled:shadow-none [&:disabled>[aria-hidden=true]]:grayscale [&:disabled>[aria-hidden=true]]:opacity-60 motion-reduce:transition-none flex min-h-14 min-w-0 flex-col items-center justify-center gap-1 rounded-lg border border-[#d9e3d3] bg-white px-1 py-1.5 text-center shadow-[0_2px_0_#e2e9dc]"
             :class="buttonDirections[(actionIndex + groupIndex) % buttonDirections.length]"
             aria-haspopup="dialog"
-            @click="features.isAvailable(action.modal) ? modalStore.open(action.modal) : features.showDetails(action.modal)"
+            @click="features.canOpen(action.modal) ? modalStore.open(action.modal) : features.showDetails(action.modal)"
           >
             <span
               aria-hidden="true"
@@ -136,7 +137,7 @@ const supportActions: LobbyAction[] = [
             >{{ action.icon }}</span>
             <span class="text-[11px] font-semibold leading-4">{{ action.label }}</span>
             <span
-              v-if="!features.isAvailable(action.modal)"
+              v-if="!features.canOpen(action.modal)"
               class="rounded bg-amber-100 px-1 py-0.5 text-[9px] leading-3 text-amber-900 underline underline-offset-2"
             >{{ tr('FeatureAvailability.maintenanceBadge') }}</span>
             <span
@@ -153,17 +154,17 @@ const supportActions: LobbyAction[] = [
         v-for="(action, actionIndex) in supportActions"
         :key="action.modal"
         type="button"
-        :disabled="features.isAvailable(action.modal) && action.requiresUnlock && !configStore.isUnlocked(action.modal)"
-        :data-locked="!features.isAvailable(action.modal)"
+        :disabled="features.canOpen(action.modal) && action.requiresUnlock && !configStore.isUnlocked(action.modal)"
+        :data-locked="!features.canOpen(action.modal)"
         class="slide-fade-in lobby-menu__button [--slide-distance:24px]! [transition:background-color_150ms_ease,border-color_150ms_ease,box-shadow_150ms_ease] [&[data-locked=true]]:cursor-pointer [&[data-locked=true]]:border-dashed [&[data-locked=true]]:bg-[#f1f3ed] [&[data-locked=true]]:shadow-none [&[data-locked=true]>[aria-hidden=true]]:grayscale [&[data-locked=true]>[aria-hidden=true]]:opacity-60 enabled:hover:border-[#8bab7a] enabled:hover:bg-[#edf5e5] enabled:hover:shadow-[0_2px_0_#cbd9c6] enabled:active:bg-[#e2edd8] enabled:active:shadow-[inset_0_1px_3px_#cbd9c6] focus-visible:outline-2 focus-visible:outline-[#527547] focus-visible:outline-offset-2 disabled:cursor-not-allowed! disabled:border-dashed disabled:bg-[#f1f3ed] disabled:shadow-none [&:disabled>[aria-hidden=true]]:grayscale [&:disabled>[aria-hidden=true]]:opacity-60 motion-reduce:transition-none flex min-h-9 min-w-0 flex-wrap items-center justify-center gap-1 rounded-lg border border-transparent px-1 py-1 text-[11px] leading-4"
         :class="buttonDirections[(actionIndex + 2) % buttonDirections.length]"
         aria-haspopup="dialog"
-        @click="features.isAvailable(action.modal) ? modalStore.open(action.modal) : features.showDetails(action.modal)"
+        @click="features.canOpen(action.modal) ? modalStore.open(action.modal) : features.showDetails(action.modal)"
       >
         <span aria-hidden="true" class="text-sm">{{ action.icon }}</span>
         <span>{{ action.label }}</span>
         <span
-          v-if="!features.isAvailable(action.modal)"
+          v-if="!features.canOpen(action.modal)"
           class="w-full text-[9px] text-amber-900 underline underline-offset-2"
         >{{ tr('FeatureAvailability.maintenanceBadge') }}</span>
         <span

@@ -4,6 +4,8 @@ export interface UserProfile {
   skill_points: number;
   level: number;
   inventory_capacity: number;
+  equipment_capacity: number;
+  fishing_net_capacity: number;
   species_storage_capacity: number;
   pond_slot: number;
   is_admin: boolean;

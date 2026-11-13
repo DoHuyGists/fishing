@@ -20,6 +20,8 @@ export const useUserProfileStore = defineStore("userProfile", {
     experiencePoint: (state) => state.profile?.experience_point ?? 0,
     skillPoints: (state) => state.profile?.skill_points ?? 0,
     inventoryCapacity: (state) => state.profile?.inventory_capacity ?? 0,
+    equipmentCapacity: (state) => Math.max(0, state.profile?.equipment_capacity ?? 0),
+    fishingNetCapacity: (state) => Math.max(0, Math.floor(state.profile?.fishing_net_capacity ?? 0)),
     speciesStorageCapacity: (state) => state.profile?.species_storage_capacity ?? 0,
   },
   actions: {

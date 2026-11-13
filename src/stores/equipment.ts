@@ -6,6 +6,7 @@ import { defaultEquipmentVariants } from "../data/equipmentCatalog";
 import { supabaseEquipmentRepository } from "../data/supabaseEquipmentRepository";
 import { useReadCacheStore } from './readCache';
 import { useAuthStore } from './auth';
+import { useUserProfileStore } from './userProfile';
 import { useFishingStore, type FishingTool } from "./fishing";
 
 export type Category = "rod" | "line" | "reel" | "hook" | "bait";
@@ -47,6 +48,9 @@ export const useEquipmentStore = defineStore("equipment", {
     requestId: 0,
   }),
   actions: {
+    countSetItems(set: EquipmentSet) {
+      return set.rod.length + set.line.length + set.reel.length + set.hook.length + set.bait.length;
+    },
     syncLoadout() {
       const selected: Partial<Record<FishingTool, string>> = {};
       for (const tool of Object.keys(this.variants) as FishingTool[]) {
@@ -117,6 +121,10 @@ export const useEquipmentStore = defineStore("equipment", {
       return supabaseEquipmentRepository.CreateNewSet();
     },
     async saveSet(userId: string, set: EquipmentSet) {
+      const capacity = useUserProfileStore().equipmentCapacity;
+      if (this.countSetItems(set) > capacity) {
+        throw new Error(tr('EquipmentSets.capacity_reached', { capacity }));
+      }
       return supabaseEquipmentRepository.UpdateSet(userId, set);
     },
   },
