@@ -26,7 +26,6 @@ const actionGroups: { key: string; label: string; iconClass: string; actions: Lo
     key: 'equipment', get label() { return tr('FeatureTable.hanh_trang'); }, iconClass: 'bg-[#e7f0df]',
     actions: [
       { modal: 'inventory', get label() { return tr('InventoryModal.tui_do'); }, icon: '🎒', tourId: 'first-play-inventory' },
-      { modal: 'body', get label() { return tr('EquipmentMenu.nhan_vat'); }, icon: '🧍' },
       { modal: 'caught', get label() { return tr('FeatureTable.kho_ca'); }, icon: '🐟', tourId: 'first-play-storage' },
       { modal: 'shop', get label() { return tr('FeatureTable.cua_hang'); }, icon: '🛒' },
       { modal: 'skill', get label() { return tr('SkillModal.ky_nang'); }, icon: '✨' },

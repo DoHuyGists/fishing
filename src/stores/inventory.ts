@@ -11,6 +11,7 @@ export const useInventoryStore = defineStore("Inventory", {
     state: () => ({
         items: [] as UserInventory[],
         equipmentSets: [] as EquipmentSet[],
+        savedEquipmentSets: [] as EquipmentSet[],
         shopItems: [] as ShopItem[],
         shopLoading: false,
         viewItems: [] as UserInventory[],
@@ -24,6 +25,26 @@ export const useInventoryStore = defineStore("Inventory", {
         viewRequest: 0,
     }),
     getters: {
+        activeFishingStats(state) {
+            const totals = { max_weight: 0, pull_strength: 0, durability: 0, catch_rate: 0, luck_bonus: 0 };
+            const userId = useAuthStore().user?.id;
+            const set = state.savedEquipmentSets.find(set => set.isUsed && set.userId === userId);
+            if (!set) return totals;
+            const seen = new Set<string>();
+            for (const slot of ['rod', 'line', 'reel', 'hook', 'bait'] as const) {
+                for (const entry of set[slot]) {
+                    if (!entry.inventory_id || seen.has(entry.inventory_id)) continue;
+                    const item = state.items.find(item => item.id === entry.inventory_id && item.userId === userId);
+                    if (!item || item.data.category !== slot || Number(item.data.quantity ?? 1) < 1 || !Number.isFinite(Number(item.data.quantity ?? 1))) continue;
+                    seen.add(entry.inventory_id);
+                    for (const key of Object.keys(totals) as (keyof typeof totals)[]) {
+                        const value = item.data[key];
+                        if (typeof value === 'number' && Number.isFinite(value) && value > 0) totals[key] += value;
+                    }
+                }
+            }
+            return totals;
+        },
         ownedQuantitiesByItemId: (state): Map<string, number> => {
             const quantities = new Map<string, number>();
             for (const item of state.items) {
@@ -60,7 +81,10 @@ export const useInventoryStore = defineStore("Inventory", {
         async setEquipmentSet() {
             const auth = useAuthStore(), generation = auth.sessionGeneration, userId = auth.user?.id;
             const sets = await supabaseEquipmentRepository.fetchAllEquipmentSet();
-            if (auth.user?.id === userId && auth.sessionGeneration === generation) this.equipmentSets = sets;
+            if (auth.user?.id === userId && auth.sessionGeneration === generation) {
+                this.equipmentSets = sets;
+                this.savedEquipmentSets = JSON.parse(JSON.stringify(sets));
+            }
         },
         async removeItem(userId: string, inventoryIds: string[]) {
             await supabaseUserInventoryRepository.deleteInventory(userId,inventoryIds)

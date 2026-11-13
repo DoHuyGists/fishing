@@ -61,13 +61,17 @@
       "delete_inventory_items",
       "buy_equipment_set",
       "save_equipment_set",
+      "create_body_equipment_set",
+      "save_body_equipment_set",
+      "switch_body_equipment",
       "switch_equipment",
       "select_current_fishing_item"
     ],
     "tables": [],
     "writeTables": [
       "user_inventory",
-      "user_equipments"
+      "user_equipments",
+      "user_body_equipments"
     ],
     "functions": [],
     "storageBuckets": []

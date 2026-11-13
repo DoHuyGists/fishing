@@ -19,7 +19,7 @@ export const readCachePolicies: Record<string, ReadCachePolicy> = {
 };
 
 export const cachedReadTables: Record<string, string> = {
-  caught: 'caught', user_inventory: 'inventory', user_equipments: 'equipment',
+  caught: 'caught', user_inventory: 'inventory', user_equipments: 'equipment', user_body_equipments: 'equipment',
   caught_diary: 'diaryOwned', player_unlocked_countries: 'unlocked', user_skills: 'skillsOwned',
   currency: 'wallet', user_profile: 'profile', personal_notifications: 'notifications',
   system_notifications: 'notifications', system_notification_reads: 'notifications',

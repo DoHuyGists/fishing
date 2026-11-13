@@ -1,3 +1,9 @@
+export interface EquipmentStatDisplay {
+  id: string;
+  label: string;
+  value: string;
+}
+
 export interface EquipmentVariant {
   id: string;
   name: string;

@@ -10,6 +10,8 @@ defineEmits<{ "request-delete": [] }>();
 const {
   LABELS,
   active,
+  activeTab,
+  healthStore,
   activeSetNumber,
   allOnPageSelected,
   hasRpc,
@@ -56,7 +58,7 @@ const displayedGroups = computed(() =>
 <template>
   <div id="user-inventory" class="flex min-w-0 flex-col rounded-lg border border-slate-200 bg-white">
     <header class="space-y-3 border-b border-slate-200 p-4">
-      <div class="flex items-center justify-between gap-2">
+      <div class="flex flex-wrap items-center justify-between gap-2">
         <div class="text-lg font-semibold">
           {{ tr('InventoryItems.kho_do') }} <span class="text-sm font-normal text-slate-500">({{ inventoryStore.ownedTotal }})</span>
         </div>
@@ -83,7 +85,7 @@ const displayedGroups = computed(() =>
       <input v-model="itemSearch" type="search" :placeholder="tr('InventoryItems.tim_theo_ten_hoac_loai_vat_pham')"
         class="w-full rounded-md border border-slate-300 px-3 py-2 text-sm outline-none focus:border-teal-600 focus:ring-2 focus:ring-teal-100" />
 
-      <div class="flex items-center justify-between text-sm">
+      <div class="flex flex-wrap items-center justify-between gap-2 text-sm">
         <label class="inline-flex cursor-pointer items-center gap-2">
           <input type="checkbox" class="h-4 w-4 accent-teal-700" :checked="allOnPageSelected"
             @change="toggleSelectPage" />
@@ -101,7 +103,11 @@ const displayedGroups = computed(() =>
         </button>
       </div>
 
-      <div v-if="active" class="flex items-center justify-between rounded-md bg-teal-50 px-3 py-2 text-sm text-teal-900">
+      <div v-if="activeTab === 'health' && healthStore.selectedSlot" class="flex flex-wrap items-center justify-between gap-2 rounded-md bg-[#f5f9f0] px-3 py-2 text-xs text-[#24352a]">
+        <span>{{ tr('Health.filterSlot', { slot: tr(`Health.slot_${healthStore.selectedSlot}`) }) }} · {{ tr('Health.pickInventoryItem') }}</span>
+        <button type="button" class="min-h-8 underline" @click="healthStore.selectedSlot = null">{{ tr('AccountInfoModal.huy') }}</button>
+      </div>
+      <div v-else-if="activeTab === 'fishing' && active" class="flex items-center justify-between rounded-md bg-teal-50 px-3 py-2 text-sm text-teal-900">
         <span>
           {{ tr('InventoryItems.dang_chon_o') }} <b>{{ LABELS[active.slot] }}</b> {{ tr('InventoryItems.cua_set') }} {{ activeSetNumber }}{{ tr('InventoryItems.bam_vat_pham_de_them') }}
         </span>

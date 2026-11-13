@@ -7,8 +7,7 @@ import { useFishingStore } from "../../../stores/fishing.ts";
 import { ref, watch } from "vue";
 import EquipmentPickerModal from "./EquipmentPickerModal.vue";
 import AdjusDepth from "./AdjusDepth.vue";
-import Character from "../body/Character.vue";
-import Modal from "../../shared/Modal.vue";
+import InventoryModal from "../inventory/InventoryModal.vue";
 import { useModalStore } from "../../../stores/modal";
 
 const store = useFishingStore();
@@ -108,18 +107,6 @@ watch(
     </div>
   </div>
   <Teleport to="body">
-    <Modal
-      v-if="modalStore.isOpening('body')"
-      compact
-      :show-count-data="false"
-      :title="tr('EquipmentMenu.nhan_vat')"
-      role="dialog"
-      aria-modal="true"
-      :aria-label="tr('EquipmentMenu.nhan_vat')"
-      @click.self="modalStore.close"
-      @keydown.esc="modalStore.close"
-    >
-      <Character />
-    </Modal>
+    <InventoryModal v-if="modalStore.isOpening('body')" initial-tab="health" compact />
   </Teleport>
 </template>

@@ -115,7 +115,7 @@ export const useEquipmentStore = defineStore("equipment", {
       };
     },
     async chooseSet(userId: string, setId: string) {
-      supabaseEquipmentRepository.updateCurrentUsedSet(userId, setId);
+      await supabaseEquipmentRepository.updateCurrentUsedSet(userId, setId);
     },
     async buySet() {
       return supabaseEquipmentRepository.CreateNewSet();

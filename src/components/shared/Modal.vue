@@ -1,7 +1,7 @@
 <script lang="ts" setup>
 import { t as tr } from "../../i18n";
 
-import { onMounted, onUnmounted, ref, watch } from "vue";
+import { computed, onMounted, onUnmounted, ref, watch } from "vue";
 import { useModalStore } from "../../stores/modal.ts";
 import { useCurrencyStore } from "../../stores/currency.ts";
 import { useUserProfileStore } from "../../stores/userProfile.ts";
@@ -22,6 +22,7 @@ const {
   onRefresh = undefined,
   showCountData = true,
   compact = false,
+  contentWidthClass = 'max-w-3xl',
 } = defineProps<{
   title?: string;
   subTitle?: string;
@@ -29,9 +30,10 @@ const {
   onRefresh?: () => void;
   showCountData?: boolean
   compact?: boolean;
+  contentWidthClass?: string;
 }>();
 const hasRefreshListener = onRefresh != undefined;
-const hasGuideSteps = guidSteps.length != 0;
+const hasGuideSteps = computed(() => guidSteps.length != 0);
 
 const currencyStore = useCurrencyStore();
 const userProfileStore = useUserProfileStore();
@@ -88,7 +90,7 @@ onUnmounted(() => {
   <div
     class="player-window-panel flex flex-col bg-white"
     :class="compact
-      ? 'max-h-[calc(100dvh-1.5rem)] w-full max-w-3xl overflow-hidden rounded-2xl border border-[#cbd9c6] shadow-xl'
+      ? ['max-h-[calc(100dvh-1.5rem)] w-full overflow-hidden rounded-2xl border border-[#cbd9c6] shadow-xl', contentWidthClass]
       : 'h-[100vh] w-screen supports-[height:100dvh]:h-[100dvh]'"
   >
     <header

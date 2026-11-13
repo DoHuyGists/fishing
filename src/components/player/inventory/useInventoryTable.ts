@@ -1,4 +1,4 @@
-import type { InventoryTableContext } from "../../../types/model/inventory";
+import type { InventoryTableContext, InventoryTab } from "../../../types/model/inventory";
 import type { UserInventory } from "../../../types/model/userInventory";
 import { t as tr } from "../../../i18n";
 import { inject, type InjectionKey } from "vue";
@@ -11,6 +11,8 @@ import { useCurrencyStore } from "../../../stores/currency.ts";
 import { useUserProfileStore } from "../../../stores/userProfile.ts";
 import { useToast } from "../../../composables/useToast.ts";
 import { usePagedListFilters } from '../../../composables/usePagedListFilters';
+import { useHealthStore } from '../../../stores/health';
+import { healthEquipment } from '../../../data/healthEquipment';
 
 const SLOTS: Category[] = ["rod", "line", "reel", "hook", "bait"];
 const LABELS: Record<Category, string> = {
@@ -23,12 +25,15 @@ const LABELS: Record<Category, string> = {
 const SET_PRICE = 50000;
 const SETS_PER_PAGE = 3;
 
-export function useInventoryTable() {
+export function useInventoryTable(initialTab: InventoryTab = 'fishing') {
+  const activeTab = ref<InventoryTab>(initialTab);
+  const healthStore = useHealthStore();
   const userId = ref<string | null>(null);
   const loading = ref(true);
   const savedSnapshot = ref<Record<string, string>>({});
   const savedSetInventoryIds = ref<Record<string, string[]>>({});
   const savingId = ref<string | null>(null);
+  const switchingId = ref<string | null>(null);
   const busy = ref(false);
   const usingItemId = ref<string | null>(null);
   const authStore = useAuthStore();
@@ -66,20 +71,20 @@ export function useInventoryTable() {
 
   async function load() {
     loading.value = true;
-    userId.value = authStore.userId ?? null;
+    userId.value = authStore.user?.id ?? null;
     if (!userId.value) {
       loading.value = false;
       return toast.error(tr('useInventoryTable.ban_can_dang_nhap_de_xem_kho_do'));
     }
 
-    try { await loadItemsPage(); }
-    catch (error) { loading.value = false; toast.error((error as Error).message); return; }
-    await inventoryStore.setEquipmentSet();
-    savedSnapshot.value = Object.fromEntries(inventoryStore.equipmentSets.map((set) => [set.id, snapshotOf(set)]));
-    savedSetInventoryIds.value = Object.fromEntries(
-      inventoryStore.equipmentSets.map((set) => [set.id, inventoryIdsInSet(set)])
-    );
-    loading.value = false;
+    try {
+      await Promise.all([loadItemsPage(), inventoryStore.setEquipmentSet(), healthStore.loadInventory()]);
+      savedSnapshot.value = Object.fromEntries(inventoryStore.equipmentSets.map((set) => [set.id, snapshotOf(set)]));
+      savedSetInventoryIds.value = Object.fromEntries(
+        inventoryStore.equipmentSets.map((set) => [set.id, inventoryIdsInSet(set)])
+      );
+    } catch (error) { toast.error((error as Error).message); }
+    finally { loading.value = false; }
   }
   onMounted(load);
 
@@ -117,6 +122,7 @@ export function useInventoryTable() {
     try {
       await inventoryStore.useItem(item.id);
       await loadItemsPage();
+      await healthStore.loadInventory();
       selected.value = new Set();
       toast.success(tr('useInventoryTable.da_su_dung_vat_pham'));
     } catch (error) {
@@ -138,6 +144,11 @@ export function useInventoryTable() {
 
     if (isItemInSet) {
       toast.error(tr('useInventoryTable.khong_the_xoa_vat_pham_dang_co_trong_set_hay_go_vat_pham_va_luu_'));
+      return;
+    }
+
+    if (healthStore.containsInventory(selectedIds)) {
+      toast.error(tr('Health.removeBeforeDelete'));
       return;
     }
 
@@ -189,13 +200,24 @@ export function useInventoryTable() {
   }
   const isActiveSlot = (setId: string, slot: Category) =>
     active.value?.setId === setId && active.value?.slot === slot;
-  const isCompatible = (item: UserInventory) => !active.value || item.data.category === active.value.slot;
+  const hasActiveSlot = computed(() => activeTab.value === 'health' ? !!healthStore.selectedSlot : !!active.value);
+  const isCompatible = (item: UserInventory) => {
+    if (activeTab.value !== 'health') return !active.value || item.data.category === active.value.slot;
+    const equipment = healthEquipment(item);
+    return !!equipment.slot && equipment.quantity > 0 && (!healthStore.selectedSlot || equipment.slot === healthStore.selectedSlot);
+  };
   const isInActiveSlot = (item: UserInventory) =>
-    !!activeSet.value &&
+    activeTab.value === 'health' ? healthStore.equippedItems.some(equipped => equipped.inventory.id === item.id) : !!activeSet.value &&
     !!active.value &&
     activeSet.value[active.value.slot].some((setItem) => setItem.inventory_id === item.id);
 
   function pickItem(item: UserInventory) {
+    if (activeTab.value === 'health') {
+      if (!healthStore.selectedSlot) return toast.info(tr('Health.selectSlotFirst'));
+      if (!isCompatible(item)) return toast.error(tr('Health.incompatibleSlot'));
+      healthStore.equip(item.id);
+      return;
+    }
     if (!active.value || !activeSet.value) {
       return toast.info(tr('useInventoryTable.chon_mot_o_trong_set_ben_phai_truoc_roi_bam_vat_pham'));
     }
@@ -219,12 +241,17 @@ export function useInventoryTable() {
   }
 
   async function saveSet(set: EquipmentSet) {
-    if (!userId.value) return;
+    if (!userId.value || savingId.value) return;
+    const snapshot = JSON.parse(JSON.stringify(set)) as EquipmentSet;
+    const owner = authStore.user?.id, generation = authStore.sessionGeneration;
     savingId.value = set.id;
     try {
-      await equipmentStore.saveSet(userId.value, set);
-      savedSnapshot.value = { ...savedSnapshot.value, [set.id]: snapshotOf(set) };
-      savedSetInventoryIds.value = { ...savedSetInventoryIds.value, [set.id]: inventoryIdsInSet(set) };
+      await equipmentStore.saveSet(userId.value, snapshot);
+      if (authStore.user?.id !== owner || authStore.sessionGeneration !== generation) return;
+      snapshot.isUsed = inventoryStore.equipmentSets.find(candidate => candidate.id === set.id)?.isUsed ?? false;
+      inventoryStore.savedEquipmentSets = inventoryStore.savedEquipmentSets.map(saved => saved.id === set.id ? snapshot : saved);
+      savedSnapshot.value = { ...savedSnapshot.value, [set.id]: snapshotOf(snapshot) };
+      savedSetInventoryIds.value = { ...savedSetInventoryIds.value, [set.id]: inventoryIdsInSet(snapshot) };
       active.value = null;
       selected.value = new Set();
       toast.success(tr('useInventoryTable.da_luu_set'));
@@ -250,11 +277,19 @@ export function useInventoryTable() {
     }
   }
 
-  function handleUpdateSetUsed(event: Event, setId: string) {
-    if ((event.target as HTMLInputElement).value === "on") {
-      equipmentStore.chooseSet(userId.value!, setId);
+  async function handleUpdateSetUsed(event: Event, setId: string) {
+    const input = event.target as HTMLInputElement;
+    if (!userId.value || switchingId.value || !input.checked) return;
+    input.checked = false;
+    const owner = authStore.user?.id, generation = authStore.sessionGeneration;
+    switchingId.value = setId;
+    try {
+      await equipmentStore.chooseSet(userId.value, setId);
+      if (authStore.user?.id !== owner || authStore.sessionGeneration !== generation) return;
+      for (const set of [...inventoryStore.equipmentSets, ...inventoryStore.savedEquipmentSets]) set.isUsed = set.id === setId;
       toast.success(tr('useInventoryTable.cap_nhat_thanh_cong'));
-    }
+    } catch (error) { toast.error((error as Error).message); }
+    finally { switchingId.value = null; }
   }
 
   function hasRpc() {
@@ -263,6 +298,9 @@ export function useInventoryTable() {
   }
 
   return {
+    activeTab,
+    healthStore,
+    hasActiveSlot,
     SLOTS,
     LABELS,
     SET_PRICE,
@@ -295,6 +333,7 @@ export function useInventoryTable() {
     removeFromSet,
     saveSet,
     savingId,
+    switchingId,
     selected,
     setPage,
     setPages,

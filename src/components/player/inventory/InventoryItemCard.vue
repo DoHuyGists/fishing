@@ -6,13 +6,15 @@ import { useInformationModal } from "../../../composables/useInformationModal";
 
 import type { ItemData } from "../../../stores/equipment";
 import { useInventoryTableContext } from "./useInventoryTable";
+import { healthEquipment } from '../../../data/healthEquipment';
 
 const props = defineProps<{ item: UserInventory; list?: boolean }>();
 const { open } = useInformationModal();
-const { LABELS, active, isCompatible, isInActiveSlot, itemName, pickItem, selected, toggleSelect } =
+const { LABELS, activeTab, healthStore, hasActiveSlot, isCompatible, isInActiveSlot, itemName, pickItem, selected, toggleSelect } =
   useInventoryTableContext();
 
 const data = computed(() => props.item.data as ItemData);
+const healthItem = computed(() => healthEquipment(props.item));
 const name = computed(() => itemName(data.value, props.item.id));
 const category = computed(() => LABELS[data.value.category] ?? data.value.category);
 const description = computed(() => {
@@ -37,6 +39,11 @@ const details = computed(() => {
   addNumber("durability", tr('InventoryItemCard.do_ben'));
   addNumber("catch_rate", tr('InventoryItemCard.bonus_moc_ca'), "percent");
   addNumber("luck_bonus", tr('InventoryItemCard.may_man'));
+  if (activeTab.value === 'health') {
+    for (const [id, bonus] of Object.entries(healthItem.value.bonuses)) {
+      rows.push({ label: tr(`Health.${id}`), value: `+${bonus?.toLocaleString(getFormattingLocale())}` });
+    }
+  }
 
   const fishTypes = data.value.fish_type;
   if (Array.isArray(fishTypes)) {
@@ -65,8 +72,8 @@ function showDetails() {
     'slide-fade-in from-bottom player-content-in relative min-w-0 cursor-pointer rounded-md border text-[#24352a] transition',
     list ? 'flex items-start gap-3 px-3 py-2' : 'p-3',
     selected.has(item.id) ? 'border-red-400 bg-red-50' : 'border-[#cbd9c6] bg-white hover:bg-[#f5f9f0]',
-    active && isCompatible(item) ? 'ring-2 ring-teal-400' : '',
-    active && !isCompatible(item) ? 'opacity-40' : '',
+    hasActiveSlot && isCompatible(item) ? 'ring-2 ring-teal-400' : '',
+    hasActiveSlot && !isCompatible(item) ? 'opacity-40' : '',
   ]" @click="pickItem(item)">
     <input type="checkbox" class="h-4 w-4 accent-red-600"
       :class="list ? 'mt-1 shrink-0' : 'absolute left-2 top-2'" :checked="selected.has(item.id)"
@@ -101,8 +108,14 @@ function showDetails() {
         </div>
       </div>
       <div v-if="isInActiveSlot(item)" class="mt-2 text-xs font-medium text-teal-700" :class="list ? '' : 'text-center'">
-        {{ tr('InventoryItems.da_them') }}
+        {{ activeTab === 'health' ? tr('Health.equipped') : tr('InventoryItems.da_them') }}
       </div>
+      <button v-if="activeTab === 'health' && healthItem.slot" type="button"
+        class="mt-2 min-h-8 w-full rounded border border-[#cbd9c6] bg-[#f5f9f0] px-2 py-1 text-xs disabled:opacity-50"
+        :disabled="!healthStore.selectedSlot || !isCompatible(item) || isInActiveSlot(item) || healthStore.loading || healthStore.busy || !!healthStore.error"
+        :aria-label="tr('Health.equipNamed', { item: name })" @click.stop="pickItem(item)">
+        {{ isInActiveSlot(item) ? tr('Health.equipped') : tr('Health.equip') }}
+      </button>
     </div>
   </div>
 </template>

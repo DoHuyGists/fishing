@@ -18,6 +18,7 @@ const {
   removeFromSet,
   saveSet,
   savingId,
+  switchingId,
   setPage,
   setPages,
   setSearch,
@@ -64,7 +65,7 @@ const {
             <span v-if="isDirty(set)" class="ml-2 text-xs font-normal text-amber-600">{{ tr('EquipmentSets.chua_luu') }}</span>
           </div>
           <div class="select-none flex gap-2">
-            <input type="radio" name="equipment-set" :checked="set.isUsed"
+            <input :key="`${set.id}-${switchingId}`" type="radio" name="equipment-set" :checked="set.isUsed" :disabled="!!switchingId"
               @change="handleUpdateSetUsed($event, set.id)" class="cursor-pointer">
             <label for="" class="text-sm">
               {{ tr('EquipmentSets.su_dung') }}

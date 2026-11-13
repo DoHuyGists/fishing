@@ -1,17 +1,28 @@
 <script lang="ts" setup>
 import { t as tr } from "../../../i18n";
 
-import { provide } from "vue";
+import { computed, provide } from "vue";
 import EquipmentSets from "./EquipmentSets.vue";
+import FishingEquipmentOverview from './FishingEquipmentOverview.vue';
 import InventoryItems from "./InventoryItems.vue";
 import Modal from "../../shared/Modal.vue";
 import PaymentConfirmation from "../../shared/PaymentConfirmation.vue";
 import { inventoryTableContextKey, useInventoryTable } from "./useInventoryTable.ts";
+import Tab from '../../shared/Tab.vue';
+import HealthPanel from '../body/HealthPanel.vue';
+import type { InventoryTab } from '../../../types/model/inventory';
+import { useModalStore } from '../../../stores/modal';
 
-const inventory = useInventoryTable();
+const { initialTab = 'fishing', compact = false } = defineProps<{ initialTab?: InventoryTab; compact?: boolean }>();
+const inventory = useInventoryTable(initialTab);
 provide(inventoryTableContextKey, inventory);
+const modalStore = useModalStore();
 
-const { busy, buySet, currencyStore, deleteSelected, load, loading, modal, selected, SET_PRICE } = inventory;
+const { activeTab, busy, buySet, currencyStore, deleteSelected, load, loading, modal, selected, SET_PRICE } = inventory;
+const tabs = computed(() => [
+  { key: 'fishing', label: tr('InventoryModal.fishingTab') },
+  { key: 'health', label: tr('InventoryModal.healthTab') },
+]);
 
 const guildeSteps = [
   {
@@ -31,19 +42,32 @@ const guildeSteps = [
   },
   {
     target: "#buy-set-button",
-    title: "Mua set",
+    get title() { return tr('InventoryModal.mua_them_set_trang_bi'); },
     get description() { return tr('InventoryModal.co_the_mua_them_set_trang_bi'); },
   },
 ];
 </script>
 <template>
-  <Modal :title="tr('InventoryModal.trang_bi')" :guid-steps="guildeSteps" :on-refresh="load">
+  <Modal :title="tr('InventoryModal.trang_bi')" :guid-steps="activeTab === 'fishing' ? guildeSteps : []" :on-refresh="load"
+    :compact="compact" :show-count-data="!compact" content-width-class="max-w-6xl"
+    role="dialog" aria-modal="true" :aria-label="tr('InventoryModal.trang_bi')"
+    @click.self="modalStore.close" @keydown.esc="modal ? (modal = null) : modalStore.close()">
     <section class="h-full w-full text-slate-800">
       <div v-if="loading" class="py-24 text-center text-sm text-slate-500">{{ tr('InventoryModal.dang_tai_kho_do') }}</div>
 
-      <div v-else class="grid grid-cols-1 gap-6 lg:grid-cols-2">
+      <div v-else class="grid min-w-0 grid-cols-1 items-start gap-3 lg:grid-cols-2">
         <InventoryItems @request-delete="modal = 'delete'" />
-        <EquipmentSets @request-buy="modal = 'buy'" />
+        <div class="min-w-0">
+          <Tab v-model="activeTab" :tabs="tabs" :aria-label="tr('InventoryModal.trang_bi')">
+            <template #fishing>
+              <div class="space-y-2.5">
+                <FishingEquipmentOverview />
+                <EquipmentSets @request-buy="modal = 'buy'" />
+              </div>
+            </template>
+            <template #health><HealthPanel /></template>
+          </Tab>
+        </div>
       </div>
 
       <PaymentConfirmation
