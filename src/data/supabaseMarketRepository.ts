@@ -1,6 +1,8 @@
 import type { MarketHistory, MarketListing, MarketListingQuery } from "../types/model/market";
 import { t as tr } from "../i18n";
 import supabase from "../database/connection";
+import { listPage, pageRange } from './pagination';
+import type { ListPage } from '../types/model/pagination';
 
 function mapCaughtRow(row: any) {
   if (!row) return null;
@@ -24,27 +26,27 @@ function mapCaughtRow(row: any) {
 }
 
 class SupabaseMarketRepository {
-  async fetchHistory(userId: string, page: number): Promise<MarketHistory[]> {
-    const { data, error } = await supabase.from("market_history").select("*")
+  async fetchHistory(userId: string, page: number): Promise<ListPage<MarketHistory>> {
+    const { data, error, count } = await supabase.from("market_history").select("*", { count: 'exact' })
       .or(`seller_id.eq.${userId},buyer_id.eq.${userId}`).order("created_at", { ascending: false }).order("id")
-      .range((page - 1) * 20, page * 20);
+      .range(...pageRange(page));
     if (error) throw new Error(error.message);
-    return (data ?? []).map(row => ({ ...row, price: Number(row.price) })) as MarketHistory[];
+    return listPage((data ?? []).map(row => ({ ...row, price: Number(row.price) })) as MarketHistory[], count);
   }
-  async fetchActiveListings(options: MarketListingQuery): Promise<MarketListing[]> {
+  async fetchActiveListings(options: MarketListingQuery): Promise<ListPage<MarketListing>> {
     const { page, pageSize, userId, search, rarity, sort } = options;
     const filteredSpecies = Boolean(search) || rarity !== 'ALL';
     const relation = filteredSpecies
       ? 'caught:caught_id!inner(id,user_id,species_id,weight,created_at,species!inner(name,image,rarity))'
       : 'caught:caught_id(id,user_id,species_id,weight,created_at,species(name,image,rarity))';
-    let query = supabase.from('species_market').select('id,created_at,caught_id,user_id,price,status,' + relation).eq('status', 'normal');
+    let query = supabase.from('species_market').select('id,created_at,caught_id,user_id,price,status,' + relation, { count: 'exact' }).eq('status', 'normal');
     if (userId) query = query.eq('user_id', userId);
     if (search) query = query.ilike('caught.species.name', '%' + search.replace(/[\\%_]/g, '\\$&') + '%');
     if (rarity !== 'ALL') query = query.eq('caught.species.rarity', rarity);
     if (sort !== 'newest') query = query.order('price', { ascending: sort === 'price-asc' });
     query = query.order('created_at', { ascending: false }).order('id', { ascending: false })
-      .range((page - 1) * pageSize, page * pageSize);
-    const { data, error } = await query;
+      .range(...pageRange(page, pageSize));
+    const { data, error, count } = await query;
     if (error) {
       // Keep the legacy relationship fallback bounded. Filtering requires the
       // relationship query; never silently filter just one unfiltered page.
@@ -60,22 +62,22 @@ class SupabaseMarketRepository {
       if (fishError) throw new Error(fishError.message);
       for (const row of fish ?? []) caughtMap.set(row.id, row);
     }
-    return list.map(row => ({ ...row, price: Number(row.price), caught: mapCaughtRow(row.caught ?? caughtMap.get(row.caught_id)) }));
+    return listPage(list.map(row => ({ ...row, price: Number(row.price), caught: mapCaughtRow(row.caught ?? caughtMap.get(row.caught_id)) })), count);
   }
 
-  private async fetchActiveListingsFallback(options: MarketListingQuery): Promise<MarketListing[]> {
-    let query = supabase.from('species_market').select('*').eq('status', 'normal');
+  private async fetchActiveListingsFallback(options: MarketListingQuery): Promise<ListPage<MarketListing>> {
+    let query = supabase.from('species_market').select('*', { count: 'exact' }).eq('status', 'normal');
     if (options.userId) query = query.eq('user_id', options.userId);
     if (options.sort !== 'newest') query = query.order('price', { ascending: options.sort === 'price-asc' });
-    const { data, error } = await query.order('created_at', { ascending: false }).order('id', { ascending: false })
-      .range((options.page - 1) * options.pageSize, options.page * options.pageSize);
+    const { data, error, count } = await query.order('created_at', { ascending: false }).order('id', { ascending: false })
+      .range(...pageRange(options.page, options.pageSize));
     if (error) throw new Error(error.message);
-    if (!data?.length) return [];
+    if (!data?.length) return listPage([], count);
     const { data: fish, error: fishError } = await supabase.from('caught')
       .select('id,user_id,species_id,weight,created_at,species(name,image,rarity)').in('id', data.map(row => row.caught_id));
     if (fishError) throw new Error(fishError.message);
     const caughtMap = new Map((fish ?? []).map(row => [row.id, row]));
-    return data.map(row => ({ ...row, price: Number(row.price), caught: mapCaughtRow(caughtMap.get(row.caught_id)) }));
+    return listPage(data.map(row => ({ ...row, price: Number(row.price), caught: mapCaughtRow(caughtMap.get(row.caught_id)) })), count);
   }
 
   async cancelListing(marketId: string): Promise<void> {

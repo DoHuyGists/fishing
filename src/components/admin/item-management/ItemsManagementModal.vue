@@ -1,5 +1,7 @@
 <script lang="ts" setup>
 import AdminModal from "../AdminModal.vue";
+import Pagination from '../../shared/Pagination.vue';
+import { usePagedListFilters } from '../../../composables/usePagedListFilters';
 import { onMounted } from "vue";
 import { storeToRefs } from "pinia";
 
@@ -8,6 +10,7 @@ import ItemForm from "./ItemsFormModal.vue";
 
 const emit = defineEmits(["close"]);
 const store = useAdminItemsManagementStore();
+usePagedListFilters([() => store.search, () => store.categoryFilter, () => store.statusFilter], () => { void store.loadItems(1); }, () => { ++store.requestId; });
 const {
   items, search, categoryFilter, statusFilter, isLoading, loadError, isFormOpen, isSaving, formError,
   deletingId, updatingId, confirmDeleteId, editingItem, categories, filteredItems,
@@ -27,7 +30,7 @@ onMounted(loadItems);
     icon="🎒"
     @close="emit('close')"
   >
-    <template #subtitle>{{ items.length }} vật phẩm trong danh mục</template>
+    <template #subtitle>{{ store.total }} vật phẩm trong danh mục</template>
 
     <div class="flex shrink-0 flex-wrap items-center gap-3 border-b border-gray-200 bg-white px-5 py-3 md:px-7">
       <div class="min-w-55 flex-1">
@@ -66,7 +69,7 @@ onMounted(loadItems);
           title="Làm mới danh sách"
           class="grid size-9 place-items-center rounded-lg border border-gray-300 bg-white text-gray-700 hover:bg-gray-100 disabled:opacity-50"
           :disabled="isLoading"
-          @click="loadItems"
+          @click="loadItems()"
         >
           <svg
             class="size-4"
@@ -100,7 +103,7 @@ onMounted(loadItems);
           class="mb-4 flex items-center justify-between gap-3 rounded-lg border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-700"
         >
           <span>{{ loadError }}</span>
-          <button type="button" class="font-bold underline" @click="loadItems">Thử lại</button>
+          <button type="button" class="font-bold underline" @click="loadItems()">Thử lại</button>
         </div>
         <div v-if="isLoading" class="grid min-h-64 place-items-center text-sm text-gray-500">
           Đang tải danh sách vật phẩm...
@@ -252,5 +255,6 @@ onMounted(loadItems);
         </div>
       </div>
     </div>
+    <Pagination :page="store.page" :page-size="store.pageSize" :total="store.total" :loading="store.isLoading" @change="store.loadItems($event)" />
   </AdminModal>
 </template>

@@ -6,6 +6,8 @@ export const useAdminFishingAreaStore = defineStore("AdminFishingArea", {
   state: () => ({
     target: null as FishingAreaRow | null,
     adminAreas: [] as FishingAreaRow[],
+    page: 1, pageSize: 10, total: 0, search: '', countryFilter: 'ALL', availabilityFilter: 'ALL', requestId: 0,
+    countryIds: [] as string[],
 
     adminLoading: false,
     adminError: "",
@@ -19,34 +21,38 @@ export const useAdminFishingAreaStore = defineStore("AdminFishingArea", {
     // for computed
   },
   actions: {
-    async fetchAllAreasAdmin() {
+    async fetchAllAreasAdmin(page?: number) {
+      page ??= this.page;
+      const request = ++this.requestId;
       this.adminLoading = true;
       this.adminError = "";
       try {
-        this.adminAreas = await supabaseFishingAreaRepository.fetchAllAreasAdmin();
+        const result = await supabaseFishingAreaRepository.fetchAdminPage(page, this.search, this.countryFilter, this.availabilityFilter);
+        if (request !== this.requestId) return;
+        this.adminAreas = result.items; this.page = page; this.total = result.total; this.countryIds = result.facets.country_id ?? [];
+        if (!result.items.length && page > 1) await this.fetchAllAreasAdmin(Math.max(1, Math.ceil(result.total / this.pageSize)));
       } catch (err) {
-        this.adminError = err instanceof Error ? err.message : "Không thể tải danh sách bãi câu";
+        if (request === this.requestId) this.adminError = err instanceof Error ? err.message : "Không thể tải danh sách bãi câu";
       } finally {
-        this.adminLoading = false;
+        if (request === this.requestId) this.adminLoading = false;
       }
     },
 
     async createAreaAdmin(payload: FishingAreaPayload) {
       const created = await supabaseFishingAreaRepository.createArea(payload);
-      this.adminAreas.unshift(created);
+      await this.fetchAllAreasAdmin();
       return created;
     },
 
     async updateAreaAdmin(id: string, payload: FishingAreaPayload) {
       const updated = await supabaseFishingAreaRepository.updateArea(id, payload);
-      const index = this.adminAreas.findIndex((area) => area.id === id);
-      if (index !== -1) this.adminAreas[index] = updated;
+      await this.fetchAllAreasAdmin();
       return updated;
     },
 
     async deleteAreaAdmin(id: string) {
       await supabaseFishingAreaRepository.deleteArea(id);
-      this.adminAreas = this.adminAreas.filter((area) => area.id !== id);
+      await this.fetchAllAreasAdmin();
     },
 
     resetDefault() {

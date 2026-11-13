@@ -1,11 +1,14 @@
 <script lang="ts" setup>
 import AdminModal from "../AdminModal.vue";
+import Pagination from '../../shared/Pagination.vue';
+import { usePagedListFilters } from '../../../composables/usePagedListFilters';
 import { onMounted } from "vue";
 import EventForm from "./EventForm.vue";
 import { useAdminEventStore } from "./admin-event-store.ts";
 
 const emit = defineEmits(["close"]);
 const store = useAdminEventStore();
+usePagedListFilters([() => store.search, () => store.statusFilter], () => { void store.loadEvents(1); }, () => { ++store.requestId; });
 
 function formatDate(value: string | null) {
   return value ? new Date(value).toLocaleString("vi-VN") : "—";
@@ -16,7 +19,7 @@ onMounted(() => store.loadEvents());
 
 <template>
   <AdminModal title="Quản lý sự kiện" icon="🎉" @close="emit('close')">
-    <template #subtitle>{{ store.events.length }} sự kiện trong danh mục</template>
+    <template #subtitle>{{ store.total }} sự kiện trong danh mục</template>
 
     <div class="flex shrink-0 flex-wrap items-center gap-3 border-b border-gray-200 bg-white px-5 py-3 md:px-7">
       <div class="relative min-w-55 flex-1">
@@ -198,5 +201,6 @@ onMounted(() => store.loadEvents());
         </div>
       </div>
     </div>
+    <Pagination :page="store.page" :page-size="store.pageSize" :total="store.total" :loading="store.isLoading" @change="store.loadEvents($event)" />
   </AdminModal>
 </template>

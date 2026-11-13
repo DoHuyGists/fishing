@@ -1,4 +1,10 @@
 {
+  "pagination": {
+    "label": "Pagination",
+    "page": "Page {page} / {pages} · {total} items",
+    "previous": "Previous",
+    "next": "Next"
+  },
   "GameCache": {
     "updateClient": "The game data is incompatible. Please reload the page to update.",
     "stale": "Showing saved data from {time}. We will retry when the connection is available.",

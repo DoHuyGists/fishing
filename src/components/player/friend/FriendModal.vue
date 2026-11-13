@@ -3,7 +3,8 @@ import type { FriendTab as ActiveTab, FriendUserProfile, UserFriend } from "../.
 import { getFormattingLocale } from '../../../i18n';
 import { t as tr } from "../../../i18n";
 
-import { computed, onMounted, ref } from "vue";
+import { computed, onMounted, ref, watch, onUnmounted } from "vue";
+import Pagination from '../../shared/Pagination.vue';
 import Modal from "../../shared/Modal.vue";
 import { useCountryStore } from "../../../stores/country.ts";
 import { useAuthStore } from "../../../stores/auth.ts";
@@ -16,8 +17,16 @@ const friendStore = useFriendStore();
 const countryStore = useCountryStore();
 const toast = useToast();
 
-const activeTab = ref<ActiveTab>("friends");
-const searchQuery = ref("");
+const activeTab = computed<ActiveTab>({ get: () => friendStore.activeTab, set: value => { friendStore.activeTab = value; } });
+const searchQuery = computed({ get: () => friendStore.search, set: value => { friendStore.search = value; } });
+let searchTimer: ReturnType<typeof setTimeout> | undefined;
+watch(activeTab, () => { clearTimeout(searchTimer); void friendStore.loadData(currentUserId.value, 1); });
+watch(searchQuery, () => {
+  clearTimeout(searchTimer);
+  ++friendStore.requestId;
+  searchTimer = setTimeout(() => { void friendStore.loadData(currentUserId.value, 1); }, 300);
+});
+onUnmounted(() => { clearTimeout(searchTimer); ++friendStore.requestId; });
 const directFriendIdInput = ref("");
 const copiedId = ref<string | null>(null);
 
@@ -51,21 +60,12 @@ const otherPlayers = computed(() => {
 
 // Lọc người chơi ở tab Khám phá
 const filteredPlayers = computed(() => {
-  const query = searchQuery.value.trim().toLowerCase();
-  if (!query) return otherPlayers.value;
-
-  return otherPlayers.value.filter((profile) => profile.id.toLowerCase().includes(query) || profile.display_name?.toLocaleLowerCase().includes(query));
+  return otherPlayers.value;
 });
 
 // Lọc bạn bè ở tab Bạn bè
 const filteredFriends = computed(() => {
-  const query = searchQuery.value.trim().toLowerCase();
-  if (!query) return acceptedFriends.value;
-
-  return acceptedFriends.value.filter((record) => {
-    const friendId = record.user_id === currentUserId.value ? record.friend_id : record.user_id;
-    return friendId.toLowerCase().includes(query) || profilesMap.value.get(friendId)?.display_name?.toLocaleLowerCase().includes(query);
-  });
+  return acceptedFriends.value;
 });
 
 async function handleRefresh() {
@@ -266,7 +266,7 @@ async function executeDelete() {
             class="px-1.5 py-0.5 rounded-full text-[10px] font-black"
             :class="activeTab === 'friends' ? 'bg-emerald-800 text-emerald-200' : 'bg-gray-200 text-gray-700'"
           >
-            {{ acceptedFriends.length }}
+            {{ friendStore.counts.friends }}
           </span>
         </button>
 
@@ -282,10 +282,10 @@ async function executeDelete() {
         >
           <span>{{ tr('FriendModal.loi_moi_da_nhan') }}</span>
           <span
-            v-if="receivedRequests.length > 0"
+            v-if="friendStore.counts.received > 0"
             class="px-1.5 py-0.5 rounded-full text-[10px] font-black bg-rose-500 text-white animate-pulse"
           >
-            {{ receivedRequests.length }}
+            {{ friendStore.counts.received }}
           </span>
           <span
             v-else
@@ -311,7 +311,7 @@ async function executeDelete() {
             class="px-1.5 py-0.5 rounded-full text-[10px] font-black"
             :class="activeTab === 'sent' ? 'bg-emerald-800 text-emerald-200' : 'bg-gray-200 text-gray-700'"
           >
-            {{ sentRequests.length }}
+            {{ friendStore.counts.sent }}
           </span>
         </button>
 
@@ -330,7 +330,7 @@ async function executeDelete() {
             class="px-1.5 py-0.5 rounded-full text-[10px] font-black"
             :class="activeTab === 'discover' ? 'bg-emerald-800 text-emerald-200' : 'bg-gray-200 text-gray-700'"
           >
-            {{ otherPlayers.length }}
+            {{ friendStore.counts.discover }}
           </span>
         </button>
       </div>
@@ -880,5 +880,6 @@ async function executeDelete() {
         </div>
       </div>
     </div>
+    <Pagination :page="friendStore.page" :page-size="friendStore.pageSize" :total="friendStore.total" :loading="friendStore.loading" @change="friendStore.loadData(currentUserId, $event)" />
   </Modal>
 </template>

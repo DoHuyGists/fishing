@@ -7,10 +7,10 @@ import { useToast } from "../../../composables/useToast";
 
 const emptyForm = (): GuidePayload => ({ title: "", content: "", sort_order: 0, is_published: true });
 const messageOf = (cause: unknown, fallback: string) => cause instanceof Error ? cause.message : fallback;
-const compareGuides = (a: AdminGuideRow, b: AdminGuideRow) => a.sort_order - b.sort_order || a.id.localeCompare(b.id);
 
 export const useAdminGuidesStore = defineStore("admin-guides", () => {
   const rows = ref<AdminGuideRow[]>([]);
+  const page = ref(1), total = ref(0), requestId = ref(0), pageSize = 10;
   const search = ref("");
   const status = ref<"all" | "published" | "hidden">("all");
   const loading = ref(false);
@@ -30,23 +30,22 @@ export const useAdminGuidesStore = defineStore("admin-guides", () => {
     excerpt: guideContentText(row.content),
   })));
   const filteredRows = computed(() => {
-    const query = search.value.trim().toLocaleLowerCase("vi");
-    return searchableRows.value.filter((row) =>
-      (status.value === "all" || row.is_published === (status.value === "published")) &&
-      (!query || `${row.title} ${row.excerpt}`.toLocaleLowerCase("vi").includes(query)),
-    );
+    return searchableRows.value;
   });
 
-  async function fetchRows() {
-    if (loading.value || busy.value) return;
+  async function fetchRows(nextPage = page.value) {
+    const request = ++requestId.value;
     loading.value = true;
     error.value = "";
     try {
-      rows.value = await supabaseGuideRepository.fetchAdminGuides();
+      const result = await supabaseGuideRepository.fetchAdminPage(nextPage, search.value, status.value);
+      if (request !== requestId.value) return;
+      rows.value = result.items; page.value = nextPage; total.value = result.total;
+      if (!result.items.length && nextPage > 1) await fetchRows(Math.max(1, Math.ceil(result.total / pageSize)));
     } catch (cause) {
-      error.value = messageOf(cause, "Không thể tải hướng dẫn. Vui lòng thử lại.");
+      if (request === requestId.value) error.value = messageOf(cause, "Không thể tải hướng dẫn. Vui lòng thử lại.");
     } finally {
-      loading.value = false;
+      if (request === requestId.value) loading.value = false;
     }
   }
 
@@ -92,10 +91,9 @@ export const useAdminGuidesStore = defineStore("admin-guides", () => {
     }
     saving.value = true;
     try {
-      const row = editingId.value
-        ? await supabaseGuideRepository.update(editingId.value, payload)
-        : await supabaseGuideRepository.create(payload);
-      rows.value = [...rows.value.filter((item) => item.id !== row.id), row].sort(compareGuides);
+      if (editingId.value) await supabaseGuideRepository.update(editingId.value, payload);
+      else await supabaseGuideRepository.create(payload);
+      await fetchRows();
       isFormOpen.value = false;
       editingId.value = null;
       toast.success("Đã lưu hướng dẫn.");
@@ -125,7 +123,7 @@ export const useAdminGuidesStore = defineStore("admin-guides", () => {
     deleteError.value = "";
     try {
       await supabaseGuideRepository.remove(id);
-      rows.value = rows.value.filter((row) => row.id !== id);
+      await fetchRows();
       deleting.value = null;
       toast.success("Đã xóa hướng dẫn.");
     } catch (cause) {
@@ -144,5 +142,5 @@ export const useAdminGuidesStore = defineStore("admin-guides", () => {
     error.value = "";
   }
 
-  return { rows, search, status, loading, saving, removing, busy, error, formError, deleteError, isFormOpen, editingId, deleting, form, filteredRows, fetchRows, openCreate, openEdit, closeForm, save, requestDelete, cancelDelete, remove, resetView };
+  return { rows, search, status, loading, saving, removing, busy, error, formError, deleteError, isFormOpen, editingId, deleting, form, filteredRows, fetchRows, openCreate, openEdit, closeForm, save, requestDelete, cancelDelete, remove, resetView, page, total, pageSize, requestId };
 });

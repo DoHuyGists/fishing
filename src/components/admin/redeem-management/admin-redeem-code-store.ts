@@ -20,6 +20,7 @@ function toDateTimeLocal(value: string | null) {
 export const useAdminRedeemCodeStore = defineStore("AdminRedeemCode", {
   state: () => ({
     codes: [] as RedeemCodeRow[],
+    page: 1, pageSize: 10, total: 0, requestId: 0,
     search: "",
     statusFilter: "ALL" as RedeemStatusFilter,
     isLoading: false,
@@ -36,29 +37,24 @@ export const useAdminRedeemCodeStore = defineStore("AdminRedeemCode", {
   }),
   getters: {
     filteredCodes(state): RedeemCodeRow[] {
-      const keyword = state.search.trim().toLocaleLowerCase();
-      return state.codes.filter((item) => {
-        const expired = isRedeemCodeExpired(item);
-        const matchesSearch = !keyword || item.code.toLocaleLowerCase().includes(keyword);
-        const matchesStatus =
-          state.statusFilter === "ALL" ||
-          (state.statusFilter === "ACTIVE" && !item.isDisabled && !expired) ||
-          (state.statusFilter === "DISABLED" && item.isDisabled) ||
-          (state.statusFilter === "EXPIRED" && expired);
-        return matchesSearch && matchesStatus;
-      });
+      return state.codes;
     },
   },
   actions: {
-    async loadCodes() {
+    async loadCodes(page?: number) {
+      page ??= this.page;
+      const request = ++this.requestId;
       this.isLoading = true;
       this.loadError = "";
       try {
-        this.codes = await supabaseRedeemCodeRepository.fetchAll();
+        const result = await supabaseRedeemCodeRepository.fetchPage(page, this.search, this.statusFilter);
+        if (request !== this.requestId) return;
+        this.codes = result.items; this.total = result.total; this.page = page;
+        if (!result.items.length && page > 1) await this.loadCodes(Math.max(1, Math.ceil(result.total / this.pageSize)));
       } catch (error) {
-        this.loadError = messageOf(error, "Không thể tải danh sách mã đổi thưởng");
+        if (request === this.requestId) this.loadError = messageOf(error, "Không thể tải danh sách mã đổi thưởng");
       } finally {
-        this.isLoading = false;
+        if (request === this.requestId) this.isLoading = false;
       }
     },
 

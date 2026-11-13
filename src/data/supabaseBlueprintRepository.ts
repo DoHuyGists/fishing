@@ -3,6 +3,7 @@ import { RepositoryError } from './repositoryError';
 import type { BlueprintMaterial, Blueprint } from "../types/model/blueprint";
 import { t as tr } from "../i18n";
 import supabase from "../database/connection";
+import { fetchAdminListPage } from './supabaseAdminListRepository';
 
 function normalizeMaterials(value: unknown): BlueprintMaterial[] {
   if (!Array.isArray(value)) return [];
@@ -18,6 +19,13 @@ function normalizeMaterials(value: unknown): BlueprintMaterial[] {
 }
 
 class SupabaseBlueprintRepository {
+  async fetchPage(page: number, search: string) {
+    const result = await fetchAdminListPage<any>('blueprint', page, search);
+    return { ...result, items: result.items.map(row => ({
+      id: row.id, result_item_id: row.result_item_id, result_quantity: Number(row.result_quantity),
+      required_materials: normalizeMaterials(row.required_materials), gold_cost: Number(row.gold_cost),
+    })) };
+  }
   async save(payload: Record<string, unknown>, id: string | null) {
     const query = supabase.from("blueprint");
     const { error } = id ? await query.update(payload).eq("id", id) : await query.insert(payload);

@@ -1,5 +1,7 @@
 <script lang="ts" setup>
-import type { FriendUserProfile } from "../../../types/model/friend";
+import type { PlayerProfileSummary } from "../../../types/model/friend";
+import { useTeamStore } from '../../../stores/team';
+import Pagination from '../../shared/Pagination.vue';
 import type { UserTeam, UserTeamInvite, UserTeamMember } from "../../../types/model/team";
 import { getFormattingLocale } from '../../../i18n';
 import { t as tr } from "../../../i18n";
@@ -10,7 +12,7 @@ import PlayerIdentity from "../../shared/PlayerIdentity.vue";
 
 
 defineProps<{
-  profiles: Map<string, FriendUserProfile>;
+  profiles: Map<string, PlayerProfileSummary>;
   team: UserTeam | null;
   members: UserTeamMember[];
   invites: UserTeamInvite[];
@@ -29,6 +31,7 @@ const emit = defineEmits<{
   create: [];
 }>();
 const tab = ref<"team" | "invites">("team");
+const store = useTeamStore();
 const showInviteForm = ref(false);
 const inviteeId = ref("");
 
@@ -64,7 +67,7 @@ const statusClass: Record<string, string> = {
     <button
       v-for="item in [
         { key: 'team', get label() { return tr('MyTeamPanel.to_doi_cua_toi'); } },
-        { key: 'invites', label: tr('MyTeamPanel.loi_moi_value0', { value0: invites.length }) },
+        { key: 'invites', label: tr('MyTeamPanel.loi_moi_value0', { value0: store.inviteTotal }) },
       ] as const"
       :key="item.key"
       :class="[
@@ -111,6 +114,7 @@ const statusClass: Record<string, string> = {
         </div>
       </div>
     </div>
+    <Pagination :page="store.invitePage" :page-size="store.invitePageSize" :total="store.inviteTotal" :loading="store.actionLoading" @change="store.invitePage = $event; store.loadMyTeam(userId)" />
   </section>
   <template v-else>
   <section v-if="team" class="flex flex-col gap-4">

@@ -9,6 +9,7 @@ import { useInventoryStore } from "../../../stores/inventory.ts";
 import { useEquipmentStore, type Category, type EquipmentSet, type ItemData } from "../../../stores/equipment.ts";
 import { useCurrencyStore } from "../../../stores/currency.ts";
 import { useToast } from "../../../composables/useToast.ts";
+import { usePagedListFilters } from '../../../composables/usePagedListFilters';
 
 const SLOTS: Category[] = ["rod", "line", "reel", "hook", "bait"];
 const LABELS: Record<Category, string> = {
@@ -36,9 +37,13 @@ export function useInventoryTable() {
   const toast = useToast();
 
   const viewMode = ref<"grid" | "list" | "grouped">("grid");
-  const itemSearch = ref("");
-  const itemPage = ref(1);
+  const itemSearch = computed({ get: () => inventoryStore.viewSearch, set: value => { inventoryStore.viewSearch = value; } });
+  const itemPage = computed({ get: () => inventoryStore.viewPage, set: value => {
+    inventoryStore.viewPage = value;
+    void loadItemsPage(value).catch(error => toast.error(error.message));
+  } });
   const selected = ref<Set<string>>(new Set());
+  const selectedRecords = new Map<string, UserInventory>();
   const setSearch = ref("");
   const setPage = ref(1);
   const active = ref<{ setId: string; slot: Category } | null>(null);
@@ -64,7 +69,8 @@ export function useInventoryTable() {
       return toast.error(tr('useInventoryTable.ban_can_dang_nhap_de_xem_kho_do'));
     }
 
-    await inventoryStore.setUserInventory(userId.value);
+    try { await loadItemsPage(); }
+    catch (error) { loading.value = false; toast.error((error as Error).message); return; }
     await inventoryStore.setEquipmentSet();
     savedSnapshot.value = Object.fromEntries(inventoryStore.equipmentSets.map((set) => [set.id, snapshotOf(set)]));
     savedSetInventoryIds.value = Object.fromEntries(
@@ -74,31 +80,20 @@ export function useInventoryTable() {
   }
   onMounted(load);
 
-  const itemPageSize = computed(() => (viewMode.value === "list" ? 10 : 12));
-  const filteredItems = computed(() => {
+  const filteredItems = computed(() => inventoryStore.viewItems);
+  const itemPages = computed(() => Math.max(1, Math.ceil(inventoryStore.viewTotal / inventoryStore.viewPageSize)));
+  const pagedItems = computed(() => inventoryStore.viewItems);
+  async function loadItemsPage(page?: number) {
     const query = itemSearch.value.trim().toLowerCase();
-    if (!query) return inventoryStore.items;
-    return inventoryStore.items.filter((item) => {
-      const label = LABELS[item.data.category as Category]?.toLowerCase() ?? "";
-      return (
-        itemName(item.data).toLowerCase().includes(query) ||
-        item.data.category?.includes(query) ||
-        label.includes(query)
-      );
-    });
-  });
-  const itemPages = computed(() => Math.max(1, Math.ceil(filteredItems.value.length / itemPageSize.value)));
-  const pagedItems = computed(() => {
-    const start = (itemPage.value - 1) * itemPageSize.value;
-    return filteredItems.value.slice(start, start + itemPageSize.value);
-  });
-  watch([itemSearch, viewMode], () => (itemPage.value = 1));
-  watch(itemPages, (pages) => {
-    if (itemPage.value > pages) itemPage.value = pages;
-  });
+    const categories = query ? SLOTS.filter(slot => LABELS[slot].toLowerCase().includes(query)) : [];
+    await inventoryStore.loadViewPage(categories, page);
+  }
+  usePagedListFilters([itemSearch], () => { void loadItemsPage(1).catch(error => toast.error(error.message)); }, () => { ++inventoryStore.viewRequest; });
 
   const toggleSelect = (id: string) => {
     const next = new Set(selected.value);
+    const record = pagedItems.value.find(item => item.id === id);
+    if (record) selectedRecords.set(id, record);
     next.has(id) ? next.delete(id) : next.add(id);
     selected.value = next;
   };
@@ -108,17 +103,17 @@ export function useInventoryTable() {
   function toggleSelectPage() {
     const next = new Set(selected.value);
     if (allOnPageSelected.value) pagedItems.value.forEach((item) => next.delete(item.id));
-    else pagedItems.value.forEach((item) => next.add(item.id));
+    else pagedItems.value.forEach((item) => { next.add(item.id); selectedRecords.set(item.id, item); });
     selected.value = next;
   }
 
   async function useSelectedItem() {
-    const item = inventoryStore.items.find((candidate) => selected.value.has(candidate.id));
+    const item = [...selectedRecords.values()].find((candidate) => selected.value.has(candidate.id));
     if (!item || item.rpc == null || usingItemId.value) return;
     usingItemId.value = item.id;
     try {
       await inventoryStore.useItem(item.id);
-      await inventoryStore.setUserInventory(userId.value!);
+      await loadItemsPage();
       selected.value = new Set();
       toast.success(tr('useInventoryTable.da_su_dung_vat_pham'));
     } catch (error) {
@@ -147,6 +142,7 @@ export function useInventoryTable() {
     try {
       await inventoryStore.removeItem(userId.value, ids);
       inventoryStore.items = inventoryStore.items.filter((item) => !selectedIds.has(item.id));
+      await loadItemsPage();
       selected.value = new Set();
       modal.value = null;
       toast.success(tr('useInventoryTable.da_xoa_value0_vat_pham', { value0: ids.length }));
@@ -256,7 +252,7 @@ export function useInventoryTable() {
   }
 
   function hasRpc() {
-    const targetItem = inventoryStore.items.find((item) => selected.value.has(item.id));
+    const targetItem = [...selectedRecords.values()].find((item) => selected.value.has(item.id));
     return targetItem?.rpc != null && targetItem.rpc !== "";
   }
 

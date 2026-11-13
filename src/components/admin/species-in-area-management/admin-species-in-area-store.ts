@@ -9,6 +9,8 @@ import { supabaseSpeciesRepository } from "../../../data/supabaseSpeciesReposito
 export const useSpeciesInAreaStore = defineStore("speciesInArea", {
   state: () => ({
     rows: [] as SpeciesInAreaRow[],
+    page: 1, pageSize: 10, total: 0, search: '', areaFilter: 'ALL', speciesFilter: 'ALL', requestId: 0,
+    areaFilterIds: [] as string[], speciesFilterIds: [] as string[],
     areas: [] as FishingAreaRow[],
     species: [] as SpeciesRow[],
     loading: false,
@@ -17,23 +19,27 @@ export const useSpeciesInAreaStore = defineStore("speciesInArea", {
     error: "",
   }),
   actions: {
-    async fetchAll() {
+    async fetchAll(page?: number) {
+      page ??= this.page;
+      const request = ++this.requestId;
       this.loading = true;
       this.error = "";
       try {
         const [rows, areas, species] = await Promise.all([
-          supabaseSpeciesInAreaRepository.fetchAll(),
+          supabaseSpeciesInAreaRepository.fetchPage(page, this.search, this.areaFilter, this.speciesFilter),
           supabaseFishingAreaRepository.fetchAllAreasAdmin(),
           supabaseSpeciesRepository.fetchAll(),
         ]);
-        this.rows = rows;
+        if (request !== this.requestId) return;
+        this.rows = rows.items; this.total = rows.total; this.page = page;
+        this.areaFilterIds = rows.facets.area_id ?? []; this.speciesFilterIds = rows.facets.species_id ?? [];
         this.areas = areas;
         this.species = species;
+        if (!rows.items.length && page > 1) await this.fetchAll(Math.max(1, Math.ceil(rows.total / this.pageSize)));
       } catch (error) {
-        this.error = error instanceof Error ? error.message : "Không thể tải dữ liệu";
-        throw error;
+        if (request === this.requestId) { this.error = error instanceof Error ? error.message : "Không thể tải dữ liệu"; throw error; }
       } finally {
-        this.loading = false;
+        if (request === this.requestId) this.loading = false;
       }
     },
     async save(payload: SpeciesInAreaPayload, originalAreaId: string | null, originalSpeciesId: string | null) {
@@ -59,7 +65,7 @@ export const useSpeciesInAreaStore = defineStore("speciesInArea", {
       this.error = "";
       try {
         await supabaseSpeciesInAreaRepository.delete(areaId, speciesId);
-        this.rows = this.rows.filter((row) => `${row.areaId}:${row.speciesId}` !== key);
+        await this.fetchAll();
       } catch (error) {
         this.error = error instanceof Error ? error.message : "Không thể xoá dữ liệu";
         throw error;

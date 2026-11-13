@@ -38,6 +38,7 @@ const toTimeTz = (value: string) => {
 export const useAdminHourMissionStore = defineStore("AdminHourMission", {
   state: () => ({
     missions: [] as HourMissionRow[],
+    page: 1, pageSize: 10, total: 0, requestId: 0,
     search: "",
     statusFilter: "ALL" as HourMissionStatusFilter,
     isLoading: false,
@@ -58,28 +59,24 @@ export const useAdminHourMissionStore = defineStore("AdminHourMission", {
   }),
   getters: {
     filteredMissions(state): HourMissionRow[] {
-      const keyword = state.search.trim().toLocaleLowerCase();
-      return state.missions.filter((item) => {
-        const matchesSearch =
-          !keyword || item.content.some((fish) => fish.name.toLocaleLowerCase().includes(keyword));
-        const matchesStatus =
-          state.statusFilter === "ALL" ||
-          (state.statusFilter === "ACTIVE" && !item.isDisabled) ||
-          (state.statusFilter === "DISABLED" && item.isDisabled);
-        return matchesSearch && matchesStatus;
-      });
+      return state.missions;
     },
   },
   actions: {
-    async loadMissions() {
+    async loadMissions(page?: number) {
+      page ??= this.page;
+      const request = ++this.requestId;
       this.isLoading = true;
       this.loadError = "";
       try {
-        this.missions = await supabaseHourMissionRepository.fetchAll();
+        const result = await supabaseHourMissionRepository.fetchPage(page, this.search, this.statusFilter);
+        if (request !== this.requestId) return;
+        this.missions = result.items; this.total = result.total; this.page = page;
+        if (!result.items.length && page > 1) await this.loadMissions(Math.max(1, Math.ceil(result.total / this.pageSize)));
       } catch (error) {
-        this.loadError = messageOf(error, "Không thể tải danh sách nhiệm vụ giờ");
+        if (request === this.requestId) this.loadError = messageOf(error, "Không thể tải danh sách nhiệm vụ giờ");
       } finally {
-        this.isLoading = false;
+        if (request === this.requestId) this.isLoading = false;
       }
     },
 

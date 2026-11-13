@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import type { ErrorFeedbackStatus } from "../../../types/model/feedback";
 import AdminModal from "../AdminModal.vue";
+import Pagination from '../../shared/Pagination.vue';
 import { onMounted, ref, watch } from "vue";
 
 import { useErrorFeedbackManagementStore } from "./admin-error-feedback-store";
@@ -161,5 +162,6 @@ function attachmentUrl(path: string) {
           </article>
         </div>
       </div>
+    <Pagination :page="store.page" :page-size="store.pageSize" :total="store.total" :loading="store.loading" @change="store.fetchErrorFeedback($event)" />
   </AdminModal>
 </template>

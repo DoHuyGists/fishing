@@ -3,24 +3,26 @@ import type { ErrorFeedbackAttachment, ErrorFeedbackStatus } from "../types/mode
 import { t as tr } from "../i18n";
 import supabase from "../database/connection";
 import { createUuid } from "../utils/uuid";
+import { COMPACT_PAGE_SIZE, listPage, pageRange } from './pagination';
+import type { ListPage } from '../types/model/pagination';
 
 class SupabaseFeedbackRepository {
-  async fetchMyErrors(userId: string, page: number): Promise<ErrorFeedbackRow[]> {
-    const { data, error } = await supabase.from("error_feedback").select("*").eq("user_id", userId)
-      .order("created_at", { ascending: false }).order("id").range((page - 1) * 20, page * 20);
+  async fetchMyErrors(userId: string, page: number): Promise<ListPage<ErrorFeedbackRow>> {
+    const { data, error, count } = await supabase.from("error_feedback").select("*", { count: 'exact' }).eq("user_id", userId)
+      .order("created_at", { ascending: false }).order("id").range(...pageRange(page, COMPACT_PAGE_SIZE));
     if (error) throw new Error(error.message);
-    return (data ?? []) as ErrorFeedbackRow[];
+    return listPage((data ?? []) as ErrorFeedbackRow[], count);
   }
-  async fetchOpinionFeedback(): Promise<OpinionFeedbackRow[]> {
-    const { data, error } = await supabase.from("feedback").select("*").order("created_at", { ascending: false });
+  async fetchOpinionFeedback(page = 1): Promise<ListPage<OpinionFeedbackRow>> {
+    const { data, error, count } = await supabase.from("feedback").select("*", { count: 'exact' }).order("created_at", { ascending: false }).order('id').range(...pageRange(page, COMPACT_PAGE_SIZE));
     if (error) throw new Error(error.message);
-    return (data ?? []) as OpinionFeedbackRow[];
+    return listPage((data ?? []) as OpinionFeedbackRow[], count);
   }
 
-  async fetchErrorFeedback(): Promise<ErrorFeedbackRow[]> {
-    const { data, error } = await supabase.from("error_feedback").select("*").order("created_at", { ascending: false });
+  async fetchErrorFeedback(page = 1): Promise<ListPage<ErrorFeedbackRow>> {
+    const { data, error, count } = await supabase.from("error_feedback").select("*", { count: 'exact' }).order("created_at", { ascending: false }).order('id').range(...pageRange(page, COMPACT_PAGE_SIZE));
     if (error) throw new Error(error.message);
-    return (data ?? []) as ErrorFeedbackRow[];
+    return listPage((data ?? []) as ErrorFeedbackRow[], count);
   }
 
   async updateErrorFeedbackStatus(id: string, status: ErrorFeedbackStatus): Promise<void> {

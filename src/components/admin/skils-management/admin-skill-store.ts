@@ -8,6 +8,7 @@ type SkillDraft = Omit<SkillPayload, "effect_per_level"> & { effectsJson: string
 
 export const useAdminSkillStore = defineStore("admin-skill", () => {
   const items = ref<Skill[]>([]);
+  const page = ref(1), total = ref(0), requestId = ref(0), pageSize = 10;
   const loading = ref(false);
   const saving = ref(false);
   const deleting = ref(false);
@@ -20,19 +21,21 @@ export const useAdminSkillStore = defineStore("admin-skill", () => {
   const deleteTarget = ref<Skill | null>(null);
   const busy = computed(() => loading.value || saving.value || deleting.value);
   const filteredItems = computed(() => {
-    const keyword = search.value.trim().toLocaleLowerCase("vi");
-    return items.value.filter((item) => !keyword || [item.code, item.name, item.description]
-      .some((value) => value?.toLocaleLowerCase("vi").includes(keyword)))
-      .sort((a, b) => a.sort_order - b.sort_order || a.name.localeCompare(b.name, "vi"));
+    return items.value;
   });
 
-  async function fetchAll() {
-    if (busy.value) return;
+  async function fetchAll(nextPage = page.value) {
+    const request = ++requestId.value;
     loading.value = true;
     error.value = "";
-    try { items.value = await supabaseSkillRepository.fetchAll(); }
-    catch (cause) { error.value = cause instanceof Error ? cause.message : "Không thể tải kỹ năng."; }
-    finally { loading.value = false; }
+    try {
+      const result = await supabaseSkillRepository.fetchPage(nextPage, search.value);
+      if (request !== requestId.value) return;
+      items.value = result.items; page.value = nextPage; total.value = result.total;
+      if (!result.items.length && nextPage > 1) await fetchAll(Math.max(1, Math.ceil(result.total / pageSize)));
+    }
+    catch (cause) { if (request === requestId.value) error.value = cause instanceof Error ? cause.message : "Không thể tải kỹ năng."; }
+    finally { if (request === requestId.value) loading.value = false; }
   }
 
   function openForm(item?: Skill) {
@@ -83,11 +86,9 @@ export const useAdminSkillStore = defineStore("admin-skill", () => {
     saving.value = true;
     let saved = false;
     try {
-      const item = editingId.value
-        ? await supabaseSkillRepository.update(editingId.value, payload)
-        : await supabaseSkillRepository.create(payload);
-      const index = items.value.findIndex((row) => row.id === item.id);
-      if (index < 0) items.value.push(item); else items.value[index] = item;
+      if (editingId.value) await supabaseSkillRepository.update(editingId.value, payload);
+      else await supabaseSkillRepository.create(payload);
+      await fetchAll();
       saved = true;
     } catch (cause) { formError.value = cause instanceof Error ? cause.message : "Không thể lưu kỹ năng."; }
     finally { saving.value = false; }
@@ -109,12 +110,13 @@ export const useAdminSkillStore = defineStore("admin-skill", () => {
     error.value = "";
     try {
       await supabaseSkillRepository.remove(id);
-      items.value = items.value.filter((item) => item.id !== id);
+      await fetchAll();
       deleteTarget.value = null;
     } catch (cause) { error.value = cause instanceof Error ? cause.message : "Không thể xóa kỹ năng."; }
     finally { deleting.value = false; }
   }
 
   return { items, loading, saving, deleting, busy, error, formError, search, filteredItems, formOpen,
+    page, total, pageSize, requestId,
     editingId, draft, deleteTarget, fetchAll, openForm, closeForm, save, requestDelete, cancelDelete, remove };
 });

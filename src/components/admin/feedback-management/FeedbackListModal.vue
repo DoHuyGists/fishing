@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import AdminModal from "../AdminModal.vue";
+import Pagination from '../../shared/Pagination.vue';
 import { onMounted } from "vue";
 import { useFeedbackListStore } from "../../../stores/feedbackList";
 
@@ -61,5 +62,6 @@ function formatDate(value: string) {
           </article>
         </div>
       </div>
+    <Pagination :page="store.page" :page-size="store.pageSize" :total="store.total" :loading="store.loading" @change="store.fetchOpinionFeedback($event)" />
   </AdminModal>
 </template>

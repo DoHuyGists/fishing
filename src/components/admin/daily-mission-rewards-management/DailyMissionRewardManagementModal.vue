@@ -1,5 +1,7 @@
 <script setup lang="ts">
 import AdminModal from "../AdminModal.vue";
+import Pagination from '../../shared/Pagination.vue';
+import { usePagedListFilters } from '../../../composables/usePagedListFilters';
 import { onMounted, onUnmounted } from "vue";
 import TwoOptionsModal from "../../shared/TwoOptionsModal.vue";
 import DailyMissionRewardForm from "./DailyMissionRewardForm.vue";
@@ -7,6 +9,7 @@ import { useAdminDailyMissionRewardStore } from "./admin-daily-mission-rewards-s
 
 const emit = defineEmits<{ close: [] }>();
 const store = useAdminDailyMissionRewardStore();
+usePagedListFilters([() => store.search, () => store.statusFilter], () => { void store.load(1); }, () => { ++store.requestId; });
 function close() {
   if (!store.isSaving && !store.isDeleting) { store.closeForm(); store.confirmDeleteId = null; emit("close"); }
 }
@@ -70,5 +73,6 @@ onUnmounted(() => { store.isFormOpen = false; store.confirmDeleteId = null; });
       <div>Bản ghi sẽ bị xoá vĩnh viễn.</div>
       <div v-if="store.loadError" role="alert" class="mt-2 text-red-700">{{ store.loadError }}</div>
     </TwoOptionsModal>
+    <Pagination :page="store.page" :page-size="store.pageSize" :total="store.total" :loading="store.isLoading" @change="store.load($event)" />
   </AdminModal>
 </template>

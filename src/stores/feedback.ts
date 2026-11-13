@@ -6,7 +6,9 @@ import { supabaseFeedbackRepository } from "../data/supabaseFeedbackRepository";
 import { startVisibleRefresh } from '../utils/visibleRefresh';
 import { createKeyedRefreshTask } from '../utils/refreshTask';
 import { useAuthStore } from './auth';
-const refreshHistory = createKeyedRefreshTask<ErrorFeedbackRow[]>();
+import { COMPACT_PAGE_SIZE } from '../data/pagination';
+import type { ListPage } from '../types/model/pagination';
+const refreshHistory = createKeyedRefreshTask<ListPage<ErrorFeedbackRow>>();
 let stopHistoryRefresh: (() => void) | null = null;
 
 export const useFeedbackStore = defineStore("feedback", {
@@ -33,7 +35,8 @@ export const useFeedbackStore = defineStore("feedback", {
         const rows = await refreshHistory(userId + ':' + generation + ':' + page,
           () => supabaseFeedbackRepository.fetchMyErrors(userId, page));
         if (!current()) return;
-        this.myErrors = rows.slice(0, 20); this.hasNext = rows.length > 20; this.page = page;
+        this.myErrors = rows.items; this.hasNext = page * COMPACT_PAGE_SIZE < rows.total; this.page = page;
+        if (!rows.items.length && page > 1) await this.loadMyErrors(userId, Math.max(1, Math.ceil(rows.total / COMPACT_PAGE_SIZE)));
       } catch (err) { if (current()) this.historyError = err instanceof Error ? err.message : tr('feedback.khong_the_tai_bao_loi'); }
       finally { if (current()) this.historyLoading = false; }
     },

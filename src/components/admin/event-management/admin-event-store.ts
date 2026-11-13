@@ -16,6 +16,7 @@ const messageOf = (cause: unknown, fallback: string) => (cause instanceof Error 
 export const useAdminEventStore = defineStore("AdminEvent", {
   state: () => ({
     events: [] as EventRow[],
+    page: 1, pageSize: 10, total: 0, requestId: 0,
     search: "",
     statusFilter: "ALL" as "ALL" | "ACTIVE" | "DISABLED",
     isLoading: false,
@@ -31,28 +32,24 @@ export const useAdminEventStore = defineStore("AdminEvent", {
   }),
   getters: {
     filteredEvents(state): EventRow[] {
-      const keyword = state.search.trim().toLocaleLowerCase();
-      return state.events.filter((item) => {
-        const matchesSearch =
-          !keyword || [item.name, item.description].some((value) => value?.toLocaleLowerCase().includes(keyword));
-        const matchesStatus =
-          state.statusFilter === "ALL" ||
-          (state.statusFilter === "ACTIVE" && !item.is_disabled) ||
-          (state.statusFilter === "DISABLED" && item.is_disabled);
-        return matchesSearch && matchesStatus;
-      });
+      return state.events;
     },
   },
   actions: {
-    async loadEvents() {
+    async loadEvents(page?: number) {
+      page ??= this.page;
+      const request = ++this.requestId;
       this.isLoading = true;
       this.loadError = "";
       try {
-        this.events = await supabaseEventRepository.fetchAll();
+        const result = await supabaseEventRepository.fetchPage(page, this.search, this.statusFilter);
+        if (request !== this.requestId) return;
+        this.events = result.items; this.total = result.total; this.page = page;
+        if (!result.items.length && page > 1) await this.loadEvents(Math.max(1, Math.ceil(result.total / this.pageSize)));
       } catch (error) {
-        this.loadError = messageOf(error, "Không thể tải danh sách sự kiện");
+        if (request === this.requestId) this.loadError = messageOf(error, "Không thể tải danh sách sự kiện");
       } finally {
-        this.isLoading = false;
+        if (request === this.requestId) this.isLoading = false;
       }
     },
 

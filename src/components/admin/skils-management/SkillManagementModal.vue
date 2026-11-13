@@ -1,12 +1,15 @@
 <script setup lang="ts">
 import { onMounted, onUnmounted } from "vue";
 import AdminModal from "../AdminModal.vue";
+import Pagination from '../../shared/Pagination.vue';
+import { usePagedListFilters } from '../../../composables/usePagedListFilters';
 import TwoOptionsModal from "../../shared/TwoOptionsModal.vue";
 import SkillFormManagement from "./SkillFormManagement.vue";
 import { useAdminSkillStore } from "./admin-skill-store";
 
 const emit = defineEmits<{ close: [] }>();
 const store = useAdminSkillStore();
+usePagedListFilters([() => store.search], () => { void store.fetchAll(1); }, () => { ++store.requestId; });
 onMounted(() => { store.search = ""; void store.fetchAll(); });
 onUnmounted(() => { store.closeForm(); store.cancelDelete(); });
 </script>
@@ -15,7 +18,7 @@ onUnmounted(() => { store.closeForm(); store.cancelDelete(); });
   <AdminModal title="Quản lý kỹ năng" subtitle="Cấu hình kỹ năng, giới hạn cấp và hiệu ứng mỗi cấp." icon="✨" :close-disabled="store.busy" @close="emit('close')">
     <div class="flex shrink-0 flex-wrap gap-3 border-b border-[#cbd9c6] bg-white p-4">
       <input v-model="store.search" type="search" aria-label="Tìm kỹ năng" placeholder="Tìm theo mã, tên hoặc mô tả..." class="min-w-0 flex-1 rounded-lg border border-[#cbd9c6] px-3 py-2 text-sm" />
-      <button type="button" :disabled="store.busy" class="rounded-lg border border-[#cbd9c6] px-3 py-2 text-sm disabled:opacity-50" @click="store.fetchAll">{{ store.loading ? 'Đang tải...' : 'Làm mới' }}</button>
+      <button type="button" :disabled="store.busy" class="rounded-lg border border-[#cbd9c6] px-3 py-2 text-sm disabled:opacity-50" @click="store.fetchAll()">{{ store.loading ? 'Đang tải...' : 'Làm mới' }}</button>
       <button type="button" :disabled="store.busy" class="rounded-lg bg-[#24352a] px-4 py-2 text-sm font-bold text-white disabled:opacity-50" @click="store.openForm()">+ Thêm kỹ năng</button>
     </div>
     <main class="flex min-h-0 min-w-0 flex-1 flex-col overflow-hidden p-4 sm:p-6">
@@ -48,5 +51,6 @@ onUnmounted(() => { store.closeForm(); store.cancelDelete(); });
       <div class="text-sm">Xóa kỹ năng “{{ store.deleteTarget.name }}”?</div>
       <div v-if="store.error" role="alert" class="text-sm text-red-700">{{ store.error }}</div>
     </TwoOptionsModal>
+    <Pagination :page="store.page" :page-size="store.pageSize" :total="store.total" :loading="store.loading" @change="store.fetchAll($event)" />
   </AdminModal>
 </template>

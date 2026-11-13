@@ -3,8 +3,25 @@ import { RepositoryError } from './repositoryError';
 import type { ItemRow, AdminItemRow, ItemPayload } from "../types/table/item";
 import type { ShopItem, Item } from "../types/model/item";
 import supabase from "../database/connection";
+import { fetchAdminListPage } from './supabaseAdminListRepository';
+
+function mapAdminItem(item: any): AdminItemRow {
+  return {
+    id: item.id, createdAt: item.created_at, updatedAt: item.updated_at,
+    category: item.category, name: item.name, information: item.information, image: item.image,
+    isDisabled: item.isDisabled, icon: item.icon, classification: item.classification,
+    quantity: item.quantity == null ? null : Number(item.quantity), price: Number(item.price), rpc: item.rpc,
+  };
+}
 
 class SupabaseItemRepository {
+  async fetchPage(page: number, search: string, category: string, status: string) {
+    const result = await fetchAdminListPage<any>('items', page, search, {
+      ...(category === 'ALL' ? {} : { category }),
+      ...(status === 'ALL' ? {} : { isDisabled: status === 'DISABLED' }),
+    });
+    return { ...result, items: result.items.map(mapAdminItem) };
+  }
   async fetchByIds(ids: string[], signal?: AbortSignal): Promise<Item[]> {
     if (!ids.length) return [];
     const data = await readCatalogPages((from, to) => supabase.from("items").select("id,category,name,information,image,icon,price").in("id", ids).order("id").abortSignal(signal ?? new AbortController().signal).range(from, to));
@@ -20,21 +37,7 @@ class SupabaseItemRepository {
     const { data, error } = await supabase.from("items").select("*").order("created_at", { ascending: false });
     if (error) throw new RepositoryError(error);
 
-    return data.map((item) => ({
-      id: item.id,
-      createdAt: item.created_at,
-      category: item.category,
-      name: item.name,
-      information: item.information,
-      image: item.image,
-      updatedAt: item.updated_at,
-      isDisabled: item.isDisabled,
-      icon: item.icon,
-      classification: item.classification,
-      quantity: item.quantity == null ? null : Number(item.quantity),
-      price: Number(item.price),
-      rpc: item.rpc,
-    }));
+    return data.map(mapAdminItem);
   }
 
   async create(payload: ItemPayload): Promise<void> {

@@ -32,6 +32,8 @@ function buildDepthCurve({ minDepth, maxDepth, peakDepth, curvePower }: DepthSco
 export const useDepthScopeStore = defineStore("depthScope", {
   state: () => ({
     items: [] as DepthScopeRow[],
+    options: [] as DepthScopeRow[],
+    page: 1, pageSize: 10, total: 0, search: '', requestId: 0,
     loading: false,
     saving: false,
     error: "",
@@ -43,15 +45,23 @@ export const useDepthScopeStore = defineStore("depthScope", {
     itemsWithCurves: (state) => state.items.map((item) => ({ ...item, curve: buildDepthCurve(item) })),
   },
   actions: {
-    async fetchAll() {
+    async fetchOptions() {
+      this.options = await supabaseDepthScopeRepository.fetchAll();
+    },
+    async fetchAll(page?: number) {
+      page ??= this.page;
+      const request = ++this.requestId;
       this.loading = true;
       this.error = "";
       try {
-        this.items = await supabaseDepthScopeRepository.fetchAll();
+        const result = await supabaseDepthScopeRepository.fetchPage(page, this.search);
+        if (request !== this.requestId) return;
+        this.items = result.items; this.total = result.total; this.page = page;
+        if (!result.items.length && page > 1) await this.fetchAll(Math.max(1, Math.ceil(result.total / this.pageSize)));
       } catch (error) {
-        this.error = error instanceof Error ? error.message : "Không thể tải danh sách phạm vi độ sâu";
+        if (request === this.requestId) this.error = error instanceof Error ? error.message : "Không thể tải danh sách phạm vi độ sâu";
       } finally {
-        this.loading = false;
+        if (request === this.requestId) this.loading = false;
       }
     },
     openCreate() {
@@ -81,9 +91,9 @@ export const useDepthScopeStore = defineStore("depthScope", {
           const index = this.items.findIndex((item) => item.id === updated.id);
           if (index !== -1) this.items[index] = updated;
         } else {
-          this.items.push(await supabaseDepthScopeRepository.create(payload));
-          this.items.sort((a, b) => a.code.localeCompare(b.code));
+          await supabaseDepthScopeRepository.create(payload);
         }
+        await this.fetchAll();
         this.closeForm();
       } finally {
         this.saving = false;
@@ -91,7 +101,7 @@ export const useDepthScopeStore = defineStore("depthScope", {
     },
     async remove(id: string) {
       await supabaseDepthScopeRepository.remove(id);
-      this.items = this.items.filter((item) => item.id !== id);
+      await this.fetchAll();
     },
   },
 });

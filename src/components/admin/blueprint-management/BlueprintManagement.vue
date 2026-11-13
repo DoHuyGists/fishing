@@ -20,5 +20,5 @@ const fields = computed<CrudField[]>(() => [
 ]);
 </script>
 <template>
-  <AdminCrudScreen title="Công thức chế tạo" subtitle="Chọn thành phẩm, số lượng, phí và danh sách nguyên liệu. ID vật phẩm có trong danh sách chọn thành phẩm." icon="🛠️" :columns="columns" :fields="fields" :items="store.items" :loading="store.loading" :error="store.error" :save="store.save" :remove="store.remove" @refresh="store.fetchAll()" @close="emit('close')" />
+  <AdminCrudScreen title="Công thức chế tạo" subtitle="Chọn thành phẩm, số lượng, phí và danh sách nguyên liệu. ID vật phẩm có trong danh sách chọn thành phẩm." icon="🛠️" :columns="columns" :fields="fields" :items="store.items" :page="store.page" :page-size="store.pageSize" :total="store.total" @page="store.fetchAll" :loading="store.loading" :error="store.error" :save="store.save" :remove="store.remove" @refresh="store.fetchAll()" @close="emit('close')" />
 </template>

@@ -1,9 +1,30 @@
-import type { UserFriend, FriendUserProfile } from "../types/model/friend";
+import type { UserFriend, FriendUserProfile, FriendListPage, FriendTab } from "../types/model/friend";
 import { t as tr } from "../i18n";
 import supabase from "../database/connection";
 import { supabaseAvatarRepository } from "./supabaseAvatarRepository";
 
 class SupabaseFriendRepository {
+  async fetchPage(tab: FriendTab, search: string, page: number): Promise<FriendListPage> {
+    const { data, error } = await supabase.rpc('get_friend_list_page', { p_tab: tab, p_search: search.trim(), p_page: page });
+    if (error) throw new Error(error.message);
+    const result = data as FriendListPage;
+    return { ...result, profiles: await supabaseAvatarRepository.resolveProfiles(result.profiles) };
+  }
+
+  async fetchProfilesByIds(ids: string[]): Promise<FriendUserProfile[]> {
+    if (!ids.length) return [];
+    const { data, error } = await supabase.from('user_profile').select('*').in('id', ids);
+    if (error) throw new Error(error.message);
+    return supabaseAvatarRepository.resolveProfiles((data ?? []) as FriendUserProfile[]);
+  }
+
+  async fetchRelationsForUsers(userId: string, ids: string[]): Promise<UserFriend[]> {
+    if (!ids.length) return [];
+    const { data, error } = await supabase.from('user_friends').select('*')
+      .or(`and(user_id.eq.${userId},friend_id.in.(${ids.join(',')})),and(friend_id.eq.${userId},user_id.in.(${ids.join(',')}))`);
+    if (error) throw new Error(error.message);
+    return (data ?? []) as UserFriend[];
+  }
   /**
    * Lấy tất cả quan hệ bạn bè mà người chơi tham gia (gửi hoặc nhận)
    */

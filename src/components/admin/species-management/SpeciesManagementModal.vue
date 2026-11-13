@@ -1,6 +1,8 @@
 <script lang="ts" setup>
 import type { SpeciesRow } from "../../../types/table/species";
 import AdminModal from "../AdminModal.vue";
+import Pagination from '../../shared/Pagination.vue';
+import { usePagedListFilters } from '../../../composables/usePagedListFilters';
 import { onMounted, ref } from "vue";
 import { storeToRefs } from "pinia";
 
@@ -9,6 +11,7 @@ import SpeciesManagementForm from "./SpeciesManagementForm.vue";
 
 const emit = defineEmits(["close"]);
 const speciesStore = useAdminSpeciesStore();
+usePagedListFilters([() => speciesStore.search, () => speciesStore.statusFilter, () => speciesStore.rarityFilter], () => { void speciesStore.fetchAll(1); }, () => { ++speciesStore.requestId; });
 
 const { search, statusFilter, rarityFilter, viewMode, statusOptions, rarityOptions, filteredSpecies, speciesGroups } =
   storeToRefs(speciesStore);
@@ -114,7 +117,7 @@ onMounted(() => speciesStore.fetchAll());
           title="Làm mới danh sách"
           class="grid size-9 place-items-center rounded-lg border border-gray-300 bg-white text-gray-700 hover:bg-gray-100 disabled:opacity-50"
           :disabled="speciesStore.isLoading"
-          @click="speciesStore.fetchAll"
+          @click="speciesStore.fetchAll()"
         >
           <svg
             class="size-4"
@@ -148,7 +151,7 @@ onMounted(() => speciesStore.fetchAll());
           class="mb-4 flex shrink-0 items-center justify-between gap-3 rounded-lg border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-700"
         >
           <span>{{ speciesStore.error }}</span>
-          <button type="button" class="font-bold underline" @click="speciesStore.fetchAll">Thử lại</button>
+          <button type="button" class="font-bold underline" @click="speciesStore.fetchAll()">Thử lại</button>
         </div>
         <div v-if="speciesStore.isLoading" class="grid min-h-64 place-items-center text-sm text-gray-500">
           Đang tải danh sách loài cá...
@@ -320,5 +323,6 @@ onMounted(() => speciesStore.fetchAll());
         </div>
       </div>
     </div>
+    <Pagination :page="speciesStore.page" :page-size="speciesStore.pageSize" :total="speciesStore.total" :loading="speciesStore.isLoading" @change="speciesStore.fetchAll($event)" />
   </AdminModal>
 </template>

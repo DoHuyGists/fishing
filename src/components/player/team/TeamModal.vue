@@ -3,13 +3,13 @@ import type { TeamView as View, TeamJoinType, TeamStatus } from "../../../types/
 import { getFormattingLocale } from '../../../i18n';
 import { t as tr } from "../../../i18n";
 
-import { computed, onMounted, onUnmounted, ref } from "vue";
+import { computed, onMounted, onUnmounted, ref, watch } from "vue";
+import Pagination from '../../shared/Pagination.vue';
 import Modal from "../../shared/Modal.vue";
 import PlayerIdentity from "../../shared/PlayerIdentity.vue";
 import { useCountryStore } from "../../../stores/country.ts";
 import { useTeamStore } from "../../../stores/team.ts";
 import { useAuthStore } from "../../../stores/auth.ts";
-import { useFriendStore } from "../../../stores/friend.ts";
 
 import TeamListSidebar from "./TeamListSidebar.vue";
 import MyTeamPanel from "./MyTeamPanel.vue";
@@ -18,37 +18,31 @@ import TwoOptionsModal from "../../shared/TwoOptionsModal.vue";
 // ─── Store ────────────────────────────────────────────────────────────────────
 const authStore = useAuthStore();
 const teamStore = useTeamStore();
-const friendStore = useFriendStore();
 const countryStore = useCountryStore();
 
 function getMemberName(id: string) {
   return teamStore.myTeamMembers.find((member) => member.user_id === id)?.user_profile?.display_name
-    || friendStore.profilesMap.get(id)?.display_name || `${id.slice(0, 8)}…`;
+    || teamStore.profilesMap.get(id)?.display_name || `${id.slice(0, 8)}…`;
 }
 
 const userId = computed(() => authStore.userId);
 const isLeader = computed(() => teamStore.isLeader(userId.value));
 const otherMembers = computed(() => teamStore.myTeamMembers.filter((m) => m.user_id !== userId.value));
-const teamSearch = ref("");
-const teamStatusFilter = ref("ALL");
-const filteredTeams = computed(() => {
-  const query = teamSearch.value.trim().toLocaleLowerCase();
-  return teamStore.teams.filter((team) => {
-    const matchesSearch = !query || `${team.name} ${team.description ?? ""}`.toLocaleLowerCase().includes(query);
-    return matchesSearch && (teamStatusFilter.value === "ALL" || team.status === teamStatusFilter.value);
-  });
+const teamSearch = computed({ get: () => teamStore.search, set: value => { teamStore.search = value; } });
+const teamStatusFilter = computed({ get: () => teamStore.statusFilter, set: value => { teamStore.statusFilter = value; } });
+const filteredTeams = computed(() => teamStore.teams);
+let filterTimer: ReturnType<typeof setTimeout> | undefined;
+watch([teamSearch, teamStatusFilter], () => {
+  clearTimeout(filterTimer);
+  filterTimer = setTimeout(() => { teamStore.page = 1; void teamStore.loadTeams(userId.value); }, 300);
 });
+onUnmounted(() => clearTimeout(filterTimer));
 
 function canJoinTeam(team: (typeof teamStore.teams)[number]) {
   if (team.status !== "OPEN") return false;
   if (team.join_type === "everyone") return true;
   if (team.join_type === "friend") {
-    return friendStore.friends.some(
-      (friend) =>
-        friend.status === "ACCEPTED" &&
-        ((friend.user_id === userId.value && friend.friend_id === team.leader_id) ||
-          (friend.friend_id === userId.value && friend.user_id === team.leader_id)),
-    );
+    return teamStore.friendLeaderIds.includes(team.leader_id);
   }
   return false;
 }
@@ -236,7 +230,7 @@ const statusClass: Record<string, string> = {
 
 // ─── Lifecycle ───────────────────────────────────────────────────────────────
 async function loadData() {
-  await Promise.all([teamStore.loadData(userId.value, false), friendStore.loadData(userId.value), countryStore.fetchCountries()]);
+  await Promise.all([teamStore.loadData(userId.value, false), countryStore.fetchCountries()]);
 }
 
 onUnmounted(() => teamStore.stopRefreshing('panel'));
@@ -261,7 +255,7 @@ onMounted(async () => {
         class="flex flex-col gap-4 lg:grid lg:grid-cols-[minmax(260px,0.8fr)_minmax(0,1.7fr)] lg:items-start"
       >
         <TeamListSidebar
-          :profiles="friendStore.profilesMap"
+          :profiles="teamStore.profilesMap"
           :teams="teamStore.teams"
           :current-team-id="teamStore.myTeam?.id"
           :action-loading="teamStore.actionLoading"
@@ -278,7 +272,7 @@ onMounted(async () => {
             {{ teamStore.error }}
           </div>
           <MyTeamPanel
-            :profiles="friendStore.profilesMap"
+            :profiles="teamStore.profilesMap"
             :team="teamStore.myTeam"
             :members="teamStore.myTeamMembers"
             :invites="teamStore.myInvites"
@@ -506,7 +500,7 @@ onMounted(async () => {
                 </span>
               </div>
               <div v-if="team.description" class="text-[0.82rem] text-[#556655] my-1 mb-2">{{ team.description }}</div>
-              <PlayerIdentity :user-id="team.leader_id" :profile="friendStore.profilesMap.get(team.leader_id)" class="my-2" />
+              <PlayerIdentity :user-id="team.leader_id" :profile="teamStore.profilesMap.get(team.leader_id)" class="my-2" />
               <div class="text-[0.76rem] text-[#778877] my-1">
                 {{
                   team.join_type === "everyone"
@@ -785,5 +779,6 @@ onMounted(async () => {
         </div>
       </TwoOptionsModal>
     </Teleport>
+    <Pagination v-if="view === 'list'" :page="teamStore.page" :page-size="teamStore.pageSize" :total="teamStore.total" :loading="teamStore.directoryLoading" @change="teamStore.page = $event; teamStore.loadTeams(userId)" />
   </Modal>
 </template>

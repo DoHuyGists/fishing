@@ -1,21 +1,20 @@
 <script setup lang="ts">
 import AdminModal from "../AdminModal.vue";
+import Pagination from '../../shared/Pagination.vue';
+import { usePagedListFilters } from '../../../composables/usePagedListFilters';
 import { computed, onMounted, ref } from "vue";
 import { useDepthScopeStore } from "./admin-depth-scope-store.ts";
 import DepthScopeForm from "./DepthScopeForm.vue";
 
 const emit = defineEmits<{ close: [] }>();
 const store = useDepthScopeStore();
-const search = ref("");
+const search = computed({ get: () => store.search, set: value => { store.search = value; } });
+usePagedListFilters([search], () => { void store.fetchAll(1); }, () => { ++store.requestId; });
 const deleteTarget = ref<{ id: string; name: string } | null>(null);
 const deleting = ref(false);
 const actionError = ref("");
 const filteredItems = computed(() => {
-  const keyword = search.value.trim().toLocaleLowerCase();
-  return store.itemsWithCurves.filter(
-    (item) =>
-      !keyword || item.code.toLocaleLowerCase().includes(keyword) || item.name.toLocaleLowerCase().includes(keyword),
-  );
+  return store.itemsWithCurves;
 });
 
 async function remove() {
@@ -186,5 +185,6 @@ onMounted(() => store.fetchAll());
         </div>
       </div>
     </div>
+    <Pagination :page="store.page" :page-size="store.pageSize" :total="store.total" :loading="store.loading" @change="store.fetchAll($event)" />
   </AdminModal>
 </template>

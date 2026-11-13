@@ -233,7 +233,8 @@ test('HTTP read cache preserves gameplay mutations, owners and response semantic
       const original = repository.fetchNotifications;
       repository.fetchNotifications = async () => {
         calls++;
-        return { personal: [], system: [{ id: 'notice', is_read: false, expires_at: new Date(clock + 1000).toISOString() }] };
+        return { personal: [], system: [{ id: 'notice', is_read: false, expires_at: new Date(clock + 1000).toISOString() }],
+          personalTotal: 0, systemTotal: 1, personalUnread: 0, systemUnread: 1 };
       };
       try {
         await notifications.loadNotifications('a'); assert.equal(notifications.unreadCount, 1);

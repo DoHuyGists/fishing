@@ -1,6 +1,8 @@
 <script lang="ts" setup>
 import type { RedeemCodeRow } from "../../../types/table/redeemCode";
 import AdminModal from "../AdminModal.vue";
+import Pagination from '../../shared/Pagination.vue';
+import { usePagedListFilters } from '../../../composables/usePagedListFilters';
 import { onMounted } from "vue";
 
 import RedeemCodeDeleteModal from "./RedeemCodeDeleteModal.vue";
@@ -9,6 +11,7 @@ import { isRedeemCodeExpired, useAdminRedeemCodeStore } from "./admin-redeem-cod
 
 const emit = defineEmits(["close"]);
 const store = useAdminRedeemCodeStore();
+usePagedListFilters([() => store.search, () => store.statusFilter], () => { void store.loadCodes(1); }, () => { ++store.requestId; });
 
 function formatDate(value: string | null) {
   return value ? new Date(value).toLocaleString("vi-VN") : "Không hết hạn";
@@ -173,5 +176,6 @@ onMounted(() => store.loadCodes());
 
     <RedeemCodeFormModal />
     <RedeemCodeDeleteModal />
+    <Pagination :page="store.page" :page-size="store.pageSize" :total="store.total" :loading="store.isLoading" @change="store.loadCodes($event)" />
   </AdminModal>
 </template>

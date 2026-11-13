@@ -4,6 +4,7 @@ import { t as tr } from "../../../i18n";
 
 import { computed, watch } from "vue";
 import Modal from "../../shared/Modal.vue";
+import Pagination from '../../shared/Pagination.vue';
 import Tab from "../../shared/Tab.vue";
 import { useLeaderboardStore } from "../../../stores/leaderboard.ts";
 import { useAuthStore } from "../../../stores/auth.ts";
@@ -124,6 +125,7 @@ watch(() => authStore.userId, load, { immediate: true });
                 </div>
               </aside>
             </div>
+            <Pagination v-if="!board.isMock" :page="leaderboardStore.page" :page-size="leaderboardStore.pageSize" :total="leaderboardStore.total" :loading="leaderboardStore.loading" @change="leaderboardStore.fetchLeaderboard(authStore.userId, $event)" />
           </section>
         </template>
       </Tab>

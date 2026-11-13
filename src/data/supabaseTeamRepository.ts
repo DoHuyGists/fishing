@@ -3,6 +3,8 @@ import { t as tr } from "../i18n";
 import supabase from "../database/connection";
 
 import { supabaseAvatarRepository } from "./supabaseAvatarRepository";
+import { COMPACT_PAGE_SIZE, pageRange, listPage, escapeLike } from './pagination';
+import type { ListPage } from '../types/model/pagination';
 
 class SupabaseTeamRepository {
   /** Trưởng nhóm mời người chơi theo id */
@@ -25,16 +27,16 @@ class SupabaseTeamRepository {
   }
 
   /** Lời mời đang chờ gửi đến người chơi */
-  async fetchMyInvites(userId: string): Promise<UserTeamInvite[]> {
-    const { data, error } = await supabase
+  async fetchMyInvites(userId: string, page = 1): Promise<ListPage<UserTeamInvite>> {
+    const { data, error, count } = await supabase
       .from("user_team_invite")
-      .select("*")
+      .select("*", { count: 'exact' })
       .eq("invitee_id", userId)
       .eq("status", "PENDING")
-      .order("created_at", { ascending: false });
+      .order("created_at", { ascending: false }).order('id').range(...pageRange(page, COMPACT_PAGE_SIZE));
     if (error) throw new Error(error.message || tr('supabaseTeamRepository.khong_the_tai_loi_moi'));
     const invites = data ?? [];
-    if (invites.length === 0) return [];
+    if (invites.length === 0) return listPage([], count);
 
     const { data: teams, error: teamError } = await supabase
       .from("user_teams")
@@ -43,7 +45,7 @@ class SupabaseTeamRepository {
     if (teamError) throw new Error(teamError.message || tr('supabaseTeamRepository.khong_the_tai_thong_tin_to_doi'));
     const teamById = new Map((teams ?? []).map((team) => [team.id, team]));
 
-    return invites.map((invite) => ({ ...invite, team: teamById.get(invite.team_id) ?? null })) as UserTeamInvite[];
+    return listPage(invites.map((invite) => ({ ...invite, team: teamById.get(invite.team_id) ?? null })) as UserTeamInvite[], count);
   }
 
   async respondInvite(inviteId: string, accept: boolean): Promise<void> {
@@ -52,15 +54,19 @@ class SupabaseTeamRepository {
   }
 
   /** Lấy danh sách nhóm theo status (mặc định OPEN + FULL để hiển thị) */
-  async fetchTeams(statuses: TeamStatus[] = ["OPEN", "FULL", "FISHING"]): Promise<UserTeam[]> {
-    const { data, error } = await supabase
+  async fetchTeams(page = 1, search = '', status = 'ALL'): Promise<ListPage<UserTeam>> {
+    let query = supabase
       .from("user_teams")
-      .select("*")
-      .in("status", statuses)
-      .order("created_at", { ascending: false });
+      .select("*", { count: 'exact' })
+      .in("status", status === 'ALL' ? ['OPEN', 'FULL', 'FISHING'] : [status]);
+    if (search.trim()) {
+      const pattern = `"%${escapeLike(search).replace(/"/g, '\\"')}%"`;
+      query = query.or(`name.ilike.${pattern},description.ilike.${pattern}`);
+    }
+    const { data, error, count } = await query.order("created_at", { ascending: false }).order('id').range(...pageRange(page));
 
     if (error) throw new Error(error.message || tr('supabaseTeamRepository.khong_the_tai_danh_sach_nhom'));
-    return (data ?? []) as UserTeam[];
+    return listPage((data ?? []) as UserTeam[], count);
   }
 
   /** Lấy thành viên của một nhóm */

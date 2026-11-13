@@ -1,5 +1,6 @@
 import type { EventScheduleRow, EventSchedulePayload } from "../types/table/eventSchedule";
 import supabase from "../database/connection";
+import { fetchAdminListPage } from './supabaseAdminListRepository';
 
 const SELECT_QUERY = "*, event:event(id, name, thumbnail, image, description)";
 
@@ -30,6 +31,12 @@ function toRecord(payload: EventSchedulePayload) {
 }
 
 class SupabaseEventScheduleRepository {
+  async fetchPage(page: number, search: string, event: string, status: string) {
+    const result = await fetchAdminListPage<any>('event_schedule', page, search, {
+      ...(event === 'ALL' ? {} : { event_id: event }), ...(status === 'ALL' ? {} : { is_disabled: status === 'DISABLED' }),
+    });
+    return { ...result, items: result.items.map(mapRow) };
+  }
   async fetchAll(): Promise<EventScheduleRow[]> {
     const { data, error } = await supabase
       .from("event_schedule")

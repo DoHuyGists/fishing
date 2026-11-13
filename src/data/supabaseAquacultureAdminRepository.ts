@@ -1,10 +1,15 @@
 import type { AquacultureRuleRow, AquacultureRulePayload, AquacultureFoodPayload, AquacultureFoodRow } from "../types/table/aquacultureAdmin";
 import supabase from '../database/connection'
+import { fetchAdminListPage } from './supabaseAdminListRepository';
 
 const ruleRow = (r: any): AquacultureRuleRow => ({ ...r, id: r.species_id })
 const foodRow = (r: any): AquacultureFoodRow => ({ ...r, id: r.species_id + ':' + r.item_id })
 
 export const supabaseAquacultureRulesAdminRepository = {
+  async fetchPage(page: number, search: string) {
+    const result = await fetchAdminListPage<any>('aquaculture_species_rules', page, search);
+    return { ...result, items: result.items.map(ruleRow) };
+  },
   async fetchAll(): Promise<AquacultureRuleRow[]> {
     const { data, error } = await supabase.from('aquaculture_species_rules').select('*').order('species_id')
     if (error) throw new Error(error.message)
@@ -31,6 +36,10 @@ export const supabaseAquacultureRulesAdminRepository = {
 }
 
 export const supabaseAquacultureFoodsAdminRepository = {
+  async fetchPage(page: number, search: string) {
+    const result = await fetchAdminListPage<any>('aquaculture_species_foods', page, search);
+    return { ...result, items: result.items.map(foodRow) };
+  },
   async fetchAll(): Promise<AquacultureFoodRow[]> {
     const { data, error } = await supabase.from('aquaculture_species_foods').select('*').order('species_id').order('item_id')
     if (error) throw new Error(error.message)

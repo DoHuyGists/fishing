@@ -11,16 +11,26 @@ export const useAdminAquacultureFoodStore = defineStore('AdminAquacultureFood', 
   state: () => ({
     items: [] as AquacultureFoodRow[], species: [] as SpeciesRow[], rules: [] as AquacultureRuleRow[],
     sourceItems: [] as AdminItemRow[], loading: false, error: '',
+    page: 1, pageSize: 10, total: 0, search: '', requestId: 0,
   }),
   actions: {
-    async fetchAll() {
+    async fetchAll(page?: number, search?: string) {
+      page ??= this.page; this.search = search ?? this.search;
+      const request = ++this.requestId;
       this.loading = true; this.error = ''
       try {
-        [this.items, this.species, this.rules, this.sourceItems] = await Promise.all([
-          repository.fetchAll(), supabaseSpeciesRepository.fetchAll(), supabaseAquacultureRulesAdminRepository.fetchAll(), supabaseItemRepository.fetchAll(),
-        ])
-      } catch (error) { this.error = error instanceof Error ? error.message : 'Không tải được thức ăn cho cá.' }
-      finally { this.loading = false }
+        const [result, species, rules, items] = await Promise.all([
+          repository.fetchPage(page, this.search),
+          this.species.length ? Promise.resolve(this.species) : supabaseSpeciesRepository.fetchAll(),
+          this.rules.length ? Promise.resolve(this.rules) : supabaseAquacultureRulesAdminRepository.fetchAll(),
+          this.sourceItems.length ? Promise.resolve(this.sourceItems) : supabaseItemRepository.fetchAll(),
+        ]);
+        if (request !== this.requestId) return;
+        this.items = result.items; this.species = species; this.rules = rules; this.sourceItems = items;
+        this.page = page; this.total = result.total;
+        if (!result.items.length && page > 1) await this.fetchAll(Math.max(1, Math.ceil(result.total / this.pageSize)));
+      } catch (error) { if (request === this.requestId) this.error = error instanceof Error ? error.message : 'Không tải được thức ăn cho cá.' }
+      finally { if (request === this.requestId) this.loading = false }
     },
     async save(input: Record<string, unknown>, id: string | null) {
       const current = id ? this.items.find(r => r.id === id) : null
@@ -38,14 +48,14 @@ export const useAdminAquacultureFoodStore = defineStore('AdminAquacultureFood', 
         throw new Error('Vật phẩm này đã được cấu hình cho loài đã chọn. Hãy sửa cấu hình hiện có.')
       }
       const row = current ? await repository.update(payload) : await repository.create(payload)
-      this.items = [...this.items.filter(r => r.id !== row.id), row]
+      await this.fetchAll();
       return row
     },
     async remove(id: string) {
       const row = this.items.find(r => r.id === id)
       if (!row) throw new Error('Không tìm thấy cấu hình thức ăn.')
       await repository.remove(row.species_id, row.item_id)
-      this.items = this.items.filter(r => r.id !== id)
+      await this.fetchAll();
     },
   },
 })

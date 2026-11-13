@@ -5,16 +5,20 @@ import { supabaseItemRepository } from "../../../data/supabaseItemRepository";
 
 interface BlueprintRow { id: string; result_item_id: string; result_quantity: number; required_materials: { item_id: string; quantity: number }[]; gold_cost: number }
 export const useAdminBlueprintStore = defineStore("admin-blueprints", {
-  state: () => ({ items: [] as BlueprintRow[], sourceItems: [] as AdminItemRow[], loading: false, error: "" }),
+  state: () => ({ items: [] as BlueprintRow[], sourceItems: [] as AdminItemRow[], loading: false, error: "", page: 1, pageSize: 10, total: 0, search: '', requestId: 0 }),
   actions: {
-    async fetchAll() {
+    async fetchAll(page?: number, search?: string) {
+      page ??= this.page; this.search = search ?? this.search;
+      const request = ++this.requestId;
       this.loading = true; this.error = "";
       try {
-        const [recipes, items] = await Promise.all([supabaseBlueprintRepository.fetchAll(), supabaseItemRepository.fetchAll()]);
-        this.items = recipes.map(row => ({ id: row.id, result_item_id: row.resultItemId, result_quantity: row.resultQuantity, required_materials: row.requiredMaterials, gold_cost: row.goldCost }));
+        const [recipes, items] = await Promise.all([supabaseBlueprintRepository.fetchPage(page, this.search), this.sourceItems.length ? Promise.resolve(this.sourceItems) : supabaseItemRepository.fetchAll()]);
+        if (request !== this.requestId) return;
+        this.items = recipes.items; this.page = page; this.total = recipes.total;
         this.sourceItems = items;
-      } catch (err) { this.error = err instanceof Error ? err.message : "Không thể tải bản vẽ."; }
-      finally { this.loading = false; }
+        if (!recipes.items.length && page > 1) await this.fetchAll(Math.max(1, Math.ceil(recipes.total / this.pageSize)));
+      } catch (err) { if (request === this.requestId) this.error = err instanceof Error ? err.message : "Không thể tải bản vẽ."; }
+      finally { if (request === this.requestId) this.loading = false; }
     },
     async save(payload: Record<string, unknown>, id: string | null) {
       const resultQuantity = Number(payload.result_quantity);

@@ -1,9 +1,26 @@
 import type { UserInventory } from "../types/model/userInventory";
 import type { SpinWheelResult } from "../types/model/spinWheel";
 import supabase from "../database/connection";
+import { escapeLike, listPage, pageRange } from './pagination';
+
+const mapInventory = (row: any): UserInventory => ({ id: row.id, data: row.data, userId: row.user_id, createdAt: row.created_at, rpc: row.rpc });
 
 
 class SupabaseUserInventoryRepository {
+  async fetchPage(userId: string, page: number, search: string, categories: string[]) {
+    let query = supabase.from('user_inventory').select('*', { count: 'exact' }).eq('user_id', userId);
+    if (search.trim()) {
+      const pattern = `"%${escapeLike(search).replace(/"/g, '\\"')}%"`;
+      query = query.or(`data->>name.ilike.${pattern},data->>category.ilike.${pattern}${categories.length ? `,data->>category.in.(${categories.join(',')})` : ''}`);
+    }
+    const [result, total] = await Promise.all([
+      query.order('created_at', { ascending: false }).order('id').range(...pageRange(page)),
+      supabase.from('user_inventory').select('id', { count: 'exact', head: true }).eq('user_id', userId),
+    ]);
+    if (result.error) throw new Error(result.error.message);
+    if (total.error) throw new Error(total.error.message);
+    return { ...listPage((result.data ?? []).map(mapInventory), result.count), ownedTotal: total.count ?? 0 };
+  }
   async fetchUserInventory(userId: string): Promise<UserInventory[]> {
     const { data, error } = await supabase.from("user_inventory").select("*").eq("user_id", userId);
 
@@ -11,16 +28,7 @@ class SupabaseUserInventoryRepository {
       throw new Error(error.message);
     }
 
-    return data.map(
-      (x) =>
-        ({
-          id: x.id,
-          data: x.data,
-          userId: x.user_id,
-          createdAt: x.created_at,
-          rpc: x.rpc,
-        }) as UserInventory,
-    );
+    return data.map(mapInventory);
   }
   async claimRandomItem(): Promise<SpinWheelResult> {
     const { data, error } = await supabase.rpc("spin_wheel");

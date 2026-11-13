@@ -4,8 +4,12 @@ import type { Skill, UserSkill, UpgradeSkillResult } from "../types/model/skill"
 import type { SkillPayload } from "../types/table/skill";
 import { t as tr } from "../i18n";
 import supabase from "../database/connection";
+import { fetchAdminListPage } from './supabaseAdminListRepository';
 
 class SupabaseSkillRepository {
+  fetchPage(page: number, search: string) {
+    return fetchAdminListPage<Skill>('skills', page, search);
+  }
   async fetchAll(): Promise<Skill[]> {
     const { data, error } = await supabase.from("skills").select("*").order("sort_order").order("name");
     if (error) throw new RepositoryError(error);

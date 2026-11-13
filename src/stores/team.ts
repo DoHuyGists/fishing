@@ -6,6 +6,8 @@ import { useReadCacheStore } from './readCache';
 import { createKeyedRefreshTask } from '../utils/refreshTask';
 import { startVisibleRefresh } from '../utils/visibleRefresh';
 import { supabaseTeamRepository } from "../data/supabaseTeamRepository";
+import { supabaseFriendRepository } from '../data/supabaseFriendRepository';
+import type { FriendUserProfile, PlayerProfileSummary } from '../types/model/friend';
 
 const refreshMembership = createKeyedRefreshTask<void>();
 const refreshDirectory = createKeyedRefreshTask<void>();
@@ -28,6 +30,17 @@ export const useTeamStore = defineStore("team", {
     error: "",
     membershipError: '',
     directoryError: '',
+    page: 1,
+    pageSize: 10,
+    total: 0,
+    search: '',
+    statusFilter: 'ALL',
+    directoryLoading: false,
+    directoryProfiles: [] as FriendUserProfile[],
+    friendLeaderIds: [] as string[],
+    invitePage: 1,
+    invitePageSize: 5,
+    inviteTotal: 0,
   }),
 
   getters: {
@@ -35,6 +48,10 @@ export const useTeamStore = defineStore("team", {
     isLeader: (state) => (userId: string) =>
       state.myTeam?.leader_id === userId,
     memberCount: (state) => state.myTeamMembers.length,
+    profilesMap: (state): Map<string, PlayerProfileSummary> => new Map<string, PlayerProfileSummary>([
+      ...state.directoryProfiles.map(profile => [profile.id, profile] as const),
+      ...state.myTeamMembers.filter(member => member.user_profile).map(member => [member.user_id, member.user_profile!] as const),
+    ]),
   },
 
   actions: {
@@ -42,16 +59,21 @@ export const useTeamStore = defineStore("team", {
       const auth = useAuthStore();
       if (auth.user?.id !== userId) return;
       const generation = auth.sessionGeneration;
-      return refreshMembership(userId + ':' + generation, async () => {
+      const invitePage = this.invitePage;
+      return refreshMembership(userId + ':' + generation + ':' + invitePage, async () => {
         try {
           if (invalidate) { await useReadCacheStore().invalidate(['team', 'profile']); if (auth.user?.id !== userId || auth.sessionGeneration !== generation) return; }
           const [myTeamData, invites] = await Promise.all([
-            supabaseTeamRepository.fetchMyTeam(userId), supabaseTeamRepository.fetchMyInvites(userId),
+            supabaseTeamRepository.fetchMyTeam(userId), supabaseTeamRepository.fetchMyInvites(userId, invitePage),
           ]);
-          if (auth.user?.id !== userId || auth.sessionGeneration !== generation) return;
+          if (auth.user?.id !== userId || auth.sessionGeneration !== generation || this.invitePage !== invitePage) return;
           this.myTeam = myTeamData?.team ?? null;
           this.myTeamMembers = myTeamData?.members ?? [];
-          this.myInvites = invites;
+          this.myInvites = invites.items; this.inviteTotal = invites.total;
+          if (!invites.items.length && invitePage > 1) {
+            this.invitePage = Math.max(1, Math.ceil(invites.total / this.invitePageSize));
+            await this.loadMyTeam(userId); return;
+          }
           this.membershipError = ''; this.error = this.directoryError;
         } catch (err) {
           if (auth.user?.id === userId && auth.sessionGeneration === generation) {
@@ -65,19 +87,35 @@ export const useTeamStore = defineStore("team", {
       const auth = useAuthStore();
       if (auth.user?.id !== userId) return;
       const generation = auth.sessionGeneration;
-      return refreshDirectory(userId + ':' + generation, async () => {
+      const page = this.page, search = this.search, status = this.statusFilter;
+      const current = () => auth.user?.id === userId && auth.sessionGeneration === generation
+        && this.page === page && this.search === search && this.statusFilter === status;
+      return refreshDirectory(userId + ':' + generation + ':' + JSON.stringify([page, search, status]), async () => {
+        this.directoryLoading = true;
         try {
           if (invalidate) { await useReadCacheStore().invalidate(['team']); if (auth.user?.id !== userId || auth.sessionGeneration !== generation) return; }
-          const teams = await supabaseTeamRepository.fetchTeams();
-          if (auth.user?.id === userId && auth.sessionGeneration === generation) {
-            this.teams = teams; this.directoryError = ''; this.error = this.membershipError;
+          const teams = await supabaseTeamRepository.fetchTeams(page, search, status);
+          const leaderIds = [...new Set(teams.items.map(team => team.leader_id))];
+          const [profiles, friends] = await Promise.all([
+            supabaseFriendRepository.fetchProfilesByIds(leaderIds),
+            supabaseFriendRepository.fetchRelationsForUsers(userId, leaderIds),
+          ]);
+          if (current()) {
+            this.teams = teams.items; this.total = teams.total;
+            this.directoryProfiles = profiles;
+            this.friendLeaderIds = friends.filter(friend => friend.status === 'ACCEPTED').map(friend => friend.user_id === userId ? friend.friend_id : friend.user_id);
+            this.directoryError = ''; this.error = this.membershipError;
+            if (!teams.items.length && page > 1) {
+              this.page = Math.max(1, Math.ceil(teams.total / this.pageSize));
+              await this.loadTeams(userId);
+            }
           }
         } catch (err) {
-          if (auth.user?.id === userId && auth.sessionGeneration === generation) {
+          if (current()) {
             this.directoryError = err instanceof Error ? err.message : tr('team.khong_the_tai_du_lieu_nhom');
             this.error = this.directoryError;
           }
-        }
+        } finally { if (current()) this.directoryLoading = false; }
       }, invalidate);
     },
     async loadData(userId: string, invalidate = true) {

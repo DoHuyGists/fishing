@@ -1,6 +1,7 @@
 import type { AreaSpecies } from "../types/model/speciesInArea";
 import type { SpeciesInAreaRow, SpeciesInAreaPayload } from "../types/table/speciesInArea";
 import supabase from "../database/connection";
+import { fetchAdminListPage } from './supabaseAdminListRepository';
 
 
 const SELECT_QUERY = "*, area:fishing_areas(id, title, country_id), species:species(id, name, image, rarity)";
@@ -21,6 +22,12 @@ function mapRow(row: any): SpeciesInAreaRow {
 }
 
 class SupabaseSpeciesInAreaRepository {
+  async fetchPage(page: number, search: string, area: string, species: string) {
+    const result = await fetchAdminListPage<any>('species_in_area', page, search, {
+      ...(area === 'ALL' ? {} : { area_id: area }), ...(species === 'ALL' ? {} : { species_id: species }),
+    });
+    return { ...result, items: result.items.map(mapRow) };
+  }
   async fetchSpeciesByAreaId(areaId: string): Promise<AreaSpecies[]> {
     const { data, error } = await supabase
       .from("species_in_area")

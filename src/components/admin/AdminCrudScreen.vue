@@ -1,6 +1,7 @@
 <script lang="ts" setup>
 import AdminModal from "./AdminModal.vue";
-import { computed, reactive, ref } from "vue";
+import { computed, reactive, ref, watch, onUnmounted } from "vue";
+import Pagination from '../shared/Pagination.vue';
 
 export interface CrudOption {
   value: string;
@@ -34,14 +35,24 @@ const props = defineProps<{
   items: any[];
   loading: boolean;
   error: string;
+  page?: number;
+  total?: number;
+  pageSize?: number;
   allowCreate?: boolean;
   allowDelete?: boolean;
   save: (payload: Record<string, unknown>, id: string | null) => Promise<unknown>;
   remove: (id: string) => Promise<unknown>;
 }>();
-const emit = defineEmits<{ (e: "close"): void; (e: "refresh"): void }>();
+const emit = defineEmits<{ (e: "close"): void; (e: "refresh"): void; (e: 'page', page: number, search: string): void }>();
 
 const search = ref("");
+let searchTimer: ReturnType<typeof setTimeout> | undefined;
+watch(search, () => {
+  if (props.page === undefined) return;
+  clearTimeout(searchTimer);
+  searchTimer = setTimeout(() => emit('page', 1, search.value), 300);
+});
+onUnmounted(() => clearTimeout(searchTimer));
 const isOpen = ref(false);
 const editingId = ref<string | null>(null);
 const form = reactive<Record<string, any>>({});
@@ -59,7 +70,7 @@ const rows = computed(() =>
 
 const filtered = computed(() => {
   const q = search.value.trim().toLowerCase();
-  if (!q) return rows.value;
+  if (!q || props.page !== undefined) return rows.value;
   return rows.value.filter((r) => r.cells.some((c) => c.toLowerCase().includes(q)));
 });
 
@@ -220,5 +231,6 @@ async function confirmDelete() {
         </div>
       </form>
     </div>
+    <Pagination v-if="page !== undefined" :page="page" :page-size="pageSize ?? 10" :total="total ?? 0" :loading="loading" @change="emit('page', $event, search)" />
   </AdminModal>
 </template>

@@ -10,6 +10,7 @@
     "test:game-cache": "node --test --test-concurrency=1 scripts/test-game-cache.mjs scripts/test-game-catalog.mjs scripts/test-catalog-sql.mjs",
     "test:game-cache:browser": "node scripts/test-game-cache-browser.mjs",
     "test:read-cache": "node --test scripts/test-read-cache.mjs",
+    "test:pagination": "node --test scripts/test-list-pagination.mjs scripts/test-refresh-stores.mjs",
     "check:i18n": "node scripts/check-i18n.mjs && node scripts/check-i18n-runtime.mjs",
     "preview": "vite preview"
   },

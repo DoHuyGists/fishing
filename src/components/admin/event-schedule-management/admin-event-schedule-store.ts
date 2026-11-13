@@ -29,6 +29,7 @@ function fromInputDateTime(value: string) {
 export const useAdminEventScheduleStore = defineStore("AdminEventSchedule", {
   state: () => ({
     schedules: [] as EventScheduleRow[],
+    page: 1, pageSize: 10, total: 0, requestId: 0,
     events: [] as EventRow[],
     search: "",
     eventFilter: "ALL",
@@ -49,33 +50,28 @@ export const useAdminEventScheduleStore = defineStore("AdminEventSchedule", {
       return [...state.events].sort((a, b) => a.name.localeCompare(b.name));
     },
     filteredSchedules(state): EventScheduleRow[] {
-      const keyword = state.search.trim().toLocaleLowerCase();
-      return state.schedules.filter((item) => {
-        const matchesSearch = !keyword || [item.eventName].some((value) => value?.toLocaleLowerCase().includes(keyword));
-        const matchesEvent = state.eventFilter === "ALL" || item.eventId === state.eventFilter;
-        const matchesStatus =
-          state.statusFilter === "ALL" ||
-          (state.statusFilter === "ACTIVE" && !item.isDisabled) ||
-          (state.statusFilter === "DISABLED" && item.isDisabled);
-        return matchesSearch && matchesEvent && matchesStatus;
-      });
+      return state.schedules;
     },
   },
   actions: {
-    async loadAll() {
+    async loadAll(page?: number) {
+      page ??= this.page;
+      const request = ++this.requestId;
       this.isLoading = true;
       this.loadError = "";
       try {
         const [schedulesData, eventsData] = await Promise.all([
-          supabaseEventScheduleRepository.fetchAll(),
+          supabaseEventScheduleRepository.fetchPage(page, this.search, this.eventFilter, this.statusFilter),
           supabaseEventRepository.fetchAll(),
         ]);
-        this.schedules = schedulesData;
+        if (request !== this.requestId) return;
+        this.schedules = schedulesData.items; this.total = schedulesData.total; this.page = page;
         this.events = eventsData;
+        if (!schedulesData.items.length && page > 1) await this.loadAll(Math.max(1, Math.ceil(schedulesData.total / this.pageSize)));
       } catch (error) {
-        this.loadError = messageOf(error, "Không thể tải danh sách lịch sự kiện");
+        if (request === this.requestId) this.loadError = messageOf(error, "Không thể tải danh sách lịch sự kiện");
       } finally {
-        this.isLoading = false;
+        if (request === this.requestId) this.isLoading = false;
       }
     },
 

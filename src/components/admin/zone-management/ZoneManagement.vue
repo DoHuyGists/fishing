@@ -8,9 +8,9 @@ const emit = defineEmits(["close"]);
 const store = useAdminZoneStore();
 const weatherStore = useAdminWeatherStore();
 store.fetchAll();
-weatherStore.fetchAll();
+weatherStore.fetchOptions();
 
-const weatherName = (id: string | null) => weatherStore.items.find((w) => w.id === id)?.name ?? "";
+const weatherName = (id: string | null) => weatherStore.options.find((w) => w.id === id)?.name ?? "";
 const dateText = (v: string | null) => (v ? new Date(v).toLocaleString("vi-VN") : "");
 
 const columns: CrudColumn[] = [
@@ -26,7 +26,7 @@ const fields = computed<CrudField[]>(() => [
     key: "weatherId",
     label: "Thời tiết hiện tại",
     type: "select",
-    options: weatherStore.items.map((w) => ({ value: w.id, label: `${w.name} (${w.code})` })),
+    options: weatherStore.options.map((w) => ({ value: w.id, label: `${w.name} (${w.code})` })),
   },
   { key: "weatherExpiresAt", label: "Thời tiết hết hạn lúc", type: "datetime" },
   { key: "weatherActiveModifiers", label: "Chỉ số đang hoạt động (JSON)", type: "json" },
@@ -46,6 +46,8 @@ const save = (payload: any, id: string | null) => (id ? store.update(id, payload
     :columns="columns"
     :fields="fields"
     :items="store.items"
+    :page="store.page" :page-size="store.pageSize" :total="store.total"
+    @page="store.fetchAll"
     :loading="store.loading"
     :error="store.error"
     :save="save"

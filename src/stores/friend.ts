@@ -1,4 +1,5 @@
-import type { FriendUserProfile, UserFriend } from "../types/model/friend";
+import type { FriendUserProfile, UserFriend, FriendTab } from "../types/model/friend";
+import { useAuthStore } from './auth';
 import { t as tr } from "../i18n";
 import { defineStore } from "pinia";
 import { supabaseFriendRepository } from "../data/supabaseFriendRepository";
@@ -17,6 +18,14 @@ export const useFriendStore = defineStore("friend", {
     loading: false,
     actionLoadingId: null as string | null,
     error: "",
+    activeTab: 'friends' as FriendTab,
+    search: '',
+    page: 1,
+    pageSize: 10,
+    total: 0,
+    counts: { friends: 0, received: 0, sent: 0, discover: 0 },
+    requestId: 0,
+    ownerId: '',
   }),
 
   getters: {
@@ -76,24 +85,28 @@ export const useFriendStore = defineStore("friend", {
   },
 
   actions: {
-    async loadData(currentUserId: string) {
+    async loadData(currentUserId: string, page?: number) {
+      page ??= this.page;
       if (!currentUserId) return;
-
+      const auth = useAuthStore(), generation = auth.sessionGeneration;
+      if (this.ownerId !== currentUserId) {
+        this.$reset(); this.ownerId = currentUserId; page = 1;
+      }
+      const request = ++this.requestId;
+      const current = () => request === this.requestId && auth.user?.id === currentUserId && auth.sessionGeneration === generation;
       this.loading = true;
       this.error = "";
 
       try {
-        const [friendsData, profilesData] = await Promise.all([
-          supabaseFriendRepository.fetchFriends(currentUserId),
-          supabaseFriendRepository.fetchUserProfiles(),
-        ]);
-
-        this.friends = friendsData;
-        this.profiles = profilesData;
+        const result = await supabaseFriendRepository.fetchPage(this.activeTab, this.search, page);
+        if (!current()) return;
+        this.friends = result.friends; this.profiles = result.profiles;
+        this.total = result.total; this.counts = result.counts; this.page = page;
+        if (!result.profiles.length && page > 1) await this.loadData(currentUserId, Math.max(1, Math.ceil(result.total / this.pageSize)));
       } catch (err) {
-        this.error = err instanceof Error ? err.message : tr('friend.khong_the_tai_du_lieu_ban_be');
+        if (current()) this.error = err instanceof Error ? err.message : tr('friend.khong_the_tai_du_lieu_ban_be');
       } finally {
-        this.loading = false;
+        if (current()) this.loading = false;
       }
     },
 

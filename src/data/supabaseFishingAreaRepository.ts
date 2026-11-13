@@ -3,6 +3,7 @@ import { RepositoryError } from './repositoryError';
 import type { FishingSessionRow, FishingAreaRow, FishingAreaPayload } from "../types/table/fishingArea";
 import type { TensionSubmission } from "../types/model/tensionChallenge";
 import supabase from "../database/connection";
+import { fetchAdminListPage } from './supabaseAdminListRepository';
 import type { RealtimeChannel } from "@supabase/supabase-js";
 
 
@@ -35,6 +36,12 @@ function toDbPayload(payload: FishingAreaPayload) {
 }
 
 class SupabaseFishingAreaRepository {
+  async fetchAdminPage(page: number, search: string, country: string, availability: string) {
+    const result = await fetchAdminListPage<any>('fishing_areas', page, search, {
+      ...(country === 'ALL' ? {} : { country_id: country }), ...(availability === 'ALL' ? {} : { is_available: availability === 'AVAILABLE' }),
+    });
+    return { ...result, items: result.items.map(mapRow) };
+  }
   async castRod(areaId: string, castDepth: number) {
     const { data, error } = await supabase.rpc("cast_rod", { p_area_id: areaId, p_cast_depth: castDepth });
     if (error) throw new RepositoryError(error);

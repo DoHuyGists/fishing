@@ -1,5 +1,7 @@
 <script lang="ts" setup>
 import AdminModal from "../AdminModal.vue";
+import Pagination from '../../shared/Pagination.vue';
+import { usePagedListFilters } from '../../../composables/usePagedListFilters';
 import { computed, ref, watch } from "vue";
 import { mapData } from "../../../data/map.ts";
 import InteractWorldMap2 from "../../player/world-map/InteractWorldMap.vue";
@@ -10,9 +12,10 @@ import { useWorldStore } from "../../../stores/worldMap.ts";
 const emit = defineEmits(["close"]);
 const adminFishingAreaStore = useAdminFishingAreaStore();
 const worldStore = useWorldStore();
-const search = ref("");
-const countryFilter = ref("ALL");
-const availabilityFilter = ref<"ALL" | "AVAILABLE" | "UNAVAILABLE">("ALL");
+const search = computed({ get: () => adminFishingAreaStore.search, set: value => { adminFishingAreaStore.search = value; } });
+const countryFilter = computed({ get: () => adminFishingAreaStore.countryFilter, set: value => { adminFishingAreaStore.countryFilter = value; } });
+const availabilityFilter = computed({ get: () => adminFishingAreaStore.availabilityFilter, set: value => { adminFishingAreaStore.availabilityFilter = value; } });
+usePagedListFilters([search, countryFilter, availabilityFilter], () => { void adminFishingAreaStore.fetchAllAreasAdmin(1); }, () => { ++adminFishingAreaStore.requestId; });
 
 const deletingId = ref<string | null>(null);
 const confirmDeleteId = ref<string | null>(null);
@@ -24,7 +27,7 @@ const countryOptions = computed(() =>
 );
 
 const countryFilterOptions = computed(() => {
-  const codes = new Set(adminFishingAreaStore.adminAreas.map((area) => area.countryId));
+  const codes = new Set(adminFishingAreaStore.countryIds);
   return countryOptions.value.filter((option) => codes.has(option.code));
 });
 
@@ -33,23 +36,7 @@ function countryName(code: string) {
 }
 
 const filteredAreas = computed(() => {
-  const keyword = search.value.trim().toLowerCase();
-  return adminFishingAreaStore.adminAreas.filter((area) => {
-    const keywordMatch =
-      !keyword ||
-      area.title?.toLowerCase().includes(keyword) ||
-      area.scenePath?.toLowerCase().includes(keyword) ||
-      countryName(area.countryId).toLowerCase().includes(keyword);
-
-    const countryMatch = countryFilter.value === "ALL" || area.countryId === countryFilter.value;
-
-    const availabilityMatch =
-      availabilityFilter.value === "ALL" ||
-      (availabilityFilter.value === "AVAILABLE" && area.isAvailable) ||
-      (availabilityFilter.value === "UNAVAILABLE" && !area.isAvailable);
-
-    return keywordMatch && countryMatch && availabilityMatch;
-  });
+  return adminFishingAreaStore.adminAreas;
 });
 
 function formatDate(dateStr: string) {
@@ -157,7 +144,7 @@ watch(
 
       <button
         type="button"
-        @click="adminFishingAreaStore.fetchAllAreasAdmin"
+        @click="adminFishingAreaStore.fetchAllAreasAdmin()"
         title="Làm mới danh sách"
         class="px-3 py-1.5 border border-gray-300 rounded-lg bg-white hover:bg-gray-100 text-gray-700 text-xs font-bold flex items-center gap-1.5 cursor-pointer transition-colors"
       >
@@ -297,5 +284,6 @@ watch(
         </div>
       </div>
     </div>
+    <Pagination v-if="!adminFishingAreaStore.isFormOpen" :page="adminFishingAreaStore.page" :page-size="adminFishingAreaStore.pageSize" :total="adminFishingAreaStore.total" :loading="adminFishingAreaStore.adminLoading" @change="adminFishingAreaStore.fetchAllAreasAdmin($event)" />
   </AdminModal>
 </template>

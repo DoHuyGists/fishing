@@ -1,5 +1,21 @@
 export type FriendTab = "friends" | "received" | "sent" | "discover";
 
+export interface FriendListPage {
+  profiles: FriendUserProfile[];
+  friends: UserFriend[];
+  total: number;
+  counts: Record<FriendTab, number>;
+}
+
+export type PlayerProfileSummary = Pick<FriendUserProfile, 'id' | 'level' | 'experience_point' | 'display_name' | 'avatar_url' | 'avatar_path' | 'country_id'>;
+
+export interface FriendListPage {
+  profiles: FriendUserProfile[];
+  friends: UserFriend[];
+  total: number;
+  counts: Record<FriendTab, number>;
+}
+
 export type FriendStatus = "PENDING" | "ACCEPTED" | "REJECTED" | "BLOCKED";
 
 export interface UserFriend {

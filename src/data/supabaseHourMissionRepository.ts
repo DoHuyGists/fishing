@@ -1,6 +1,7 @@
 import type { HourMissionRow, HourMissionPayload } from "../types/table/hourMission";
 import type { MissionFish } from "../types/model/mission";
 import supabase from "../database/connection";
+import { fetchAdminListPage } from './supabaseAdminListRepository';
 
 
 const COLUMNS = 'id, created_at, content, start, "end", is_disabled, cash';
@@ -20,6 +21,13 @@ function parseContent(value: unknown): MissionFish[] {
 }
 
 class SupabaseHourMissionRepository {
+  async fetchPage(page: number, search: string, status: string) {
+    const result = await fetchAdminListPage<any>('hour_missions', page, search, status === 'ALL' ? {} : { is_disabled: status === 'DISABLED' });
+    return { ...result, items: result.items.map((row): HourMissionRow => ({
+      id: row.id, createdAt: row.created_at, content: parseContent(row.content), start: row.start, end: row.end,
+      isDisabled: row.is_disabled, cash: row.cash == null ? null : Number(row.cash),
+    })) };
+  }
   async fetchAll(): Promise<HourMissionRow[]> {
     const { data, error } = await supabase
       .from("hour_missions")

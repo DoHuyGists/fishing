@@ -1,4 +1,10 @@
 {
+  "pagination": {
+    "label": "Phân trang",
+    "page": "Trang {page} / {pages} · {total} mục",
+    "previous": "Trước",
+    "next": "Tiếp"
+  },
   "GameCache": {
     "updateClient": "Dữ liệu trò chơi không tương thích. Vui lòng tải lại trang để cập nhật.",
     "stale": "Đang hiển thị dữ liệu đã lưu từ {time}. Sẽ thử cập nhật lại khi kết nối ổn định.",

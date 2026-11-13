@@ -7,6 +7,10 @@ export const useErrorFeedbackManagementStore = defineStore("error-feedback-manag
   state: () => ({
     errorFeedback: [] as ErrorFeedbackRow[],
     loading: false,
+    page: 1,
+    pageSize: 5,
+    total: 0,
+    requestId: 0,
     error: "",
     updatingIds: [] as string[],
     signedUrls: {} as Record<string, string>,
@@ -14,15 +18,20 @@ export const useErrorFeedbackManagementStore = defineStore("error-feedback-manag
     loadingAttachments: false,
   }),
   actions: {
-    async fetchErrorFeedback() {
+    async fetchErrorFeedback(page?: number) {
+      page ??= this.page;
+      const request = ++this.requestId;
       this.loading = true;
       this.error = "";
       try {
-        this.errorFeedback = await supabaseFeedbackRepository.fetchErrorFeedback();
+        const result = await supabaseFeedbackRepository.fetchErrorFeedback(page);
+        if (request !== this.requestId) return;
+        this.errorFeedback = result.items; this.total = result.total; this.page = page;
+        if (!result.items.length && page > 1) await this.fetchErrorFeedback(Math.max(1, Math.ceil(result.total / this.pageSize)));
       } catch (error) {
-        this.error = error instanceof Error ? error.message : "Không thể tải danh sách báo lỗi.";
+        if (request === this.requestId) this.error = error instanceof Error ? error.message : "Không thể tải danh sách báo lỗi.";
       } finally {
-        this.loading = false;
+        if (request === this.requestId) this.loading = false;
       }
     },
     async updateErrorStatus(id: string, status: ErrorFeedbackStatus) {

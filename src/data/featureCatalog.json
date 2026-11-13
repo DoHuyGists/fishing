@@ -237,6 +237,7 @@
     "key": "friend",
     "labelKey": "FeatureTable.ban_be",
     "rpcs": [
+      "get_friend_list_page",
       "send_friend_request",
       "respond_friend_request",
       "cancel_friend_request",

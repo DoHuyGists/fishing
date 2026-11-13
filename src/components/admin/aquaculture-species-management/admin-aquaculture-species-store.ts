@@ -18,13 +18,20 @@ export function enabledField(value: unknown): boolean {
 }
 
 export const useAdminAquacultureSpeciesStore = defineStore('AdminAquacultureSpecies', {
-  state: () => ({ items: [] as AquacultureRuleRow[], species: [] as SpeciesRow[], loading: false, error: '' }),
+  state: () => ({ items: [] as AquacultureRuleRow[], species: [] as SpeciesRow[], loading: false, error: '', page: 1, pageSize: 10, total: 0, search: '', requestId: 0 }),
   actions: {
-    async fetchAll() {
+    async fetchAll(page?: number, search?: string) {
+      page ??= this.page; this.search = search ?? this.search;
+      const request = ++this.requestId;
       this.loading = true; this.error = ''
-      try { [this.items, this.species] = await Promise.all([repository.fetchAll(), supabaseSpeciesRepository.fetchAll()]) }
-      catch (error) { this.error = error instanceof Error ? error.message : 'Không tải được cấu hình loài nuôi.' }
-      finally { this.loading = false }
+      try {
+        const [result, species] = await Promise.all([repository.fetchPage(page, this.search), this.species.length ? Promise.resolve(this.species) : supabaseSpeciesRepository.fetchAll()]);
+        if (request !== this.requestId) return;
+        this.items = result.items; this.species = species; this.total = result.total; this.page = page;
+        if (!result.items.length && page > 1) await this.fetchAll(Math.max(1, Math.ceil(result.total / this.pageSize)));
+      }
+      catch (error) { if (request === this.requestId) this.error = error instanceof Error ? error.message : 'Không tải được cấu hình loài nuôi.' }
+      finally { if (request === this.requestId) this.loading = false }
     },
     async save(input: Record<string, unknown>, id: string | null) {
       const current = id ? this.items.find(r => r.id === id) : null
@@ -47,9 +54,9 @@ export const useAdminAquacultureSpeciesStore = defineStore('AdminAquacultureSpec
       if (payload.adult_weight_kg <= payload.seed_weight_kg) throw new Error('Cân nặng trưởng thành phải lớn hơn cân nặng cá giống.')
       if (payload.rare_chance + payload.advanced_rare_bonus > 1) throw new Error('Tổng tỷ lệ đặc biệt và thưởng chăm chút không được vượt 1 (100%).')
       const row = current ? await repository.update(current.id, payload, current.rules_version) : await repository.create(payload)
-      this.items = [...this.items.filter(r => r.id !== row.id), row]
+      await this.fetchAll();
       return row
     },
-    async remove(id: string) { await repository.remove(id); this.items = this.items.filter(r => r.id !== id) },
+    async remove(id: string) { await repository.remove(id); await this.fetchAll(); },
   },
 })

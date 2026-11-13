@@ -171,7 +171,7 @@ watch(
 onMounted(() => {
   worldStore.showAnchorSelectButton = true;
   countryStore.fetchCountries();
-  if (!zoneStore.items.length) zoneStore.fetchAll();
+  if (!zoneStore.options.length) void zoneStore.fetchOptions();
 });
 
 onUnmounted(() => {
@@ -243,7 +243,7 @@ onUnmounted(() => {
           :disabled="adminFishingAreaStore.isFormLock"
         >
           <option :value="null">-- Không chọn --</option>
-          <option v-for="zone in zoneStore.items" :key="zone.id" :value="zone.id">
+          <option v-for="zone in zoneStore.options" :key="zone.id" :value="zone.id">
             {{ zone.name }} ({{ zone.code }})
           </option>
         </select>

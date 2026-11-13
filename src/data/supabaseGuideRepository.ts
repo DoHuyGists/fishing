@@ -3,10 +3,14 @@ import { RepositoryError } from './repositoryError';
 import type { GuideRow, AdminGuideRow, GuidePayload } from "../types/table/guide";
 import { t as tr } from "../i18n";
 import supabase from "../database/connection";
+import { fetchAdminListPage } from './supabaseAdminListRepository';
 
 const adminColumns = "id, title, content, sort_order, is_published, created_at";
 
 class SupabaseGuideRepository {
+  fetchAdminPage(page: number, search: string, status: string) {
+    return fetchAdminListPage<AdminGuideRow>('guides', page, search, status === 'all' ? {} : { is_published: status === 'published' });
+  }
   async fetchAll(signal?: AbortSignal): Promise<GuideRow[]> {
     const data = await readCatalogPages((from, to) => supabase
       .from("guides")

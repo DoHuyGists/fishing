@@ -1,6 +1,8 @@
 <script lang="ts" setup>
 import type { HourMissionRow } from "../../../types/table/hourMission";
 import AdminModal from "../AdminModal.vue";
+import Pagination from '../../shared/Pagination.vue';
+import { usePagedListFilters } from '../../../composables/usePagedListFilters';
 import { computed, onMounted, onUnmounted, ref, type ComponentPublicInstance } from "vue";
 import HourMissionForm from "./HourMissionForm.vue";
 import { toTimeInput, useAdminHourMissionStore } from "./admin-hour-mission-store";
@@ -8,6 +10,7 @@ import { toTimeInput, useAdminHourMissionStore } from "./admin-hour-mission-stor
 
 const emit = defineEmits(["close"]);
 const store = useAdminHourMissionStore();
+usePagedListFilters([() => store.search, () => store.statusFilter], () => { void store.loadMissions(1); }, () => { ++store.requestId; });
 const viewMode = ref<"list" | "timeline">("list");
 const currentTime = ref(new Date());
 const currentMarker = ref<HTMLElement | null>(null);
@@ -417,5 +420,6 @@ onUnmounted(() => clearInterval(clockInterval));
         </div>
       </div>
     </div>
+    <Pagination :page="store.page" :page-size="store.pageSize" :total="store.total" :loading="store.isLoading" @change="store.loadMissions($event)" />
   </AdminModal>
 </template>

@@ -1,6 +1,8 @@
 <script lang="ts" setup>
 import type { SpeciesInAreaPayload, SpeciesInAreaRow } from "../../../types/table/speciesInArea";
 import AdminModal from "../AdminModal.vue";
+import Pagination from '../../shared/Pagination.vue';
+import { usePagedListFilters } from '../../../composables/usePagedListFilters';
 import { computed, onMounted, reactive, ref } from "vue";
 import { storeToRefs } from "pinia";
 
@@ -15,10 +17,16 @@ const store = useSpeciesInAreaStore();
 const { rows, areas, species, loading: isLoading, deletingKey } = storeToRefs(store);
 const depthScopeStore = useDepthScopeStore();
 
-const search = ref("");
-const areaFilter = ref("ALL");
-const speciesFilter = ref("ALL");
+const search = computed({ get: () => store.search, set: value => { store.search = value; } });
+const areaFilter = computed({ get: () => store.areaFilter, set: value => { store.areaFilter = value; } });
+const speciesFilter = computed({ get: () => store.speciesFilter, set: value => { store.speciesFilter = value; } });
+usePagedListFilters([search, areaFilter, speciesFilter], () => { void loadPage(1); }, () => { ++store.requestId; });
 const loadError = ref("");
+async function loadPage(page: number) {
+  loadError.value = '';
+  try { await store.fetchAll(page); }
+  catch (error) { loadError.value = error instanceof Error ? error.message : String(error); }
+}
 const viewMode = ref<"table" | "grouped">("grouped");
 const collapsedAreas = ref<Set<string>>(new Set());
 
@@ -50,33 +58,23 @@ const rowKey = (row: SpeciesInAreaRow) => `${row.areaId}:${row.speciesId}`;
 async function loadAll() {
   loadError.value = "";
   try {
-    await Promise.all([store.fetchAll(), depthScopeStore.fetchAll()]);
+    await Promise.all([store.fetchAll(), depthScopeStore.fetchOptions()]);
   } catch (error) {
     loadError.value = error instanceof Error ? error.message : "Unable to load data";
   }
 }
 const areaFilterOptions = computed(() => {
-  const ids = new Set(rows.value.map((row) => row.areaId));
+  const ids = new Set(store.areaFilterIds);
   return areas.value.filter((area) => ids.has(area.id)).sort((a, b) => (a.title ?? "").localeCompare(b.title ?? ""));
 });
 
 const speciesFilterOptions = computed(() => {
-  const ids = new Set(rows.value.map((row) => row.speciesId));
+  const ids = new Set(store.speciesFilterIds);
   return species.value.filter((item) => ids.has(item.id)).sort((a, b) => a.name.localeCompare(b.name));
 });
 
 const filteredRows = computed(() => {
-  const keyword = search.value.trim().toLocaleLowerCase();
-  return rows.value.filter((row) => {
-    const matchesSearch =
-      !keyword ||
-      [row.areaTitle, row.speciesName, countryName(row.areaCountryId), row.speciesRarity].some((value) =>
-        value?.toLocaleLowerCase().includes(keyword),
-      );
-    const matchesArea = areaFilter.value === "ALL" || row.areaId === areaFilter.value;
-    const matchesSpecies = speciesFilter.value === "ALL" || row.speciesId === speciesFilter.value;
-    return matchesSearch && matchesArea && matchesSpecies;
-  });
+  return rows.value;
 });
 
 interface AreaGroup {
@@ -283,7 +281,7 @@ onMounted(loadAll);
         </button>
       </div>
       <div class="ml-auto flex items-center gap-2">
-        <span class="hidden text-xs text-gray-500 sm:inline">{{ filteredRows.length }} kết quả</span>
+        <span class="hidden text-xs text-gray-500 sm:inline">{{ store.total }} kết quả</span>
         <button
           type="button"
           title="Làm mới danh sách"
@@ -472,7 +470,7 @@ onMounted(loadAll);
         :error="formError"
         :areas="areas"
         :species="species"
-        :depth-scopes="depthScopeStore.items"
+        :depth-scopes="depthScopeStore.options"
         v-model:area-search="areaSearch"
         v-model:species-search="speciesSearch"
         :filtered-area-options="filteredAreaOptions"
@@ -506,5 +504,6 @@ onMounted(loadAll);
         </div>
       </div>
     </div>
+    <Pagination :page="store.page" :page-size="store.pageSize" :total="store.total" :loading="store.loading" @change="loadPage" />
   </AdminModal>
 </template>

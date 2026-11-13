@@ -13,33 +13,48 @@ export function defineCrudStore<Row extends { id: string }, Payload>(
       items: [] as Row[],
       loading: false,
       error: "",
+      page: 1,
+      pageSize: 10,
+      total: 0,
+      search: '',
+      requestId: 0,
+      options: [] as Row[],
     }),
     actions: {
-      async fetchAll() {
+      async fetchAll(page?: number, search?: string) {
+        page ??= this.page;
+        this.search = search ?? this.search;
+        const request = ++this.requestId;
         this.loading = true;
         this.error = "";
         try {
-          this.items = (await repository.fetchAll()) as any;
+          const result = await repository.fetchPage(page, this.search);
+          if (request !== this.requestId) return;
+          this.items = result.items as any; this.total = result.total; this.page = page;
+          if (!result.items.length && page > 1) await this.fetchAll(Math.max(1, Math.ceil(result.total / this.pageSize)));
         } catch (err) {
-          this.error = err instanceof Error ? err.message : `Không thể tải ${errorLabel}`;
+          if (request === this.requestId) this.error = err instanceof Error ? err.message : `Không thể tải ${errorLabel}`;
         } finally {
-          this.loading = false;
+          if (request === this.requestId) this.loading = false;
         }
+      },
+      async fetchOptions() {
+        // Relation selectors need the complete catalog, separate from the page.
+        this.options = (await repository.fetchAll()) as any;
       },
       async create(payload: Payload) {
         const created = await repository.create(payload);
-        this.items.push(created as any);
+        await this.fetchAll(1);
         return created;
       },
       async update(id: string, payload: Payload) {
         const updated = await repository.update(id, payload);
-        const index = this.items.findIndex((item) => item.id === id);
-        if (index !== -1) this.items[index] = updated as any;
+        await this.fetchAll();
         return updated;
       },
       async remove(id: string) {
         await repository.remove(id);
-        this.items = this.items.filter((item) => item.id !== id) as any;
+        await this.fetchAll();
       },
     },
   });

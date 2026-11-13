@@ -1,5 +1,7 @@
 <script lang="ts" setup>
 import AdminModal from "../AdminModal.vue";
+import Pagination from '../../shared/Pagination.vue';
+import { usePagedListFilters } from '../../../composables/usePagedListFilters';
 import { onMounted } from "vue";
 import EventThumbnail from "../../player/event/EventThumbnail.vue";
 import EventScheduleForm from "./EventScheduleForm.vue";
@@ -7,6 +9,7 @@ import { useAdminEventScheduleStore } from "./admin-event-schedule-store";
 
 const emit = defineEmits(["close"]);
 const store = useAdminEventScheduleStore();
+usePagedListFilters([() => store.search, () => store.statusFilter, () => store.eventFilter], () => { void store.loadAll(1); }, () => { ++store.requestId; });
 
 function formatDate(value: string) {
   return value ? new Date(value).toLocaleString("vi-VN") : "—";
@@ -203,5 +206,6 @@ onMounted(() => store.loadAll());
         </div>
       </div>
     </div>
+    <Pagination :page="store.page" :page-size="store.pageSize" :total="store.total" :loading="store.isLoading" @change="store.loadAll($event)" />
   </AdminModal>
 </template>

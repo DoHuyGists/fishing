@@ -1,3 +1,5 @@
+import type { PageSize } from './pagination';
+
 export interface MarketHistory {
   id: string;
   created_at: string;
@@ -9,7 +11,7 @@ export interface MarketHistory {
 
 export interface MarketListingQuery {
   page: number;
-  pageSize: number;
+  pageSize: PageSize;
   userId?: string;
   search: string;
   rarity: string;

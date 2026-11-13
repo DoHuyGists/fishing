@@ -58,7 +58,7 @@ const displayedGroups = computed(() =>
     <header class="space-y-3 border-b border-slate-200 p-4">
       <div class="flex items-center justify-between gap-2">
         <div class="text-lg font-semibold">
-          {{ tr('InventoryItems.kho_do') }} <span class="text-sm font-normal text-slate-500">({{ inventoryStore.items.length }})</span>
+          {{ tr('InventoryItems.kho_do') }} <span class="text-sm font-normal text-slate-500">({{ inventoryStore.ownedTotal }})</span>
         </div>
         <div class="inline-flex overflow-hidden rounded-md border border-slate-300 text-sm" role="group"
           :aria-label="tr('InventoryItems.kieu_hien_thi')">
@@ -111,7 +111,7 @@ const displayedGroups = computed(() =>
 
     <div class="min-h-0 max-h-[60dvh] flex-1 overflow-y-scroll p-4">
       <div v-if="pagedItems.length === 0" class="py-12 text-center text-sm text-slate-500">
-        {{ inventoryStore.items.length === 0 ? tr('InventoryItems.kho_do_dang_trong') : tr('InventoryItems.khong_co_vat_pham_nao_khop_voi_tim_kiem') }}
+        {{ inventoryStore.ownedTotal === 0 ? tr('InventoryItems.kho_do_dang_trong') : tr('InventoryItems.khong_co_vat_pham_nao_khop_voi_tim_kiem') }}
       </div>
 
       <div v-for="group in displayedGroups" :key="group.category" class="mb-4 last:mb-0">
@@ -126,13 +126,13 @@ const displayedGroups = computed(() =>
     </div>
 
     <footer v-if="itemPages > 1" class="flex items-center justify-between border-t border-slate-200 px-4 py-3 text-sm">
-      <button type="button" :disabled="itemPage <= 1"
+      <button type="button" :disabled="itemPage <= 1 || inventoryStore.viewLoading"
         class="rounded border border-slate-300 px-3 py-1 hover:bg-slate-100 disabled:opacity-40"
         @click="itemPage--">
         {{ tr('Fishfarm.truoc') }}
       </button>
       <span class="text-slate-600">{{ tr('CaughtModal.trang') }} {{ itemPage }} / {{ itemPages }}</span>
-      <button type="button" :disabled="itemPage >= itemPages"
+      <button type="button" :disabled="itemPage >= itemPages || inventoryStore.viewLoading"
         class="rounded border border-slate-300 px-3 py-1 hover:bg-slate-100 disabled:opacity-40"
         @click="itemPage++">
         {{ tr('Fishfarm.sau') }}

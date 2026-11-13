@@ -42,6 +42,10 @@ export const useLeaderboardStore = defineStore("leaderboard", {
     loading: false,
     error: "",
     requestId: 0,
+    page: 1,
+    pageSize: 10,
+    total: 0,
+    firstRank: 1,
   }),
   getters: {
     categories: () => categories,
@@ -60,17 +64,18 @@ export const useLeaderboardStore = defineStore("leaderboard", {
 
         // Equal values share a rank, matching countHigherScore for the personal rank.
         entries.sort((a, b) => b.value - a.value);
-        let rank = 1;
+        const offset = category.isMock ? 0 : (state.page - 1) * state.pageSize;
+        let rank = category.isMock ? 1 : state.firstRank;
         entries.forEach((entry, index) => {
-          if (index === 0 || entry.value !== entries[index - 1]!.value) rank = index + 1;
+          if (index > 0 && entry.value !== entries[index - 1]!.value) rank = offset + index + 1;
           entry.rank = rank;
         });
 
         return {
           ...category,
           entries,
-          leaders: entries.slice(0, 3),
-          remaining: entries.slice(3),
+          leaders: offset === 0 ? entries.slice(0, 3) : [],
+          remaining: offset === 0 ? entries.slice(3) : entries,
           loading: !category.isMock && state.loading,
           error: category.isMock ? "" : state.error,
           myEntry: category.isMock ? null : state.myEntry,
@@ -80,16 +85,22 @@ export const useLeaderboardStore = defineStore("leaderboard", {
     },
   },
   actions: {
-    async fetchLeaderboard(userId?: string | null, limit = 50) {
+    async fetchLeaderboard(userId?: string | null, page?: number) {
+      page ??= this.page;
       const requestId = ++this.requestId;
       this.loading = true;
       this.error = "";
       this.myEntry = null;
       this.myRank = null;
       try {
-        const entries = await supabaseLeaderboardRepository.fetchTop(limit);
+        const result = await supabaseLeaderboardRepository.fetchTop(page);
         if (requestId !== this.requestId) return;
-        this.entries = entries;
+        const firstRank = page > 1 && result.items[0] ? await supabaseLeaderboardRepository.countHigherScore(result.items[0].score) + 1 : 1;
+        if (requestId !== this.requestId) return;
+        this.entries = result.items; this.total = result.total; this.page = page; this.firstRank = firstRank;
+        if (!result.items.length && page > 1) {
+          await this.fetchLeaderboard(userId, Math.max(1, Math.ceil(result.total / this.pageSize))); return;
+        }
         const myEntry = userId ? await supabaseLeaderboardRepository.fetchByUser(userId) : null;
         const myRank = myEntry
           ? (await supabaseLeaderboardRepository.countHigherScore(myEntry.score)) + 1

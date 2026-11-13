@@ -13,6 +13,10 @@ export const useAdminNotificationStore = defineStore("AdminNotification", {
     rows: [] as AdminNotificationRow[],
     search: "",
     loading: false,
+    page: 1,
+    pageSize: 5,
+    total: 0,
+    requestId: 0,
     error: "",
 
     isFormOpen: false,
@@ -25,30 +29,31 @@ export const useAdminNotificationStore = defineStore("AdminNotification", {
   }),
   getters: {
     filteredRows(state): AdminNotificationRow[] {
-      const q = state.search.trim().toLocaleLowerCase();
-      return q
-        ? state.rows.filter((item) =>
-            `${item.title} ${item.body} ${item.type ?? ""} ${item.user_id ?? ""}`.toLocaleLowerCase().includes(q),
-          )
-        : state.rows;
+      return state.rows;
     },
   },
   actions: {
-    async fetchRows() {
+    async fetchRows(page?: number) {
+      page ??= this.page;
+      const request = ++this.requestId;
       this.loading = true;
       this.error = "";
       try {
-        this.rows = await supabaseNotificationRepository.fetchAdminNotifications(this.tab);
+        const result = await supabaseNotificationRepository.fetchAdminNotifications(this.tab, page, this.search);
+        if (request !== this.requestId) return;
+        this.rows = result.items; this.total = result.total; this.page = page;
+        if (!result.items.length && page > 1) await this.fetchRows(Math.max(1, Math.ceil(result.total / this.pageSize)));
       } catch (cause) {
-        this.error = messageOf(cause, "Không thể tải thông báo.");
+        if (request === this.requestId) this.error = messageOf(cause, "Không thể tải thông báo.");
       } finally {
-        this.loading = false;
+        if (request === this.requestId) this.loading = false;
       }
     },
 
     changeTab(value: NotificationKind) {
       this.tab = value;
       this.search = "";
+      this.page = 1;
       void this.fetchRows();
     },
 

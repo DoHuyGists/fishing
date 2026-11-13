@@ -22,7 +22,27 @@ Giữ `fishing_sessions` để nhận trạng thái cá cắn và `active_sessio
 
 Các lịch dùng [visibleRefresh.ts](src/utils/visibleRefresh.ts): dừng khi tab ẩn/offline, đối soát khi quay lại, jitter tối đa 15% và backoff khi lỗi. Chu kỳ polling khác TTL cache; lần đọc vẫn có thể dùng cache còn hạn.
 
-Đã có single-flight/đọc bù, chặn response cũ khi đổi user hoặc trang, refresh sau mutation và không tự retry mutation. Chợ đã phân trang server **25 listing/trang**, history **20 dòng/trang**, filter/sort phía server.
+Đã có single-flight/đọc bù, chặn response cũ khi đổi user hoặc trang, refresh sau mutation và không tự retry mutation. Chợ và lịch sử giao dịch phân trang server **10 dòng/trang**, filter/sort phía server.
+
+### Phân trang danh sách
+
+Áp dụng [20261113_list_pagination.sql](scripts/supabase/migrations/20261113_list_pagination.sql) trước khi triển khai client mới. Migration bổ sung RPC đọc danh sách bạn bè và danh sách quản trị, giữ quyền caller/RLS, giới hạn 10 dòng và bổ sung index. Chưa áp dụng migration lên Supabase từ phiên làm việc này.
+
+| Luồng xem | Số mục mỗi trang |
+| --- | --- |
+| Chợ, lịch sử giao dịch, bạn bè/lời mời/khám phá, danh sách tổ đội, bảng xếp hạng | 10 |
+| Túi đồ: query riêng cho trang đang xem; snapshot chế tạo/cửa hàng giữ riêng | 10 |
+| Thông báo cá nhân/hệ thống, lời mời tổ đội, lịch sử báo lỗi, góp ý/báo lỗi admin | 5 |
+| Quản trị thời tiết, chỉ số, vùng và liên kết thời tiết/chỉ số | 10 |
+| Quản trị loài cá, vật phẩm, bãi câu, loài trong bãi, phạm vi độ sâu | 10 |
+| Quản trị công thức, loài nuôi, thức ăn, kỹ năng, hướng dẫn | 10 |
+| Quản trị sự kiện/lịch sự kiện, nhiệm vụ giờ/ngày, thưởng nhiệm vụ ngày, vé/thưởng vé | 10 |
+
+Query trang dùng count riêng hoặc metadata `total`, không lấy thêm dòng thứ 11 để đoán còn trang. Tìm kiếm/bộ lọc thực hiện trước LIMIT/OFFSET; thứ tự có khóa phụ ổn định. Các bộ lọc động dùng metadata toàn danh sách thay vì chỉ 10 dòng hiện tại. Khi xóa hết dòng ở trang cuối, store tự lùi về trang hợp lệ. Bộ điều hướng dùng chung hỗ trợ tiếng Việt/Anh. Tổng thông báo chưa đọc không phụ thuộc số dòng đang xem; hồ sơ và quan hệ trưởng nhóm chỉ lấy theo ID của trang tổ đội hiện tại.
+
+Không áp giới hạn tùy tiện lên dữ liệu cần đầy đủ để xử lý nghiệp vụ: catalog gameplay/cache, snapshot cá dùng cho nhiệm vụ/chuyển lưới/sức chứa và nhóm theo loài, nguyên liệu chế tạo, thành viên tổ đội, cấu hình feature flags, thống kê monitor, cây thư mục tài nguyên và danh sách chọn quan hệ trong form admin. Những luồng này vẫn giữ cách tải đầy đủ hiện có; phân trang một phần mà không thay logic tổng hợp sẽ làm sai kết quả.
+
+Kiểm tra phân trang: `npm run test:pagination` (SQL chạy trên PostgreSQL/PGlite, quyền đọc RLS, tìm ngoài trang đầu, giới hạn trang, đổi trang/search khi response về sai thứ tự, tổng thông báo chưa đọc, lùi trang sau xóa). Build: `npm run build`.
 
 Mã chính: [playerRefresh.ts](src/stores/playerRefresh.ts), [mutationRefresh.ts](src/database/mutationRefresh.ts), [refreshTask.ts](src/utils/refreshTask.ts).
 
@@ -128,7 +148,7 @@ Kho cá mở lại trong 30 giây phải dùng RAM nếu chưa invalidation; rel
 | P0 | Xác minh hai migration đã áp dụng trên Supabase, prerequisite/signature RPC, grants/RLS/trigger và cấu hình versioned trong bản build đang chạy. Deploy client snapshot trước khi gỡ publication; rà consumer/client cũ và lưu danh sách publication để rollback. |
 | P0 | Smoke test staging bằng nhiều tài khoản/JWT thật: đổi user, mua cùng listing, thưởng/tiền, đội/khu, thông báo, bảo trì; kiểm tra mismatch trước side effect, receipt và lock khi cập nhật catalog đồng thời. |
 | P0 | Thay `fishing.fetchPlayersInArea()` tải toàn bộ cá để đếm bằng RPC/summary có phân trang; chuyển query Supabase trực tiếp trong store về repository. |
-| P0 | Phân trang server cho directory đội, các luồng kho cá/nhật ký/thông báo còn tải toàn bộ; giảm số query thông báo; đánh giá chi phí exact rank leaderboard. Cache chưa giải quyết kích thước payload. |
+| P0 | Tách read model tổng hợp cho kho cá/nhật ký khỏi snapshot gameplay trước khi phân trang các luồng này; đánh giá chi phí count và exact rank leaderboard. Directory đội, thông báo và các danh sách nêu ở mục phân trang đã giới hạn server. |
 | P0 | Xác minh scheduler/trigger/worker chuyển `BITE`; profile `cast_rod`/replay/submit, index/RLS/query plan và contention với dữ liệu đại diện. |
 | P0 | Đo request, byte, p95/p99, CPU/I/O/lock, Realtime và cache hit trước–sau. Load test staging tăng dần 20 → 50 → 100 → 150 → 300… kèm soak/burst, reconnect và admin monitor; chỉ chốt CCU từ kết quả đo. |
 | P1 | Đối chiếu mọi RPC/trigger production làm đổi tiền/tiến trình với danh sách refresh; bổ sung khi thêm mutation mới. |

@@ -1,11 +1,18 @@
 <script setup lang="ts">
 import AdminModal from "../AdminModal.vue";
-import { onMounted } from "vue";
+import { onMounted, watch, onUnmounted } from "vue";
+import Pagination from '../../shared/Pagination.vue';
 import NotificationForm from "./NotificationForm.vue";
 import { useAdminNotificationStore } from "./admin-notification-store";
 
 const emit = defineEmits(["close"]);
 const store = useAdminNotificationStore();
+let searchTimer: ReturnType<typeof setTimeout> | undefined;
+watch(() => store.search, () => {
+  clearTimeout(searchTimer); ++store.requestId;
+  searchTimer = setTimeout(() => { void store.fetchRows(1); }, 300);
+});
+onUnmounted(() => { clearTimeout(searchTimer); ++store.requestId; });
 
 function formatDate(value: string) {
   return new Date(value).toLocaleString("vi-VN");
@@ -19,7 +26,7 @@ onMounted(() => store.fetchRows());
     icon="🔔"
     @close="emit('close')"
   >
-    <template #subtitle>{{ store.rows.length }} thông báo</template>
+    <template #subtitle>{{ store.total }} thông báo</template>
     <div class="flex shrink-0 flex-wrap items-center gap-3 border-b border-gray-200 bg-white px-5 py-3 md:px-7">
       <div class="flex rounded-lg bg-gray-100 p-1">
         <button
@@ -150,5 +157,6 @@ onMounted(() => store.fetchRows());
         </div>
       </div>
     </div>
+    <Pagination :page="store.page" :page-size="store.pageSize" :total="store.total" :loading="store.loading" @change="store.fetchRows($event)" />
   </AdminModal>
 </template>

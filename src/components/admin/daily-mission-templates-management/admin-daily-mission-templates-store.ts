@@ -8,26 +8,29 @@ const messageOf = (error: unknown) => error instanceof Error ? error.message : "
 export const useAdminDailyMissionTemplateStore = defineStore("AdminDailyMissionTemplate", {
   state: () => ({
     items: [] as DailyMissionTemplateRow[], search: "", statusFilter: "ALL",
+    page: 1, pageSize: 10, total: 0, requestId: 0,
     isLoading: false, loadError: "", isFormOpen: false, isSaving: false,
     formError: "", form: emptyForm(), confirmDeleteId: null as string | null, isDeleting: false,
   }),
   getters: {
     filteredItems(state): DailyMissionTemplateRow[] {
-      const keyword = state.search.trim().toLocaleLowerCase();
-      return state.items.filter(item =>
-        [item.code, item.name, item.description, item.event_type, item.difficulty].some(value => value?.toLocaleLowerCase().includes(keyword)) &&
-        (state.statusFilter === "ALL" || item.is_active === (state.statusFilter === "ACTIVE")),
-      );
+      return state.items;
     },
   },
   actions: {
-    async load() {
-      if (this.isLoading) return;
+    async load(page?: number) {
+      page ??= this.page;
+      const request = ++this.requestId;
       this.isLoading = true;
       this.loadError = "";
-      try { this.items = await supabaseDailyMissionTemplateRepository.fetchAll(); }
-      catch (error) { this.loadError = messageOf(error); }
-      finally { this.isLoading = false; }
+      try {
+        const result = await supabaseDailyMissionTemplateRepository.fetchPage(page, this.search, this.statusFilter);
+        if (request !== this.requestId) return;
+        this.items = result.items; this.page = page; this.total = result.total;
+        if (!result.items.length && page > 1) await this.load(Math.max(1, Math.ceil(result.total / this.pageSize)));
+      }
+      catch (error) { if (request === this.requestId) this.loadError = messageOf(error); }
+      finally { if (request === this.requestId) this.isLoading = false; }
     },
     openCreateForm() {
       this.form = emptyForm(); this.formError = ""; this.isFormOpen = true;
@@ -57,8 +60,8 @@ export const useAdminDailyMissionTemplateStore = defineStore("AdminDailyMissionT
       try {
         const payload = this.buildPayload();
         this.isSaving = true;
-        const saved = await supabaseDailyMissionTemplateRepository.save(this.form.id, payload);
-        this.items = [...this.items.filter(item => item.id !== saved.id), saved].sort((a, b) => a.code.localeCompare(b.code));
+        await supabaseDailyMissionTemplateRepository.save(this.form.id, payload);
+        await this.load();
         this.isFormOpen = false;
       } catch (error) { this.formError = messageOf(error); }
       finally { this.isSaving = false; }
@@ -69,7 +72,7 @@ export const useAdminDailyMissionTemplateStore = defineStore("AdminDailyMissionT
       try {
         const id = this.confirmDeleteId;
         await supabaseDailyMissionTemplateRepository.remove(id);
-        this.items = this.items.filter(item => item.id !== id);
+        await this.load();
         this.confirmDeleteId = null;
       } catch (error) { this.loadError = messageOf(error); }
       finally { this.isDeleting = false; }

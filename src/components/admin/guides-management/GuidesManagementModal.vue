@@ -1,6 +1,8 @@
 <script setup lang="ts">
 import { onMounted, onUnmounted, ref } from "vue";
 import AdminModal from "../AdminModal.vue";
+import Pagination from '../../shared/Pagination.vue';
+import { usePagedListFilters } from '../../../composables/usePagedListFilters';
 import TwoOptionsModal from "../../shared/TwoOptionsModal.vue";
 import RichTextContent from "../../shared/RichTextContent.vue";
 import RichEditor from "../../shared/RichEditor.vue";
@@ -8,6 +10,7 @@ import { useAdminGuidesStore } from "./admin-guides-store";
 
 const emit = defineEmits<{ close: [] }>();
 const store = useAdminGuidesStore();
+usePagedListFilters([() => store.search, () => store.status], () => { void store.fetchRows(1); }, () => { ++store.requestId; });
 const preview = ref(false);
 const formatDate = (value: string) => new Date(value).toLocaleString("vi-VN");
 
@@ -91,5 +94,6 @@ onUnmounted(() => store.resetView());
       <div class="break-words text-sm">Bạn có chắc muốn xóa “{{ store.deleting.title }}”? Thao tác này không thể hoàn tác.</div>
       <div v-if="store.deleteError" role="alert" class="mt-3 text-sm text-red-700">{{ store.deleteError }}</div>
     </TwoOptionsModal>
+    <Pagination :page="store.page" :page-size="store.pageSize" :total="store.total" :loading="store.loading" @change="store.fetchRows($event)" />
   </AdminModal>
 </template>

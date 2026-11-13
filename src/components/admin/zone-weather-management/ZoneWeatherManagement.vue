@@ -10,11 +10,11 @@ const store = useAdminZoneWeatherStore();
 const zoneStore = useAdminZoneStore();
 const weatherStore = useAdminWeatherStore();
 store.fetchAll();
-zoneStore.fetchAll();
-weatherStore.fetchAll();
+zoneStore.fetchOptions();
+weatherStore.fetchOptions();
 
-const zoneName = (id: string) => zoneStore.items.find((z) => z.id === id)?.name ?? id;
-const weatherName = (id: string) => weatherStore.items.find((w) => w.id === id)?.name ?? id;
+const zoneName = (id: string) => zoneStore.options.find((z) => z.id === id)?.name ?? id;
+const weatherName = (id: string) => weatherStore.options.find((w) => w.id === id)?.name ?? id;
 
 const columns: CrudColumn[] = [
   { key: "zoneId", label: "Vùng", format: (r) => zoneName(r.zoneId) },
@@ -22,8 +22,8 @@ const columns: CrudColumn[] = [
   { key: "weightModifier", label: "Hệ số trọng số" },
 ];
 const fields = computed<CrudField[]>(() => [
-  { key: "zoneId", label: "Vùng", type: "select", required: true, options: zoneStore.items.map((z) => ({ value: z.id, label: `${z.name} (${z.code})` })) },
-  { key: "weatherId", label: "Thời tiết", type: "select", required: true, options: weatherStore.items.map((w) => ({ value: w.id, label: `${w.name} (${w.code})` })) },
+  { key: "zoneId", label: "Vùng", type: "select", required: true, options: zoneStore.options.map((z) => ({ value: z.id, label: `${z.name} (${z.code})` })) },
+  { key: "weatherId", label: "Thời tiết", type: "select", required: true, options: weatherStore.options.map((w) => ({ value: w.id, label: `${w.name} (${w.code})` })) },
   { key: "weightModifier", label: "Hệ số trọng số", type: "number" },
 ]);
 
@@ -38,6 +38,8 @@ const save = (payload: any, id: string | null) => (id ? store.update(id, payload
     :columns="columns"
     :fields="fields"
     :items="store.items"
+    :page="store.page" :page-size="store.pageSize" :total="store.total"
+    @page="store.fetchAll"
     :loading="store.loading"
     :error="store.error"
     :save="save"

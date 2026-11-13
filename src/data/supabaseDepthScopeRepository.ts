@@ -1,5 +1,6 @@
 import type { DepthScopeRow, DepthScopePayload } from "../types/table/depthScope";
 import supabase from "../database/connection";
+import { fetchAdminListPage } from './supabaseAdminListRepository';
 
 function mapRow(row: any): DepthScopeRow {
   return {
@@ -16,6 +17,10 @@ function mapRow(row: any): DepthScopeRow {
 }
 
 class SupabaseDepthScopeRepository {
+  async fetchPage(page: number, search: string) {
+    const result = await fetchAdminListPage<any>('depth_scope', page, search);
+    return { ...result, items: result.items.map(mapRow) };
+  }
   async fetchAll(): Promise<DepthScopeRow[]> {
     const { data, error } = await supabase.from("depth_scope").select("*").order("code", { ascending: true });
     if (error) throw new Error(error.message);

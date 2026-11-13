@@ -45,4 +45,5 @@ export const uncachedReadRpcs = new Set([
   'get_game_catalog_versions', 'get_game_catalog_snapshot', 'get_currency_conversion_rates',
   'get_user_status', 'get_user_equipment_set_using', 'get_caught_in_area', 'get_area_species_diary',
   'preview_fish_by_depth', 'get_aquaculture_farm',
+  'get_friend_list_page', 'get_admin_list_page',
 ]);

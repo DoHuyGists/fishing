@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import Pagination from '../../shared/Pagination.vue';
 import type { NotificationKind } from "../../../types/model/notification";
 import type { NotificationRow } from "../../../types/table/notification";
 import { t as tr } from "../../../i18n";
@@ -11,8 +12,8 @@ import { useNotificationStore } from "../../../stores/notification.ts";
 import Tab from "../../shared/Tab.vue";
 import { formatDateTime } from "../../../utils/time.ts";
 const currentTabActive = ref("personal");
-const unreadPersonalNotifyCount = computed(() => notifications.personal.filter((x) => !x.is_read).length);
-const unreadASystemNotifyCount = computed(() => notifications.system.filter((x) => !x.is_read).length);
+const unreadPersonalNotifyCount = computed(() => notifications.personalUnread);
+const unreadASystemNotifyCount = computed(() => notifications.systemUnread);
 const tabs = computed(() => [
   { key: "personal", get label() { return tr('NotificationModal.ca_nhan'); }, badge: unreadPersonalNotifyCount.value },
   { key: "system", get label() { return tr('NotificationModal.he_thong'); }, badge: unreadASystemNotifyCount.value },
@@ -103,6 +104,7 @@ onUnmounted(() => {
                 >
               </span>
             </button>
+            <Pagination :page="notifications.personalPage" :page-size="notifications.pageSize" :total="notifications.personalTotal" :loading="notifications.loading" @change="notifications.personalPage = $event; selected = null; expandedNotificationId = null; loadNotifications()" />
           </aside>
           <article class="slide-fade-in from-right player-content-in hidden min-w-0 flex-1 overflow-y-auto p-5 sm:block sm:p-8">
             <div v-if="selected">
@@ -169,6 +171,7 @@ onUnmounted(() => {
                 >
               </span>
             </button>
+            <Pagination :page="notifications.systemPage" :page-size="notifications.pageSize" :total="notifications.systemTotal" :loading="notifications.loading" @change="notifications.systemPage = $event; selected = null; expandedNotificationId = null; loadNotifications()" />
           </aside>
           <article class="slide-fade-in from-right player-content-in hidden min-w-0 flex-1 overflow-y-auto p-5 sm:block sm:p-8">
             <div v-if="selected">

@@ -1,6 +1,8 @@
 import type { LeaderboardEntry } from "../types/model/leaderboard";
 import supabase from "../database/connection";
 import { supabaseAvatarRepository } from "./supabaseAvatarRepository";
+import { pageRange, listPage } from './pagination';
+import type { ListPage } from '../types/model/pagination';
 
 class SupabaseLeaderboardRepository {
   private async withProfiles(entries: LeaderboardEntry[]): Promise<LeaderboardEntry[]> {
@@ -11,16 +13,16 @@ class SupabaseLeaderboardRepository {
     const byId = new Map(profiles.map(profile => [profile.id, profile]));
     return entries.map(entry => ({ ...entry, display_name: byId.get(entry.user_id)?.display_name || entry.display_name, avatar_url: byId.get(entry.user_id)?.avatar_url ?? null }));
   }
-  async fetchTop(limit = 50): Promise<LeaderboardEntry[]> {
-    const { data, error } = await supabase
+  async fetchTop(page = 1): Promise<ListPage<LeaderboardEntry>> {
+    const { data, error, count } = await supabase
       .from("leaderboard")
-      .select("*")
+      .select("*", { count: 'exact' })
       .order("score", { ascending: false })
       .order("updated_at", { ascending: true })
-      .limit(limit);
+      .order('id').range(...pageRange(page));
 
     if (error) throw new Error(error.message);
-    return this.withProfiles((data ?? []) as LeaderboardEntry[]);
+    return listPage(await this.withProfiles((data ?? []) as LeaderboardEntry[]), count);
   }
 
   async fetchByUser(userId: string): Promise<LeaderboardEntry | null> {

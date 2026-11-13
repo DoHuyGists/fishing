@@ -38,6 +38,8 @@ const save = (payload: any, id: string | null) => {
     :columns="columns"
     :fields="fields"
     :items="store.items"
+    :page="store.page" :page-size="store.pageSize" :total="store.total"
+    @page="store.fetchAll"
     :loading="store.loading"
     :error="store.error"
     :save="save"

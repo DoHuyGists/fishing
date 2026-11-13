@@ -1,6 +1,8 @@
 <script setup lang="ts">
 import type { FishingPassRewardPayload, FishingPassRewardRow } from "../../../types/table/fishingPassRewardsAdmin";
 import AdminModal from "../AdminModal.vue";
+import Pagination from '../../shared/Pagination.vue';
+import { usePagedListFilters } from '../../../composables/usePagedListFilters';
 import { computed, onMounted, ref } from "vue";
 import { useAdminFishingPassRewardsStore } from "./admin-fishing-pass-rewards-store.ts";
 
@@ -8,20 +10,15 @@ import FishingPassRewardsForm from "./FishingPassRewardsFormManagement.vue";
 
 const emit = defineEmits<{ close: [] }>();
 const store = useAdminFishingPassRewardsStore();
-const search = ref("");
-const passFilter = ref("ALL");
-const typeFilter = ref<"ALL" | "FREE" | "PREMIUM">("ALL");
+const search = computed({ get: () => store.search, set: value => { store.search = value; } });
+const passFilter = computed({ get: () => store.passFilter, set: value => { store.passFilter = value; } });
+const typeFilter = computed({ get: () => store.typeFilter, set: value => { store.typeFilter = value; } });
+usePagedListFilters([search, passFilter, typeFilter], () => { void store.fetchAll(1); }, () => { ++store.requestId; });
 const editing = ref<FishingPassRewardRow | null>(null);
 const formOpen = ref(false);
 const deleting = ref<FishingPassRewardRow | null>(null);
 const filtered = computed(() => {
-  const query = search.value.trim().toLocaleLowerCase();
-  return store.rewards.filter(
-    (reward) =>
-      (!query || `${reward.passName} ${reward.itemName}`.toLocaleLowerCase().includes(query)) &&
-      (passFilter.value === "ALL" || reward.passId === passFilter.value) &&
-      (typeFilter.value === "ALL" || reward.rewardType === typeFilter.value),
-  );
+  return store.rewards;
 });
 function create() {
   editing.value = null;
@@ -173,5 +170,6 @@ onMounted(() => store.fetchAll());
         </div>
       </div>
     </div>
+    <Pagination v-if="!formOpen" :page="store.page" :page-size="store.pageSize" :total="store.total" :loading="store.loading" @change="store.fetchAll($event)" />
   </AdminModal>
 </template>

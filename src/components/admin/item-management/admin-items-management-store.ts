@@ -17,37 +17,26 @@ export const useAdminItemsManagementStore = defineStore("admin-items-management"
   const updatingId = ref<string | null>(null);
   const confirmDeleteId = ref<string | null>(null);
   const editingItem = ref<AdminItemRow | null>(null);
+  const page = ref(1), total = ref(0), pageSize = 10;
+  const requestId = ref(0);
+  const categories = ref<string[]>([]);
 
-  const categories = computed(() =>
-    [...new Set(items.value.map((item) => item.category?.trim()).filter((value): value is string => Boolean(value)))].sort(
-      (a, b) => a.localeCompare(b, "vi"),
-    ),
-  );
+  const filteredItems = computed(() => items.value);
 
-  const filteredItems = computed(() => {
-    const keyword = search.value.trim().toLocaleLowerCase();
-    return items.value.filter((item) => {
-      const matchesSearch = !keyword || [item.name, item.category, item.information, item.image, item.icon].some((value) =>
-        value?.toLocaleLowerCase().includes(keyword),
-      );
-      const matchesCategory = categoryFilter.value === "ALL" || item.category === categoryFilter.value;
-      const matchesStatus =
-        statusFilter.value === "ALL" ||
-        (statusFilter.value === "ENABLED" && item.isDisabled === false) ||
-        (statusFilter.value === "DISABLED" && item.isDisabled !== false);
-      return matchesSearch && matchesCategory && matchesStatus;
-    });
-  });
-
-  async function loadItems() {
+  async function loadItems(nextPage = page.value) {
+    const request = ++requestId.value;
     isLoading.value = true;
     loadError.value = "";
     try {
-      items.value = await supabaseItemRepository.fetchAll();
+      const result = await supabaseItemRepository.fetchPage(nextPage, search.value, categoryFilter.value, statusFilter.value);
+      if (request !== requestId.value) return;
+      items.value = result.items; total.value = result.total; page.value = nextPage;
+      categories.value = result.facets.category ?? [];
+      if (!result.items.length && nextPage > 1) await loadItems(Math.max(1, Math.ceil(result.total / pageSize)));
     } catch (error) {
-      loadError.value = error instanceof Error ? error.message : "Không thể tải danh sách vật phẩm";
+      if (request === requestId.value) loadError.value = error instanceof Error ? error.message : "Không thể tải danh sách vật phẩm";
     } finally {
-      isLoading.value = false;
+      if (request === requestId.value) isLoading.value = false;
     }
   }
 
@@ -124,6 +113,7 @@ export const useAdminItemsManagementStore = defineStore("admin-items-management"
 
   return {
     items, search, categoryFilter, statusFilter, isLoading, loadError, isFormOpen, isSaving, formError,
+    page, pageSize, total, requestId,
     deletingId, updatingId, confirmDeleteId, editingItem, categories, filteredItems,
     loadItems, openCreateForm, openEditForm, closeForm, saveItem, toggleEnabled, deleteItem,
   };

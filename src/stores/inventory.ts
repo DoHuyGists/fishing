@@ -13,6 +13,15 @@ export const useInventoryStore = defineStore("Inventory", {
         equipmentSets: [] as EquipmentSet[],
         shopItems: [] as ShopItem[],
         shopLoading: false,
+        viewItems: [] as UserInventory[],
+        viewPage: 1,
+        viewPageSize: 10,
+        viewSearch: '',
+        viewTotal: 0,
+        ownedTotal: 0,
+        viewLoading: false,
+        viewError: '',
+        viewRequest: 0,
     }),
     getters: {
         ownedQuantitiesByItemId: (state): Map<string, number> => {
@@ -27,6 +36,22 @@ export const useInventoryStore = defineStore("Inventory", {
         },
     },
     actions: {
+        async loadViewPage(categories: string[] = [], page?: number) {
+            page ??= this.viewPage;
+            const auth = useAuthStore(), generation = auth.sessionGeneration, userId = auth.user?.id;
+            if (!userId) return;
+            const request = ++this.viewRequest;
+            const current = () => request === this.viewRequest && auth.user?.id === userId && auth.sessionGeneration === generation;
+            this.viewLoading = true; this.viewError = '';
+            try {
+                const result = await supabaseUserInventoryRepository.fetchPage(userId, page, this.viewSearch, categories);
+                if (!current()) return;
+                this.viewItems = result.items; this.viewPage = page; this.viewTotal = result.total; this.ownedTotal = result.ownedTotal;
+                if (!result.items.length && page > 1) await this.loadViewPage(categories, Math.max(1, Math.ceil(result.total / this.viewPageSize)));
+            } catch (error) {
+                if (current()) { this.viewError = error instanceof Error ? error.message : String(error); throw error; }
+            } finally { if (current()) this.viewLoading = false; }
+        },
         async setUserInventory(userId: string) {
             const auth = useAuthStore(), generation = auth.sessionGeneration;
             const items = await supabaseUserInventoryRepository.fetchUserInventory(userId);

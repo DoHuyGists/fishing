@@ -1,8 +1,12 @@
 import type { DailyMissionRewardRow, DailyMissionTemplateRow, RewardPayload, TemplatePayload } from "../types/table/dailyMissionAdmin";
 import supabase from "../database/connection";
+import { fetchAdminListPage } from './supabaseAdminListRepository';
 
 function repository<Row, Payload extends object>(table: string, order: string) {
   return {
+    fetchPage(page: number, search: string, status: string) {
+      return fetchAdminListPage<Row>(table, page, search, status === 'ALL' ? {} : { is_active: status === 'ACTIVE' });
+    },
     async fetchAll(): Promise<Row[]> {
       const { data, error } = await supabase.from(table).select("*").order(order);
       if (error) throw new Error(error.message);

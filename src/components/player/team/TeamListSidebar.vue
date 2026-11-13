@@ -1,16 +1,19 @@
 <script lang="ts" setup>
-import type { FriendUserProfile } from "../../../types/model/friend";
+import type { PlayerProfileSummary } from "../../../types/model/friend";
 import type { UserTeam } from "../../../types/model/team";
 import { t as tr } from "../../../i18n";
 
-import { computed, ref } from "vue";
+import { computed } from "vue";
+import { useTeamStore } from '../../../stores/team';
+import { useAuthStore } from '../../../stores/auth';
+import Pagination from '../../shared/Pagination.vue';
 import PlayerIdentity from "../../shared/PlayerIdentity.vue";
 
 
 import Tab, { type TabItem } from "../../shared/Tab.vue";
 
 const props = defineProps<{
-  profiles: Map<string, FriendUserProfile>;
+  profiles: Map<string, PlayerProfileSummary>;
   teams: UserTeam[];
   currentTeamId?: string;
   actionLoading: boolean;
@@ -23,8 +26,10 @@ const emit = defineEmits<{
   create: [];
 }>();
 
-const search = ref("");
-const status = ref("ALL");
+const store = useTeamStore();
+const auth = useAuthStore();
+const search = computed({ get: () => store.search, set: value => { store.search = value; } });
+const status = computed({ get: () => store.statusFilter, set: value => { store.statusFilter = value; } });
 const statusTabs: TabItem[] = [
   { key: "ALL", get label() { return tr('Achievement.tat_ca'); } },
   { key: "OPEN", get label() { return tr('MyTeamPanel.mo'); } },
@@ -46,13 +51,7 @@ const statusClass: Record<string, string> = {
   FISHING: "bg-[#dceeff] text-[#1a4fa0] border border-[#9ac4f7]",
   CLOSED: "bg-[#f0e0e0] text-[#8a2020] border border-[#e8a0a0]",
 };
-const filteredTeams = computed(() => {
-  const query = search.value.trim().toLocaleLowerCase();
-  return props.teams.filter((team) => {
-    const matchesSearch = !query || `${team.name} ${team.description ?? ""}`.toLocaleLowerCase().includes(query);
-    return matchesSearch && (status.value === "ALL" || team.status === status.value);
-  });
-});
+const filteredTeams = computed(() => props.teams);
 
 function joinTypeLabel(team: UserTeam) {
   return team.join_type === "everyone"
@@ -125,5 +124,6 @@ function joinTypeLabel(team: UserTeam) {
         </div>
       </template>
     </Tab>
+    <Pagination :page="store.page" :page-size="store.pageSize" :total="store.total" :loading="store.directoryLoading" @change="store.page = $event; store.loadTeams(auth.userId)" />
   </aside>
 </template>

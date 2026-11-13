@@ -6,8 +6,10 @@ import { useAuthStore } from './auth';
 import { useReadCacheStore } from './readCache';
 import { createKeyedRefreshTask } from '../utils/refreshTask';
 import { startVisibleRefresh } from '../utils/visibleRefresh';
-const refreshListings = createKeyedRefreshTask<MarketListing[]>();
-const refreshHistory = createKeyedRefreshTask<MarketHistory[]>();
+import { LIST_PAGE_SIZE } from '../data/pagination';
+import type { ListPage } from '../types/model/pagination';
+const refreshListings = createKeyedRefreshTask<ListPage<MarketListing>>();
+const refreshHistory = createKeyedRefreshTask<ListPage<MarketHistory>>();
 let stopRefresh: (() => void) | null = null;
 
 export const useMarketStore = defineStore("species_market", {
@@ -33,7 +35,8 @@ export const useMarketStore = defineStore("species_market", {
         const rows = await refreshHistory(userId + ':' + generation + ':' + page,
           () => supabaseMarketRepository.fetchHistory(userId, page), invalidate);
         if (!current()) return;
-        this.history = rows.slice(0, 20); this.historyHasNext = rows.length > 20;
+        this.history = rows.items; this.historyHasNext = this.historyPage * LIST_PAGE_SIZE < rows.total;
+        if (!rows.items.length && rows.total > 0 && this.historyPage > 1) await this.loadHistory(userId, Math.ceil(rows.total / LIST_PAGE_SIZE));
       } catch (err) { if (current()) this.historyError = err instanceof Error ? err.message : tr('market.khong_the_tai_lich_su'); }
       finally { if (current()) this.historyLoading = false; }
     },
@@ -66,7 +69,7 @@ export const useMarketStore = defineStore("species_market", {
       if (!userId) return;
       const generation = auth.sessionGeneration;
       const query: MarketListingQuery = {
-        page: this.listingPage, pageSize: 25,
+        page: this.listingPage, pageSize: LIST_PAGE_SIZE,
         userId: this.activeTab === 'my' ? userId : undefined,
         search: this.activeTab === 'my' ? '' : this.search.trim(),
         rarity: this.activeTab === 'my' ? 'ALL' : this.rarity, sort: this.sort,
@@ -79,7 +82,11 @@ export const useMarketStore = defineStore("species_market", {
         const rows = await refreshListings(userId + ':' + generation + ':' + JSON.stringify(query),
           () => supabaseMarketRepository.fetchActiveListings(query), invalidate);
         if (!current()) return;
-        this.marketListings = rows.slice(0, 25); this.listingHasNext = rows.length > 25;
+        this.marketListings = rows.items; this.listingHasNext = this.listingPage * LIST_PAGE_SIZE < rows.total;
+        if (!rows.items.length && this.listingPage > 1) {
+          this.listingPage = Math.max(1, Math.ceil(rows.total / LIST_PAGE_SIZE));
+          await this.loadMarketListings();
+        }
       } catch (err) { if (current()) this.error = err instanceof Error ? err.message : tr('market.khong_the_tai_cho_ca'); }
       finally { if (current()) this.isLoadingMarket = false; }
     },

@@ -1,5 +1,7 @@
 <script setup lang="ts">
 import AdminModal from "../AdminModal.vue";
+import Pagination from '../../shared/Pagination.vue';
+import { usePagedListFilters } from '../../../composables/usePagedListFilters';
 import { computed, ref } from "vue";
 import { useAdminFishingPassStore } from "./admin-fishing-pass-store";
 import type { FishingPass, FishingPassPayload } from "./fishing-pass-admin";
@@ -7,16 +9,13 @@ import FishingPassFormManagement from "./FishingPassFormManagement.vue";
 
 const emit = defineEmits<{ close: [] }>();
 const store = useAdminFishingPassStore();
-const search = ref("");
-const status = ref<"all" | "active" | "inactive">("all");
+const search = computed({ get: () => store.search, set: value => { store.search = value; } });
+const status = computed({ get: () => store.status, set: value => { store.status = value; } });
+usePagedListFilters([search, status], () => { void store.fetchAll(1); }, () => { ++store.requestId; });
 const editing = ref<FishingPass | null>(null);
 const formOpen = ref(false);
 const deleting = ref<FishingPass | null>(null);
-const filtered = computed(() => store.passes.filter((pass) => {
-  const query = search.value.trim().toLocaleLowerCase();
-  return (!query || `${pass.name} ${pass.description ?? ""}`.toLocaleLowerCase().includes(query)) &&
-    (status.value === "all" || pass.isActive === (status.value === "active"));
-}));
+const filtered = computed(() => store.passes);
 const money = (value: number) => `${new Intl.NumberFormat("vi-VN").format(value)} xu`;
 const date = (value: string) => new Date(value).toLocaleString("vi-VN");
 function openCreate() { editing.value = null; formOpen.value = true; }
@@ -64,5 +63,6 @@ store.fetchAll();
     <div v-if="deleting" class="fixed inset-0 z-[60] grid place-items-center bg-black/45 p-4">
       <div class="w-full max-w-sm rounded-xl bg-white p-5 shadow-xl"><div class="font-bold">Xác nhận xoá vé</div><div class="my-3 text-sm text-slate-600">Bạn có chắc muốn xoá “{{ deleting.name }}”?</div><div class="flex justify-end gap-2"><button type="button" class="rounded-lg border px-3 py-2 text-sm" @click="deleting = null">Huỷ</button><button type="button" class="rounded-lg bg-red-700 px-3 py-2 text-sm font-semibold text-white" @click="confirmRemove">Xoá vé</button></div></div>
     </div>
+    <Pagination v-if="!formOpen" :page="store.page" :page-size="store.pageSize" :total="store.total" :loading="store.loading" @change="store.fetchAll($event)" />
   </AdminModal>
 </template>

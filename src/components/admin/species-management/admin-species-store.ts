@@ -2,10 +2,6 @@ import type { SpeciesPayload, SpeciesRow } from "../../../types/table/species";
 import { defineStore } from "pinia";
 import { supabaseSpeciesRepository } from "../../../data/supabaseSpeciesRepository";
 
-function sortSpecies(species: SpeciesRow[]) {
-  return species.sort((left, right) => left.name.localeCompare(right.name));
-}
-
 export const useAdminSpeciesStore = defineStore("AdminSpecies", {
   state: () => ({
     species: [] as SpeciesRow[],
@@ -15,24 +11,18 @@ export const useAdminSpeciesStore = defineStore("AdminSpecies", {
     statusFilter: "ALL",
     rarityFilter: "ALL",
     viewMode: "list" as "list" | "grid" | "grouped",
+    page: 1,
+    pageSize: 10,
+    total: 0,
+    requestId: 0,
+    statuses: [] as string[],
+    rarities: [] as string[],
   }),
   getters: {
-    statusOptions: (state) =>
-      [...new Set(state.species.map((item) => item.status).filter((value): value is string => Boolean(value)))].sort(),
-    rarityOptions: (state) =>
-      [...new Set(state.species.map((item) => item.rarity).filter((value): value is string => Boolean(value)))].sort(),
+    statusOptions: (state) => state.statuses,
+    rarityOptions: (state) => state.rarities,
     filteredSpecies: (state): SpeciesRow[] => {
-      const keyword = state.search.trim().toLocaleLowerCase();
-      return state.species.filter((item) => {
-        const matchesSearch =
-          !keyword ||
-          [item.name, item.location, item.status, item.rarity, item.information, item.image].some((value) =>
-            value?.toLocaleLowerCase().includes(keyword),
-          );
-        return matchesSearch &&
-          (state.statusFilter === "ALL" || item.status === state.statusFilter) &&
-          (state.rarityFilter === "ALL" || item.rarity === state.rarityFilter);
-      });
+      return state.species;
     },
     speciesGroups(): { location: string; species: SpeciesRow[] }[] {
       if (this.viewMode !== "grouped") return [{ location: "", species: this.filteredSpecies }];
@@ -54,15 +44,21 @@ export const useAdminSpeciesStore = defineStore("AdminSpecies", {
     },
   },
   actions: {
-    async fetchAll() {
+    async fetchAll(page?: number) {
+      page ??= this.page;
+      const request = ++this.requestId;
       this.isLoading = true;
       this.error = "";
       try {
-        this.species = await supabaseSpeciesRepository.fetchAll();
+        const result = await supabaseSpeciesRepository.fetchPage(page, this.search, this.statusFilter, this.rarityFilter);
+        if (request !== this.requestId) return;
+        this.species = result.items; this.total = result.total; this.page = page;
+        this.statuses = result.facets.status ?? []; this.rarities = result.facets.rarity ?? [];
+        if (!result.items.length && page > 1) await this.fetchAll(Math.max(1, Math.ceil(result.total / this.pageSize)));
       } catch (error) {
-        this.error = error instanceof Error ? error.message : "Không thể tải danh sách loài cá";
+        if (request === this.requestId) this.error = error instanceof Error ? error.message : "Không thể tải danh sách loài cá";
       } finally {
-        this.isLoading = false;
+        if (request === this.requestId) this.isLoading = false;
       }
     },
 
@@ -70,7 +66,7 @@ export const useAdminSpeciesStore = defineStore("AdminSpecies", {
       this.error = "";
       try {
         const created = await supabaseSpeciesRepository.create(payload);
-        this.species = sortSpecies([...this.species, created]);
+        await this.fetchAll(1);
         return created;
       } catch (error) {
         this.error = error instanceof Error ? error.message : "Không thể tạo loài cá";
@@ -82,7 +78,7 @@ export const useAdminSpeciesStore = defineStore("AdminSpecies", {
       this.error = "";
       try {
         const updated = await supabaseSpeciesRepository.update(id, payload);
-        this.species = sortSpecies(this.species.map((item) => (item.id === id ? updated : item)));
+        await this.fetchAll();
         return updated;
       } catch (error) {
         this.error = error instanceof Error ? error.message : "Không thể cập nhật loài cá";
@@ -94,7 +90,7 @@ export const useAdminSpeciesStore = defineStore("AdminSpecies", {
       this.error = "";
       try {
         await supabaseSpeciesRepository.delete(id);
-        this.species = this.species.filter((item) => item.id !== id);
+        await this.fetchAll();
       } catch (error) {
         this.error = error instanceof Error ? error.message : "Không thể xoá loài cá";
         throw error;

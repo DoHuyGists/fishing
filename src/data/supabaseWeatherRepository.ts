@@ -1,6 +1,7 @@
 import type { CrudRepository } from "../types/model/weather";
 import type { ModifierRow, ModifierPayload, WeatherRow, WeatherPayload, ZoneRow, ZonePayload, ZoneWeatherRow, ZoneWeatherPayload, WeatherModifierRow, WeatherModifierPayload } from "../types/table/weather";
 import supabase from "../database/connection";
+import { fetchAdminListPage } from './supabaseAdminListRepository';
 
 function createRepository<Row extends { id: string }, Payload>(
   table: string,
@@ -9,6 +10,10 @@ function createRepository<Row extends { id: string }, Payload>(
   orderBy = "id",
 ): CrudRepository<Row, Payload> {
   return {
+    async fetchPage(page, search) {
+      const result = await fetchAdminListPage<Record<string, unknown>>(table, page, search);
+      return { ...result, items: result.items.map(mapRow) };
+    },
     async fetchAll() {
       const { data, error } = await supabase.from(table).select("*").order(orderBy, { ascending: true });
       if (error) throw new Error(error.message);
