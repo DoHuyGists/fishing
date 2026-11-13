@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import { useGameCatalogRefresh } from '../../../composables/useGameCatalogRefresh';
 import { t as tr } from "../../../i18n";
 
 import { onBeforeUnmount, onMounted, ref, watch } from 'vue'
@@ -6,6 +7,8 @@ import Modal from '../../shared/Modal.vue'
 import Fishfarm from './Fishfarm.vue'
 import { useAquacultureStore } from '../../../stores/aquaculture'
 import { useAuthStore } from '../../../stores/auth'
+
+useGameCatalogRefresh(['aquaculture']);
 
 const farm = useAquacultureStore()
 const auth = useAuthStore()

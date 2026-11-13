@@ -365,7 +365,7 @@
       "consume_turn"
     ],
     "tables": [
-      "country_values"
+      "fishing_areas"
     ],
     "writeTables": [
       "user_in_area"

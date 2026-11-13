@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import { useGameCatalogRefresh } from '../../../composables/useGameCatalogRefresh';
 import type { CurrencyConversionRate } from "../../../types/model/currency";
 import { getFormattingLocale } from '../../../i18n';
 import { t as tr } from "../../../i18n";
@@ -11,6 +12,8 @@ import PaymentConfirmation from "../../shared/PaymentConfirmation.vue";
 import Cash from "../currency/Cash.vue";
 import Shells from "../currency/Shells.vue";
 import Tickets from "../currency/Tickets.vue";
+
+useGameCatalogRefresh(['rates']);
 
 const currencyStore = useCurrencyStore();
 const toast = useToast();

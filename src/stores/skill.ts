@@ -1,3 +1,4 @@
+import { useGameCatalogStore } from './gameCatalog';
 import type { Skill, UserSkill } from "../types/model/skill";
 import { t as tr } from "../i18n";
 import { computed, ref, watch } from "vue";
@@ -73,7 +74,7 @@ export const useSkillStore = defineStore("skill", () => {
   const learnedCount = computed(() => skillCards.value.filter((skill) => skill.level > 0).length);
   const totalLevels = computed(() => skillCards.value.reduce((total, skill) => total + skill.level, 0));
 
-  async function fetchSkills() {
+  async function fetchSkills(force = false) {
     const userId = authStore.user?.id;
     const currentRequest = ++requestId;
     error.value = "";
@@ -84,7 +85,7 @@ export const useSkillStore = defineStore("skill", () => {
     loading.value = true;
     try {
       const [catalog, owned] = await Promise.all([
-        supabaseSkillRepository.fetchSkills(),
+        useGameCatalogStore().get('skills', { force, consumer: 'skill', onUpdate: data => { skills.value = data ?? []; } }),
         supabaseSkillRepository.fetchUserSkills(userId),
       ]);
       if (currentRequest !== requestId) return false;
@@ -103,13 +104,15 @@ export const useSkillStore = defineStore("skill", () => {
 
   async function upgradeSkill(skillId: string) {
     const userId = authStore.user?.id;
+    const generation = authStore.sessionGeneration;
     const skill = skillCards.value.find((item) => item.id === skillId);
     if (!userId || !skill || skill.isMaxLevel || upgradingId.value || loading.value || error.value) return false;
     upgradingId.value = skillId;
     upgradeError.value = "";
     try {
-      const result = await supabaseSkillRepository.upgradeSkill(skillId);
-      if (authStore.user?.id !== userId) return false;
+      const result = await useGameCatalogStore().action('upgrade_skill', { p_skill_id: skillId }, ['skills'],
+        () => supabaseSkillRepository.upgradeSkill(skillId));
+      if (authStore.user?.id !== userId || authStore.sessionGeneration !== generation) return false;
       const owned = userSkills.value.find((item) => item.skill_id === result.skill_id);
       if (owned) owned.level = result.current_level;
       else userSkills.value.push({ skill_id: result.skill_id, level: result.current_level });
@@ -126,12 +129,12 @@ export const useSkillStore = defineStore("skill", () => {
       currentEffects.value[result.skill_id] = result.effects;
       return result;
     } catch (err) {
-      if (authStore.user?.id === userId) {
+      if (authStore.user?.id === userId && authStore.sessionGeneration === generation) {
         upgradeError.value = err instanceof Error ? err.message : tr('supabaseSkillRepository.khong_the_nang_cap_ky_nang');
       }
       return false;
     } finally {
-      if (authStore.user?.id === userId) upgradingId.value = "";
+      if (authStore.user?.id === userId && authStore.sessionGeneration === generation) upgradingId.value = "";
     }
   }
 

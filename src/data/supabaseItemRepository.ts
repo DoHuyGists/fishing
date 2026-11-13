@@ -1,24 +1,24 @@
+import { readCatalogPages } from './readCatalogPages';
+import { RepositoryError } from './repositoryError';
 import type { ItemRow, AdminItemRow, ItemPayload } from "../types/table/item";
 import type { ShopItem, Item } from "../types/model/item";
 import supabase from "../database/connection";
 
 class SupabaseItemRepository {
-  async fetchByIds(ids: string[]): Promise<Item[]> {
+  async fetchByIds(ids: string[], signal?: AbortSignal): Promise<Item[]> {
     if (!ids.length) return [];
-    const { data, error } = await supabase.from("items").select("id,category,name,information,image,icon,price").in("id", ids);
-    if (error) throw new Error(error.message);
+    const data = await readCatalogPages((from, to) => supabase.from("items").select("id,category,name,information,image,icon,price").in("id", ids).order("id").abortSignal(signal ?? new AbortController().signal).range(from, to));
     return data.map((item) => ({ ...item, price: Number(item.price) }));
   }
 
-  async fetchShopItems(): Promise<ShopItem[]> {
-    const { data, error } = await supabase.from("items").select("id,category,classification,name,information,image,icon,quantity,price,rpc").eq("isDisabled", false).order("classification").order("name");
-    if (error) throw new Error(error.message);
+  async fetchShopItems(signal?: AbortSignal): Promise<ShopItem[]> {
+    const data = await readCatalogPages((from, to) => supabase.from("items").select("id,category,classification,name,information,image,icon,quantity,price,rpc").eq("isDisabled", false).order("classification").order("name").order("id").abortSignal(signal ?? new AbortController().signal).range(from, to));
     return data.map((item) => ({ ...item, price: Number(item.price), quantity: item.quantity == null ? null : Number(item.quantity), rpc: item.rpc }));
   }
 
   async fetchAll(): Promise<AdminItemRow[]> {
     const { data, error } = await supabase.from("items").select("*").order("created_at", { ascending: false });
-    if (error) throw new Error(error.message);
+    if (error) throw new RepositoryError(error);
 
     return data.map((item) => ({
       id: item.id,
@@ -39,7 +39,7 @@ class SupabaseItemRepository {
 
   async create(payload: ItemPayload): Promise<void> {
     const { error } = await supabase.from("items").insert(payload);
-    if (error) throw new Error(error.message);
+    if (error) throw new RepositoryError(error);
   }
 
   async update(id: string, payload: ItemPayload): Promise<void> {
@@ -47,19 +47,19 @@ class SupabaseItemRepository {
       .from("items")
       .update({ ...payload, updated_at: new Date().toISOString() })
       .eq("id", id);
-    if (error) throw new Error(error.message);
+    if (error) throw new RepositoryError(error);
   }
 
   async delete(id: string): Promise<void> {
     const { error } = await supabase.from("items").delete().eq("id", id);
-    if (error) throw new Error(error.message);
+    if (error) throw new RepositoryError(error);
   }
 
   async getReward(): Promise<ItemRow[]> {
     const { data, error } = await supabase.from("items").select("*").eq("isDisabled", false).order("created_at", { ascending: false });
 
     if (error) {
-      throw new Error(error.message);
+      throw new RepositoryError(error);
     }
 
     return data.map((x) => ({

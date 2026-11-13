@@ -17,7 +17,7 @@ const fishingAreaStore = useFishingAreaStore();
 const worldStore = useWorldStore();
 
 onMounted(() => {
-  if (!fishingAreaStore.loaded) void fishingAreaStore.fetchArea();
+  void fishingAreaStore.fetchArea();
   void countryStore.fetchCountries();
 });
 </script>

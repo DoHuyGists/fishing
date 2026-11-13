@@ -1,4 +1,5 @@
 import { requestFeatures } from "../data/featureAvailability";
+import { featureRequestUrl } from './catalogRequests';
 
 export interface FeatureDenial { message: string; code?: string }
 type Guard = (features: string[]) => Promise<FeatureDenial | null>;
@@ -18,7 +19,7 @@ export function createFeatureFetch(baseUrl: string, transport: typeof fetch = (.
   return async (input, init) => {
     const request = input instanceof Request ? input : null;
     const url = new URL(request?.url ?? String(input));
-    const features = url.origin === origin ? requestFeatures(url, init?.method ?? request?.method ?? "GET") : [];
+    const features = url.origin === origin ? requestFeatures(await featureRequestUrl(url, input, init), init?.method ?? request?.method ?? "GET") : [];
     if (features.length) {
       const denial = guard ? await guard(features) : { message: "Feature availability is not initialized.", code: "FEATURE_FLAGS_UNAVAILABLE" };
       if (denial) {

@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import { useGameCatalogRefresh } from '../../../composables/useGameCatalogRefresh';
 import { t as tr } from "../../../i18n";
 
 import { watch } from "vue";
@@ -8,18 +9,20 @@ import { useSkillStore } from "../../../stores/skill";
 import { useAuthStore } from "../../../stores/auth";
 import { useToast } from "../../../composables/useToast";
 
+useGameCatalogRefresh(['skills']);
+
 const skillStore = useSkillStore();
 const authStore = useAuthStore();
 const toast = useToast();
 
-async function refresh() {
+async function refresh(force = false) {
   if (skillStore.upgradingId) return;
-  if (!await skillStore.fetchSkills() && skillStore.error) {
+  if (!await skillStore.fetchSkills(force) && skillStore.error) {
     toast.error(skillStore.error, { get title() { return tr('SkillModal.khong_the_tai_ky_nang'); } });
   }
 }
 
-watch(() => authStore.user?.id, refresh, { immediate: true });
+watch(() => authStore.user?.id, () => refresh(), { immediate: true });
 
 async function upgrade(skillId: string) {
   const result = await skillStore.upgradeSkill(skillId);
@@ -32,9 +35,9 @@ async function upgrade(skillId: string) {
 </script>
 
 <template>
-  <Modal :title="tr('SkillModal.ky_nang')" :sub-title="tr('SkillModal.ren_luyen_ky_nang_can_thu')" :on-refresh="refresh">
+  <Modal :title="tr('SkillModal.ky_nang')" :sub-title="tr('SkillModal.ren_luyen_ky_nang_can_thu')" :on-refresh="() => refresh(true)">
     <section class="skill-board bg-[#edf2e6] bg-[radial-gradient(#b6c6a84d_0.7px,transparent_0.7px)] bg-size-[12px_12px] min-h-full w-full space-y-4 rounded-2xl p-3 text-[#24352a] sm:p-4" :aria-busy="skillStore.loading">
-      <button v-if="skillStore.error" type="button" class="cursor-pointer text-sm font-bold text-emerald-800 underline disabled:opacity-50" :disabled="skillStore.loading || !!skillStore.upgradingId" @click="refresh">{{ tr('SkillModal.tai_lai_ky_nang') }}</button>
+      <button v-if="skillStore.error" type="button" class="cursor-pointer text-sm font-bold text-emerald-800 underline disabled:opacity-50" :disabled="skillStore.loading || !!skillStore.upgradingId" @click="refresh(true)">{{ tr('SkillModal.tai_lai_ky_nang') }}</button>
       <div v-if="skillStore.loading" role="status" class="py-4 text-center text-sm">{{ tr('SkillModal.dang_tai_ky_nang') }}</div>
       <div v-else-if="!skillStore.error && !skillStore.skillCards.length" class="rounded-xl border border-dashed border-[#cbd9c6] p-8 text-center text-sm">{{ tr('SkillModal.chua_co_ky_nang_nao') }}</div>
 

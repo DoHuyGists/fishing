@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import { useGameCatalogRefresh } from '../../../composables/useGameCatalogRefresh';
 import { t as tr } from "../../../i18n";
 
 import { computed, onMounted, ref, watch } from "vue";
@@ -9,6 +10,8 @@ import type { Country } from "../../../stores/country.ts";
 import BookShelf from "./BookShelf.vue";
 import FlipBook from "./FlipBook.vue";
 import Modal from "../../shared/Modal.vue";
+
+useGameCatalogRefresh(['species']);
 
 const diaryStore = useDiaryStore();
 const authStore = useAuthStore();
@@ -32,7 +35,7 @@ const unlockedCountries = computed<Country[]>(() => countryStore.unlockedCountri
 const currentBookEntries = computed(() => diaryStore.currentLocationEntries);
 async function retry() {
   await countryStore.fetchMyUnlockedCountries();
-  await diaryStore.initDiary(authStore.userId);
+  await diaryStore.initDiary(authStore.userId, true);
   if (selectedCountry.value) await diaryStore.selectLocation(authStore.userId, selectedCountry.value.code, selectedCountry.value.name);
 }
 

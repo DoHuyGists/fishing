@@ -1,3 +1,5 @@
+import { readCatalogPages } from './readCatalogPages';
+import { RepositoryError } from './repositoryError';
 import type { BlueprintMaterial, Blueprint } from "../types/model/blueprint";
 import { t as tr } from "../i18n";
 import supabase from "../database/connection";
@@ -19,25 +21,24 @@ class SupabaseBlueprintRepository {
   async save(payload: Record<string, unknown>, id: string | null) {
     const query = supabase.from("blueprint");
     const { error } = id ? await query.update(payload).eq("id", id) : await query.insert(payload);
-    if (error) throw new Error(error.message);
+    if (error) throw new RepositoryError(error);
   }
   async remove(id: string) {
     const { error } = await supabase.from("blueprint").delete().eq("id", id);
-    if (error) throw new Error(error.message);
+    if (error) throw new RepositoryError(error);
   }
   async craft(blueprintId: string, quantity: number): Promise<unknown> {
     const { data, error } = await supabase.rpc("craft_blueprint", {
       p_blueprint_id: blueprintId,
       p_quantity: quantity,
     });
-    if (error) throw new Error(error.message);
+    if (error) throw new RepositoryError(error);
     if (data?.success === false) throw new Error(data.message || tr('WorkBenchModal.khong_the_che_tao_vat_pham'));
     return data;
   }
 
-  async fetchAll(): Promise<Blueprint[]> {
-    const { data, error } = await supabase.from("blueprint").select("id,result_item_id,result_quantity,required_materials,gold_cost").order("created_at");
-    if (error) throw new Error(error.message);
+  async fetchAll(signal?: AbortSignal): Promise<Blueprint[]> {
+    const data = await readCatalogPages((from, to) => supabase.from("blueprint").select("id,result_item_id,result_quantity,required_materials,gold_cost").order("created_at").order("id").abortSignal(signal ?? new AbortController().signal).range(from, to));
     return data.map((row) => ({
       id: row.id,
       resultItemId: row.result_item_id,

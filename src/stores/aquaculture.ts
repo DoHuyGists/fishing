@@ -1,3 +1,6 @@
+import { useGameCatalogStore } from './gameCatalog';
+import { versionedCatalogEnabled } from '../data/supabaseGameCatalogRepository';
+import { RepositoryError } from '../data/repositoryError';
 import type { UserInventory } from "../types/model/userInventory";
 import type { AquacultureCatalog, AquacultureFarm, CareMode, FarmAction, AquaculturePond, AquacultureBatch, AquacultureFish, PondSwimmer, FarmFoodOption } from "../types/model/aquaculture";
 import type { AquacultureRecord } from "../types/table/aquaculture";
@@ -16,7 +19,7 @@ import { batchProgress, fishSaleCash, maxStockQuantity } from '../data/aquacultu
 import { createUuid } from '../utils/uuid'
 import { useToast } from '../composables/useToast'
 
-interface PendingAction { action: FarmAction; params: Record<string, unknown>; requestId: string }
+interface PendingAction { action: FarmAction; params: Record<string, unknown>; requestId: string; catalogArgs?: Record<string, unknown> }
 const actions: FarmAction[] = ['purchase_pond_slot', 'stock_aquaculture_batch', 'feed_aquaculture_batch',
   'care_aquaculture_pond', 'sell_aquaculture_fish', 'transfer_aquaculture_fish', 'release_aquaculture_fish']
 function rememberRequest(owner: string, request: PendingAction | null) {
@@ -158,7 +161,7 @@ export const useAquacultureStore = defineStore('AquaculturePlayer', {
       try {
         const farm = await repository.fetchFarm()
         const context = full ? await Promise.all([
-            repository.fetchCatalog(), repository.fetchRecords(owner),
+            useGameCatalogStore().get('aquaculture', { consumer: 'aquaculture', onUpdate: data => { this.catalog = data ?? { species: [], foods: [] }; } }), repository.fetchRecords(owner),
             supabaseUserInventoryRepository.fetchUserInventory(owner),
             supabaseCurrencyRepository.fetchMyCurrency(), supabaseUserProfileRepository.fetchUserProfile(owner),
             repository.fetchStoredFishCount(owner),
@@ -196,13 +199,23 @@ export const useAquacultureStore = defineStore('AquaculturePlayer', {
     },
     async perform(action: FarmAction, params: Record<string, unknown>, retry = false): Promise<boolean> {
       if (this.busy || this.loading || useAuthStore().user?.id !== this.ownerId || (!retry && !this.canMutate)) return false
-      const request = retry ? this.pending : { action, params, requestId: createUuid() }
+      const request: PendingAction | null = retry ? this.pending : { action, params, requestId: createUuid() }
       if (!request) return false
+      if (!retry && action === 'stock_aquaculture_batch') {
+        const rule = this.farm?.species.find(row => row.species_id === params.p_species_id)
+        if (rule) {
+          const { can_stock: _canStock, ...snapshot } = rule
+          request.catalogArgs = { _rules_snapshot: snapshot }
+        }
+      }
       const owner = this.ownerId, epoch = this.epoch
       this.pending = request; this.busy = true; this.error = ''
       rememberRequest(owner, request)
       try {
-        const result = await repository.execute(request.action, request.params, request.requestId)
+        const guarded = versionedCatalogEnabled && ['stock_aquaculture_batch', 'feed_aquaculture_batch'].includes(request.action)
+        const execute = () => repository.execute(request.action, request.params, request.requestId)
+        const result = guarded ? await useGameCatalogStore().action(request.action,
+          { ...request.params, ...request.catalogArgs, p_request_id: request.requestId }, ['aquaculture'], execute, retry) : await execute()
         if (this.epoch !== epoch || useAuthStore().user?.id !== owner) return false
         this.pending = null
         rememberRequest(owner, null)
@@ -224,8 +237,11 @@ export const useAquacultureStore = defineStore('AquaculturePlayer', {
         return true
       } catch (error) {
         if (this.epoch === epoch) {
-          const uncertain = !(error instanceof AquacultureRpcError) || error.uncertain
+          const uncertain = error instanceof RepositoryError
+            ? !error.code || ['PGRST000', 'PGRST001', 'PGRST002'].includes(error.code)
+            : !(error instanceof AquacultureRpcError) || error.uncertain
           if (!uncertain) { this.pending = null; rememberRequest(owner, null) }
+          if (error instanceof RepositoryError && error.code === 'CATALOG_VERSION_MISMATCH') await this.refresh(true, true)
           this.notifyError(uncertain
             ? tr('aquaculture.chua_nhan_duoc_ket_qua_tu_may_chu_nhan_thu_lai_thao_tac_de_kiem_')
             : errorMessage(error))

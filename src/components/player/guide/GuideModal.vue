@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import { useGameCatalogRefresh } from '../../../composables/useGameCatalogRefresh';
 import { t as tr } from "../../../i18n";
 
 import { onMounted } from "vue";
@@ -7,6 +8,8 @@ import RichTextContent from "../../shared/RichTextContent.vue";
 import { useGuideStore } from "../../../stores/guide";
 import { useModalStore } from "../../../stores/modal";
 import { useOnboardingStore } from "../../../stores/onboarding";
+
+useGameCatalogRefresh(['guides']);
 
 const guideStore = useGuideStore();
 const modalStore = useModalStore();
@@ -25,7 +28,7 @@ onMounted(() => guideStore.loadGuides());
     :title="tr('GuideModal.chi_dan_co_ban')"
     :sub-title="tr('GuideModal.chon_mot_chu_de_de_xem_huong_dan')"
     :show-count-data="false"
-    :on-refresh="guideStore.loadGuides"
+    :on-refresh="() => guideStore.loadGuides(true)"
   >
     <div class="flex h-full min-h-0 flex-col">
     <div class="slide-fade-in from-top player-content-in mb-3 flex shrink-0 flex-wrap items-center justify-between gap-3 rounded-xl border border-[#cbd9c6] bg-[#f5f9f0] p-3 text-[#24352a]">
@@ -48,7 +51,7 @@ onMounted(() => guideStore.loadGuides());
       <div v-if="guideStore.loading" role="status" class="p-5 text-sm">{{ tr('GuideModal.dang_tai_huong_dan') }}</div>
       <div v-else-if="guideStore.loadError" role="alert" class="p-5 text-sm text-red-700">
         <div>{{ guideStore.loadError }}</div>
-        <button type="button" class="mt-2 font-bold underline" @click="guideStore.loadGuides">{{ tr('Maintenance.thu_lai') }}</button>
+        <button type="button" class="mt-2 font-bold underline" @click="guideStore.loadGuides(true)">{{ tr('Maintenance.thu_lai') }}</button>
       </div>
       <div v-else-if="!guideStore.guides.length" class="p-5 text-sm">{{ tr('GuideModal.chua_co_huong_dan_nao') }}</div>
       <div v-else class="flex min-h-0 flex-1 flex-col sm:flex-row">

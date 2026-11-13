@@ -1,3 +1,4 @@
+import { useGameCatalogStore } from './gameCatalog';
 import type { CurrencyConversionRate } from "../types/model/currency";
 import { getFormattingLocale, t as tr } from "../i18n";
 import { defineStore } from "pinia";
@@ -37,20 +38,21 @@ export const useCurrencyStore = defineStore("currency", {
         ? Math.min(Number.MAX_SAFE_INTEGER, Math.max(1, Math.floor(current) + change))
         : 1;
     },
-    async fetchConversionRates() {
-      if (this.conversionRatesLoading) return;
+    async fetchConversionRates(force = false) {
+      const auth = useAuthStore(), generation = auth.sessionGeneration;
       this.conversionRatesLoading = true;
       this.conversionRatesError = "";
       try {
-        this.conversionRates = await supabaseCurrencyRepository.fetchConversionRates();
+        await useGameCatalogStore().get('rates', { force, consumer: 'currency', onUpdate: data => { this.conversionRates = data ?? []; if (!data) { this.conversionRatesLoading = false; this.conversionRatesError = ''; this.conversionBatches = {}; } } });
+        if (auth.sessionGeneration !== generation) return;
         for (const rate of this.conversionRates) {
           const key = `${rate.source_currency}-${rate.target_currency}`;
           this.conversionBatches[key] ??= 1;
         }
       } catch (error) {
-        this.conversionRatesError = error instanceof Error ? error.message : tr('currency.khong_the_tai_ty_gia_quy_doi');
+        if (auth.sessionGeneration === generation) this.conversionRatesError = error instanceof Error ? error.message : tr('currency.khong_the_tai_ty_gia_quy_doi');
       } finally {
-        this.conversionRatesLoading = false;
+        if (auth.sessionGeneration === generation) this.conversionRatesLoading = false;
       }
     },
     conversionAmounts(rate: CurrencyConversionRate) {
@@ -70,19 +72,25 @@ export const useCurrencyStore = defineStore("currency", {
     },
     async convertCurrency(rate: CurrencyConversionRate) {
       if (!this.canConvert(rate)) return;
+      const auth = useAuthStore(), generation = auth.sessionGeneration;
       this.converting = true;
       try {
-        const wallet = await supabaseCurrencyRepository.convertCurrency(rate, this.conversionAmounts(rate).batches);
+        const batches = this.conversionAmounts(rate).batches;
+        const wallet = await useGameCatalogStore().action('convert_currency', { p_source_currency: rate.source_currency, p_target_currency: rate.target_currency,
+          p_batches: batches, p_source_amount: rate.source_amount, p_target_amount: rate.target_amount }, ['rates'],
+          () => supabaseCurrencyRepository.convertCurrency(rate, batches));
+        if (auth.sessionGeneration !== generation) return;
         this.cash = wallet.cash;
         this.shells = wallet.shells;
         this.tickets = wallet.tickets;
         useToast().success(tr('currency.quy_doi_tien_te_thanh_cong'));
       } catch (error) {
+        if (auth.sessionGeneration !== generation) return;
         useToast().error(error instanceof Error ? error.message : tr('currency.khong_the_quy_doi_tien_te'));
         await this.fetchConversionRates();
         await this.fetchCurrency();
       } finally {
-        this.converting = false;
+        if (auth.sessionGeneration === generation) this.converting = false;
       }
     },
     async fetchCurrency(invalidate = false) {

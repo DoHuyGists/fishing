@@ -1,4 +1,5 @@
 <script lang="ts" setup>
+import { useGameCatalogRefresh } from '../../../composables/useGameCatalogRefresh';
 import type { PickPoint } from "../../../types/model/worldMap";
 import { t as tr } from "../../../i18n";
 
@@ -35,6 +36,7 @@ const pickEnabled = computed(() => worldStore.isAnchorMode);
 const anchor = computed(() => worldStore.pickedLocation);
 const worldStore = useWorldStore();
 const isMapVisible = computed(() => !props.collapsible || worldStore.isMapVisible);
+useGameCatalogRefresh(['countries', 'areas'], () => isMapVisible.value && features.isAvailable('world-map'));
 const selectedArea = computed(() => (worldStore.selectedArea?.id ? worldStore.selectedArea : null));
 const pendingArea = ref<any | null>(null);
 const isEntering = ref(false);
@@ -64,7 +66,7 @@ onMounted(async () => {
 });
 
 watch(() => features.isAvailable('world-map'), async enabled => {
-  if (enabled && !fishingAreaStore.loaded) void fishingAreaStore.fetchArea();
+  if (enabled) void fishingAreaStore.fetchArea();
   if (!enabled) { pendingArea.value = null; worldStore.isAnchorMode = false; }
   else {
     await nextTick();

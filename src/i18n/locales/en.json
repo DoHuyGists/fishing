@@ -1,4 +1,11 @@
 {
+  "GameCache": {
+    "updateClient": "The game data is incompatible. Please reload the page to update.",
+    "stale": "Showing saved data from {time}. We will retry when the connection is available.",
+    "changed": "The data has changed. Please review the updated information and try again.",
+    "refreshRequired": "Refresh the data before performing this action. Please try again.",
+    "unavailable": "Game data is currently unavailable. Please try again."
+  },
   "PaymentConfirmation": {
     "insufficientBalance": "Insufficient balance for this transaction."
   },

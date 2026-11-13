@@ -1,3 +1,5 @@
+import { useGameCatalogStore } from './gameCatalog';
+import { useAuthStore } from './auth';
 import type { Species, CaughtDiary } from "../types/model/diary";
 import type { AreaSpecies } from "../types/model/speciesInArea";
 import { t as tr } from "../i18n";
@@ -24,6 +26,7 @@ export const useDiaryStore = defineStore("diary", {
     isLoadingAreaSpecies: false,
     areaSpeciesError: "",
     areaSpeciesRequestId: 0,
+    diaryRequestId: 0,
   }),
 
   getters: {
@@ -72,6 +75,16 @@ export const useDiaryStore = defineStore("diary", {
   },
 
   actions: {
+    applySpecies(data?: Species[]) {
+      this.allSpecies = data ?? [];
+      if (!data) {
+        this.caughtDiary = []; this.locationSpecies = []; this.discoveredAreaSpecies = [];
+        this.areaSpeciesRequestId++; this.isLoading = false;
+      } else if (this.selectedLocationCode) {
+        const matches = [this.selectedLocationCode, this.selectedLocationName].filter((value): value is string => Boolean(value)).map(value => value.toLocaleLowerCase());
+        this.locationSpecies = data.filter(species => matches.some(value => species.location?.toLocaleLowerCase().includes(value)));
+      }
+    },
     async loadDiscoveredAreaSpecies(areaId: string | null | undefined, userId: string | null | undefined) {
       const requestId = ++this.areaSpeciesRequestId;
       this.discoveredAreaSpecies = [];
@@ -98,23 +111,25 @@ export const useDiaryStore = defineStore("diary", {
       }
     },
 
-    async initDiary(userId?: string) {
+    async initDiary(userId?: string, force = false) {
+      const auth = useAuthStore(), generation = auth.sessionGeneration, request = ++this.diaryRequestId;
+      const current = () => auth.sessionGeneration === generation && request === this.diaryRequestId;
       this.isLoading = true;
       this.error = null;
       try {
-        const [speciesData, caughtData] = await Promise.all([supabaseDiaryRepository.fetchSpecies(), userId ? supabaseDiaryRepository.fetchCaughtDiary(userId) : Promise.resolve([])]);
-
-        this.allSpecies = speciesData;
+        const [, caughtData] = await Promise.all([useGameCatalogStore().get('species', { force, consumer: 'diary', onUpdate: data => this.applySpecies(data) }), userId ? supabaseDiaryRepository.fetchCaughtDiary(userId) : Promise.resolve([])]);
+        if (!current()) return;
         this.caughtDiary = caughtData;
       } catch (err: any) {
-        this.error = err?.message || tr('diary.khong_the_tai_du_lieu_nhat_ky');
-        console.error("Failed to init diary:", err);
+        if (current()) this.error = err?.message || tr('diary.khong_the_tai_du_lieu_nhat_ky');
       } finally {
-        this.isLoading = false;
+        if (current()) this.isLoading = false;
       }
     },
 
     async selectLocation(userId: string | undefined, code: string, name: string) {
+      const auth = useAuthStore(), generation = auth.sessionGeneration, request = ++this.diaryRequestId;
+      const current = () => auth.sessionGeneration === generation && request === this.diaryRequestId;
       this.error = null;
       this.locationSpecies = [];
       this.selectedLocationCode = code;
@@ -124,16 +139,21 @@ export const useDiaryStore = defineStore("diary", {
       try {
         // Fetch caught list if not loaded yet
         if (userId && this.caughtDiary.length === 0) {
-          this.caughtDiary = await supabaseDiaryRepository.fetchCaughtDiary(userId);
+          const caught = await supabaseDiaryRepository.fetchCaughtDiary(userId);
+          if (!current()) return;
+          this.caughtDiary = caught;
         }
 
         // Fetch location species
-        const speciesData = await supabaseDiaryRepository.fetchSpeciesByLocation(code, name);
+        const all = await useGameCatalogStore().get('species', { consumer: 'diary', onUpdate: data => this.applySpecies(data) });
+        if (!current()) return;
+        const matches = [code, name].filter(Boolean).map(value => value.toLocaleLowerCase());
+        const speciesData = all.filter(species => matches.some(value => species.location?.toLocaleLowerCase().includes(value)));
         this.locationSpecies = speciesData;
       } catch (err: any) {
-        this.error = err?.message || tr('diary.khong_the_tai_danh_sach_ca_vui_long_thu_lai');
+        if (current()) this.error = err?.message || tr('diary.khong_the_tai_danh_sach_ca_vui_long_thu_lai');
       } finally {
-        this.isLoading = false;
+        if (current()) this.isLoading = false;
       }
     },
 

@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import { useGameCatalogRefresh } from '../../../composables/useGameCatalogRefresh';
 import { t as tr } from "../../../i18n";
 
 import { computed, onMounted, ref } from "vue";
@@ -9,6 +10,8 @@ import { useInventoryStore } from "../../../stores/inventory.ts";
 import { useCurrencyStore } from "../../../stores/currency.ts";
 import { useAuthStore } from "../../../stores/auth.ts";
 import { useToast } from "../../../composables/useToast";
+
+useGameCatalogRefresh(['shop']);
 
 const inventoryStore = useInventoryStore();
 const currencyStore = useCurrencyStore();
@@ -87,7 +90,7 @@ const canBuy = computed(
 );
 
 onMounted(() => {
-  void inventoryStore.loadShopItems();
+  void inventoryStore.loadShopItems().catch(err => toast.error(err instanceof Error ? err.message : tr('GameCache.unavailable')));
   if (authStore.userId) {
     void inventoryStore.setUserInventory(authStore.userId).catch((err: unknown) => {
       toast.error(err instanceof Error ? err.message : tr('ShopModal.khong_the_tai_tui_do'), { position: "bottom" });
@@ -126,7 +129,7 @@ async function buyItem() {
   <Modal
     :title="tr('ShopModal.cua_hang_vat_pham')"
     :sub-title="tr('ShopModal.chon_vat_pham_va_so_luong_muon_mua')"
-    :on-refresh="inventoryStore.loadShopItems"
+    :on-refresh="() => inventoryStore.loadShopItems(true)"
   >
     <div class="grid min-h-full gap-4 lg:grid-cols-[minmax(0,1fr)_18rem] text-[#24352a]">
       <section>

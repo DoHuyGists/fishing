@@ -1,10 +1,11 @@
+import { useGameCatalogStore } from './gameCatalog';
+import { useAuthStore } from './auth';
 import type { UserInventory } from "../types/model/userInventory";
 import type { ShopItem } from "../types/model/item";
 import { defineStore } from "pinia";
 import { supabaseUserInventoryRepository } from "../data/supabaseUserInventoryRepository";
 import { supabaseEquipmentRepository } from "../data/supabaseEquipmentRepository";
 import type { EquipmentSet } from "./equipment";
-import { supabaseItemRepository } from "../data/supabaseItemRepository";
 
 export const useInventoryStore = defineStore("Inventory", {
     state: () => ({
@@ -38,13 +39,16 @@ export const useInventoryStore = defineStore("Inventory", {
         async useItem(inventoryId: string) {
             return await supabaseUserInventoryRepository.useItem(inventoryId);
         },
-        async loadShopItems() {
+        async loadShopItems(force = false) {
+            const auth = useAuthStore(), generation = auth.sessionGeneration;
             this.shopLoading = true;
-            try { this.shopItems = await supabaseItemRepository.fetchShopItems(); }
-            finally { this.shopLoading = false; }
+            try { await useGameCatalogStore().get('shop', { force, consumer: 'inventory', onUpdate: data => { this.shopItems = data ?? []; if (!data) this.shopLoading = false; } }); }
+            catch (error) { if (auth.sessionGeneration === generation) { this.shopItems = []; throw error; } }
+            finally { if (auth.sessionGeneration === generation) this.shopLoading = false; }
         },
         async purchaseItem(itemId: string, quantity: number) {
-            await supabaseUserInventoryRepository.purchaseItem(itemId, quantity);
+            await useGameCatalogStore().action('purchase_item', { p_item_id: itemId, p_quantity: quantity }, ['shop'],
+                () => supabaseUserInventoryRepository.purchaseItem(itemId, quantity));
         },
     }
 })

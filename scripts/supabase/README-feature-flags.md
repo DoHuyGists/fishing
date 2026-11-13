@@ -23,7 +23,7 @@ Migration dừng và rollback nếu phát hiện `pgrst.db_pre_request` khác đ
 
 ## Phạm vi khóa
 
-- `world-map`: ẩn bản đồ tương tác và danh sách bãi, chặn dữ liệu màu bản đồ và request vào bãi/trừ lượt.
+- `world-map`: ẩn bản đồ tương tác và danh sách bãi, chặn metadata bãi câu và request vào bãi/trừ lượt.
 - `enter-area`: giữ bản đồ để xem nhưng khóa mở màn chuẩn bị và request vào bãi/trừ lượt.
 - `prepare` là modal nội bộ, dùng cả hai flag trên.
 - Flag khác tương ứng với nút trong `FeatureTable.vue`. Modal đang mở sẽ đóng khi nhận trạng thái tắt; modal lưu trong localStorage và đường dẫn màn thực hành trực tiếp cũng được kiểm tra.

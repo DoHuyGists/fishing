@@ -1,4 +1,11 @@
 {
+  "GameCache": {
+    "updateClient": "Dữ liệu trò chơi không tương thích. Vui lòng tải lại trang để cập nhật.",
+    "stale": "Đang hiển thị dữ liệu đã lưu từ {time}. Sẽ thử cập nhật lại khi kết nối ổn định.",
+    "changed": "Dữ liệu đã thay đổi. Vui lòng kiểm tra thông tin mới và thử lại.",
+    "refreshRequired": "Cần cập nhật dữ liệu trước khi thực hiện thao tác này. Vui lòng thử lại.",
+    "unavailable": "Chưa thể tải dữ liệu trò chơi. Vui lòng thử lại."
+  },
   "PaymentConfirmation": {
     "insufficientBalance": "Số dư không đủ để thực hiện giao dịch."
   },

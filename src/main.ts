@@ -12,6 +12,8 @@ import { setFeatureRequestGuard } from "./database/featureRequestGate";
 import { useFeatureAvailabilityStore } from "./stores/featureAvailability";
 import { setMutationRefreshHandler } from './database/mutationRefresh';
 import { usePlayerRefreshStore } from './stores/playerRefresh';
+import { useGameCatalogStore } from './stores/gameCatalog';
+import { setCatalogMutationHandler } from './database/catalogRequests';
 
 const app = createApp(App);
 const pinia = createPinia();
@@ -30,6 +32,16 @@ setMutationRefreshHandler(snapshots => {
   };
 });
 app.use(i18n);
+const catalogs = useGameCatalogStore(pinia);
+setCatalogMutationHandler(domains => {
+  const generation = useAuthStore(pinia).sessionGeneration;
+  return () => {
+    if (useAuthStore(pinia).sessionGeneration === generation) void catalogs.invalidate(domains);
+  };
+});
+window.addEventListener('focus', () => { void catalogs.resume(); });
+window.addEventListener('online', () => { void catalogs.resume(); });
+document.addEventListener('visibilitychange', () => { void catalogs.resume(); });
 useLocaleStore(pinia);
 const features = useFeatureAvailabilityStore(pinia);
 setFeatureRequestGuard(async keys => {

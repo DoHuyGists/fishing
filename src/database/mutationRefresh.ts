@@ -1,4 +1,5 @@
 import type { PlayerSnapshot } from '../types/model/playerRefresh';
+import { catalogRequestBody } from './requestBody.ts';
 
 // Installed after Pinia. Capture the owner before sending a mutation so a late
 // response from a previous login cannot refresh the next user's stores.
@@ -28,11 +29,19 @@ export function createMutationRefreshFetch(baseUrl: string, transport: typeof fe
     const request = input instanceof Request ? input : null;
     const url = new URL(request?.url ?? String(input));
     const method = (init?.method ?? request?.method ?? 'GET').toUpperCase();
-    const rpc = url.pathname.split('/rest/v1/rpc/')[1];
-    const snapshots = url.origin === origin && method === 'POST' && rpc ? mutations[rpc] : undefined;
+    let rpc: string | undefined = url.pathname.split('/rest/v1/rpc/')[1];
+    const wrapper = url.origin === origin && method === 'POST' && rpc === 'execute_game_catalog_action';
+    // Capture the login before reading an asynchronous Request body. Populate
+    // the captured list before invoking the notifier, after resolving the RPC.
+    const snapshots = url.origin === origin && method === 'POST' && rpc ? wrapper ? [] as PlayerSnapshot[] : mutations[rpc] : undefined;
     const notify = snapshots ? capture?.(snapshots) : undefined;
+    if (wrapper) {
+      const body = await catalogRequestBody(input, init);
+      rpc = typeof body.p_action === 'string' ? body.p_action : undefined;
+      snapshots?.push(...(rpc ? mutations[rpc] ?? [] : []));
+    }
     const response = await transport(input, init);
-    if (notify && response.ok) {
+    if (notify && snapshots?.length && response.ok) {
       // Some RPCs return a business failure in an HTTP 200 response.
       try {
         const result = await response.clone().json();

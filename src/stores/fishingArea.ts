@@ -1,7 +1,8 @@
+import { useGameCatalogStore } from './gameCatalog';
+import { useAuthStore } from './auth';
 import type { FishingAreaRow } from "../types/table/fishingArea";
 import { t as tr } from "../i18n";
 import { defineStore } from "pinia";
-import { supabaseFishingAreaRepository } from "../data/supabaseFishingAreaRepository";
 import { useCountryStore } from "./country";
 import { useWorldStore } from "./worldMap";
 
@@ -70,17 +71,16 @@ export const useFishingAreaStore = defineStore("fishing_areas", {
     },
   },
   actions: {
-    async fetchArea() {
-      if (this.loading) return;
+    async fetchArea(force = false) {
+      const auth = useAuthStore(), generation = auth.sessionGeneration;
       this.loading = true;
       this.error = "";
       try {
-        this.fishingAreas = await supabaseFishingAreaRepository.fetchAreas();
-        this.loaded = true;
+        await useGameCatalogStore().get('areas', { force, consumer: 'fishingArea', onUpdate: data => { this.fishingAreas = data ?? []; this.loaded = Boolean(data); if (!data) { this.loading = false; this.error = ''; } } });
       } catch (err) {
-        this.error = err instanceof Error ? err.message : tr('equipment.khong_the_tai_trang_bi_tu_may_chu');
+        if (auth.sessionGeneration === generation) this.error = err instanceof Error ? err.message : tr('equipment.khong_the_tai_trang_bi_tu_may_chu');
       } finally {
-        this.loading = false;
+        if (auth.sessionGeneration === generation) this.loading = false;
       }
     },
 

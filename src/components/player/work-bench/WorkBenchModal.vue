@@ -1,4 +1,5 @@
 <script lang="ts" setup>
+import { useGameCatalogRefresh } from '../../../composables/useGameCatalogRefresh';
 import type { WorkBenchInventoryItem } from "../../../types/model/workBench";
 import type { UserInventory } from "../../../types/model/userInventory";
 import type { Blueprint } from "../../../types/model/blueprint";
@@ -16,6 +17,8 @@ import { useBlueprintStore } from "../../../stores/blueprint";
 import { useCurrencyStore } from "../../../stores/currency";
 
 
+
+useGameCatalogRefresh(['blueprints', 'items']);
 
 const authStore = useAuthStore();
 const inventoryStore = useInventoryStore();
@@ -82,13 +85,13 @@ function selectBlueprint(blueprint: Blueprint) {
   craftQuantity.value = 1;
 }
 
-async function loadData() {
+async function loadData(force = false) {
   if (isLoading.value) return;
   isLoading.value = true;
   errorMessage.value = "";
   try {
     if (!authStore.userId) throw new Error(tr('WorkBenchModal.ban_can_dang_nhap_de_xem_ban_che_tao'));
-    await Promise.all([inventoryStore.setUserInventory(authStore.userId), blueprintStore.loadBlueprints(), currencyStore.fetchCurrency()]);
+    await Promise.all([inventoryStore.setUserInventory(authStore.userId), blueprintStore.loadBlueprints(force), currencyStore.fetchCurrency()]);
   } catch (error) {
     errorMessage.value = error instanceof Error ? error.message : tr('WorkBenchModal.khong_the_tai_du_lieu_ban_che_tao');
   } finally {
@@ -106,7 +109,7 @@ const guideSteps = [
 </script>
 
 <template>
-  <Modal :title="tr('WorkBenchModal.ban_che_tao')" :sub-title="tr('WorkBenchModal.work_bench')" :guid-steps="guideSteps" :on-refresh="loadData">
+  <Modal :title="tr('WorkBenchModal.ban_che_tao')" :sub-title="tr('WorkBenchModal.work_bench')" :guid-steps="guideSteps" :on-refresh="() => loadData(true)">
     <section class="grid min-h-full w-full grid-cols-1 gap-4 text-[#24352a] lg:h-full lg:min-h-0 lg:grid-cols-[minmax(15rem,0.8fr)_minmax(0,1.8fr)]">
       <WorkBenchInventory
         v-model:search-query="searchQuery"

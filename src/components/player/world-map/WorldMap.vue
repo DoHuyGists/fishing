@@ -1,12 +1,10 @@
 <script setup lang="ts">
-import type { CountryValueRow } from "../../../types/table/worldMap";
 import type { ViewTarget, ZoomState, PickPoint, AreaPoint } from "../../../types/model/worldMap";
 import { computed, onBeforeUnmount, onMounted, ref, watch } from "vue";
 import * as d3 from "d3";
 import * as topojson from "topojson-client";
 import type { GeometryCollection, Topology } from "topojson-specification";
 import world from "world-atlas/countries-110m.json";
-import { useCountryStore } from "../../../stores/country";
 import { createWorldMapCloudTexture } from "../../../utils/worldMapClouds";
 
 const emit = defineEmits<{
@@ -311,13 +309,6 @@ function draw() {
   for (const feature of countries) {
     ctx.beginPath();
     path(feature);
-    const custom = colors.get(String(feature.id));
-    if (custom) {
-      ctx.globalAlpha = 0.45;
-      ctx.fillStyle = custom;
-      ctx.fill();
-      ctx.globalAlpha = 1;
-    }
     ctx.stroke();
   }
 
@@ -335,21 +326,6 @@ function draw() {
 }
 
 watch(() => [props.anchor, props.pickEnabled], updateTip, { deep: true });
-
-async function loadColors() {
-  let data: CountryValueRow[];
-  try { data = await useCountryStore().fetchMapColors(); }
-  catch (error) {
-    console.error("Không tải được country_values:", error);
-    return;
-  }
-
-  colors.clear();
-  for (const row of data ?? []) {
-    if (row.color) colors.set(String(row.country_id).padStart(3, "0"), row.color);
-  }
-  draw();
-}
 
 function emitZoom(fromUser = false) {
   const [mx, my] = transform.invert([width / 2, height / 2]);
@@ -385,7 +361,6 @@ onMounted(() => {
   setupCanvas();
   d3.select(canvas).call(zoomBehavior);
   draw();
-  //   loadColors();
 
   // Vẽ lại khi đổi kích thước khung
   resizeObserver = new ResizeObserver(() => {
@@ -457,7 +432,7 @@ watch(() => props.unlockedCountryIds, () => {
 // Đổi màu qua props thì vẽ lại
 watch(() => [props.seaColor, props.landColor, props.borderColor], draw);
 
-defineExpose({ reload: loadColors, setView, resetView });
+defineExpose({ setView, resetView });
 </script>
 
 <template>

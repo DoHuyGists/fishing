@@ -1,3 +1,4 @@
+import { useGameCatalogStore } from './gameCatalog';
 import { t as tr } from "../i18n";
 import { defineStore } from "pinia";
 import { supabaseCountryRepository } from "../data/supabaseCountryRepository";
@@ -21,7 +22,6 @@ export interface Country {
 export const useCountryStore = defineStore("Country", {
   state: () => ({
     countries: [] as Country[],
-    mapColors: [] as { country_id: number; color: string | null }[],
     isLoading: false,
     loaded: false,
     unlockedCountries: [] as Country[],
@@ -39,20 +39,15 @@ export const useCountryStore = defineStore("Country", {
       .filter((id): id is string => id !== null),
   },
   actions: {
-    async fetchMapColors() {
-      this.mapColors = await supabaseCountryRepository.fetchMapColors();
-      return this.mapColors;
-    },
     async fetchCountries(force = false) {
-      if (this.loaded && !force) return;
+      const auth = useAuthStore(), generation = auth.sessionGeneration;
       this.isLoading = true;
       try {
-        this.countries = await supabaseCountryRepository.fetchCountries();
-        this.loaded = true;
+        await useGameCatalogStore().get('countries', { force, consumer: 'country', onUpdate: data => { this.countries = data ?? []; this.loaded = Boolean(data); if (!data) this.isLoading = false; } });
       } catch (error) {
-        console.error("Failed to fetch countries:", error);
+        if (auth.sessionGeneration === generation) console.error("Failed to fetch countries:", error);
       } finally {
-        this.isLoading = false;
+        if (auth.sessionGeneration === generation) this.isLoading = false;
       }
     },
     async fetchMyUnlockedCountries(playerId = useAuthStore().user?.id ?? null, invalidate = false) {

@@ -2,7 +2,7 @@
 
 Ngày đánh giá ban đầu: **12/11/2026**. Phạm vi: mã nguồn Vue/Pinia, repository Supabase, RPC và migration SQL có trong dự án. Các ước lượng tải dưới đây chưa được benchmark trên Supabase; tiến độ triển khai được ghi ở mục 9–10.
 
-**Cập nhật 13/11/2026:** đã thay subscription của 14 bảng bằng snapshot/refresh trong client, giữ `fishing_sessions` và `active_sessions`. Đánh giá tại mục 9, kết quả triển khai tại mục 10; định hướng này thay thế các đề xuất giữ/thu hẹp subscription tại mục 5 và 7. Đã chuẩn bị migration gỡ publication, chưa áp dụng lên Supabase.
+**Cập nhật 13/11/2026:** đã thay subscription của 14 bảng bằng snapshot/refresh trong client, giữ `fishing_sessions` và `active_sessions`. Đánh giá tại mục 9, kết quả triển khai tại mục 10; định hướng này thay thế các đề xuất giữ/thu hẹp subscription tại mục 5 và 7. Đã chuẩn bị migration gỡ publication, chưa áp dụng lên Supabase. Cache catalog Pinia + IndexedDB đã triển khai phía client theo mục 11; kết quả và cách bật RPC có kiểm tra revision tại mục 12. Hai migration mới chưa áp dụng lên Supabase.
 
 ## 1. Hiện tại đáp ứng được khoảng bao nhiêu người chơi?
 
@@ -394,3 +394,177 @@ Chưa chạy SQL này trên database. Trình tự rollout:
 - `npm run check:i18n`: qua kiểm tra 1.697 bản dịch mỗi ngôn ngữ và kiểm tra runtime Việt/Anh; UI mới tái sử dụng các key hiện có.
 - `npm run test:data-refresh` (Node 24 trong môi trường này): 12 kiểm thử đạt, gồm gộp request/đọc bù, phục hồi sau lỗi, khác user/phiên, điều kiện mutation thành công, pause/resume/backoff/cleanup, phân trang/filter/sort chợ trước khi lấy trang, đổi trang 1 → 2 → 1 và response hồ sơ tới muộn sau đổi tài khoản.
 - Kiểm thử repository dùng transport giả, kiểm thử store dùng Pinia thật qua Vite SSR; không gửi request tới Supabase. Chưa kiểm thử SQL migration, RLS/trigger production, UI với tài khoản thật hoặc tải CCU. Endpoint notification hiện vẫn đọc ba tập dữ liệu, directory đội vẫn chưa phân trang; đây là các việc P0-B/P1 tiếp theo, không coi việc bỏ Realtime đã giải quyết chúng.
+
+## 11. Kế hoạch cache Pinia + IndexedDB — 13/11/2026
+
+**Đã triển khai client và chuẩn bị SQL theo kế hoạch; cập nhật trạng thái tại 11.8 và kết quả thực tế tại mục 12.** Ưu tiên cache catalog ở máy khách; chưa thêm Redis, service worker hay backend cache. Mục này cụ thể hóa P1-B; các lịch snapshot ở mục 10 vẫn áp dụng cho dữ liệu động.
+
+### 11.1. Hiện trạng trước triển khai và phạm vi
+
+- Chưa có tầng IndexedDB dùng chung hoặc thư viện IndexedDB trong dependency. `country` và `fishingArea` dùng cờ `loaded` không có TTL; reload làm mất dữ liệu. Một số component còn kiểm tra `!loaded` trước khi gọi action: phải chuyển việc quyết định còn hạn về store, nếu không cache sẽ không bao giờ được kiểm tra lại trong phiên dài.
+- [guide.ts](src/stores/guide.ts), [inventory.ts](src/stores/inventory.ts), [blueprint.ts](src/stores/blueprint.ts), [skill.ts](src/stores/skill.ts) và catalog ao vẫn có luồng tải lại catalog khi mở/tải tính năng. Guard `if (loading) return` không trả dữ liệu/promise đang chờ cho caller khác.
+- Loài cá có nhiều projection: catalog nhật ký trong [supabaseDiaryRepository.ts](src/data/supabaseDiaryRepository.ts), dữ liệu theo khu, và `select('*')` phục vụ admin trong [supabaseSpeciesRepository.ts](src/data/supabaseSpeciesRepository.ts). Không lấy projection admin làm cache chung cho người chơi; không gộp các response khác cấu trúc dưới cùng key.
+- `equipment.fetchEquipment()` gọi `get_user_equipment_set_using`: đây là bộ trang bị của user, không phải catalog chung dù tên action dễ gây nhầm. Tương tự, `caughtDiary`, quốc gia đã mở khóa và farm snapshot là dữ liệu riêng.
+- Tái sử dụng [refreshTask.ts](src/utils/refreshTask.ts) để gộp request và đọc bù khi invalidate; giữ guard user/thế hệ đăng nhập đã có. Query Supabase tiếp tục nằm trong repository; store điều phối cache và state.
+
+### 11.2. Nhóm dữ liệu và chính sách ban đầu
+
+TTL tính từ lúc fetch thành công, được lưu cùng payload. “Tuổi tối đa khi fallback” tính từ cùng thời điểm đó, không cộng thêm sau mỗi lần đọc/lỗi. Đây là cấu hình khởi đầu, cần điều chỉnh bằng số đo và tần suất sửa catalog.
+
+| Nhóm | TTL | Tuổi tối đa khi fallback | Phạm vi triển khai |
+| --- | --- | --- | --- |
+| Quốc gia, metadata bãi câu dùng để hiển thị | 6 giờ | 7 ngày | Đợt đầu; không dùng metadata cũ thay kiểm tra quyền/vào khu ở server |
+| Catalog loài cá cho nhật ký/hiển thị | 6 giờ | 7 ngày | Đợt đầu; tách thành tích bắt được theo user và thông tin challenge riêng |
+| Hướng dẫn | 24 giờ | 7 ngày | Đợt đầu; chỉ cache nội dung, vẫn qua feature gate |
+| Vật phẩm hiển thị/cửa hàng | 15 phút | 24 giờ, chỉ xem | Đợt tiếp theo; mua cần xác nhận giá/phiên bản tại RPC |
+| Blueprint và metadata vật phẩm phụ thuộc | 15 phút | 24 giờ, chỉ xem | Lưu dependency; chế tạo cần kiểm tra phiên bản/giá/nguyên liệu ở server |
+| Catalog kỹ năng, catalog loài/thức ăn ao | 30 phút | 24 giờ, chỉ xem | Tách khỏi kỹ năng sở hữu, wallet, inventory và farm snapshot |
+| Tỷ giá quy đổi | 5 phút | Không fallback stale | Có kiểm tra expected amounts ở SQL hiện tại; bổ sung mã lỗi có cấu trúc |
+| Ví, inventory, trang bị đang dùng, profile, lượt, tiến trình/mở khóa, farm snapshot | Giữ refresh hiện tại | Không thêm fallback IndexedDB | Chưa persist trong đợt này; không làm cache catalog trì hoãn refresh sau mutation |
+| Chợ/history, đội/invite, presence, notification/feedback, leaderboard/admin monitor | Giữ snapshot/phân trang hiện tại | Không thêm fallback IndexedDB | Chưa persist trong đợt này |
+| Feature flags, Auth, active session, fishing session/challenge/mechanics | Giữ cơ chế hiện tại | Không fallback catalog | Flags giữ TTL 30 giây và server enforcement; không persist token/challenge vào game cache |
+
+“Chỉ xem” nghĩa là dữ liệu stale không được dùng để xác nhận giá hay quyết định trừ tiền. UI yêu cầu làm mới trước giao dịch; server luôn quyết định tính hợp lệ. Giá/công thức vẫn có thể đổi ngay sau GET thành công nên cần bước kiểm tra phiên bản tại mục 11.6.
+
+Chỉ dùng scope chung cho projection đã xác minh giống nhau giữa các user và được phép lưu. Catalog chịu RLS theo user/role phải có scope tương ứng; mặc định chưa chứng minh được thì key theo user, không chia sẻ. Kiểm tra tính năng/session trước khi trả cache để cache không bỏ qua gate hiện tại.
+
+### 11.3. Cấu trúc và trách nhiệm
+
+Luồng dự kiến: **component → action Pinia → Pinia còn hạn / IndexedDB còn hạn / repository Supabase → Pinia + IndexedDB**. Cache lỗi không làm mất response mạng thành công.
+
+Các thành phần được thiết kế trong kế hoạch (đã tạo khi triển khai):
+
+| Vị trí | Trách nhiệm |
+| --- | --- |
+| `src/types/model/gameCache.ts` | `CacheEntry<T>`, policy, scope, kết quả fresh/stale và metadata lỗi |
+| `src/data/indexedDbCacheRepository.ts` | Mở DB, get/put/delete/prune, transaction và upgrade; không chứa query Supabase |
+| `src/data/gameCachePolicies.ts` | Registry domain/key/projection, TTL, tuổi tối đa, dependency, policy stale |
+| `src/utils/gameCache.ts` | Điều phối hydrate, single-flight theo key, expiry, retry, invalidation; nhận loader từ store |
+| `src/stores/gameCatalog.ts` | Sở hữu catalog dùng chung trong Pinia, các action như `getSpecies()`; store tính năng dùng lại action/getter này |
+| Repository Supabase hiện có | SELECT đúng projection, map/validate dữ liệu, giữ lỗi có cấu trúc; bổ sung snapshot/revision khi triển khai mục 11.6 |
+
+Không persist toàn bộ `$state` bằng plugin tự động: selection, loading, lỗi UI, promise và timer không phải dữ liệu cache. Giữ API action đang dùng khi phù hợp, tránh mỗi component có một cơ chế cache riêng. Các hàm xử lý không mutate payload cache bằng sort/splice hoặc thêm `is_used`; dùng getter/bản sao khi cần.
+
+Mỗi entry có tối thiểu: `key`, `schemaVersion`, `scope`, `data`, `fetchedAt`, `expiresAt`, `staleUntil`, `serverRevision` khi server hỗ trợ, `generation` dùng cho invalidation. Metadata thử lại gồm `retryAt`, `failureCount`; lưu được cả khi chưa có payload để reload không reset backoff. Không ghi promise xuống IndexedDB.
+
+Key bao gồm namespace project/môi trường, domain/projection, phiên bản cấu trúc cache, scope và tham số chuẩn hóa. Ví dụ: `project:catalog-v1:species:diary:user:<id>`; key của tập ID phải sort/deduplicate, key theo khu phải chứa `areaId`. Chỉ thêm locale nếu payload thực sự phụ thuộc locale; không cache chuỗi UI đã dịch. Không dùng token làm key.
+
+Phân biệt **version cấu trúc IndexedDB**, **schemaVersion của payload client**, **serverRevision của nội dung** và **version protocol câu cá**; chúng không thay thế nhau. Mỗi projection tự kiểm tra shape lúc hydrate; entry hỏng/khác schema bị bỏ, không gây lỗi màn hình. Danh sách rỗng hợp lệ vẫn là cache hit.
+
+### 11.4. Thuật toán đọc, TTL và gộp request
+
+1. Kiểm tra scope/gate và generation hiện tại. Nếu Pinia có entry hợp lệ, chưa invalidate và `now < expiresAt`, trả ngay, không chạm DB/mạng.
+2. Nếu cần hydrate, tạo/lấy **pendingPromise theo key trước mọi thao tác bất đồng bộ**, bao gồm đọc IndexedDB. Toàn bộ caller cùng key dùng chung lượt hydrate/fetch; key khác không chặn nhau.
+3. Đọc IndexedDB, validate payload/metadata. Nếu còn hạn thì hydrate Pinia và trả, giữ nguyên `fetchedAt/expiresAt`; reload hoặc đọc cache không kéo dài TTL.
+4. Nếu thiếu/hết hạn, kiểm tra `retryAt`. Trong cooldown, chỉ trả stale đủ điều kiện; nếu không có dữ liệu dùng được thì trả lỗi có thể thử lại, không tự tạo request mới.
+5. Khi được thử lại, gọi loader repository với timeout/abort cho request đọc, mặc định khởi đầu 10 giây. Mười caller `getSpecies()` hết hạn tạo **một lượt fetch logic**; nếu catalog cần phân trang thì các trang của lượt fetch cũng dùng chung, không thành mười bộ request.
+6. Response thành công phải qua validate và guard generation/scope trước khi cập nhật. Áp dụng Pinia, ghi payload + timestamp nhất quán vào IndexedDB, xóa failure metadata. Lỗi ghi IndexedDB không biến fetch thành thất bại.
+7. Response lỗi áp dụng mục 11.5; `finally` giải phóng promise kể cả lỗi đồng bộ, timeout, hydrate lỗi. Caller chờ được kết quả thực, không chỉ thấy `loading` rồi return sớm.
+
+`get...()` mặc định tôn trọng TTL; `refresh...()` chủ động bỏ qua freshness nhưng vẫn gộp request; `invalidate...()` tăng generation và đánh dấu entry không dùng được. Nếu invalidate xảy ra giữa fetch, response cũ không được ghi vào Pinia hoặc IndexedDB; gộp một lượt đọc bù theo helper hiện có. Làm mới thủ công không vượt cooldown lặp lại do lỗi mạng; mismatch phiên bản có một lượt làm mới bắt buộc riêng.
+
+Không thêm interval fetch cho từng catalog. Kiểm tra TTL khi tính năng mở/được dùng, khi focus/online với catalog đang được sử dụng; nếu màn hình cần đối soát thì dùng lịch `visibleRefresh` hiện có. Dừng tab ẩn/offline và dùng cùng `retryAt`, tránh hai vòng retry chạy song song. Bỏ guard `!loaded` bên ngoài store để các lần mở lại luôn kiểm tra expiry.
+
+### 11.5. Stale fallback và cooldown khi lỗi
+
+- Chỉ fallback cho lỗi tạm thời như timeout, mất mạng, server 5xx hoặc rate limit; nếu có `Retry-After` thì tôn trọng. Dùng snapshot cũ khi policy cho phép, đúng scope/schema và chưa quá `staleUntil`.
+- Không fallback để che lỗi Auth/quyền, `FEATURE_DISABLED`, payload sai cấu trúc, phiên bản không tương thích hoặc entry đã invalidate. Khi quyền/tính năng bị thu hồi, bỏ/hide dữ liệu liên quan và giữ luồng thông báo hiện có.
+- Retry mặc định 15 → 30 → 60 → tối đa 120 giây, thêm jitter tối đa 15%. Persist metadata theo key; lỗi tiếp theo không tăng `expiresAt`, không làm stale sống mãi. Offline không gọi mạng; online thử lại khi đến hạn.
+- Cache quá tuổi tối đa hoặc không có payload: hiển thị lỗi/thử lại; không thay bằng `[]` rồi xem là thành công. Không giữ response lỗi làm payload catalog.
+- Pinia có trạng thái `fresh/stale/unavailable`, `fetchedAt`, `refreshError`; nội dung stale có dấu thời điểm và thông báo nhẹ dùng i18n, gộp thông báo để mười caller không tạo mười toast. Luồng thanh toán/chế tạo/nâng cấp yêu cầu dữ liệu đủ mới và xác nhận lại nếu giá/điều kiện thay đổi.
+
+### 11.6. Lệch phiên bản: hợp đồng cần bổ sung ở server
+
+**DB đổi không tự khiến GET hoặc RPC báo lỗi phiên bản.** Nếu client không gửi expected revision/quote và server không kiểm tra, request vẫn có thể thành công với dữ liệu mới trong khi UI hiển thị dữ liệu cũ. TTL chỉ giới hạn độ cũ khi lần đọc tiếp theo xảy ra. Vì vậy case 3 cần bổ sung hợp đồng SQL/RPC, không thể hoàn tất chỉ bằng `catch` phía client.
+
+Hiện nhiều repository dùng `throw new Error(error.message)`, làm mất `code/details/hint`. Riêng [currency-conversion.sql](scripts/supabase/rpc/currency-conversion/currency-conversion.sql) đã khóa/so sánh expected amounts trước khi trừ tiền, nhưng báo cùng SQLSTATE `22023` với nhiều lỗi khác; chưa có tín hiệu mismatch riêng. Các version mechanics/ao có sẵn không phải revision cho toàn bộ catalog.
+
+Thiết kế đề xuất:
+
+1. Chuẩn hóa lỗi repository, giữ `code`, HTTP status khi có, `details`, `hint`, và mã nghiệp vụ trong response `success:false`. Phân biệt mismatch catalog, schema/protocol client không hỗ trợ, lỗi mạng, thiếu tiền, listing đã bán và bảo trì. Không match chuỗi tiếng Việt/Anh hoặc coi mọi HTTP 409/`22023`/`PGRST...` là cache cũ. PostgREST hỗ trợ cấu trúc lỗi và custom error; định dạng phải phù hợp bản đang deploy, không giả định production cùng bản tài liệu. Nguồn: [PostgREST errors](https://docs.postgrest.org/en/stable/references/errors.html).
+2. Thêm revision theo domain catalog và RPC manifest nhỏ, ví dụ `get_game_catalog_versions()`. Cập nhật revision trong cùng transaction với thay đổi catalog ở admin/SQL/import; bao phủ insert/update/delete và dependency như item → blueprint/foods. Không dùng `MAX(updated_at)` làm revision vì có thể bỏ sót delete và bảng chưa có timestamp tin cậy. Không bump revision trên các bảng gameplay thay đổi mỗi lượt.
+3. Với domain cần revision, fetch `{ data, revision }` từ một snapshot nhất quán. Không GET dữ liệu rồi gắn revision đọc ở thời điểm khác. Nếu phải tải nhiều trang, dùng revision trước/sau và bỏ toàn bộ lượt khi đổi giữa chừng, retry có giới hạn; không ghi catalog thiếu trang thành snapshot đầy đủ. Manifest chỉ cho biết cần invalidate, không cấp quyền truy cập nội dung.
+4. RPC giao dịch chịu ảnh hưởng bởi catalog nhận expected revision hoặc expected quote/amounts. Kiểm tra trong cùng transaction, có khóa/phương án bảo đảm cấu hình không đổi từ lúc kiểm tra đến lúc áp dụng, **trước side effect**. Trả mã nghiệp vụ dự kiến `CATALOG_VERSION_MISMATCH` cùng domain bị ảnh hưởng và current revision, bảo đảm lần bị từ chối chưa trừ tiền/tạo phần thưởng. SQLSTATE chỉ là lớp vận chuyển; mã nghiệp vụ cần có trường có cấu trúc đã thống nhất.
+5. Client nhận mismatch: invalidate Pinia + IndexedDB cho domain và dependency, tăng generation; không fallback lại snapshot vừa bị server bác bỏ. Gộp một lượt force fetch, kiểm tra revision yêu cầu và cập nhật UI. Thông báo “Dữ liệu đã thay đổi, vui lòng kiểm tra và thử lại” qua i18n. Nếu tải mới lỗi, giữ trạng thái cần làm mới và cho retry có cooldown; không khôi phục giá/công thức sai.
+6. Người dùng xem thông tin mới rồi bấm lại; **không tự gửi lại mutation**. Timeout giao dịch có thể đã commit, không được coi là mismatch: giữ request ID/receipt và cơ chế đối soát hiện tại của ao, không tạo request ID mới để thử mù. Lỗi protocol/schema không hỗ trợ yêu cầu cập nhật trang/client, không lặp xóa cache/fetch vô hạn.
+
+Manifest cũng dùng single-flight và TTL dự kiến 5 phút, đọc khi catalog đang được dùng/mở lại hoặc resume đã hết hạn, không poll nền mọi người chơi. Khi revision đổi thì tải lại domain đang cần; domain chưa mở chỉ đánh dấu invalidate. Nếu manifest thất bại, dùng policy stale của từng domain; RPC vẫn kiểm tra trước giao dịch. TTL manifest chỉ rút ngắn thời gian phát hiện, không cam kết cập nhật tức thời trên mọi client.
+
+Triển khai SQL/hợp đồng lỗi tương thích trước rồi client gửi expected revision. Nếu cần hỗ trợ client cũ, dùng wrapper/version RPC rõ ràng và chốt thời điểm bắt buộc nâng client; giai đoạn client cũ không gửi revision chưa được coi là hoàn tất case 3. Chưa thay signature RPC đang chạy hoặc tuyên bố đã có kiểm tra phiên bản chỉ từ kế hoạch này.
+
+### 11.7. Reload, đổi tài khoản, nhiều tab và lỗi storage
+
+- Logout/đổi tài khoản: reset state riêng và tăng session generation trước cleanup bất đồng bộ; xóa entry scoped theo user cũ. Response/ghi IndexedDB tới muộn phải qua guard, không tái tạo cache đã xóa. Shared catalog chỉ giữ nếu đã kiểm chứng không chứa dữ liệu riêng hoặc phụ thuộc quyền user.
+- Gửi tín hiệu invalidate nhỏ qua BroadcastChannel cùng trình duyệt để tab khác bỏ cache Pinia; không thêm Supabase realtime. Lưu generation/tombstone theo domain trong IndexedDB và kiểm tra nguyên tử khi ghi để snapshot cũ từ tab khác không ghi đè sau invalidation. Đồng bộ invalidate đang mở không đồng nghĩa chia sẻ pendingPromise giữa các tab: bảo đảm mười caller/một lượt fetch ở mục 11.4 áp dụng trong một tab. Khóa fetch xuyên tab có thể bổ sung sau nếu số đo cho thấy cần.
+- IndexedDB không khả dụng, bị xóa, đầy quota hoặc mở DB bị chặn bởi tab cũ: coi là cache miss hoặc tạm chạy Pinia + network; không chặn đăng nhập/chơi game. Có thời hạn chờ storage để không treo pendingPromise. Đóng connection khi `versionchange`; không giữ transaction IndexedDB mở trong lúc chờ Supabase. Theo dõi transaction hoàn tất thay vì chỉ request `put` thành công. Nguồn: [MDN Using IndexedDB](https://developer.mozilla.org/en-US/docs/Web/API/IndexedDB_API/Using_IndexedDB).
+- Chỉ lưu DTO serializable, không lưu Vue proxy, URL blob tạm, ảnh/audio nhị phân hoặc secret. Dọn entry hết `staleUntil`, schema cũ và key ít dùng theo ngân sách ban đầu 10 MB/200 entry, loại entry ít dùng khi cần; entry vượt ngân sách chỉ ở RAM. Thống kê dung lượng là ước lượng và bắt lỗi quota thực tế. Browser có thể tự thu hồi storage nên IndexedDB luôn là cache có thể mất. Nguồn: [MDN Storage quotas and eviction](https://developer.mozilla.org/en-US/docs/Web/API/Storage_API/Storage_quotas_and_eviction_criteria).
+- Timestamp không hợp lệ hoặc đồng hồ bị lùi rõ rệt so với `fetchedAt` phải coi là cần đối soát; không cho cache mới giả hoặc sống vô hạn. Thời gian cache chỉ phục vụ UI, không quyết định thời điểm thưởng/cooldown gameplay phía server.
+- Admin editor tiếp tục fetch mới khi mở/chỉnh sửa; sau ghi thành công invalidate local domain/dependency. Client khác phát hiện qua revision/TTL. Không dùng catalog stale để ghi đè cấu hình admin.
+
+### 11.8. Thứ tự triển khai và tiêu chí nghiệm thu
+
+| Bước | Việc thực hiện | Điều kiện hoàn thành | Trạng thái |
+| --- | --- | --- | --- |
+| C1 | Audit projection/RLS, policy registry, types, IndexedDB adapter, điều phối TTL/single-flight/invalidation | Có kiểm thử concurrency, reload TTL, stale/cooldown, lỗi storage và generation | Đã triển khai và kiểm thử cục bộ; scope mặc định theo user vì chưa audit RLS production |
+| C2 | Áp dụng quốc gia, metadata bãi câu, catalog nhật ký và hướng dẫn; thay guard `loaded` ở caller | Reload trong TTL không tải lại payload; mở lại sau TTL đối soát đúng; không trộn dữ liệu khám phá theo user | Đã triển khai client; Edge kiểm thử reload/IndexedDB thật |
+| C3 | Bảo toàn structured errors, migration revision/manifest và guard RPC giá/công thức; triển khai server tương thích | Mismatch trước side effect, client invalidation/force fetch, yêu cầu người dùng thử lại; có kiểm thử SQL | Đã có client + migration, kiểm thử PostgreSQL cục bộ qua; chưa deploy SQL/bật chế độ versioned |
+| C4 | Áp dụng item/shop, blueprint, skill catalog, catalog ao và tỷ giá; xử lý dependency và stale chỉ xem | Không trì hoãn wallet/inventory/farm refresh sau mutation, không giao dịch với quote cũ | Đã nối client; guard revision nguyên tử chờ rollout C3, chế độ API cũ làm mới và yêu cầu xem lại nếu dữ liệu đổi |
+| C5 | Smoke test nhiều tab/user, lỗi mạng/storage, đo request/byte/latency trước–sau và chỉnh TTL | Các ca dưới đây qua; build/i18n/refresh regression qua; cập nhật kết quả thực tại mục này | Kiểm thử cục bộ, Edge, build/i18n/refresh đã qua; JWT/RLS/lock staging, trình duyệt khác và benchmark production còn chờ |
+
+Các ca bắt buộc:
+
+- Cold cache, cache rỗng hợp lệ, TTL sát biên, reload còn hạn/hết hạn; đọc lại không gia hạn `expiresAt`. So sánh RAM hit, IndexedDB hit và network fetch.
+- Mười caller đồng thời tạo một lượt hydrate/fetch mỗi key; caller khác key chạy độc lập; pending được xóa sau lỗi/timeout. Mutation/invalidate giữa fetch tạo một lượt đọc bù, response cũ không ghi RAM/IndexedDB.
+- Supabase treo/5xx/offline/rate limit: stale chỉ cho domain được phép và trong tuổi tối đa; cooldown vẫn còn sau reload; quá tuổi thì báo lỗi. Auth/permission/feature denial/schema mismatch không bị stale che.
+- Đổi user/logout khi đang đọc/ghi, projection cùng ID nhưng khác quyền; mở hai tab, invalidation đồng thời và upgrade DB; storage bị chặn/đầy/xóa/hỏng. Không có dữ liệu user cũ xuất hiện lại.
+- Catalog đổi/delete trong khi cache còn TTL hoặc đang phân trang; manifest phát hiện đúng dependency. Mismatch giao dịch không trừ tiền/thưởng, chỉ một force fetch, không retry mutation tự động; fetch khôi phục thất bại không dùng lại cache bị bác bỏ. Mạng mất sau mutation commit vẫn giữ cơ chế receipt.
+- Kiểm tra SQL trên staging bằng JWT/role thật, thử concurrent đổi giá và giao dịch; kiểm tra client cũ trong rollout. `get_aquaculture_farm()` vẫn được gọi theo cơ chế hiện tại, không vô tình xem RPC có side effect là cache GET thông thường.
+- Chạy `npm run build`, `npm run check:i18n`, `npm run test:data-refresh` và kiểm thử cache mới khi triển khai code; thêm browser test IndexedDB thật (ít nhất Chromium và trình duyệt mục tiêu khác), vì test mock không xác minh transaction/eviction thực tế.
+
+Đo theo domain trên staging/production: số hit RAM/IndexedDB, số request fetch logic và HTTP thực, byte truyền, hydrate/fetch p95, số fallback stale/mismatch/retry/storage error. Các kiểm thử cục bộ đã xác minh reload cùng scope trong TTL không fetch lại payload catalog và mười caller hết hạn chỉ có một lượt fetch. Manifest và dữ liệu động vẫn có thể tạo request. Chưa có telemetry/p95/benchmark production hoặc kết luận tăng CCU.
+
+## 12. Kết quả triển khai cache catalog — 13/11/2026
+
+### 12.1. Hành vi client đã triển khai
+
+- [gameCatalog.ts](src/stores/gameCatalog.ts) sở hữu catalog/metadata trong Pinia; [gameCache.ts](src/utils/gameCache.ts) điều phối đọc, gộp promise trước hydrate, TTL, timeout đọc 10 giây, backoff 15/30/60/120 giây cộng jitter và `Retry-After`. [gameCachePolicies.ts](src/data/gameCachePolicies.ts) giữ policy/validator/dependency của 10 domain, theo TTL tại 11.2. Dữ liệu rỗng hợp lệ được cache; dữ liệu cache hỏng không được áp dụng.
+- Đã loại bỏ `country_values`/`mapColors` vì DB hiện tại không có bảng này và bản đồ đã ngừng gọi tải màu tùy chỉnh. Gỡ repository, state, policy, snapshot/trigger SQL và mã tô màu cũ; bản đồ tiếp tục dùng ảnh địa hình và lớp mây theo quốc gia đã mở khóa. Feature `world-map` ánh xạ đọc sang `fishing_areas`; kiểm thử SQL chạy trên schema không có `country_values`. Không cần tạo bảng thay thế.
+- [indexedDbCacheRepository.ts](src/data/indexedDbCacheRepository.ts) lưu payload và timestamp trong cùng transaction, kiểm tra generation khi ghi, ngân sách payload 10 MB/200 entry và dọn entry quá tuổi. Mở DB chờ tối đa 1,5 giây, thao tác storage tối đa 2 giây rồi dùng RAM + network; cache lỗi không biến response mạng thành thất bại. Entry quá lớn không persist. Pinia/engine cũng giới hạn số entry trong RAM; các store màn hình giữ projection đang dùng.
+- Pinia còn hạn trả ngay, không đọc IndexedDB; reload hydrate từ IndexedDB giữ nguyên hạn cũ. Fallback stale chỉ áp dụng policy cho phép, có thông báo thời điểm bằng Việt/Anh; tỷ giá không fallback stale. Lỗi quyền/feature/schema không bị stale che. Cooldown được lưu cả khi chưa có payload; hết tuổi tối đa thì báo lỗi, không trả danh sách rỗng giả.
+- Scope gồm Supabase URL, cache schema và user; tập ID được sort/deduplicate. Mỗi fetch kiểm tra thế hệ đăng nhập trước khi ghi. Logout/đổi user xóa state đã bind và invalidate scope cũ; không persist wallet/inventory/tiến trình/challenge. Store màn hình nhận bản sao DTO, không mutate payload cache chung.
+- [useGameCatalogRefresh.ts](src/composables/useGameCatalogRefresh.ts) đăng ký catalog theo vòng đời màn hình; focus/online/visibility chỉ đối soát catalog đang được dùng, qua TTL và dừng khi ẩn/offline. Không thêm interval riêng cho catalog. Nút refresh chính bỏ qua freshness nhưng vẫn tôn trọng cooldown lỗi và gộp request.
+- Đã nối quốc gia, metadata bãi câu, loài cá nhật ký, hướng dẫn, shop, item metadata, blueprint, skill catalog, catalog ao và tỷ giá. Cờ `loaded` ở component bản đồ không còn ngăn store kiểm tra TTL. Nhật ký lọc location từ catalog dùng chung; thành tích bắt được vẫn lấy riêng theo user. Trang bị đang sử dụng vẫn là dữ liệu riêng, không đưa vào catalog cache.
+- [readCatalogPages.ts](src/data/readCatalogPages.ts) gom catalog của API cũ qua trang 200 dòng, tiếp tục đến trang rỗng, kể cả server cắt response nhỏ hơn page size; thứ tự có ID ổn định, tối đa 10.000 dòng. Một lượt fetch logic ở chế độ cũ có thể gồm nhiều HTTP request. Chế độ versioned dùng một RPC snapshot JSON thay vì ghép trang; snapshot quá 10.000 phần tử bị từ chối để nâng protocol, không cache dữ liệu bị cắt cụt.
+- [catalogRequests.ts](src/database/catalogRequests.ts) phát invalidation local sau admin ghi catalog thành công và giữ ánh xạ feature gate của wrapper mới. BroadcastChannel chỉ mang scope/domain để các tab bỏ cache; không có subscription Supabase mới. IndexedDB kiểm tra token trong transaction để tab cũ không ghi đè sau invalidation. Pending promise được chia sẻ trong từng tab; chưa khóa fetch giữa các tab.
+
+### 12.2. RPC revision và hai chế độ rollout
+
+Migration mới: [20261113_game_catalog_cache.sql](scripts/supabase/migrations/20261113_game_catalog_cache.sql), **chưa chạy trên Supabase**. Migration gỡ realtime ở mục 10 là việc riêng; SQL cache không thay đổi publication hoặc hai listener đang giữ.
+
+| Cấu hình build | Đọc catalog | Thao tác chịu ảnh hưởng catalog |
+| --- | --- | --- |
+| Chưa đặt `VITE_GAME_CATALOG_VERSIONED`, hoặc khác `true` | Cache client dùng repository/API cũ, không gọi RPC mới | Làm mới catalog trước thao tác; dữ liệu thay đổi hoặc stale thì yêu cầu xem lại/thử lại. Dùng RPC cũ; chưa bảo đảm kiểm tra revision nguyên tử giữa GET và mutation |
+| `VITE_GAME_CATALOG_VERSIONED=true` sau migration | Manifest TTL 5 phút + snapshot `{data, revision}` nhất quán, giữ SELECT grants/RLS của user | Wrapper nhận expected revision, giữ shared lock revision qua transaction rồi gọi RPC nghiệp vụ hiện có; mismatch bị từ chối trước side effect |
+
+Chế độ versioned bao phủ `purchase_item`, `craft_blueprint`, `upgrade_skill`, `convert_currency`, `stock_aquaculture_batch` và `feed_aquaculture_batch`. Stock so sánh thêm toàn bộ quote rules từ farm đang hiển thị, vì giá/capacity của farm không thuộc payload metadata cache. Các thao tác ao còn lại giữ RPC/receipt cũ vì không sử dụng catalog cache để xác nhận giá/luật của thao tác.
+
+[repositoryError.ts](src/data/repositoryError.ts) giữ mã lỗi/status/details/hint và giải mã `CATALOG_VERSION_MISMATCH`. Khi mismatch, client invalidate domain/dependency trong hai tầng, gộp tải lại, cập nhật UI và yêu cầu người dùng bấm lại. Không tự retry mutation. Với ao, wrapper tra receipt theo đúng user/request ID/input **trước** kiểm tra revision; retry kết quả đã commit vẫn trả receipt dù catalog đổi. Mismatch/lỗi chuẩn bị chưa gửi mutation được phân biệt với timeout không rõ kết quả.
+
+Revision tăng theo statement insert/update/delete/truncate và dependency trong cùng transaction catalog. Snapshot chạy `STABLE SECURITY INVOKER`, không lấy dữ liệu admin `*`; tỷ giá có helper đọc giới hạn vì bảng không cấp SELECT trực tiếp. Wrapper giữ quyền của RPC gốc; danh sách action/argument cố định, tra signature thực tế theo tên tham số và từ chối overload không rõ ràng. Các function `craft_blueprint`/`upgrade_skill` chưa có đủ định nghĩa SQL trong repo nên vẫn phải đối chiếu signature, grants và business logic thực tế trên staging.
+
+Trình tự triển khai:
+
+1. Kiểm tra migration feature flags, các bảng catalog, RPC gốc và quyền/RLS đã có. SQL cache dừng nếu thiếu prerequisite thay vì tạo schema gameplay thay thế. Sao lưu định nghĩa liên quan; không sửa/replay migration lịch sử để ghi đè thay đổi mới.
+2. Áp dụng SQL cache trên staging; xác minh cập nhật catalog đồng thời với mua/chế tạo/quy đổi/stock/feed, RLS theo JWT thật, rollback khi mismatch và receipt sau mất response. PostgreSQL cục bộ chưa thay được kiểm tra lock/concurrency của Supabase thật.
+3. Áp dụng migration đã kiểm chứng trên Supabase, sau đó đặt `VITE_GAME_CATALOG_VERSIONED=true` trong môi trường build frontend và build/deploy lại. Đây là biến Vite lúc build; chỉ đổi biến trên server hosting mà không build lại không kích hoạt client.
+4. Smoke test cold/warm/reload, hai tab, đổi user, bảo trì, sửa/xóa catalog và các RPC ở trên; theo dõi request/byte/p95/lỗi/lock. Client cũ vẫn gọi RPC cũ nên chưa có guard revision; cần rollout/refresh client cũ để hoàn tất case 3 cho toàn bộ người chơi.
+5. Nếu cần rollback frontend, bỏ cờ và build lại hoặc quay về bản trước. Giữ migration/RPC wrapper/revision trong DB trong giai đoạn rollback; không xóa các function khi còn client versioned. Chưa thay đổi `.env`, chưa deploy frontend, chưa chạy SQL live trong lần cập nhật này.
+
+### 12.3. Xác minh đã hoàn thành và phần còn chờ
+
+- `npm run build`: TypeScript + Vite qua. Cảnh báo vendor 616,49 kB vượt ngưỡng 600 kB đã có từ trước vẫn còn.
+- `npm run check:i18n`: 1.702 key mỗi locale và kiểm tra runtime Việt/Anh qua; các thông báo cache mới có đủ bản dịch.
+- `npm run test:game-cache`: **27 kiểm thử qua**, gồm core cache, Pinia thật qua Vite SSR và migration thực thi trên PostgreSQL in-memory PGlite. Có ca 10 caller/1 fetch, reload TTL, timeout/stale/cooldown/Retry-After, cache/storage hỏng, đổi user, invalidation khi đang đọc, mismatch rồi yêu cầu bấm lại, RLS/projection, trigger rollback, RPC argument guards và receipt ưu tiên trước revision. RPC nghiệp vụ trong fixture SQL được mô phỏng; chưa replay logic gameplay production.
+- `npm run test:data-refresh`: **12 kiểm thử hồi quy qua**; wrapper mới vẫn ánh xạ refresh ví/profile đúng, chặn response phiên cũ và giữ feature gate.
+- `npm run test:game-cache:browser`: **Edge headless thật + IndexedDB thật qua**, gồm reload không fetch lại, transaction generation giữa tab, cooldown sau reload, schema sai, storage bị chặn/hết quota; Pinia hydrate từ disk, BroadcastChannel invalidate, resume màn hình đang dùng và logout. Dùng Edge/Chromium cài sẵn; có thể đặt `CACHE_TEST_BROWSER` đến executable phù hợp. Hai dependency kiểm thử `playwright-core`/PGlite chỉ nằm ở devDependencies, không vào bundle game.
+- Kiểm thử không gửi request tới Supabase thật. Chưa kiểm tra Firefox/Safari, chính sách thu hồi storage thực tế của từng thiết bị, JWT/RLS/trigger/signature production, contention nhiều connection hoặc benchmark CCU. Chưa có số đo p95/egress/CPU trước–sau; không suy ra phần trăm cải thiện hoặc mức CCU mới từ các test chức năng.

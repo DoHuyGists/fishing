@@ -1,9 +1,10 @@
+import { useGameCatalogStore } from './gameCatalog';
+import { useAuthStore } from './auth';
 import type { Blueprint } from "../types/model/blueprint";
 import type { Item } from "../types/model/item";
 import { t as tr } from "../i18n";
 import { defineStore } from "pinia";
 import { supabaseBlueprintRepository } from "../data/supabaseBlueprintRepository";
-import { supabaseItemRepository } from "../data/supabaseItemRepository";
 import { useCurrencyStore } from "./currency";
 import { useInventoryStore } from "./inventory";
 
@@ -15,16 +16,26 @@ export const useBlueprintStore = defineStore("blueprint", {
     crafting: false,
   }),
   actions: {
-    async loadBlueprints() {
+    async loadBlueprintItems(blueprints: Blueprint[], force = false) {
+      const ids = [...new Set(blueprints.flatMap(blueprint => [blueprint.resultItemId, ...blueprint.requiredMaterials.map(material => material.item_id)]))];
+      await useGameCatalogStore().get('items', { ids, force, consumer: 'blueprint', onUpdate: data => {
+        this.itemsById = Object.fromEntries((data ?? []).map(item => [item.id, item]));
+      } });
+    },
+    async loadBlueprints(force = false) {
+      const auth = useAuthStore(), generation = auth.sessionGeneration;
       this.loading = true;
       try {
-        const blueprints = await supabaseBlueprintRepository.fetchAll();
-        const ids = [...new Set(blueprints.flatMap((blueprint) => [blueprint.resultItemId, ...blueprint.requiredMaterials.map((material) => material.item_id)]))];
-        const items = await supabaseItemRepository.fetchByIds(ids);
-        this.blueprints = blueprints;
-        this.itemsById = Object.fromEntries(items.map((item) => [item.id, item]));
+        const catalog = useGameCatalogStore();
+        const blueprints = await catalog.get('blueprints', { force, consumer: 'blueprint', onUpdate: data => {
+          this.blueprints = data ?? [];
+          if (!data) { this.itemsById = {}; this.loading = false; }
+          else void this.loadBlueprintItems(data, force).catch(() => {});
+        } });
+        if (auth.sessionGeneration !== generation) return;
+        await this.loadBlueprintItems(blueprints, force);
       } finally {
-        this.loading = false;
+        if (auth.sessionGeneration === generation) this.loading = false;
       }
     },
     async craft(blueprintId: string, quantity: number) {
@@ -48,7 +59,8 @@ export const useBlueprintStore = defineStore("blueprint", {
         const required = new Map<string, number>();
         for (const material of blueprint.requiredMaterials) required.set(material.item_id, (required.get(material.item_id) ?? 0) + material.quantity * quantity);
         for (const [id, count] of required) if ((owned.get(id) ?? 0) < count) throw new Error(tr('blueprint.khong_du_nguyen_lieu_che_tao'));
-        const result = await supabaseBlueprintRepository.craft(blueprintId, quantity);
+        const result = await useGameCatalogStore().action('craft_blueprint', { p_blueprint_id: blueprintId, p_quantity: quantity }, ['blueprints'],
+          () => supabaseBlueprintRepository.craft(blueprintId, quantity));
         await currency.fetchCurrency();
         return result;
       } finally { this.crafting = false; }

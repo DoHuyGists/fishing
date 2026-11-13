@@ -1,3 +1,5 @@
+import { readCatalogPages } from './readCatalogPages';
+import { RepositoryError } from './repositoryError';
 import type { Species, CaughtDiary } from "../types/model/diary";
 import supabase from "../database/connection";
 
@@ -5,13 +7,8 @@ class SupabaseDiaryRepository {
   /**
    * Fetch all fish species from the `species` table.
    */
-  async fetchSpecies(): Promise<Species[]> {
-    const { data, error } = await supabase.from("species").select("id, created_at, information, location, status, name, image").order("location", { ascending: true }).order("name", { ascending: true });
-
-    if (error) {
-      console.error("Error fetching species:", error);
-      throw new Error(error.message);
-    }
+  async fetchSpecies(signal?: AbortSignal): Promise<Species[]> {
+    const data = await readCatalogPages((from, to) => supabase.from("species").select("id, created_at, information, location, status, name, image").order("location", { ascending: true }).order("name", { ascending: true }).order("id").abortSignal(signal ?? new AbortController().signal).range(from, to));
 
     return data ?? [];
   }
@@ -49,7 +46,7 @@ class SupabaseDiaryRepository {
 
     if (error) {
       console.error("Error fetching caught_diary:", error);
-      throw new Error(error.message);
+      throw new RepositoryError(error);
     }
 
     return data ?? [];
