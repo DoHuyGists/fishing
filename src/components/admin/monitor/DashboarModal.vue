@@ -29,13 +29,13 @@ onUnmounted(store.stop);
         <div class="mb-1 flex items-center gap-2">
           <span
             class="size-2 shrink-0 rounded-full"
-            :class="store.realtimeStatus === 'connected' ? 'bg-emerald-600' : 'bg-amber-500'"
+            :class="store.error || store.currencyError ? 'bg-amber-500' : 'bg-emerald-600'"
             aria-hidden="true"
           />
-          {{ store.realtimeLabel }}
+          Tự động tải báo cáo đang xem mỗi 30 giây
         </div>
         <div>Cập nhật: {{ store.activeReport === 'currency' ? store.currencyUpdatedLabel : store.lastUpdatedLabel }}</div>
-        <div class="mt-1">Theo dõi thay đổi bãi câu và số dư tiền tệ; tải lại mỗi 30 giây.</div>
+        <div class="mt-1">Tạm dừng tải tự động khi tab ẩn hoặc mất mạng.</div>
       </div>
       <button
         type="button"

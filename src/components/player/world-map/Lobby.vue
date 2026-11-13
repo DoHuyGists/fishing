@@ -130,26 +130,29 @@ watch(
 watch(
   () => [authStore.user?.id, features.isAvailable("notifications")] as const,
   ([userId, enabled], _, onCleanup) => {
-    if (userId && enabled) notificationStore.subscribeToNewNotifications(userId, () => {});
+    if (userId && enabled) notificationStore.startRefreshing(userId, 'badge');
     onCleanup(() => {
-      void notificationStore.unsubscribeFromNewNotifications();
+      notificationStore.stopRefreshing('badge');
     });
   },
   { immediate: true },
 );
 
+watch(() => [authStore.user?.id, features.isAvailable('team')] as const, ([userId, enabled], _, onCleanup) => {
+  if (!userId || !enabled) return;
+  teamStore.startRefreshing(userId, 'lobby');
+  onCleanup(() => teamStore.stopRefreshing('lobby'));
+}, { immediate: true });
+
 onMounted(() => {
   void userTurnsStore.fetchStatus().then(() => userTurnsStore.startCountdown());
   if (authStore.userId) {
     caughtStore.loadCaughtFishes();
-    void teamStore.loadData(authStore.userId);
-    teamStore.subscribeRealtime(authStore.userId);
   }
 });
 
 onUnmounted(() => {
-  void notificationStore.unsubscribeFromNewNotifications();
-  teamStore.unsubscribeRealtime();
+  notificationStore.stopRefreshing('badge');
   userTurnsStore.stopCountdown();
 });
 </script>

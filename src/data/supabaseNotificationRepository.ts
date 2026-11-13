@@ -1,6 +1,5 @@
 import type { NotificationRow, AdminNotificationRow, AdminNotificationPayload } from "../types/table/notification";
 import type { NotificationKind } from "../types/model/notification";
-import type { RealtimeChannel } from "@supabase/supabase-js";
 import supabase from "../database/connection";
 
 const adminTable = (kind: NotificationKind) => (kind === "system" ? "system_notifications" : "personal_notifications");
@@ -75,38 +74,6 @@ class SupabaseNotificationRepository {
     if (error) throw new Error(error.message);
   }
 
-  subscribeToNotifications(userId: string, onChange: () => void, consumer: "modal" | "badge" = "modal"): RealtimeChannel {
-    return supabase
-      .channel(`notifications-${consumer}:${userId}:${crypto.randomUUID()}`)
-      .on(
-        "postgres_changes",
-        { event: "*", schema: "public", table: "personal_notifications", filter: `user_id=eq.${userId}` },
-        onChange,
-      )
-      .on("postgres_changes", { event: "*", schema: "public", table: "system_notifications" }, onChange)
-      .on(
-        "postgres_changes",
-        { event: "*", schema: "public", table: "system_notification_reads", filter: `user_id=eq.${userId}` },
-        onChange,
-      )
-      .subscribe(status => { if (status === "SUBSCRIBED") onChange(); });
-  }
-
-  subscribeToNewNotifications(userId: string, onNewNotification: () => void): RealtimeChannel {
-    return supabase
-      .channel(`notifications-badge:${userId}`)
-      .on(
-        "postgres_changes",
-        { event: "INSERT", schema: "public", table: "personal_notifications", filter: `user_id=eq.${userId}` },
-        onNewNotification,
-      )
-      .on("postgres_changes", { event: "INSERT", schema: "public", table: "system_notifications" }, onNewNotification)
-      .subscribe();
-  }
-
-  async unsubscribe(channel: RealtimeChannel): Promise<void> {
-    await supabase.removeChannel(channel);
-  }
 }
 
 export const supabaseNotificationRepository = new SupabaseNotificationRepository();

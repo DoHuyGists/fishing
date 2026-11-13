@@ -1,6 +1,5 @@
 import type { FeatureFlagRow, FeatureFlagUpdate } from "../types/table/featureFlag";
 import supabase from "../database/connection";
-import type { RealtimeChannel } from "@supabase/supabase-js";
 const columns = "feature_key,enabled,message_vi,message_en,updated_at,updated_by";
 
 class SupabaseFeatureFlagRepository {
@@ -19,13 +18,6 @@ class SupabaseFeatureFlagRepository {
     return data;
   }
 
-  subscribe(onChange: () => void): RealtimeChannel {
-    return supabase.channel(`feature-flags:${crypto.randomUUID()}`)
-      .on("postgres_changes", { event: "*", schema: "public", table: "feature_flags" }, onChange)
-      .subscribe(status => { if (status === "SUBSCRIBED") onChange(); });
-  }
-
-  async unsubscribe(channel: RealtimeChannel) { await supabase.removeChannel(channel); }
 }
 
 export const supabaseFeatureFlagRepository = new SupabaseFeatureFlagRepository();

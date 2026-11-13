@@ -3,7 +3,7 @@ import type { TeamView as View, TeamJoinType, TeamStatus } from "../../../types/
 import { getFormattingLocale } from '../../../i18n';
 import { t as tr } from "../../../i18n";
 
-import { computed, onMounted, ref } from "vue";
+import { computed, onMounted, onUnmounted, ref } from "vue";
 import Modal from "../../shared/Modal.vue";
 import PlayerIdentity from "../../shared/PlayerIdentity.vue";
 import { useCountryStore } from "../../../stores/country.ts";
@@ -236,10 +236,12 @@ const statusClass: Record<string, string> = {
 
 // ─── Lifecycle ───────────────────────────────────────────────────────────────
 async function loadData() {
-  await Promise.all([teamStore.loadData(userId.value), friendStore.loadData(userId.value), countryStore.fetchCountries()]);
+  await Promise.all([teamStore.loadData(userId.value, false), friendStore.loadData(userId.value), countryStore.fetchCountries()]);
 }
 
+onUnmounted(() => teamStore.stopRefreshing('panel'));
 onMounted(async () => {
+  teamStore.startRefreshing(userId.value, 'panel');
   await loadData();
   view.value = "room";
 });

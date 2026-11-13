@@ -11,12 +11,6 @@ class SupabaseFeedbackRepository {
     if (error) throw new Error(error.message);
     return (data ?? []) as ErrorFeedbackRow[];
   }
-  subscribeMyErrors(userId: string, onChange: () => void) {
-    return supabase.channel(`my-errors:${userId}`).on("postgres_changes",
-      { event: "*", schema: "public", table: "error_feedback", filter: `user_id=eq.${userId}` }, onChange)
-      .subscribe(status => { if (status === "SUBSCRIBED") onChange(); });
-  }
-  async unsubscribe(channel: ReturnType<typeof supabase.channel>) { await supabase.removeChannel(channel); }
   async fetchOpinionFeedback(): Promise<OpinionFeedbackRow[]> {
     const { data, error } = await supabase.from("feedback").select("*").order("created_at", { ascending: false });
     if (error) throw new Error(error.message);

@@ -5,12 +5,11 @@ import { FEATURE_CATALOG, modalFeatures } from "../data/featureAvailability";
 import { supabaseFeatureFlagRepository as repository } from "../data/supabaseFeatureFlagRepository";
 import { useToast } from "../composables/useToast";
 import { useInformationModalStore } from "./informationModal";
-import type { RealtimeChannel } from "@supabase/supabase-js";
+import { startVisibleRefresh } from "../utils/visibleRefresh";
 
-let channel: RealtimeChannel | null = null;
+let stopRefresh: (() => void) | null = null;
 let pending: Promise<void> | null = null;
 let refreshRequested = false;
-let refreshTimer: ReturnType<typeof setInterval> | null = null;
 let epoch = 0;
 let lastNotice = "";
 let lastNoticeAt = 0;
@@ -93,16 +92,16 @@ export const useFeatureAvailabilityStore = defineStore("FeatureAvailability", {
       useToast().warning(message, { title: tr("FeatureAvailability.title") });
     },
     async start() {
-      if (!channel) channel = repository.subscribe(() => { void this.load(true); });
-      if (!refreshTimer) refreshTimer = setInterval(() => { void this.load(true); }, 30_000);
+      if (!stopRefresh) stopRefresh = startVisibleRefresh(async () => {
+        await this.load();
+        if (this.error) throw new Error(this.error);
+      }, 30_000, false);
       await this.load();
     },
     stop() {
       epoch++;
-      if (channel) void repository.unsubscribe(channel);
-      channel = null;
-      if (refreshTimer) clearInterval(refreshTimer);
-      refreshTimer = null;
+      stopRefresh?.();
+      stopRefresh = null;
       pending = null;
       refreshRequested = false;
       lastNotice = "";

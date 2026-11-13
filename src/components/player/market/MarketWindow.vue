@@ -3,7 +3,8 @@ import type { MarketListing } from "../../../types/model/market";
 import { getFormattingLocale } from '../../../i18n';
 import { t as tr } from "../../../i18n";
 
-import { computed, onMounted, onUnmounted, ref } from "vue";
+import { computed, onMounted, onUnmounted, ref, watch } from "vue";
+import { storeToRefs } from "pinia";
 import { useCurrencyStore } from "../../../stores/currency.ts";
 import { supabaseMarketRepository } from "../../../data/supabaseMarketRepository.ts";
 import { useAuthStore } from "../../../stores/auth.ts";
@@ -17,16 +18,15 @@ import { useToast } from "../../../composables/useToast.ts";
 
 const authStore = useAuthStore();
 const currencyStore = useCurrencyStore();
-const activeMarketTab = ref<"all" | "my" | "history">("all");
+
 const viewMode = ref<"list" | "grid" | "species">("grid");
 const toast = useToast();
-const marketSearch = ref("");
-const marketRarity = ref("ALL");
-const marketSort = ref<"newest" | "price-asc" | "price-desc">("newest");
+
 const itemToBuy = ref<MarketListing | null>(null);
 const isBuying = ref(false);
 const isCancellingListing = ref(false);
 const marketStore = useMarketStore();
+const { activeTab: activeMarketTab, search: marketSearch, rarity: marketRarity, sort: marketSort } = storeToRefs(marketStore);
 const caughtStore = useCaughtStore();
 const LISTED_PRICE = 500;
 const emit = defineEmits(["close"]);
@@ -40,35 +40,12 @@ const balanceFee = computed(() => {
     return 0;
   }
 });
-const filteredMarketListings = computed(() => {
-  let result = marketStore.marketListings.filter((item) => {
-    const fish = item.caught?.fish;
-    const nameMatch =
-      !marketSearch.value || fish?.name?.toLowerCase().includes(marketSearch.value.toLowerCase().trim());
-    const rarityMatch = marketRarity.value === "ALL" || fish?.rarity === marketRarity.value;
-    return nameMatch && rarityMatch;
-  });
-
-  if (marketSort.value === "price-asc") {
-    result.sort((a, b) => a.price - b.price);
-  } else if (marketSort.value === "price-desc") {
-    result.sort((a, b) => b.price - a.price);
-  } else {
-    result.sort((a, b) => new Date(b.created_at).getTime() - new Date(a.created_at).getTime());
-  }
-
-  return result;
-});
-
-const myMarketListings = computed(() => {
-  const currentUserId = authStore.userId;
-  if (!currentUserId) return [];
-  return marketStore.marketListings.filter((item) => item.user_id === currentUserId);
-});
+const filteredMarketListings = computed(() => marketStore.marketListings);
+const myMarketListings = computed(() => marketStore.marketListings.filter(item => item.user_id === authStore.userId));
 
 const marketTabs = computed(() => [
-  { key: "all", get label() { return tr('MarketWindow.san_giao_dich'); }, badge: marketStore.marketListings.length },
-  { key: "my", get label() { return tr('MarketWindow.ca_cua_toi_dang_ban'); }, badge: myMarketListings.value.length },
+  { key: "all", get label() { return tr('MarketWindow.san_giao_dich'); } },
+  { key: "my", get label() { return tr('MarketWindow.ca_cua_toi_dang_ban'); } },
   { key: "history", get label() { return tr('MarketWindow.lich_su_mua_ban'); } },
 ]);
 
@@ -102,11 +79,11 @@ async function handleBuyFish() {
   try {
     const fishName = itemToBuy.value.caught?.fish?.name || tr('Fishfarm.ca_2');
     await supabaseMarketRepository.buyFish(itemToBuy.value.id);
-    await marketStore.loadMarketListings();
-    await caughtStore.loadCaughtFishes();
+    await Promise.all([marketStore.loadMarketListings(true), currencyStore.fetchCurrency(), caughtStore.loadCaughtFishes()]);
     itemToBuy.value = null;
     toast.success(tr('MarketWindow.mua_value0_thanh_cong', { value0: fishName }), { get title() { return tr('FishingPassPurchaseModal.giao_dich_thanh_cong'); } });
   } catch (err: any) {
+    void marketStore.loadMarketListings(true);
     console.error("Lỗi khi mua cá:", err);
     toast.error(err?.message || tr('MarketWindow.khong_the_mua_ca_vui_long_thu_lai'), {
       get title() { return tr('MarketWindow.mua_ca_that_bai'); }
@@ -154,16 +131,27 @@ function getRarityBadgeClass(rarity: string | null | undefined) {
   }
 }
 
-onMounted(() => {
-  marketStore.startRealtime(authStore.userId);
-  void marketStore.loadHistory(authStore.userId, 1);
-  marketStore.loadMarketListings();
+let searchTimer: ReturnType<typeof setTimeout> | undefined;
+watch([marketSearch, marketRarity, marketSort], () => {
+  clearTimeout(searchTimer);
+  marketStore.listingPage = 1;
+  searchTimer = setTimeout(() => { void marketStore.loadVisible(); }, 300);
 });
-onUnmounted(() => marketStore.stopRealtime());
+watch(activeMarketTab, () => {
+  clearTimeout(searchTimer);
+  marketStore.listingPage = 1;
+  void marketStore.loadVisible();
+});
+watch(() => marketStore.listingPage, () => { void marketStore.loadVisible(); });
+onMounted(() => {
+  marketStore.startRefreshing(authStore.userId);
+  void currencyStore.fetchCurrency();
+});
+onUnmounted(() => { clearTimeout(searchTimer); marketStore.stopRefreshing(); });
 </script>
 
 <template>
-  <Modal :title="tr('MarketWindow.cho_ca')" :show-count-data="activeMarketTab !== 'history'" :on-refresh="() => { marketStore.loadMarketListings(); marketStore.loadHistory(authStore.userId); }">
+  <Modal :title="tr('MarketWindow.cho_ca')" :show-count-data="activeMarketTab !== 'history'" :on-refresh="() => marketStore.loadVisible()">
     <div v-if="marketStore.error" role="alert" class="mb-3 rounded bg-red-50 p-3 text-red-700">{{ marketStore.error }}</div>
     <Tab v-model="activeMarketTab" :tabs="marketTabs" :aria-label="tr('MarketWindow.cho_ca')" lazy>
       <template #all>
@@ -401,6 +389,11 @@ onUnmounted(() => marketStore.stopRealtime());
         </section>
       </template>
     </Tab>
+    <nav v-if="activeMarketTab !== 'history'" :aria-label="tr('MarketWindow.cho_ca')" class="mt-3 flex items-center justify-between gap-3 text-xs">
+      <button type="button" :disabled="marketStore.isLoadingMarket || marketStore.listingPage <= 1" class="rounded-lg border border-[#cbd9c6] px-3 py-1.5 disabled:opacity-40" @click="marketStore.listingPage--">{{ tr('Fishfarm.truoc') }}</button>
+      <span>{{ tr('CaughtModal.trang') }} {{ marketStore.listingPage }}</span>
+      <button type="button" :disabled="marketStore.isLoadingMarket || !marketStore.listingHasNext" class="rounded-lg border border-[#cbd9c6] px-3 py-1.5 disabled:opacity-40" @click="marketStore.listingPage++">{{ tr('Fishfarm.sau') }}</button>
+    </nav>
   </Modal>
   <PaymentConfirmation
     v-if="itemToBuy"

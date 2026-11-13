@@ -1,7 +1,6 @@
 import type { UserInAreaRow } from "../types/table/userInArea";
 import type { UserTurnStatus } from "../types/model/userInArea";
 import supabase from "../database/connection";
-import type { RealtimeChannel } from "@supabase/supabase-js";
 
 class SupabaseUserInAreaRepository {
   async fetchTurnStatus(): Promise<UserTurnStatus> {
@@ -46,33 +45,6 @@ class SupabaseUserInAreaRepository {
     }
 
     return data ?? [];
-  }
-
-  /**
-   * Đăng ký lắng nghe thay đổi realtime trên bảng user_in_area.
-   */
-  subscribeToAreaUsers(onChange: () => void): RealtimeChannel {
-    return supabase
-      .channel("user_in_area_realtime")
-      .on(
-        "postgres_changes",
-        {
-          event: "*",
-          schema: "public",
-          table: "user_in_area",
-        },
-        () => {
-          onChange();
-        },
-      )
-      .subscribe();
-  }
-
-  /**
-   * Hủy đăng ký realtime channel
-   */
-  async unsubscribe(channel: RealtimeChannel): Promise<void> {
-    await supabase.removeChannel(channel);
   }
 
   async getCurrentUserArea(userId: string) : Promise<UserInAreaRow | null> {

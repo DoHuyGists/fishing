@@ -1,15 +1,19 @@
 import type { UserTeam, UserTeamMember, TeamStatus, TeamJoinType, UserTeamInvite } from "../types/model/team";
 import { t as tr } from "../i18n";
 import { defineStore } from "pinia";
-import type { RealtimeChannel } from "@supabase/supabase-js";
-import supabase from "../database/connection";
+import { useAuthStore } from './auth';
+import { createKeyedRefreshTask } from '../utils/refreshTask';
+import { startVisibleRefresh } from '../utils/visibleRefresh';
 import { supabaseTeamRepository } from "../data/supabaseTeamRepository";
 
-// Module-level: không đưa vào Pinia state để tránh serialize warning
-let _channel: RealtimeChannel | null = null;
+const refreshMembership = createKeyedRefreshTask<void>();
+const refreshDirectory = createKeyedRefreshTask<void>();
+const consumers = new Map<string, string>();
+let stopRefresh: (() => void) | null = null;
 
 export const useTeamStore = defineStore("team", {
   state: () => ({
+    ownerId: '',
     /** Danh sách tất cả nhóm đang active (OPEN/FULL/FISHING) */
     teams: [] as UserTeam[],
     /** Nhóm mà user hiện đang tham gia (null nếu chưa join) */
@@ -21,6 +25,8 @@ export const useTeamStore = defineStore("team", {
     loading: false,
     actionLoading: false,
     error: "",
+    membershipError: '',
+    directoryError: '',
   }),
 
   getters: {
@@ -31,58 +37,80 @@ export const useTeamStore = defineStore("team", {
   },
 
   actions: {
-    async loadData(userId: string) {
+    async loadMyTeam(userId: string, invalidate = false) {
+      const auth = useAuthStore();
+      if (auth.user?.id !== userId) return;
+      const generation = auth.sessionGeneration;
+      return refreshMembership(userId + ':' + generation, async () => {
+        try {
+          const [myTeamData, invites] = await Promise.all([
+            supabaseTeamRepository.fetchMyTeam(userId), supabaseTeamRepository.fetchMyInvites(userId),
+          ]);
+          if (auth.user?.id !== userId || auth.sessionGeneration !== generation) return;
+          this.myTeam = myTeamData?.team ?? null;
+          this.myTeamMembers = myTeamData?.members ?? [];
+          this.myInvites = invites;
+          this.membershipError = ''; this.error = this.directoryError;
+        } catch (err) {
+          if (auth.user?.id === userId && auth.sessionGeneration === generation) {
+            this.membershipError = err instanceof Error ? err.message : tr('team.khong_the_tai_du_lieu_nhom');
+            this.error = this.membershipError;
+          }
+        }
+      }, invalidate);
+    },
+    async loadTeams(userId: string, invalidate = false) {
+      const auth = useAuthStore();
+      if (auth.user?.id !== userId) return;
+      const generation = auth.sessionGeneration;
+      return refreshDirectory(userId + ':' + generation, async () => {
+        try {
+          const teams = await supabaseTeamRepository.fetchTeams();
+          if (auth.user?.id === userId && auth.sessionGeneration === generation) {
+            this.teams = teams; this.directoryError = ''; this.error = this.membershipError;
+          }
+        } catch (err) {
+          if (auth.user?.id === userId && auth.sessionGeneration === generation) {
+            this.directoryError = err instanceof Error ? err.message : tr('team.khong_the_tai_du_lieu_nhom');
+            this.error = this.directoryError;
+          }
+        }
+      }, invalidate);
+    },
+    async loadData(userId: string, invalidate = true) {
+      const auth = useAuthStore();
+      if (auth.user?.id !== userId) return;
+      const generation = auth.sessionGeneration;
       this.loading = true;
-      this.error = "";
-      try {
-        const [teams, myTeamData, myInvites] = await Promise.all([
-          supabaseTeamRepository.fetchTeams(),
-          supabaseTeamRepository.fetchMyTeam(userId),
-          supabaseTeamRepository.fetchMyInvites(userId),
-        ]);
-        this.teams = teams;
-        this.myInvites = myInvites;
-        this.myTeam = myTeamData?.team ?? null;
-        this.myTeamMembers = myTeamData?.members ?? [];
-      } catch (err) {
-        this.error = err instanceof Error ? err.message : tr('team.khong_the_tai_du_lieu_nhom');
-      } finally {
-        this.loading = false;
-      }
+      try { await Promise.all([this.loadMyTeam(userId, invalidate), this.loadTeams(userId, invalidate)]); }
+      finally { if (auth.user?.id === userId && auth.sessionGeneration === generation) this.loading = false; }
     },
-
-    /**
-     * Đăng ký lắng nghe realtime trên user_teams và user_team_members.
-     * Gọi một lần sau khi loadData; cleanup bằng unsubscribeRealtime().
-     */
-    subscribeRealtime(userId: string) {
-      if (_channel) return; // đã subscribe rồi
-
-      _channel = supabase
-        .channel("team-realtime")
-        .on(
-          "postgres_changes",
-          { event: "*", schema: "public", table: "user_teams" },
-          () => { this.loadData(userId); }
-        )
-        .on(
-          "postgres_changes",
-          { event: "*", schema: "public", table: "user_team_members" },
-          () => { this.loadData(userId); }
-        )
-        .on(
-          "postgres_changes",
-          { event: "*", schema: "public", table: "user_team_invite" },
-          () => { this.loadData(userId); }
-        )
-        .subscribe();
-    },
-
-    unsubscribeRealtime() {
-      if (_channel) {
-        supabase.removeChannel(_channel);
-        _channel = null;
+    startRefreshing(userId: string, consumer: 'lobby' | 'panel') {
+      if (this.ownerId !== userId) {
+        stopRefresh?.(); stopRefresh = null; consumers.clear();
+        this.$reset(); this.ownerId = userId;
       }
+      consumers.set(consumer, userId);
+      this.restartRefresh(userId);
+    },
+    stopRefreshing(consumer: 'lobby' | 'panel') {
+      consumers.delete(consumer);
+      stopRefresh?.(); stopRefresh = null;
+      const owner = consumers.values().next().value;
+      if (owner) this.restartRefresh(owner);
+    },
+    restartRefresh(userId: string) {
+      stopRefresh?.();
+      let lastDirectoryAt = 0;
+      stopRefresh = startVisibleRefresh(async () => {
+        if (useAuthStore().user?.id !== userId) return;
+        const jobs = [this.loadMyTeam(userId)];
+        if (consumers.has('panel') && Date.now() - lastDirectoryAt >= 30_000) {
+          lastDirectoryAt = Date.now(); jobs.push(this.loadTeams(userId));
+        }
+        await Promise.all(jobs);
+        if (this.error) throw new Error(this.error);
+      }, consumers.has('panel') ? 15_000 : 30_000);
     },
 
     async createTeam(

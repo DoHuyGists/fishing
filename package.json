@@ -6,6 +6,7 @@
   "scripts": {
     "dev": "vite --host",
     "build": "vue-tsc -b && vite build",
+    "test:data-refresh": "node --test scripts/test-data-refresh.mjs scripts/test-refresh-stores.mjs",
     "check:i18n": "node scripts/check-i18n.mjs && node scripts/check-i18n-runtime.mjs",
     "preview": "vite preview"
   },

@@ -1,13 +1,17 @@
 import type { NotificationRow } from "../types/table/notification";
 import { t as tr } from "../i18n";
 import { defineStore } from "pinia";
-import type { RealtimeChannel } from "@supabase/supabase-js";
+import { useAuthStore } from './auth';
+import { createKeyedRefreshTask } from '../utils/refreshTask';
+import { startVisibleRefresh } from '../utils/visibleRefresh';
 import { supabaseNotificationRepository } from "../data/supabaseNotificationRepository";
 
 type NotificationKind = "personal" | "system";
 
-let realtimeChannel: RealtimeChannel | null = null;
-let badgeChannel: RealtimeChannel | null = null;
+const refreshNotifications = createKeyedRefreshTask<Awaited<ReturnType<typeof supabaseNotificationRepository.fetchNotifications>>>();
+const consumers = new Map<string, string>();
+let stopRefresh: (() => void) | null = null;
+let expiryTimer: ReturnType<typeof setTimeout> | undefined;
 
 export const useNotificationStore = defineStore("notifications", {
   state: () => ({
@@ -22,59 +26,63 @@ export const useNotificationStore = defineStore("notifications", {
     unreadCount: state => [...state.personal, ...state.system].filter(item => !item.is_read).length,
   },
   actions: {
-    async loadNotifications(userId: string) {
+    async loadNotifications(userId: string, invalidate = false) {
+      const auth = useAuthStore();
+      const generation = auth.sessionGeneration;
       const request = ++this.requestId;
+      const current = () => request === this.requestId && auth.user?.id === userId && auth.sessionGeneration === generation;
       if (this.ownerId !== userId) { this.personal = []; this.system = []; this.ownerId = userId; }
-      this.loading = true;
-      this.loadError = "";
+      this.loading = true; this.loadError = '';
       try {
-        const notifications = await supabaseNotificationRepository.fetchNotifications(userId);
-        if (request !== this.requestId) return;
-        this.personal = notifications.personal;
-        this.system = notifications.system;
+        const notifications = await refreshNotifications(userId + ':' + generation,
+          () => supabaseNotificationRepository.fetchNotifications(userId), invalidate);
+        if (!current()) return;
+        this.personal = notifications.personal; this.system = notifications.system;
+        this.expireNotifications();
       } catch (error) {
-        if (request === this.requestId) this.loadError = error instanceof Error ? error.message : tr('notification.khong_the_tai_thong_bao');
-      } finally {
-        if (request === this.requestId) this.loading = false;
-      }
+        if (current()) this.loadError = error instanceof Error ? error.message : tr('notification.khong_the_tai_thong_bao');
+      } finally { if (current()) this.loading = false; }
     },
 
     async markAsRead(kind: NotificationKind, item: NotificationRow, userId: string) {
+      const generation = useAuthStore().sessionGeneration;
       await supabaseNotificationRepository.markAsRead(kind, item.id, userId);
+      if (useAuthStore().user?.id !== userId || this.ownerId !== userId || useAuthStore().sessionGeneration !== generation) return;
       const list = kind === "personal" ? this.personal : this.system;
       const notification = list.find((entry) => entry.id === item.id);
       if (notification) notification.is_read = true;
-      void this.loadNotifications(userId);
+      void this.loadNotifications(userId, true);
     },
 
-    subscribeToNotifications(userId: string) {
-      if (realtimeChannel) void supabaseNotificationRepository.unsubscribe(realtimeChannel);
-      realtimeChannel = supabaseNotificationRepository.subscribeToNotifications(userId, () => {
-        void this.loadNotifications(userId);
-      });
+    expireNotifications() {
+      clearTimeout(expiryTimer);
+      const now = Date.now();
+      this.system = this.system.filter(item => !item.expires_at || Date.parse(item.expires_at) > now);
+      const next = Math.min(...this.system.filter(item => item.expires_at).map(item => Date.parse(item.expires_at!)));
+      if (Number.isFinite(next)) expiryTimer = setTimeout(() => this.expireNotifications(), Math.min(next - now + 1, 2_147_483_647));
     },
-
-    subscribeToNewNotifications(userId: string, onNewNotification: () => void) {
-      if (badgeChannel) void supabaseNotificationRepository.unsubscribe(badgeChannel);
-      void this.loadNotifications(userId);
-      badgeChannel = supabaseNotificationRepository.subscribeToNotifications(userId, () => {
-        void this.loadNotifications(userId);
-        onNewNotification();
-      }, "badge");
+    startRefreshing(userId: string, consumer: 'badge' | 'modal') {
+      if (this.ownerId !== userId) {
+        consumers.clear(); stopRefresh?.(); stopRefresh = null;
+        clearTimeout(expiryTimer); ++this.requestId;
+        this.personal = []; this.system = []; this.ownerId = userId;
+      }
+      consumers.set(consumer, userId);
+      if (!stopRefresh) stopRefresh = startVisibleRefresh(async () => {
+        const owner = consumers.values().next().value;
+        if (!owner || useAuthStore().user?.id !== owner) return;
+        await this.loadNotifications(owner);
+        if (this.loadError) throw new Error(this.loadError);
+      }, 60_000);
+      else if (consumer === 'modal') void this.loadNotifications(userId);
     },
-
-    async unsubscribeFromNotifications() {
-      if (!realtimeChannel) return;
-      const channel = realtimeChannel;
-      realtimeChannel = null;
-      await supabaseNotificationRepository.unsubscribe(channel);
-    },
-
-    async unsubscribeFromNewNotifications() {
-      if (!badgeChannel) return;
-      const channel = badgeChannel;
-      badgeChannel = null;
-      await supabaseNotificationRepository.unsubscribe(channel);
+    stopRefreshing(consumer: 'badge' | 'modal') {
+      consumers.delete(consumer);
+      if (consumers.size) return;
+      stopRefresh?.(); stopRefresh = null;
+      clearTimeout(expiryTimer);
+      ++this.requestId;
+      this.loading = false;
     },
   },
 });

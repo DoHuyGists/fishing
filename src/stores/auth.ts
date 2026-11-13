@@ -21,6 +21,7 @@ export const useAuthStore = defineStore("auth", {
     profile: null as UserProfile | null,
     loading: false,
     initialized: false,
+    sessionGeneration: 0,
     error: "",
     isAdmin: false,
     adminLoading: false,
@@ -59,6 +60,7 @@ export const useAuthStore = defineStore("auth", {
     },
     applySession(session: Session | null) {
       if (this.user?.id !== session?.user.id) {
+        this.sessionGeneration++;
         adminStatusRequest++;
         this.profile = null;
         this.isAdmin = false;

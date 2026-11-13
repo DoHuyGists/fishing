@@ -1,25 +1,8 @@
 import type { UserProfile } from "../types/model/userProfile";
 import supabase from "../database/connection";
-import type { RealtimeChannel } from "@supabase/supabase-js";
 import { supabaseAvatarRepository } from "./supabaseAvatarRepository";
 
 class SupabaseUserProfileRepository {
-  subscribeToProgress(userId: string, onChange: (profile: UserProfile) => void): RealtimeChannel {
-    return supabase
-      .channel(`user_profile_progress_${userId}`)
-      .on("postgres_changes", {
-        event: "UPDATE",
-        schema: "public",
-        table: "user_profile",
-        filter: `id=eq.${userId}`,
-      }, (payload) => onChange(payload.new as UserProfile))
-      .subscribe();
-  }
-
-  async unsubscribe(channel: RealtimeChannel): Promise<void> {
-    await supabase.removeChannel(channel);
-  }
-
   async updateLanguage(userId: string, language: "vi" | "en"): Promise<void> {
     const { error } = await supabase
       .from("user_profile")

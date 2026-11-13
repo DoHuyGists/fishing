@@ -1,7 +1,6 @@
 import type { CurrencyRow } from "../types/table/currency";
 import type { CurrencyConversionRate } from "../types/model/currency";
 import supabase from "../database/connection";
-import type { RealtimeChannel } from "@supabase/supabase-js";
 
 class SupabaseCurrencyRepository {
   async fetchConversionRates(): Promise<CurrencyConversionRate[]> {
@@ -30,6 +29,12 @@ class SupabaseCurrencyRepository {
     }
 
     return data;
+  }
+
+  async fetchWallet(userId: string): Promise<Pick<CurrencyRow, 'cash' | 'shells' | 'tickets'>> {
+    const { data, error } = await supabase.from('currency').select('cash,shells,tickets').eq('user_id', userId).single();
+    if (error) throw new Error(error.message);
+    return { cash: Number(data.cash), shells: Number(data.shells ?? 0), tickets: Number(data.tickets ?? 0) };
   }
 
   async fetchTickets(userId: string): Promise<number> {
@@ -63,33 +68,6 @@ class SupabaseCurrencyRepository {
     return data?.next_claim_daily_reward_at ?? null;
   }
 
-  /**
-   * Đăng ký lắng nghe thay đổi realtime trên bảng currency theo userId.
-   */
-  subscribeToCurrency(userId: string, onChange: () => void): RealtimeChannel {
-    return supabase
-      .channel(`currency_realtime_${userId}`)
-      .on(
-        "postgres_changes",
-        {
-          event: "*",
-          schema: "public",
-          table: "currency",
-          filter: `user_id=eq.${userId}`,
-        },
-        () => {
-          onChange();
-        },
-      )
-      .subscribe();
-  }
-
-  /**
-   * Hủy đăng ký realtime channel
-   */
-  async unsubscribe(channel: RealtimeChannel): Promise<void> {
-    await supabase.removeChannel(channel);
-  }
 }
 
 export const supabaseCurrencyRepository = new SupabaseCurrencyRepository();

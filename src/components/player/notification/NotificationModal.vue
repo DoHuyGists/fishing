@@ -47,12 +47,11 @@ async function selectNotification(item: NotificationRow) {
 onMounted(() => {
   const userId = auth.user?.id;
   if (!userId) return;
-  void notifications.loadNotifications(userId);
-  notifications.subscribeToNotifications(userId);
+  notifications.startRefreshing(userId, 'modal');
 });
 
 onUnmounted(() => {
-  void notifications.unsubscribeFromNotifications();
+  notifications.stopRefreshing('modal');
 });
 </script>
 

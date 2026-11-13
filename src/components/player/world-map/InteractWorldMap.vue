@@ -46,7 +46,7 @@ watch(isMapVisible, async (visible) => {
 });
 
 watch(
-  () => [props.fogEnabled && features.isAvailable('world-map'), authStore.user?.id ?? null] as const,
+  () => [props.fogEnabled && isMapVisible.value && features.isAvailable('world-map'), authStore.user?.id ?? null] as const,
   ([enabled, playerId], _, onCleanup) => {
     if (enabled) onCleanup(countryStore.watchUnlockedCountries(playerId));
   },

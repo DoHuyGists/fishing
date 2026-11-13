@@ -1,11 +1,12 @@
 import type { UserProfile } from "../types/model/userProfile";
 import { t as tr } from "../i18n";
 import { defineStore } from "pinia";
-import type { RealtimeChannel } from "@supabase/supabase-js";
+import { useAuthStore } from "./auth";
+import { createKeyedRefreshTask } from "../utils/refreshTask";
 import { supabaseUserProfileRepository } from "../data/supabaseUserProfileRepository";
 import { supabaseAvatarRepository } from "../data/supabaseAvatarRepository";
 
-let progressChannel: RealtimeChannel | null = null;
+const refreshProfile = createKeyedRefreshTask<UserProfile | null>();
 
 export const useUserProfileStore = defineStore("userProfile", {
   state: () => ({
@@ -21,20 +22,6 @@ export const useUserProfileStore = defineStore("userProfile", {
     speciesStorageCapacity: (state) => state.profile?.species_storage_capacity ?? 0,
   },
   actions: {
-    subscribeToProgress(userId: string) {
-      this.stopProgressSubscription();
-      const channel = supabaseUserProfileRepository.subscribeToProgress(userId, (profile) => {
-        if (progressChannel !== channel || this.profile?.id !== userId) return;
-        this.profile.level = profile.level;
-        this.profile.experience_point = profile.experience_point;
-        this.profile.skill_points = profile.skill_points;
-      });
-      progressChannel = channel;
-    },
-    stopProgressSubscription() {
-      if (progressChannel) void supabaseUserProfileRepository.unsubscribe(progressChannel);
-      progressChannel = null;
-    },
     async updateIdentity(displayName: string, avatarUrl: string | null, file?: File) {
       const name = displayName.trim();
       if (name.length < 2 || name.length > 40) throw new Error(tr('userProfile.ten_hien_thi_can_tu_2_den_40_ky_tu'));
@@ -61,17 +48,19 @@ export const useUserProfileStore = defineStore("userProfile", {
       await supabaseUserProfileRepository.completeOnboarding();
       if (this.profile) this.profile.onboarding_completed = true;
     },
-    async fetchProfile(userId: string) {
-      this.loading = true;
-      this.error = "";
+    async fetchProfile(userId: string, invalidate = false) {
+      const auth = useAuthStore();
+      const generation = auth.sessionGeneration;
+      if (auth.user?.id !== userId) return;
+      const current = () => auth.user?.id === userId && auth.sessionGeneration === generation;
+      this.loading = true; this.error = '';
       try {
-        const data = await supabaseUserProfileRepository.fetchUserProfile(userId);
-        this.profile = data;
+        const data = await refreshProfile(userId + ':' + generation,
+          () => supabaseUserProfileRepository.fetchUserProfile(userId), invalidate);
+        if (current()) this.profile = data;
       } catch (err) {
-        this.error = err instanceof Error ? err.message : tr('userProfile.khong_the_tai_thong_tin_ho_so_nguoi_choi');
-      } finally {
-        this.loading = false;
-      }
+        if (current()) this.error = err instanceof Error ? err.message : tr('userProfile.khong_the_tai_thong_tin_ho_so_nguoi_choi');
+      } finally { if (current()) this.loading = false; }
     },
     async updateCountry(userId: string, countryId: string) {
       this.error = "";

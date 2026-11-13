@@ -1,7 +1,6 @@
-import type { MarketHistory, MarketListing } from "../types/model/market";
+import type { MarketHistory, MarketListing, MarketListingQuery } from "../types/model/market";
 import { t as tr } from "../i18n";
 import supabase from "../database/connection";
-import type { RealtimeChannel } from "@supabase/supabase-js";
 
 function mapCaughtRow(row: any) {
   if (!row) return null;
@@ -32,55 +31,51 @@ class SupabaseMarketRepository {
     if (error) throw new Error(error.message);
     return (data ?? []).map(row => ({ ...row, price: Number(row.price) })) as MarketHistory[];
   }
-  subscribe(userId: string, onChange: () => void): RealtimeChannel {
-    return supabase.channel(`market:${userId}`)
-      .on("postgres_changes", { event: "*", schema: "public", table: "species_market" }, onChange)
-      .on("postgres_changes", { event: "INSERT", schema: "public", table: "market_history", filter: `buyer_id=eq.${userId}` }, onChange)
-      .on("postgres_changes", { event: "INSERT", schema: "public", table: "market_history", filter: `seller_id=eq.${userId}` }, onChange)
-      .subscribe(status => { if (status === "SUBSCRIBED") onChange(); });
-  }
-  async unsubscribe(channel: RealtimeChannel) { await supabase.removeChannel(channel); }
-  async fetchActiveListings(): Promise<MarketListing[]> {
-    try {
-      const { data, error } = await supabase.from("species_market").select("id, created_at, caught_id, user_id, price, status, caught:caught_id (id, user_id, species_id, weight, created_at, species(name, image, rarity))").eq("status", "normal").order("created_at", { ascending: false });
-
-      if (error) {
-        return this.fetchActiveListingsFallback();
-      }
-
-      const list = (data as any[]) ?? [];
-      const missingItemIds = list.filter((m) => !m.caught).map((m) => m.caught_id);
-
-      if (missingItemIds.length > 0) {
-        const { data: caughtData } = await supabase.from("caught").select("id, user_id, species_id, weight, created_at, species(name, image, rarity)").in("id", missingItemIds);
-
-        const caughtMap = new Map((caughtData ?? []).map((c: any) => [c.id, c]));
-        return list.map((m) => ({
-          ...m,
-          caught: m.caught ? mapCaughtRow(m.caught) : mapCaughtRow(caughtMap.get(m.caught_id)),
-        }));
-      }
-
-      return list.map((m) => ({ ...m, caught: m.caught ? mapCaughtRow(m.caught) : null }));
-    } catch {
-      return this.fetchActiveListingsFallback();
+  async fetchActiveListings(options: MarketListingQuery): Promise<MarketListing[]> {
+    const { page, pageSize, userId, search, rarity, sort } = options;
+    const filteredSpecies = Boolean(search) || rarity !== 'ALL';
+    const relation = filteredSpecies
+      ? 'caught:caught_id!inner(id,user_id,species_id,weight,created_at,species!inner(name,image,rarity))'
+      : 'caught:caught_id(id,user_id,species_id,weight,created_at,species(name,image,rarity))';
+    let query = supabase.from('species_market').select('id,created_at,caught_id,user_id,price,status,' + relation).eq('status', 'normal');
+    if (userId) query = query.eq('user_id', userId);
+    if (search) query = query.ilike('caught.species.name', '%' + search.replace(/[\\%_]/g, '\\$&') + '%');
+    if (rarity !== 'ALL') query = query.eq('caught.species.rarity', rarity);
+    if (sort !== 'newest') query = query.order('price', { ascending: sort === 'price-asc' });
+    query = query.order('created_at', { ascending: false }).order('id', { ascending: false })
+      .range((page - 1) * pageSize, page * pageSize);
+    const { data, error } = await query;
+    if (error) {
+      // Keep the legacy relationship fallback bounded. Filtering requires the
+      // relationship query; never silently filter just one unfiltered page.
+      if (filteredSpecies) throw new Error(error.message);
+      return this.fetchActiveListingsFallback(options);
     }
+    const list = (data ?? []) as unknown as Array<MarketListing & { caught: any }>;
+    const missingIds = list.filter(row => !row.caught).map(row => row.caught_id);
+    const caughtMap = new Map<string, any>();
+    if (missingIds.length) {
+      const { data: fish, error: fishError } = await supabase.from('caught')
+        .select('id,user_id,species_id,weight,created_at,species(name,image,rarity)').in('id', missingIds);
+      if (fishError) throw new Error(fishError.message);
+      for (const row of fish ?? []) caughtMap.set(row.id, row);
+    }
+    return list.map(row => ({ ...row, price: Number(row.price), caught: mapCaughtRow(row.caught ?? caughtMap.get(row.caught_id)) }));
   }
 
-  private async fetchActiveListingsFallback(): Promise<MarketListing[]> {
-    const { data: rawData, error: rawError } = await supabase.from("species_market").select("*").eq("status", "normal").order("created_at", { ascending: false });
-
-    if (rawError) throw new Error(rawError.message);
-    if (!rawData || rawData.length === 0) return [];
-
-    const itemIds = rawData.map((m) => m.caught_id);
-    const { data: caughtData } = await supabase.from("caught").select("id, user_id, species_id, weight, created_at, species(name, image, rarity)").in("id", itemIds);
-
-    const caughtMap = new Map((caughtData ?? []).map((c: any) => [c.id, c]));
-    return rawData.map((m) => ({
-      ...m,
-      caught: mapCaughtRow(caughtMap.get(m.caught_id)),
-    }));
+  private async fetchActiveListingsFallback(options: MarketListingQuery): Promise<MarketListing[]> {
+    let query = supabase.from('species_market').select('*').eq('status', 'normal');
+    if (options.userId) query = query.eq('user_id', options.userId);
+    if (options.sort !== 'newest') query = query.order('price', { ascending: options.sort === 'price-asc' });
+    const { data, error } = await query.order('created_at', { ascending: false }).order('id', { ascending: false })
+      .range((options.page - 1) * options.pageSize, options.page * options.pageSize);
+    if (error) throw new Error(error.message);
+    if (!data?.length) return [];
+    const { data: fish, error: fishError } = await supabase.from('caught')
+      .select('id,user_id,species_id,weight,created_at,species(name,image,rarity)').in('id', data.map(row => row.caught_id));
+    if (fishError) throw new Error(fishError.message);
+    const caughtMap = new Map((fish ?? []).map(row => [row.id, row]));
+    return data.map(row => ({ ...row, price: Number(row.price), caught: mapCaughtRow(caughtMap.get(row.caught_id)) }));
   }
 
   async cancelListing(marketId: string): Promise<void> {

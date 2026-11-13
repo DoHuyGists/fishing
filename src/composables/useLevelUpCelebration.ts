@@ -9,12 +9,10 @@ export function useLevelUpCelebration() {
   const userProfile = useUserProfileStore();
   const confetti = ref<InstanceType<typeof ConfettiCannon> | null>(null);
 
-  watch(() => auth.user?.id, (userId, _, onCleanup) => {
-    userProfile.stopProgressSubscription();
+  watch(() => auth.user?.id, (userId) => {
     confetti.value?.clear();
     if (!userId) return;
-    userProfile.subscribeToProgress(userId);
-    onCleanup(() => userProfile.stopProgressSubscription());
+    void userProfile.fetchProfile(userId);
   }, { immediate: true, flush: "sync" });
 
   watch(

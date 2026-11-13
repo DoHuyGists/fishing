@@ -7,6 +7,15 @@ export interface MarketHistory {
   price: number;
 }
 
+export interface MarketListingQuery {
+  page: number;
+  pageSize: number;
+  userId?: string;
+  search: string;
+  rarity: string;
+  sort: 'newest' | 'price-asc' | 'price-desc';
+}
+
 export interface MarketListing {
   id: string;
   created_at: string;

@@ -4,6 +4,10 @@ import { supabaseCountryRepository } from "../data/supabaseCountryRepository";
 import { getWorldMapCountryId } from "../data/worldMapCountries";
 import { useAuthStore } from "./auth";
 
+import { createKeyedRefreshTask } from '../utils/refreshTask';
+import { startVisibleRefresh } from '../utils/visibleRefresh';
+const refreshCountries = createKeyedRefreshTask<Country[]>();
+
 export interface Country {
   id: string; // uuid
   name: string; // text
@@ -51,34 +55,31 @@ export const useCountryStore = defineStore("Country", {
         this.isLoading = false;
       }
     },
-    async fetchMyUnlockedCountries(playerId = useAuthStore().user?.id ?? null) {
+    async fetchMyUnlockedCountries(playerId = useAuthStore().user?.id ?? null, invalidate = false) {
+      const generation = useAuthStore().sessionGeneration;
       const request = ++this.unlockedRequest;
       if (this.unlockedPlayerId !== playerId || !playerId) this.unlockedCountries = [];
-      this.unlockedPlayerId = playerId;
-      this.unlockedError = "";
-      this.isLoadingUnlocked = Boolean(playerId);
+      this.unlockedPlayerId = playerId; this.unlockedError = ''; this.isLoadingUnlocked = Boolean(playerId);
       if (!playerId) return;
-
-      const isCurrentRequest = () => request === this.unlockedRequest
-        && useAuthStore().user?.id === playerId;
+      const current = () => request === this.unlockedRequest && useAuthStore().user?.id === playerId
+        && useAuthStore().sessionGeneration === generation;
       try {
-        const countries = await supabaseCountryRepository.fetchMyUnlockedCountries(playerId);
-        if (isCurrentRequest()) this.unlockedCountries = countries;
+        const countries = await refreshCountries(playerId + ':' + generation,
+          () => supabaseCountryRepository.fetchMyUnlockedCountries(playerId), invalidate);
+        if (current()) this.unlockedCountries = countries;
       } catch (error) {
-        if (isCurrentRequest()) {
+        if (current()) {
           this.unlockedError = tr('country.khong_the_tai_quoc_gia_da_mo_khoa_vui_long_thu_lai');
-          console.error("Failed to fetch unlocked countries:", error);
+          console.error('Failed to fetch unlocked countries:', error);
         }
-      } finally {
-        if (isCurrentRequest()) this.isLoadingUnlocked = false;
-      }
+      } finally { if (current()) this.isLoadingUnlocked = false; }
     },
     watchUnlockedCountries(playerId: string | null): () => void {
-      void this.fetchMyUnlockedCountries(playerId);
-      if (!playerId) return () => {};
-      return supabaseCountryRepository.subscribeToUnlockedCountries(playerId, () => {
-        if (useAuthStore().user?.id === playerId) void this.fetchMyUnlockedCountries(playerId);
-      });
+      if (!playerId) { void this.fetchMyUnlockedCountries(null); return () => {}; }
+      return startVisibleRefresh(async () => {
+        await this.fetchMyUnlockedCountries(playerId);
+        if (this.unlockedError) throw new Error(this.unlockedError);
+      }, 60_000);
     },
   },
 });

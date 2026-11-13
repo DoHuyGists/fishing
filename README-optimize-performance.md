@@ -1,6 +1,8 @@
 # Đánh giá tải đồng thời và kế hoạch tối ưu
 
-Ngày đánh giá: **12/11/2026**. Phạm vi: mã nguồn Vue/Pinia, repository Supabase, RPC và migration SQL có trong dự án. Tài liệu này đề xuất thay đổi; chưa triển khai tối ưu hoặc chạy tải lên Supabase.
+Ngày đánh giá ban đầu: **12/11/2026**. Phạm vi: mã nguồn Vue/Pinia, repository Supabase, RPC và migration SQL có trong dự án. Các ước lượng tải dưới đây chưa được benchmark trên Supabase; tiến độ triển khai được ghi ở mục 9–10.
+
+**Cập nhật 13/11/2026:** đã thay subscription của 14 bảng bằng snapshot/refresh trong client, giữ `fishing_sessions` và `active_sessions`. Đánh giá tại mục 9, kết quả triển khai tại mục 10; định hướng này thay thế các đề xuất giữ/thu hẹp subscription tại mục 5 và 7. Đã chuẩn bị migration gỡ publication, chưa áp dụng lên Supabase.
 
 ## 1. Hiện tại đáp ứng được khoảng bao nhiêu người chơi?
 
@@ -277,6 +279,118 @@ Chọn **nấc cao nhất vẫn đạt tiêu chí trong bài hỗn hợp và soa
 
 Mục tiêu hợp lý đầu tiên là **kiểm chứng 100 CCU trên Pro/Micro sau P0**, sau đó thử 150 và 300. Giữ mô hình Vue + Supabase là khả thi về kiến trúc; con số chịu tải cần được xác nhận bằng dữ liệu triển khai và load test theo quy trình trên.
 
-## 8. Kiểm tra trong lần đánh giá này
+## 8. Kiểm tra trong lần đánh giá ban đầu ngày 12/11/2026
 
 `npm run build` đã thành công, gồm `vue-tsc -b` và Vite production build. Có cảnh báo chunk vendor khoảng 616,49 kB sau minify, vượt ngưỡng 600 kB; đây là vấn đề phân phối bundle cần đo thêm, không phải bằng chứng về giới hạn CCU. File báo cáo đã được kiểm tra UTF-8 không BOM và các liên kết mã nguồn cục bộ. Chưa chạy benchmark hoặc thay đổi cấu hình/database Supabase.
+
+## 9. Thay Realtime bằng tải lại dữ liệu — đánh giá 13/11/2026
+
+### 9.1. Kết luận và phạm vi
+
+**Đề xuất bỏ subscription của 14/16 bảng sau khi bổ sung các điểm refresh tương ứng; tạm giữ `fishing_sessions` và `active_sessions`.** Không có bảng nào bắt buộc dùng Postgres Changes về mặt kiến trúc. Hai bảng tạm giữ đang phục vụ hành vi cần phản ứng nhanh trong code hiện tại; muốn bỏ phải có cơ chế thay thế và kiểm thử riêng. Không tắt cả 16 bảng trên Dashboard trước khi sửa client.
+
+Phân biệt ba cách cập nhật: lấy snapshot khi mở màn hình/bấm làm mới; đọc lại sau thao tác thành công của chính người chơi; polling có giới hạn cho thay đổi từ người khác. Chỉ GET sau thao tác của mình không thể tự phát hiện người khác mua cá, gửi lời mời, admin gửi thông báo hoặc đổi cấu hình. Các chu kỳ bên dưới là đề xuất ban đầu, cần đo tải và độ trễ chấp nhận được; không phải cấu hình đã triển khai hoặc cam kết thời gian thực khi mạng lỗi/tab bị trình duyệt đình chỉ.
+
+GET dùng để đọc snapshot qua repository. Giữ mutation/RPC cho mua bán, nhận thưởng, vào/ra khu và chuyển trạng thái câu; không biến thao tác có ghi DB thành GET. Sau mutation, ưu tiên áp dụng response đầy đủ vào Pinia; nếu response chưa đủ thì GET đúng dữ liệu bị ảnh hưởng, tránh tải lại toàn bộ màn hình.
+
+### 9.2. Quyết định cho từng bảng
+
+| Bảng | Đề xuất | Cơ chế thay thế và ảnh hưởng cần xử lý |
+| --- | --- | --- |
+| `active_sessions` | **Tạm giữ** | [use-single-session.ts](src/composables/use-single-session.ts) nghe UPDATE theo user để hiện cảnh báo khi thiết bị khác ghi đè session. Có thể thay bằng GET session mỗi 15–30 giây và khi focus, nhưng cảnh báo sẽ trễ; BroadcastChannel đang có chỉ xử lý cùng trình duyệt. Nếu yêu cầu thật sự chỉ một phiên được thao tác, server phải xác thực session hiện hành trong các mutation quan trọng; modal Realtime hiện tại không phải cơ chế cưỡng chế phía server. Chỉ bỏ khi chấp nhận độ trễ và hoàn thành kiểm tra này |
+| `currency` | **Bỏ** | GET lúc khởi tạo, sau hành động có thay đổi tiền/vỏ sò và khi quay lại tab với cache hết hạn. Các thay đổi do người khác mua listing của mình, quà admin hoặc tác vụ nền cần GET đối soát mỗi 60 giây khi tab hiển thị, hoặc chấp nhận chỉ cập nhật lúc mở ví/chợ. RPC vẫn quyết định đủ tiền; không dựa vào số dư cache. Monitor admin cũng nghe bảng này, phải chuyển sang snapshot riêng |
+| `error_feedback` | **Bỏ** | GET khi mở lịch sử, đổi trang, sau gửi báo lỗi và bấm làm mới; nếu cần thấy admin trả lời khi đang xem thì poll 60 giây chỉ lúc panel mở. Giữ trang hiện tại và phân trang server đã có. Không cần tải nền khi panel đóng |
+| `feature_flags` | **Bỏ** | Store đã có polling 30 giây và TTL 30 giây: bỏ subscription, dùng chung một lịch refresh, dừng nền khi tab ẩn và đối soát lúc quay lại. Giữ kiểm tra tại feature gate và xử lý server denial. Chấp nhận UI phản ánh bảo trì trễ khoảng một chu kỳ; các RPC nhạy cảm phải được kiểm tra có gate phía server trước khi coi việc tắt tính năng có hiệu lực ngay |
+| `fishing_sessions` | **Tạm giữ** | [FishingView.vue](src/views/FishingView.vue) chỉ bắt đầu challenge khi nhận `BITE`; repository có SELECT phục hồi sau subscribe/reconnect. Bỏ ngay có thể khiến người chơi kẹt chờ. Có thể thay bằng timer theo thời gian server rồi GET session, retry ngắn có giới hạn khi chưa `BITE`; hoặc thiết kế RPC activate nguyên tử tại hạn cá cắn. Chi tiết tại 9.3 |
+| `market_history` | **Bỏ** | GET khi mở tab lịch sử/đổi trang và sau mua bán của mình. Với giao dịch do người khác mua listing của mình, refresh lịch sử khi quay lại tab hoặc poll 30–60 giây nếu lịch sử đang mở. Không tải lịch sử chỉ vì listing bất kỳ thay đổi. Lịch sử hiện đã có phân trang 20 dòng |
+| `personal_notifications` | **Bỏ** | GET khi mở modal; badge ở sảnh dùng một lịch chung 60 giây khi hiển thị và refresh khi quay lại tab. Badge/modal cùng dùng Pinia, không tạo hai vòng polling. Thông báo mới đến trễ theo chu kỳ; nếu cần báo tức thời thì giữ riêng subscription INSERT theo người nhận hoặc dùng push, đây là yêu cầu trải nghiệm bổ sung |
+| `player_unlocked_countries` | **Bỏ** | GET khi vào bản đồ và sau hành động có thể mở khóa nước (nhiệm vụ, thưởng, tiến trình…). Đối soát lúc trở lại bản đồ/focus để nhận mở khóa từ admin/tác vụ nền. Rà soát các nguồn ghi và trigger trước khi bỏ, không chỉ luồng đổi quốc gia đang chọn. Giữ bảo vệ response cũ/đổi user trong store |
+| `species_market` | **Bỏ, ưu tiên cao** | GET khi mở chợ, đổi filter/trang, bấm làm mới, sau đăng bán/hủy/mua. Poll khoảng 30 giây chỉ khi danh sách chợ hiển thị; hiện store đã có đối soát 30 giây nên tránh thêm lịch thứ hai. Phân trang listing phía server là việc đi kèm cần làm. Khi listing đã bán, RPC từ chối mua và client refresh; GET trước khi mua không thay thế kiểm tra nguyên tử trong transaction |
+| `system_notification_reads` | **Bỏ** | Store đã đánh dấu đọc cục bộ sau mutation thành công. Giữ cập nhật badge từ state chung; GET đối soát khi mở modal/focus. Trạng thái đọc từ thiết bị khác sẽ đồng bộ ở lần tải tiếp theo, không cần listener riêng |
+| `system_notifications` | **Bỏ** | Dùng chung lịch refresh thông báo ở trên; GET khi mở modal, đối soát badge 60 giây tại sảnh. Lọc hạn dùng mỗi lần đọc và xử lý thông báo hết hạn trong UI ngay cả khi không có event DB. Thông báo bảo trì không được thay thế gate kiểm tra nghiệp vụ phía server |
+| `user_in_area` | **Bỏ, ưu tiên cao; bổ sung luồng điều hướng trước** | Listener toàn bảng trong [PlayerLayout.vue](src/layouts/PlayerLayout.vue) hiện GET lại khu của chính mình rồi điều hướng. Thay bằng GET sau vào/ra khu, chuyến đi theo đội và lúc khởi tạo/focus. Khi trạng thái của mình có thể bị đổi từ bên ngoài, poll dòng của mình khoảng 15 giây khi tab hiển thị để phục hồi điều hướng; không poll toàn bảng. Danh sách người trong bãi chỉ GET khi mở panel/refresh. Snapshot monitor admin tách riêng |
+| `user_profile` | **Bỏ, sau khi nối đủ điểm refresh** | GET sau câu/nhận thưởng/tiêu điểm/nâng sức chứa và thao tác khác thay đổi profile, hoặc áp dụng profile từ response RPC. Subscription hiện chỉ áp dụng level/EXP/skill points; [useLevelUpCelebration.ts](src/composables/useLevelUpCelebration.ts) theo dõi level trong Pinia nên vẫn có thể bắn confetti qua cập nhật từ GET. Phải giữ phản hồi lên cấp ngay sau thưởng, không chờ người chơi mở hồ sơ. Thay đổi từ admin được đối soát khi focus/mở hồ sơ |
+| `user_team_invite` | **Bỏ** | GET lời mời khi vào sảnh/mở tổ đội, sau nhận/từ chối; poll khoảng 30 giây tại sảnh nếu cần badge lời mời. Người gửi vẫn nhận kết quả thao tác ngay, người nhận thấy lời mời trễ một chu kỳ. Lọc theo `invitee_id`; không tải lại toàn bộ danh sách đội vì mỗi lời mời |
+| `user_team_members` | **Bỏ** | GET sau tham gia/rời/kick/chuyển trưởng nhóm; với thay đổi do thành viên khác, poll membership/đội của mình 10–15 giây khi panel đội mở, khoảng 30 giây tại sảnh có hiển thị đội. Nếu cần phản ứng tức thì với kick thì giữ riêng listener đúng đội/user hoặc thay bằng tín hiệu khác. Mutation phải kiểm tra quyền hiện tại ở server |
+| `user_teams` | **Bỏ** | GET danh sách khi mở tổ đội/đổi trang/bấm làm mới, sau tạo/sửa/đóng đội; poll danh sách 30 giây chỉ khi đang xem. Đội của mình dùng chung chu kỳ snapshot membership ở trên, không thêm lịch cho mỗi bảng. Chấp nhận trạng thái đầy/đóng/đổi trưởng nhóm trễ; server xác thực khi thực hiện thao tác |
+
+### 9.3. Điều kiện để bỏ nốt hai subscription còn lại
+
+**Phiên câu:** `cast_rod.sql` hiện trả `session_id`, `wait_time_ms`, `server_time_ms`; `bite_at` được lưu ở DB nhưng chưa trả trực tiếp. `start_tension_challenge` và submit hiện yêu cầu trạng thái `BITE`. Chỉ thêm timer frontend không làm DB tự đổi trạng thái.
+
+1. Xác minh scheduler/trigger/worker đang chuyển `BITE` trong production và quyền SELECT trên session. Nếu giữ cơ chế đó, timer tới hạn chỉ GET session/challenge của chính lượt hiện tại; nếu vẫn chờ thì retry có giới hạn tới deadline, có đường báo lỗi/thử lại, không GET dồn liên tục. Dùng `bite_at`/thời gian server được trả rõ ràng để tránh tính sai từ đồng hồ client hoặc thời điểm response tới.
+2. Phương án bỏ phụ thuộc scheduler: RPC activate xác minh owner, khu/phiên, thời gian server, expiry và trạng thái; chuyển sang `BITE` nguyên tử, idempotent theo session. Đây là mutation qua RPC, không phải GET. Không bắt đầu tính thời gian người chơi giữ nút trước hành động thật; giữ luật hiện tại của `start_tension_challenge`.
+3. Timer và response phải gắn session/user hiện hành, hủy khi thu mồi/ra khu/đổi user; khi focus/online phải đối soát phiên. Kiểm thử mạng chậm, chạm hạn, tab ngủ, retry, session hết hạn và submit trùng trước khi gỡ publication.
+
+**Phiên đăng nhập:** GET 15–30 giây chỉ phù hợp nếu chấp nhận phát hiện thiết bị khác trễ. Giữ BroadcastChannel cho cùng trình duyệt; đối soát lúc focus và kiểm tra server trước thao tác quan trọng. Nếu yêu cầu cảnh báo gần tức thời giữa thiết bị thì nên giữ listener `active_sessions` theo user: bảng này thay đổi theo lần đăng nhập, không theo tick câu. Cần sửa các truy vấn hiện nằm trong composable về repository khi triển khai thay thế.
+
+### 9.4. Quy tắc tải lại để thực sự giảm tải
+
+- Pinia quản lý cache theo user/phạm vi, thời điểm fetch, trạng thái đang chạy; repository thực hiện SELECT/RPC. Một tác vụ refresh chung cho cùng snapshot, nhiều nơi gọi dùng chung request đang chạy và tối đa một lượt đối soát bù. Request ID chỉ bỏ response cũ, không ngăn query đã gửi.
+- Refresh sau mutation chỉ khi server xác nhận thành công. Nếu mutation thành công nhưng GET lỗi, giữ kết quả thao tác, báo dữ liệu cần tải lại và cho retry GET; không tự gửi lại mutation không có bảo vệ trùng.
+- Focus/online chỉ làm mới phần dữ liệu cần dùng đã hết TTL; gộp `focus`, `visibilitychange`, `online` để tránh burst. Dừng polling thông thường lúc tab ẩn/offline, đóng panel hoặc đổi user; focus phải đối soát các luồng quan trọng trước khi tiếp tục thao tác. Tab ẩn không thể dựa vào timer để bảo đảm single-session.
+- Lệch ngẫu nhiên thời điểm polling giữa client, tăng khoảng chờ khi lỗi, không chồng request. Các khoảng 10–60 giây ở bảng là lịch cho từng snapshot/màn hình, không phải tạo 14 timer độc lập. Hiển thị thời điểm cập nhật/nút làm mới ở nơi dữ liệu cũ ảnh hưởng quyết định người dùng; dùng i18n hiện có khi triển khai UI.
+- Tách snapshot listing, history, badge, đội và số dư theo nhu cầu. `loadData()` đội hiện có nhiều query phụ; `fetchNotifications()` hiện có ba SELECT, chưa phải một request badge nhẹ. Tối ưu endpoint/phân trang trước khi polling thường xuyên, chỉ đọc trường cần thiết.
+- Với `V` người xem, `q` query/lần và chu kỳ `T` giây, tải đọc nền xấp xỉ `V × q / T` request/giây, chưa tính lần mở màn hình/focus/mutation. Ví dụ 1.000 người dùng một snapshot một query mỗi 30 giây tạo khoảng 33,3 request/giây; gọi hàm notification hiện tại mỗi 60 giây cho 1.000 người tạo khoảng 50 request/giây. Bỏ Realtime không mặc nhiên giảm CPU DB nếu thay bằng nhiều GET không cần thiết.
+
+Supabase mô tả chi phí Postgres Changes tăng theo số subscriber cần kiểm quyền, cùng xử lý thay đổi theo thứ tự trên một luồng. Đó là lý do ưu tiên bỏ fan-out chợ/khu/đội; không đủ để khẳng định polling luôn nhanh hơn. Nguồn đối chiếu: [Scaling Postgres Changes](https://supabase.com/docs/guides/realtime/postgres-changes#scaling-postgres-changes).
+
+### 9.5. Theo dõi triển khai
+
+| Hạng mục | Trạng thái ngày 13/11/2026 | Điều kiện hoàn tất |
+| --- | --- | --- |
+| Đánh giá 16 bảng và cơ chế thay thế | Đã hoàn thành trong tài liệu | Đã đối chiếu call site, store, repository và SQL có trong repo; chưa xác minh cấu hình production |
+| Bỏ listener chợ, lịch sử, feedback, đọc thông báo | Đã triển khai client | Chợ phân trang server 25 listing/trang; tải đúng tab; feedback giữ phân trang; thông báo cập nhật state sau đánh dấu đọc |
+| Bỏ listener profile, mở khóa nước, currency | Đã triển khai client | Làm mới sau các RPC được liệt kê trong mutationRefresh; đối soát thay đổi bên ngoài bằng snapshot. Nguồn ghi/trigger chỉ có trên production vẫn cần kiểm thử thực tế |
+| Bỏ listener flags và thông báo mới | Đã triển khai client | Flags giữ TTL 30 giây; badge/modal dùng chung một lịch 60 giây. Repo đã có migration gate phía server, chưa xác minh trạng thái deploy của gate |
+| Bỏ listener đội và trạng thái khu | Đã triển khai client | Tách directory khỏi membership; GET khu theo owner; đối soát lúc hiển thị. Cần smoke test nhiều tài khoản với RLS production |
+| Chuyển monitor admin sang snapshot | Đã triển khai client | Bỏ toàn bộ subscription monitor, chỉ tải báo cáo đang xem mỗi 30 giây; dashboard hiển thị chế độ snapshot |
+| Thay `fishing_sessions` và `active_sessions` | Tạm giữ; chưa triển khai thay thế | Hoàn thành điều kiện 9.3; không dùng GET để thực hiện chuyển trạng thái |
+| Tắt publication từng bảng | Đã chuẩn bị migration; chưa áp dụng DB | Deploy client trước, rà soát consumer ngoài repo/client cũ, chụp danh sách publication để rollback; chạy migration mới sau các migration cũ có ADD TABLE |
+| Kiểm tra cập nhật code | Build, i18n và kiểm thử refresh đã qua | Chi tiết và giới hạn xác minh tại mục 10.3 |
+
+Thứ tự đề xuất: chợ/feedback → profile/currency/mở khóa → thông báo/flags → đội/khu và monitor → hai luồng đặc biệt. Sau mỗi nhóm, đo số subscription, message, HTTP request, lỗi và p95 bằng cùng kịch bản trước/sau. Chưa thể khẳng định tăng được bao nhiêu CCU chỉ từ việc bỏ listener.
+
+## 10. Kết quả triển khai snapshot/refresh — 13/11/2026
+
+### 10.1. Hành vi đã cập nhật
+
+14 bảng ở mục 9.2 đã hết consumer Postgres Changes trong `src`. Trong danh sách 16 bảng ban đầu chỉ còn hai consumer cần giữ. Realtime `zones` nằm ngoài phạm vi yêu cầu và được giữ nguyên; Supabase Auth và BroadcastChannel cùng trình duyệt không thay đổi.
+
+| Snapshot | Thời điểm đọc và chu kỳ đối soát khi tab hiển thị |
+| --- | --- |
+| Trạng thái khu của mình | Khởi tạo, sau RPC vào/ra/kết thúc chuyến và mỗi 15 giây. Chỉ SELECT theo user; route guard vẫn kiểm tra DB khi điều hướng |
+| Ví và hồ sơ | Khởi tạo, sau RPC có ảnh hưởng và mỗi 60 giây; ví dùng một SELECT `cash,shells,tickets`, thay cho RPC tiền cộng SELECT vé riêng trong store |
+| Quốc gia đã mở khóa | Mở/hiện bản đồ, sau RPC thưởng/tiến trình và mỗi 60 giây khi bản đồ có hiển thị lớp mở khóa |
+| Feature flags | Một lịch 30 giây dùng TTL hiện có, cộng kiểm tra tại feature gate; không có subscription song song |
+| Chợ | Mở chợ, chuyển tab/trang/filter, làm mới thủ công, sau mua/hủy/đăng bán; đối soát 30 giây chỉ tải tab đang xem. History giữ 20 dòng/trang |
+| Thông báo | Badge và modal dùng chung một lịch 60 giây tại sảnh; mở modal tải mới, đánh dấu đọc cập nhật Pinia rồi đối soát. Timer cục bộ loại thông báo hệ thống hết hạn mà không chờ event DB |
+| Lịch sử báo lỗi | Mở panel, đổi trang, sau gửi, refresh thủ công và đối soát 60 giây khi panel còn mở |
+| Đội | Membership và lời mời khoảng 30 giây tại sảnh, 15 giây khi panel đội mở. Directory đội chỉ tải ở panel, tối đa theo lịch khoảng 30 giây, hoặc sau thao tác/làm mới; không tải toàn bộ directory tại sảnh |
+| Monitor admin | Khởi tạo/chuyển báo cáo/làm mới và mỗi 30 giây; chỉ tải báo cáo đang xem |
+
+Các lịch trên dùng [visibleRefresh.ts](src/utils/visibleRefresh.ts): dừng khi tab ẩn/offline, gộp focus/visibility/online khi hết chu kỳ, lệch ngẫu nhiên tối đa 15% để giảm đồng loạt và tăng thời gian chờ khi lỗi. Các chu kỳ là gần đúng; trình duyệt/mạng có thể làm dữ liệu trễ hơn. Không tự gửi lại mutation khi GET đối soát lỗi.
+
+[refreshTask.ts](src/utils/refreshTask.ts) gộp các lần đọc cùng snapshot theo user/phiên/trang; mutation xảy ra khi đang đọc sẽ yêu cầu một lượt đọc bù được gộp. Dữ liệu trả về được áp dụng với kiểm tra thế hệ đăng nhập/request hiện hành để tránh response cũ ghi vào user hoặc trang mới. [playerRefresh.ts](src/stores/playerRefresh.ts) điều phối các store; toàn bộ query mới vẫn nằm trong repository.
+
+[mutationRefresh.ts](src/database/mutationRefresh.ts) mở rộng tầng fetch chung hiện có bằng danh sách RPC ảnh hưởng tới ví/profile/quốc gia/khu. Chỉ đánh dấu cần đối soát sau HTTP thành công và kết quả không có `success: false`; giữ nguyên response cho nơi gọi. Handler được cài sau Pinia trong `main.ts`, chụp user/thế hệ đăng nhập trước request. Lỗi GET chỉ được ghi vào store, không biến mutation đã commit thành thao tác thất bại. Khi thêm RPC thưởng/chi phí/tiến trình mới, phải cập nhật danh sách này hoặc áp dụng response đầy đủ vào store.
+
+Listing chợ dùng `.range()` lấy 25 dòng cộng một dòng kiểm tra trang tiếp, filter tên/rarity/owner và sort ở server, thứ tự ổn định với `created_at`/`id`. Fallback quan hệ cũ cũng được giới hạn trang; khi tìm theo loài mà quan hệ query bị lỗi thì hiển thị lỗi, không lọc một trang không khớp rồi báo thiếu kết quả. Chế độ nhóm loài gom các listing trong trang đang xem. Bỏ badge tổng listing trên tab để không nhầm 25 dòng của trang là tổng toàn chợ. Sau lỗi mua do listing cũ, tải lại snapshot; tính đúng giao dịch vẫn do RPC server quyết định.
+
+### 10.2. Áp dụng publication trên Supabase
+
+Migration đã chuẩn bị: [20261113_remove_optional_realtime.sql](scripts/supabase/migrations/20261113_remove_optional_realtime.sql). Migration chỉ gỡ đúng 14 bảng, kiểm tra tồn tại trước khi gỡ, giữ hai bảng đặc biệt và các bảng ngoài phạm vi. Dừng với lỗi rõ ràng nếu publication đang ở chế độ `FOR ALL TABLES`.
+
+Chưa chạy SQL này trên database. Trình tự rollout:
+
+1. Lưu danh sách bảng publication hiện tại để rollback; kiểm tra các consumer khác và client cũ.
+2. Deploy client snapshot/refresh. Smoke test câu/thưởng, tiền, mời/kick/đóng đội, vào/ra khu, mua cùng listing, badge/đánh dấu đọc, bảo trì và admin monitor bằng JWT người dùng thật.
+3. Chạy migration mới **sau** các migration cũ có `ADD TABLE` (`player_feature_completion.sql`, `user_profile_progress_realtime.sql`, `world_map_unlock_realtime.sql`, `20261112_feature_flags.sql`). Không sửa lịch sử migration cũ; không replay chúng sau migration gỡ publication mà thiếu bước đối soát.
+4. Xác minh publication và thống kê Realtime/HTTP/DB trước–sau. Nếu quay về client cũ, ADD TABLE lại đúng các bảng trong snapshot trước triển khai trước khi rollback frontend.
+
+### 10.3. Kiểm tra và giới hạn
+
+- `npm run build`: qua TypeScript và Vite; vẫn có cảnh báo vendor 616,49 kB vượt ngưỡng 600 kB đã tồn tại trước thay đổi.
+- `npm run check:i18n`: qua kiểm tra 1.697 bản dịch mỗi ngôn ngữ và kiểm tra runtime Việt/Anh; UI mới tái sử dụng các key hiện có.
+- `npm run test:data-refresh` (Node 24 trong môi trường này): 12 kiểm thử đạt, gồm gộp request/đọc bù, phục hồi sau lỗi, khác user/phiên, điều kiện mutation thành công, pause/resume/backoff/cleanup, phân trang/filter/sort chợ trước khi lấy trang, đổi trang 1 → 2 → 1 và response hồ sơ tới muộn sau đổi tài khoản.
+- Kiểm thử repository dùng transport giả, kiểm thử store dùng Pinia thật qua Vite SSR; không gửi request tới Supabase. Chưa kiểm thử SQL migration, RLS/trigger production, UI với tài khoản thật hoặc tải CCU. Endpoint notification hiện vẫn đọc ba tập dữ liệu, directory đội vẫn chưa phân trang; đây là các việc P0-B/P1 tiếp theo, không coi việc bỏ Realtime đã giải quyết chúng.

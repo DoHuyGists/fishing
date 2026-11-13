@@ -5,6 +5,9 @@ import { supabaseCurrencyRepository } from "../data/supabaseCurrencyRepository";
 import { useAuthStore } from "./auth";
 import { useToast } from "../composables/useToast";
 
+import { createKeyedRefreshTask } from '../utils/refreshTask';
+const refreshWallet = createKeyedRefreshTask<Awaited<ReturnType<typeof supabaseCurrencyRepository.fetchWallet>>>();
+
 export const useCurrencyStore = defineStore("currency", {
   state: () => ({
     cash: 0,
@@ -82,19 +85,21 @@ export const useCurrencyStore = defineStore("currency", {
         this.converting = false;
       }
     },
-    async fetchCurrency() {
-      this.loading = true;
-      this.error = "";
+    async fetchCurrency(invalidate = false) {
+      const auth = useAuthStore();
+      const userId = auth.user?.id;
+      const generation = auth.sessionGeneration;
+      if (!userId) return;
+      const current = () => auth.user?.id === userId && auth.sessionGeneration === generation;
+      this.loading = true; this.error = '';
       try {
-        const { cash, shells } = await supabaseCurrencyRepository.fetchMyCurrency();
-        this.cash = cash;
-        this.shells = shells ?? 0;
-        this.tickets = await supabaseCurrencyRepository.fetchTickets(useAuthStore().userId);
+        const wallet = await refreshWallet(userId + ':' + generation,
+          () => supabaseCurrencyRepository.fetchWallet(userId), invalidate);
+        if (!current()) return;
+        this.cash = wallet.cash; this.shells = wallet.shells; this.tickets = wallet.tickets;
       } catch (err) {
-        this.error = err instanceof Error ? err.message : tr('currency.khong_the_lay_du_lieu_tien_te');
-      } finally {
-        this.loading = false;
-      }
+        if (current()) this.error = err instanceof Error ? err.message : tr('currency.khong_the_lay_du_lieu_tien_te');
+      } finally { if (current()) this.loading = false; }
     },
   },
 });

@@ -1,6 +1,5 @@
 import supabase from "../database/connection";
 import type { Country } from "../stores/country";
-import { createUuid } from "../utils/uuid";
 
 class SupabaseCountryRepository {
   async fetchMapColors(): Promise<{ country_id: number; color: string | null }[]> {
@@ -17,23 +16,6 @@ class SupabaseCountryRepository {
       .returns<{ country: Country }[]>();
     if (error) throw new Error(error.message);
     return (data ?? []).map((row) => row.country).sort((a, b) => a.name.localeCompare(b.name));
-  }
-
-  subscribeToUnlockedCountries(playerId: string, onChange: () => void): () => void {
-    const channel = supabase
-      .channel(`unlocked_countries_${playerId}_${createUuid()}`)
-      .on("postgres_changes", {
-        event: "*",
-        schema: "public",
-        table: "player_unlocked_countries",
-        filter: `player_id=eq.${playerId}`,
-      }, onChange)
-      .subscribe((status) => {
-        // Refresh after subscribing/reconnecting to recover changes missed while offline.
-        if (status === "SUBSCRIBED") onChange();
-      });
-
-    return () => { void supabase.removeChannel(channel); };
   }
 
   async fetchCountries(): Promise<Country[]> {
