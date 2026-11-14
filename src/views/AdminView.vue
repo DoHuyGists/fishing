@@ -125,10 +125,10 @@ const groups: ModuleGroup[] = [
     ],
   },
   {
-    get title() { return tr('FeatureAvailability.title'); },
+    get title() { return tr('AdminView.features'); },
     modules: [{
       key: "featureAvailability", icon: "🛑",
-      get label() { return tr('FeatureAvailability.title'); },
+      get label() { return tr('AdminView.feature_controls'); },
       get desc() { return tr('FeatureAvailability.adminDescription'); },
       component: moduleComponents.featureAvailability,
     }],
@@ -380,23 +380,23 @@ const close = () => {
   <div class="min-h-screen bg-slate-50 text-slate-800 lg:flex">
     <!-- Sidebar -->
     <aside
-      class="hidden lg:sticky lg:top-0 lg:flex lg:h-dvh lg:w-56 lg:shrink-0 lg:self-start flex-col overflow-hidden bg-[#153221] text-emerald-50"
+      class="hidden lg:sticky lg:top-0 lg:flex lg:h-dvh lg:w-52 lg:shrink-0 lg:self-start flex-col overflow-hidden bg-[#153221] text-emerald-50"
     >
-      <div class="shrink-0 px-4 py-3 border-b border-white/10">
-        <div class="text-base font-extrabold leading-tight">{{ tr('AdminView.quan_tri') }}</div>
+      <div class="shrink-0 px-3 py-2 border-b border-white/10">
+        <div class="text-sm font-bold leading-tight">{{ tr('AdminView.quan_tri') }}</div>
       </div>
 
       <nav
-        class="min-h-0 flex-1 overflow-y-auto overscroll-contain px-2 py-3 space-y-3"
+        class="min-h-0 flex-1 overflow-y-auto overscroll-contain px-2 py-2 space-y-2"
         :aria-label="tr('AdminView.dieu_huong_quan_tri')"
       >
         <section v-for="group in groups" :key="group.title">
-          <div class="px-2 mb-1 text-xs font-semibold text-emerald-200/60">{{ group.title }}</div>
+          <div class="px-2 text-xs font-semibold text-emerald-200/60">{{ group.title }}</div>
           <div>
             <div v-for="m in group.modules" :key="m.key">
               <button
                 type="button"
-                class="w-full flex items-center gap-2 rounded-md px-2 py-1.5 text-left text-xs font-medium transition-colors cursor-pointer focus-visible:outline-2 focus-visible:outline-emerald-300"
+                class="w-full flex items-center gap-1.5 rounded px-2 py-1 text-left text-xs leading-4 font-medium transition-colors cursor-pointer focus-visible:outline-2 focus-visible:outline-emerald-300"
                 :class="
                   active === m.key ? 'bg-white/15 text-white' : 'text-emerald-50/80 hover:bg-white/10 hover:text-white'
                 "
@@ -415,13 +415,13 @@ const close = () => {
     <!-- Main -->
     <main class="flex-1 min-w-0">
       <header
-        class="bg-white border-b border-[#cbd9c6] px-3 py-3 sm:px-4 flex flex-wrap items-center gap-2 justify-between"
+        class="bg-white border-b border-[#cbd9c6] px-3 py-2 flex flex-wrap items-center gap-2 justify-between"
       >
         <div>
-          <div class="text-base font-extrabold text-[#153221]">{{ tr('AdminView.bang_dieu_khien') }}</div>
+          <div class="text-sm font-bold text-[#153221]">{{ tr('AdminView.bang_dieu_khien') }}</div>
         </div>
 
-        <div class="flex w-full flex-wrap items-center gap-2 sm:w-auto sm:justify-end">
+        <div class="flex w-full flex-wrap items-center gap-1.5 sm:w-auto sm:justify-end">
           <button
             type="button"
             class="rounded-md border border-[#cbd9c6] bg-[#f5f9f0] px-2.5 py-1.5 text-xs font-semibold text-[#24352a] hover:bg-emerald-100 focus-visible:outline-2 focus-visible:outline-emerald-600"
@@ -454,7 +454,7 @@ const close = () => {
           >
             {{ tr('AdminView.xu_ly_bao_loi') }}
           </button>
-          <label class="relative w-full sm:w-48">
+          <label class="relative w-full sm:w-40">
             <span class="sr-only">{{ tr('AdminView.tim_muc_quan_ly') }}</span>
             <input
               v-model="keyword"
@@ -469,33 +469,37 @@ const close = () => {
         </div>
       </header>
 
-      <div class="grid items-start gap-4 p-3 sm:p-4 xl:grid-cols-2">
-        <section v-for="group in filteredGroups" :key="group.title">
-          <div class="mb-2 text-xs font-bold text-[#24352a]">{{ group.title }}</div>
+      <div class="columns-1 gap-2 p-2 sm:columns-2 xl:columns-3">
+        <section
+          v-for="group in filteredGroups"
+          :key="group.title"
+          class="mb-2 break-inside-avoid rounded-md border border-[#cbd9c6] bg-white p-2"
+        >
+          <div class="mb-1 border-b border-[#cbd9c6] pb-1 text-xs font-bold text-[#24352a]">{{ group.title }}</div>
 
-          <div class="grid gap-2 sm:grid-cols-2">
+          <div class="grid gap-0.5">
             <button
               v-for="m in group.modules"
               :key="m.key"
               type="button"
-              class="group flex items-center gap-2 rounded-lg border border-[#cbd9c6] bg-white px-2.5 py-2 text-left transition-colors hover:border-emerald-600 hover:bg-[#f5f9f0] cursor-pointer focus-visible:outline-2 focus-visible:outline-emerald-600"
+              class="flex min-h-8 items-center gap-2 rounded px-1.5 py-1 text-left transition-colors hover:bg-[#f5f9f0] cursor-pointer focus-visible:outline-2 focus-visible:outline-emerald-600"
               :title="m.desc"
               @click="open(m.key)"
             >
               <span
-                class="flex h-7 w-7 shrink-0 items-center justify-center rounded-md bg-[#f5f9f0] text-base group-hover:bg-emerald-100"
+                class="w-5 shrink-0 text-center text-sm"
                 aria-hidden="true"
               >
                 {{ m.icon }}
               </span>
-              <span class="min-w-0 text-xs font-semibold text-[#24352a]">{{ m.label }}</span>
+              <span class="min-w-0 text-xs leading-4 font-medium text-[#24352a]">{{ m.label }}</span>
             </button>
           </div>
         </section>
 
         <div
           v-if="filteredGroups.length === 0"
-          class="rounded-lg border border-dashed border-[#cbd9c6] bg-white p-4 text-center text-xs text-slate-500 xl:col-span-2"
+          class="rounded-md border border-dashed border-[#cbd9c6] bg-white p-3 text-center text-xs text-slate-500"
         >
           {{ tr('AdminView.khong_co_muc_nao_khop_voi') }}{{ keyword }}{{ tr('AdminView.hay_thu_tu_khoa_khac') }}
         </div>

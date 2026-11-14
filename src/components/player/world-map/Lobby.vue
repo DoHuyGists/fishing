@@ -18,7 +18,7 @@ import Shells from "../currency/Shells.vue";
 import Tickets from "../currency/Tickets.vue";
 import SkillPoints from "../currency/SkillPoints.vue";
 import TeamMembersSticky from "../team/TeamMembersSticky.vue";
-import PrepareModal from "./PrepareModal.vue";
+import PrepareModal from "../prepare/PrepareModal.vue";
 import FeatureTable from "./FeatureTable.vue";
 import GuideTour from "../../shared/GuideTour.vue";
 import { useOnboardingStore } from "../../../stores/onboarding";
@@ -131,19 +131,23 @@ watch(
 watch(
   () => [authStore.user?.id, features.isAvailable("notifications")] as const,
   ([userId, enabled], _, onCleanup) => {
-    if (userId && enabled) notificationStore.startRefreshing(userId, 'badge');
+    if (userId && enabled) notificationStore.startRefreshing(userId, "badge");
     onCleanup(() => {
-      notificationStore.stopRefreshing('badge');
+      notificationStore.stopRefreshing("badge");
     });
   },
   { immediate: true },
 );
 
-watch(() => [authStore.user?.id, features.isAvailable('team')] as const, ([userId, enabled], _, onCleanup) => {
-  if (!userId || !enabled) return;
-  teamStore.startRefreshing(userId, 'lobby');
-  onCleanup(() => teamStore.stopRefreshing('lobby'));
-}, { immediate: true });
+watch(
+  () => [authStore.user?.id, features.isAvailable("team")] as const,
+  ([userId, enabled], _, onCleanup) => {
+    if (!userId || !enabled) return;
+    teamStore.startRefreshing(userId, "lobby");
+    onCleanup(() => teamStore.stopRefreshing("lobby"));
+  },
+  { immediate: true },
+);
 
 onMounted(() => {
   void userTurnsStore.fetchStatus().then(() => userTurnsStore.startCountdown());
@@ -153,7 +157,7 @@ onMounted(() => {
 });
 
 onUnmounted(() => {
-  notificationStore.stopRefreshing('badge');
+  notificationStore.stopRefreshing("badge");
   userTurnsStore.stopCountdown();
 });
 </script>
@@ -210,8 +214,10 @@ onUnmounted(() => {
           <ShopModal v-if="modalStore.isOpening('shop')" />
           <CatchDiaryModal v-if="modalStore.isOpening('diary')" />
           <SpinWheelModal v-if="configStore.isUnlocked('gacha') && modalStore.isOpening('gacha')" />
-          <InventoryModal v-if="modalStore.isOpening('inventory') || modalStore.isOpening('body')"
-            :initial-tab="modalStore.isOpening('body') ? 'health' : 'fishing'" />
+          <InventoryModal
+            v-if="modalStore.isOpening('inventory') || modalStore.isOpening('body')"
+            :initial-tab="modalStore.isOpening('body') ? 'health' : 'fishing'"
+          />
           <SkillModal v-if="modalStore.isOpening('skill')" />
           <AquacultureModal v-if="modalStore.isOpening('aquaculture')" />
           <DispatchModal v-if="modalStore.isOpening('dispatch')" />

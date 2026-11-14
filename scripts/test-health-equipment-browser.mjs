@@ -32,9 +32,10 @@ const server = await createServer({
     load(id) {
       if (id !== '/__fixture.ts') return;
       return `
-        import { createApp, h } from 'vue';
+        import { createApp, h, ref } from 'vue';
         import { createPinia } from 'pinia';
         import InventoryModal from '/src/components/player/inventory/InventoryModal.vue';
+        import PrepareBodyEquipmentSets from '/src/components/player/prepare/PrepareBodyEquipmentSets.vue';
         import { useAuthStore } from '/src/stores/auth.ts';
         import { useHealthStore } from '/src/stores/health.ts';
         import { useInventoryStore } from '/src/stores/inventory.ts';
@@ -52,7 +53,8 @@ const server = await createServer({
         const auth = useAuthStore(pinia); auth.user = { id: '${owner}' }; auth.initialized = true;
         useUserProfileStore(pinia).profile = { id: '${owner}', equipment_capacity: 10 };
         const modal = useModalStore(pinia); modal.modalOpening = 'inventory';
-        createApp({ render: () => modal.isOpening('inventory') || modal.isOpening('body') ? h(InventoryModal, { compact: true, initialTab: modal.isOpening('body') ? 'health' : 'fishing' }) : null }).use(pinia).use(i18n).mount('#app');
+        const showPrepareBody = ref(false); window.showPrepareBody = showPrepareBody;
+        createApp({ render: () => showPrepareBody.value ? h(PrepareBodyEquipmentSets) : modal.isOpening('inventory') || modal.isOpening('body') ? h(InventoryModal, { compact: true, initialTab: modal.isOpening('body') ? 'health' : 'fishing' }) : null }).use(pinia).use(i18n).mount('#app');
         window.health = useHealthStore(pinia); window.inventory = useInventoryStore(pinia); window.healthI18n = i18n; window.healthModal = modal;
       `;
     },
@@ -196,6 +198,32 @@ try {
   assert.equal(await page.locator('#user-inventory').count(), 1);
   await page.getByRole('button', { name: 'Close', exact: true }).click();
   await page.getByRole('dialog').waitFor({ state: 'detached' });
+  // Preparation shows saved body equipment and switches the same persisted active set.
+  await page.evaluate(async () => { await window.health.loadInventory(); window.showPrepareBody.value = true; });
+  const prepareBody = page.getByRole('region', { name: 'Body equipment sets', exact: true });
+  await prepareBody.waitFor();
+  assert.equal(await prepareBody.getByRole('button').count(), 3);
+  assert.equal(await prepareBody.getByText('Áo bảo hộ', { exact: true }).count(), 1);
+  for (const slot of ['Head', 'Torso', 'Hands', 'Legs', 'Footwear', 'Accessory']) {
+    assert.equal(await prepareBody.getByText(slot, { exact: true }).count(), 1);
+  }
+  const bodySet2 = prepareBody.getByRole('button', { name: /Set 2/ });
+  await bodySet2.click();
+  await page.waitForFunction(() => window.health.savedSets[1].is_used && !window.health.busy);
+  assert.equal(await bodySet2.getAttribute('aria-pressed'), 'true');
+  assert.equal(await prepareBody.getByText('Áo bảo hộ', { exact: true }).count(), 0);
+  assert.equal(await page.evaluate(() => window.health.bonuses.vitality), 0);
+  await prepareBody.getByRole('button', { name: /Set 1/ }).click();
+  await page.waitForFunction(() => window.health.bonuses.vitality === 20 && !window.health.busy);
+  // Unsaved inventory edits must not appear as equipped in preparation.
+  await page.evaluate(() => { window.health.sets[0].head.push({ inventory_id: 'hat' }); window.health.busy = true; });
+  assert.equal(await prepareBody.getByText('Mũ sinh tồn', { exact: true }).count(), 0);
+  assert.equal(await bodySet2.isDisabled(), true);
+  await page.evaluate(() => { window.health.busy = false; window.healthI18n.global.locale.value = 'vi'; });
+  await page.getByRole('region', { name: 'Set trang bị cơ thể', exact: true }).waitFor();
+  assert.ok(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth));
+  await page.evaluate(() => { window.health.savedSets = []; });
+  await page.getByText('Bạn chưa có set trang bị cơ thể. Hãy vào kho đồ để tạo và lắp trang bị.', { exact: true }).waitFor();
   assert.ok(reads.length > 0); assert.ok(mutations.length >= 8); assert.ok(mutations.every(url => /rpc\/(save_body_equipment_set|switch_body_equipment|create_body_equipment_set|save_equipment_set|switch_equipment)/.test(url))); assert.deepEqual(errors, []);
   console.log('Inventory tabs passed: shared inventory, fishing drafts, body set save/switch/create, committed totals, deletion guard, mobile, translations and close.');
 } finally { await browser?.close(); await server.close(); }
