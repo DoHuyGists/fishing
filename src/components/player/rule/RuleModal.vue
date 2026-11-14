@@ -27,13 +27,12 @@ onUnmounted(() => {
     :title="tr('RuleModal.title')"
     :sub-title="tr('RuleModal.subtitle')"
     :show-count-data="false"
-    compact
     role="dialog"
     aria-modal="true"
     :aria-label="tr('RuleModal.title')"
     @keydown.esc.stop="modalStore.close()"
   >
-    <div ref="content" tabindex="-1" class="space-y-4 p-2 text-[#24352a] outline-none sm:p-4">
+    <div ref="content" tabindex="-1" class="space-y-4 text-[#24352a] outline-none">
       <div class="rounded-xl border border-[#cbd9c6] bg-[#f5f9f0] p-4 text-sm leading-6">
         <div class="font-bold">{{ tr('RuleModal.introTitle') }}</div>
         <div class="mt-1">{{ tr('RuleModal.intro') }}</div>

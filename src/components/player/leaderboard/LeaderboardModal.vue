@@ -6,6 +6,7 @@ import { computed, watch } from "vue";
 import Modal from "../../shared/Modal.vue";
 import Pagination from '../../shared/Pagination.vue';
 import Tab from "../../shared/Tab.vue";
+import LeaderboardFish from "./LeaderboardFish.vue";
 import { useLeaderboardStore } from "../../../stores/leaderboard.ts";
 import { useAuthStore } from "../../../stores/auth.ts";
 
@@ -21,7 +22,7 @@ function rankLabel(rank: number) {
   return ["🥇", "🥈", "🥉"][rank - 1] ?? `#${rank}`;
 }
 
-watch(() => authStore.userId, load, { immediate: true });
+watch([() => authStore.userId, () => leaderboardStore.activeTab], () => leaderboardStore.fetchLeaderboard(authStore.userId, 1), { immediate: true });
 </script>
 
 <template>
@@ -41,13 +42,10 @@ watch(() => authStore.userId, load, { immediate: true });
                 <div class="mb-0 mt-1 text-sm text-[#52654f]">{{ board.description }}</div>
               </div>
               <span class="rounded-full border border-[#cbd9c6] bg-[#f5f9f0] px-3 py-1 text-xs font-semibold">
-                {{ board.isMock ? tr('LeaderboardModal.du_lieu_mau') : tr('LeaderboardModal.du_lieu_thuc_te') }}
+                {{ tr('LeaderboardModal.du_lieu_thuc_te') }}
               </span>
             </div>
 
-            <div v-if="board.isMock" class="m-0 rounded-xl border border-amber-200 bg-amber-50 px-4 py-3 text-sm text-amber-900">
-              {{ tr('LeaderboardModal.bang_nay_dang_dung_du_lieu_mau_de_minh_hoa_thu_hang_chua_phan_an') }}
-            </div>
             <div v-if="board.error" role="alert" class="m-0 rounded-xl border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-700">
               {{ board.error }}{{ tr('LeaderboardModal.hay_thu_lam_moi_bang_xep_hang') }}
             </div>
@@ -74,6 +72,7 @@ watch(() => authStore.userId, load, { immediate: true });
                       <span v-if="entry.userId && entry.userId === authStore.userId" class="text-xs font-semibold text-emerald-700">{{ tr('LeaderboardModal.ban') }} </span>
                       <div class="m-0 break-words text-base font-extrabold tabular-nums sm:text-xl">{{ numberFormatter.format(entry.value) }}</div>
                       <div class="mb-0 mt-1 text-xs text-[#52654f]">{{ board.unit }}</div>
+                      <LeaderboardFish v-if="entry.bestFish" :fish="entry.bestFish" class="mt-2" />
                     </div>
                   </div>
 
@@ -91,7 +90,10 @@ watch(() => authStore.userId, load, { immediate: true });
                       >
                         <span class="w-8 shrink-0 text-center text-sm font-bold text-[#52654f]">#{{ entry.rank }}</span>
                         <img v-if="entry.avatarUrl" :src="entry.avatarUrl" alt="" class="h-8 w-8 rounded-full object-cover" referrerpolicy="no-referrer" />
-                        <span class="min-w-0 flex-1 truncate text-sm font-semibold" :title="entry.displayName">{{ entry.displayName }}</span>
+                        <div class="min-w-0 flex-1">
+                          <div class="truncate text-sm font-semibold" :title="entry.displayName">{{ entry.displayName }}</div>
+                          <LeaderboardFish v-if="entry.bestFish" :fish="entry.bestFish" class="mt-1" />
+                        </div>
                         <span v-if="entry.userId && entry.userId === authStore.userId" class="rounded-full bg-emerald-100 px-2 py-0.5 text-xs font-bold text-emerald-800">{{ tr('LeaderboardModal.ban_2') }}</span>
                         <span class="shrink-0 text-right text-sm font-bold tabular-nums">
                           {{ numberFormatter.format(entry.value) }} <span class="text-xs font-normal text-[#52654f]">{{ board.unit }}</span>
@@ -109,23 +111,21 @@ watch(() => authStore.userId, load, { immediate: true });
 
               <aside class="slide-fade-in from-right player-content-in order-first rounded-2xl border border-[#cbd9c6] bg-[#f5f9f0] p-4 lg:order-last" :aria-label="tr('LeaderboardModal.thu_hang_ca_nhan')">
                 <div class="m-0 text-sm font-bold">{{ tr('LeaderboardModal.thu_hang_cua_ban') }}</div>
-                <div v-if="board.isMock" class="mb-0 mt-2 text-sm leading-relaxed text-[#52654f]">
-                  {{ tr('LeaderboardModal.thu_hang_ca_nhan_se_hien_thi_khi_tieu_chi_nay_co_du_lieu_thuc_te') }}
-                </div>
-                <div v-else-if="board.loading" class="mb-0 mt-2 text-sm text-[#52654f]">{{ tr('LeaderboardModal.dang_tai_thu_hang') }}</div>
+                <div v-if="board.loading" class="mb-0 mt-2 text-sm text-[#52654f]">{{ tr('LeaderboardModal.dang_tai_thu_hang') }}</div>
                 <template v-else-if="board.myEntry && board.myRank !== null">
                   <div class="mt-3 flex flex-wrap items-end justify-between gap-2">
                     <span class="text-3xl font-extrabold text-emerald-800">#{{ board.myRank }}</span>
-                    <span class="text-sm font-bold tabular-nums">{{ numberFormatter.format(board.myEntry.score) }} {{ board.unit }}</span>
+                    <span class="text-sm font-bold tabular-nums">{{ numberFormatter.format(board.myValue) }} {{ board.unit }}</span>
                   </div>
                   <div class="mb-0 mt-3 truncate text-sm text-[#52654f]">{{ board.myEntry.display_name || tr('LeaderboardModal.an_danh') }}</div>
+                  <LeaderboardFish v-if="board.key === 'best_fish' && board.myEntry.best_fish" :fish="board.myEntry.best_fish" class="mt-2" />
                 </template>
                 <div v-else class="mb-0 mt-2 text-sm leading-relaxed text-[#52654f]">
                   {{ board.error ? tr('LeaderboardModal.chua_the_tai_thu_hang_ca_nhan_vui_long_thu_lam_moi') : authStore.userId ? tr('LeaderboardModal.ban_chua_co_thu_hang_o_tieu_chi_nay_tiep_tuc_cau_ca_de_ghi_dau_t') : tr('LeaderboardModal.dang_nhap_de_xem_thu_hang_cua_ban') }}
                 </div>
               </aside>
             </div>
-            <Pagination v-if="!board.isMock" :page="leaderboardStore.page" :page-size="leaderboardStore.pageSize" :total="leaderboardStore.total" :loading="leaderboardStore.loading" @change="leaderboardStore.fetchLeaderboard(authStore.userId, $event)" />
+            <Pagination :page="leaderboardStore.page" :page-size="leaderboardStore.pageSize" :total="leaderboardStore.total" :loading="leaderboardStore.loading" @change="leaderboardStore.fetchLeaderboard(authStore.userId, $event)" />
           </section>
         </template>
       </Tab>

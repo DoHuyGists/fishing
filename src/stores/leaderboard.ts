@@ -1,41 +1,17 @@
-import type { LeaderboardEntry } from "../types/model/leaderboard";
-import type { MockLeaderboardCriterion } from "../types/model/mockLeaderboard";
+import { leaderboardValue, type LeaderboardCriterion, type LeaderboardEntry } from "../types/model/leaderboard";
 import { t as tr } from "../i18n";
 import { defineStore } from "pinia";
 import { supabaseLeaderboardRepository } from "../data/supabaseLeaderboardRepository";
-import { mockLeaderboards } from "../data/mockLeaderboard";
 
-type LeaderboardCriterion = "score" | MockLeaderboardCriterion;
-
-interface LeaderboardCategory {
-  key: LeaderboardCriterion;
-  label: string;
-  description: string;
-  metric: string;
-  unit: string;
-  emoji: string;
-  isMock: boolean;
-}
-
-interface RankedLeaderboardEntry {
-  id: string;
-  userId: string | null;
-  displayName: string;
-  avatarUrl?: string | null;
-  value: number;
-  rank: number;
-}
-
-const categories: LeaderboardCategory[] = [
-  { key: "score", get label() { return tr('leaderboard.tong_diem'); }, get description() { return tr('leaderboard.nhung_can_thu_dan_dau_ve_diem_xep_hang'); }, get metric() { return tr('leaderboard.tong_diem'); }, get unit() { return tr('DailyMission.diem'); }, emoji: "🏆", isMock: false },
-  { key: "catches", get label() { return tr('leaderboard.so_ca_da_cau'); }, get description() { return tr('leaderboard.xep_hang_theo_tong_so_ca_cau_duoc'); }, get metric() { return tr('leaderboard.so_ca_da_cau'); }, get unit() { return tr('UserProfile.con'); }, emoji: "🎣", isMock: true },
-  { key: "largest", get label() { return tr('leaderboard.ca_lon_nhat'); }, get description() { return tr('leaderboard.xep_hang_theo_can_nang_cua_con_ca_lon_nhat_tung_cau_duoc'); }, get metric() { return tr('leaderboard.ky_luc_can_nang'); }, unit: "kg", emoji: "🐟", isMock: true },
-  { key: "collection", get label() { return tr('leaderboard.bo_suu_tap'); }, get description() { return tr('leaderboard.xep_hang_theo_so_loai_ca_khac_nhau_da_kham_pha'); }, get metric() { return tr('leaderboard.loai_da_kham_pha'); }, get unit() { return tr('FlipBook.loai'); }, emoji: "📖", isMock: true },
-];
+const categories = () => [
+  { key: "score", label: tr('leaderboard.tong_diem'), description: tr('leaderboard.nhung_can_thu_dan_dau_ve_diem_xep_hang'), metric: tr('leaderboard.tong_diem'), unit: tr('DailyMission.diem'), emoji: "🏆" },
+  { key: "total_caught", label: tr('leaderboard.so_ca_da_cau'), description: tr('leaderboard.xep_hang_theo_tong_so_ca_cau_duoc'), metric: tr('leaderboard.so_ca_da_cau'), unit: tr('UserProfile.con'), emoji: "🎣" },
+  { key: "best_fish", label: tr('leaderboard.best_fish'), description: tr('leaderboard.best_fish_description'), metric: tr('leaderboard.fish_score'), unit: tr('DailyMission.diem'), emoji: "🐟" },
+] satisfies { key: LeaderboardCriterion; label: string; description: string; metric: string; unit: string; emoji: string }[];
 
 export const useLeaderboardStore = defineStore("leaderboard", {
   state: () => ({
-    activeTab: "score",
+    activeTab: "score" as string,
     entries: [] as LeaderboardEntry[],
     myEntry: null as LeaderboardEntry | null,
     myRank: null as number | null,
@@ -48,69 +24,63 @@ export const useLeaderboardStore = defineStore("leaderboard", {
     firstRank: 1,
   }),
   getters: {
-    categories: () => categories,
+    categories: () => categories(),
+    criterion(state): LeaderboardCriterion {
+      return state.activeTab === "total_caught" || state.activeTab === "best_fish" ? state.activeTab : "score";
+    },
     boards(state) {
-      return categories.map((category) => {
-        const entries: RankedLeaderboardEntry[] = category.key === "score"
-          ? state.entries.map((entry) => ({
-              id: entry.id,
-              userId: entry.user_id,
-              displayName: entry.display_name || tr('LeaderboardModal.an_danh'),
-              avatarUrl: entry.avatar_url,
-              value: entry.score,
-              rank: 0,
-            }))
-          : mockLeaderboards[category.key].map((entry) => ({ ...entry, userId: null, rank: 0 }));
-
-        // Equal values share a rank, matching countHigherScore for the personal rank.
-        entries.sort((a, b) => b.value - a.value);
-        const offset = category.isMock ? 0 : (state.page - 1) * state.pageSize;
-        let rank = category.isMock ? 1 : state.firstRank;
-        entries.forEach((entry, index) => {
-          if (index > 0 && entry.value !== entries[index - 1]!.value) rank = offset + index + 1;
-          entry.rank = rank;
-        });
-
-        return {
-          ...category,
-          entries,
-          leaders: offset === 0 ? entries.slice(0, 3) : [],
-          remaining: offset === 0 ? entries.slice(3) : entries,
-          loading: !category.isMock && state.loading,
-          error: category.isMock ? "" : state.error,
-          myEntry: category.isMock ? null : state.myEntry,
-          myRank: category.isMock ? null : state.myRank,
-        };
+      const available = categories();
+      const category = available.find(category => category.key === state.activeTab) ?? available[0]!;
+      const criterion = category.key;
+      const offset = (state.page - 1) * state.pageSize;
+      let rank = state.firstRank;
+      const entries = state.entries.map((entry, index) => {
+        const value = leaderboardValue(entry, criterion);
+        if (index > 0 && value !== leaderboardValue(state.entries[index - 1]!, criterion)) rank = offset + index + 1;
+        return { id: entry.id, userId: entry.id, displayName: entry.display_name || tr('LeaderboardModal.an_danh'),
+          avatarUrl: entry.avatar_url, value, rank, bestFish: criterion === "best_fish" ? entry.best_fish : null };
       });
+      return [{ ...category, entries, leaders: offset === 0 ? entries.slice(0, 3) : [],
+        remaining: offset === 0 ? entries.slice(3) : entries, loading: state.loading, error: state.error,
+        myEntry: state.myEntry, myRank: state.myRank,
+        myValue: state.myEntry ? leaderboardValue(state.myEntry, criterion) : 0 }];
     },
   },
   actions: {
     async fetchLeaderboard(userId?: string | null, page?: number) {
       page ??= this.page;
       const requestId = ++this.requestId;
+      const criterion = this.criterion;
       this.loading = true;
       this.error = "";
+      this.entries = [];
+      this.total = 0;
       this.myEntry = null;
       this.myRank = null;
       try {
-        const result = await supabaseLeaderboardRepository.fetchTop(page);
+        const [result, myEntry] = await Promise.all([
+          supabaseLeaderboardRepository.fetchTop(page, criterion),
+          userId ? supabaseLeaderboardRepository.fetchByUser(userId) : null,
+        ]);
         if (requestId !== this.requestId) return;
-        const firstRank = page > 1 && result.items[0] ? await supabaseLeaderboardRepository.countHigherScore(result.items[0].score) + 1 : 1;
-        if (requestId !== this.requestId) return;
-        this.entries = result.items; this.total = result.total; this.page = page; this.firstRank = firstRank;
         if (!result.items.length && page > 1) {
-          await this.fetchLeaderboard(userId, Math.max(1, Math.ceil(result.total / this.pageSize))); return;
+          await this.fetchLeaderboard(userId, Math.max(1, Math.ceil(result.total / this.pageSize)));
+          return;
         }
-        const myEntry = userId ? await supabaseLeaderboardRepository.fetchByUser(userId) : null;
-        const myRank = myEntry
-          ? (await supabaseLeaderboardRepository.countHigherScore(myEntry.score)) + 1
-          : null;
+        const hasPersonalRank = myEntry && (criterion !== "best_fish" || myEntry.best_fish?.score != null);
+        const [firstRank, myRank] = await Promise.all([
+          page > 1 && result.items[0] ? supabaseLeaderboardRepository.countHigher(leaderboardValue(result.items[0], criterion), criterion).then(count => count + 1) : 1,
+          hasPersonalRank ? supabaseLeaderboardRepository.countHigher(leaderboardValue(myEntry, criterion), criterion).then(count => count + 1) : null,
+        ]);
         if (requestId !== this.requestId) return;
+        this.entries = result.items;
+        this.total = result.total;
+        this.page = page;
+        this.firstRank = firstRank;
         this.myEntry = myEntry;
         this.myRank = myRank;
       } catch (error) {
-        if (requestId !== this.requestId) return;
-        this.error = error instanceof Error ? error.message : tr('leaderboard.khong_the_tai_bang_xep_hang');
+        if (requestId === this.requestId) this.error = error instanceof Error ? error.message : tr('leaderboard.khong_the_tai_bang_xep_hang');
       } finally {
         if (requestId === this.requestId) this.loading = false;
       }

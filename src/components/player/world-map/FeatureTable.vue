@@ -69,7 +69,7 @@ const supportActions: LobbyAction[] = [
 <template>
   <nav
     :aria-label="tr('FeatureTable.chuc_nang_sanh_cau_ca')"
-    class="lobby-menu flex max-h-[min(100dvh,calc(100dvh-7rem))] w-full min-w-0 max-w-sm flex-col self-start overflow-hidden rounded-xl border border-[#cbd9c6] bg-[#f5f9f0] text-[#24352a] shadow-[0_4px_20px_-12px_rgba(36,53,42,0.3)]"
+    class="lobby-menu flex max-h-[calc(100dvh-6rem)] w-full min-w-0 max-w-sm flex-col self-start overflow-hidden rounded-xl border border-[#cbd9c6] bg-[#f5f9f0] text-[#24352a] shadow-[0_4px_20px_-12px_rgba(36,53,42,0.3)]"
   >
     <div class="shrink-0 border-b border-[#cbd9c6] bg-linear-to-br from-[#edf5e5] to-[#f5f9f0] px-2.5 py-2">
       <div class="mb-2 flex items-center gap-2">

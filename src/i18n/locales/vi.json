@@ -1912,6 +1912,9 @@
     "khong_the_tai_huong_dan_vui_long_thu_lai": "Không thể tải hướng dẫn. Vui lòng thử lại."
   },
   "leaderboard": {
+    "best_fish": "Cá có điểm cao nhất",
+    "best_fish_description": "Xếp hạng theo điểm của con cá tốt nhất từng câu được.",
+    "fish_score": "Điểm cá",
     "tong_diem": "Tổng điểm",
     "nhung_can_thu_dan_dau_ve_diem_xep_hang": "Những cần thủ dẫn đầu về điểm xếp hạng.",
     "so_ca_da_cau": "Số cá đã câu",

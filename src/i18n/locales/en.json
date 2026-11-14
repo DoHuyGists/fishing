@@ -1908,6 +1908,9 @@
     "khong_the_tai_huong_dan_vui_long_thu_lai": "Unable to load guides. Please try again."
   },
   "leaderboard": {
+    "best_fish": "Highest-scoring fish",
+    "best_fish_description": "Ranked by the score of the best fish ever caught.",
+    "fish_score": "Fish score",
     "tong_diem": "Total score",
     "nhung_can_thu_dan_dau_ve_diem_xep_hang": "Leading anglers by ranking score.",
     "so_ca_da_cau": "Fish caught",
