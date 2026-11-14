@@ -307,7 +307,7 @@ onBeforeUnmount(() => {
           class="max-h-[85dvh] w-full max-w-lg overflow-y-auto rounded-xl border border-[#cbd9c6] bg-[#f5f9f0] p-4 text-[#24352a]"
         >
           <header class="mb-4 flex items-center justify-between gap-4 border-b pb-2">
-            <dib id="fishing-settings-title" class="text-lg font-bold">{{ tr('FishingView.cai_dat_cau_ca') }}</dib>
+            <div id="fishing-settings-title" class="text-lg font-bold">{{ tr('FishingView.cai_dat_cau_ca') }}</div>
             <button
               type="button"
               class="flex size-8 shrink-0 items-center justify-center rounded-full border border-[#cbd9c6] text-2xl leading-none hover:bg-[#e2ecdc]"

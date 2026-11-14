@@ -20,6 +20,10 @@ export const useHealthStore = defineStore('health', {
       return useInventoryStore().items.filter(item => item.userId === state.owner).map(healthEquipment).filter(item => item.quantity > 0);
     },
     selectedSet(): BodyEquipmentSet | undefined { return this.sets.find(set => set.id === this.selectedSetId); },
+    activeItems(): HealthEquipment[] {
+      const set = this.savedSets.find(set => set.is_used);
+      return set ? this.ownedItems.filter(item => item.slot && set[item.slot].some(entry => entry.inventory_id === item.inventory.id)) : [];
+    },
     equippedItems(): HealthEquipment[] {
       const set = this.selectedSet;
       return set ? this.ownedItems.filter(item => item.slot && set[item.slot].some(entry => entry.inventory_id === item.inventory.id)) : [];

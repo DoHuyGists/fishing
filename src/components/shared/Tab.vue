@@ -20,6 +20,8 @@ interface Props {
   lazy?: boolean
   /** Giới hạn nội dung trong chiều cao còn lại bên dưới thanh tab. */
   contained?: boolean
+  /** Cho phép các tab xuống dòng khi không đủ chiều rộng. */
+  wrap?: boolean
   /** Nhãn aria cho cả danh sách tab. */
   ariaLabel?: string
 }
@@ -27,6 +29,7 @@ interface Props {
 const props = withDefaults(defineProps<Props>(), {
   lazy: false,
   contained: false,
+  wrap: false,
   ariaLabel: undefined,
 })
 
@@ -103,7 +106,8 @@ async function onKeydown(e: KeyboardEvent, index: number) {
     <div
       role="tablist"
       :aria-label="ariaLabel"
-      class="flex shrink-0 gap-1 overflow-x-auto border-b border-green-200"
+      class="flex shrink-0 gap-1 border-b border-green-200"
+      :class="wrap ? 'flex-wrap' : 'overflow-x-auto'"
     >
       <button
         v-for="(tab, index) in tabs"
