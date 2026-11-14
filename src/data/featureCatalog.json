@@ -1,5 +1,14 @@
 [
   {
+    "key": "dispatch",
+    "labelKey": "Dispatch.title",
+    "rpcs": ["get_dispatch_state", "dispatch_action"],
+    "tables": ["dispatch_npcs", "dispatch_jobs", "dispatch_owned_npcs", "dispatch_runs", "dispatch_history", "dispatch_actions"],
+    "writeTables": [],
+    "functions": [],
+    "storageBuckets": []
+  },
+  {
     "key": "account",
     "labelKey": "FeatureTable.tai_khoan",
     "rpcs": [

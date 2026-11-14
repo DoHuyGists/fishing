@@ -42,6 +42,7 @@ const actionGroups: { key: string; label: string; iconClass: string; actions: Lo
       { modal: 'market', get label() { return tr('MarketWindow.cho_ca'); }, icon: '🏪', tourId: 'first-play-market', requiresUnlock: true },
       { modal: 'gacha', label: 'Gacha', icon: '🎁', requiresUnlock: true },
       { modal: 'aquaculture', get label() { return tr('AquacultureModal.nong_trai_ca'); }, icon: '🐠' },
+      { modal: 'dispatch', get label() { return tr('Dispatch.title'); }, icon: '🧭' },
     ],
   },
   {

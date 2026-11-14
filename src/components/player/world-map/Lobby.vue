@@ -48,6 +48,7 @@ const AttendanceModal = defineAsyncComponent(() => import("../attendance/Attenda
 const DonationModal = defineAsyncComponent(() => import("../donation/DonationModal.vue"));
 const SkillModal = defineAsyncComponent(() => import("../skill/SkillModal.vue"));
 const AquacultureModal = defineAsyncComponent(() => import("../aquaculture/AquacultureModal.vue"));
+const DispatchModal = defineAsyncComponent(() => import("../dispatch/DispatchModal.vue"));
 const GuideModal = defineAsyncComponent(() => import("../guide/GuideModal.vue"));
 const TutorialModal = defineAsyncComponent(() => import("../tutorial/TutorialModal.vue"));
 
@@ -213,6 +214,7 @@ onUnmounted(() => {
             :initial-tab="modalStore.isOpening('body') ? 'health' : 'fishing'" />
           <SkillModal v-if="modalStore.isOpening('skill')" />
           <AquacultureModal v-if="modalStore.isOpening('aquaculture')" />
+          <DispatchModal v-if="modalStore.isOpening('dispatch')" />
           <Feedbackmodal v-if="modalStore.isOpening('feedback')" />
           <MissionModal v-if="modalStore.isOpening('mission')" />
           <EventModal v-if="configStore.isUnlocked('event') && modalStore.isOpening('event')" />

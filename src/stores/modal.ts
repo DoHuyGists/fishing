@@ -29,6 +29,7 @@ const modalNames = [
     "donation",
     "skill",
     "aquaculture",
+    "dispatch",
     "guide",
     "tutorial",
 ] as const;

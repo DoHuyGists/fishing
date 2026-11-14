@@ -10,11 +10,11 @@ const privateStores = new Set([
 // Register only stores already loaded by the app. Avoid eager imports of every
 // modal/store, and clear displayed snapshots as well as the underlying caches.
 export const resetPlayerSnapshots: PiniaPlugin = ({ store, pinia }) => {
-  if (!privateStores.has(store.$id) && !['equipment', 'AquaculturePlayer'].includes(store.$id)) return;
+  if (!privateStores.has(store.$id) && !['equipment', 'AquaculturePlayer', 'DispatchPlayer'].includes(store.$id)) return;
   const auth = useAuthStore(pinia);
   const stop = watch(() => auth.sessionGeneration, () => {
     if (store.$id === 'equipment') store.reset();
-    else if (store.$id === 'AquaculturePlayer') store.resetSession();
+    else if (['AquaculturePlayer', 'DispatchPlayer'].includes(store.$id)) store.resetSession();
     else {
       if (store.$id === 'team') { store.stopRefreshing('panel'); store.stopRefreshing('lobby'); }
       if (store.$id === 'notifications') { store.stopRefreshing('modal'); store.stopRefreshing('badge'); }

@@ -21,6 +21,7 @@ const mutations: Record<string, PlayerSnapshot[]> = {
   respond_team_invite: ['area'], join_team: ['area'], leave_team: ['area'], close_team: ['area'],
   purchase_pond_slot: ['currency', 'profile'], stock_aquaculture_batch: ['currency'],
   sell_aquaculture_fish: ['currency'],
+  dispatch_action: ['currency'],
 };
 
 export function createMutationRefreshFetch(baseUrl: string, transport: typeof fetch): typeof fetch {

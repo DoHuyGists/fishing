@@ -7,6 +7,8 @@
     "dev": "vite --host",
     "build": "vue-tsc -b && vite build",
     "test:data-refresh": "node --test scripts/test-data-refresh.mjs scripts/test-refresh-stores.mjs",
+    "test:dispatch": "node --test --test-isolation=none scripts/test-dispatch-sql.mjs scripts/test-dispatch-store.mjs",
+    "test:dispatch:browser": "node scripts/test-dispatch-browser.mjs",
     "test:game-cache": "node --test --test-concurrency=1 scripts/test-game-cache.mjs scripts/test-game-catalog.mjs scripts/test-catalog-sql.mjs",
     "test:game-cache:browser": "node scripts/test-game-cache-browser.mjs",
     "test:read-cache": "node --test scripts/test-read-cache.mjs",

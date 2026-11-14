@@ -25,6 +25,8 @@ type ModuleKey =
   | "speciesInArea"
   | "aquacultureSpecies"
   | "aquacultureFood"
+  | "dispatchNpcs"
+  | "dispatchJobs"
   | "event"
   | "schedule"
   | "redeemCode"
@@ -43,9 +45,11 @@ interface AdminModule {
   label: string;
   desc: string;
   component: ReturnType<typeof defineAsyncComponent>;
+  props?: Record<string, unknown>;
 }
 
 const moduleComponents = {
+  dispatch: defineAsyncComponent(() => import("../components/admin/dispatch-management/DispatchManagement.vue")),
   featureAvailability: defineAsyncComponent(() => import("../components/admin/feature-management/FeatureManagement.vue")),
   assets: defineAsyncComponent(() => import("../components/admin/assets/AssetsManagementModal.vue")),
   guides: defineAsyncComponent(() => import("../components/admin/guides-management/GuidesManagementModal.vue")),
@@ -113,6 +117,13 @@ interface ModuleGroup {
 }
 
 const groups: ModuleGroup[] = [
+  {
+    get title() { return tr('Dispatch.title'); },
+    modules: [
+      { key: 'dispatchNpcs', icon: '🧑‍🌾', get label() { return tr('Dispatch.npcs'); }, get desc() { return tr('Dispatch.adminNpcs'); }, component: moduleComponents.dispatch, props: { kind: 'npcs' } },
+      { key: 'dispatchJobs', icon: '🧭', get label() { return tr('Dispatch.jobs'); }, get desc() { return tr('Dispatch.adminJobs'); }, component: moduleComponents.dispatch, props: { kind: 'jobs' } },
+    ],
+  },
   {
     get title() { return tr('FeatureAvailability.title'); },
     modules: [{
@@ -478,7 +489,7 @@ const close = () => {
     <!-- Module dialogs (giữ nguyên cơ chế @close của từng component) -->
     <DashboarModal v-if="monitorOpen" @close="monitorOpen = false" />
     <AdminGuideModal v-if="guideStore.isOpen" @close="guideStore.close" />
-    <component :is="activeComponent" v-if="activeComponent" @close="close" />
+    <component :is="activeComponent" v-if="activeComponent" :key="active ?? undefined" v-bind="allModules.find(m => m.key === active)?.props ?? {}" @close="close" />
     <FeedbackListModal v-if="feedbackModal === 'opinion'" @close="feedbackModal = null" />
     <ErrorFeedbackManagementModal v-if="feedbackModal === 'errors'" @close="feedbackModal = null" />
   </div>
