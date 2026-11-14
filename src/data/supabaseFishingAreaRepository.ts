@@ -55,6 +55,11 @@ class SupabaseFishingAreaRepository {
     return data as { id: string; status: string; challenge_data: unknown };
   }
 
+  async cancelFishingSession(sessionId: string): Promise<void> {
+    const { error } = await supabase.rpc("cancel_fishing_session", { p_session_id: sessionId });
+    if (error) throw new RepositoryError(error);
+  }
+
   async submitChallenge(sessionId: string, success: boolean, timeSpentMs: number) {
     const { data, error } = await supabase.rpc("submit_challenge", {
       p_session_id: sessionId, p_success: success, p_time_spent_ms: timeSpentMs,

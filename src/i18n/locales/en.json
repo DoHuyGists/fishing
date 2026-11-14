@@ -1875,6 +1875,8 @@
     "ban_da_het_moi_hay_chon_hoac_mua_them_moi_de_quang": "You are out of bait. Select or buy more bait to cast.",
     "dang_ket_noi_voi_bai_cau": "Connecting to the fishing area...",
     "moi_da_cham_nuoc_dang_cho_tin_hieu": "Your bait is in the water. Waiting for a bite...",
+    "dang_thu_moi": "Retrieving bait...",
+    "khong_the_thu_moi_hay_thu_lai": "Unable to retrieve bait. Please try again.",
     "khong_the_ket_noi_hay_thu_tha_can_lai": "Unable to connect. Try casting again.",
     "ca_can_cau_dang_tai_thu_thach": "Fish on! Loading challenge...",
     "co_tin_hieu_giu_nut_hoac_space_khi_san_sang_de_thu_day": "A bite! Hold the button or Space when ready to reel in.",

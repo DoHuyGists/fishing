@@ -92,6 +92,7 @@ export const useFishingStore = defineStore("fishing", {
     baitPosition: { x: 56, y: 60 },
     castMessage: tr('fishing.san_sang_tha_cau'),
     isCasting: false,
+    isRetrievingBait: false,
     catchDialogOpen: false,
     bagOpen: false,
     lakeGuideOpen: false,
@@ -139,10 +140,12 @@ export const useFishingStore = defineStore("fishing", {
       return this.inventory.length >= this.fishingNetCapacity;
     },
     canCast(): boolean {
-      return this.sessionReady && !this.isLeavingArea && !this.hasLeftArea && !this.isFishingNetFull &&
+      return this.sessionReady && !this.isLeavingArea && !this.hasLeftArea && !this.isRetrievingBait && !this.isFishingNetFull &&
         (this.castPhase === "idle" || this.castPhase === "lost");
     },
-    canReelIn: (s) => !s.isLeavingArea && !s.hasLeftArea && ["casting", "waiting", "bite"].includes(s.castPhase) && (!s.tensionChallenge || s.tensionStartedAt === null),
+    canReelIn: (s) => !s.isLeavingArea && !s.hasLeftArea && !s.isCasting && !s.isRetrievingBait &&
+      !s.isStartingTensionChallenge && Boolean(s.sessionId) && ["waiting", "bite"].includes(s.castPhase) &&
+      (!s.tensionChallenge || s.tensionStartedAt === null),
     canAdjustDepth: (s) => s.sessionReady && !s.isLeavingArea && !s.hasLeftArea && (s.castPhase === "idle" || s.castPhase === "lost"),
     canAdjustLakeDepth: (s) =>
       s.sessionReady && !s.isLeavingArea && !s.hasLeftArea &&
@@ -197,7 +200,7 @@ export const useFishingStore = defineStore("fishing", {
       if (this.hasLeftArea) return true;
       if (this.isLeavingArea) return false;
       this.leaveAreaError = "";
-      if (this.isCasting || this.castPhase === "submitting" || this.isStartingTensionChallenge || this.isReleasingFish) {
+      if (this.isCasting || this.isRetrievingBait || this.castPhase === "submitting" || this.isStartingTensionChallenge || this.isReleasingFish) {
         this.leaveAreaError = tr('fishing.dang_xu_ly_luot_cau_hoac_tha_ca_vui_long_thu_lai_sau_giay_lat');
         return false;
       }
@@ -533,6 +536,9 @@ export const useFishingStore = defineStore("fishing", {
         this.castPhase = "bite";
       } catch {
         if (requestId !== this.castRequestId) return;
+        // A concurrent challenge read may see CANCELLED before the cancel RPC
+        // response arrives. Let retrieval own cleanup so it can still be retried.
+        if (this.isRetrievingBait) return;
         this.sessionId = null;
         this.resetTensionChallenge();
         this.castPhase = "lost";
@@ -551,7 +557,7 @@ export const useFishingStore = defineStore("fishing", {
       this.isLoadingChallenge = false;
     },
     async beginTensionChallenge() {
-      if (this.isLeavingArea || this.hasLeftArea) return;
+      if (this.isLeavingArea || this.hasLeftArea || this.isRetrievingBait) return;
       this.advanceTensionFight();
       const sessionId = this.sessionId;
       if (!sessionId || !this.tensionChallenge || this.castPhase !== "bite" ||
@@ -591,6 +597,7 @@ export const useFishingStore = defineStore("fishing", {
       }
     },
     advanceTensionFight(now = performance.now()) {
+      if (this.isRetrievingBait) return;
       const challenge = this.tensionChallenge;
       const fight = this.tensionFight;
       if (!challenge || !fight || this.castPhase !== "bite") return;
@@ -614,6 +621,7 @@ export const useFishingStore = defineStore("fishing", {
       }
     },
     setTensionReeling(reeling: boolean) {
+      if (this.isRetrievingBait) return;
       this.advanceTensionFight();
       if (this.tensionChallenge && this.castPhase === "bite" && this.tensionStartedAt === null) {
         this.tensionReeling = reeling;
@@ -626,15 +634,30 @@ export const useFishingStore = defineStore("fishing", {
       if (this.tensionInputs.at(-1)?.tick === fight.tick) this.tensionInputs.pop();
       if ((this.tensionInputs.at(-1)?.reeling ?? false) !== reeling) this.tensionInputs.push({ tick: fight.tick, reeling });
     },
-    reelInBait() {
-      if (!this.canReelIn) return;
-      this.resetCast();
+    async reelInBait() {
+      const sessionId = this.sessionId;
+      if (!this.canReelIn || !sessionId) return;
+      const requestId = this.castRequestId;
+      this.isRetrievingBait = true;
+      this.castMessage = tr('fishing.dang_thu_moi');
+      try {
+        await withTimeout(supabaseFishingAreaRepository.cancelFishingSession(sessionId), RPC_TIMEOUT_MS);
+        if (requestId !== this.castRequestId || this.sessionId !== sessionId) return;
+        // Clearing the ID also removes this session's Realtime subscription.
+        this.resetCast();
+      } catch {
+        if (requestId !== this.castRequestId || this.sessionId !== sessionId) return;
+        this.castMessage = tr('fishing.khong_the_thu_moi_hay_thu_lai');
+      } finally {
+        if (requestId === this.castRequestId) this.isRetrievingBait = false;
+      }
     },
     resetCast() {
       this.castRequestId += 1;
       this.sessionId = null;
       this.resetTensionChallenge();
       this.isCasting = false;
+      this.isRetrievingBait = false;
       this.castPhase = "idle";
       this.castMessage = tr('fishing.san_sang_tha_cau');
     },
