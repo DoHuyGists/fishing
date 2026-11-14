@@ -153,29 +153,8 @@ const groups: ModuleGroup[] = [
     ],
   },
   {
-    get title() { return tr('AdminView.du_lieu_tro_choi'); },
+    get title() { return tr('AdminView.fishing_areas_species'); },
     modules: [
-      {
-        key: "assets",
-        icon: "🖼️",
-        get label() { return tr('AdminView.anh_video'); },
-        get desc() { return tr('AdminView.tai_len_xem_truoc_va_sao_chep_link_anh_video_tu_storage'); },
-        component: moduleComponents.assets,
-      },
-      {
-        key: "blueprint",
-        icon: "🛠️",
-        get label() { return tr('AdminView.cong_thuc_che_tao'); },
-        get desc() { return tr('AdminView.quan_ly_ban_ve_nguyen_lieu_thanh_pham_va_phi_che_tao'); },
-        component: moduleComponents.blueprint,
-      },
-      {
-        key: "skill",
-        icon: "✨",
-        get label() { return tr('SkillModal.ky_nang'); },
-        get desc() { return tr('AdminView.quan_ly_ky_nang_cap_toi_da_va_hieu_ung_moi_cap'); },
-        component: moduleComponents.skill,
-      },
       {
         key: "area",
         icon: "🗺️",
@@ -191,6 +170,25 @@ const groups: ModuleGroup[] = [
         component: moduleComponents.depthScope,
       },
       {
+        key: "species",
+        icon: "🐟",
+        get label() { return tr('AquacultureStockForm.loai_ca'); },
+        get desc() { return tr('AdminView.chinh_thong_tin_va_thuoc_tinh_cua_tung_loai_ca'); },
+        component: moduleComponents.species,
+      },
+      {
+        key: "speciesInArea",
+        icon: "🎯",
+        get label() { return tr('AdminView.ca_theo_bai_cau'); },
+        get desc() { return tr('AdminView.chon_loai_ca_xuat_hien_o_moi_bai_cau'); },
+        component: moduleComponents.speciesInArea,
+      },
+    ],
+  },
+  {
+    get title() { return tr('AdminView.items_skills'); },
+    modules: [
+      {
         key: "item",
         icon: "🎒",
         get label() { return tr('ShopModal.vat_pham'); },
@@ -198,12 +196,24 @@ const groups: ModuleGroup[] = [
         component: moduleComponents.item,
       },
       {
-        key: "redeemCode",
-        icon: "🎟️",
-        get label() { return tr('RedeemCodeForm.ma_doi_thuong'); },
-        get desc() { return tr('AdminView.tao_ma_nhan_xu_dat_han_dung_va_bat_hoac_tat_ma'); },
-        component: moduleComponents.redeemCode,
+        key: "blueprint",
+        icon: "🛠️",
+        get label() { return tr('AdminView.cong_thuc_che_tao'); },
+        get desc() { return tr('AdminView.quan_ly_ban_ve_nguyen_lieu_thanh_pham_va_phi_che_tao'); },
+        component: moduleComponents.blueprint,
       },
+      {
+        key: "skill",
+        icon: "✨",
+        get label() { return tr('SkillModal.ky_nang'); },
+        get desc() { return tr('AdminView.quan_ly_ky_nang_cap_toi_da_va_hieu_ung_moi_cap'); },
+        component: moduleComponents.skill,
+      },
+    ],
+  },
+  {
+    get title() { return tr('AdminView.missions'); },
+    modules: [
       {
         key: "hourMission",
         icon: "⏰",
@@ -225,20 +235,11 @@ const groups: ModuleGroup[] = [
         get desc() { return tr('AdminView.thiet_lap_moc_diem_va_phan_thuong_nhiem_vu_hang_ngay'); },
         component: moduleComponents.dailyMissionRewards,
       },
-      {
-        key: "notifications",
-        icon: "🔔",
-        get label() { return tr('NotificationModal.thong_bao'); },
-        get desc() { return tr('AdminView.tao_va_quan_ly_thong_bao_ca_nhan_thong_bao_he_thong'); },
-        component: moduleComponents.notifications,
-      },
-      {
-        key: "guides",
-        icon: "📖",
-        get label() { return tr('AdminView.huong_dan_nguoi_choi'); },
-        get desc() { return tr('AdminView.soan_noi_dung_sap_xep_va_quan_ly_trang_thai_xuat_ban_huong_dan'); },
-        component: moduleComponents.guides,
-      },
+    ],
+  },
+  {
+    get title() { return tr('AdminView.passes_redeem_codes'); },
+    modules: [
       {
         key: "fishingPass",
         icon: "🎫",
@@ -254,18 +255,37 @@ const groups: ModuleGroup[] = [
         component: moduleComponents.fishingPassRewards,
       },
       {
-        key: "species",
-        icon: "🐟",
-        get label() { return tr('AquacultureStockForm.loai_ca'); },
-        get desc() { return tr('AdminView.chinh_thong_tin_va_thuoc_tinh_cua_tung_loai_ca'); },
-        component: moduleComponents.species,
+        key: "redeemCode",
+        icon: "🎟️",
+        get label() { return tr('RedeemCodeForm.ma_doi_thuong'); },
+        get desc() { return tr('AdminView.tao_ma_nhan_xu_dat_han_dung_va_bat_hoac_tat_ma'); },
+        component: moduleComponents.redeemCode,
+      },
+    ],
+  },
+  {
+    get title() { return tr('AdminView.content_resources'); },
+    modules: [
+      {
+        key: "notifications",
+        icon: "🔔",
+        get label() { return tr('NotificationModal.thong_bao'); },
+        get desc() { return tr('AdminView.tao_va_quan_ly_thong_bao_ca_nhan_thong_bao_he_thong'); },
+        component: moduleComponents.notifications,
       },
       {
-        key: "speciesInArea",
-        icon: "🎯",
-        get label() { return tr('AdminView.ca_theo_bai_cau'); },
-        get desc() { return tr('AdminView.chon_loai_ca_xuat_hien_o_moi_bai_cau'); },
-        component: moduleComponents.speciesInArea,
+        key: "guides",
+        icon: "📖",
+        get label() { return tr('AdminView.huong_dan_nguoi_choi'); },
+        get desc() { return tr('AdminView.soan_noi_dung_sap_xep_va_quan_ly_trang_thai_xuat_ban_huong_dan'); },
+        component: moduleComponents.guides,
+      },
+      {
+        key: "assets",
+        icon: "🖼️",
+        get label() { return tr('AdminView.anh_video'); },
+        get desc() { return tr('AdminView.tai_len_xem_truoc_va_sao_chep_link_anh_video_tu_storage'); },
+        component: moduleComponents.assets,
       },
     ],
   },
@@ -343,7 +363,7 @@ const filteredGroups = computed(() => {
   return groups
     .map((g) => ({
       ...g,
-      modules: g.modules.filter((m) => `${m.label} ${m.desc}`.toLowerCase().includes(q)),
+      modules: g.modules.filter((m) => `${g.title} ${m.label} ${m.desc}`.toLowerCase().includes(q)),
     }))
     .filter((g) => g.modules.length > 0);
 });
@@ -360,31 +380,30 @@ const close = () => {
   <div class="min-h-screen bg-slate-50 text-slate-800 lg:flex">
     <!-- Sidebar -->
     <aside
-      class="hidden lg:sticky lg:top-0 lg:flex lg:h-dvh lg:w-64 lg:shrink-0 lg:self-start flex-col overflow-hidden bg-[#153221] text-emerald-50"
+      class="hidden lg:sticky lg:top-0 lg:flex lg:h-dvh lg:w-56 lg:shrink-0 lg:self-start flex-col overflow-hidden bg-[#153221] text-emerald-50"
     >
-      <div class="shrink-0 px-6 py-5 border-b border-white/10">
-        <div class="text-lg font-extrabold leading-tight">{{ tr('AdminView.quan_tri') }}</div>
-        <div class="text-xs text-emerald-200/70 mt-0.5">{{ tr('AdminView.he_thong_cau_ca') }}</div>
+      <div class="shrink-0 px-4 py-3 border-b border-white/10">
+        <div class="text-base font-extrabold leading-tight">{{ tr('AdminView.quan_tri') }}</div>
       </div>
 
       <nav
-        class="min-h-0 flex-1 overflow-y-auto overscroll-contain px-3 py-4 space-y-5"
+        class="min-h-0 flex-1 overflow-y-auto overscroll-contain px-2 py-3 space-y-3"
         :aria-label="tr('AdminView.dieu_huong_quan_tri')"
       >
         <section v-for="group in groups" :key="group.title">
-          <div class="px-3 mb-1.5 text-xs font-semibold text-emerald-200/60">{{ group.title }}</div>
-          <div class="space-y-0.5">
+          <div class="px-2 mb-1 text-xs font-semibold text-emerald-200/60">{{ group.title }}</div>
+          <div>
             <div v-for="m in group.modules" :key="m.key">
               <button
                 type="button"
-                class="w-full flex items-center gap-3 rounded-lg px-3 py-2 text-left text-sm font-medium transition-colors cursor-pointer focus-visible:outline-2 focus-visible:outline-emerald-300"
+                class="w-full flex items-center gap-2 rounded-md px-2 py-1.5 text-left text-xs font-medium transition-colors cursor-pointer focus-visible:outline-2 focus-visible:outline-emerald-300"
                 :class="
                   active === m.key ? 'bg-white/15 text-white' : 'text-emerald-50/80 hover:bg-white/10 hover:text-white'
                 "
                 :aria-current="active === m.key ? 'true' : undefined"
                 @click="open(m.key)"
               >
-                <span class="text-base" aria-hidden="true">{{ m.icon }}</span>
+                <span class="text-sm" aria-hidden="true">{{ m.icon }}</span>
                 {{ m.label }}
               </button>
             </div>
@@ -396,17 +415,16 @@ const close = () => {
     <!-- Main -->
     <main class="flex-1 min-w-0">
       <header
-        class="bg-white border-b border-slate-200 px-5 py-4 sm:px-8 flex flex-wrap items-center gap-4 justify-between"
+        class="bg-white border-b border-[#cbd9c6] px-3 py-3 sm:px-4 flex flex-wrap items-center gap-2 justify-between"
       >
         <div>
-          <div class="text-xl font-extrabold text-[#153221]">{{ tr('AdminView.bang_dieu_khien') }}</div>
-          <div class="text-sm text-slate-500">{{ tr('AdminView.chon_mot_muc_de_quan_ly_du_lieu') }}</div>
+          <div class="text-base font-extrabold text-[#153221]">{{ tr('AdminView.bang_dieu_khien') }}</div>
         </div>
 
-        <div class="flex w-full flex-col gap-3 sm:w-auto sm:flex-row sm:flex-wrap sm:items-center sm:justify-end">
+        <div class="flex w-full flex-wrap items-center gap-2 sm:w-auto sm:justify-end">
           <button
             type="button"
-            class="rounded-lg border border-[#cbd9c6] bg-[#f5f9f0] px-4 py-2 text-sm font-semibold text-[#24352a] hover:bg-emerald-100 focus-visible:outline-2 focus-visible:outline-emerald-600"
+            class="rounded-md border border-[#cbd9c6] bg-[#f5f9f0] px-2.5 py-1.5 text-xs font-semibold text-[#24352a] hover:bg-emerald-100 focus-visible:outline-2 focus-visible:outline-emerald-600"
             aria-haspopup="dialog"
             :aria-expanded="monitorOpen"
             @click="monitorOpen = true"
@@ -415,7 +433,7 @@ const close = () => {
           </button>
           <button
             type="button"
-            class="rounded-lg border border-[#cbd9c6] bg-[#f5f9f0] px-4 py-2 text-sm font-semibold text-[#24352a] hover:bg-emerald-100 focus-visible:outline-2 focus-visible:outline-emerald-600"
+            class="rounded-md border border-[#cbd9c6] bg-[#f5f9f0] px-2.5 py-1.5 text-xs font-semibold text-[#24352a] hover:bg-emerald-100 focus-visible:outline-2 focus-visible:outline-emerald-600"
             aria-haspopup="dialog"
             :aria-expanded="guideStore.isOpen"
             @click="guideStore.open"
@@ -424,25 +442,25 @@ const close = () => {
           </button>
           <button
             type="button"
-            class="rounded-lg bg-emerald-700 px-4 py-2 text-sm font-semibold text-white hover:bg-emerald-800 focus-visible:outline-2 focus-visible:outline-emerald-600"
+            class="rounded-md bg-emerald-700 px-2.5 py-1.5 text-xs font-semibold text-white hover:bg-emerald-800 focus-visible:outline-2 focus-visible:outline-emerald-600"
             @click="feedbackModal = 'opinion'"
           >
             {{ tr('AdminView.xem_gop_y') }}
           </button>
           <button
             type="button"
-            class="rounded-lg bg-amber-600 px-4 py-2 text-sm font-semibold text-white hover:bg-amber-700 focus-visible:outline-2 focus-visible:outline-amber-600"
+            class="rounded-md bg-amber-600 px-2.5 py-1.5 text-xs font-semibold text-white hover:bg-amber-700 focus-visible:outline-2 focus-visible:outline-amber-600"
             @click="feedbackModal = 'errors'"
           >
             {{ tr('AdminView.xu_ly_bao_loi') }}
           </button>
-          <label class="relative w-full sm:w-72">
+          <label class="relative w-full sm:w-48">
             <span class="sr-only">{{ tr('AdminView.tim_muc_quan_ly') }}</span>
             <input
               v-model="keyword"
               type="search"
               :placeholder="tr('AdminView.tim_muc_quan_ly_2')"
-              class="w-full rounded-lg border border-slate-300 bg-white py-2 pl-9 pr-3 text-sm placeholder:text-slate-400 focus:border-emerald-600 focus:outline-none focus:ring-2 focus:ring-emerald-600/25"
+              class="w-full rounded-md border border-[#cbd9c6] bg-white py-1.5 pl-8 pr-2 text-xs placeholder:text-slate-400 focus:border-emerald-600 focus:outline-none focus:ring-2 focus:ring-emerald-600/25"
             />
             <span class="pointer-events-none absolute left-3 top-1/2 -translate-y-1/2 text-slate-400" aria-hidden="true"
               >🔍</span
@@ -451,35 +469,33 @@ const close = () => {
         </div>
       </header>
 
-      <div class="px-5 py-6 sm:px-8 space-y-8">
+      <div class="grid items-start gap-4 p-3 sm:p-4 xl:grid-cols-2">
         <section v-for="group in filteredGroups" :key="group.title">
-          <div class="mb-3 text-sm font-bold text-slate-600">{{ group.title }}</div>
+          <div class="mb-2 text-xs font-bold text-[#24352a]">{{ group.title }}</div>
 
-          <div class="grid gap-4 sm:grid-cols-2 xl:grid-cols-3">
+          <div class="grid gap-2 sm:grid-cols-2">
             <button
               v-for="m in group.modules"
               :key="m.key"
               type="button"
-              class="group flex items-start gap-4 rounded-xl border border-slate-200 bg-white p-4 text-left transition-colors hover:border-emerald-600 cursor-pointer focus-visible:outline-2 focus-visible:outline-emerald-600"
+              class="group flex items-center gap-2 rounded-lg border border-[#cbd9c6] bg-white px-2.5 py-2 text-left transition-colors hover:border-emerald-600 hover:bg-[#f5f9f0] cursor-pointer focus-visible:outline-2 focus-visible:outline-emerald-600"
+              :title="m.desc"
               @click="open(m.key)"
             >
               <span
-                class="flex h-11 w-11 shrink-0 items-center justify-center rounded-lg bg-emerald-50 text-2xl group-hover:bg-emerald-100"
+                class="flex h-7 w-7 shrink-0 items-center justify-center rounded-md bg-[#f5f9f0] text-base group-hover:bg-emerald-100"
                 aria-hidden="true"
               >
                 {{ m.icon }}
               </span>
-              <span class="min-w-0">
-                <span class="block text-sm font-bold text-[#153221]">{{ tr('AdminView.quan_ly') }} {{ m.label.toLowerCase() }}</span>
-                <span class="mt-1 block text-sm text-slate-500">{{ m.desc }}</span>
-              </span>
+              <span class="min-w-0 text-xs font-semibold text-[#24352a]">{{ m.label }}</span>
             </button>
           </div>
         </section>
 
         <div
           v-if="filteredGroups.length === 0"
-          class="rounded-xl border border-dashed border-slate-300 bg-white p-8 text-center text-sm text-slate-500"
+          class="rounded-lg border border-dashed border-[#cbd9c6] bg-white p-4 text-center text-xs text-slate-500 xl:col-span-2"
         >
           {{ tr('AdminView.khong_co_muc_nao_khop_voi') }}{{ keyword }}{{ tr('AdminView.hay_thu_tu_khoa_khac') }}
         </div>
