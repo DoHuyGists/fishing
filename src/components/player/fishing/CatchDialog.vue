@@ -3,6 +3,7 @@ import { t as tr } from "../../../i18n";
 
 import { computed } from "vue";
 import { useFishingStore } from "../../../stores/fishing";
+import Fishthrash from "./Fishthrash.vue";
 
 const store = useFishingStore();
 const caught = computed(() => store.inventory[0]);
@@ -37,12 +38,7 @@ const variantFrameClass = computed(() => {
           <div class="mt-[19px] mb-2.5 text-[#e8bd62] text-[10px] font-black tracking-[0.16em] uppercase">
             {{ tr('CatchDialog.cu_cau_thanh_cong') }}
           </div>
-          <img
-            :src="caught.image"
-            :alt="caught.name"
-            class="block w-[calc(100%-28px)] h-[178px] mx-3.5 rounded-[14px] object-cover"
-            draggable="false"
-          />
+          <Fishthrash :src="caught.image" :width="240" />
           <div class="px-5 pt-3.5 pb-3">
             <span
               class="inline-block px-2 py-1 rounded-full bg-[#dcae52] text-[#254130] text-[9px] font-black tracking-[0.1em]"

@@ -7,6 +7,7 @@ export type FishingPhase = "idle" | "casting" | "waiting" | "bite" | "submitting
 export interface FishingSceneState {
   canCast: boolean;
   castPhase: FishingPhase;
+  baitRetrievalSequence: number;
   baitPosition: MapPoint;
   castMessage: string;
   currentArea: { fishingBoundary?: MapPoint[] };

@@ -4,6 +4,7 @@ import { t as tr } from "../../../i18n";
 
 import { computed, onBeforeUnmount, onMounted, ref, watch } from "vue";
 import { isPointInWater } from "../../../data/fishingMap.ts";
+import BobbingBuoy from "./BobbingBuoy.vue";
 
 
 const props = defineProps<{ context: FishingSceneContext }>();
@@ -11,6 +12,31 @@ const sceneState = computed(() => props.context.state);
 
 const sceneElement = ref<HTMLElement | null>(null);
 const rodLineAnchor = ref<HTMLElement | null>(null);
+const rodHolder = ref<HTMLElement | null>(null);
+let retrieveAnimation: Animation | undefined;
+
+watch(
+  () => sceneState.value.baitRetrievalSequence,
+  () => {
+    if (!rodHolder.value) return;
+    retrieveAnimation?.cancel();
+    retrieveAnimation = rodHolder.value.animate(
+      [
+        { transform: "rotate(-27deg)", offset: 0 },
+        { transform: "rotate(-48deg)", offset: 0.28 },
+        { transform: "rotate(-24deg)", offset: 0.75 },
+        { transform: "rotate(-27deg)", offset: 1 },
+      ],
+      {
+        duration: window.matchMedia("(prefers-reduced-motion: reduce)").matches ? 0 : 380,
+        easing: "ease-out",
+        iterations: 1,
+      },
+    );
+  },
+  { flush: "post" },
+);
+
 const fishingRod = ref({
   x: 0,
   y: 0,
@@ -23,10 +49,20 @@ const rodLineOffset = {
 const ripple = ref(false);
 const invalidTap = ref(false);
 const castClass = computed(() => `phase-${sceneState.value.castPhase}`);
+const castProgress = ref(1);
+let castStartedAt = 0;
+let castOrigin = { x: 0, y: 0 };
+const floatPosition = computed(() => {
+  const target = sceneState.value.baitPosition;
+  const progress = castProgress.value;
+  const arcHeight = Math.min(12, Math.hypot(target.x - castOrigin.x, target.y - castOrigin.y) * 0.25);
+  return {
+    x: castOrigin.x + (target.x - castOrigin.x) * progress + biteOffset.value.x,
+    y: castOrigin.y + (target.y - castOrigin.y) * progress - Math.sin(progress * Math.PI) * arcHeight + biteOffset.value.y,
+  };
+});
 const linePath = computed(() => {
-  const { x, y } = sceneState.value.baitPosition;
-  const endX = x + biteOffset.value.x;
-  const endY = y + biteOffset.value.y;
+  const { x: endX, y: endY } = floatPosition.value;
   const { x: rodX, y: rodY } = fishingRod.value;
   const distance = Math.hypot(endX - rodX, endY - rodY);
   const sag = Math.min(18, Math.max(8, distance * 0.18));
@@ -78,6 +114,24 @@ let rodPositionFrame: number | undefined;
 let invalidTapTimer: ReturnType<typeof setTimeout> | undefined;
 let rippleTimer: ReturnType<typeof setTimeout> | undefined;
 
+watch(
+  () => sceneState.value.castPhase,
+  (phase) => {
+    if (phase === "casting") {
+      updateRodPosition();
+      castOrigin = { ...fishingRod.value };
+      castStartedAt = performance.now();
+      castProgress.value = 0;
+      ripple.value = false;
+      clearTimeout(rippleTimer);
+    } else if (["idle", "lost", "caught"].includes(phase)) {
+      castProgress.value = 1;
+      ripple.value = false;
+      clearTimeout(rippleTimer);
+    }
+  },
+);
+
 function updateRodPosition() {
   if (!sceneElement.value || !rodLineAnchor.value) return;
 
@@ -89,16 +143,25 @@ function updateRodPosition() {
   };
 }
 
-function trackRodPosition() {
+function trackRodPosition(timestamp: number) {
   updateRodPosition();
+  if (castProgress.value < 1) {
+    castProgress.value = Math.min(1, (timestamp - castStartedAt) / 550);
+    if (castProgress.value === 1) {
+      ripple.value = true;
+      clearTimeout(rippleTimer);
+      rippleTimer = setTimeout(() => (ripple.value = false), 900);
+    }
+  }
   rodPositionFrame = window.requestAnimationFrame(trackRodPosition);
 }
 
 onMounted(() => {
-  trackRodPosition();
+  trackRodPosition(performance.now());
   window.addEventListener("resize", updateRodPosition);
 });
 onBeforeUnmount(() => {
+  retrieveAnimation?.cancel();
   clearTimeout(invalidTapTimer);
   clearTimeout(rippleTimer);
   if (rodPositionFrame) window.cancelAnimationFrame(rodPositionFrame);
@@ -125,9 +188,6 @@ function castAt(event: MouseEvent) {
     return;
   }
   sceneState.value.castTo(x, y);
-  ripple.value = true;
-  clearTimeout(rippleTimer);
-  rippleTimer = setTimeout(() => (ripple.value = false), 900);
 }
 </script>
 
@@ -165,13 +225,13 @@ function castAt(event: MouseEvent) {
       class="bait-float"
       :class="castClass"
       :style="{
-        left: `${sceneState.baitPosition.x + biteOffset.x}%`,
-        top: `${sceneState.baitPosition.y + biteOffset.y}%`,
+        left: `${floatPosition.x}%`,
+        top: `${floatPosition.y}%`,
       }"
     >
-      <span></span>
+      <BobbingBuoy :size="13" :clickable="false" ripple-color="rgba(255, 255, 255, 0.8)" />
     </div>
-    <div class="rod-holder" :class="castClass" aria-hidden="true">
+    <div ref="rodHolder" class="rod-holder" :class="castClass" aria-hidden="true">
       <img :src="context.rodImage" alt="" class="fishing-rod" />
       <span ref="rodLineAnchor" class="rod-line-anchor"></span>
     </div>
@@ -304,41 +364,20 @@ function castAt(event: MouseEvent) {
   opacity: 0;
 }
 
-.casting-line.phase-casting path {
-  stroke-dasharray: 100;
-  stroke-dashoffset: 100;
-  animation: cast-line 0.38s 0.17s ease-out forwards;
-}
-
 .bait-float {
   position: absolute;
   z-index: 4;
-  width: 13px;
-  height: 13px;
-  border: 2px solid #fff7e2;
-  border-radius: 50%;
-  background: linear-gradient(#ef6444 49%, #f7e7af 51%);
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.38);
+  width: 200px;
+  height: 200px;
   transform: translate(-50%, -50%) scale(0);
   pointer-events: none;
 }
 
-.bait-float span {
-  position: absolute;
-  inset: 3px;
-  border-radius: inherit;
-  background: rgba(255, 255, 255, 0.52);
-}
-
-.bait-float.phase-casting {
-  animation: bait-fly 0.55s cubic-bezier(0.16, 0.78, 0.38, 1) forwards;
-}
-
+.bait-float.phase-casting,
 .bait-float.phase-waiting,
 .bait-float.phase-bite,
 .bait-float.phase-fighting {
   transform: translate(-50%, -50%);
-  animation: bob 1.8s ease-in-out infinite;
 }
 
 .bait-float.phase-bite {
@@ -465,30 +504,9 @@ function castAt(event: MouseEvent) {
   animation: bite-alert 0.48s ease-in-out infinite alternate;
 }
 
-@keyframes cast-line {
-  to {
-    stroke-dashoffset: 0;
-  }
-}
-
 @keyframes reel-line {
   to {
     stroke-dashoffset: -40;
-  }
-}
-
-@keyframes bait-fly {
-  0% {
-    transform: translate(40%, 105%) scale(0.2);
-    opacity: 0;
-  }
-
-  42% {
-    opacity: 1;
-  }
-
-  100% {
-    transform: translate(-50%, -50%) scale(1);
   }
 }
 
@@ -514,12 +532,6 @@ function castAt(event: MouseEvent) {
 
   50% {
     transform: rotate(-17deg);
-  }
-}
-
-@keyframes bob {
-  50% {
-    transform: translate(-50%, calc(-50% - 4px));
   }
 }
 

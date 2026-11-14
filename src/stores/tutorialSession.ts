@@ -34,6 +34,7 @@ export interface TutorialSessionConfig {
 export const useTutorialSessionStore = defineStore("tutorial-session", () => {
   const config = ref<TutorialSessionConfig | null>(null);
   const castPhase = ref<FishingPhase>("idle");
+  const baitRetrievalSequence = ref(0);
   const castMessage = ref(tr('tutorialSession.chon_du_trang_bi_de_bat_dau'));
   const baitPosition = ref<MapPoint>({ x: 56, y: 60 });
   const loadout = ref<Partial<Record<TutorialTool, string>>>({});
@@ -59,6 +60,7 @@ export const useTutorialSessionStore = defineStore("tutorial-session", () => {
   const selectedRod = computed(() => config.value?.equipment.find(item => item.id === loadout.value.rod));
   const sceneContext = computed<FishingSceneContext>(() => ({
     state: { get canCast() { return canCast.value; }, get castPhase() { return castPhase.value; },
+      get baitRetrievalSequence() { return baitRetrievalSequence.value; },
       get baitPosition() { return baitPosition.value; }, get castMessage() { return castMessage.value; },
       get currentArea() { return currentArea.value; }, castTo, rejectCast },
     sceneImage: config.value?.sceneImage ?? "",
@@ -142,6 +144,7 @@ export const useTutorialSessionStore = defineStore("tutorial-session", () => {
   }
   function reelInBait() {
     if (!canReelIn.value) return;
+    baitRetrievalSequence.value += 1;
     clearTimers();
     clearFight();
     castPhase.value = "idle";
@@ -188,7 +191,7 @@ export const useTutorialSessionStore = defineStore("tutorial-session", () => {
     }
   }
 
-  return { config, castPhase, castMessage, baitPosition, loadout, equipmentConfirmed, inventory,
+  return { config, castPhase, baitRetrievalSequence, castMessage, baitPosition, loadout, equipmentConfirmed, inventory,
     tensionChallenge, tensionFight, tensionStartedAt, tensionReeling, serverClockOffset, isStartingTensionChallenge,
     paused, currentArea, equipmentReady, canCast, canReelIn, canChangeEquipment, selectedRod, sceneContext,
     start, stop, selectEquipment, confirmEquipment, castTo, rejectCast, reelInBait, advanceTensionFight, setTensionReeling, setPaused };

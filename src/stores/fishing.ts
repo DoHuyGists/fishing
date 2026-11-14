@@ -93,6 +93,7 @@ export const useFishingStore = defineStore("fishing", {
     castMessage: tr('fishing.san_sang_tha_cau'),
     isCasting: false,
     isRetrievingBait: false,
+    baitRetrievalSequence: 0,
     catchDialogOpen: false,
     bagOpen: false,
     lakeGuideOpen: false,
@@ -639,6 +640,7 @@ export const useFishingStore = defineStore("fishing", {
       if (!this.canReelIn || !sessionId) return;
       const requestId = this.castRequestId;
       this.isRetrievingBait = true;
+      this.baitRetrievalSequence += 1;
       this.castMessage = tr('fishing.dang_thu_moi');
       try {
         await withTimeout(supabaseFishingAreaRepository.cancelFishingSession(sessionId), RPC_TIMEOUT_MS);
