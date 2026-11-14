@@ -955,6 +955,9 @@
     "chon_mot_chi_dan_de_xem_noi_dung": "Choose a guide to view its content."
   },
   "EquipmentSets": {
+    "bodyTitle": "Body equipment sets",
+    "fishingTitle": "Fishing equipment sets",
+    "setNumber": "Set {number}",
     "statsTitle": "Fishing equipment stats",
     "statsDescription": "Total stats from the saved fishing equipment set currently in use.",
     "capacity_usage": "{count}/{capacity} equipment items",

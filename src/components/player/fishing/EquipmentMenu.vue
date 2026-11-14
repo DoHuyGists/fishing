@@ -7,7 +7,6 @@ import { useFishingStore } from "../../../stores/fishing.ts";
 import { ref, watch } from "vue";
 import EquipmentPickerModal from "./EquipmentPickerModal.vue";
 import AdjusDepth from "./AdjusDepth.vue";
-import InventoryModal from "../inventory/InventoryModal.vue";
 import { useModalStore } from "../../../stores/modal";
 
 const store = useFishingStore();
@@ -72,10 +71,6 @@ watch(
         </span>
       </button>
       <AdjusDepth />
-      <button type="button" class="slide-fade-in from-top player-content-in flex items-center gap-2 rounded-lg border border-[#cbd9c6] bg-[#f5f9f0] min-h-7 px-3 py-[3px] text-[11px] font-bold text-[#24352a] transition hover:border-[#70a77e] hover:bg-[#eaf5e8]" @click="modalStore.open('body')">
-        <span aria-hidden="true" class="text-base">🧍</span>
-        {{ tr('EquipmentMenu.nhan_vat') }}
-      </button>
       <button type="button" class="slide-fade-in from-top player-content-in relative flex items-center gap-2 rounded-lg border border-[#cbd9c6] bg-[#f5f9f0] min-h-7 px-3 py-[3px] text-[11px] font-bold text-[#24352a] transition hover:border-[#70a77e] hover:bg-[#eaf5e8]" @click="store.openBag">
         <span aria-hidden="true" class="text-base">🕸️</span>
         {{ tr('CaughtModal.tui_ca') }}
@@ -106,7 +101,4 @@ watch(
       </div>
     </div>
   </div>
-  <Teleport to="body">
-    <InventoryModal v-if="modalStore.isOpening('body')" initial-tab="health" compact />
-  </Teleport>
 </template>

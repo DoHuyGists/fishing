@@ -4,7 +4,6 @@ import { modalFeatures } from "../data/featureAvailability";
 
 const STORAGE_KEY = "fishing.modalOpening";
 const modalNames = [
-    "body",
     "account",
     "market",
     "diary",

@@ -959,6 +959,9 @@
     "chon_mot_chi_dan_de_xem_noi_dung": "Chọn một chỉ dẫn để xem nội dung."
   },
   "EquipmentSets": {
+    "bodyTitle": "Set trang bị cơ thể",
+    "fishingTitle": "Set trang bị câu",
+    "setNumber": "Set {number}",
     "statsTitle": "Chỉ số trang bị câu",
     "statsDescription": "Tổng chỉ số từ bộ trang bị câu đã lưu và đang sử dụng.",
     "capacity_usage": "{count}/{capacity} trang bị",

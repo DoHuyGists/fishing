@@ -194,7 +194,7 @@ export function useInventoryTable(initialTab: InventoryTab = 'fishing') {
     if (!query) return all;
     return all.filter(
       ({ set, index }) =>
-        `set ${index + 1}`.includes(query) ||
+        tr('EquipmentSets.setNumber', { number: index + 1 }).toLowerCase().includes(query) ||
         SLOTS.some((slot) => set[slot].some((item) => itemName(item, item.id).toLowerCase().includes(query)))
     );
   });
@@ -350,6 +350,8 @@ export function useInventoryTable(initialTab: InventoryTab = 'fishing') {
     modal,
     pagedItems,
     pagedSets,
+    filteredSets,
+    SETS_PER_PAGE,
     pickItem,
     removeFromSet,
     saveSet,
