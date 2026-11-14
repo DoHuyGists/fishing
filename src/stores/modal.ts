@@ -9,6 +9,7 @@ const modalNames = [
     "diary",
     "gacha",
     "inventory",
+    "body",
     "feedback",
     "mission",
     "event",
@@ -30,6 +31,7 @@ const modalNames = [
     "aquaculture",
     "dispatch",
     "guide",
+    "rule",
     "tutorial",
 ] as const;
 

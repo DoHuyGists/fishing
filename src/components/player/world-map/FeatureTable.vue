@@ -59,6 +59,7 @@ const actionGroups: { key: string; label: string; iconClass: string; actions: Lo
 ];
 
 const supportActions: LobbyAction[] = [
+  { modal: 'rule', get label() { return tr('RuleModal.title'); }, icon: '📋' },
   { modal: 'redeem', get label() { return tr('CurrencyConvertTable.quy_doi'); }, icon: '🎟️' },
   { modal: 'feedback', get label() { return tr('Feedbackmodal.phan_hoi'); }, icon: '💬' },
   { modal: 'donation', get label() { return tr('FeatureTable.ung_ho'); }, icon: '💚', requiresUnlock: true },
@@ -68,7 +69,7 @@ const supportActions: LobbyAction[] = [
 <template>
   <nav
     :aria-label="tr('FeatureTable.chuc_nang_sanh_cau_ca')"
-    class="lobby-menu flex max-h-[min(30rem,calc(100dvh-7rem))] w-full min-w-0 max-w-sm flex-col self-start overflow-hidden rounded-xl border border-[#cbd9c6] bg-[#f5f9f0] text-[#24352a] shadow-[0_4px_20px_-12px_rgba(36,53,42,0.3)]"
+    class="lobby-menu flex max-h-[min(100dvh,calc(100dvh-7rem))] w-full min-w-0 max-w-sm flex-col self-start overflow-hidden rounded-xl border border-[#cbd9c6] bg-[#f5f9f0] text-[#24352a] shadow-[0_4px_20px_-12px_rgba(36,53,42,0.3)]"
   >
     <div class="shrink-0 border-b border-[#cbd9c6] bg-linear-to-br from-[#edf5e5] to-[#f5f9f0] px-2.5 py-2">
       <div class="mb-2 flex items-center gap-2">
@@ -149,7 +150,7 @@ const supportActions: LobbyAction[] = [
       </section>
     </div>
 
-    <div class="grid shrink-0 grid-cols-3 gap-1 border-t border-[#cbd9c6] bg-[#edf3e7] px-2 py-1">
+    <div class="grid shrink-0 grid-cols-2 gap-1 border-t border-[#cbd9c6] bg-[#edf3e7] px-2 py-1">
       <button
         v-for="(action, actionIndex) in supportActions"
         :key="action.modal"

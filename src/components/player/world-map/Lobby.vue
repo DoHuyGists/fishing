@@ -50,6 +50,7 @@ const SkillModal = defineAsyncComponent(() => import("../skill/SkillModal.vue"))
 const AquacultureModal = defineAsyncComponent(() => import("../aquaculture/AquacultureModal.vue"));
 const DispatchModal = defineAsyncComponent(() => import("../dispatch/DispatchModal.vue"));
 const GuideModal = defineAsyncComponent(() => import("../guide/GuideModal.vue"));
+const RuleModal = defineAsyncComponent(() => import("../rule/RuleModal.vue"));
 const TutorialModal = defineAsyncComponent(() => import("../tutorial/TutorialModal.vue"));
 
 const authStore = useAuthStore();
@@ -209,6 +210,7 @@ onUnmounted(() => {
         <div v-if="modalStore.isModalOpening">
           <AccountInfoModal v-if="modalStore.isOpening('account')" />
           <GuideModal v-if="modalStore.isOpening('guide')" />
+          <RuleModal v-if="modalStore.isOpening('rule')" />
           <TutorialModal v-if="modalStore.isOpening('tutorial')" />
           <MarketWindow v-if="configStore.isUnlocked('market') && modalStore.isOpening('market')" />
           <ShopModal v-if="modalStore.isOpening('shop')" />
