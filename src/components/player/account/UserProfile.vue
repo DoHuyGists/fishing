@@ -145,7 +145,7 @@ const userInitial = computed(() => {
 
     <div>
       <div class="text-xs font-bold text-gray-400 uppercase tracking-wider mb-2">{{ tr('UserProfile.chi_so_can_thu') }}</div>
-      <div class="slide-fade-in from-bottom player-content-in grid grid-cols-2 gap-2.5">
+      <div class="slide-fade-in from-bottom player-content-in grid grid-cols-2 md:grid-cols-4 lg:grid-cols-6 gap-2.5">
         <div class="bg-gray-50 border border-gray-100 rounded-xl p-3 flex flex-col gap-1">
           <div class="flex items-center gap-1.5 text-gray-500 text-[11px] font-medium">
             <span>🎒</span><span>{{ tr('UserProfile.suc_chua_tui_do') }}</span>
@@ -160,6 +160,22 @@ const userInitial = computed(() => {
           </div>
           <span class="text-sm font-bold text-[#263238]">
             {{ userProfileStore.speciesStorageCapacity }} <span class="text-xs font-normal text-gray-500">{{ tr('UserProfile.con') }}</span>
+          </span>
+        </div>
+        <div class="bg-gray-50 border border-gray-100 rounded-xl p-3 flex flex-col gap-1">
+          <div class="flex items-center gap-1.5 text-gray-500 text-[11px] font-medium">
+            <span>🎣</span><span>{{ tr('UserProfile.suc_chua_bo_trang_bi') }}</span>
+          </div>
+          <span class="text-sm font-bold text-[#263238]">
+            {{ userProfileStore.equipmentCapacity }} <span class="text-xs font-normal text-gray-500">{{ tr('UserProfile.o') }}</span>
+          </span>
+        </div>
+        <div class="bg-gray-50 border border-gray-100 rounded-xl p-3 flex flex-col gap-1">
+          <div class="flex items-center gap-1.5 text-gray-500 text-[11px] font-medium">
+            <span>🧺</span><span>{{ tr('UserProfile.suc_chua_gio_ca') }}</span>
+          </div>
+          <span class="text-sm font-bold text-[#263238]">
+            {{ userProfileStore.fishingNetCapacity }} <span class="text-xs font-normal text-gray-500">{{ tr('UserProfile.con') }}</span>
           </span>
         </div>
         <div class="bg-gray-50 border border-gray-100 rounded-xl p-3 flex flex-col gap-1">

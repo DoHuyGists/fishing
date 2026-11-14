@@ -195,6 +195,8 @@
     "suc_chua_tui_do": "Inventory capacity",
     "o": "slots",
     "suc_chua_kho_ca": "Fish storage capacity",
+    "suc_chua_bo_trang_bi": "Equipment set capacity",
+    "suc_chua_gio_ca": "Fishing basket capacity",
     "cap_do": "Level",
     "diem_kinh_nghiem": "Experience points",
     "chi_tiet_tai_khoan": "Account details",
