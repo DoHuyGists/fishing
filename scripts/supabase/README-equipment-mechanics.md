@@ -26,7 +26,7 @@ Mỗi bộ đang dùng phải chọn đúng một vật phẩm cho cả năm nh�
 | Hook | `catch_rate` | JSON number 0–1; phần cộng tỷ lệ, `0.1` = 10 điểm phần trăm trước hệ số | `0.1` |
 | Tất cả | `luck_bonus` | JSON number tùy chọn, mặc định 0; chỉ ảnh hưởng shiny | `0.05` |
 
-Không dùng chuỗi số như `"20"`. `match_number`, `bait_match_number` và `hook.strength` không tham gia công thức mới.
+Không dùng chuỗi số như `"20"`. `match_number`, `hook.strength` không tham gia công thức mới.
 
 Ví dụ phần `data` của từng vật phẩm (năm inventory row riêng):
 
