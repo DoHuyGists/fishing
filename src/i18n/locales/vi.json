@@ -1928,6 +1928,7 @@
     "khong_the_tai_bang_xep_hang": "Không thể tải bảng xếp hạng"
   },
   "LeaderboardSeason": {
+    "details": "Thể lệ & hệ số mùa",
     "title": "Mùa giải câu cá",
     "season": "Mùa {number}",
     "previous": "Mùa trước",

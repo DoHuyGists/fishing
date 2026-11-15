@@ -32,6 +32,11 @@ const server = await createServer({ server: { host: '127.0.0.1', port: 0, hmr: f
       window.board=store; window.testI18n=i18n;
       const fish={id:'fish',species_id:'species',name:'Cá kỷ lục',image:null,rarity:'RARE',weight:8,score:12.345678,caught_at:'2026-11-14T12:00:00Z'};
       const player={id:'player',display_name:'Người câu cá',score:0,total_caught:1,best_fish:fish,created_at:fish.caught_at,updated_at:fish.caught_at,rank:1};
+      repo.fetchTop=async(page,criterion)=>({items:Array.from({length:page===1?10:2},(_,index)=>({...player,
+        id:index===0&&page===1?'player':'player-'+page+'-'+index,display_name:'Angler '+page+' '+index,
+        score:1000-((page-1)*10+index)*10,total_caught:100-((page-1)*10+index)})),total:12});
+      repo.fetchByUser=async()=>({...player,score:1000,total_caught:100});
+      repo.countHigher=async(value,criterion)=>criterion==='score'?(1000-value)/10:100-value;
       const archiveId='1479943f-d8bc-48ca-b49f-80701df0de1b',currentId='82dbaf73-3577-480c-8eb8-8584e4ef0a9a';
       repo.fetchSeasonBoard=async(page,seasonId)=>({items:[player,{...player,id:'other',display_name:'Other',rank:2}],total:2,my_entry:player,
         season:{id:seasonId??currentId,season_number:seasonId===archiveId?1:2,starts_at:'2026-11-01T00:00:00Z',ends_at:'2026-11-15T00:00:00Z',finalized_at:seasonId===archiveId?'2026-11-15T00:00:00Z':null},
@@ -65,8 +70,41 @@ try {
   await page.getByText('Area fatigue: 55.5/100', { exact: true }).waitFor();
   await page.getByRole('button', { name: 'Current season', exact: true }).click();
   await page.getByText('Season 2', { exact: true }).waitFor();
+  const rules = page.locator('details');
+  assert.equal(await rules.evaluate(element => element.open), false);
+  await page.getByText('Rules & seasonal multipliers', { exact: true }).click();
+  assert.equal(await rules.evaluate(element => element.open), true);
+  await page.getByText('Rules & seasonal multipliers', { exact: true }).click();
+
+  for (const criterion of ['score', 'total_caught']) {
+    await page.getByRole('tab').nth(criterion === 'score' ? 0 : 1).click();
+    await page.getByText('Angler 1 0', { exact: true }).waitFor();
+    const podium = page.getByLabel('Top three', { exact: true });
+    assert.equal(await podium.count(), 1);
+    const cards = podium.locator(':scope > div');
+    const positions = await cards.evaluateAll(elements => elements.map(element => element.getBoundingClientRect().x));
+    assert.ok(positions[1] < positions[0] && positions[0] < positions[2], 'Podium places the leader in the center');
+    assert.equal(await page.locator('section aside').count(), 1);
+    await page.getByRole('button', { name: 'Next', exact: true }).click();
+    await page.getByText('Angler 2 0', { exact: true }).waitFor();
+    assert.equal(await podium.count(), 0);
+    assert.deepEqual(await page.evaluate(() => window.board.boards[0].entries.map(entry => entry.rank)), [11, 12]);
+    await page.getByRole('button', { name: 'Previous', exact: true }).click();
+    await page.getByText('Angler 1 0', { exact: true }).waitFor();
+  }
+
+  if (process.env.LEADERBOARD_TEST_SCREENSHOT) await page.screenshot({ path: process.env.LEADERBOARD_TEST_SCREENSHOT + '-desktop.png' });
   await page.setViewportSize({ width: 390, height: 844 });
   assert.ok(await page.evaluate(() => document.documentElement.scrollWidth <= window.innerWidth));
+  if (process.env.LEADERBOARD_TEST_SCREENSHOT) await page.screenshot({ path: process.env.LEADERBOARD_TEST_SCREENSHOT + '-mobile.png' });
+  await page.setViewportSize({ width: 320, height: 740 });
+  for (let index = 0; index < 3; index++) {
+    await page.getByRole('tab').nth(index).click();
+    await page.waitForFunction(() => !window.board.loading);
+    assert.ok(await page.evaluate(() => document.documentElement.scrollWidth <= window.innerWidth));
+    const panel = page.getByRole('tabpanel');
+    assert.ok(await panel.evaluate(element => element.scrollWidth <= element.clientWidth), 'Ranking fits the smallest mobile width');
+  }
   assert.deepEqual(errors, []);
-  process.stdout.write('Validated current/archive navigation, Hall of Fame, distinct ties, fatigue, both locales and mobile width.\n');
+  process.stdout.write('Validated all three tabs, podium order, pagination, personal rank, season rules and navigation, Hall of Fame, distinct ties, fatigue, both locales and mobile widths.\n');
 } finally { await browser?.close(); await server.close(); }

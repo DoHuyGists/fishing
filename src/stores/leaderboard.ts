@@ -1,4 +1,4 @@
-import { leaderboardValue, type FishingSeasonBoard, type LeaderboardCriterion, type LeaderboardEntry } from "../types/model/leaderboard";
+import { leaderboardValue, type FishingSeasonBoard, type LeaderboardCriterion, type LeaderboardEntry, type LeaderboardRankedEntry } from "../types/model/leaderboard";
 import { t as tr } from "../i18n";
 import { defineStore } from "pinia";
 import { supabaseLeaderboardRepository } from "../data/supabaseLeaderboardRepository";
@@ -36,7 +36,7 @@ export const useLeaderboardStore = defineStore("leaderboard", {
       const criterion = category.key;
       const offset = (state.page - 1) * state.pageSize;
       let rank = state.firstRank;
-      const entries = state.entries.map((entry, index) => {
+      const entries = state.entries.map((entry, index): LeaderboardRankedEntry => {
         const value = leaderboardValue(entry, criterion);
         if (index > 0 && value !== leaderboardValue(state.entries[index - 1]!, criterion)) rank = offset + index + 1;
         return { id: entry.id, userId: entry.id, displayName: entry.display_name || tr('LeaderboardModal.an_danh'),

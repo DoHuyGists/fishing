@@ -5,10 +5,12 @@ export interface LeaderboardBestFish {
   species_id: string;
   name: string;
   image: string | null;
-  rarity: string;
+  rarity: string | null;
   weight: number;
   score: number;
   caught_at?: string;
+  season_id?: string;
+  session_id?: string;
 }
 
 export interface LeaderboardEntry {
@@ -21,6 +23,16 @@ export interface LeaderboardEntry {
   created_at: string;
   updated_at: string;
   rank?: number;
+}
+
+export interface LeaderboardRankedEntry {
+  id: string;
+  userId: string;
+  displayName: string;
+  avatarUrl?: string | null;
+  value: number;
+  rank: number;
+  bestFish?: LeaderboardBestFish | null;
 }
 
 export interface FishingSeason {

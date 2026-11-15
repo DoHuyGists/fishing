@@ -322,10 +322,31 @@ BEGIN
     WHERE id = v_user_id;
 
     -- =====================================================
-    -- 12. Trả kết quả thành công cho client
+    -- 12. Cập nhật tổng điểm và số cá đã câu trọn đời
     -- =====================================================
 
+    -- Both challenge wrappers use this resolver. The locked BITE session
+    -- ensures retries cannot award another catch or score; the upsert increments
+    -- atomically across different successful sessions for the same player.
+    -- Totals survive season rollover and selling/releasing fish.
+    -- A catch without scoring data contributes zero points and one catch.
+    -- Acquire the season lock and update the best fish before locking a
+    -- leaderboard row: rollover takes the same lock before resetting rows.
     v_scoring := public.record_fishing_score(p_session_id, v_caught_id);
+
+    INSERT INTO public.leaderboard AS board (
+        id, score, total_caught, created_at, updated_at
+    ) VALUES (
+        v_user_id, COALESCE((v_scoring->>'score')::NUMERIC, 0), 1, clock_timestamp(), clock_timestamp()
+    )
+    ON CONFLICT (id) DO UPDATE
+    SET score = COALESCE(board.score, 0) + EXCLUDED.score,
+        total_caught = COALESCE(board.total_caught, 0) + 1,
+        updated_at = EXCLUDED.updated_at;
+
+    -- =====================================================
+    -- 13. Trả kết quả thành công cho client
+    -- =====================================================
 
     RETURN jsonb_build_object(
         'success', TRUE,

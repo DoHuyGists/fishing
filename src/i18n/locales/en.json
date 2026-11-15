@@ -1924,6 +1924,7 @@
     "khong_the_tai_bang_xep_hang": "Unable to load leaderboard"
   },
   "LeaderboardSeason": {
+    "details": "Rules & seasonal multipliers",
     "title": "Fishing season",
     "season": "Season {number}",
     "previous": "Previous season",

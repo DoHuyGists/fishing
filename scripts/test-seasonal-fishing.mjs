@@ -24,6 +24,8 @@ test('ranked fishing integrates server catches, fatigue, seasons, ties and perma
       GRANT USAGE ON SCHEMA auth TO authenticated;
       CREATE TABLE feature_control.request_rules(feature_key TEXT,path TEXT,writes_only BOOLEAN,PRIMARY KEY(feature_key,path));
       CREATE TABLE public.user_profile(id UUID PRIMARY KEY,display_name TEXT,level INTEGER DEFAULT 1,experience_point INTEGER DEFAULT 0);
+      CREATE TABLE public.leaderboard(id UUID PRIMARY KEY REFERENCES public.user_profile(id),score NUMERIC NOT NULL,
+        total_caught BIGINT, best_fish JSONB, created_at TIMESTAMPTZ NOT NULL, updated_at TIMESTAMPTZ NOT NULL);
       CREATE TABLE public.countries(id UUID PRIMARY KEY,default_timezone TEXT);
       CREATE TABLE public.weathers(id UUID PRIMARY KEY);
       CREATE TABLE public.zones(id UUID PRIMARY KEY,weather_id UUID,weather_expires_at TIMESTAMPTZ);
@@ -47,9 +49,10 @@ test('ranked fishing integrates server catches, fatigue, seasons, ties and perma
     await db.exec(await read('./supabase/migrations/equipment_mechanics.sql'));
     await db.exec(await read('./supabase/migrations/20261115_ranked_fishing.sql'));
     await db.exec(`
-      INSERT INTO fishing_seasons(starts_at,ends_at) VALUES('2020-01-01Z','2020-01-15Z');
+      INSERT INTO fishing_seasons(starts_at,ends_at)
+        SELECT starts_at, starts_at+interval '336 hours' FROM (SELECT clock_timestamp()-interval '15 days' AS starts_at) initial;
       INSERT INTO fishing_score_catches(id,session_id,season_id,user_id,species_id,caught_at,score,fish,factors)
-        SELECT gen_random_uuid(),gen_random_uuid(),id,gen_random_uuid(),gen_random_uuid(),starts_at,42,'{}','{}' FROM fishing_seasons;
+        SELECT gen_random_uuid(),gen_random_uuid(),id,gen_random_uuid(),gen_random_uuid(),starts_at,42,'{"name":"Legacy fish","score":42}','{}' FROM fishing_seasons;
       INSERT INTO fishing_hall_of_fame(season_id,rank,catch_id,user_id,species_id,fish,caught_at)
         SELECT season_id,1,id,user_id,species_id,fish,caught_at FROM fishing_score_catches;
       INSERT INTO fishing_season_meta(season_id,species_id,name,season_weight)
@@ -66,10 +69,18 @@ test('ranked fishing integrates server catches, fatigue, seasons, ties and perma
       assert.equal(Number(await scalar('SELECT score FROM fishing_score_catches')), 42);
       await db.exec(await read('./supabase/migrations/20261115_ranked_fishing_uuid.sql'));
       assert.equal(await scalar('SELECT id FROM fishing_seasons'), migrated.id);
-      await db.exec('DELETE FROM fishing_hall_of_fame; DELETE FROM fishing_season_meta; DELETE FROM fishing_score_catches; DELETE FROM fishing_seasons;');
+      await db.exec("UPDATE fishing_seasons SET finalized_at=ends_at");
+      await db.exec(await read('./supabase/migrations/20261115_leaderboard_season_best_fish.sql'));
+      const archive = await rpc('get_fishing_season_board(1,$1)', [migrated.id]);
+      assert.equal(archive.total, 1);
+      assert.equal(archive.items[0].best_fish.score, 42);
+      assert.equal(archive.items[0].best_fish.season_id, migrated.id);
+      assert.equal(archive.hall_of_fame.length, 1);
+      await db.exec('DELETE FROM fishing_season_results; DELETE FROM fishing_hall_of_fame; DELETE FROM fishing_season_meta; DELETE FROM fishing_score_catches; DELETE FROM fishing_seasons;');
     });
     await db.exec(await read('./supabase/rpc/fishing/cast_rod.sql'));
     await db.exec(await read('./supabase/rpc/fishing/submit_challenge.sql'));
+    await db.exec(await read('./supabase/migrations/20261115_leaderboard_season_best_fish.sql'));
     await db.query('INSERT INTO auth.users VALUES($1),($2)', [uid, other]);
     await db.query("INSERT INTO user_profile(id,display_name) VALUES($1,'Người câu cá'),($2,'Other')", [uid, other]);
     await db.query("SELECT set_config('test.uid',$1,false)", [uid]);
@@ -97,7 +108,13 @@ test('ranked fishing integrates server catches, fatigue, seasons, ties and perma
     };
     const resolve = async session => {
       await db.query("UPDATE fishing_sessions SET status='BITE',bite_at=clock_timestamp()-interval '1 second',expires_at=clock_timestamp()+interval '90 seconds' WHERE id=$1", [session.id]);
-      return rpc('public.resolve_fishing_challenge($1,TRUE,1000)', [session.id]);
+      const before = Number(await scalar('SELECT COALESCE((SELECT total_caught FROM leaderboard WHERE id=$1),0)', [uid]));
+      const scoreBefore = Number(await scalar('SELECT COALESCE((SELECT score FROM leaderboard WHERE id=$1),0)', [uid]));
+      const result = await rpc('public.resolve_fishing_challenge($1,TRUE,1000)', [session.id]);
+      assert.equal(Number(await scalar('SELECT COALESCE((SELECT total_caught FROM leaderboard WHERE id=$1),0)', [uid])), before + (result.success ? 1 : 0));
+      const scoreAfter = Number(await scalar('SELECT COALESCE((SELECT score FROM leaderboard WHERE id=$1),0)', [uid]));
+      assert.ok(Math.abs(scoreAfter - (scoreBefore + (result.success ? result.scoring?.score ?? 0 : 0))) < 1e-10);
+      return result;
     };
 
     await check('repair handles invoker wrappers and legacy owners without exposing helpers to players', async () => {
@@ -149,6 +166,23 @@ test('ranked fishing integrates server catches, fatigue, seasons, ties and perma
       assert.ok(Math.abs((await rpc('touch_fishing_presence()')).fatigue_score - 24) < 0.1);
     });
 
+    await check('lifetime catch count is awarded before seasons start and retries cannot increment it', async () => {
+      const session = await cast();
+      const result = await resolve(session);
+      assert.equal(result.success, true);
+      assert.equal(Number(await scalar('SELECT total_caught FROM leaderboard WHERE id=$1', [uid])), 1);
+      assert.equal(Number(await scalar('SELECT count(*) FROM fishing_score_catches')), 0);
+      await assert.rejects(rpc('resolve_fishing_challenge($1,TRUE,1000)', [session.id]), /already processed/);
+      assert.equal(Number(await scalar('SELECT total_caught FROM leaderboard WHERE id=$1', [uid])), 1);
+
+      await db.query('UPDATE leaderboard SET total_caught=NULL,score=123,best_fish=$2 WHERE id=$1', [uid, { id: 'existing-record' }]);
+      assert.equal((await resolve(await cast())).success, true);
+      const row = (await query('SELECT * FROM leaderboard WHERE id=$1', [uid]))[0];
+      assert.equal(Number(row.total_caught), 1);
+      assert.equal(Number(row.score), 123);
+      assert.deepEqual(row.best_fish, { id: 'existing-record' });
+    });
+
     await check('actual cast and resolver freeze factors and compute the agreed score', async () => {
       assert.equal((await rpc('get_fishing_season_board()')).season, null);
       await rpc("start_fishing_seasons(clock_timestamp()-interval '1 day')");
@@ -162,8 +196,14 @@ test('ranked fishing integrates server catches, fatigue, seasons, ties and perma
       const expected = session.fish_snapshot.weight_ratio ** 1.5 * 9 * 2;
       assert.ok(Math.abs(result.scoring.score - expected) < 1e-10);
       assert.equal(result.scoring.factors.rare_weight, 3);
-      assert.equal(Number(await scalar('SELECT count(*) FROM fishing_score_catches')), 1);
+      assert.equal(Number(await scalar('SELECT count(*) FROM fishing_score_catches')), 0);
+      assert.equal((await scalar('SELECT best_fish FROM leaderboard WHERE id=$1', [uid])).id, result.caught.id);
+      assert.equal((await scalar('SELECT best_fish FROM leaderboard WHERE id=$1', [uid])).season_id, result.scoring.season_id);
+      assert.equal(Number(await scalar('SELECT count(*) FROM fishing_season_results')), 0);
+      const scoreAfterCatch = Number(await scalar('SELECT score FROM leaderboard WHERE id=$1', [uid]));
+      assert.ok(Math.abs(scoreAfterCatch - (123 + expected)) < 1e-10);
       await assert.rejects(rpc('resolve_fishing_challenge($1,TRUE,1000)', [session.id]), /already processed/);
+      assert.equal(Number(await scalar('SELECT score FROM leaderboard WHERE id=$1', [uid])), scoreAfterCatch);
       const board = await rpc('get_fishing_season_board()');
       assert.equal(board.my_entry.rank, 1);
       assert.match(result.scoring.season_id, /^[0-9a-f-]{36}$/);
@@ -187,35 +227,85 @@ test('ranked fishing integrates server catches, fatigue, seasons, ties and perma
       await db.query("INSERT INTO fatigue_effects(modifier_id,min_fatigue,target,value) VALUES($1,2,'rare_spawn',-100)", [mod]);
       const failedCast = await cast();
       assert.equal(failedCast.species_id, null);
-      const countBeforeFailure = Number(await scalar('SELECT count(*) FROM fishing_score_catches'));
+      const bestBeforeFailure = await scalar('SELECT best_fish FROM leaderboard WHERE id=$1', [uid]);
       assert.equal((await resolve(failedCast)).success, false);
-      assert.equal(Number(await scalar('SELECT count(*) FROM fishing_score_catches')), countBeforeFailure);
+      assert.deepEqual(await scalar('SELECT best_fish FROM leaderboard WHERE id=$1', [uid]), bestBeforeFailure);
       await db.exec('DELETE FROM fatigue_effects');
       await db.query("UPDATE zones SET weather_expires_at=clock_timestamp()-interval '1 minute'");
       assert.equal((await cast()).fish_snapshot.scoring.extreme_weight, 1);
       await db.query("UPDATE zones SET weather_expires_at=clock_timestamp()+interval '1 hour'");
     });
 
-    // Seed known records to test species winners independently from player ranks.
+    await check('successful lower catches retain the best fish and equal scores favor the later catch', async () => {
+      const saved = await scalar('SELECT best_fish FROM leaderboard WHERE id=$1', [uid]);
+      await db.query("UPDATE leaderboard SET best_fish=jsonb_set(best_fish,'{score}','1000') WHERE id=$1", [uid]);
+      const strong = await scalar('SELECT best_fish FROM leaderboard WHERE id=$1', [uid]);
+      assert.equal((await resolve(await cast())).success, true);
+      assert.deepEqual(await scalar('SELECT best_fish FROM leaderboard WHERE id=$1', [uid]), strong);
+      await db.query('UPDATE leaderboard SET best_fish=$2 WHERE id=$1', [uid, saved]);
+      const maxCatch = async () => {
+        const session = await cast();
+        await db.query("UPDATE fishing_session_mechanics SET fish_snapshot=jsonb_set(fish_snapshot,'{scoring,w_norm}','1') WHERE session_id=$1", [session.id]);
+        return resolve(session);
+      };
+      const first = await maxCatch();
+      const second = await maxCatch();
+      assert.equal(first.scoring.score, second.scoring.score);
+      assert.equal((await scalar('SELECT best_fish FROM leaderboard WHERE id=$1', [uid])).id, second.caught.id);
+      assert.equal((await rpc('get_fishing_season_board()')).total, 1);
+      assert.equal(Number(await scalar('SELECT count(*) FROM fishing_score_catches')), 0);
+    });
+
+    await check('upgrade migrates existing best catches and reruns preserve newer live records', async () => {
+      const season = (await rpc('get_fishing_season_board()')).season;
+      const saved = await scalar('SELECT best_fish FROM leaderboard WHERE id=$1', [uid]);
+      const ids = [randomUUID(), randomUUID()];
+      for (let index = 0; index < 2; index++) {
+        const at = new Date(Date.now() - 60000 + index).toISOString();
+        const fish = { ...saved, id: ids[index], score: 500 + index, caught_at: at };
+        await db.query('INSERT INTO fishing_score_catches VALUES($1,$2,$3,$4,$5,$6,$7,$8,$9,$10)',
+          [ids[index], randomUUID(), season.id, uid, species[0], at, fish.score, fish, 'Legacy name', {}]);
+      }
+      const upgrade = await read('./supabase/migrations/20261115_leaderboard_season_best_fish.sql');
+      await db.exec(upgrade);
+      assert.equal((await scalar('SELECT best_fish FROM leaderboard WHERE id=$1', [uid])).id, ids[1]);
+      await db.query("UPDATE leaderboard SET best_fish=jsonb_set(best_fish,'{score}','600') WHERE id=$1", [uid]);
+      await db.exec(upgrade);
+      assert.equal((await scalar('SELECT best_fish FROM leaderboard WHERE id=$1', [uid])).score, 600);
+      assert.equal((await rpc('get_fishing_season_board()')).total, 1);
+      assert.equal(Number(await scalar('SELECT count(*) FROM fishing_score_catches')), 2);
+      await db.query('UPDATE leaderboard SET best_fish=$2 WHERE id=$1', [uid, saved]);
+    });
+
+    // Seed personal bests; a lower catch never replaces an existing best.
     const season = (await rpc('get_fishing_season_board()')).season;
     const add = async (player, sp, score, at, id = randomUUID()) => {
-      const fish = { id, species_id: sp, name: 'Cá kỷ lục', image: null, rarity: 'RARE', weight: 10, score, caught_at: at };
-      await db.query('INSERT INTO fishing_score_catches VALUES($1,$2,$3,$4,$5,$6,$7,$8,$9,$10)',
-        [id, randomUUID(), season.id, player, sp, at, score, fish, 'Tên lưu trữ', {}]);
+      const fish = { id, species_id: sp, name: 'Cá kỷ lục', image: null, rarity: 'RARE', weight: 10, score, caught_at: at, season_id: season.id, display_name: 'Tên lưu trữ' };
+      await db.query("INSERT INTO user_profile(id,display_name) VALUES($1,'Tên lưu trữ') ON CONFLICT DO NOTHING", [player]);
+      await db.query(`INSERT INTO leaderboard AS board(id,score,total_caught,best_fish,created_at,updated_at)
+        VALUES($1,0,0,$2,$3,$3) ON CONFLICT(id) DO UPDATE SET best_fish=EXCLUDED.best_fish
+        WHERE (($2->>'score')::numeric,($2->>'caught_at')::timestamptz,($2->>'id')::uuid) >
+          ((board.best_fish->>'score')::numeric,(board.best_fish->>'caught_at')::timestamptz,(board.best_fish->>'id')::uuid)`, [player, fish, at]);
       return id;
     };
+    const speciesWinners = [other, randomUUID(), randomUUID()];
     await check('later equal catches win both species records and player ranks across pages', async () => {
       const old = new Date(Date.now() - 120000).toISOString(), recent = new Date(Date.now() - 60000).toISOString();
       await add(uid, species[0], 100, old);
       const winner = await add(other, species[0], 100, recent);
       await add(uid, species[1], 90, recent);
       await add(uid, species[2], 80, recent);
+      await add(speciesWinners[1], species[1], 90, recent);
+      await add(speciesWinners[2], species[2], 80, recent);
       for (let i = 0; i < 12; i++) await add(randomUUID(), species[3], 10, new Date(Date.now() - 10000 + i).toISOString());
       const board = await rpc('get_fishing_season_board()');
       assert.equal(board.items[0].id, other);
       assert.equal(board.items[0].best_fish.id, winner);
       assert.equal(board.my_entry.rank, 2);
-      assert.deepEqual((await rpc('get_fishing_season_board(2)')).items.map(e => e.rank), [11, 12, 13, 14]);
+      assert.equal(board.total, 16);
+      assert.equal(board.items.filter(entry => entry.id === uid).length, 1);
+      assert.equal(board.my_entry.best_fish.score, 100);
+      assert.deepEqual((await rpc('get_fishing_season_board(2)')).items.map(e => e.rank), [11, 12, 13, 14, 15, 16]);
     });
 
     await check('exact boundary rotates once, snapshots top species and selects disjoint random boosts', async () => {
@@ -227,14 +317,18 @@ test('ranked fishing integrates server catches, fatigue, seasons, ties and perma
       assert.equal(Number(await scalar('SELECT season_number FROM fishing_seasons WHERE id=$1', [newSeason])), 2);
       const fame = await query('SELECT * FROM fishing_hall_of_fame ORDER BY rank');
       assert.deepEqual(fame.map(r => r.species_id), species.slice(0, 3));
-      assert.deepEqual(fame.map(r => r.user_id), [other, uid, uid]);
+      assert.deepEqual(fame.map(r => r.user_id), speciesWinners);
+      assert.equal(Number(await scalar('SELECT count(*) FROM fishing_season_results WHERE season_id=$1', [season.id])), 16);
+      assert.equal(Number(await scalar('SELECT count(*) FROM leaderboard WHERE best_fish IS NOT NULL')), 0);
       const meta = await query('SELECT * FROM fishing_season_meta WHERE season_id=$1', [newSeason]);
       assert.equal(meta.length, 6);
       assert.equal(meta.filter(r => Number(r.season_weight) === 0.7).length, 3);
       assert.equal(meta.filter(r => Number(r.season_weight) === 1.3).length, 3);
       assert.ok(meta.filter(r => Number(r.season_weight) === 1.3).every(r => !species.slice(0, 3).includes(r.species_id)));
       await db.query("UPDATE species SET name='Đã đổi tên'");
+      const totalBeforeRelease = Number(await scalar('SELECT total_caught FROM leaderboard WHERE id=$1', [uid]));
       await db.exec('DELETE FROM caught');
+      assert.equal(Number(await scalar('SELECT total_caught FROM leaderboard WHERE id=$1', [uid])), totalBeforeRelease);
       assert.equal((await query('SELECT fish FROM fishing_hall_of_fame LIMIT 1'))[0].fish.name, 'Cá kỷ lục');
       await db.query('UPDATE species_in_area SET weight_rate=CASE WHEN species_id=$1 THEN 1 ELSE 0 END', [species[0]]);
       const spanningCast = await cast();
@@ -245,6 +339,13 @@ test('ranked fishing integrates server catches, fatigue, seasons, ties and perma
       assert.equal(result.scoring.season_id, newSeason);
       assert.equal(result.scoring.factors.season_weight, 0.7);
       assert.equal((await rpc('get_fishing_season_board(1,$1)', [season.id])).hall_of_fame.length, 3);
+      const archive = await rpc('get_fishing_season_board(2,$1)', [season.id]);
+      assert.equal(archive.total, 16);
+      assert.deepEqual(archive.items.map(entry => entry.rank), [11, 12, 13, 14, 15, 16]);
+      assert.equal(archive.my_entry.best_fish.score, 100);
+      assert.equal((await rpc('get_fishing_season_board()')).total, 1);
+      assert.equal((await scalar('SELECT best_fish FROM leaderboard WHERE id=$1', [uid])).id, result.caught.id);
+      assert.equal(Number(await scalar('SELECT count(*) FROM fishing_score_catches')), 2);
     });
 
     await check('empty elapsed seasons preserve continuous dates and reset weights without compounding', async () => {
@@ -263,6 +364,8 @@ test('ranked fishing integrates server catches, fatigue, seasons, ties and perma
     await check('clients cannot forge scores, mutate fatigue or rotate with a chosen clock', async () => {
       await db.exec('SET ROLE authenticated');
       await assert.rejects(db.query('INSERT INTO fishing_score_catches(id) VALUES($1)', [randomUUID()]), /permission denied/);
+      await assert.rejects(db.exec("UPDATE leaderboard SET best_fish='{}'"), /permission denied/);
+      await assert.rejects(db.exec('DELETE FROM fishing_season_results'), /permission denied/);
       await assert.rejects(db.exec('UPDATE user_area_fatigue SET fatigue_score=0'), /permission denied/);
       await assert.rejects(rpc('fishing_ensure_season(clock_timestamp())'), /permission denied/);
       await assert.rejects(rpc('record_fishing_score($1,$2)', [randomUUID(), randomUUID()]), /permission denied/);

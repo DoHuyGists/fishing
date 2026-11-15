@@ -27,7 +27,7 @@ onBeforeUnmount(() => { clearTimeout(rolloverTimer); });
 </script>
 
 <template>
-  <div class="space-y-3 rounded-2xl border border-[#cbd9c6] bg-[#f5f9f0] p-4 text-[#24352a]">
+  <div class="space-y-2 rounded-xl border border-[#cbd9c6] bg-[#f5f9f0] p-3 text-xs text-[#24352a]">
     <div class="flex flex-wrap items-center justify-between gap-2">
       <div class="font-bold">{{ board?.season ? tr('LeaderboardSeason.season', { number: board.season.season_number }) : tr('LeaderboardSeason.title') }}</div>
       <div class="flex flex-wrap gap-2">
@@ -38,20 +38,23 @@ onBeforeUnmount(() => { clearTimeout(rolloverTimer); });
     </div>
     <template v-if="board?.season">
       <div class="text-xs text-[#52654f]">{{ formatDate(board.season.starts_at) }} → {{ formatDate(board.season.ends_at) }}</div>
-      <div class="text-xs text-[#52654f]">{{ tr('LeaderboardSeason.rules') }}</div>
-      <div v-if="board.meta.length" class="flex flex-wrap gap-2">
-        <div v-for="species in board.meta" :key="species.species_id" class="rounded-lg border px-2 py-1 text-xs" :class="species.season_weight < 1 ? 'border-amber-200 bg-amber-50' : 'border-emerald-200 bg-emerald-50'">
-          {{ species.name }} · ×{{ numberFormatter.format(species.season_weight) }}
+      <details class="border-t border-[#cbd9c6] pt-2">
+        <summary class="cursor-pointer rounded text-xs font-semibold text-[#52654f] focus-visible:outline-2 focus-visible:outline-emerald-600">{{ tr('LeaderboardSeason.details') }}</summary>
+        <div class="mt-3 text-xs leading-relaxed text-[#52654f]">{{ tr('LeaderboardSeason.rules') }}</div>
+        <div v-if="board.meta.length" class="mt-3 flex flex-wrap gap-2">
+          <div v-for="species in board.meta" :key="species.species_id" class="rounded-lg border px-2 py-1 text-xs" :class="species.season_weight < 1 ? 'border-amber-200 bg-amber-50' : 'border-emerald-200 bg-emerald-50'">
+            {{ species.name }} · ×{{ numberFormatter.format(species.season_weight) }}
+          </div>
         </div>
-      </div>
+      </details>
       <template v-if="board.season.finalized_at">
         <div class="font-bold">{{ tr('LeaderboardSeason.hall') }}</div>
         <div v-if="!board.hall_of_fame.length" class="text-xs text-[#52654f]">{{ tr('LeaderboardSeason.no_winners') }}</div>
-        <div v-else class="grid gap-3 sm:grid-cols-3">
-          <div v-for="winner in board.hall_of_fame" :key="winner.rank" class="slide-fade-in from-bottom player-content-in min-w-0 rounded-xl border border-[#cbd9c6] bg-white p-3">
+        <div v-else class="grid gap-2 sm:grid-cols-3">
+          <div v-for="winner in board.hall_of_fame" :key="winner.rank" class="slide-fade-in from-bottom player-content-in min-w-0 rounded-lg border border-[#cbd9c6] bg-white p-2">
             <div class="mb-2 text-xl">{{ ['🥇', '🥈', '🥉'][winner.rank - 1] }}</div>
             <PlayerIdentity :user-id="winner.user_id" :profile="{ display_name: winner.display_name, avatar_url: null, country_id: null }" />
-            <LeaderboardFish :fish="winner.fish" class="mt-2" />
+            <LeaderboardFish :fish="winner.fish" compact class="mt-1.5" />
             <div class="mt-1 font-bold tabular-nums">{{ numberFormatter.format(winner.fish.score) }} {{ tr('DailyMission.diem') }}</div>
             <div class="mt-1 text-[10px] text-[#52654f]">{{ formatDate(winner.caught_at) }}</div>
           </div>
