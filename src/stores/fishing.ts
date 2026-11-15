@@ -1,4 +1,5 @@
 import type { AreaSpeciesDiaryResponse, FishDepthPreviewResponse } from "../types/model/fish";
+import type { FishingCatchScore } from '../types/model/fishingGameplay';
 import type { TensionChallenge, TensionFight, TensionInput, TensionSubmission } from "../types/model/tensionChallenge";
 import { t as tr } from "../i18n";
 import { defineStore } from "pinia";
@@ -26,6 +27,9 @@ export type CaughtFish = {
   isShiny?: boolean;
   variantType: "NORMAL" | "GOLDEN" | "MUTATED";
   starRating?: number;
+  score?: number;
+  seasonId?: string;
+  seasonNumber?: number;
 };
 export type FishingPlayer = {
   id: string | number;
@@ -48,6 +52,7 @@ type CastRodResponse = {
 
 type SubmitChallengeResponse = {
   success: boolean;
+  scoring?: FishingCatchScore | null;
   message?: string;
   caught?: {
     id: string;
@@ -687,6 +692,10 @@ export const useFishingStore = defineStore("fishing", {
             isShiny: response.caught.is_shiny,
             variantType: response.caught.variant_type,
             starRating: response.caught.star_rating,
+            score: response.scoring?.score,
+            seasonId: response.scoring?.season_id,
+            seasonNumber: response.scoring?.season_number,
+            createdAt: response.scoring?.caught_at,
           };
           this.inventory.unshift(caught);
           this.inventoryRequestId++;

@@ -1909,7 +1909,7 @@
   },
   "leaderboard": {
     "best_fish": "Highest-scoring fish",
-    "best_fish_description": "Ranked by the score of the best fish ever caught.",
+    "best_fish_description": "Ranked by the highest-scoring fish this season. Later catches win ties.",
     "fish_score": "Fish score",
     "tong_diem": "Total score",
     "nhung_can_thu_dan_dau_ve_diem_xep_hang": "Leading anglers by ranking score.",
@@ -1922,6 +1922,26 @@
     "xep_hang_theo_so_loai_ca_khac_nhau_da_kham_pha": "Ranked by the number of different fish species discovered.",
     "loai_da_kham_pha": "Species discovered",
     "khong_the_tai_bang_xep_hang": "Unable to load leaderboard"
+  },
+  "LeaderboardSeason": {
+    "title": "Fishing season",
+    "season": "Season {number}",
+    "previous": "Previous season",
+    "next": "Next season",
+    "current": "Current season",
+    "rules": "Each season lasts 14 days. Scores combine weight within the species, rarity, weather, seasonal weight and fatigue effects. The successful catch time determines the season.",
+    "hall": "Hall of Fame · Top three species",
+    "no_winners": "This season has no eligible catches to honor.",
+    "not_started": "The season has not started yet.",
+    "caught_at": "Caught at"
+  },
+  "FishingFatigue": {
+    "label": "Area fatigue",
+    "recovery": "In area +1/min · Away −1/min",
+    "weight_cap": "Weight ceiling within species",
+    "rare_spawn": "Rare fish frequency",
+    "score": "Score efficiency",
+    "unavailable": "Unable to update fatigue. Retrying."
   },
   "market": {
     "khong_the_tai_lich_su": "Unable to load history.",

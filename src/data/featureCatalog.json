@@ -302,7 +302,7 @@
   {
     "key": "leaderboard",
     "labelKey": "FeatureTable.xep_hang",
-    "rpcs": [],
+    "rpcs": ["get_fishing_season_board"],
     "tables": [
       "leaderboard"
     ],

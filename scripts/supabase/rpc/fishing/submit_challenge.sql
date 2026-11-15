@@ -29,6 +29,7 @@ DECLARE
     v_bait_data JSONB;
     v_bait_quantity NUMERIC;
     v_caught_id UUID;
+    v_scoring JSONB;
 BEGIN
     -- =====================================================
     -- 0. Kiểm tra xác thực người dùng
@@ -324,10 +325,13 @@ BEGIN
     -- 12. Trả kết quả thành công cho client
     -- =====================================================
 
+    v_scoring := public.record_fishing_score(p_session_id, v_caught_id);
+
     RETURN jsonb_build_object(
         'success', TRUE,
         'caught_fish', TRUE,
         'result', 'CAUGHT',
+        'scoring', v_scoring,
 
         'caught', jsonb_build_object(
             'id', v_caught_id,

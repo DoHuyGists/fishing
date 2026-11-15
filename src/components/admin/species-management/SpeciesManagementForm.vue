@@ -27,6 +27,7 @@ interface SpeciesFormState {
   weightMin: number | null;
   weightMax: number | null;
   baseCatchRate: number | null;
+  rareWeight: number;
 }
 
 function emptyForm(): SpeciesFormState {
@@ -40,6 +41,7 @@ function emptyForm(): SpeciesFormState {
     weightMin: null,
     weightMax: null,
     baseCatchRate: 0.5,
+    rareWeight: 1,
   };
 }
 
@@ -61,6 +63,7 @@ watch(
             weightMin: species.weight_min,
             weightMax: species.weight_max,
             baseCatchRate: species.base_catch_rate,
+            rareWeight: species.rare_weight ?? 1,
           }
         : emptyForm(),
     );
@@ -80,6 +83,12 @@ function buildPayload(): SpeciesPayload | null {
   const weightMin = optionalNumber(form.weightMin);
   const weightMax = optionalNumber(form.weightMax);
   const baseCatchRate = optionalNumber(form.baseCatchRate);
+  const rareWeight = optionalNumber(form.rareWeight);
+
+  if (rareWeight === null || !Number.isFinite(rareWeight) || rareWeight <= 0 || rareWeight > 1000000) {
+    formError.value = "Trọng số độ hiếm phải lớn hơn 0 và không vượt quá 1.000.000";
+    return null;
+  }
 
   if (!name) {
     formError.value = "Tên loài cá là bắt buộc";
@@ -112,6 +121,7 @@ function buildPayload(): SpeciesPayload | null {
     weight_min: weightMin,
     weight_max: weightMax,
     base_catch_rate: baseCatchRate,
+    rare_weight: rareWeight,
   };
 }
 
@@ -221,6 +231,13 @@ async function handleSave() {
               class="rounded-md border border-gray-300 px-3 py-2 text-sm font-normal text-gray-800 focus:border-emerald-600 focus:outline-none"
             />
           </label>
+          <label class="flex flex-col gap-1.5 text-xs font-bold text-gray-600">
+            Trọng số độ hiếm (R)
+            <input v-model.number="form.rareWeight" type="number" min="0.000001" max="1000000" step="any" required class="rounded-md border border-gray-300 px-3 py-2 text-sm font-normal text-gray-800 focus:border-emerald-600 focus:outline-none" />
+          </label>
+          <div v-if="species" class="text-xs text-gray-600">
+            Hệ số mùa hiện tại: {{ species.season_weight ?? 1 }} (tự động theo mùa)
+          </div>
           <label class="flex flex-col gap-1.5 text-xs font-bold text-gray-600 sm:col-span-2">
             Đường dẫn hình ảnh
             <input

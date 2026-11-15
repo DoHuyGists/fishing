@@ -10,6 +10,7 @@ const columns: CrudColumn[] = [
   { key: "code", label: "Mã" },
   { key: "name", label: "Tên" },
   { key: "rarityTier", label: "Độ hiếm" },
+  { key: "extremeWeight", label: "Hệ số khắc nghiệt (E)" },
   { key: "durationMin", label: "Tối thiểu (phút)" },
   { key: "durationMax", label: "Tối đa (phút)" },
   { key: "image", label: "Ảnh" },
@@ -18,6 +19,7 @@ const fields: CrudField[] = [
   { key: "code", label: "Mã", type: "text", required: true },
   { key: "name", label: "Tên", type: "text", required: true },
   { key: "rarityTier", label: "Độ hiếm", type: "text", required: true },
+  { key: "extremeWeight", label: "Hệ số khắc nghiệt (E)", type: "number", required: true, defaultValue: 1, min: 0.000001, max: 1000000, step: 0.01 },
   { key: "durationMin", label: "Thời lượng tối thiểu (phút)", type: "number", required: true },
   { key: "durationMax", label: "Thời lượng tối đa (phút)", type: "number", required: true },
   { key: "image", label: "Ảnh", type: "text" },
@@ -25,6 +27,7 @@ const fields: CrudField[] = [
 ];
 
 const save = (payload: any, id: string | null) => {
+  if (!Number.isFinite(Number(payload.extremeWeight)) || Number(payload.extremeWeight) <= 0 || Number(payload.extremeWeight) > 1000000) throw new Error("Hệ số khắc nghiệt phải lớn hơn 0 và không vượt quá 1.000.000");
   if (payload.durationMin > payload.durationMax) throw new Error("Thời lượng tối thiểu phải nhỏ hơn hoặc bằng tối đa");
   return id ? store.update(id, payload) : store.create(payload);
 };

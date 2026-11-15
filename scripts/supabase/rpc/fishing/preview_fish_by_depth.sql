@@ -5,6 +5,8 @@ DECLARE
     v_session_id UUID;
     v_status TEXT;
     v_result JSONB;
+    v_presence JSONB;
+    v_rare_spawn NUMERIC;
 BEGIN
     -- 1. Xác định người chơi đang đăng nhập
     v_user_id := auth.uid();
@@ -41,6 +43,9 @@ BEGIN
         RAISE EXCEPTION 'You are not in an active fishing area'
             USING ERRCODE = 'P0001';
     END IF;
+
+    v_presence := public.touch_fishing_presence();
+    v_rare_spawn := public.fishing_fatigue_multiplier(v_presence->'effects', 'rare_spawn');
 
     -- 5. Lấy danh sách cá có thể xuất hiện ở độ sâu đã chọn
     WITH raw_fishes AS (
@@ -136,7 +141,8 @@ BEGIN
     candidates AS (
         SELECT
             *,
-            weight_rate::NUMERIC * depth_factor AS spawn_weight
+            weight_rate::NUMERIC * depth_factor
+              * CASE WHEN UPPER(rarity) IN ('RARE', 'EPIC', 'LEGENDARY') THEN v_rare_spawn ELSE 1 END AS spawn_weight
         FROM raw_fishes
         WHERE depth_factor > 0
     ),

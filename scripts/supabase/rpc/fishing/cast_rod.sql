@@ -1,8 +1,11 @@
--- Body of public.cast_rod(p_area_id UUID, p_cast_depth NUMERIC), RETURNS JSONB.
--- Keep the existing SECURITY DEFINER wrapper and SET search_path = public.
--- Deploy equipment_mechanics.sql and both submit RPC files first.
+-- Execute this complete definition, including the SECURITY DEFINER wrapper.
+-- Deploy equipment_mechanics.sql, 20261115_ranked_fishing.sql and both submit RPC files first.
 -- Requires fishing_areas.timezone and countries.default_timezone (IANA names).
 -- Rules v2; tension replay protocol remains v1 (only configuration changes).
+CREATE OR REPLACE FUNCTION public.cast_rod(p_area_id UUID, p_cast_depth NUMERIC)
+RETURNS JSONB
+LANGUAGE plpgsql SECURITY DEFINER SET search_path = public
+AS $function$
 DECLARE
     v_user_id UUID := auth.uid();
     v_set RECORD;
@@ -67,6 +70,11 @@ DECLARE
     v_wait_time INTEGER;
     v_bite_at TIMESTAMPTZ;
     v_expires_at TIMESTAMPTZ;
+    v_presence JSONB;
+    v_weight_cap NUMERIC := 1;
+    v_rare_spawn NUMERIC := 1;
+    v_extreme_weight NUMERIC := 1;
+    v_weather_id UUID;
 BEGIN
     -- ================================================================
     -- A. Snapshot exactly one equipped item per slot.
@@ -75,6 +83,20 @@ BEGIN
     -- ================================================================
     IF v_user_id IS NULL THEN RAISE EXCEPTION 'User not authenticated'; END IF;
     IF p_area_id IS NULL THEN RAISE EXCEPTION 'Fishing area is required'; END IF;
+    IF NOT EXISTS (SELECT 1 FROM public.user_in_area
+        WHERE user_id = v_user_id AND area_id = p_area_id AND status = 'enter') THEN
+        RAISE EXCEPTION 'Player is not in this fishing area';
+    END IF;
+    v_presence := public.touch_fishing_presence();
+    v_weight_cap := public.fishing_fatigue_multiplier(v_presence->'effects', 'weight_cap');
+    v_rare_spawn := public.fishing_fatigue_multiplier(v_presence->'effects', 'rare_spawn');
+    -- Snapshot the actual server-owned weather at cast time. An expired or
+    -- missing weather is neutral, never supplied by the client.
+    SELECT w.id, w.extreme_weight INTO v_weather_id, v_extreme_weight
+    FROM public.fishing_areas a JOIN public.zones z ON z.id = a.zone_id
+    JOIN public.weathers w ON w.id = z.weather_id
+    WHERE a.id = p_area_id AND z.weather_expires_at > clock_timestamp();
+    v_extreme_weight := COALESCE(v_extreme_weight, 1);
     IF p_cast_depth IS NULL OR p_cast_depth < 0
        OR p_cast_depth::TEXT IN ('NaN', 'Infinity', '-Infinity') THEN
         RAISE EXCEPTION 'Invalid cast depth';
@@ -192,7 +214,7 @@ BEGIN
     -- A common multiplier on ALL species cancels and is intentionally absent.
     -- ================================================================
     WITH candidates AS (
-        SELECT sa.species_id, sa.weight_rate, s.fish_type,
+        SELECT sa.species_id, sa.weight_rate, s.fish_type, s.rarity,
             CASE
                 WHEN ds.id IS NULL THEN 1.0::NUMERIC
                 WHEN ds.min_depth IS NULL OR ds.max_depth IS NULL OR ds.peak_depth IS NULL
@@ -228,6 +250,7 @@ BEGIN
     ), weighted_candidates AS (
         SELECT species_id,
             GREATEST(0, weight_rate + spawn_add) * spawn_multiplier * depth_weight
+            * CASE WHEN UPPER(rarity) IN ('RARE', 'EPIC', 'LEGENDARY') THEN v_rare_spawn ELSE 1 END
             * CASE WHEN v_bait_types ? fish_type
                 THEN (v_balance->>'matched_attraction')::NUMERIC
                 ELSE (v_balance->>'unmatched_attraction')::NUMERIC END AS final_weight
@@ -261,9 +284,10 @@ BEGIN
         IF v_burst_multiplier NOT BETWEEN 1 AND 10 THEN
             RAISE EXCEPTION 'Species burst_multiplier must be between 1 and 10';
         END IF;
-        v_weight_ratio := (random() + random() + random()) / 3.0;
-        v_weight := ROUND(v_species.weight_min + v_weight_ratio *
-            (v_species.weight_max - v_species.weight_min), 2);
+        v_weight_ratio := (random() + random() + random()) / 3.0 * v_weight_cap;
+        v_weight := LEAST(ROUND(v_species.weight_min + v_weight_ratio *
+            (v_species.weight_max - v_species.weight_min), 2),
+            v_species.weight_min + v_weight_cap * (v_species.weight_max - v_species.weight_min));
         v_weight_ratio := CASE WHEN v_species.weight_max = v_species.weight_min THEN 0.5
             ELSE LEAST(1, GREATEST(0, (v_weight - v_species.weight_min)
                 / (v_species.weight_max - v_species.weight_min))) END;
@@ -293,7 +317,15 @@ BEGIN
             'effective_strength', v_fish_strength, 'burst_multiplier', v_burst_multiplier,
             'fish_type', v_species.fish_type, 'alertness', v_species.alertness,
             'base_catch_rate', v_species.base_catch_rate, 'bait_matches', v_bait_matches,
-            'catch_probability', v_catch_probability);
+            'catch_probability', v_catch_probability,
+            'scoring', jsonb_build_object(
+                'w_norm', v_weight_ratio, 'rare_weight', v_species.rare_weight,
+                'extreme_weight', v_extreme_weight, 'weather_id', v_weather_id,
+                'fatigue_score', v_presence->'fatigue_score',
+                'fatigue_multiplier', public.fishing_fatigue_multiplier(v_presence->'effects', 'score'),
+                'fatigue_effects', v_presence->'effects',
+                'fish', jsonb_build_object('species_id', v_species_id, 'name', v_species.name,
+                    'image', v_species.image, 'rarity', v_species.rarity, 'weight', v_weight)));
 
         IF v_failure_reason IS NULL THEN
             IF random() < LEAST(1, GREATEST(0, 0.04 + (v_effective->>'luck_bonus')::NUMERIC * 0.02)) THEN
@@ -383,3 +415,6 @@ BEGIN
     RETURN jsonb_build_object('session_id', v_session_id, 'wait_time_ms', v_wait_time,
         'server_time_ms', FLOOR(EXTRACT(EPOCH FROM clock_timestamp()) * 1000)::BIGINT);
 END;
+$function$;
+REVOKE ALL ON FUNCTION public.cast_rod(UUID, NUMERIC) FROM PUBLIC, anon;
+GRANT EXECUTE ON FUNCTION public.cast_rod(UUID, NUMERIC) TO authenticated;

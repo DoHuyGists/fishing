@@ -8,7 +8,7 @@ Mỗi lượt câu mới chỉ dùng tension challenge. Replay vẫn là protoco
 2. Điền dữ liệu loài cá, trang bị trong inventory và nguồn cấp vật phẩm theo các bảng bên dưới. Migration không tự suy diễn chỉ số mới từ `strength` của lưỡi cũ.
 3. Chạy toàn bộ `rpc/submit_challenge.sql`, rồi `rpc/submit_tension_challenge.sql`.
 4. Triển khai client đã hỗ trợ `start_tension_challenge.resolution`.
-5. Thay body RPC `cast_rod` bằng `rpc/cast_rod.sql`. Giữ chữ ký `(p_area_id UUID, p_cast_depth NUMERIC) RETURNS JSONB`, `SECURITY DEFINER` và `SET search_path = public` của RPC. File này là body, không phải câu lệnh `CREATE FUNCTION` đầy đủ.
+5. Chạy toàn bộ `rpc/fishing/cast_rod.sql` trong SQL Editor. File này chứa định nghĩa `CREATE OR REPLACE FUNCTION` đầy đủ với chữ ký `(p_area_id UUID, p_cast_depth NUMERIC) RETURNS JSONB`, `SECURITY DEFINER` và `SET search_path = public`. Nếu RPC cũ có owner khác, áp dụng thêm `migrations/20261115_ranked_fishing_permissions.sql` theo hướng dẫn ranked fishing.
 
 Các script được kiểm chứng bằng PostgreSQL cục bộ qua PGlite; không tự cập nhật Supabase đang chạy. Session cũ không có snapshot tiếp tục được resolver xử lý theo nhánh tương thích.
 

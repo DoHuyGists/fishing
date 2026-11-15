@@ -19,6 +19,7 @@ export interface WeatherRow {
   code: string;
   name: string;
   rarityTier: string;
+  extremeWeight: number;
   durationMin: number;
   durationMax: number;
   image: string | null;
@@ -29,6 +30,7 @@ export interface WeatherPayload {
   code: string;
   name: string;
   rarityTier: string;
+  extremeWeight: number;
   durationMin: number;
   durationMax: number;
   image: string | null;

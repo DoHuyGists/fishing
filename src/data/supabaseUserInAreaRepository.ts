@@ -1,8 +1,15 @@
 import type { UserInAreaRow } from "../types/table/userInArea";
 import type { UserTurnStatus } from "../types/model/userInArea";
+import type { FishingFatigue } from '../types/model/fishingFatigue';
 import supabase from "../database/connection";
 
 class SupabaseUserInAreaRepository {
+  async touchPresence(): Promise<FishingFatigue> {
+    const { data, error } = await supabase.rpc('touch_fishing_presence');
+    if (error) throw new Error(error.message);
+    return data as unknown as FishingFatigue;
+  }
+
   async fetchTurnStatus(): Promise<UserTurnStatus> {
     const { data, error } = await supabase.rpc("get_user_status");
     if (error) throw new Error(error.message);

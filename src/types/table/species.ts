@@ -10,6 +10,8 @@ export interface SpeciesRow {
   weight_min: number | null;
   weight_max: number | null;
   base_catch_rate: number | null;
+  rare_weight: number;
+  season_weight: number;
 }
 
-export type SpeciesPayload = Omit<SpeciesRow, "id" | "created_at">;
+export type SpeciesPayload = Omit<SpeciesRow, "id" | "created_at" | "season_weight">;

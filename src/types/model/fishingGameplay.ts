@@ -3,6 +3,13 @@ import type { TensionChallenge, TensionFight } from "./tensionChallenge";
 
 export type FishingPhase = "idle" | "casting" | "waiting" | "bite" | "submitting" | "caught" | "lost";
 
+export interface FishingCatchScore {
+  score: number;
+  season_id: string;
+  season_number: number;
+  caught_at: string;
+}
+
 // The scene and controls consume this contract without owning a database session.
 export interface FishingSceneState {
   canCast: boolean;

@@ -8,6 +8,7 @@ export interface LeaderboardBestFish {
   rarity: string;
   weight: number;
   score: number;
+  caught_at?: string;
 }
 
 export interface LeaderboardEntry {
@@ -19,6 +20,43 @@ export interface LeaderboardEntry {
   best_fish: LeaderboardBestFish | null;
   created_at: string;
   updated_at: string;
+  rank?: number;
+}
+
+export interface FishingSeason {
+  id: string;
+  season_number: number;
+  starts_at: string;
+  ends_at: string;
+  finalized_at: string | null;
+}
+
+export interface FishingSeasonMeta {
+  species_id: string;
+  name: string;
+  image: string | null;
+  season_weight: number;
+}
+
+export interface FishingHallEntry {
+  rank: number;
+  user_id: string;
+  display_name: string | null;
+  fish: LeaderboardBestFish;
+  caught_at: string;
+}
+
+export interface FishingSeasonBoard {
+  items: LeaderboardEntry[];
+  total: number;
+  my_entry: LeaderboardEntry | null;
+  season: FishingSeason | null;
+  current_season_id: string | null;
+  previous_season_id: string | null;
+  next_season_id: string | null;
+  hall_of_fame: FishingHallEntry[];
+  meta: FishingSeasonMeta[];
+  server_time: string;
 }
 
 export function leaderboardValue(entry: LeaderboardEntry, criterion: LeaderboardCriterion): number {

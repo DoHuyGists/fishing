@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { t as tr } from "../../../i18n";
+import { getFormattingLocale, t as tr } from "../../../i18n";
 
 import { computed } from "vue";
 import { useFishingStore } from "../../../stores/fishing";
@@ -7,6 +7,7 @@ import Fishthrash from "./Fishthrash.vue";
 
 const store = useFishingStore();
 const caught = computed(() => store.inventory[0]);
+const scoreFormatter = computed(() => new Intl.NumberFormat(getFormattingLocale(), { maximumFractionDigits: 6 }));
 const variantFrameClass = computed(() => {
   switch (caught.value?.variantType) {
     case "GOLDEN":
@@ -59,6 +60,9 @@ const variantFrameClass = computed(() => {
             <div id="catch-title" class="mt-2 mb-[3px] text-2xl">{{ caught.name }}</div>
             <div class="m-0 text-[#b7cfb9] text-[13px]">
               {{ caught.weight }}<span v-if="caught.length"> · {{ caught.length }}</span>
+            </div>
+            <div v-if="caught.score !== undefined" class="mt-2 text-sm font-bold text-[#ffd65a]">
+              {{ scoreFormatter.format(caught.score) }} {{ tr('DailyMission.diem') }} · {{ tr('LeaderboardSeason.season', { number: caught.seasonNumber }) }}
             </div>
           </div>
           <button

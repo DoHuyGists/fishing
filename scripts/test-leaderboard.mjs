@@ -5,6 +5,8 @@ import ts from 'typescript';
 import { createPinia, defineStore, setActivePinia } from 'pinia';
 
 const repository = {};
+const archiveId = '1479943f-d8bc-48ca-b49f-80701df0de1b';
+const currentId = '82dbaf73-3577-480c-8eb8-8584e4ef0a9a';
 const dependencies = {
   pinia: { defineStore },
   '../i18n': { t: key => key },
@@ -30,6 +32,8 @@ beforeEach(() => {
   setActivePinia(createPinia());
   repository.fetchByUser = async () => null;
   repository.countHigher = async () => 0;
+  repository.fetchSeasonBoard = async () => ({ items: [], total: 0, my_entry: null, season: null,
+    current_season_id: null, previous_season_id: null, next_season_id: null, hall_of_fame: [], meta: [], server_time: new Date().toISOString() });
 });
 
 test('each real criterion uses its own values and personal rank', async () => {
@@ -37,6 +41,7 @@ test('each real criterion uses its own values and personal rank', async () => {
   const player = entry('player', 900, 12, 450);
   assert.deepEqual(store.categories.map(category => category.key), ['score', 'total_caught', 'best_fish']);
   repository.fetchByUser = async id => { assert.equal(id, 'player'); return player; };
+  repository.fetchSeasonBoard = async () => ({ items: [{ ...player, rank: 5 }], total: 1, my_entry: { ...player, rank: 5 }, season: null });
   for (const [criterion, value] of [['score', 900], ['total_caught', 12], ['best_fish', 450]]) {
     store.activeTab = criterion;
     repository.fetchTop = async (page, key) => {
@@ -91,4 +96,32 @@ test('a delayed response cannot overwrite the selected criterion', async () => {
   assert.equal(store.entries[0].id, 'new');
   assert.equal(store.boards[0].entries[0].value, 25);
   assert.equal(store.loading, false);
+});
+
+test('seasonal equal scores retain distinct server ranks and selecting an archive resets the page', async () => {
+  const store = useLeaderboardStore();
+  store.activeTab = 'best_fish';
+  store.page = 3;
+  repository.fetchSeasonBoard = async (page, id) => {
+    assert.equal(page, 1); assert.equal(id, archiveId);
+    return { items: [{ ...entry('later', 0, 0, 10), rank: 1 }, { ...entry('earlier', 0, 0, 10), rank: 2 }],
+      total: 2, my_entry: null, season: { id: archiveId, season_number: 2 }, hall_of_fame: [], meta: [] };
+  };
+  await store.selectSeason(archiveId);
+  assert.deepEqual(store.boards[0].entries.map(e => e.rank), [1, 2]);
+  assert.equal(store.page, 1);
+  assert.equal(store.seasonBoard.season.id, archiveId);
+});
+
+test('a late seasonal response cannot overwrite a newer season selection', async () => {
+  const store = useLeaderboardStore();
+  store.activeTab = 'best_fish';
+  let resolveOld;
+  repository.fetchSeasonBoard = (_page, id) => id === null ? new Promise(resolve => { resolveOld = resolve; })
+    : Promise.resolve({ items: [], total: 0, my_entry: null, season: { id } });
+  const pending = store.fetchLeaderboard();
+  await store.selectSeason(archiveId);
+  resolveOld({ items: [], total: 0, my_entry: null, season: { id: currentId } });
+  await pending;
+  assert.equal(store.seasonBoard.season.id, archiveId);
 });

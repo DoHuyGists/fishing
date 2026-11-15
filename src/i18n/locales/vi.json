@@ -1913,7 +1913,7 @@
   },
   "leaderboard": {
     "best_fish": "Cá có điểm cao nhất",
-    "best_fish_description": "Xếp hạng theo điểm của con cá tốt nhất từng câu được.",
+    "best_fish_description": "Xếp hạng theo con cá có điểm cao nhất trong mùa. Bằng điểm ưu tiên lượt bắt muộn hơn.",
     "fish_score": "Điểm cá",
     "tong_diem": "Tổng điểm",
     "nhung_can_thu_dan_dau_ve_diem_xep_hang": "Những cần thủ dẫn đầu về điểm xếp hạng.",
@@ -1926,6 +1926,26 @@
     "xep_hang_theo_so_loai_ca_khac_nhau_da_kham_pha": "Xếp hạng theo số loài cá khác nhau đã khám phá.",
     "loai_da_kham_pha": "Loài đã khám phá",
     "khong_the_tai_bang_xep_hang": "Không thể tải bảng xếp hạng"
+  },
+  "LeaderboardSeason": {
+    "title": "Mùa giải câu cá",
+    "season": "Mùa {number}",
+    "previous": "Mùa trước",
+    "next": "Mùa sau",
+    "current": "Mùa hiện tại",
+    "rules": "Mỗi mùa kéo dài 14 ngày. Điểm tính theo trọng lượng nội loài, độ hiếm, thời tiết, hệ số mùa và hiệu ứng mệt mỏi. Cá thuộc mùa tại thời điểm bắt thành công.",
+    "hall": "Đại sảnh danh vọng · Ba loài dẫn đầu",
+    "no_winners": "Mùa này chưa có thành tích hợp lệ để vinh danh.",
+    "not_started": "Mùa giải chưa bắt đầu.",
+    "caught_at": "Bắt lúc"
+  },
+  "FishingFatigue": {
+    "label": "Mệt mỏi tại bãi",
+    "recovery": "Ở bãi +1/phút · Rời bãi −1/phút",
+    "weight_cap": "Trần trọng lượng nội loài",
+    "rare_spawn": "Tần suất cá hiếm",
+    "score": "Hiệu suất điểm",
+    "unavailable": "Chưa thể cập nhật mức mệt mỏi. Đang thử lại."
   },
   "market": {
     "khong_the_tai_lich_su": "Không thể tải lịch sử.",

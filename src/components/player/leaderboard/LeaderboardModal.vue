@@ -7,22 +7,23 @@ import Modal from "../../shared/Modal.vue";
 import Pagination from '../../shared/Pagination.vue';
 import Tab from "../../shared/Tab.vue";
 import LeaderboardFish from "./LeaderboardFish.vue";
+import LeaderboardSeason from './LeaderboardSeason.vue';
 import { useLeaderboardStore } from "../../../stores/leaderboard.ts";
 import { useAuthStore } from "../../../stores/auth.ts";
 
 const leaderboardStore = useLeaderboardStore();
 const authStore = useAuthStore();
-const numberFormatter = computed(() => new Intl.NumberFormat(getFormattingLocale(), { maximumFractionDigits: 2 }));
+const numberFormatter = computed(() => new Intl.NumberFormat(getFormattingLocale(), { maximumFractionDigits: leaderboardStore.criterion === 'best_fish' ? 6 : 2 }));
 
 function load() {
-  return leaderboardStore.fetchLeaderboard(authStore.userId);
+  return leaderboardStore.fetchLeaderboard(authStore.user?.id);
 }
 
 function rankLabel(rank: number) {
   return ["🥇", "🥈", "🥉"][rank - 1] ?? `#${rank}`;
 }
 
-watch([() => authStore.userId, () => leaderboardStore.activeTab], () => leaderboardStore.fetchLeaderboard(authStore.userId, 1), { immediate: true });
+watch([() => authStore.user?.id, () => leaderboardStore.activeTab], () => leaderboardStore.fetchLeaderboard(authStore.user?.id, 1), { immediate: true });
 </script>
 
 <template>
@@ -36,6 +37,7 @@ watch([() => authStore.userId, () => leaderboardStore.activeTab], () => leaderbo
 
         <template v-for="board in leaderboardStore.boards" :key="board.key" #[board.key]>
           <section class="space-y-4" :aria-label="board.label" :aria-busy="board.loading">
+            <LeaderboardSeason v-if="board.key === 'best_fish'" />
             <div class="flex flex-wrap items-start justify-between gap-3">
               <div>
                 <div class="m-0 text-xl font-extrabold">{{ board.label }}</div>

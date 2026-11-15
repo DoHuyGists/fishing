@@ -1,4 +1,4 @@
-import { leaderboardValue, type LeaderboardCriterion, type LeaderboardEntry } from "../types/model/leaderboard";
+import { leaderboardValue, type FishingSeasonBoard, type LeaderboardCriterion, type LeaderboardEntry } from "../types/model/leaderboard";
 import { t as tr } from "../i18n";
 import { defineStore } from "pinia";
 import { supabaseLeaderboardRepository } from "../data/supabaseLeaderboardRepository";
@@ -22,6 +22,8 @@ export const useLeaderboardStore = defineStore("leaderboard", {
     pageSize: 10,
     total: 0,
     firstRank: 1,
+    selectedSeasonId: null as string | null,
+    seasonBoard: null as FishingSeasonBoard | null,
   }),
   getters: {
     categories: () => categories(),
@@ -38,7 +40,7 @@ export const useLeaderboardStore = defineStore("leaderboard", {
         const value = leaderboardValue(entry, criterion);
         if (index > 0 && value !== leaderboardValue(state.entries[index - 1]!, criterion)) rank = offset + index + 1;
         return { id: entry.id, userId: entry.id, displayName: entry.display_name || tr('LeaderboardModal.an_danh'),
-          avatarUrl: entry.avatar_url, value, rank, bestFish: criterion === "best_fish" ? entry.best_fish : null };
+          avatarUrl: entry.avatar_url, value, rank: criterion === 'best_fish' ? entry.rank ?? offset + index + 1 : rank, bestFish: criterion === "best_fish" ? entry.best_fish : null };
       });
       return [{ ...category, entries, leaders: offset === 0 ? entries.slice(0, 3) : [],
         remaining: offset === 0 ? entries.slice(3) : entries, loading: state.loading, error: state.error,
@@ -47,6 +49,11 @@ export const useLeaderboardStore = defineStore("leaderboard", {
     },
   },
   actions: {
+    async selectSeason(seasonId: string | null, userId?: string | null) {
+      this.selectedSeasonId = seasonId;
+      this.seasonBoard = null;
+      await this.fetchLeaderboard(userId, 1);
+    },
     async fetchLeaderboard(userId?: string | null, page?: number) {
       page ??= this.page;
       const requestId = ++this.requestId;
@@ -58,6 +65,21 @@ export const useLeaderboardStore = defineStore("leaderboard", {
       this.myEntry = null;
       this.myRank = null;
       try {
+        if (criterion === 'best_fish') {
+          const board = await supabaseLeaderboardRepository.fetchSeasonBoard(page, this.selectedSeasonId);
+          if (requestId !== this.requestId) return;
+          if (!board.items.length && page > 1) {
+            await this.fetchLeaderboard(userId, Math.max(1, Math.ceil(board.total / this.pageSize)));
+            return;
+          }
+          this.seasonBoard = board;
+          this.entries = board.items;
+          this.total = board.total;
+          this.page = page;
+          this.myEntry = userId ? board.my_entry : null;
+          this.myRank = this.myEntry?.rank ?? null;
+          return;
+        }
         const [result, myEntry] = await Promise.all([
           supabaseLeaderboardRepository.fetchTop(page, criterion),
           userId ? supabaseLeaderboardRepository.fetchByUser(userId) : null,
@@ -67,7 +89,7 @@ export const useLeaderboardStore = defineStore("leaderboard", {
           await this.fetchLeaderboard(userId, Math.max(1, Math.ceil(result.total / this.pageSize)));
           return;
         }
-        const hasPersonalRank = myEntry && (criterion !== "best_fish" || myEntry.best_fish?.score != null);
+        const hasPersonalRank = myEntry;
         const [firstRank, myRank] = await Promise.all([
           page > 1 && result.items[0] ? supabaseLeaderboardRepository.countHigher(leaderboardValue(result.items[0], criterion), criterion).then(count => count + 1) : 1,
           hasPersonalRank ? supabaseLeaderboardRepository.countHigher(leaderboardValue(myEntry, criterion), criterion).then(count => count + 1) : null,

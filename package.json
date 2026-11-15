@@ -6,6 +6,8 @@
   "scripts": {
     "dev": "vite --host",
     "build": "vue-tsc -b && vite build",
+    "test:leaderboard": "node --test --test-isolation=none scripts/test-leaderboard.mjs scripts/test-seasonal-fishing.mjs",
+    "test:leaderboard:browser": "node scripts/test-leaderboard-browser.mjs",
     "test:data-refresh": "node --test scripts/test-data-refresh.mjs scripts/test-refresh-stores.mjs",
     "test:dispatch": "node --test --test-isolation=none scripts/test-dispatch-sql.mjs scripts/test-dispatch-store.mjs",
     "test:dispatch:browser": "node scripts/test-dispatch-browser.mjs",

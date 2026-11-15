@@ -19,6 +19,7 @@ import { useEquipmentStore } from "../stores/equipment";
 import { useUserSettingStore } from "../stores/userSetting";
 import { useFishingBackgroundSoundStore } from "../stores/fishingBackgroundSound";
 import DayPhaseClock from "../components/player/fishing/DayPhaseClock.vue";
+import FishingFatigue from '../components/player/fishing/FishingFatigue.vue';
 import { useDayPhaseStore } from "../stores/dayPhase";
 import { useUserInAreaStore } from "../stores/userInArea";
 import { supabaseFishingAreaRepository } from "../data/supabaseFishingAreaRepository";
@@ -187,6 +188,7 @@ onBeforeUnmount(() => {
     <div class="fixed top-3 left-3 z-20 text-white flex justify-between items-start">
       <div class="flex flex-col gap-2">
         <DayPhaseClock :area-id="userInAreaStore.userInArea?.area_id" />
+        <FishingFatigue :area-id="userInAreaStore.userInArea?.area_id ?? null" />
         <div class="backdrop-blur-2xl h-fit w-fit rounded p-1">
           <button
             type="button"

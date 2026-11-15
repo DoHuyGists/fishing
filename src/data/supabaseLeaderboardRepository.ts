@@ -1,10 +1,19 @@
-import type { LeaderboardCriterion, LeaderboardEntry } from "../types/model/leaderboard";
+import type { FishingSeasonBoard, LeaderboardCriterion, LeaderboardEntry } from "../types/model/leaderboard";
 import supabase from "../database/connection";
 import { supabaseAvatarRepository } from "./supabaseAvatarRepository";
 import { pageRange, listPage } from './pagination';
 import type { ListPage } from '../types/model/pagination';
 
 class SupabaseLeaderboardRepository {
+  async fetchSeasonBoard(page = 1, seasonId: string | null = null): Promise<FishingSeasonBoard> {
+    const { data, error } = await supabase.rpc('get_fishing_season_board', { p_page: page, p_season_id: seasonId });
+    if (error) throw new Error(error.message);
+    const board = data as unknown as FishingSeasonBoard;
+    const entries = [...board.items, ...(board.my_entry ? [board.my_entry] : [])];
+    const profiles = await this.withProfiles(entries);
+    return { ...board, items: profiles.slice(0, board.items.length), my_entry: board.my_entry ? profiles[profiles.length - 1]! : null };
+  }
+
   private async withProfiles(entries: LeaderboardEntry[]): Promise<LeaderboardEntry[]> {
     if (!entries.length) return entries;
     const { data, error } = await supabase.from("user_profile").select("id,display_name,avatar_url,avatar_path").in("id", entries.map(entry => entry.id));
