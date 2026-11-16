@@ -34,7 +34,7 @@ const formatter = computed(() => new Intl.NumberFormat(getFormattingLocale(), { 
             <div class="text-xs font-semibold text-[#52654f]">{{ tr('LeaderboardModal.thu_hang_cua_ban') }}</div>
             <div v-if="board.myEntry && board.myRank !== null" class="mt-0.5 truncate text-xs font-bold">{{ board.myEntry.display_name || tr('LeaderboardModal.an_danh') }}</div>
             <div v-else class="mt-1 text-xs leading-relaxed text-[#52654f]">
-              {{ board.error ? tr('LeaderboardModal.chua_the_tai_thu_hang_ca_nhan_vui_long_thu_lam_moi') : auth.userId ? tr('LeaderboardModal.ban_chua_co_thu_hang_o_tieu_chi_nay_tiep_tuc_cau_ca_de_ghi_dau_t') : tr('LeaderboardModal.dang_nhap_de_xem_thu_hang_cua_ban') }}
+              {{ board.error ? tr('LeaderboardModal.chua_the_tai_thu_hang_ca_nhan_vui_long_thu_lam_moi') : auth.userId ? board.key === 'spend' ? tr('leaderboard.chua_tieu_cash') : tr('LeaderboardModal.ban_chua_co_thu_hang_o_tieu_chi_nay_tiep_tuc_cau_ca_de_ghi_dau_t') : tr('LeaderboardModal.dang_nhap_de_xem_thu_hang_cua_ban') }}
             </div>
           </div>
           <template v-if="board.myEntry && board.myRank !== null">

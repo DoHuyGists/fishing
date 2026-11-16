@@ -6,6 +6,7 @@ import { supabaseLeaderboardRepository } from "../data/supabaseLeaderboardReposi
 const categories = () => [
   { key: "score", label: tr('leaderboard.tong_diem'), description: tr('leaderboard.nhung_can_thu_dan_dau_ve_diem_xep_hang'), metric: tr('leaderboard.tong_diem'), unit: tr('DailyMission.diem'), emoji: "🏆" },
   { key: "total_caught", label: tr('leaderboard.so_ca_da_cau'), description: tr('leaderboard.xep_hang_theo_tong_so_ca_cau_duoc'), metric: tr('leaderboard.so_ca_da_cau'), unit: tr('UserProfile.con'), emoji: "🎣" },
+  { key: "spend", label: tr('leaderboard.tieu_cash'), description: tr('leaderboard.xep_hang_theo_cash_da_tieu'), metric: tr('leaderboard.tong_cash_da_tieu'), unit: 'cash', emoji: "💸" },
   { key: "best_fish", label: tr('leaderboard.best_fish'), description: tr('leaderboard.best_fish_description'), metric: tr('leaderboard.fish_score'), unit: tr('DailyMission.diem'), emoji: "🐟" },
 ] satisfies { key: LeaderboardCriterion; label: string; description: string; metric: string; unit: string; emoji: string }[];
 
@@ -29,7 +30,7 @@ export const useLeaderboardStore = defineStore("leaderboard", {
     categories: () => categories(),
     tabs: () => [...categories(), { key: 'hall_of_fame', label: tr('LeaderboardSeason.hall_tab'), emoji: '🏅' }],
     criterion(state): LeaderboardCriterion {
-      return state.activeTab === "total_caught" || state.activeTab === "best_fish" ? state.activeTab : "score";
+      return state.activeTab === "total_caught" || state.activeTab === "spend" || state.activeTab === "best_fish" ? state.activeTab : "score";
     },
     boards(state) {
       const available = categories();

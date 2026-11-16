@@ -1,4 +1,4 @@
-export type LeaderboardCriterion = "score" | "total_caught" | "best_fish";
+export type LeaderboardCriterion = "score" | "total_caught" | "spend" | "best_fish";
 
 export interface LeaderboardBestFish {
   id: string;
@@ -19,6 +19,7 @@ export interface LeaderboardEntry {
   avatar_url?: string | null;
   score: number;
   total_caught: number | null;
+  spend?: number | null;
   best_fish: LeaderboardBestFish | null;
   created_at: string;
   updated_at: string;

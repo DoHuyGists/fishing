@@ -6,6 +6,7 @@ import { useLeaderboardStore } from '../../../stores/leaderboard';
 import Modal from '../../shared/Modal.vue';
 import Tab from '../../shared/Tab.vue';
 import LeaderboardScore from './LeaderboardScore.vue';
+import LeaderboardBoard from './LeaderboardBoard.vue';
 import LeaderboardCaught from './LeaderboardCaught.vue';
 import LeaderboardBestFish from './LeaderboardBestFish.vue';
 import LeaderboardSeason from './LeaderboardSeason.vue';
@@ -33,6 +34,9 @@ watch([() => authStore.user?.id, () => leaderboardStore.activeTab], () => leader
         </template>
         <template #total_caught="{ active }">
           <LeaderboardCaught v-if="active" />
+        </template>
+        <template #spend="{ active }">
+          <LeaderboardBoard v-if="active" />
         </template>
         <template #best_fish="{ active }">
           <LeaderboardBestFish v-if="active" />

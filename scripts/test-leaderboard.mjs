@@ -2,6 +2,7 @@ import assert from 'node:assert/strict';
 import { beforeEach, test } from 'node:test';
 import { readFile } from 'node:fs/promises';
 import ts from 'typescript';
+import { PGlite } from '@electric-sql/pglite';
 import { createPinia, defineStore, setActivePinia } from 'pinia';
 
 const repository = {};
@@ -38,11 +39,11 @@ beforeEach(() => {
 
 test('each real criterion uses its own values and personal rank', async () => {
   const store = useLeaderboardStore();
-  const player = entry('player', 900, 12, 450);
-  assert.deepEqual(store.categories.map(category => category.key), ['score', 'total_caught', 'best_fish']);
+  const player = { ...entry('player', 900, 12, 450), spend: 1200 };
+  assert.deepEqual(store.categories.map(category => category.key), ['score', 'total_caught', 'spend', 'best_fish']);
   repository.fetchByUser = async id => { assert.equal(id, 'player'); return player; };
   repository.fetchSeasonBoard = async () => ({ items: [{ ...player, rank: 5 }], total: 1, my_entry: { ...player, rank: 5 }, season: null });
-  for (const [criterion, value] of [['score', 900], ['total_caught', 12], ['best_fish', 450]]) {
+  for (const [criterion, value] of [['score', 900], ['total_caught', 12], ['spend', 1200], ['best_fish', 450]]) {
     store.activeTab = criterion;
     repository.fetchTop = async (page, key) => {
       assert.equal(page, 1); assert.equal(key, criterion);
@@ -62,7 +63,7 @@ test('each real criterion uses its own values and personal rank', async () => {
 
 test('Hall of Fame loads seasonal history and preserves season selection when switching tabs', async () => {
   const store = useLeaderboardStore();
-  assert.deepEqual(store.tabs.map(tab => tab.key), ['score', 'total_caught', 'best_fish', 'hall_of_fame']);
+  assert.deepEqual(store.tabs.map(tab => tab.key), ['score', 'total_caught', 'spend', 'best_fish', 'hall_of_fame']);
   const board = { items: [], total: 0, my_entry: null, season: { id: archiveId, finalized_at: '2026-11-15T00:00:00Z' },
     hall_of_fame: [{ rank: 1, user_id: 'winner', display_name: 'Winner', fish: { score: 100 } }] };
   const calls = [];
@@ -89,6 +90,46 @@ test('ties crossing page boundaries retain shared global ranks', async () => {
   assert.deepEqual(store.boards[0].entries.map(row => row.rank), [9, 9, 13]);
   assert.equal(store.boards[0].leaders.length, 0);
   assert.equal(store.boards[0].remaining.length, 3);
+});
+
+test('cash spending trigger accumulates only decreases, preserves achievements and rolls back atomically', async () => {
+  const db = new PGlite();
+  const uid = '11111111-1111-4111-8111-111111111111';
+  const other = '22222222-2222-4222-8222-222222222222';
+  const migration = await readFile(new URL('./supabase/migrations/20261116_leaderboard_spend.sql', import.meta.url), 'utf8');
+  const rows = async () => (await db.query('SELECT * FROM leaderboard ORDER BY id')).rows;
+  try {
+    await db.exec(`
+      CREATE ROLE anon; CREATE ROLE authenticated;
+      CREATE TABLE leaderboard(id UUID PRIMARY KEY, score NUMERIC NOT NULL, total_caught BIGINT,
+        best_fish JSONB, created_at TIMESTAMPTZ NOT NULL, updated_at TIMESTAMPTZ NOT NULL);
+      CREATE TABLE currency(user_id UUID PRIMARY KEY, cash BIGINT NOT NULL, shells BIGINT DEFAULT 0);
+      INSERT INTO leaderboard VALUES('${uid}',900,12,'{"score":450}',now(),now());
+      INSERT INTO currency VALUES('${uid}',1000,10),('${other}',1000,10);
+      GRANT SELECT, UPDATE ON currency TO authenticated;
+    `);
+    await db.exec(migration);
+    assert.equal(Number((await rows())[0].spend), 0);
+    await db.exec("SET ROLE authenticated; UPDATE currency SET cash=cash+100; UPDATE currency SET cash=cash; UPDATE currency SET shells=shells-1; RESET ROLE;");
+    assert.equal((await rows()).length, 1);
+    assert.equal(Number((await rows())[0].spend), 0);
+    await db.exec('SET ROLE authenticated; UPDATE currency SET cash=cash-200; UPDATE currency SET cash=cash-50; RESET ROLE;');
+    let board = await rows();
+    assert.deepEqual(board.map(row => Number(row.spend)), [250, 250]);
+    assert.equal(Number(board[0].score), 900);
+    assert.equal(Number(board[0].total_caught), 12);
+    assert.deepEqual(board[0].best_fish, { score: 450 });
+    assert.equal(Number(board[1].score), 0);
+    await db.exec('BEGIN; UPDATE currency SET cash=cash-100; ROLLBACK;');
+    assert.deepEqual((await rows()).map(row => Number(row.spend)), [250, 250]);
+    await db.exec(migration);
+    await db.exec('UPDATE currency SET cash=cash-10;');
+    assert.deepEqual((await rows()).map(row => Number(row.spend)), [260, 260]);
+    await assert.rejects(db.exec("SET ROLE authenticated; UPDATE leaderboard SET spend=999;"), /permission denied/);
+    await db.exec('RESET ROLE;');
+  } finally {
+    await db.close();
+  }
 });
 
 test('a player without a best fish has no personal best-fish rank', async () => {
