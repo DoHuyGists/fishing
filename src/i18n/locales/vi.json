@@ -793,6 +793,8 @@
     "ap_dung": "✓ Áp dụng"
   },
   "CatchDialog": {
+    "tha_ca": "Thả cá",
+    "star_rating": "{count} sao",
     "cu_cau_thanh_cong": "Cú câu thành công",
     "ca_xin": "CÁ XỊN",
     "cau_tiep": "Câu tiếp"

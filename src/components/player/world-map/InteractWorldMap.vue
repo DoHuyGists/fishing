@@ -191,7 +191,7 @@ function zoomTo(k: number) {
                   draggable="false"
                 />
               </div>
-              <FishingFatigue :area-id="area.id" />
+              <FishingFatigue variant="compact" :area-id="area.id" />
               <button
                 type="button"
                 class="w-full rounded-lg bg-green-500 px-2 py-1.5 font-bold text-white hover:bg-green-600 disabled:opacity-70"

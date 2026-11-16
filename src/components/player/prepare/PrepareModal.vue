@@ -209,7 +209,7 @@ async function confirm() {
         class="flex-1 overflow-y-auto flex flex-col gap-4 pb-1 [&::-webkit-scrollbar]:w-1.5 [&::-webkit-scrollbar-thumb]:bg-[#b7cbb4] [&::-webkit-scrollbar-thumb]:rounded-full [&::-webkit-scrollbar-track]:bg-transparent"
       >
         <WeatherSection :area-id="worldStore.selectedArea.id" inline />
-        <FishingFatigue :area-id="worldStore.selectedArea.id || null" />
+        <FishingFatigue variant="default" :area-id="worldStore.selectedArea.id || null" />
 
         <PrepareLakeFish />
 

@@ -188,7 +188,7 @@ onBeforeUnmount(() => {
     <div class="fixed top-3 left-3 z-20 text-white flex justify-between items-start">
       <div class="flex flex-col gap-2">
         <DayPhaseClock :area-id="userInAreaStore.userInArea?.area_id" />
-        <FishingFatigue class="max-w-60" :area-id="userInAreaStore.userInArea?.area_id ?? null" presence />
+        <FishingFatigue variant="compact" class="max-w-60" :area-id="userInAreaStore.userInArea?.area_id ?? null" presence />
         <div class="backdrop-blur-2xl h-fit w-fit rounded p-1">
           <button
             type="button"

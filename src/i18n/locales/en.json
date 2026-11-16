@@ -789,6 +789,8 @@
     "ap_dung": "✓ Apply"
   },
   "CatchDialog": {
+    "tha_ca": "Release fish",
+    "star_rating": "{count} stars",
     "cu_cau_thanh_cong": "Successful catch",
     "ca_xin": "SPECIAL FISH",
     "cau_tiep": "Keep fishing"
