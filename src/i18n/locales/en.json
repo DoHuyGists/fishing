@@ -215,6 +215,7 @@
     "luu_ho_so": "Save profile"
   },
   "UserProfile": {
+    "da_cap_nhat_quoc_gia": "Country updated.",
     "chua_co_thong_tin": "No information available",
     "khong_the_cap_nhat_quoc_gia_vui_long_thu_lai": "Unable to update country. Please try again.",
     "chua_cap_nhat_email": "Email not provided",
@@ -1937,6 +1938,11 @@
     "caught_at": "Caught at"
   },
   "FishingFatigue": {
+    "loading": "Loading fatigue…",
+    "rested": "Rested",
+    "exhausted": "Exhausted",
+    "effects": "Current effects",
+    "noEffects": "No fatigue penalties currently apply.",
     "label": "Area fatigue",
     "recovery": "In area +1/min · Away −1/min",
     "weight_cap": "Weight ceiling within species",

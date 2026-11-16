@@ -44,7 +44,11 @@ const server = await createServer({ server: { host: '127.0.0.1', port: 0, hmr: f
         hall_of_fame:seasonId===archiveId?[{rank:1,user_id:'player',display_name:'Tên được vinh danh',fish,caught_at:fish.caught_at}]:[],
         meta:[{species_id:'species',name:'Cá kỷ lục',image:null,season_weight:0.7}],server_time:'2026-11-14T00:00:00Z'});
       areas.touchPresence=async()=>({area_id:'lake',fatigue_score:55.5,effects:[{code:'TEST',target:'score',value:-10,name:'Mệt mỏi'}]});
-      createApp({render:()=>h('div',[h(LeaderboardModal),h(FishingFatigue,{areaId:'lake'})])}).use(pinia).use(i18n).mount('#app');
+      window.presenceCalls=0; window.previewCalls=0;
+      const touch=areas.touchPresence;
+      areas.touchPresence=async()=>{window.presenceCalls++;return touch();};
+      areas.fetchFatigue=async(areaId)=>{window.previewCalls++;return {area_id:areaId,fatigue_score:0,effects:[]};};
+      createApp({render:()=>h('div',[h(LeaderboardModal),h(FishingFatigue,{areaId:'lake',presence:true}),h(FishingFatigue,{areaId:'preview-lake'})])}).use(pinia).use(i18n).mount('#app');
     `;
   },
 }] });
@@ -61,6 +65,11 @@ try {
   await page.goto(server.resolvedUrls.local[0] + '__leaderboard');
   await page.getByText('Mùa 2', { exact: true }).waitFor();
   await page.getByText('Mệt mỏi tại bãi: 55,5/100', { exact: true }).waitFor();
+  await page.getByText('Mệt mỏi tại bãi: 0/100', { exact: true }).waitFor();
+  assert.equal(await page.getByRole('progressbar').nth(0).getAttribute('aria-valuenow'), '55.5');
+  assert.equal(await page.getByRole('progressbar').nth(1).getAttribute('aria-valuenow'), '0');
+  assert.deepEqual(await page.evaluate(()=>[window.presenceCalls,window.previewCalls]), [1,1]);
+  await page.getByText('Chưa bị giảm hiệu quả do mệt mỏi.', {exact:true}).waitFor();
   await page.getByRole('button', { name: 'Mùa trước', exact: true }).click();
   await page.getByText('Đại sảnh danh vọng · Ba loài dẫn đầu', { exact: true }).waitFor();
   await page.getByText('Tên được vinh danh', { exact: true }).waitFor();

@@ -8,6 +8,7 @@ import { useCurrencyStore } from "../../../stores/currency.ts";
 import { useUserProfileStore } from "../../../stores/userProfile.ts";
 import { useCountryStore } from "../../../stores/country.ts";
 import { useLocaleStore } from "../../../stores/locale.ts";
+import { useToast } from "../../../composables/useToast";
 import Cash from "../currency/Cash.vue";
 import TwoOptionsModal from "../../shared/TwoOptionsModal.vue";
 import UpdateIdentityModal from "./UpdateIdentityModal.vue";
@@ -21,6 +22,7 @@ const currencyStore = useCurrencyStore();
 const userProfileStore = useUserProfileStore();
 const countryStore = useCountryStore();
 const localeStore = useLocaleStore();
+const toast = useToast();
 const copied = ref(false);
 const selectedCountryId = ref("");
 const countrySearch = ref("");
@@ -69,8 +71,10 @@ async function updateCountry() {
     await userProfileStore.updateCountry(userId, selectedCountryId.value);
     showCountryModal.value = false;
     selectedCountryId.value = "";
+    toast.success(tr('UserProfile.da_cap_nhat_quoc_gia'));
   } catch {
     countryError.value = userProfileStore.error || tr('UserProfile.khong_the_cap_nhat_quoc_gia_vui_long_thu_lai');
+    toast.error(countryError.value);
   } finally {
     isUpdatingCountry.value = false;
   }

@@ -219,6 +219,7 @@
     "luu_ho_so": "Lưu hồ sơ"
   },
   "UserProfile": {
+    "da_cap_nhat_quoc_gia": "Đã cập nhật quốc gia.",
     "chua_co_thong_tin": "Chưa có thông tin",
     "khong_the_cap_nhat_quoc_gia_vui_long_thu_lai": "Không thể cập nhật quốc gia. Vui lòng thử lại.",
     "chua_cap_nhat_email": "Chưa cập nhật email",
@@ -1941,6 +1942,11 @@
     "caught_at": "Bắt lúc"
   },
   "FishingFatigue": {
+    "loading": "Đang tải mức mệt mỏi…",
+    "rested": "Khỏe khoắn",
+    "exhausted": "Kiệt sức",
+    "effects": "Ảnh hưởng hiện tại",
+    "noEffects": "Chưa bị giảm hiệu quả do mệt mỏi.",
     "label": "Mệt mỏi tại bãi",
     "recovery": "Ở bãi +1/phút · Rời bãi −1/phút",
     "weight_cap": "Trần trọng lượng nội loài",

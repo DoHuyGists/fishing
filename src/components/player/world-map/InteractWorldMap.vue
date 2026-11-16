@@ -12,6 +12,7 @@ import { useAuthStore } from "../../../stores/auth.ts";
 import { useDayPhaseStore } from "../../../stores/dayPhase.ts";
 import { useToast } from "../../../composables/useToast.ts";
 import FishingAnchor from "./FishingAnchor.vue";
+import FishingFatigue from "../fishing/FishingFatigue.vue";
 import { useModalStore } from "../../../stores/modal.ts";
 import { useCountryStore } from "../../../stores/country.ts";
 import { useFeatureAvailabilityStore } from "../../../stores/featureAvailability";
@@ -190,6 +191,7 @@ function zoomTo(k: number) {
                   draggable="false"
                 />
               </div>
+              <FishingFatigue :area-id="area.id" />
               <button
                 type="button"
                 class="w-full rounded-lg bg-green-500 px-2 py-1.5 font-bold text-white hover:bg-green-600 disabled:opacity-70"

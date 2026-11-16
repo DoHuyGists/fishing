@@ -48,5 +48,5 @@ export const uncachedReadRpcs = new Set([
   'get_friend_list_page', 'get_admin_list_page',
   // These manage only scoring/presence state. Never cache them or invalidate
   // unrelated inventory/profile snapshots on every heartbeat or board read.
-  'get_fishing_season_board', 'touch_fishing_presence',
+  'get_fishing_season_board', 'touch_fishing_presence', 'get_fishing_fatigue',
 ]);

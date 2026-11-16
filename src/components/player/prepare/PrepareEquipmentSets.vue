@@ -3,6 +3,7 @@ import { computed } from "vue";
 import { t as tr } from "../../../i18n/index.ts";
 import { equipmentCategories } from "../../../data/equipmentCatalog.ts";
 import { useInventoryStore } from "../../../stores/inventory.ts";
+import { useModalStore } from "../../../stores/modal.ts";
 import type { EquipmentSet } from "../../../stores/equipment.ts";
 import type { FishingTool } from "../../../stores/fishing.ts";
 
@@ -21,6 +22,7 @@ const emit = defineEmits<{
 }>();
 
 const inventoryStore = useInventoryStore();
+const modalStore = useModalStore();
 
 const usedSetIndex = computed(() => {
   if (!props.usedSet) return 0;
@@ -73,18 +75,27 @@ function countSetItems(s: EquipmentSet): number {
           </div>
         </div>
       </div>
-      <div v-if="usedSet" class="flex items-center gap-2">
+      <div class="flex flex-wrap items-center gap-2">
         <span
-          v-if="!isUsedSetComplete"
+          v-if="usedSet && !isUsedSetComplete"
           class="inline-flex items-center gap-1 px-3 py-1 bg-amber-100 border border-amber-300 text-amber-800 text-xs font-semibold rounded-lg"
         >
           {{ tr("PrepareModal.set_chua_du_5_loai") }}
         </span>
         <span
+          v-if="usedSet"
           class="inline-flex items-center gap-1 px-3 py-1 bg-[#dce9d7] border border-[#b7cbb4] text-[#344f3b] text-xs font-semibold rounded-lg"
         >
           {{ tr("PrepareModal.dang_dung_set") }} {{ usedSetIndex + 1 }}
         </span>
+        <button
+          type="button"
+          class="inline-flex items-center justify-center gap-2 rounded-lg border border-[#cbd9c6] bg-[#f5f9f0] px-3 py-1.5 text-xs font-semibold text-[#24352a] cursor-pointer transition-all duration-150 hover:bg-[#dce8d5] active:scale-95"
+          @click="modalStore.open('inventory')"
+        >
+          <span aria-hidden="true">🎒</span>
+          {{ tr("InventoryModal.tui_do") }}
+        </button>
       </div>
     </div>
 

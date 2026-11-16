@@ -2,6 +2,8 @@
 
 ## Deployment
 
+For fatigue previews in the map popup and preparation modal, also apply `migrations/20261116_fishing_fatigue_preview.sql` after the ranked-fishing migrations. Its authenticated RPC reads only the caller's fatigue for the selected area, including recovery and configured effects, without entering the area or renewing presence.
+
 1. Apply `migrations/equipment_mechanics.sql` and the existing feature flags migration if not already installed.
 2. Apply `migrations/20261115_ranked_fishing.sql` once. It adds scoring columns to the existing `species` and **`weathers`** tables, without replacing the existing lifetime `leaderboard`.
 3. Apply `migrations/20261115_ranked_fishing_uuid.sql`. This upgrades the original numeric season IDs to UUIDs, preserving all score/history relationships. `season_number` is a separate positive sequential display number. This migration is required for new installations too; do not rerun the original schema migration on an existing installation.

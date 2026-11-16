@@ -3,16 +3,17 @@ import { t as tr } from "../../../i18n";
 
 import { computed, onBeforeUnmount, ref, watch } from "vue";
 import { useUserProfileStore } from "../../../stores/userProfile.ts";
+import { useToast } from "../../../composables/useToast";
 
 const emit = defineEmits<{ close: [] }>();
 const userProfileStore = useUserProfileStore();
+const toast = useToast();
 const displayName = ref(userProfileStore.profile?.display_name ?? "");
 const avatarUrl = ref(userProfileStore.profile?.avatar_url ?? "");
 const avatarFile = ref<File>();
 const avatarInput = ref<HTMLInputElement>();
 const identityBusy = ref(false);
 const identityError = ref("");
-const identitySaved = ref(false);
 const localPreviewUrl = ref("");
 const previewFailed = ref(false);
 const removedAvatar = ref<{ url: string; file?: File }>();
@@ -54,7 +55,6 @@ function restoreAvatar() {
 watch([avatarUrl, avatarFile], () => { removedAvatar.value = undefined; }, { flush: "sync" });
 watch(previewUrl, () => { previewFailed.value = false; });
 watch([displayName, avatarUrl, avatarFile], () => {
-  identitySaved.value = false;
   identityError.value = "";
 }, { flush: "sync" });
 onBeforeUnmount(clearSelectedFile);
@@ -67,15 +67,13 @@ async function saveIdentity() {
   if (identityBusy.value) return;
   identityBusy.value = true;
   identityError.value = "";
-  identitySaved.value = false;
   try {
     await userProfileStore.updateIdentity(displayName.value, avatarUrl.value.trim() || null, avatarFile.value);
-    avatarUrl.value = userProfileStore.profile?.avatar_url ?? "";
-    clearSelectedFile();
-    removedAvatar.value = undefined;
-    identitySaved.value = true;
+    toast.success(tr('UpdateIdentityModal.da_luu_ho_so'));
+    emit("close");
   } catch (err) {
     identityError.value = err instanceof Error ? err.message : tr('UpdateIdentityModal.khong_the_luu_ho_so');
+    toast.error(identityError.value);
   } finally {
     identityBusy.value = false;
   }
@@ -135,7 +133,6 @@ async function saveIdentity() {
           </details>
         </fieldset>
         <div v-if="identityError" role="alert" class="mx-5 mb-4 rounded-lg border border-red-200 bg-red-50 px-3 py-2 text-red-700">{{ identityError }}</div>
-        <div v-if="identitySaved" role="status" class="mx-5 mb-4 rounded-lg border border-[#cbd9c6] bg-white px-3 py-2 text-emerald-800">{{ tr('UpdateIdentityModal.da_luu_ho_so') }}</div>
         <div class="flex justify-end gap-3 border-t border-[#cbd9c6] px-5 py-4">
           <button type="button" :disabled="identityBusy" class="rounded-lg border border-[#cbd9c6] px-4 py-2.5 font-medium transition hover:bg-[#e7ecda] focus-visible:outline-2 focus-visible:outline-offset-2 disabled:opacity-50" @click="close">{{ tr('ChangePasswordModal.dong') }}</button>
           <button type="submit" :disabled="identityBusy" class="rounded-lg bg-[#24352a] px-4 py-2.5 font-semibold text-white transition hover:bg-[#364c3d] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#24352a] disabled:opacity-50">{{ identityBusy ? tr('ChangePasswordModal.dang_luu') : tr('UpdateIdentityModal.luu_ho_so') }}</button>

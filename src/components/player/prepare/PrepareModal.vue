@@ -17,6 +17,7 @@ import { useWorldStore } from "../../../stores/worldMap.ts";
 import Modal from "../../shared/Modal.vue";
 import { useModalStore } from "../../../stores/modal.ts";
 import WeatherSection from "../fishing/WeatherSection.vue";
+import FishingFatigue from "../fishing/FishingFatigue.vue";
 import { useDiaryStore } from "../../../stores/diary.ts";
 import PrepareLakeFish from "./PrepareLakeFish.vue";
 import PrepareEquipmentSets from "./PrepareEquipmentSets.vue";
@@ -208,6 +209,7 @@ async function confirm() {
         class="flex-1 overflow-y-auto flex flex-col gap-4 pb-1 [&::-webkit-scrollbar]:w-1.5 [&::-webkit-scrollbar-thumb]:bg-[#b7cbb4] [&::-webkit-scrollbar-thumb]:rounded-full [&::-webkit-scrollbar-track]:bg-transparent"
       >
         <WeatherSection :area-id="worldStore.selectedArea.id" inline />
+        <FishingFatigue :area-id="worldStore.selectedArea.id || null" />
 
         <PrepareLakeFish />
 

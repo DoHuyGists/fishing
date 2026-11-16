@@ -4,6 +4,12 @@ import type { FishingFatigue } from '../types/model/fishingFatigue';
 import supabase from "../database/connection";
 
 class SupabaseUserInAreaRepository {
+  async fetchFatigue(areaId: string): Promise<FishingFatigue> {
+    const { data, error } = await supabase.rpc('get_fishing_fatigue', { p_area_id: areaId });
+    if (error) throw new Error(error.message);
+    return data as unknown as FishingFatigue;
+  }
+
   async touchPresence(): Promise<FishingFatigue> {
     const { data, error } = await supabase.rpc('touch_fishing_presence');
     if (error) throw new Error(error.message);

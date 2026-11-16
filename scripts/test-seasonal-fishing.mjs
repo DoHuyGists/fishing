@@ -166,6 +166,30 @@ test('ranked fishing integrates server catches, fatigue, seasons, ties and perma
       assert.ok(Math.abs((await rpc('touch_fishing_presence()')).fatigue_score - 24) < 0.1);
     });
 
+    await check('fatigue previews recover per area without changing membership or presence', async () => {
+      await db.exec(await read('./supabase/migrations/20261116_fishing_fatigue_preview.sql'));
+      await db.query("UPDATE user_area_fatigue SET fatigue_score=40,calculated_at=clock_timestamp()-interval '5 minutes',active_until=NULL WHERE user_id=$1 AND area_id=$2", [uid, areaB]);
+      const before = await query('SELECT * FROM user_area_fatigue ORDER BY user_id,area_id');
+      const membership = await query('SELECT * FROM user_in_area ORDER BY user_id');
+      await db.exec('SET ROLE authenticated');
+      const preview = await rpc('get_fishing_fatigue($1)', [areaB]);
+      assert.equal(preview.area_id, areaB);
+      assert.ok(preview.fatigue_score > 34.9 && preview.fatigue_score <= 35);
+      await assert.rejects(rpc('get_fishing_fatigue($1)', [randomUUID()]), /Fishing area not found/);
+      await db.exec('RESET ROLE');
+      assert.deepEqual(await query('SELECT * FROM user_area_fatigue ORDER BY user_id,area_id'), before);
+      assert.deepEqual(await query('SELECT * FROM user_in_area ORDER BY user_id'), membership);
+      await db.query("SELECT set_config('test.uid',$1,false)", [other]);
+      await db.exec('SET ROLE authenticated');
+      assert.deepEqual(await rpc('get_fishing_fatigue($1)', [areaB]), {area_id: areaB, fatigue_score: 0, effects: []});
+      await db.query("SELECT set_config('test.uid','',false)");
+      await assert.rejects(rpc('get_fishing_fatigue($1)', [areaB]), /User not authenticated/);
+      await db.exec('RESET ROLE; SET ROLE anon');
+      await assert.rejects(rpc('get_fishing_fatigue($1)', [areaB]), /permission denied/);
+      await db.exec('RESET ROLE');
+      await db.query("SELECT set_config('test.uid',$1,false)", [uid]);
+    });
+
     await check('lifetime catch count is awarded before seasons start and retries cannot increment it', async () => {
       const session = await cast();
       const result = await resolve(session);
@@ -218,6 +242,7 @@ test('ranked fishing integrates server catches, fatigue, seasons, ties and perma
       const mod = randomUUID();
       await db.query("INSERT INTO modifiers(id,code,name) VALUES($1,'FATIGUE_WEIGHT','Mệt mỏi')", [mod]);
       await db.query("INSERT INTO fatigue_effects(modifier_id,min_fatigue,target,value) VALUES($1,0,'weight_cap',-50),($1,1,'score',-10)", [mod]);
+      assert.deepEqual((await rpc('get_fishing_fatigue($1)', [area])).effects.map(effect => [effect.target, effect.value]), [['weight_cap', -50], ['score', -10]]);
       const session = await cast();
       assert.ok(session.fish_snapshot.weight_ratio <= 0.5);
       assert.ok(session.secret_weight <= 5.5);

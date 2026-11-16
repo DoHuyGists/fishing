@@ -2,29 +2,37 @@ import { defineStore } from 'pinia';
 import { supabaseUserInAreaRepository } from '../data/supabaseUserInAreaRepository';
 import { useAuthStore } from './auth';
 import type { FishingFatigue } from '../types/model/fishingFatigue';
-import { t as tr } from '../i18n';
 
 export const useFishingFatigueStore = defineStore('fishingFatigue', {
-  state: () => ({ snapshot: null as FishingFatigue | null, error: '', requestId: 0 }),
+  state: () => ({
+    snapshots: {} as Record<string, FishingFatigue>,
+    errors: {} as Record<string, boolean>,
+    loading: {} as Record<string, boolean>,
+  }),
   actions: {
-    async refresh(areaId: string) {
+    snapshotKey(areaId: string, presence: boolean) {
       const auth = useAuthStore();
-      const userId = auth.user?.id;
-      if (!userId) return;
-      const generation = auth.sessionGeneration;
-      const request = ++this.requestId;
+      return `${auth.sessionGeneration}:${auth.user?.id ?? ''}:${areaId}:${presence}`;
+    },
+    async refresh(areaId: string, presence = false) {
+      const auth = useAuthStore();
+      if (!auth.user?.id) return;
+      const key = this.snapshotKey(areaId, presence);
+      if (this.loading[key]) return;
+      this.loading[key] = true;
       try {
-        const snapshot = await supabaseUserInAreaRepository.touchPresence();
-        if (request !== this.requestId || auth.sessionGeneration !== generation || auth.user?.id !== userId) return;
-        if (snapshot.area_id !== areaId) { this.snapshot = null; return; }
-        this.snapshot = snapshot;
-        this.error = '';
+        const snapshot = presence
+          ? await supabaseUserInAreaRepository.touchPresence()
+          : await supabaseUserInAreaRepository.fetchFatigue(areaId);
+        if (key !== this.snapshotKey(areaId, presence)) return;
+        if (snapshot.area_id !== areaId) throw new Error('Unexpected fatigue area');
+        this.snapshots[key] = snapshot;
+        this.errors[key] = false;
       } catch {
-        if (request === this.requestId && auth.sessionGeneration === generation) {
-          this.error = tr('FishingFatigue.unavailable');
-        }
+        if (key === this.snapshotKey(areaId, presence)) this.errors[key] = true;
+      } finally {
+        delete this.loading[key];
       }
     },
-    reset() { this.requestId++; this.snapshot = null; this.error = ''; },
   },
 });

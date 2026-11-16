@@ -3,14 +3,15 @@ import { t as tr } from "../../../i18n";
 
 import { ref } from "vue";
 import { useAuthStore } from "../../../stores/auth.ts";
+import { useToast } from "../../../composables/useToast";
 
 const emit = defineEmits<{ close: [] }>();
 const authStore = useAuthStore();
+const toast = useToast();
 const currentPassword = ref("");
 const newPassword = ref("");
 const confirmPassword = ref("");
 const passwordError = ref("");
-const passwordSaved = ref(false);
 
 function close() {
   if (!authStore.passwordBusy) emit("close");
@@ -19,14 +20,15 @@ function close() {
 async function changePassword() {
   if (authStore.passwordBusy) return;
   passwordError.value = "";
-  passwordSaved.value = false;
   try {
     if (!currentPassword.value) throw new Error(tr('ChangePasswordModal.vui_long_nhap_mat_khau_hien_tai'));
     await authStore.updatePassword(newPassword.value, confirmPassword.value, currentPassword.value);
     currentPassword.value = newPassword.value = confirmPassword.value = "";
-    passwordSaved.value = true;
+    toast.success(tr('ChangePasswordModal.da_doi_mat_khau'));
+    emit("close");
   } catch (err) {
     passwordError.value = err instanceof Error ? err.message : tr('ChangePasswordModal.khong_the_doi_mat_khau');
+    toast.error(passwordError.value);
   }
 }
 </script>
@@ -50,7 +52,6 @@ async function changePassword() {
           <label class="block">{{ tr('ChangePasswordModal.xac_nhan_mat_khau_moi') }}<input v-model="confirmPassword" required minlength="8" type="password" autocomplete="new-password" class="mt-1 w-full rounded border border-[#cbd9c6] bg-white p-2" /></label>
         </fieldset>
         <div v-if="passwordError" role="alert" class="text-red-700">{{ passwordError }}</div>
-        <div v-if="passwordSaved" role="status">{{ tr('ChangePasswordModal.da_doi_mat_khau') }}</div>
         <div class="flex justify-end gap-2">
           <button type="button" :disabled="authStore.passwordBusy" class="rounded border border-[#cbd9c6] px-4 py-2 disabled:opacity-50" @click="close">{{ tr('ChangePasswordModal.dong') }}</button>
           <button type="submit" :disabled="authStore.passwordBusy" class="rounded bg-[#24352a] px-4 py-2 text-white disabled:opacity-50">{{ authStore.passwordBusy ? tr('ChangePasswordModal.dang_luu') : tr('ChangePasswordModal.doi_mat_khau') }}</button>

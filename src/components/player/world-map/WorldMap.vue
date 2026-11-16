@@ -452,7 +452,14 @@ defineExpose({ setView, resetView });
         :title="m.area.title ?? ''"
         @click.stop="emit('select-area', m.area)"
       />
-      <div v-if="m.area.id === selectedAreaId" class="world-map-marker__popup" @click.stop @pointerdown.stop>
+      <div
+        v-if="m.area.id === selectedAreaId"
+        class="world-map-marker__popup"
+        :style="{ maxHeight: `${Math.max(80, m.y - 24)}px` }"
+        @click.stop
+        @pointerdown.stop
+        @wheel.stop
+      >
         <slot name="popup" :area="m.area" />
       </div>
     </div>
@@ -540,6 +547,8 @@ defineExpose({ setView, resetView });
   bottom: 0;
   transform: translate(-50%, -16px);
   width: 200px;
+  overflow-y: auto;
+  overscroll-behavior: contain;
 }
 .world-map-tip__dot,
 .world-map-tip__pulse {

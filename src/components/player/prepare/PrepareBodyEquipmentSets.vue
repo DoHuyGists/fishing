@@ -3,10 +3,12 @@ import { computed } from "vue";
 import { t as tr } from "../../../i18n/index.ts";
 import { healthSlots } from "../../../data/healthEquipment.ts";
 import { useHealthStore } from "../../../stores/health.ts";
+import { useModalStore } from "../../../stores/modal.ts";
 import { useToast } from "../../../composables/useToast.ts";
 import type { BodyEquipmentSet } from "../../../types/model/health.ts";
 
 const store = useHealthStore();
+const modalStore = useModalStore();
 const toast = useToast();
 // Show persisted equipment, matching the set that actually contributes bonuses.
 const usedSet = computed(() => store.savedSets.find((set) => set.is_used));
@@ -39,12 +41,22 @@ async function switchSet(set: BodyEquipmentSet) {
           <div class="mt-0.5 text-xs leading-normal text-[#617565]">{{ tr("PrepareModal.body_sets_hint") }}</div>
         </div>
       </div>
-      <span
-        v-if="usedSet"
-        class="inline-flex items-center gap-1 rounded-lg border border-[#b7cbb4] bg-[#dce9d7] px-3 py-1 text-xs font-semibold text-[#344f3b]"
-      >
-        {{ tr("PrepareModal.dang_dung_set") }} {{ usedSetIndex + 1 }}
-      </span>
+      <div class="flex flex-wrap items-center gap-2">
+        <span
+          v-if="usedSet"
+          class="inline-flex items-center gap-1 rounded-lg border border-[#b7cbb4] bg-[#dce9d7] px-3 py-1 text-xs font-semibold text-[#344f3b]"
+        >
+          {{ tr("PrepareModal.dang_dung_set") }} {{ usedSetIndex + 1 }}
+        </span>
+        <button
+          type="button"
+          class="inline-flex items-center justify-center gap-2 rounded-lg border border-[#cbd9c6] bg-[#f5f9f0] px-3 py-1.5 text-xs font-semibold text-[#24352a] cursor-pointer transition-all duration-150 hover:bg-[#dce8d5] active:scale-95"
+          @click="modalStore.open('body')"
+        >
+          <span aria-hidden="true">🎒</span>
+          {{ tr("InventoryModal.tui_do") }}
+        </button>
+      </div>
     </header>
 
     <div v-if="store.loading" class="flex items-center justify-center gap-2 p-4 text-sm text-[#617565]" role="status">
