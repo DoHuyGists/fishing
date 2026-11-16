@@ -6,6 +6,8 @@ import { useAuthStore } from '../../../stores/auth';
 import LeaderboardFish from './LeaderboardFish.vue';
 import PlayerIdentity from '../../shared/PlayerIdentity.vue';
 
+defineProps<{ hallOfFame?: boolean }>();
+
 const store = useLeaderboardStore();
 const auth = useAuthStore();
 const board = computed(() => store.seasonBoard);
@@ -27,7 +29,7 @@ onBeforeUnmount(() => { clearTimeout(rolloverTimer); });
 </script>
 
 <template>
-  <div class="space-y-2 rounded-xl border border-[#cbd9c6] bg-[#f5f9f0] p-3 text-xs text-[#24352a]">
+  <div class="space-y-2 rounded-xl border border-[#cbd9c6] bg-[#f5f9f0] p-3 text-xs text-[#24352a]" :aria-busy="store.loading">
     <div class="flex flex-wrap items-center justify-between gap-2">
       <div class="font-bold">{{ board?.season ? tr('LeaderboardSeason.season', { number: board.season.season_number }) : tr('LeaderboardSeason.title') }}</div>
       <div class="flex flex-wrap gap-2">
@@ -36,9 +38,13 @@ onBeforeUnmount(() => { clearTimeout(rolloverTimer); });
         <button v-if="store.selectedSeasonId !== null" type="button" class="rounded-lg border border-[#cbd9c6] bg-white px-3 py-1 text-xs disabled:opacity-40" :disabled="store.loading" @click="selectSeason(null)">{{ tr('LeaderboardSeason.current') }}</button>
       </div>
     </div>
-    <template v-if="board?.season">
+    <div v-if="hallOfFame && store.error" role="alert" class="rounded-lg border border-red-200 bg-red-50 px-3 py-2 text-red-700">
+      {{ store.error }} {{ tr('LeaderboardModal.hay_thu_lam_moi_bang_xep_hang') }}
+    </div>
+    <div v-if="hallOfFame && store.loading" role="status" class="py-8 text-center text-[#52654f]">{{ tr('LeaderboardModal.dang_tai_bang_xep_hang') }}</div>
+    <template v-if="board?.season && (!hallOfFame || (!store.loading && !store.error))">
       <div class="text-xs text-[#52654f]">{{ formatDate(board.season.starts_at) }} → {{ formatDate(board.season.ends_at) }}</div>
-      <details class="border-t border-[#cbd9c6] pt-2">
+      <details v-if="!hallOfFame" class="border-t border-[#cbd9c6] pt-2">
         <summary class="cursor-pointer rounded text-xs font-semibold text-[#52654f] focus-visible:outline-2 focus-visible:outline-emerald-600">{{ tr('LeaderboardSeason.details') }}</summary>
         <div class="mt-3 text-xs leading-relaxed text-[#52654f]">{{ tr('LeaderboardSeason.rules') }}</div>
         <div v-if="board.meta.length" class="mt-3 flex flex-wrap gap-2">
@@ -47,7 +53,7 @@ onBeforeUnmount(() => { clearTimeout(rolloverTimer); });
           </div>
         </div>
       </details>
-      <template v-if="board.season.finalized_at">
+      <template v-if="hallOfFame && board.season.finalized_at">
         <div class="font-bold">{{ tr('LeaderboardSeason.hall') }}</div>
         <div v-if="!board.hall_of_fame.length" class="text-xs text-[#52654f]">{{ tr('LeaderboardSeason.no_winners') }}</div>
         <div v-else class="grid gap-2 sm:grid-cols-3">
@@ -60,6 +66,7 @@ onBeforeUnmount(() => { clearTimeout(rolloverTimer); });
           </div>
         </div>
       </template>
+      <div v-else-if="hallOfFame" class="py-6 text-center text-[#52654f]">{{ tr('LeaderboardSeason.not_finalized') }}</div>
     </template>
     <div v-else-if="!store.loading && !store.error" class="text-sm text-[#52654f]">{{ tr('LeaderboardSeason.not_started') }}</div>
   </div>

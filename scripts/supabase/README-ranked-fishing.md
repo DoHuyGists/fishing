@@ -25,6 +25,10 @@ For an existing UUID installation, redeploy `rpc/fishing/submit_challenge.sql`, 
 
 Deploy the migration and RPC changes before the frontend. The repository has no connection for applying production SQL automatically.
 
+If the depth preview reports `cannot execute SELECT FOR SHARE in a read-only transaction`, run `migrations/20261116_fishing_depth_preview_transaction.sql` in SQL Editor. It marks `preview_fish_by_depth(numeric)` as `VOLATILE`, because the preview calls `touch_fishing_presence()` to lock membership and renew presence. PostgREST runs `STABLE` RPCs in read-only transactions even for POST requests. This repair preserves the deployed function body, owner, permissions and player data, and reloads the API schema cache. It is safe to rerun. The complete `rpc/fishing/preview_fish_by_depth.sql` definition also declares `VOLATILE` for future deployments.
+
+Run `node --test scripts/test-depth-preview.mjs` to reproduce the read-only failure and verify the repair, authenticated access, preview results and presence renewal in an isolated database.
+
 If an already deployed cast returns `permission denied for function fishing_fatigue_multiplier`, run `migrations/20261115_ranked_fishing_permissions.sql` in SQL Editor under the trusted migration role. Do not grant client roles access to private scoring helpers: the repair runs the validated RPCs under the correct trusted owner instead. The repair is safe to rerun and does not require rerunning the schema migration or resetting seasons.
 
 ## Scoring and season boundaries

@@ -1933,6 +1933,8 @@
     "current": "Current season",
     "rules": "Each season lasts 14 days. Scores combine weight within the species, rarity, weather, seasonal weight and fatigue effects. The successful catch time determines the season.",
     "hall": "Hall of Fame · Top three species",
+    "hall_tab": "Hall of Fame",
+    "not_finalized": "This season has not ended yet. Select a previous season to view honored catches.",
     "no_winners": "This season has no eligible catches to honor.",
     "not_started": "The season has not started yet.",
     "caught_at": "Caught at"

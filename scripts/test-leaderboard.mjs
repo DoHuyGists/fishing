@@ -60,6 +60,26 @@ test('each real criterion uses its own values and personal rank', async () => {
   }
 });
 
+test('Hall of Fame loads seasonal history and preserves season selection when switching tabs', async () => {
+  const store = useLeaderboardStore();
+  assert.deepEqual(store.tabs.map(tab => tab.key), ['score', 'total_caught', 'best_fish', 'hall_of_fame']);
+  const board = { items: [], total: 0, my_entry: null, season: { id: archiveId, finalized_at: '2026-11-15T00:00:00Z' },
+    hall_of_fame: [{ rank: 1, user_id: 'winner', display_name: 'Winner', fish: { score: 100 } }] };
+  const calls = [];
+  repository.fetchSeasonBoard = async (page, seasonId) => { calls.push([page, seasonId]); return board; };
+  repository.fetchTop = async () => { throw new Error('Hall of Fame must use seasonal data'); };
+  store.activeTab = 'hall_of_fame';
+  await store.selectSeason(archiveId);
+  assert.deepEqual(store.seasonBoard.hall_of_fame, board.hall_of_fame);
+  store.activeTab = 'best_fish';
+  await store.fetchLeaderboard(null, 1);
+  store.activeTab = 'hall_of_fame';
+  await store.fetchLeaderboard(null, 1);
+  assert.deepEqual(calls, [[1, archiveId], [1, archiveId], [1, archiveId]]);
+  assert.equal(store.error, '');
+  assert.equal(store.loading, false);
+});
+
 test('ties crossing page boundaries retain shared global ranks', async () => {
   const store = useLeaderboardStore();
   store.activeTab = 'total_caught';

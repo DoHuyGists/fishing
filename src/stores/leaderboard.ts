@@ -27,6 +27,7 @@ export const useLeaderboardStore = defineStore("leaderboard", {
   }),
   getters: {
     categories: () => categories(),
+    tabs: () => [...categories(), { key: 'hall_of_fame', label: tr('LeaderboardSeason.hall_tab'), emoji: '🏅' }],
     criterion(state): LeaderboardCriterion {
       return state.activeTab === "total_caught" || state.activeTab === "best_fish" ? state.activeTab : "score";
     },
@@ -65,7 +66,7 @@ export const useLeaderboardStore = defineStore("leaderboard", {
       this.myEntry = null;
       this.myRank = null;
       try {
-        if (criterion === 'best_fish') {
+        if (criterion === 'best_fish' || this.activeTab === 'hall_of_fame') {
           const board = await supabaseLeaderboardRepository.fetchSeasonBoard(page, this.selectedSeasonId);
           if (requestId !== this.requestId) return;
           if (!board.items.length && page > 1) {

@@ -1937,6 +1937,8 @@
     "current": "Mùa hiện tại",
     "rules": "Mỗi mùa kéo dài 14 ngày. Điểm tính theo trọng lượng nội loài, độ hiếm, thời tiết, hệ số mùa và hiệu ứng mệt mỏi. Cá thuộc mùa tại thời điểm bắt thành công.",
     "hall": "Đại sảnh danh vọng · Ba loài dẫn đầu",
+    "hall_tab": "Đại sảnh danh vọng",
+    "not_finalized": "Mùa này chưa kết thúc. Hãy chọn mùa trước để xem các thành tích đã được vinh danh.",
     "no_winners": "Mùa này chưa có thành tích hợp lệ để vinh danh.",
     "not_started": "Mùa giải chưa bắt đầu.",
     "caught_at": "Bắt lúc"

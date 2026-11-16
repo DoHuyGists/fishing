@@ -1,4 +1,7 @@
-
+-- This preview renews presence, so PostgREST must use a read-write transaction.
+CREATE OR REPLACE FUNCTION public.preview_fish_by_depth(p_cast_depth NUMERIC)
+RETURNS JSONB
+LANGUAGE plpgsql VOLATILE SECURITY DEFINER SET search_path = '' AS $$
 DECLARE
     v_user_id UUID;
     v_area_id UUID;
@@ -240,3 +243,7 @@ BEGIN
 
     RETURN v_result;
 END;
+$$;
+REVOKE ALL ON FUNCTION public.preview_fish_by_depth(NUMERIC) FROM PUBLIC, anon;
+GRANT EXECUTE ON FUNCTION public.preview_fish_by_depth(NUMERIC) TO authenticated;
+NOTIFY pgrst, 'reload schema';
