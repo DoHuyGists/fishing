@@ -37,6 +37,7 @@ const actionGroups: { key: string; label: string; iconClass: string; actions: Lo
     key: 'activities', get label() { return tr('FeatureTable.hoat_dong'); }, iconClass: 'bg-[#fcf0d9]',
     actions: [
       { modal: 'mission', get label() { return tr('MissionList.nhiem_vu'); }, icon: '📜' },
+      { modal: 'lake-map', get label() { return tr('LakeMapModal.title'); }, icon: '🗺️' },
       { modal: 'attendance', get label() { return tr('AttendanceModal.diem_danh'); }, icon: '📅' },
       { modal: 'event', get label() { return tr('EventModal.su_kien_2'); }, icon: '🎉', requiresUnlock: true },
       { modal: 'market', get label() { return tr('MarketWindow.cho_ca'); }, icon: '🏪', tourId: 'first-play-market', requiresUnlock: true },

@@ -1,4 +1,28 @@
 {
+  "LakeMapModal": {
+    "title": "Lake map",
+    "shoreName": "Shallow shore waters",
+    "shoreNote": "Abundant vegetation",
+    "weedName": "Swirling currents",
+    "weedNote": "Difficult fishing",
+    "flowName": "Common waters",
+    "flowNote": "Few large fish",
+    "deepName": "Calm deep waters",
+    "deepNote": "Large fish",
+    "pier": "Pier",
+    "newPin": "New label",
+    "placePin": "Click a spot on the lake to place a label",
+    "selectedZone": "Selected zone",
+    "zoneName": "Zone name",
+    "note": "Note",
+    "color": "Color",
+    "selectHint": "Click a zone on the lake to edit its label and color.",
+    "customPins": "Custom labels",
+    "cancel": "Cancel",
+    "addPin": "Add label",
+    "remove": "Delete",
+    "emptyPins": "No labels yet."
+  },
   "RuleModal": {
     "title": "Rules",
     "subtitle": "Keep the game fair and friendly together",

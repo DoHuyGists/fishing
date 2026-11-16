@@ -1,4 +1,28 @@
 {
+  "LakeMapModal": {
+    "title": "Bản đồ hồ",
+    "shoreName": "Vùng nước nông ven bờ",
+    "shoreNote": "Nhiều rong rêu",
+    "weedName": "Vùng nước xoáy dòng chảy",
+    "weedNote": "Khó câu",
+    "flowName": "Vùng phổ biến",
+    "flowNote": "Ít cá lớn",
+    "deepName": "Vùng nước sâu tĩnh lặng",
+    "deepNote": "Cá lớn",
+    "pier": "Cầu tàu",
+    "newPin": "Nhãn mới",
+    "placePin": "Bấm vào vị trí trên hồ để đặt nhãn",
+    "selectedZone": "Vùng đang chọn",
+    "zoneName": "Tên vùng",
+    "note": "Ghi chú",
+    "color": "Màu",
+    "selectHint": "Bấm vào một vùng trên hồ để sửa nhãn và màu.",
+    "customPins": "Nhãn tự thêm",
+    "cancel": "Huỷ",
+    "addPin": "Thêm nhãn",
+    "remove": "Xoá",
+    "emptyPins": "Chưa có nhãn nào."
+  },
   "RuleModal": {
     "title": "Quy tắc",
     "subtitle": "Cùng giữ sân chơi công bằng và thân thiện",

@@ -30,6 +30,7 @@ const modalNames = [
     "skill",
     "aquaculture",
     "dispatch",
+    "lake-map",
     "guide",
     "rule",
     "tutorial",
