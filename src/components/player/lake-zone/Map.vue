@@ -196,6 +196,62 @@ function applyPreset(key: ShapeKey) {
   reshape(p.key, p.w, p.h)
 }
 
+/* ---------- Hình hồ ngẫu nhiên ---------- */
+// Sinh các node quanh tâm với độ dài bán kính thay đổi. Góc chỉ lệch nhẹ nên
+// thứ tự node được giữ và bờ hồ không tự cắt nhau.
+function randomNatural(): Pt[] {
+  const n = 8 + Math.floor(Math.random() * 7) // 8–14 node
+  const rx = 170 + Math.random() * 95
+  const ry = 105 + Math.random() * 60
+  const cx = CX + (Math.random() - 0.5) * 30
+  const cy = CY + (Math.random() - 0.5) * 20
+  const phase = Math.random() * Math.PI * 2
+  const harmonics = [2, 3, 4].map((m) => ({
+    m,
+    amp: Math.random() * (0.2 / (m - 1)),
+    ph: Math.random() * Math.PI * 2,
+  }))
+  const step = (Math.PI * 2) / n
+
+  return Array.from({ length: n }, (_, i) => {
+    const t = phase + i * step + (Math.random() - 0.5) * step * 0.7
+    let k = 1 + (Math.random() - 0.5) * 0.24
+    for (const h of harmonics) k += h.amp * Math.sin(h.m * t + h.ph)
+    k = clamp(k, 0.55, 1.12)
+    return {
+      x: clamp(cx + rx * k * Math.cos(t), 40, 560),
+      y: clamp(cy + ry * k * Math.sin(t), 40, 360),
+    }
+  })
+}
+
+function bounds(poly: Pt[]) {
+  const xs = poly.map((p) => p.x)
+  const ys = poly.map((p) => p.y)
+  return { minX: Math.min(...xs), maxX: Math.max(...xs), minY: Math.min(...ys), maxY: Math.max(...ys) }
+}
+
+function randomizeLake() {
+  const old = bounds(lake.value)
+  naturalPts.value = randomNatural()
+  shapeKey.value = 'natural'
+  size.value = { w: 500, h: 300 }
+  const now = bounds(lake.value)
+
+  // Co giãn bố cục các vùng theo khung của hồ mới
+  const sx = clamp((now.maxX - now.minX) / (old.maxX - old.minX || 1), 0.4, 2.5)
+  const sy = clamp((now.maxY - now.minY) / (old.maxY - old.minY || 1), 0.4, 2.5)
+  const ocx = (old.minX + old.maxX) / 2
+  const ocy = (old.minY + old.maxY) / 2
+  const ncx = (now.minX + now.maxX) / 2
+  const ncy = (now.minY + now.maxY) / 2
+  for (const z of zones.value) {
+    z.seed = { x: ncx + (z.seed.x - ocx) * sx, y: ncy + (z.seed.y - ocy) * sy }
+    z.r = clamp(z.r * Math.sqrt(sx * sy), R_MIN, R_MAX)
+  }
+  pullSeedsIn()
+}
+
 function resize(next: { w?: number; h?: number }) {
   let w = next.w ?? size.value.w
   let h = next.h ?? size.value.h
@@ -771,6 +827,22 @@ function percentOf(id: string): number {
               <path :d="p.icon" />
             </svg>
             {{ p.label }}
+          </button>
+
+          <!-- Hình tự do không biết trước; sau đó vẫn chỉnh tiếp bằng node -->
+          <button
+            class="flex flex-col items-center gap-0.5 rounded-lg border border-dashed border-slate-300 px-1 py-1.5 text-[11px] text-slate-600 hover:bg-slate-50 focus:outline-none focus-visible:ring-2 focus-visible:ring-sky-500"
+            @click="randomizeLake"
+          >
+            <svg viewBox="0 0 24 24" class="h-6 w-6" fill="currentColor" fill-opacity=".18" stroke="currentColor" stroke-width="1.5" stroke-linejoin="round">
+              <rect x="3.5" y="3.5" width="17" height="17" rx="3.5" />
+              <circle cx="8.5" cy="8.5" r="1.2" fill="currentColor" stroke="none" />
+              <circle cx="15.5" cy="8.5" r="1.2" fill="currentColor" stroke="none" />
+              <circle cx="12" cy="12" r="1.2" fill="currentColor" stroke="none" />
+              <circle cx="8.5" cy="15.5" r="1.2" fill="currentColor" stroke="none" />
+              <circle cx="15.5" cy="15.5" r="1.2" fill="currentColor" stroke="none" />
+            </svg>
+            Ngẫu nhiên
           </button>
         </div>
 
