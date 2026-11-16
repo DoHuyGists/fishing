@@ -1,5 +1,17 @@
 export type LeaderboardCriterion = "score" | "total_caught" | "spend" | "best_fish";
 
+export interface LeaderboardRewardTier {
+  minPlayers: number;
+  maxPlayers: number | null;
+  rewards: { fromRank: number; toRank: number; tickets: number }[];
+}
+
+export interface LeaderboardRewardTier {
+  minPlayers: number;
+  maxPlayers: number | null;
+  rewards: { fromRank: number; toRank: number; tickets: number }[];
+}
+
 export interface LeaderboardBestFish {
   id: string;
   species_id: string;

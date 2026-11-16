@@ -10,6 +10,7 @@ import LeaderboardBoard from './LeaderboardBoard.vue';
 import LeaderboardCaught from './LeaderboardCaught.vue';
 import LeaderboardBestFish from './LeaderboardBestFish.vue';
 import LeaderboardSeason from './LeaderboardSeason.vue';
+import LeaderboardRules from './LeaderboardRules.vue';
 
 const leaderboardStore = useLeaderboardStore();
 const authStore = useAuthStore();
@@ -23,7 +24,7 @@ watch([() => authStore.user?.id, () => leaderboardStore.activeTab], () => leader
 
 <template>
   <Modal :title="tr('LeaderboardModal.bang_xep_hang')" :on-refresh="load" :show-count-data="false">
-    <div class="mx-auto max-w-3xl px-1 py-1 text-[#24352a] sm:px-2 sm:py-2">
+    <div class="mx-auto px-1 py-1 text-[#24352a] sm:px-4 sm:py-3" :class="leaderboardStore.activeTab === 'rules' ? 'max-w-[1440px]' : 'max-w-5xl'">
       <Tab v-model="leaderboardStore.activeTab" class="leaderboard-tabs" :tabs="leaderboardStore.tabs" :aria-label="tr('LeaderboardModal.tieu_chi_xep_hang')" lazy wrap>
         <template #label="{ tab }">
           <span aria-hidden="true">{{ leaderboardStore.tabs.find(category => category.key === tab.key)?.emoji }}</span>
@@ -43,6 +44,9 @@ watch([() => authStore.user?.id, () => leaderboardStore.activeTab], () => leader
         </template>
         <template #hall_of_fame="{ active }">
           <LeaderboardSeason v-if="active" hall-of-fame />
+        </template>
+        <template #rules="{ active }">
+          <LeaderboardRules v-if="active" />
         </template>
       </Tab>
     </div>

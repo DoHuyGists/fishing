@@ -63,7 +63,7 @@ test('each real criterion uses its own values and personal rank', async () => {
 
 test('Hall of Fame loads seasonal history and preserves season selection when switching tabs', async () => {
   const store = useLeaderboardStore();
-  assert.deepEqual(store.tabs.map(tab => tab.key), ['score', 'total_caught', 'spend', 'best_fish', 'hall_of_fame']);
+  assert.deepEqual(store.tabs.map(tab => tab.key), ['score', 'total_caught', 'spend', 'best_fish', 'hall_of_fame', 'rules']);
   const board = { items: [], total: 0, my_entry: null, season: { id: archiveId, finalized_at: '2026-11-15T00:00:00Z' },
     hall_of_fame: [{ rank: 1, user_id: 'winner', display_name: 'Winner', fish: { score: 100 } }] };
   const calls = [];
@@ -157,6 +157,22 @@ test('a delayed response cannot overwrite the selected criterion', async () => {
   assert.equal(store.entries[0].id, 'new');
   assert.equal(store.boards[0].entries[0].value, 25);
   assert.equal(store.loading, false);
+});
+
+test('rules need no database request and invalidate a pending board response', async () => {
+  const store = useLeaderboardStore();
+  let resolveOld;
+  repository.fetchTop = () => new Promise(resolve => { resolveOld = resolve; });
+  const pending = store.fetchLeaderboard();
+  store.activeTab = 'rules';
+  repository.fetchByUser = async () => { throw new Error('Rules must not fetch a player'); };
+  repository.fetchTop = async () => { throw new Error('Rules must not fetch a board'); };
+  await store.fetchLeaderboard('player');
+  assert.equal(store.loading, false);
+  resolveOld({ items: [entry('old', 999, 1)], total: 1 });
+  await pending;
+  assert.deepEqual(store.entries, []);
+  assert.equal(store.error, '');
 });
 
 test('seasonal equal scores retain distinct server ranks and selecting an archive resets the page', async () => {

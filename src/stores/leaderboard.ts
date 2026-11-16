@@ -1,4 +1,4 @@
-import { leaderboardValue, type FishingSeasonBoard, type LeaderboardCriterion, type LeaderboardEntry, type LeaderboardRankedEntry } from "../types/model/leaderboard";
+import { leaderboardValue, type FishingSeasonBoard, type LeaderboardCriterion, type LeaderboardEntry, type LeaderboardRankedEntry, type LeaderboardRewardTier } from "../types/model/leaderboard";
 import { t as tr } from "../i18n";
 import { defineStore } from "pinia";
 import { supabaseLeaderboardRepository } from "../data/supabaseLeaderboardRepository";
@@ -9,6 +9,16 @@ const categories = () => [
   { key: "spend", label: tr('leaderboard.tieu_cash'), description: tr('leaderboard.xep_hang_theo_cash_da_tieu'), metric: tr('leaderboard.tong_cash_da_tieu'), unit: 'cash', emoji: "💸" },
   { key: "best_fish", label: tr('leaderboard.best_fish'), description: tr('leaderboard.best_fish_description'), metric: tr('leaderboard.fish_score'), unit: tr('DailyMission.diem'), emoji: "🐟" },
 ] satisfies { key: LeaderboardCriterion; label: string; description: string; metric: string; unit: string; emoji: string }[];
+
+// Published reward proposal; this is not a reward settlement configuration.
+const rewardTiers: LeaderboardRewardTier[] = [
+  { minPlayers: 0, maxPlayers: 9, rewards: [] },
+  { minPlayers: 10, maxPlayers: 29, rewards: [{ fromRank: 1, toRank: 1, tickets: 1 }] },
+  { minPlayers: 30, maxPlayers: 99, rewards: [{ fromRank: 1, toRank: 1, tickets: 3 }, { fromRank: 2, toRank: 2, tickets: 2 }, { fromRank: 3, toRank: 3, tickets: 1 }] },
+  { minPlayers: 100, maxPlayers: 299, rewards: [{ fromRank: 1, toRank: 1, tickets: 5 }, { fromRank: 2, toRank: 2, tickets: 3 }, { fromRank: 3, toRank: 3, tickets: 2 }, { fromRank: 4, toRank: 5, tickets: 1 }] },
+  { minPlayers: 300, maxPlayers: 999, rewards: [{ fromRank: 1, toRank: 1, tickets: 8 }, { fromRank: 2, toRank: 2, tickets: 5 }, { fromRank: 3, toRank: 3, tickets: 3 }, { fromRank: 4, toRank: 10, tickets: 1 }] },
+  { minPlayers: 1000, maxPlayers: null, rewards: [{ fromRank: 1, toRank: 1, tickets: 12 }, { fromRank: 2, toRank: 2, tickets: 8 }, { fromRank: 3, toRank: 3, tickets: 5 }, { fromRank: 4, toRank: 10, tickets: 2 }, { fromRank: 11, toRank: 20, tickets: 1 }] },
+];
 
 export const useLeaderboardStore = defineStore("leaderboard", {
   state: () => ({
@@ -28,7 +38,8 @@ export const useLeaderboardStore = defineStore("leaderboard", {
   }),
   getters: {
     categories: () => categories(),
-    tabs: () => [...categories(), { key: 'hall_of_fame', label: tr('LeaderboardSeason.hall_tab'), emoji: '🏅' }],
+    tabs: () => [...categories(), { key: 'hall_of_fame', label: tr('LeaderboardSeason.hall_tab'), emoji: '🏅' }, { key: 'rules', label: tr('LeaderboardRules.tab'), emoji: '📖' }],
+    rewardTiers: () => rewardTiers,
     criterion(state): LeaderboardCriterion {
       return state.activeTab === "total_caught" || state.activeTab === "spend" || state.activeTab === "best_fish" ? state.activeTab : "score";
     },
@@ -59,6 +70,10 @@ export const useLeaderboardStore = defineStore("leaderboard", {
     async fetchLeaderboard(userId?: string | null, page?: number) {
       page ??= this.page;
       const requestId = ++this.requestId;
+      if (this.activeTab === 'rules') {
+        this.loading = false;
+        return;
+      }
       const criterion = this.criterion;
       this.loading = true;
       this.error = "";

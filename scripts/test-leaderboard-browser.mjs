@@ -70,7 +70,23 @@ try {
   assert.equal(await page.getByRole('progressbar').nth(1).getAttribute('aria-valuenow'), '0');
   assert.deepEqual(await page.evaluate(()=>[window.presenceCalls,window.previewCalls]), [1,1]);
   await page.getByText('Chưa bị giảm hiệu quả do mệt mỏi.', {exact:true}).waitFor();
-  assert.equal(await page.getByRole('tab').count(), 4);
+  assert.equal(await page.getByRole('tab').count(), 6);
+  await page.getByRole('tab', { name: 'Thể lệ', exact: false }).click();
+  await page.getByText('Hạng mục & cách xếp hạng', { exact: true }).waitFor();
+  const categories = page.getByRole('region', { name: 'Hạng mục & cách xếp hạng', exact: true });
+  const categoryCards = categories.locator(':scope > .grid > div');
+  const categoryPositions = await categoryCards.evaluateAll(elements => elements.map(element => element.getBoundingClientRect().x));
+  assert.ok(categoryPositions[1] > categoryPositions[0], 'Desktop rules use two category columns');
+  const rewardSection = page.getByRole('region', { name: 'Phần thưởng theo mốc người chơi', exact: true });
+  const milestones = rewardSection.locator(':scope > .grid').nth(1).locator(':scope > div');
+  const milestonePositions = await milestones.evaluateAll(elements => elements.map(element => element.getBoundingClientRect().x));
+  assert.ok(milestonePositions[0] < milestonePositions[1] && milestonePositions[1] < milestonePositions[2], 'Desktop rewards use three milestone columns');
+  assert.ok(await categories.evaluate(element => element.clientWidth > 1100), 'Rules use the available desktop width');
+  assert.doesNotMatch(await page.getByRole('tabpanel').innerText(), /W\^|R²|mã lượt bắt|mã người chơi|chuẩn hóa/);
+  if (process.env.LEADERBOARD_TEST_SCREENSHOT) await page.screenshot({ path: process.env.LEADERBOARD_TEST_SCREENSHOT + '-rules-desktop.png' });
+  await page.getByText('Dự kiến', { exact: true }).waitFor();
+  assert.equal(await page.locator('table').count(), 5);
+  await page.getByText('Từ 1000 người đủ điều kiện', { exact: true }).waitFor();
   await page.getByRole('tab', { name: 'Đại sảnh danh vọng', exact: false }).click();
   await page.getByText('Mùa này chưa kết thúc. Hãy chọn mùa trước để xem các thành tích đã được vinh danh.', { exact: true }).waitFor();
   assert.equal(await page.locator('section aside').count(), 0);
@@ -83,7 +99,7 @@ try {
   await page.getByText('Area fatigue: 55.5/100', { exact: true }).waitFor();
   await page.getByRole('button', { name: 'Current season', exact: true }).click();
   await page.getByText('Season 2', { exact: true }).waitFor();
-  await page.getByRole('tab').nth(2).click();
+  await page.getByRole('tab', { name: 'Highest-scoring fish', exact: false }).click();
   await page.getByText('Season 2', { exact: true }).waitFor();
   const rules = page.locator('details');
   assert.equal(await rules.evaluate(element => element.open), false);
@@ -120,6 +136,16 @@ try {
     const panel = page.getByRole('tabpanel');
     assert.ok(await panel.evaluate(element => element.scrollWidth <= element.clientWidth), 'Ranking fits the smallest mobile width');
   }
+  await page.getByRole('tab', { name: 'Rules', exact: false }).click();
+  await page.getByText('Rewards by player milestone', { exact: true }).waitFor();
+  assert.ok(await page.evaluate(() => document.documentElement.scrollWidth <= window.innerWidth));
+  const rulesPanel = page.getByRole('tabpanel');
+  assert.ok(await rulesPanel.evaluate(element => element.scrollWidth <= element.clientWidth), 'Rules and reward tables fit 320px');
+  await page.evaluate(() => { window.testI18n.global.locale.value = 'vi'; });
+  await page.getByText('Phần thưởng theo mốc người chơi', { exact: true }).waitFor();
+  const mobilePositions = await categoryCards.evaluateAll(elements => elements.map(element => element.getBoundingClientRect().x));
+  assert.ok(mobilePositions.every(position => position === mobilePositions[0]), 'Mobile rules use one category column');
+  if (process.env.LEADERBOARD_TEST_SCREENSHOT) await page.screenshot({ path: process.env.LEADERBOARD_TEST_SCREENSHOT + '-rules-mobile.png' });
   assert.deepEqual(errors, []);
   process.stdout.write('Validated all three tabs, podium order, pagination, personal rank, season rules and navigation, Hall of Fame, distinct ties, fatigue, both locales and mobile widths.\n');
 } finally { await browser?.close(); await server.close(); }
