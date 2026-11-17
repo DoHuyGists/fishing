@@ -4,6 +4,7 @@ import { t as tr } from "../../../i18n";
 
 
 import { fishImageUrl } from './pondPresentation'
+import FishSwim from './FishSwim.vue'
 
 defineProps<{
   pond: AquaculturePond
@@ -30,13 +31,23 @@ defineProps<{
         <span v-if="pond.fish.some(f => f.status === 'ready')" class="absolute right-4 top-4 rounded-lg bg-amber-100 px-3 py-1.5 text-xs font-semibold text-amber-900">{{ tr('FishPond.co_ca_truong_thanh') }}</span>
         <div v-if="!pond.fish.length" class="empty-plaque absolute inset-x-4 top-1/2 m-0 text-center text-sm">{{ tr('FishPond.ao_da_san_sang_tha_lua_ca_dau_tien_nhe') }}</div>
         <div class="swimming-area absolute inset-x-4 bottom-5 top-14" aria-hidden="true">
-          <span v-for="(fish, i) in swimmers" :key="fish.id" class="fish absolute block" :class="{ 'special-fish': fish.special }" :style="{ '--fish-width': (68 + fish.progress * .4) + 'px', top: (15 + i * 19) + '%', animationDuration: (150 + i * 20) + 's', animationDelay: -(i * 43) + 's' }">
-            <img :src="fishImageUrl(fish.image)" alt="" class="fish-image" decoding="async" draggable="false" />
-            <template v-if="fish.special">
+          <FishSwim
+            v-for="(fish, i) in swimmers"
+            :key="fish.id"
+            class="fish"
+            :class="{ 'special-fish': fish.special }"
+            :src="fishImageUrl(fish.image)"
+            :size="68 + fish.progress * .4"
+            :initial-x=".2 + (i * .23) % .6"
+            :lane=".15 + i * .19"
+            :phase-offset="i * 2.3"
+            :paused="paused"
+          >
+            <span v-if="fish.special" class="fish-effects">
               <span class="special-sparkle">✦</span>
               <span class="special-sparkle special-sparkle-small">✧</span>
-            </template>
-          </span>
+            </span>
+          </FishSwim>
         </div>
         <div class="lily-pad lily-one" aria-hidden="true" />
         <div class="lily-pad lily-two" aria-hidden="true" />
@@ -170,45 +181,23 @@ defineProps<{
   background: repeating-linear-gradient(0deg, #c6a573 0 5px, #9d7e52 5px 6px);
 }
 
-.swimming-area {
-  container-type: inline-size;
-}
-
-.fish {
-  left: 0;
-  width: var(--fish-width);
+.swimming-area .fish {
+  position: absolute;
+  inset: 0;
   mix-blend-mode: multiply;
   opacity: .9;
-  animation: swim linear infinite;
-  will-change: transform;
 }
 
-.fish-image {
-  display: block;
-  width: 100%;
-  height: auto;
-  pointer-events: none;
-  user-select: none;
-}
-
-.special-fish {
+.swimming-area .special-fish {
   mix-blend-mode: normal;
   opacity: 1;
   isolation: isolate;
 }
 
-.special-fish::before {
-  content: '';
+.fish-effects {
   position: absolute;
-  z-index: -1;
-  inset: -35% -18%;
-  border-radius: 50%;
-  background: radial-gradient(ellipse, #fff7bdcc 0%, #ffdf6e80 32%, #ffe78a00 70%);
-  animation: golden-glow 5s ease-in-out infinite;
-}
-
-.special-fish .fish-image {
-  filter: brightness(1.15) saturate(1.15) drop-shadow(0 0 3px #fff6c5) drop-shadow(0 0 9px #ffd45b);
+  inset: 0;
+  isolation: isolate;
 }
 
 .special-sparkle {
@@ -230,24 +219,8 @@ defineProps<{
   animation-delay: -2s;
 }
 
-.motion-paused .fish,
-.motion-paused .special-fish::before,
 .motion-paused .special-sparkle {
   animation-play-state: paused;
-}
-
-@keyframes golden-glow {
-
-  0%,
-  100% {
-    opacity: .65;
-    transform: scale(.92);
-  }
-
-  50% {
-    opacity: 1;
-    transform: scale(1.08);
-  }
 }
 
 @keyframes golden-sparkle {
@@ -264,34 +237,10 @@ defineProps<{
   }
 }
 
-@keyframes swim {
-  0% {
-    transform: translateX(0) scaleX(-1);
-  }
-
-  49% {
-    transform: translateX(max(0px, calc(100cqw - var(--fish-width)))) scaleX(-1);
-  }
-
-  50% {
-    transform: translateX(max(0px, calc(100cqw - var(--fish-width)))) scaleX(1);
-  }
-
-  100% {
-    transform: translateX(0) scaleX(1);
-  }
-}
-
 @media (prefers-reduced-motion: reduce) {
 
-  .fish,
-  .special-fish::before,
   .special-sparkle {
     animation: none;
-  }
-
-  .fish:nth-child(even) {
-    left: 55%;
   }
 }
 </style>
