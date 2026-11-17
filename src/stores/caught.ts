@@ -1,4 +1,4 @@
-import { defineStore } from "pinia";
+import { acceptHMRUpdate, defineStore } from "pinia";
 import { useAuthStore } from "./auth";
 import { supabaseFishRepository } from "../data/supabaseFishRepository";
 import { useReadCacheStore } from './readCache';
@@ -32,9 +32,20 @@ export const useCaughtStore = defineStore("Caught", {
   state: () => ({
     isLoadingCaught: false,
     caughtFishes: [] as CaughtFish[],
+    latestCaughtViewMode: "group",
   }),
   getters: {
     inNetFishes: (state) => state.caughtFishes.filter((f) => f.status === "in-net"),
+    inNetFishGroups(): { fish: CaughtFish; count: number }[] {
+      const groups = new Map<string, { fish: CaughtFish; count: number }>();
+      for (const fish of this.inNetFishes) {
+        const key = fish.species?.id || "unknown";
+        const group = groups.get(key);
+        if (group) group.count += 1;
+        else groups.set(key, { fish, count: 1 });
+      }
+      return [...groups.values()];
+    },
     storedFishes: (state) => state.caughtFishes.filter((f) => f.status === "normal"),
   },
   actions: {
@@ -73,3 +84,7 @@ export const useCaughtStore = defineStore("Caught", {
     },
   },
 });
+
+if (import.meta.hot) {
+  import.meta.hot.accept(acceptHMRUpdate(useCaughtStore, import.meta.hot));
+}
