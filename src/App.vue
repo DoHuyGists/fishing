@@ -10,12 +10,20 @@ import { useFeatureAvailabilityStore } from "./stores/featureAvailability";
 import { useModalStore } from "./stores/modal";
 import { modalFeatures } from "./data/featureAvailability";
 import ConfettiCannon from "./components/shared/ConfettiCannon.vue";
+import { useStoryStore } from './stores/story';
+import { useStoryEditorStore } from './stores/storyEditor';
 
 useLocaleStore();
 const auth = useAuthStore();
 const router = useRouter();
 const features = useFeatureAvailabilityStore();
 const modals = useModalStore();
+const stories = useStoryStore();
+watch(() => auth.user?.id, userId => {
+  stories.reset(userId ?? '');
+  const editor = useStoryEditorStore();
+  if (editor.owner && editor.owner !== userId) { editor.cache(); editor.$reset(); }
+}, { immediate: true });
 watch(() => auth.user?.id, (userId, _, onCleanup) => {
   features.stop();
   if (!userId) return;

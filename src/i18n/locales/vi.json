@@ -1,4 +1,17 @@
 {
+  "Story": {
+    "library": "Cốt truyện", "editor": "Biên tập kịch bản", "editorDescription": "Soạn, chạy thử và xuất bản chương truyện tương tác.",
+    "visualNovel": "Hồ sơ hành trình", "libraryIntro": "Mỗi tín hiệu mở ra một câu chuyện. Chọn chương và bắt đầu hành trình của bạn.",
+    "close": "Đóng", "back": "Quay lại", "backHome": "Về sảnh", "loading": "Đang tải chương truyện…", "retry": "Thử lại", "loadError": "Không tải được chương truyện.",
+    "catalogError": "Chưa tải được danh sách truyện từ máy chủ. Bạn vẫn có thể chơi bản mẫu bên dưới.", "empty": "Chưa có chương truyện được xuất bản.", "publishedVersion": "Phiên bản {version}",
+    "demo": "Truyện mẫu trên thiết bị", "demoHint": "7 node · 2 nhân vật · 2 lựa chọn · media dự phòng · không lưu tiến độ",
+    "begin": "Bắt đầu / Tiếp tục", "next": "Câu tiếp theo", "reveal": "Hiện toàn bộ câu thoại", "choose": "Chọn hướng đi", "narrator": "Người dẫn chuyện",
+    "controls": "Điều khiển cốt truyện", "auto": "Tự động", "skip": "Bỏ qua", "log": "Lịch sử thoại", "hide": "Ẩn giao diện", "show": "Hiện giao diện", "mute": "Tắt tiếng", "unmute": "Bật tiếng", "speed": "Tốc độ",
+    "preview": "Chạy thử", "previewMissing": "Bản chạy thử chưa có hoặc đã hết phiên. Hãy mở lại từ công cụ biên tập.", "shortcuts": "Space / Enter: hiện chữ hoặc tiếp tục · H: ẩn/hiện giao diện",
+    "skipConfirm": "Bỏ qua chương này?", "skipHint": "Chương sẽ được đánh dấu đã bỏ qua. Các lựa chọn chưa đi qua sẽ không được tự chọn.", "cancel": "Hủy", "chapterComplete": "Kết thúc chương", "skipped": "Bạn đã bỏ qua phần còn lại của chương.",
+    "resumeTitle": "Tiếp tục hành trình", "resumeHint": "Bạn có tiến độ ở phiên bản này. Tiếp tục từ đoạn đang đọc hay bắt đầu lại?", "resume": "Đọc tiếp", "restart": "Đọc từ đầu", "progressError": "Chưa đồng bộ được tiến độ. Tiến độ vẫn được giữ trong phiên đọc này.",
+    "expression_happy": "Vui", "expression_angry": "Giận", "expression_shocked": "Bất ngờ", "expression_sad": "Buồn"
+  },
   "LakeMapModal": {
     "title": "Bản đồ hồ",
     "shoreName": "Vùng nước nông ven bờ",

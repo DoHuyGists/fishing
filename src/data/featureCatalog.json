@@ -1,5 +1,14 @@
 [
   {
+    "key": "story",
+    "labelKey": "Story.library",
+    "rpcs": ["story_catalog", "story_get", "story_save_progress", "story_save_draft", "story_publish", "story_unpublish"],
+    "tables": ["story_scripts", "story_releases", "story_progress"],
+    "writeTables": [],
+    "functions": [],
+    "storageBuckets": ["story-media"]
+  },
+  {
     "key": "dispatch",
     "labelKey": "Dispatch.title",
     "rpcs": ["get_dispatch_state", "dispatch_action"],

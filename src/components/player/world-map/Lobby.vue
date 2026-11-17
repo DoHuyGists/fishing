@@ -53,6 +53,7 @@ const LakeMapModal = defineAsyncComponent(() => import("../lake-zone/LakeMapModa
 const GuideModal = defineAsyncComponent(() => import("../guide/GuideModal.vue"));
 const RuleModal = defineAsyncComponent(() => import("../rule/RuleModal.vue"));
 const TutorialModal = defineAsyncComponent(() => import("../tutorial/TutorialModal.vue"));
+const StoryModal = defineAsyncComponent(() => import('../../story/StoryModal.vue'));
 
 const authStore = useAuthStore();
 const caughtStore = useCaughtStore();
@@ -213,6 +214,7 @@ onUnmounted(() => {
           <GuideModal v-if="modalStore.isOpening('guide')" />
           <RuleModal v-if="modalStore.isOpening('rule')" />
           <TutorialModal v-if="modalStore.isOpening('tutorial')" />
+          <StoryModal v-if="modalStore.isOpening('story')" />
           <MarketWindow v-if="configStore.isUnlocked('market') && modalStore.isOpening('market')" />
           <ShopModal v-if="modalStore.isOpening('shop')" />
           <CatchDiaryModal v-if="modalStore.isOpening('diary')" />

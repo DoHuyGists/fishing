@@ -2,6 +2,7 @@
 import { t as tr } from "../i18n";
 
 import { computed, defineAsyncComponent, ref } from "vue";
+import { useRoute } from 'vue-router';
 import { useAdminGuideStore } from "../stores/adminGuide";
 
 const guideStore = useAdminGuideStore();
@@ -10,6 +11,7 @@ const DashboarModal = defineAsyncComponent(() => import("../components/admin/mon
 const monitorOpen = ref(false);
 
 type ModuleKey =
+  | "story"
   | "featureAvailability"
   | "blueprint"
   | "skill"
@@ -49,6 +51,7 @@ interface AdminModule {
 }
 
 const moduleComponents = {
+  story: defineAsyncComponent(() => import('../components/admin/story/StoryEditor.vue')),
   dispatch: defineAsyncComponent(() => import("../components/admin/dispatch-management/DispatchManagement.vue")),
   featureAvailability: defineAsyncComponent(() => import("../components/admin/feature-management/FeatureManagement.vue")),
   assets: defineAsyncComponent(() => import("../components/admin/assets/AssetsManagementModal.vue")),
@@ -117,6 +120,10 @@ interface ModuleGroup {
 }
 
 const groups: ModuleGroup[] = [
+  {
+    get title() { return tr('Story.library'); },
+    modules: [{ key: 'story', icon: '◈', get label() { return tr('Story.editor'); }, get desc() { return tr('Story.editorDescription'); }, component: moduleComponents.story }],
+  },
   {
     get title() { return tr('Dispatch.title'); },
     modules: [
@@ -351,7 +358,7 @@ const groups: ModuleGroup[] = [
 ];
 
 const allModules = groups.flatMap((g) => g.modules);
-const active = ref<ModuleKey | null>(null);
+const active = ref<ModuleKey | null>(useRoute().query.module === 'story' ? 'story' : null);
 const keyword = ref("");
 const feedbackModal = ref<"opinion" | "errors" | null>(null);
 

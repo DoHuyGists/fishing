@@ -36,6 +36,7 @@ const actionGroups: { key: string; label: string; iconClass: string; actions: Lo
   {
     key: 'activities', get label() { return tr('FeatureTable.hoat_dong'); }, iconClass: 'bg-[#fcf0d9]',
     actions: [
+      { modal: 'story', get label() { return tr('Story.library'); }, icon: '◈' },
       { modal: 'mission', get label() { return tr('MissionList.nhiem_vu'); }, icon: '📜' },
       { modal: 'lake-map', get label() { return tr('LakeMapModal.title'); }, icon: '🗺️' },
       { modal: 'attendance', get label() { return tr('AttendanceModal.diem_danh'); }, icon: '📅' },

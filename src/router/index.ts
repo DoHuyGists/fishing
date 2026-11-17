@@ -8,6 +8,10 @@ const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
   routes: [
     {
+      path: '/story', name: 'story', component: () => import('../views/StoryView.vue'),
+      meta: { requiresAuth: true, localContext: true },
+    },
+    {
       path: "/tutorial/:slug",
       name: "tutorial",
       component: () => import("../views/TutorialView.vue"),

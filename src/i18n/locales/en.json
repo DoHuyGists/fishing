@@ -1,4 +1,17 @@
 {
+  "Story": {
+    "library": "Stories", "editor": "Scenario Builder", "editorDescription": "Write, test and publish interactive story chapters.",
+    "visualNovel": "Journey archives", "libraryIntro": "Every signal reveals a story. Choose a chapter and begin your journey.",
+    "close": "Close", "back": "Back", "backHome": "Back to lobby", "loading": "Loading chapter…", "retry": "Try again", "loadError": "Unable to load this chapter.",
+    "catalogError": "The server story catalog is unavailable. You can still play the sample below.", "empty": "No chapters have been published yet.", "publishedVersion": "Version {version}",
+    "demo": "Local sample story", "demoHint": "7 nodes · 2 characters · 2 choices · fallback media · progress is not saved",
+    "begin": "Begin / Continue", "next": "Next dialogue", "reveal": "Reveal the full dialogue", "choose": "Choose your path", "narrator": "Narrator",
+    "controls": "Story controls", "auto": "Auto", "skip": "Skip", "log": "Dialogue log", "hide": "Hide UI", "show": "Show UI", "mute": "Mute", "unmute": "Unmute", "speed": "Speed",
+    "preview": "Play test", "previewMissing": "The preview is unavailable or its session has ended. Open it again from the editor.", "shortcuts": "Space / Enter: reveal or advance · H: hide/show UI",
+    "skipConfirm": "Skip this chapter?", "skipHint": "The chapter will be marked as skipped. Unvisited choices will remain unselected.", "cancel": "Cancel", "chapterComplete": "Chapter complete", "skipped": "You skipped the rest of this chapter.",
+    "resumeTitle": "Continue your journey", "resumeHint": "You have progress in this version. Continue where you left off or start again?", "resume": "Continue", "restart": "Start over", "progressError": "Progress has not synced yet. It remains available in this reading session.",
+    "expression_happy": "Happy", "expression_angry": "Angry", "expression_shocked": "Shocked", "expression_sad": "Sad"
+  },
   "LakeMapModal": {
     "title": "Lake map",
     "shoreName": "Shallow shore waters",

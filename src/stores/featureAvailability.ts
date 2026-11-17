@@ -69,7 +69,8 @@ export const useFeatureAvailabilityStore = defineStore("FeatureAvailability", {
             refreshRequested = false;
             const rows = await repository.fetchAll();
             if (generation !== epoch) return;
-            if (!FEATURE_CATALOG.every(feature => rows.some(row => row.feature_key === feature.key))) {
+            // A pending story migration must not disable existing gameplay. Missing story stays unavailable.
+            if (!FEATURE_CATALOG.filter(feature => feature.key !== 'story').every(feature => rows.some(row => row.feature_key === feature.key))) {
               throw new Error("Incomplete feature flag configuration");
             }
             this.flags = Object.fromEntries(rows.map(row => [row.feature_key, row]));
