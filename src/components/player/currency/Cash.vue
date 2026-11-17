@@ -16,11 +16,9 @@ function showInformation() {
 
 
 const props = withDefaults(defineProps<{
-    size?: number,
     amount?: number | string,
     interactive?: boolean,
 }>(), {
-    size: 30,
     interactive: true,
 })
 
@@ -36,12 +34,12 @@ function handleClick(event: MouseEvent) {
     <component
         :is="props.interactive ? 'button' : 'span'"
         :type="props.interactive ? 'button' : undefined"
-        class="gap-2 items-center bg-white rounded-full px-2"
+        class="gap-2 items-center bg-white rounded-full px-3 py-1 w-fit h-fit"
         :class="props.interactive ? 'flex cursor-pointer' : 'inline-flex text-[#24352a]'"
         :aria-label="props.interactive ? tr('Cash.thong_tin_ve_tien') : undefined"
         @click="handleClick"
     >
         <span v-if="props.amount != undefined">{{ fmtPrice }}</span>
-        <img src="/currency/cash.svg" :width="props.size" :alt="tr('Cash.cash')" draggable="false">
+        <img src="/currency/cash.svg" class="w-4 sm:w-6" :alt="tr('Cash.cash')" draggable="false">
     </component>
 </template>

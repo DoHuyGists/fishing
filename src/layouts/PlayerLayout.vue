@@ -15,6 +15,7 @@ import { useConfigStore } from "../stores/config.ts";
 import { useUserProfileStore } from "../stores/userProfile";
 import { useFishingStore } from "../stores/fishing";
 import { useFeatureAvailabilityStore } from "../stores/featureAvailability";
+import { useMissionStore } from "../stores/mission";
 
 const router = useRouter();
 const authStore = useAuthStore();
@@ -25,6 +26,7 @@ const userProfileStore = useUserProfileStore();
 const fishingStore = useFishingStore();
 const features = useFeatureAvailabilityStore();
 const refresh = usePlayerRefreshStore();
+const missionStore = useMissionStore();
 const { showConflictModal, modalMessage, closeCurrentTab, logoutAccount } = useSingleSession(authStore.userId);
 onBeforeMount(async () => { await useTimezoneCheck(); });
 watch(() => authStore.user?.id, (userId, _, onCleanup) => {
@@ -36,6 +38,17 @@ watch(() => authStore.user?.id, (userId, _, onCleanup) => {
   const stopWallet = startVisibleRefresh(() => refresh.refresh(userId, ['currency', 'profile']), 60_000);
   onCleanup(() => { stopArea(); stopWallet(); });
 }, { immediate: true });
+
+watch(
+  () => [authStore.user?.id, features.isAvailable("mission")] as const,
+  ([userId, enabled], _, onCleanup) => {
+    if (!userId || !enabled) return;
+    // The store checks the day before requesting data, including after midnight.
+    const stop = startVisibleRefresh(() => missionStore.ensureDailyMissions(), 60_000);
+    onCleanup(stop);
+  },
+  { immediate: true },
+);
 
 watch(
   () => userInAreaStore.userInArea,

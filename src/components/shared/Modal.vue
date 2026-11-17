@@ -94,22 +94,22 @@ onUnmounted(() => {
       : 'h-[100vh] w-screen supports-[height:100dvh]:h-[100dvh]'"
   >
     <header
-      class="flex flex-wrap items-center justify-between gap-x-3 gap-y-2 p-2 border-b border-emerald-950/10 bg-[#e7ecda] sm:flex-nowrap sm:gap-4"
+      class="grid grid-cols-2 md:grid-cols-[auto_1fr_auto] gap-x-3 gap-y-2 p-2 border-b border-emerald-950/10 bg-[#e7ecda] sm:flex-nowrap sm:gap-4"
     >
-      <div class="min-w-0 flex-1 sm:flex-none">
+      <div class="min-w-0 flex-1 sm:flex-none order-1 md:order-1">
         <div class="m-0 mt-1 break-words text-lg font-bold sm:text-xl">{{ title }}</div>
         <div class="m-0 break-words text-[10px] font-extrabold tracking-[0.14em] uppercase text-emerald-800">
           {{ subTitle }}
         </div>
       </div>
-      <div v-if="showCountData" class="flex flex-col md:flex-row md:gap-2 order-2 ml-auto shrink-0 sm:order-none sm:ml-0">
+      <div v-if="showCountData" class="order-3 md:order-2 col-span-2 md:col-span-1 flex flex-row items-center md:justify-center shrink-0 gap-1 text-xs md:text-sm">
         <Cash :amount="currencyStore.formattedCash" />
         <Shells :amount="currencyStore.formattedShells" />
         <Tickets :amount="currencyStore.formattedTickets" />
         <SkillPoints :amount="userProfileStore.skillPoints" />
         <UserTurn />
       </div>
-      <div class="order-3 ml-auto flex max-w-full shrink-0 items-center gap-1 sm:order-none sm:ml-0 sm:gap-2">
+      <div class="order-2 md:order-3 flex items-center justify-end shrink-0 gap-1 sm:ml-0 sm:gap-2">
         <button
           v-if="hasGuideSteps"
           type="button"

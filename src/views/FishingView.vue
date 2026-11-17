@@ -25,7 +25,6 @@ import { useUserInAreaStore } from "../stores/userInArea";
 import { supabaseFishingAreaRepository } from "../data/supabaseFishingAreaRepository";
 import type { RealtimeChannel } from "@supabase/supabase-js";
 
-
 const authStore = useAuthStore();
 const router = useRouter();
 const fishingStore = useFishingStore();
@@ -34,6 +33,9 @@ const userSettingStore = useUserSettingStore();
 const backgroundSoundStore = useFishingBackgroundSoundStore();
 const dayPhaseStore = useDayPhaseStore();
 const userInAreaStore = useUserInAreaStore();
+const selectedBait = computed(() =>
+  equipmentStore.variants.bait?.find((bait) => bait.id === fishingStore.equipmentLoadout.bait),
+);
 const { user } = storeToRefs(authStore);
 const { sessionReady, sessionError } = storeToRefs(fishingStore);
 const equipmentCollapsed = ref(true);
@@ -213,7 +215,7 @@ onBeforeUnmount(() => {
       <FishingScene :context="sceneContext" />
       <section class="control-deck p-2" :class="{ 'control-deck--tension': fishingStore.tensionChallenge }">
         <div class="side-panel">
-          <div class="flex justify-between items-center mx-[3px]">
+          <div class="flex justify-between md:justify-end items-center">
             <button
               type="button"
               class="equipment-toggle"
@@ -223,8 +225,15 @@ onBeforeUnmount(() => {
             >
               {{ equipmentCollapsed ? tr('MyTeamPanel.mo') : tr('FishingView.thu_gon') }}
             </button>
+            <div class="slide-fade-in from-top player-content-in flex shrink-0 items-center gap-2 rounded-lg border border-[#cbd9c6] bg-[#f5f9f0] px-2 py-1 text-[11px] leading-3 text-[#24352a]" :aria-label="tr('EquipmentMenu.moi_dang_chon')">
+              <img :src="selectedBait?.image ?? ''" class="size-6 object-contain" alt="">
+              <div class="flex flex-col gap-0.5">
+                <span class="font-bold">{{ selectedBait?.name ?? tr('EquipmentMenu.chua_chon_moi') }}</span>
+                <span class="text-[#4b5f50]">{{ tr('EquipmentMenu.con') }} {{ selectedBait?.quantity ?? 0 }}</span>
+              </div>
+            </div>
           </div>
-          <div id="equipment-menu" :class="{ 'equipment-menu-collapsed': equipmentCollapsed }">
+          <div id="equipment-menu" class="mt-1" :class="{ 'equipment-menu-collapsed': equipmentCollapsed }">
             <EquipmentMenu />
           </div>
         </div>

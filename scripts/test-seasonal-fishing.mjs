@@ -21,6 +21,10 @@ test('ranked fishing integrates server catches, fatigue, seasons, ties and perma
       CREATE SCHEMA auth; CREATE SCHEMA feature_control;
       CREATE TABLE auth.users(id UUID PRIMARY KEY);
       CREATE FUNCTION auth.uid() RETURNS UUID LANGUAGE sql STABLE AS $$ SELECT nullif(current_setting('test.uid',true),'')::UUID $$;
+      CREATE TABLE daily_mission_events(id BIGINT GENERATED ALWAYS AS IDENTITY,user_id UUID,event_type TEXT,value NUMERIC);
+      CREATE FUNCTION public.update_daily_mission_progress(event_type TEXT,value NUMERIC DEFAULT 1) RETURNS VOID LANGUAGE sql AS $$
+        INSERT INTO daily_mission_events(user_id,event_type,value) VALUES(auth.uid(),event_type,value);
+      $$;
       GRANT USAGE ON SCHEMA auth TO authenticated;
       CREATE TABLE feature_control.request_rules(feature_key TEXT,path TEXT,writes_only BOOLEAN,PRIMARY KEY(feature_key,path));
       CREATE TABLE public.user_profile(id UUID PRIMARY KEY,display_name TEXT,level INTEGER DEFAULT 1,experience_point INTEGER DEFAULT 0);
@@ -103,14 +107,29 @@ test('ranked fishing integrates server catches, fatigue, seasons, ties and perma
     await db.query('INSERT INTO user_equipments(user_id,rod,reel,line,bait,hook) VALUES($1,$2,$3,$4,$5,$6)',
       [uid, slots.rod, slots.reel, slots.line, slots.bait, slots.hook]);
     const cast = async () => {
+      const eventsBefore = Number(await scalar('SELECT count(*) FROM daily_mission_events'));
       const response = await rpc('public.cast_rod($1,10)', [area]);
+      assert.equal(Number(await scalar('SELECT count(*) FROM daily_mission_events')), eventsBefore + 1);
+      assert.deepEqual((await query('SELECT user_id,event_type,value FROM daily_mission_events ORDER BY id DESC LIMIT 1'))[0], { user_id: uid, event_type: 'CAST_ROD', value: '1' });
       return (await query('SELECT s.*,m.fish_snapshot FROM fishing_sessions s JOIN fishing_session_mechanics m ON m.session_id=s.id WHERE s.id=$1', [response.session_id]))[0];
     };
     const resolve = async session => {
       await db.query("UPDATE fishing_sessions SET status='BITE',bite_at=clock_timestamp()-interval '1 second',expires_at=clock_timestamp()+interval '90 seconds' WHERE id=$1", [session.id]);
       const before = Number(await scalar('SELECT COALESCE((SELECT total_caught FROM leaderboard WHERE id=$1),0)', [uid]));
       const scoreBefore = Number(await scalar('SELECT COALESCE((SELECT score FROM leaderboard WHERE id=$1),0)', [uid]));
+      const missionEventsBefore = Number(await scalar('SELECT count(*) FROM daily_mission_events'));
+      const baitBefore = Number(await scalar("SELECT data->>'quantity' FROM user_inventory WHERE id=$1", [slots.bait[0].inventory_id]));
       const result = await rpc('public.resolve_fishing_challenge($1,TRUE,1000)', [session.id]);
+      const baitAfter = Number(await scalar("SELECT data->>'quantity' FROM user_inventory WHERE id=$1", [slots.bait[0].inventory_id]));
+      const expectedEvents = [];
+      if (baitAfter === baitBefore - 1) expectedEvents.push({ user_id: uid, event_type: 'USE_BAIT', value: 1 });
+      else assert.equal(baitAfter, baitBefore);
+      if (result.success) {
+        expectedEvents.push({ user_id: uid, event_type: 'CATCH_FISH', value: 1 }, { user_id: uid, event_type: 'CATCH_WEIGHT', value: Number(session.secret_weight) });
+        if (result.caught.rarity.toUpperCase() === 'EPIC') expectedEvents.push({ user_id: uid, event_type: 'CATCH_EPIC', value: 1 });
+      }
+      const actualEvents = await query('SELECT user_id,event_type,value FROM daily_mission_events ORDER BY id OFFSET $1', [missionEventsBefore]);
+      assert.deepEqual(actualEvents.map(event => ({ ...event, value: Number(event.value) })), expectedEvents);
       assert.equal(Number(await scalar('SELECT COALESCE((SELECT total_caught FROM leaderboard WHERE id=$1),0)', [uid])), before + (result.success ? 1 : 0));
       const scoreAfter = Number(await scalar('SELECT COALESCE((SELECT score FROM leaderboard WHERE id=$1),0)', [uid]));
       assert.ok(Math.abs(scoreAfter - (scoreBefore + (result.success ? result.scoring?.score ?? 0 : 0))) < 1e-10);
@@ -198,6 +217,7 @@ test('ranked fishing integrates server catches, fatigue, seasons, ties and perma
       assert.equal(Number(await scalar('SELECT count(*) FROM fishing_score_catches')), 0);
       await assert.rejects(rpc('resolve_fishing_challenge($1,TRUE,1000)', [session.id]), /already processed/);
       assert.equal(Number(await scalar('SELECT total_caught FROM leaderboard WHERE id=$1', [uid])), 1);
+      assert.equal(Number(await scalar("SELECT count(*) FROM daily_mission_events WHERE event_type='CATCH_FISH'")), 1);
 
       await db.query('UPDATE leaderboard SET total_caught=NULL,score=123,best_fish=$2 WHERE id=$1', [uid, { id: 'existing-record' }]);
       assert.equal((await resolve(await cast())).success, true);
@@ -384,6 +404,36 @@ test('ranked fishing integrates server catches, fatigue, seasons, ties and perma
       assert.ok(meta.every(m => Number(m.season_weight) === 1.3));
       const weights = await query('SELECT season_weight FROM species');
       assert.ok(weights.every(s => [1, 1.3].includes(Number(s.season_weight))));
+    });
+
+    await check('daily missions track epic catches, exact weight and actual bait use without duplicate retry events', async () => {
+      await db.exec('BEGIN');
+      try {
+        await db.query("UPDATE species SET rarity='EPIC' WHERE id=$1", [species[0]]);
+        const session = await cast();
+        const result = await resolve(session);
+        assert.equal(result.success, true);
+        assert.equal(result.caught.rarity, 'EPIC');
+        const eventsBeforeRetry = Number(await scalar('SELECT count(*) FROM daily_mission_events'));
+        await db.exec('SAVEPOINT retry_catch');
+        await assert.rejects(rpc('resolve_fishing_challenge($1,TRUE,1000)', [session.id]), /already processed/);
+        await db.exec('ROLLBACK TO SAVEPOINT retry_catch');
+        assert.equal(Number(await scalar('SELECT count(*) FROM daily_mission_events')), eventsBeforeRetry);
+        await db.exec('ROLLBACK');
+        await db.exec('BEGIN');
+        const noBaitSession = await cast();
+        await db.query("UPDATE user_inventory SET data=jsonb_set(data,'{quantity}','0') WHERE id=$1", [slots.bait[0].inventory_id]);
+        const eventsBeforeMissingBait = Number(await scalar('SELECT count(*) FROM daily_mission_events'));
+        const noBaitResult = await resolve(noBaitSession);
+        assert.equal(noBaitResult.result, 'BAIT_UNAVAILABLE');
+        assert.equal(Number(await scalar('SELECT count(*) FROM daily_mission_events')), eventsBeforeMissingBait);
+        await db.exec('SAVEPOINT failed_cast');
+        await assert.rejects(cast(), /No usable bait remaining/);
+        await db.exec('ROLLBACK TO SAVEPOINT failed_cast');
+        assert.equal(Number(await scalar('SELECT count(*) FROM daily_mission_events')), eventsBeforeMissingBait);
+      } finally {
+        await db.exec('ROLLBACK');
+      }
     });
 
     await check('clients cannot forge scores, mutate fatigue or rotate with a chosen clock', async () => {

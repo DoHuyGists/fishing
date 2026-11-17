@@ -412,6 +412,8 @@ BEGIN
         v_session_id, jsonb_build_object('items', v_equipment, 'base', v_base, 'effective', v_effective),
         v_fish_snapshot, v_modifiers, v_balance, v_failure_reason
     );
+    PERFORM public.update_daily_mission_progress(event_type => 'CAST_ROD');
+
     RETURN jsonb_build_object('session_id', v_session_id, 'wait_time_ms', v_wait_time,
         'server_time_ms', FLOOR(EXTRACT(EPOCH FROM clock_timestamp()) * 1000)::BIGINT);
 END;

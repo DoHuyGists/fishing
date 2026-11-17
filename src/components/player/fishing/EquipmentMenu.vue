@@ -1,21 +1,13 @@
 <script setup lang="ts">
 import { t as tr } from "../../../i18n";
 
-import { computed } from "vue";
-import { useEquipmentStore } from "../../../stores/equipment.ts";
 import { useFishingStore } from "../../../stores/fishing.ts";
 import { ref, watch } from "vue";
 import EquipmentPickerModal from "./EquipmentPickerModal.vue";
 import AdjusDepth from "./AdjusDepth.vue";
-import { useModalStore } from "../../../stores/modal";
 
 const store = useFishingStore();
-const equipmentStore = useEquipmentStore();
-const modalStore = useModalStore();
 const pickerOpen = ref(false);
-const selectedBait = computed(() =>
-  equipmentStore.variants.bait?.find((bait) => bait.id === store.equipmentLoadout.bait),
-);
 
 function openPicker() {
   if (!store.canAdjustDepth) return;
@@ -92,13 +84,6 @@ watch(
           {{ store.nearbyPlayers.length }}
         </b>
       </button>
-    </div>
-    <div class="slide-fade-in from-top player-content-in flex shrink-0 items-center gap-2 rounded-lg border border-[#cbd9c6] bg-[#f5f9f0] px-2 py-1 text-[11px] leading-3 text-[#24352a]" :aria-label="tr('EquipmentMenu.moi_dang_chon')">
-      <img :src="selectedBait?.image ?? ''" class="size-6 object-contain" alt="">
-      <div class="flex flex-col gap-0.5">
-        <span class="font-bold">{{ selectedBait?.name ?? tr('EquipmentMenu.chua_chon_moi') }}</span>
-        <span class="text-[#4b5f50]">{{ tr('EquipmentMenu.con') }} {{ selectedBait?.quantity ?? 0 }}</span>
-      </div>
     </div>
   </div>
 </template>

@@ -4,6 +4,13 @@ import supabase from "../database/connection";
 import { formatTime } from "../utils/time";
 
 class SupabaseMissionRepository {
+  async claimDailyMissionReward(rewardId: string): Promise<void> {
+    const { error } = await supabase.rpc("claim_daily_mission_reward", {
+      p_reward_id: rewardId,
+    });
+    if (error) throw new Error(error.message);
+  }
+
   async fetchDailyMissions(): Promise<DailyMissionData> {
     const { data, error } = await supabase.rpc("get_daily_missions");
     if (error) throw new Error(error.message);

@@ -16,18 +16,15 @@ function showInformation() {
 
 
 const props = withDefaults(defineProps<{
-    size?: number,
     amount?: number | string,
-}>(), {
-    size: 25
-})
+}>(), {})
 
 const formattedAmount = computed(() => Number(props.amount ?? 0).toLocaleString(getFormattingLocale()))
 
 </script>
 <template>
-    <button type="button" class="flex gap-2 items-center bg-white rounded-full px-2 cursor-pointer" :aria-label="tr('SkillPoints.thong_tin_ve_diem_ky_nang')" @click.stop="showInformation">
+    <button type="button" class="flex gap-2 items-center bg-white rounded-full px-3 py-1 cursor-pointer w-fit h-fit" :aria-label="tr('SkillPoints.thong_tin_ve_diem_ky_nang')" @click.stop="showInformation">
         <div v-if="props.amount != undefined">{{ formattedAmount }}</div>
-        <img src="/currency/skill-points.svg" :width="props.size" :alt="tr('SkillPoints.diem_ky_nang')" draggable="false">
+        <img src="/currency/skill-points.svg" class="w-4 sm:w-6" :alt="tr('SkillPoints.diem_ky_nang')" draggable="false">
     </button>
 </template>

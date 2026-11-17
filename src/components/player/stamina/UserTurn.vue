@@ -17,11 +17,11 @@ const userTurnsStore = useUserTurnsStore();
 </script>
 
 <template>
-  <button type="button" class="flex flex-wrap items-center gap-1 bg-white rounded-full px-2 cursor-pointer" aria-live="polite" :aria-label="tr('UserTurn.thong_tin_ve_luot_cau')" @click.stop="showInformation">
-    <span class="font-bold">
+  <button type="button" class="flex flex-nowrap items-center gap-1 bg-white rounded-full px-3 py-1 cursor-pointer w-fit h-fit" aria-live="polite" :aria-label="tr('UserTurn.thong_tin_ve_luot_cau')" @click.stop="showInformation">
+    <span class="font-bold whitespace-nowrap">
       {{ userTurnsStore.status?.turns ?? "—" }} / {{ userTurnsStore.status?.max_turns ?? "—" }}
     </span>
-    <img src="/currency/turn.svg" :width="20" alt="">
+    <img src="/currency/turn.svg" class="w-4 sm:w-6" alt="">
     <span v-if="userTurnsStore.status && userTurnsStore.status.turns < userTurnsStore.status.max_turns" class="text-xs w-20 text-[#617565]">
       {{ tr('UserTurn.1_sau') }} {{ userTurnsStore.countdown }}
     </span>

@@ -54,10 +54,16 @@ function rewardVisual(value: unknown) {
   };
 }
 
-function claimReward() {
-  toast.error(tr('DailyMission.chua_co_api_nhan_moc_thuong_nhiem_vu_hang_ngay'), {
-    get title() { return tr('DailyMission.khong_the_nhan_thuong'); }
-  });
+async function claimReward(rewardId: string) {
+  try {
+    if (await missionStore.claimDailyMissionReward(rewardId)) {
+      toast.success(tr('AttendanceModal.thanh_cong'));
+    }
+  } catch (error) {
+    toast.error(error instanceof Error ? error.message : tr('DailyMission.khong_the_nhan_thuong'), {
+      get title() { return tr('DailyMission.khong_the_nhan_thuong'); }
+    });
+  }
 }
 
 onMounted(() => void loadDailyMissions());
@@ -122,7 +128,7 @@ onMounted(() => void loadDailyMissions());
                     </div>
                   </div>
                   <div v-else class="m-0 text-xs text-emerald-900/55">{{ tr('DailyMission.phan_thuong_theo_moc') }}</div>
-                  <button v-if="reward.can_claim" type="button" class="mt-2 w-full rounded-lg bg-emerald-700 px-2 py-1.5 text-xs font-bold text-white transition hover:bg-emerald-800" @click="claimReward">{{ tr('DailyAttendance.nhan_thuong') }}</button>
+                  <button v-if="reward.can_claim" type="button" :disabled="!!missionStore.claimingDailyRewardId" :aria-busy="missionStore.claimingDailyRewardId === reward.id" class="mt-2 w-full rounded-lg bg-emerald-700 px-2 py-1.5 text-xs font-bold text-white transition hover:bg-emerald-800 disabled:cursor-not-allowed disabled:opacity-60" @click="claimReward(reward.id)">{{ missionStore.claimingDailyRewardId === reward.id ? tr('FishingPassRewards.dang_nhan') : tr('DailyAttendance.nhan_thuong') }}</button>
                   <div v-else-if="!reward.is_unlocked" class="mb-0 mt-2 text-[10px] text-emerald-900/55">
                     {{ tr('Fishfarm.con') }} {{ Math.max(0, reward.required_points - missionStore.dailyMissions.total_points) }} {{ tr('DailyMission.diem') }}
                   </div>

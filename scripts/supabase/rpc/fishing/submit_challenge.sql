@@ -100,6 +100,7 @@ BEGIN
             IF v_has_mechanics THEN
                 UPDATE public.fishing_session_mechanics SET bait_consumed = TRUE WHERE session_id = p_session_id;
             END IF;
+            PERFORM public.update_daily_mission_progress(event_type => 'USE_BAIT');
         ELSIF v_has_mechanics THEN
             -- Concurrent casts cannot earn fish from the same last unit of bait.
             UPDATE public.fishing_sessions SET status = 'FAILED' WHERE id = p_session_id;
@@ -347,6 +348,12 @@ BEGIN
     -- =====================================================
     -- 13. Trả kết quả thành công cho client
     -- =====================================================
+
+    PERFORM public.update_daily_mission_progress(event_type => 'CATCH_FISH');
+    PERFORM public.update_daily_mission_progress(event_type => 'CATCH_WEIGHT', value => v_session.secret_weight);
+    IF UPPER(v_species.rarity) = 'EPIC' THEN
+        PERFORM public.update_daily_mission_progress(event_type => 'CATCH_EPIC');
+    END IF;
 
     RETURN jsonb_build_object(
         'success', TRUE,
