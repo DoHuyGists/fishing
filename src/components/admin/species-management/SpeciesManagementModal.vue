@@ -191,7 +191,7 @@ onMounted(() => speciesStore.fetchAll());
                       v-if="item.image"
                       :src="item.image"
                       :alt="item.name"
-                      class="size-12 shrink-0 rounded-md border border-gray-200 bg-gray-50 object-cover"
+                      class="w-30 shrink-0 rounded-md border border-gray-200 bg-gray-50 object-cover"
                       loading="lazy"
                     />
                     <div

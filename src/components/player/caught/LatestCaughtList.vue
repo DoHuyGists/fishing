@@ -18,7 +18,7 @@ const viewModes = computed(() => [
   <section class="w-full max-w-sm rounded-xl border border-[#cbd9c6] bg-white/95 p-3 text-[#24352a] shadow-sm">
     <div class="mb-2 flex items-center justify-between">
       <div class="m-0 text-sm font-bold text-[#153221]">{{ tr('CaughtModal.luoi') }}</div>
-      <span class="text-[11px] text-gray-500">{{ recentCaughtFishes.length }} {{ tr('Fishfarm.ca_2') }}</span>
+      <span class="text-[11px] text-gray-500">{{ recentCaughtFishes.length }} {{ tr('UserProfile.con') }}</span>
     </div>
     <Tab v-model="caughtStore.latestCaughtViewMode" :tabs="viewModes" :aria-label="tr('CaughtModal.che_do_hien_thi')" wrap lazy>
       <template v-for="mode in viewModes" :key="mode.key" #[mode.key]>
@@ -39,7 +39,7 @@ const viewModes = computed(() => [
                 <div class="truncate text-xs font-bold" :title="group.fish.species?.name || tr('CaughtModal.ca_chua_ro_ten')">{{ group.fish.species?.name || tr('CaughtModal.ca_chua_ro_ten') }}</div>
                 <div class="text-[10px] text-gray-500">{{ group.fish.species?.rarity || tr('LatestCaughtList.thuong') }}</div>
               </div>
-              <span class="shrink-0 rounded-full border border-[#cbd9c6] px-2 py-0.5 text-[11px] font-bold">{{ group.count }} {{ tr('Fishfarm.ca_2') }}</span>
+              <span class="shrink-0 rounded-full border border-[#cbd9c6] px-2 py-0.5 text-[11px] font-bold">{{ group.count }} {{ tr('UserProfile.con') }}</span>
             </div>
           </template>
           <template v-else>

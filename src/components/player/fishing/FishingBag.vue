@@ -133,7 +133,7 @@ function getRewardEffect(variant: "NORMAL" | "GOLDEN" | "MUTATED") {
                     <img
                       :src="group.fishes[0].image"
                       :alt="group.name"
-                      class="w-[74px] h-12 rounded-lg object-cover flex-shrink-0"
+                      class="h-12 rounded-lg object-cover flex-shrink-0"
                     />
                     <strong class="text-sm truncate">{{ group.name }}</strong>
                   </div>
@@ -193,7 +193,7 @@ function getRewardEffect(variant: "NORMAL" | "GOLDEN" | "MUTATED") {
                     :src="fish.image"
                     :alt="fish.name"
                     class="rounded-lg object-cover flex-shrink-0"
-                    :class="viewMode === 'grid' ? 'w-full h-24' : 'w-[74px] h-12'"
+                    :class="viewMode === 'grid' ? 'w-full' : 'h-12'"
                   />
                   <div class="grid gap-0.5 min-w-0">
                     <span class="text-[#e8bd62] text-[9px] font-black tracking-[0.09em] uppercase">{{
