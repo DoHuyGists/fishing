@@ -1187,6 +1187,9 @@
     "phu_hop": "Phù hợp"
   },
   "DailyMission": {
+    "difficulty_easy": "Dễ",
+    "difficulty_medium": "Trung bình",
+    "difficulty_hard": "Khó",
     "khong_the_tai_nhiem_vu_hang_ngay": "Không thể tải nhiệm vụ hằng ngày.",
     "value0_value1": "{value0} ×{value1}",
     "chua_co_api_nhan_moc_thuong_nhiem_vu_hang_ngay": "Chưa có API nhận mốc thưởng nhiệm vụ hằng ngày.",
@@ -1195,7 +1198,6 @@
     "nhiem_vu_hang_ngay": "Nhiệm vụ hằng ngày",
     "diem_nhiem_vu": "điểm nhiệm vụ",
     "moc_thuong": "Mốc thưởng",
-    "tich_luy_diem_de_nhan_qua": "Tích lũy điểm để nhận quà",
     "diem": "điểm",
     "da_mo_khoa": "Đã mở khóa",
     "phan_thuong_theo_moc": "Phần thưởng theo mốc",

@@ -163,7 +163,7 @@ async function onKeydown(e: KeyboardEvent, index: number) {
         role="tabpanel"
         :aria-labelledby="tabId(tab.key)"
         tabindex="0"
-        class="py-4 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-green-500"
+        class="focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-green-500"
         :class="contained ? 'min-h-0 flex-1 overflow-hidden' : 'h-full'"
       >
         <slot :name="tab.key" :active="tab.key === activeKey" />

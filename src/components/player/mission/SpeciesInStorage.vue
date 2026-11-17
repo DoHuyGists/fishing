@@ -16,7 +16,7 @@ const emit = defineEmits<{
   toggle: [caught: CaughtFish];
 }>();
 
-const viewMode = ref<ViewMode>("grid");
+const viewMode = ref<ViewMode>("group");
 const expandedSpecies = reactive(new Set<string>());
 
 const groupedBySpecies = computed(() => {
@@ -91,9 +91,9 @@ function selectionClass(caught: CaughtFish) {
         <button
           type="button"
           class="rounded px-2 py-1"
-          :class="viewMode === 'species' ? 'bg-emerald-800 text-white' : 'hover:bg-emerald-50'"
-          :aria-pressed="viewMode === 'species'"
-          @click="viewMode = 'species'"
+          :class="viewMode === 'group' ? 'bg-emerald-800 text-white' : 'hover:bg-emerald-50'"
+          :aria-pressed="viewMode === 'group'"
+          @click="viewMode = 'group'"
         >
           {{ tr('CaughtModal.theo_loai') }}
         </button>
@@ -104,7 +104,7 @@ function selectionClass(caught: CaughtFish) {
       {{ tr('CaughtFishList.ban_chua_co_ca_trong_bo_suu_tap') }}
     </div>
     <div v-else class="h-0 grow overflow-y-auto p-3 sm:p-4">
-      <div v-if="viewMode === 'species'" class="flex flex-col gap-2">
+      <div v-if="viewMode === 'group'" class="flex flex-col gap-2">
         <section
           v-for="group in groupedBySpecies"
           :key="group.key"
@@ -119,7 +119,7 @@ function selectionClass(caught: CaughtFish) {
             <img
               :src="group.image || '/fish/VN/fish.jpg'"
               :alt="group.name"
-              class="h-12 w-14 shrink-0 rounded-md bg-emerald-950/5 object-cover"
+              class="h-12 shrink-0 rounded-md bg-emerald-950/5 object-cover"
             />
             <span class="min-w-0 flex-1 truncate text-sm font-bold text-[#24352a]">{{ group.name }}</span>
             <span class="shrink-0 rounded-full bg-white px-2 py-1 text-xs font-bold"
@@ -142,7 +142,7 @@ function selectionClass(caught: CaughtFish) {
                 <img
                   :src="caught.species?.image || '/fish/VN/fish.jpg'"
                   :alt="caught.species?.name || tr('CaughtModal.ca')"
-                  class="h-10 w-12 shrink-0 rounded-md object-cover"
+                  class="w-12 shrink-0 rounded-md object-cover"
                 />
                 <span class="min-w-0 flex-1">
                   <span class="block truncate text-sm font-bold">{{ caught.species?.name || tr('CaughtModal.ca_chua_ro_ten') }}</span>
@@ -180,8 +180,8 @@ function selectionClass(caught: CaughtFish) {
             :alt="caught.species?.name || tr('CaughtModal.ca')"
             :class="
               viewMode === 'grid'
-                ? 'h-16 w-full rounded-md object-cover bg-emerald-950/5'
-                : 'h-12 w-14 shrink-0 rounded-md object-cover bg-emerald-950/5'
+                ? 'w-full rounded-md object-cover bg-emerald-950/5'
+                : 'w-14 shrink-0 rounded-md object-cover bg-emerald-950/5'
             "
           />
           <span :class="viewMode === 'grid' ? 'w-full min-w-0' : 'min-w-0 flex-1'">

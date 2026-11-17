@@ -13,6 +13,25 @@ export const useMissionStore = defineStore("Mission", {
     dailyMissionsInitializedOn: "",
     claimingDailyRewardId: "",
   }),
+  getters: {
+    dailyMissionProgress(state) {
+      return (state.dailyMissions?.missions ?? []).map((mission) => ({
+        ...mission,
+        isTargetReached: mission.is_completed || (mission.target_value > 0 && mission.current_value >= mission.target_value),
+        progressPercent: mission.is_completed ? 100 : mission.target_value > 0
+          ? Math.max(0, Math.min(100, mission.current_value / mission.target_value * 100))
+          : 0,
+      }));
+    },
+    completedDailyMissionCount(): number {
+      return this.dailyMissionProgress.filter((mission) => mission.isTargetReached).length;
+    },
+    dailyRewardMilestones(state) {
+      return [...(state.dailyMissions?.rewards ?? [])].sort(
+        (first, second) => first.required_points - second.required_points,
+      );
+    },
+  },
   actions: {
     async claimDailyMissionReward(rewardId: string) {
       if (this.claimingDailyRewardId) return false;

@@ -1,4 +1,4 @@
-export type CaughtFishViewMode = "list" | "grid" | "species";
+export type CaughtFishViewMode = "list" | "grid" | "group";
 
 export interface MissionFish {
   id: string;

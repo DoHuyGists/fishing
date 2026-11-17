@@ -61,7 +61,7 @@ const emit = defineEmits<{
             :key="`${fish.id}-${index}`"
             class="flex items-center gap-3 rounded-lg bg-white/75 border border-emerald-950/10 p-2"
           >
-            <img :src="fish.image" :alt="fish.name" class="w-12 h-10 rounded object-cover bg-emerald-950/5" />
+            <img :src="fish.image" :alt="fish.name" class="w-20 rounded object-cover bg-emerald-950/5" />
             <span class="min-w-0 flex-1"
               ><strong class="block truncate text-sm">{{ fish.name }}</strong
               ><span class="block text-xs text-emerald-900/60">{{ fish.rarity }} · {{ fish.length }}</span></span

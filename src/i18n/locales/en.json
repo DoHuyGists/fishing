@@ -1183,6 +1183,9 @@
     "phu_hop": "Matching"
   },
   "DailyMission": {
+    "difficulty_easy": "Easy",
+    "difficulty_medium": "Medium",
+    "difficulty_hard": "Hard",
     "khong_the_tai_nhiem_vu_hang_ngay": "Unable to load daily missions.",
     "value0_value1": "{value0} ×{value1}",
     "chua_co_api_nhan_moc_thuong_nhiem_vu_hang_ngay": "Daily mission milestone rewards are not available yet.",
@@ -1191,7 +1194,6 @@
     "nhiem_vu_hang_ngay": "Daily missions",
     "diem_nhiem_vu": "mission points",
     "moc_thuong": "Reward milestones",
-    "tich_luy_diem_de_nhan_qua": "Earn points to receive gifts",
     "diem": "points",
     "da_mo_khoa": "Unlocked",
     "phan_thuong_theo_moc": "Milestone rewards",

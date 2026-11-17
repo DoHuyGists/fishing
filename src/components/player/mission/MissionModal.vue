@@ -8,7 +8,7 @@ import { useToast } from "../../../composables/useToast.ts";
 import Modal from "../../shared/Modal.vue";
 import Tab from "../../shared/Tab.vue";
 import type { TabItem } from "../../shared/Tab.vue";
-import CaughtFishList from "./CaughtFishList.vue";
+import SpeciesInStorage from "./SpeciesInStorage.vue";
 import MissionList from "./MissionList.vue";
 import DailyMission from "./DailyMission.vue";
 
@@ -133,7 +133,7 @@ onMounted(() => void loadMissionData(true));
             {{ tr('MissionModal.dang_tai_ca_va_nhiem_vu') }}
           </div>
           <div v-else class="grid min-h-0 grid-rows-[minmax(0,1fr)_minmax(0,1fr)] md:grid-rows-1 md:grid-cols-[minmax(0,1fr)_minmax(0,1fr)] h-full">
-            <CaughtFishList :caught-fishes="caughtStore.caughtFishes" :selected-caught-ids="selectedCaughtIds" :required-fish-counts="requiredFishCounts" :selected-fish-counts="selectedFishCounts" @toggle="toggleCaught" />
+            <SpeciesInStorage :caught-fishes="caughtStore.caughtFishes" :selected-caught-ids="selectedCaughtIds" :required-fish-counts="requiredFishCounts" :selected-fish-counts="selectedFishCounts" @toggle="toggleCaught" />
             <MissionList :missions="missionStore.missions" :selected-mission="selectedMission" :selected-mission-id="selectedMissionId" :selected-caught-ids="selectedCaughtIds" :required-fish-counts="requiredFishCounts" :selected-fish-counts="selectedFishCounts" :status-message="statusMessage"
               :status-is-error="statusIsError" :is-mission-complete="isMissionComplete" :is-claiming="isClaiming" @select="selectMission" @claim="claimMission" />
           </div>

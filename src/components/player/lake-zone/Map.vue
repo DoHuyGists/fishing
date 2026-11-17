@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { ref, computed } from 'vue'
+import { ref, computed, watch } from 'vue'
 
 interface Pt {
   x: number
@@ -62,6 +62,21 @@ function defaultNatural(): Pt[] {
 }
 
 const naturalPts = ref<Pt[]>(defaultNatural())
+const selectedNode = ref<number | null>(null) // node bờ hồ đang chọn (hiện nút "Xóa node")
+
+const selectedNodePt = computed<Pt | null>(() =>
+  selectedNode.value === null ? null : (naturalPts.value[selectedNode.value] ?? null),
+)
+const canRemoveNode = computed(() => naturalPts.value.length > NODE_MIN)
+
+// Vị trí nút "Xóa node": phía trên node, lật xuống dưới nếu sát mép trên
+const removeBtnPos = computed<Pt | null>(() => {
+  const n = selectedNodePt.value
+  if (!n) return null
+  const x = clamp(n.x, 50, 550)
+  const y = n.y - 42 < 6 ? n.y + 16 : n.y - 42
+  return { x, y }
+})
 
 // Đường cong Catmull-Rom khép kín đi qua tất cả node
 function spline(pts: Pt[]): Pt[] {
@@ -193,6 +208,7 @@ function reshape(shape: ShapeKey, w: number, h: number) {
 function applyPreset(key: ShapeKey) {
   const p = presets.find((p) => p.key === key)!
   if (key === 'natural') naturalPts.value = defaultNatural() // bấm lại "Tự nhiên" = đặt lại hình
+  selectedNode.value = null
   reshape(p.key, p.w, p.h)
 }
 
@@ -234,6 +250,7 @@ function bounds(poly: Pt[]) {
 function randomizeLake() {
   const old = bounds(lake.value)
   naturalPts.value = randomNatural()
+  selectedNode.value = null
   shapeKey.value = 'natural'
   size.value = { w: 500, h: 300 }
   const now = bounds(lake.value)
@@ -268,6 +285,7 @@ function resize(next: { w?: number; h?: number }) {
 function insertNode(afterIndex: number, p: Pt) {
   if (naturalPts.value.length >= NODE_MAX) return
   naturalPts.value.splice(afterIndex + 1, 0, { x: p.x, y: p.y })
+  selectedNode.value = null // chỉ số node đã đổi
 }
 
 function addNodeAuto() {
@@ -289,6 +307,7 @@ function addNodeAuto() {
 function removeNode(i: number) {
   if (naturalPts.value.length <= NODE_MIN) return
   naturalPts.value.splice(i, 1)
+  selectedNode.value = null
   pullSeedsIn()
 }
 
@@ -565,8 +584,20 @@ function toSvg(e: PointerEvent | MouseEvent): Pt {
 function startDrag(id: string, kind: DragKind, e: PointerEvent) {
   drag.value = { id, kind }
   if (kind === 'seed' || kind === 'radius') selectedId.value = id
+  if (kind === 'lakeNode') {
+    selectedId.value = null
+    selectedNode.value = Number(id)
+  }
   ;(e.target as Element).setPointerCapture(e.pointerId)
 }
+
+// Chọn vùng thì bỏ chọn node bờ hồ; đổi hình hoặc tắt node thì ẩn nút xoá
+watch(selectedId, (v) => {
+  if (v) selectedNode.value = null
+})
+watch([isNatural, shapeMode], ([natural, mode]) => {
+  if (!natural || !mode) selectedNode.value = null
+})
 
 function onMove(e: PointerEvent) {
   if (!drag.value) return
@@ -628,7 +659,7 @@ function percentOf(id: string): number {
           @pointermove="onMove"
           @pointerup="endDrag"
           @pointercancel="endDrag"
-          @click="selectedId = null"
+          @click="((selectedId = null), (selectedNode = null))"
           @dblclick="onDblClick"
         >
           <defs>
@@ -754,8 +785,8 @@ function percentOf(id: string): number {
                 :key="'n-' + i"
                 :cx="n.x"
                 :cy="n.y"
-                r="6"
-                fill="#1e293b"
+                :r="selectedNode === i ? 8 : 6"
+                :fill="selectedNode === i ? '#0284c7' : '#1e293b'"
                 stroke="#fff"
                 stroke-width="2"
                 class="cursor-move"
@@ -764,6 +795,38 @@ function percentOf(id: string): number {
                 @dblclick.stop="removeNode(i)"
                 @pointerdown.stop="startDrag(String(i), 'lakeNode', $event)"
               />
+
+              <!-- Nút "Xóa node" hiện cạnh node đang chọn -->
+              <g
+                v-if="removeBtnPos && selectedNode !== null && !drag"
+                :transform="`translate(${removeBtnPos.x - 46}, ${removeBtnPos.y})`"
+                role="button"
+                tabindex="0"
+                aria-label="Xóa node"
+                :class="canRemoveNode ? 'cursor-pointer' : 'cursor-not-allowed'"
+                @click.stop="selectedNode !== null && removeNode(selectedNode)"
+                @keydown.enter.stop="selectedNode !== null && removeNode(selectedNode)"
+              >
+                <rect
+                  width="92"
+                  height="26"
+                  rx="13"
+                  :fill="canRemoveNode ? '#dc2626' : '#94a3b8'"
+                  stroke="#fff"
+                  stroke-width="2"
+                />
+                <text
+                  x="46"
+                  y="17"
+                  text-anchor="middle"
+                  font-size="12"
+                  font-weight="600"
+                  fill="#fff"
+                  class="pointer-events-none"
+                >
+                  {{ canRemoveNode ? 'Xóa node' : 'Tối thiểu ' + NODE_MIN }}
+                </text>
+              </g>
             </template>
 
             <!-- Các hình còn lại: 2 thanh kéo giãn biên -->
@@ -859,8 +922,8 @@ function percentOf(id: string): number {
             </button>
           </div>
           <p class="text-xs text-slate-500">
-            Kéo chấm đen để uốn bờ hồ. Bấm đúp lên bờ để thêm node, bấm đúp vào node để xoá (tối thiểu {{ NODE_MIN }}).
-            Bấm lại "Tự nhiên" để đặt lại hình ban đầu.
+            Kéo chấm đen để uốn bờ hồ. Bấm vào một node để hiện nút "Xóa node" (tối thiểu {{ NODE_MIN }} node).
+            Bấm đúp lên bờ để thêm node. Bấm lại "Tự nhiên" để đặt lại hình ban đầu.
           </p>
         </div>
 
