@@ -8,6 +8,7 @@ import { useToast } from "../../../composables/useToast.ts";
 import { useAdminZoneStore } from "../zone-management/admin-zone-store.ts";
 import { useAdminFishingAreaStore } from "./admin-fishing-area-store.ts";
 import FishingBoundaryPickerModal from "./FishingBoundaryPickerModal.vue";
+import { timezoneOptions } from "./timezone-options";
 
 const worldStore = useWorldStore();
 const countryStore = useCountryStore();
@@ -93,6 +94,8 @@ function buildPayload(): FishingAreaPayload | null {
   }
 
   return {
+    timezone: adminFishingAreaStore.target.timezone || null,
+    allowDepthTool: adminFishingAreaStore.target.allowDepthTool,
     zoneId: adminFishingAreaStore.target.zoneId || null,
     maxDepth,
     countryId: adminFishingAreaStore.target.countryId,
@@ -261,6 +264,35 @@ onUnmounted(() => {
           class="px-3 py-1.5 border border-gray-300 rounded-lg text-xs focus:outline-none focus:border-emerald-500"
         />
       </div>
+
+      <div class="flex flex-col gap-1.5">
+        <label for="fishing-area-timezone" class="text-[11px] font-bold text-gray-500 uppercase">Múi giờ (timezone)</label>
+        <select
+          id="fishing-area-timezone"
+          v-model="adminFishingAreaStore.target.timezone"
+          :disabled="adminFishingAreaStore.isFormLock"
+          class="px-3 py-1.5 border border-[#cbd9c6] rounded-lg text-xs bg-[#f5f9f0] text-[#24352a] focus:outline-none focus:border-emerald-500"
+        >
+          <option :value="null">-- Theo múi giờ quốc gia --</option>
+          <option
+            v-if="adminFishingAreaStore.target.timezone && !timezoneOptions.includes(adminFishingAreaStore.target.timezone)"
+            :value="adminFishingAreaStore.target.timezone"
+          >
+            {{ adminFishingAreaStore.target.timezone }}
+          </option>
+          <option v-for="timezone in timezoneOptions" :key="timezone" :value="timezone">{{ timezone }}</option>
+        </select>
+      </div>
+
+      <label class="flex items-center gap-2 text-xs font-medium text-[#24352a] cursor-pointer select-none">
+        <input
+          v-model="adminFishingAreaStore.target.allowDepthTool"
+          type="checkbox"
+          class="w-4 h-4 accent-emerald-700"
+          :disabled="adminFishingAreaStore.isFormLock"
+        />
+        Cho phép công cụ đo độ sâu (allow_depth_tool)
+      </label>
 
       <label class="flex items-center gap-2 text-xs font-medium text-gray-700 cursor-pointer select-none">
         <input

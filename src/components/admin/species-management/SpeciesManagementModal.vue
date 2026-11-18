@@ -8,6 +8,7 @@ import { storeToRefs } from "pinia";
 
 import { useAdminSpeciesStore } from "./admin-species-store.ts";
 import SpeciesManagementForm from "./SpeciesManagementForm.vue";
+import SpeciesManagementStats from "./SpeciesManagementStats.vue";
 
 const emit = defineEmits(["close"]);
 const speciesStore = useAdminSpeciesStore();
@@ -66,8 +67,6 @@ onMounted(() => speciesStore.fetchAll());
     icon="🐟"
     @close="emit('close')"
   >
-    <template #subtitle>{{ speciesStore.species.length }} loài trong danh mục</template>
-
     <div class="flex shrink-0 flex-wrap items-center gap-3 border-b border-gray-200 bg-white px-5 py-3 md:px-7">
       <div class="relative min-w-55 flex-1">
         <input
@@ -156,7 +155,7 @@ onMounted(() => speciesStore.fetchAll());
           </div>
         </div>
         <div v-else-if="viewMode === 'list'" class="min-h-0 flex-1 overflow-auto rounded-lg border border-gray-200 bg-white shadow-sm">
-          <table class="w-full min-w-[1050px] border-collapse text-left text-sm">
+          <table class="w-full min-w-[1400px] border-collapse text-left text-sm">
             <thead class="text-[11px] uppercase text-gray-600">
               <tr>
                 <th class="sticky top-0 z-10 bg-gray-100 px-4 py-3">Loài cá</th>
@@ -164,6 +163,7 @@ onMounted(() => speciesStore.fetchAll());
                 <th class="sticky top-0 z-10 bg-gray-100 px-4 py-3">Độ hiếm</th>
                 <th class="sticky top-0 z-10 bg-gray-100 px-4 py-3">Khối lượng</th>
                 <th class="sticky top-0 z-10 bg-gray-100 px-4 py-3">Tỉ lệ bắt</th>
+                <th class="sticky top-0 z-10 bg-gray-100 px-4 py-3">Chỉ số loài cá</th>
                 <th class="sticky top-0 z-10 bg-gray-100 px-4 py-3">Ngày tạo</th>
                 <th class="sticky top-0 z-10 bg-gray-100 px-4 py-3 text-right">Thao tác</th>
               </tr>
@@ -191,6 +191,7 @@ onMounted(() => speciesStore.fetchAll());
                     </div>
                     <div class="min-w-0">
                       <div class="truncate font-bold text-gray-800" :title="item.name">{{ item.name }}</div>
+                      <div class="mt-1 break-all text-xs text-gray-500">ID: {{ item.id }}</div>
                       <div class="mt-1 max-w-[22rem] truncate text-xs text-gray-500" :title="item.information || ''">
                         {{ item.information || "Chưa có mô tả" }}
                       </div>
@@ -203,6 +204,7 @@ onMounted(() => speciesStore.fetchAll());
                   {{ item.weight_min ?? "—" }} – {{ item.weight_max ?? "—" }}
                 </td>
                 <td class="px-4 py-3 text-gray-700">{{ item.base_catch_rate ?? "—" }}</td>
+                <td class="min-w-72 px-4 py-3"><SpeciesManagementStats :species="item" /></td>
                 <td class="whitespace-nowrap px-4 py-3 text-xs text-gray-500">{{ formatDate(item.created_at) }}</td>
                 <td class="px-4 py-3">
                   <div class="flex justify-end gap-2">
@@ -248,6 +250,7 @@ onMounted(() => speciesStore.fetchAll());
                 <div class="flex flex-1 flex-col gap-3 p-4">
                   <div>
                     <div class="m-0 break-words text-sm font-bold text-[#24352a]">{{ item.name }}</div>
+                    <div class="mt-2 break-all text-xs text-gray-500">ID: {{ item.id }}</div>
                     <div class="m-0 mt-1 line-clamp-2 text-xs text-gray-500" :title="item.information || ''">
                       {{ item.information || "Chưa có mô tả" }}
                     </div>
@@ -259,6 +262,7 @@ onMounted(() => speciesStore.fetchAll());
                     <div><dt class="text-gray-500">Tỉ lệ bắt</dt><dd class="m-0 mt-1 text-[#24352a]">{{ item.base_catch_rate ?? "—" }}</dd></div>
                     <div><dt class="text-gray-500">Ngày tạo</dt><dd class="m-0 mt-1 text-[#24352a]">{{ formatDate(item.created_at) }}</dd></div>
                   </dl>
+                  <SpeciesManagementStats :species="item" />
                   <div class="mt-auto flex justify-end gap-2 border-t border-[#cbd9c6] pt-3">
                     <button type="button" :aria-label="`Sửa ${item.name}`" class="rounded-md border border-[#cbd9c6] px-2.5 py-1.5 text-xs font-bold text-[#24352a] hover:bg-[#f5f9f0]" @click="openEditForm(item)">Sửa</button>
                     <button type="button" :aria-label="`Xoá ${item.name}`" class="rounded-md border border-red-200 px-2.5 py-1.5 text-xs font-bold text-red-700 hover:bg-red-50" @click="confirmDeleteId = item.id">Xoá</button>

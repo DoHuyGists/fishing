@@ -20,6 +20,7 @@ function mapRow(row: any): FishingAreaRow {
     zoneId: row.zone_id ?? null,
     maxDepth: row.max_depth == null ? null : Number(row.max_depth),
     allowDepthTool: row.allow_depth_tool === true,
+    timezone: row.timezone ?? null,
   };
 }
 
@@ -33,6 +34,8 @@ function toDbPayload(payload: FishingAreaPayload) {
     fishing_boundary: payload.fishingBoundary,
     zone_id: payload.zoneId,
     max_depth: payload.maxDepth,
+    timezone: payload.timezone,
+    allow_depth_tool: payload.allowDepthTool,
   };
 }
 

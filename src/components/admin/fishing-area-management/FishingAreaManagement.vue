@@ -195,7 +195,7 @@ watch(
           <div class="m-0 font-medium">Không tìm thấy bãi câu nào phù hợp.</div>
         </div>
 
-        <div v-else class="bg-white border border-gray-200 rounded-xl overflow-hidden shadow-2xs">
+        <div v-else class="bg-white border border-gray-200 rounded-xl overflow-x-auto shadow-2xs">
           <table class="w-full text-xs text-left border-collapse">
             <thead class="bg-gray-100 text-gray-600 uppercase text-[10px] tracking-wide">
               <tr>
@@ -203,6 +203,8 @@ watch(
                 <th class="px-4 py-2.5">Quốc gia</th>
                 <th class="px-4 py-2.5">Đường dẫn cảnh</th>
                 <th class="px-4 py-2.5">Vùng câu</th>
+                <th class="px-4 py-2.5">Múi giờ</th>
+                <th class="px-4 py-2.5">Công cụ đo độ sâu</th>
                 <th class="px-4 py-2.5">Trạng thái</th>
                 <th class="px-4 py-2.5">Tạo lúc</th>
                 <th class="px-4 py-2.5 text-right">Hành động</th>
@@ -216,6 +218,16 @@ watch(
                   {{ area.scenePath || "—" }}
                 </td>
                 <td class="px-4 py-2.5 text-gray-500">{{ area.fishingBoundary?.length || 0 }} điểm</td>
+                <td class="px-4 py-2.5 text-gray-600 whitespace-nowrap">{{ area.timezone || "Theo quốc gia" }}</td>
+                <td class="px-4 py-2.5">
+                  <input
+                    type="checkbox"
+                    :checked="area.allowDepthTool"
+                    disabled
+                    :aria-label="`Cho phép công cụ đo độ sâu: ${area.title || area.id}`"
+                    class="w-4 h-4 accent-emerald-700"
+                  />
+                </td>
                 <td class="px-4 py-2.5">
                   <span
                     class="px-2 py-0.5 rounded-full text-[10px] font-bold border"

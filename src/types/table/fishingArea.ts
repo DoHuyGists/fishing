@@ -15,9 +15,12 @@ export interface FishingAreaRow {
   zoneId: string | null;
   maxDepth: number | null;
   allowDepthTool: boolean;
+  timezone: string | null;
 }
 
 export interface FishingAreaPayload {
+  timezone: string | null;
+  allowDepthTool: boolean;
   countryId: string;
   isAvailable: boolean;
   title: string | null;

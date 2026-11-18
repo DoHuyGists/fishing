@@ -1,5 +1,5 @@
 <script lang="ts" setup>
-import type { SpeciesPayload, SpeciesRow } from "../../../types/table/species";
+import type { SpeciesFormState, SpeciesPayload, SpeciesRow } from "../../../types/table/species";
 import { reactive, ref, watch } from "vue";
 
 import { useAdminSpeciesStore } from "./admin-species-store";
@@ -17,18 +17,6 @@ const speciesStore = useAdminSpeciesStore();
 const isSaving = ref(false);
 const formError = ref("");
 
-interface SpeciesFormState {
-  name: string;
-  information: string;
-  location: string;
-  image: string;
-  rarity: string;
-  weightMin: number | null;
-  weightMax: number | null;
-  baseCatchRate: number | null;
-  rareWeight: number;
-}
-
 function emptyForm(): SpeciesFormState {
   return {
     name: "",
@@ -40,6 +28,12 @@ function emptyForm(): SpeciesFormState {
     weightMax: null,
     baseCatchRate: 0.5,
     rareWeight: 1,
+    activeTime: "",
+    experiencePoint: 0,
+    fishType: "",
+    strength: null,
+    alertness: null,
+    burstMultiplier: null,
   };
 }
 
@@ -61,6 +55,12 @@ watch(
             weightMax: species.weight_max,
             baseCatchRate: species.base_catch_rate,
             rareWeight: species.rare_weight ?? 1,
+            activeTime: species.active_time ?? "",
+            experiencePoint: species.experience_point ?? 0,
+            fishType: species.fish_type ?? "",
+            strength: species.strength,
+            alertness: species.alertness,
+            burstMultiplier: species.burst_multiplier,
           }
         : emptyForm(),
     );
@@ -81,6 +81,23 @@ function buildPayload(): SpeciesPayload | null {
   const weightMax = optionalNumber(form.weightMax);
   const baseCatchRate = optionalNumber(form.baseCatchRate);
   const rareWeight = optionalNumber(form.rareWeight);
+  const experiencePoint = optionalNumber(form.experiencePoint);
+  const strength = optionalNumber(form.strength);
+  const alertness = optionalNumber(form.alertness);
+  const burstMultiplier = optionalNumber(form.burstMultiplier);
+
+  if (experiencePoint === null || !Number.isInteger(experiencePoint) || experiencePoint < 0) {
+    formError.value = "Điểm kinh nghiệm phải là số nguyên không âm";
+    return null;
+  }
+  if ([strength, alertness].some((value) => value !== null && (!Number.isFinite(value) || value < 0))) {
+    formError.value = "Sức mạnh và độ cảnh giác phải là số không âm hợp lệ";
+    return null;
+  }
+  if (burstMultiplier !== null && (!Number.isFinite(burstMultiplier) || burstMultiplier < 1 || burstMultiplier > 10)) {
+    formError.value = "Hệ số bùng nổ phải nằm trong khoảng 1 đến 10";
+    return null;
+  }
 
   if (rareWeight === null || !Number.isFinite(rareWeight) || rareWeight <= 0 || rareWeight > 1000000) {
     formError.value = "Trọng số độ hiếm phải lớn hơn 0 và không vượt quá 1.000.000";
@@ -118,6 +135,12 @@ function buildPayload(): SpeciesPayload | null {
     weight_max: weightMax,
     base_catch_rate: baseCatchRate,
     rare_weight: rareWeight,
+    active_time: form.activeTime.trim() || null,
+    experience_point: experiencePoint,
+    fish_type: form.fishType.trim() || null,
+    strength,
+    alertness,
+    burst_multiplier: burstMultiplier,
   };
 }
 
@@ -140,13 +163,12 @@ async function handleSave() {
 </script>
 
 <template>
-  <aside class="ml-auto flex h-full w-full max-w-xl flex-col border-l border-gray-200 bg-white shadow-xl" @click.stop>
+  <aside class="player-popup-in ml-auto flex h-full w-full max-w-xl flex-col border-l border-gray-200 bg-white shadow-xl" @click.stop>
     <div class="flex shrink-0 items-center justify-between border-b border-gray-200 px-5 py-4">
       <div>
         <div class="m-0 text-base font-extrabold text-[#153221]">
           {{ species ? "Chỉnh sửa loài cá" : "Thêm loài cá" }}
         </div>
-        <div class="m-0 mt-1 text-xs text-gray-500">Thông tin trong bảng species</div>
       </div>
       <button
         type="button"
@@ -223,8 +245,36 @@ async function handleSave() {
             Trọng số độ hiếm (R)
             <input v-model.number="form.rareWeight" type="number" min="0.000001" max="1000000" step="any" required class="rounded-md border border-gray-300 px-3 py-2 text-sm font-normal text-gray-800 focus:border-emerald-600 focus:outline-none" />
           </label>
-          <div v-if="species" class="text-xs text-gray-600">
-            Hệ số mùa hiện tại: {{ species.season_weight ?? 1 }} (tự động theo mùa)
+          <label class="flex flex-col gap-1.5 text-xs font-bold text-gray-600">
+            Thời gian hoạt động
+            <input v-model="form.activeTime" placeholder="ALL, DAY, NIGHT..." class="rounded-md border border-[#cbd9c6] px-3 py-2 text-sm font-normal text-[#24352a] focus:border-emerald-600 focus:outline-none" />
+          </label>
+          <label class="flex flex-col gap-1.5 text-xs font-bold text-gray-600">
+            Loại cá
+            <input v-model="form.fishType" class="rounded-md border border-[#cbd9c6] px-3 py-2 text-sm font-normal text-[#24352a] focus:border-emerald-600 focus:outline-none" />
+          </label>
+          <label class="flex flex-col gap-1.5 text-xs font-bold text-gray-600">
+            Điểm kinh nghiệm *
+            <input v-model.number="form.experiencePoint" type="number" min="0" step="1" required class="rounded-md border border-[#cbd9c6] px-3 py-2 text-sm font-normal text-[#24352a] focus:border-emerald-600 focus:outline-none" />
+          </label>
+          <label class="flex flex-col gap-1.5 text-xs font-bold text-gray-600">
+            Sức mạnh kéo
+            <input v-model.number="form.strength" type="number" min="0" step="any" class="rounded-md border border-[#cbd9c6] px-3 py-2 text-sm font-normal text-[#24352a] focus:border-emerald-600 focus:outline-none" />
+          </label>
+          <label class="flex flex-col gap-1.5 text-xs font-bold text-gray-600">
+            Độ cảnh giác
+            <input v-model.number="form.alertness" type="number" min="0" step="any" class="rounded-md border border-[#cbd9c6] px-3 py-2 text-sm font-normal text-[#24352a] focus:border-emerald-600 focus:outline-none" />
+          </label>
+          <label class="flex flex-col gap-1.5 text-xs font-bold text-gray-600">
+            Hệ số bùng nổ (1–10)
+            <input v-model.number="form.burstMultiplier" type="number" min="1" max="10" step="any" class="rounded-md border border-[#cbd9c6] px-3 py-2 text-sm font-normal text-[#24352a] focus:border-emerald-600 focus:outline-none" />
+          </label>
+          <div class="rounded-md border border-[#cbd9c6] bg-[#f5f9f0] p-3 text-xs text-[#24352a] sm:col-span-2">
+            Trọng số theo mùa: {{ species?.season_weight ?? 1 }} (tự động theo mùa, không phải %)
+            <template v-if="species">
+              <div class="mt-2 break-all">ID: {{ species.id }}</div>
+              <div class="mt-2">Ngày tạo: {{ new Date(species.created_at).toLocaleString('vi-VN') }}</div>
+            </template>
           </div>
           <label class="flex flex-col gap-1.5 text-xs font-bold text-gray-600 sm:col-span-2">
             Đường dẫn hình ảnh

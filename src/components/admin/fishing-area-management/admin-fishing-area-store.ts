@@ -77,6 +77,7 @@ export const useAdminFishingAreaStore = defineStore("AdminFishingArea", {
         zoneId: null,
         maxDepth: null,
         allowDepthTool: false,
+        timezone: null,
         createdAt: "",
       };
     },
