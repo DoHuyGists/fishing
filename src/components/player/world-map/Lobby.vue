@@ -49,11 +49,11 @@ const DonationModal = defineAsyncComponent(() => import("../donation/DonationMod
 const SkillModal = defineAsyncComponent(() => import("../skill/SkillModal.vue"));
 const AquacultureModal = defineAsyncComponent(() => import("../aquaculture/AquacultureModal.vue"));
 const DispatchModal = defineAsyncComponent(() => import("../dispatch/DispatchModal.vue"));
-const LakeMapModal = defineAsyncComponent(() => import("../lake-zone/LakeMapModal.vue"));
+const FishingMapModal = defineAsyncComponent(() => import("../fishing-map/FishingMapModal.vue"));
 const GuideModal = defineAsyncComponent(() => import("../guide/GuideModal.vue"));
 const RuleModal = defineAsyncComponent(() => import("../rule/RuleModal.vue"));
 const TutorialModal = defineAsyncComponent(() => import("../tutorial/TutorialModal.vue"));
-const StoryModal = defineAsyncComponent(() => import('../../story/StoryModal.vue'));
+const StoryModal = defineAsyncComponent(() => import("../../story/StoryModal.vue"));
 
 const authStore = useAuthStore();
 const caughtStore = useCaughtStore();
@@ -228,7 +228,7 @@ onUnmounted(() => {
           <SkillModal v-if="modalStore.isOpening('skill')" />
           <AquacultureModal v-if="modalStore.isOpening('aquaculture')" />
           <DispatchModal v-if="modalStore.isOpening('dispatch')" />
-          <LakeMapModal v-if="modalStore.isOpening('lake-map')" />
+          <FishingMapModal v-if="modalStore.isOpening('fishing-map')" />
           <Feedbackmodal v-if="modalStore.isOpening('feedback')" />
           <MissionModal v-if="modalStore.isOpening('mission')" />
           <EventModal v-if="configStore.isUnlocked('event') && modalStore.isOpening('event')" />

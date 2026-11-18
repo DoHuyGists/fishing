@@ -24,6 +24,14 @@ function mapRow(row: any): SpeciesInAreaRow {
 }
 
 class SupabaseSpeciesInAreaRepository {
+  async fetchMapSpecies(countryId: string): Promise<SpeciesInAreaRow[]> {
+    const rows = await readCatalogPages((from, to) => supabase.from("species_in_area")
+      .select("area_id, species_id, area:fishing_areas!inner(id, title, country_id, is_available), species:species!inner(id, name, image, rarity)")
+      .eq("area.country_id", countryId).eq("area.is_available", true)
+      .order("area_id").order("species_id").range(from, to));
+    return rows.map(mapRow);
+  }
+
   async fetchDistribution(areaId: string): Promise<SpeciesInAreaRow[]> {
     // Do not let either the admin page size or PostgREST's row limit truncate a lake.
     const rows = await readCatalogPages((from, to) => supabase.from("species_in_area").select(SELECT_QUERY)

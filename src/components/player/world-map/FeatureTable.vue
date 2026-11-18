@@ -12,59 +12,253 @@ const modalStore = useModalStore();
 const notificationStore = useNotificationStore();
 const features = useFeatureAvailabilityStore();
 
-const buttonDirections = ['from-top-left', 'from-top-right', 'from-bottom-left', 'from-bottom-right'];
+const buttonDirections = ["from-top-left", "from-top-right", "from-bottom-left", "from-bottom-right"];
 
 const utilityActions: LobbyAction[] = [
-  { modal: 'account', get label() { return tr('FeatureTable.tai_khoan'); }, icon: '⚙️', tourId: 'first-play-account' },
-  { modal: 'guide', get label() { return tr('FeatureTable.huong_dan'); }, icon: '📖' },
-  { modal: 'tutorial', get label() { return tr('NewPlayerFishing.thuc_hanh'); }, icon: '🎣' },
-  { modal: 'notifications', get label() { return tr('NotificationModal.thong_bao'); }, icon: '🔔' },
+  {
+    modal: "account",
+    get label() {
+      return tr("FeatureTable.tai_khoan");
+    },
+    icon: "⚙️",
+    tourId: "first-play-account",
+  },
+  {
+    modal: "guide",
+    get label() {
+      return tr("FeatureTable.huong_dan");
+    },
+    icon: "📖",
+  },
+  {
+    modal: "tutorial",
+    get label() {
+      return tr("NewPlayerFishing.thuc_hanh");
+    },
+    icon: "🎣",
+  },
+  {
+    modal: "notifications",
+    get label() {
+      return tr("NotificationModal.thong_bao");
+    },
+    icon: "🔔",
+  },
 ];
 
 const actionGroups: { key: string; label: string; iconClass: string; actions: LobbyAction[] }[] = [
   {
-    key: 'equipment', get label() { return tr('FeatureTable.hanh_trang'); }, iconClass: 'bg-[#e7f0df]',
+    key: "equipment",
+    get label() {
+      return tr("FeatureTable.hanh_trang");
+    },
+    iconClass: "bg-[#e7f0df]",
     actions: [
-      { modal: 'inventory', get label() { return tr('InventoryModal.tui_do'); }, icon: '🎒', tourId: 'first-play-inventory' },
-      { modal: 'caught', get label() { return tr('FeatureTable.kho_ca'); }, icon: '🐟', tourId: 'first-play-storage' },
-      { modal: 'shop', get label() { return tr('FeatureTable.cua_hang'); }, icon: '🛒' },
-      { modal: 'skill', get label() { return tr('SkillModal.ky_nang'); }, icon: '✨' },
-      { modal: 'post-production', get label() { return tr('PostProduction.luoi_ca'); }, icon: '🕸️', requiresUnlock: true },
-      { modal: 'work-bench', get label() { return tr('WorkBenchModal.che_tao'); }, icon: '🛠️', requiresUnlock: true },
+      {
+        modal: "inventory",
+        get label() {
+          return tr("InventoryModal.tui_do");
+        },
+        icon: "🎒",
+        tourId: "first-play-inventory",
+      },
+      {
+        modal: "caught",
+        get label() {
+          return tr("FeatureTable.kho_ca");
+        },
+        icon: "🐟",
+        tourId: "first-play-storage",
+      },
+      {
+        modal: "shop",
+        get label() {
+          return tr("FeatureTable.cua_hang");
+        },
+        icon: "🛒",
+      },
+      {
+        modal: "skill",
+        get label() {
+          return tr("SkillModal.ky_nang");
+        },
+        icon: "✨",
+      },
+      {
+        modal: "post-production",
+        get label() {
+          return tr("PostProduction.luoi_ca");
+        },
+        icon: "🕸️",
+        requiresUnlock: true,
+      },
+      {
+        modal: "work-bench",
+        get label() {
+          return tr("WorkBenchModal.che_tao");
+        },
+        icon: "🛠️",
+        requiresUnlock: true,
+      },
     ],
   },
   {
-    key: 'activities', get label() { return tr('FeatureTable.hoat_dong'); }, iconClass: 'bg-[#fcf0d9]',
+    key: "activities",
+    get label() {
+      return tr("FeatureTable.hoat_dong");
+    },
+    iconClass: "bg-[#fcf0d9]",
     actions: [
-      { modal: 'story', get label() { return tr('Story.library'); }, icon: '◈' },
-      { modal: 'mission', get label() { return tr('MissionList.nhiem_vu'); }, icon: '📜' },
-      { modal: 'lake-map', get label() { return tr('LakeMapModal.title'); }, icon: '🗺️' },
-      { modal: 'attendance', get label() { return tr('AttendanceModal.diem_danh'); }, icon: '📅' },
-      { modal: 'event', get label() { return tr('EventModal.su_kien_2'); }, icon: '🎉', requiresUnlock: true },
-      { modal: 'market', get label() { return tr('MarketWindow.cho_ca'); }, icon: '🏪', tourId: 'first-play-market', requiresUnlock: true },
-      { modal: 'gacha', label: 'Gacha', icon: '🎁', requiresUnlock: true },
-      { modal: 'aquaculture', get label() { return tr('AquacultureModal.nong_trai_ca'); }, icon: '🐠' },
-      { modal: 'dispatch', get label() { return tr('Dispatch.title'); }, icon: '🧭' },
+      {
+        modal: "story",
+        get label() {
+          return tr("Story.library");
+        },
+        icon: "◈",
+      },
+      {
+        modal: "mission",
+        get label() {
+          return tr("MissionList.nhiem_vu");
+        },
+        icon: "📜",
+      },
+      {
+        modal: "fishing-map",
+        get label() {
+          return tr("FishingMapModal.title");
+        },
+        icon: "🗺️",
+      },
+      {
+        modal: "attendance",
+        get label() {
+          return tr("AttendanceModal.diem_danh");
+        },
+        icon: "📅",
+      },
+      {
+        modal: "event",
+        get label() {
+          return tr("EventModal.su_kien_2");
+        },
+        icon: "🎉",
+        requiresUnlock: true,
+      },
+      {
+        modal: "market",
+        get label() {
+          return tr("MarketWindow.cho_ca");
+        },
+        icon: "🏪",
+        tourId: "first-play-market",
+        requiresUnlock: true,
+      },
+      { modal: "gacha", label: "Gacha", icon: "🎁", requiresUnlock: true },
+      {
+        modal: "aquaculture",
+        get label() {
+          return tr("AquacultureModal.nong_trai_ca");
+        },
+        icon: "🐠",
+      },
+      {
+        modal: "dispatch",
+        get label() {
+          return tr("Dispatch.title");
+        },
+        icon: "🧭",
+      },
     ],
   },
   {
-    key: 'community', get label() { return tr('FeatureTable.cong_dong_thanh_tich'); }, iconClass: 'bg-[#e7eff7]',
+    key: "community",
+    get label() {
+      return tr("FeatureTable.cong_dong_thanh_tich");
+    },
+    iconClass: "bg-[#e7eff7]",
     actions: [
-      { modal: 'friend', get label() { return tr('FeatureTable.ban_be'); }, icon: '👥', requiresUnlock: true },
-      { modal: 'team', get label() { return tr('FeatureTable.lap_doi'); }, icon: '🎣', requiresUnlock: true },
-      { modal: 'faction', get label() { return tr('FactionSelectModal.phe_phai'); }, icon: '🛡️', requiresUnlock: true },
-      { modal: 'leaderboard', get label() { return tr('FeatureTable.xep_hang'); }, icon: '📊', requiresUnlock: true },
-      { modal: 'badge', get label() { return tr('Achievement.huy_hieu'); }, icon: '🏆', requiresUnlock: true },
-      { modal: 'diary', get label() { return tr('FeatureTable.nhat_ky'); }, icon: '📖' },
+      {
+        modal: "friend",
+        get label() {
+          return tr("FeatureTable.ban_be");
+        },
+        icon: "👥",
+        requiresUnlock: true,
+      },
+      {
+        modal: "team",
+        get label() {
+          return tr("FeatureTable.lap_doi");
+        },
+        icon: "🎣",
+        requiresUnlock: true,
+      },
+      {
+        modal: "faction",
+        get label() {
+          return tr("FactionSelectModal.phe_phai");
+        },
+        icon: "🛡️",
+        requiresUnlock: true,
+      },
+      {
+        modal: "leaderboard",
+        get label() {
+          return tr("FeatureTable.xep_hang");
+        },
+        icon: "📊",
+        requiresUnlock: true,
+      },
+      {
+        modal: "badge",
+        get label() {
+          return tr("Achievement.huy_hieu");
+        },
+        icon: "🏆",
+        requiresUnlock: true,
+      },
+      {
+        modal: "diary",
+        get label() {
+          return tr("FeatureTable.nhat_ky");
+        },
+        icon: "📖",
+      },
     ],
   },
 ];
 
 const supportActions: LobbyAction[] = [
-  { modal: 'rule', get label() { return tr('RuleModal.title'); }, icon: '📋' },
-  { modal: 'redeem', get label() { return tr('CurrencyConvertTable.quy_doi'); }, icon: '🎟️' },
-  { modal: 'feedback', get label() { return tr('Feedbackmodal.phan_hoi'); }, icon: '💬' },
-  { modal: 'donation', get label() { return tr('FeatureTable.ung_ho'); }, icon: '💚', requiresUnlock: true },
+  {
+    modal: "rule",
+    get label() {
+      return tr("RuleModal.title");
+    },
+    icon: "📋",
+  },
+  {
+    modal: "redeem",
+    get label() {
+      return tr("CurrencyConvertTable.quy_doi");
+    },
+    icon: "🎟️",
+  },
+  {
+    modal: "feedback",
+    get label() {
+      return tr("Feedbackmodal.phan_hoi");
+    },
+    icon: "💬",
+  },
+  {
+    modal: "donation",
+    get label() {
+      return tr("FeatureTable.ung_ho");
+    },
+    icon: "💚",
+    requiresUnlock: true,
+  },
 ];
 </script>
 
@@ -75,10 +269,16 @@ const supportActions: LobbyAction[] = [
   >
     <div class="shrink-0 border-b border-[#cbd9c6] bg-linear-to-br from-[#edf5e5] to-[#f5f9f0] px-2.5 py-2">
       <div class="mb-2 flex items-center gap-2">
-        <span aria-hidden="true" class="flex size-8 shrink-0 items-center justify-center rounded-lg border border-[#cbd9c6] bg-white/80 text-lg shadow-sm">🎣</span>
+        <span
+          aria-hidden="true"
+          class="flex size-8 shrink-0 items-center justify-center rounded-lg border border-[#cbd9c6] bg-white/80 text-lg shadow-sm"
+          >🎣</span
+        >
         <div class="min-w-0">
-          <div class="text-sm font-bold tracking-wide">{{ tr('FeatureTable.sanh_cau_ca') }}</div>
-          <div class="mt-0.5 text-[11px] leading-4 text-[#61745d]">{{ tr('FeatureTable.chuan_bi_cho_chuyen_cau_tiep_theo') }}</div>
+          <div class="text-sm font-bold tracking-wide">{{ tr("FeatureTable.sanh_cau_ca") }}</div>
+          <div class="mt-0.5 text-[11px] leading-4 text-[#61745d]">
+            {{ tr("FeatureTable.chuan_bi_cho_chuyen_cau_tiep_theo") }}
+          </div>
         </div>
       </div>
       <div class="grid grid-cols-2 gap-1.5">
@@ -95,12 +295,15 @@ const supportActions: LobbyAction[] = [
         >
           <span aria-hidden="true" class="text-sm">{{ action.icon }}</span>
           <span>{{ action.label }}</span>
-          <span v-if="!features.canOpen(action.modal)" class="w-full text-[9px] underline underline-offset-2">{{ tr('FeatureAvailability.maintenanceBadge') }}</span>
+          <span v-if="!features.canOpen(action.modal)" class="w-full text-[9px] underline underline-offset-2">{{
+            tr("FeatureAvailability.maintenanceBadge")
+          }}</span>
           <span
             v-if="action.modal === 'notifications' && notificationStore.unreadCount"
             class="absolute -right-1 -top-1 flex min-h-4 min-w-4 items-center justify-center rounded-full bg-[#b84436] px-1 text-[9px] font-bold leading-4 text-white ring-2 ring-[#f5f9f0]"
             :aria-label="tr('FeatureTable.value0_thong_bao_chua_doc', { value0: notificationStore.unreadCount })"
-          >{{ notificationStore.unreadCount > 99 ? '99+' : notificationStore.unreadCount }}</span>
+            >{{ notificationStore.unreadCount > 99 ? "99+" : notificationStore.unreadCount }}</span
+          >
         </button>
       </div>
     </div>
@@ -117,7 +320,11 @@ const supportActions: LobbyAction[] = [
         :aria-labelledby="`lobby-group-${group.key}`"
       >
         <div class="mb-1.5 flex items-center gap-2">
-          <span :id="`lobby-group-${group.key}`" class="shrink-0 text-[11px] font-bold uppercase tracking-wider text-[#61745d]">{{ group.label }}</span>
+          <span
+            :id="`lobby-group-${group.key}`"
+            class="shrink-0 text-[11px] font-bold uppercase tracking-wider text-[#61745d]"
+            >{{ group.label }}</span
+          >
           <span aria-hidden="true" class="h-px flex-1 bg-[#dce5d6]"></span>
         </div>
         <div class="grid grid-cols-3 gap-1.5">
@@ -137,16 +344,20 @@ const supportActions: LobbyAction[] = [
               aria-hidden="true"
               class="flex size-6 shrink-0 items-center justify-center rounded-md text-base"
               :class="group.iconClass"
-            >{{ action.icon }}</span>
+              >{{ action.icon }}</span
+            >
             <span class="text-[11px] font-semibold leading-4">{{ action.label }}</span>
             <span
               v-if="!features.canOpen(action.modal)"
               class="rounded bg-amber-100 px-1 py-0.5 text-[9px] leading-3 text-amber-900 underline underline-offset-2"
-            >{{ tr('FeatureAvailability.maintenanceBadge') }}</span>
+              >{{ tr("FeatureAvailability.maintenanceBadge") }}</span
+            >
             <span
               v-else-if="action.requiresUnlock && !configStore.isUnlocked(action.modal)"
               class="inline-flex items-center gap-0.5 rounded bg-[#eef1e9] px-1 py-0.5 text-[9px] leading-3 text-[#64715e]"
-            ><span aria-hidden="true">🔒</span> {{ tr('FishPond.cap') }} {{ configStore.requiredLevel(action.modal) }}</span>
+              ><span aria-hidden="true">🔒</span> {{ tr("FishPond.cap") }}
+              {{ configStore.requiredLevel(action.modal) }}</span
+            >
           </button>
         </div>
       </section>
@@ -169,11 +380,14 @@ const supportActions: LobbyAction[] = [
         <span
           v-if="!features.canOpen(action.modal)"
           class="w-full text-[9px] text-amber-900 underline underline-offset-2"
-        >{{ tr('FeatureAvailability.maintenanceBadge') }}</span>
+          >{{ tr("FeatureAvailability.maintenanceBadge") }}</span
+        >
         <span
           v-else-if="action.requiresUnlock && !configStore.isUnlocked(action.modal)"
           class="w-full text-[9px] leading-3 text-[#64715e]"
-        ><span aria-hidden="true">🔒</span> {{ tr('FishPond.cap') }} {{ configStore.requiredLevel(action.modal) }}</span>
+          ><span aria-hidden="true">🔒</span> {{ tr("FishPond.cap") }}
+          {{ configStore.requiredLevel(action.modal) }}</span
+        >
       </button>
     </div>
   </nav>
