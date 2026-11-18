@@ -28,7 +28,7 @@ export function useSpeciesDistributionBoundary(
     else next[axis] = clampBoundary(value, axis === 'width' ? 160 : 120, axis === 'width' ? 540 : 340);
     apply(next);
   }
-  function insertNode(index?: number) {
+  function insertNode(index?: number, position?: SpeciesBoundaryPoint) {
     const next = cloneBoundary(boundary.value);
     if (next.shape !== 'natural' || next.nodes.length >= 24) return;
     if (index === undefined) {
@@ -39,15 +39,15 @@ export function useSpeciesDistributionBoundary(
         if (length > longest) { longest = length; index = i; }
       }
     }
-    const point = speciesBoundaryPolygon(next)[index! * 8 + 4]!;
+    const point = position ?? speciesBoundaryPolygon(next)[index! * 8 + 4]!;
     next.nodes.splice(index! + 1, 0, { ...point });
     apply(next);
     selectedNode.value = null;
   }
-  function removeNode() {
-    if (selectedNode.value === null || boundary.value.nodes.length <= 6) return;
+  function removeNode(index = selectedNode.value) {
+    if (index === null || boundary.value.shape !== 'natural' || boundary.value.nodes.length <= 6) return;
     const next = cloneBoundary(boundary.value);
-    next.nodes.splice(selectedNode.value, 1);
+    next.nodes.splice(index, 1);
     apply(next);
     selectedNode.value = null;
   }
@@ -61,7 +61,7 @@ export function useSpeciesDistributionBoundary(
     if (!event.isPrimary || event.button !== 0) return;
     selectedNode.value = kind === 'node' ? index : null;
     drag.value = { kind, index, pointerId: event.pointerId };
-    svgRef.value?.setPointerCapture(event.pointerId);
+    (event.currentTarget as Element).setPointerCapture(event.pointerId);
   }
   function onMove(event: PointerEvent) {
     const current = drag.value;
@@ -89,7 +89,7 @@ export function useSpeciesDistributionBoundary(
       const next = Math.hypot(candidate.x - point.x, candidate.y - point.y);
       if (next < distance) { nearest = i; distance = next; }
     });
-    if (nearest >= 0) insertNode(Math.floor(nearest / 8));
+    if (nearest >= 0) insertNode(Math.floor(nearest / 8), polygon[nearest]);
   }
   return { editing, selectedNode, locked, rightHandle, bottomHandle, preset, resize, insertNode, removeNode, startDrag, onMove, endDrag, doubleClick };
 }

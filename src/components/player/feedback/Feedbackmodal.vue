@@ -53,7 +53,7 @@ onBeforeUnmount(() => {
 </script>
 
 <template>
-  <Modal :title="tr('Feedbackmodal.phan_hoi')" :sub-title="tr('Feedbackmodal.chia_se_y_kien_hoac_bao_loi_de_chung_toi_cai_thien_tro_choi')" :on-refresh="() => feedbackStore.loadMyErrors(auth.userId)">
+  <Modal :title="tr('Feedbackmodal.phan_hoi')" :on-refresh="() => feedbackStore.loadMyErrors(auth.userId)">
     <div
       role="dialog"
       aria-modal="true"

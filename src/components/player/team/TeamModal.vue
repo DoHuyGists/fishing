@@ -242,7 +242,7 @@ onMounted(async () => {
 </script>
 
 <template>
-  <Modal :title="tr('TeamModal.lap_doi_cau')" :sub-title="tr('TeamModal.tim_dong_doi_cung_chinh_phuc')" :on-refresh="loadData">
+  <Modal :title="tr('TeamModal.lap_doi_cau')" :on-refresh="loadData">
     <!-- ── Loading ── -->
     <div v-if="teamStore.loading" class="flex flex-col items-center justify-center gap-3 py-12 text-[#5a7a5a]">
       <span class="block w-8 h-8 border-[3px] border-[#d1e7d1] border-t-[#3b7a57] rounded-full animate-spin" />

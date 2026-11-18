@@ -23,6 +23,38 @@ function clip(polygon: DistributionPoint[], a: number, b: number, c: number): Di
   return result;
 }
 
+// Two reversible shears bend the power diagram without changing area. Adjacent
+// cells share the same transform, so their curved edges cannot overlap or gap.
+const waveX = (y: number) => 12 * Math.sin(y * 0.021 + 1.3) + 6 * Math.sin(y * 0.047 + 0.4);
+const waveY = (x: number) => 12 * Math.sin(x * 0.018 + 2.1) + 6 * Math.sin(x * 0.05 + 3);
+export function warpDistributionPoint(point: DistributionPoint): DistributionPoint {
+  const x = point.x + waveX(point.y);
+  return { x, y: point.y + waveY(x) };
+}
+export function unwarpDistributionPoint(point: DistributionPoint): DistributionPoint {
+  const y = point.y - waveY(point.x);
+  return { x: point.x - waveX(y), y };
+}
+
+function sampleEdges(polygon: DistributionPoint[], step: number, transform: (point: DistributionPoint) => DistributionPoint): DistributionPoint[] {
+  return polygon.flatMap((a, i) => {
+    const b = polygon[(i + 1) % polygon.length]!;
+    const count = Math.max(1, Math.ceil(Math.hypot(b.x - a.x, b.y - a.y) / step));
+    return Array.from({ length: count }, (_, j) => transform({ x: a.x + (b.x - a.x) * j / count, y: a.y + (b.y - a.y) * j / count }));
+  });
+}
+
+const lakeCache = new WeakMap<DistributionPoint[], { polygon: DistributionPoint[]; areaScale: number }>();
+function warpedLake(lake: DistributionPoint[]) {
+  let cached = lakeCache.get(lake);
+  if (!cached) {
+    const polygon = sampleEdges(lake, 6, warpDistributionPoint);
+    cached = { polygon, areaScale: polygonArea(lake) / polygonArea(polygon) };
+    lakeCache.set(lake, cached);
+  }
+  return cached;
+}
+
 export function polygonArea(polygon: DistributionPoint[]): number {
   let sum = 0;
   for (let i = 0; i < polygon.length; i++) {
@@ -32,7 +64,7 @@ export function polygonArea(polygon: DistributionPoint[]): number {
   return Math.abs(sum) / 2;
 }
 
-export function distributionCell(zone: SpeciesDistributionZone, zones: SpeciesDistributionZone[], lake: DistributionPoint[] = distributionLake): SpeciesDistributionCell {
+function powerCell(zone: SpeciesDistributionZone, zones: SpeciesDistributionZone[], lake: DistributionPoint[]): SpeciesDistributionCell {
   let polygon = lake;
   for (const other of zones) {
     if (other.id === zone.id) continue;
@@ -54,6 +86,13 @@ export function distributionCell(zone: SpeciesDistributionZone, zones: SpeciesDi
   return { id: zone.id, polygon, area, center: Math.abs(signedArea) > 1e-8 ? { x: x / (3 * signedArea), y: y / (3 * signedArea) } : zone.seed };
 }
 
+export function distributionCell(zone: SpeciesDistributionZone, zones: SpeciesDistributionZone[], lake: DistributionPoint[] = distributionLake): SpeciesDistributionCell {
+  const domain = warpedLake(lake);
+  const warped = zones.map(item => ({ ...item, seed: warpDistributionPoint(item.seed) }));
+  const cell = powerCell({ ...zone, seed: warpDistributionPoint(zone.seed) }, warped, domain.polygon);
+  return { ...cell, polygon: sampleEdges(cell.polygon, 3, unwarpDistributionPoint), area: cell.area * domain.areaScale, center: unwarpDistributionPoint(cell.center) };
+}
+
 // Fit diagram areas to the actual weights, rather than treating influence radii
 // as weights. Coordinate descent solves each cell's monotonic area by bisection.
 export function fitDistribution(zones: SpeciesDistributionZone[], weights: Record<string, number | null>, lake: DistributionPoint[] = distributionLake): SpeciesDistributionZone[] {
@@ -64,22 +103,26 @@ export function fitDistribution(zones: SpeciesDistributionZone[], weights: Recor
   const sum = active.reduce((total, zone) => total + weights[zone.id]! / max, 0);
   const lakeArea = polygonArea(lake);
   const targets = active.map(zone => weights[zone.id]! / max / sum * lakeArea);
+  const domain = warpedLake(lake);
+  const warped = active.map(zone => ({ ...zone, seed: warpDistributionPoint(zone.seed) }));
+  const areaOf = (index: number) => powerCell(warped[index]!, warped, domain.polygon).area * domain.areaScale;
   for (let pass = 0; pass < 100; pass++) {
     for (let i = 0; i < active.length; i++) {
-      const zone = active[i]!;
+      const zone = warped[i]!;
       let low = -1e6, high = 1e6;
       for (let step = 0; step < 24; step++) {
         zone.power = (low + high) / 2;
-        if (distributionCell(zone, active, lake).area < targets[i]!) low = zone.power;
+        if (areaOf(i) < targets[i]!) low = zone.power;
         else high = zone.power;
       }
       zone.power = (low + high) / 2;
     }
     // Offsets share an arbitrary additive constant. Keep them bounded.
-    const baseline = active[0]!.power;
-    active.forEach(zone => { zone.power -= baseline; });
-    if (active.every((zone, i) => Math.abs(distributionCell(zone, active, lake).area - targets[i]!) / lakeArea < 0.0002)) break;
+    const baseline = warped[0]!.power;
+    warped.forEach(zone => { zone.power -= baseline; });
+    if (warped.every((_, i) => Math.abs(areaOf(i) - targets[i]!) / lakeArea < 0.0002)) break;
   }
+  active.forEach((zone, i) => { zone.power = warped[i]!.power; });
   return active;
 }
 

@@ -26,7 +26,6 @@ onMounted(() => guideStore.loadGuides());
 <template>
   <Modal
     :title="tr('GuideModal.chi_dan_co_ban')"
-    :sub-title="tr('GuideModal.chon_mot_chu_de_de_xem_huong_dan')"
     :show-count-data="false"
     :on-refresh="() => guideStore.loadGuides(true)"
   >

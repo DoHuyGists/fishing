@@ -8,9 +8,32 @@ import { PGlite } from '@electric-sql/pglite';
 test('distribution geometry matches real weights and keeps the original total after dragging', async () => {
   const server = await createServer({ configFile: false, envDir: false, server: { middlewareMode: true, hmr: false, watch: null } });
   try {
-    const { fitDistribution, distributionCell, distributionLake, polygonArea, distributionWeights } = await server.ssrLoadModule('/src/utils/speciesDistribution.ts');
+    const { fitDistribution, distributionCell, distributionLake, polygonArea, distributionWeights, warpDistributionPoint, unwarpDistributionPoint } = await server.ssrLoadModule('/src/utils/speciesDistribution.ts');
     const { boundaryShapes, createSpeciesBoundary, speciesBoundaryPolygon, validSpeciesBoundary, pointInSpeciesBoundary, storedSpeciesBoundary } = await server.ssrLoadModule('/src/utils/speciesDistributionBoundary.ts');
     const lakeArea = polygonArea(distributionLake);
+    const rectangle = speciesBoundaryPolygon(createSpeciesBoundary('rect'));
+    const pair = fitDistribution([
+      { id: 'left', color: '', seed: { x: 180, y: 200 }, power: 0 },
+      { id: 'right', color: '', seed: { x: 420, y: 200 }, power: 0 },
+    ], { left: 1, right: 1 }, rectangle);
+    const curved = pair.map(zone => distributionCell(zone, pair, rectangle));
+    const [left, right] = pair.map(zone => ({ ...zone, seed: warpDistributionPoint(zone.seed) }));
+    const score = point => {
+      const p = warpDistributionPoint(point);
+      return 2 * (right.seed.x - left.seed.x) * p.x + 2 * (right.seed.y - left.seed.y) * p.y
+        - (right.seed.x ** 2 + right.seed.y ** 2 - left.seed.x ** 2 - left.seed.y ** 2 + left.power - right.power);
+    };
+    const edge = curved[0].polygon.filter(point => Math.abs(score(point)) < 1e-6);
+    assert.ok(edge.length > 20, 'the shared boundary is sampled along its curve');
+    const first = edge[0], last = edge.at(-1);
+    assert.ok(edge.some(point => Math.abs((last.x - first.x) * (point.y - first.y) - (last.y - first.y) * (point.x - first.x)) / Math.hypot(last.x - first.x, last.y - first.y) > 3), 'the dividing boundary visibly bends away from a straight line');
+    for (const cell of curved) {
+      assert.ok(Math.abs(polygonArea(cell.polygon) - cell.area) / polygonArea(rectangle) < 0.001, 'rendered curved area matches the weight');
+      for (const point of cell.polygon) {
+        const restored = unwarpDistributionPoint(warpDistributionPoint(point));
+        assert.ok(Math.hypot(point.x - restored.x, point.y - restored.y) < 1e-9);
+      }
+    }
     for (const weights of [[100, 50, 25, 0], [0, 0], [7], Array.from({ length: 15 }, (_, i) => i + 1), [10000, 1, 0.01]]) {
       const rates = Object.fromEntries(weights.map((weight, i) => [String(i), weight]));
       const zones = weights.map((_, i) => ({ id: String(i), color: '', seed: { x: 300 + 160 * Math.cos(i * 2.4), y: 200 + 100 * Math.sin(i * 2.4) }, power: 0 }));

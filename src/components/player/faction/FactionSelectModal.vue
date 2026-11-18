@@ -145,7 +145,7 @@ onMounted(() => {
 </script>
 
 <template>
-  <Modal :title="tr('FactionSelectModal.phe_phai')" :sub-title="tr('FactionSelectModal.gia_nhap_phe_phai_de_nhan_cac_loi_ich_tap_the')" :on-refresh="handleRefresh">
+  <Modal :title="tr('FactionSelectModal.phe_phai')" :on-refresh="handleRefresh">
     <div class="faction-screen [font-family:inherit]! min-h-full p-5 sm:p-8 space-y-6 bg-[#f5f9f0] text-[#24352a]">
       <!-- Thanh trạng thái người chơi -->
       <section

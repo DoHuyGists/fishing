@@ -125,7 +125,7 @@ onMounted(() => void loadMissionData(true));
 </script>
 
 <template>
-  <Modal :title="tr('MissionModal.bang_nhiem_vu')" :sub-title="tr('MissionModal.nhiem_vu_theo_gio_va_hang_ngay')" :on-refresh="loadMissionData">
+  <Modal :title="tr('MissionModal.bang_nhiem_vu')" :on-refresh="loadMissionData">
     <div class="h-full">
       <Tab v-model="activeTab" :tabs="tabs" :aria-label="tr('MissionModal.loai_nhiem_vu')" lazy contained>
         <template #hourly>

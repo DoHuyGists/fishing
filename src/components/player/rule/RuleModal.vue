@@ -25,7 +25,6 @@ onUnmounted(() => {
 <template>
   <Modal
     :title="tr('RuleModal.title')"
-    :sub-title="tr('RuleModal.subtitle')"
     :show-count-data="false"
     role="dialog"
     aria-modal="true"

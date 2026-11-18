@@ -120,7 +120,7 @@ onMounted(() => {
 </script>
 
 <template>
-  <Modal :title="tr('PostProduction.luoi_ca')" :sub-title="tr('PostProduction.xu_ly_sau_khi_cau')" :on-refresh="caughtStore.loadCaughtFishes">
+  <Modal :title="tr('PostProduction.luoi_ca')" :on-refresh="caughtStore.loadCaughtFishes">
     <div class="flex h-full flex-col gap-2">
       <div class="flex min-h-0 grow flex-col gap-2 md:flex-row">
         <template v-for="(panel, index) in panels" :key="panel.key">

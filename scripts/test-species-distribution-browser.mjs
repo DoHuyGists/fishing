@@ -99,6 +99,22 @@ try {
   await page.mouse.move(handleBox.x + 37, handleBox.y + 7, { steps: 4 }); await page.mouse.up();
   const total = await page.evaluate(() => Object.values(speciesStore.distributions.a.weights).reduce((a, b) => a + b, 0));
   assert.ok(Math.abs(total - originalTotal) < 1e-8);
+  // A vertical radius drag must also resize the region, as in the original map.
+  await a.locator('circle.cursor-grab').last().click();
+  const radialHandle = a.getByLabel(/Điều chỉnh bán kính vùng/);
+  await radialHandle.scrollIntoViewIfNeeded();
+  const radial = await radialHandle.boundingBox();
+  const beforeVertical = await page.evaluate(() => ({ ...speciesStore.distributions.a.weights }));
+  await page.mouse.move(radial.x + radial.width / 2, radial.y + radial.height / 2);
+  await page.mouse.down();
+  await page.mouse.move(radial.x + radial.width / 2, radial.y + radial.height / 2 + 30, { steps: 5 });
+  await page.mouse.up();
+  assert.notDeepEqual(await page.evaluate(() => ({ ...speciesStore.distributions.a.weights })), beforeVertical);
+  assert.equal(await a.locator('circle[stroke-dasharray]').count(), 1);
+  const radiusBeforeInput = Number(await a.locator('circle[stroke-dasharray]').getAttribute('r'));
+  await a.getByLabel('Tỉ trọng Loài cá 11', { exact: true }).fill('250');
+  const radiusAfterInput = Number(await a.locator('circle[stroke-dasharray]').getAttribute('r'));
+  assert.notEqual(radiusAfterInput, radiusBeforeInput, 'the radius is recalculated from influence when numeric weights change');
   await page.evaluate(() => { window.speciesFailure = true; });
   await a.getByRole('button', { name: 'Lưu phân bổ', exact: true }).click();
   await a.getByRole('alert').filter({ hasText: 'Không thể lưu thử nghiệm' }).waitFor();
@@ -120,6 +136,7 @@ try {
   assert.equal(await page.evaluate(() => speciesStore.distributions.a.boundary.height), 161);
   await a.getByRole('button', { name: 'Chữ nhật', exact: true }).click();
   await a.getByRole('button', { name: 'Chỉnh vòng biên', exact: true }).click();
+  assert.equal(await a.locator('circle.cursor-grab').count(), 12, 'region handles remain available while editing the lake');
   const widthHandle = await a.getByLabel('Kéo chiều rộng vòng biên', { exact: true }).boundingBox();
   await page.mouse.move(widthHandle.x + widthHandle.width / 2, widthHandle.y + widthHandle.height / 2);
   await page.mouse.down(); await page.mouse.move(widthHandle.x - 30, widthHandle.y + widthHandle.height / 2, { steps: 4 }); await page.mouse.up();

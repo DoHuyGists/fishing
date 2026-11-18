@@ -41,7 +41,7 @@ onBeforeUnmount(() => {
 </script>
 
 <template>
-  <Modal :title="tr('Dispatch.title')" :sub-title="tr('Dispatch.subtitle')" :on-refresh="refresh" role="dialog" aria-modal="true" :aria-label="tr('Dispatch.title')">
+  <Modal :title="tr('Dispatch.title')" :on-refresh="refresh" role="dialog" aria-modal="true" :aria-label="tr('Dispatch.title')">
     <div class="dispatch-content w-full min-w-0 space-y-2 bg-[#f5f9f0] p-2 text-xs text-[#24352a]">
       <div class="text-xs text-[#61745d]">{{ tr('Dispatch.rules') }}</div>
       <div v-if="store.error" role="alert" class="rounded-lg border border-red-200 bg-white p-3 text-sm text-red-700">{{ store.error }}</div>

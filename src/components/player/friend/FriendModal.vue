@@ -217,7 +217,7 @@ async function executeDelete() {
 </script>
 
 <template>
-  <Modal :title="tr('FriendModal.quan_ly_ban_be')" :sub-title="tr('FriendModal.ket_noi_cong_dong_cau_ca')" :on-refresh="handleRefresh">
+  <Modal :title="tr('FriendModal.quan_ly_ban_be')" :on-refresh="handleRefresh">
     <div class="w-full min-w-0 space-y-3 pb-6 sm:space-y-4 sm:pb-10">
       <!-- ID Người chơi hiện tại & Banner -->
       <div

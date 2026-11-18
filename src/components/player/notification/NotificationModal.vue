@@ -57,7 +57,7 @@ onUnmounted(() => {
 </script>
 
 <template>
-  <Modal :title="tr('NotificationModal.thong_bao')" :sub-title="tr('NotificationModal.tin_nhan_danh_cho_ban_va_thong_bao_he_thong')" :on-refresh="loadNotifications">
+  <Modal :title="tr('NotificationModal.thong_bao')" :on-refresh="loadNotifications">
     <div v-if="notifications.loadError || readError" role="alert" class="mb-3 rounded bg-red-50 p-3 text-sm text-red-700">{{ notifications.loadError || readError }}</div>
     <Tab v-model="currentTabActive" :tabs="tabs" lazy>
       <template #personal>

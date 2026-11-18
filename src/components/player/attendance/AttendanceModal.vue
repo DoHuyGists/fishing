@@ -88,7 +88,7 @@ function claimMonthReward(_day: MonthReward, _lane: "free" | "pass") { /* Claims
 </script>
 
 <template>
-  <Modal :title="tr('AttendanceModal.diem_danh')" :sub-title="tr('AttendanceModal.nhan_qua_mien_phi_moi_ngay')" :on-refresh="loadData">
+  <Modal :title="tr('AttendanceModal.diem_danh')" :on-refresh="loadData">
     <div class="w-full">
       <Tab v-model="activeTab" :tabs="tabs" :aria-label="tr('AttendanceModal.loai_diem_danh')">
         <template #daily>

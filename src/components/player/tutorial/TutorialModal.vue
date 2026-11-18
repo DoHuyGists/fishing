@@ -31,7 +31,7 @@ onMounted(() => store.load());
 </script>
 
 <template>
-  <Modal :title="tr('TutorialModal.thuc_hanh_cau_ca')" :sub-title="tr('TutorialModal.hoc_co_che_qua_cac_man_choi_huong_dan')" :show-count-data="false" :on-refresh="store.load">
+  <Modal :title="tr('TutorialModal.thuc_hanh_cau_ca')" :show-count-data="false" :on-refresh="store.load">
     <div class="space-y-4 p-2 text-[#24352a] sm:p-4">
       <div class="slide-fade-in from-top player-content-in flex flex-wrap items-center justify-between gap-3 rounded-xl border border-[#cbd9c6] bg-[#f5f9f0] p-4">
         <div class="max-w-2xl text-sm leading-6">{{ tr('TutorialModal.tap_luyen_voi_trang_bi_co_san_ca_moi_va_tien_do_trong_man_huong_') }}</div>

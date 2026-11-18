@@ -60,7 +60,7 @@ async function selectSchedule(item: EventScheduleRow) {
 onMounted(loadSchedules);
 </script>
 <template>
-  <Modal :title="tr('EventModal.bang_su_kien')" :sub-title="tr('EventModal.su_kien_dang_dien_ra')" :on-refresh="loadSchedules">
+  <Modal :title="tr('EventModal.bang_su_kien')" :on-refresh="loadSchedules">
     <section
       class="relative flex max-w-none h-full flex-col overflow-hidden border-0 bg-[#f4f5e9] text-[#20372a]"
       role="dialog"
