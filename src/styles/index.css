@@ -12,6 +12,7 @@
 img {
   -webkit-user-drag: none;
   user-select: none; /* tùy chọn: không bôi đen được ảnh */
+  display: block;
 }
 
 button {

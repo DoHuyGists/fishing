@@ -47,7 +47,7 @@ const emit = defineEmits<{ buy: [] }>();
           <div class="m-0 text-xs text-emerald-950/60">{{ selectedItem.category || tr('ShopModal.vat_pham') }}</div>
         </div>
       </div>
-      <label class="mt-5 block text-xs font-bold"
+      <label class="my-5 block text-xs font-bold"
         >{{ tr('ShopModal.so_luot_mua') }}
         <input
           v-model.number="quantity"

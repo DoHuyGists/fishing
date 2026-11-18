@@ -8,7 +8,7 @@ const store = useHealthStore();
 </script>
 
 <template>
-  <div class="min-w-0 space-y-2.5 text-[#24352a]">
+  <div class="min-w-0 space-y-2.5 text-[#24352a] py-2">
     <div
       v-if="store.error"
       role="alert"

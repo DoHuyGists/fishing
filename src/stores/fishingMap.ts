@@ -27,7 +27,8 @@ export const useFishingMapStore = defineStore('fishingMap', {
       const query = normalize(this.countrySearch);
       return useCountryStore().countries.filter(country =>
         normalize(`${country.name} ${country.code}`).includes(query)
-        && (this.countryFilter === 'all' || this.unlockedIds.has(country.id) === (this.countryFilter === 'unlocked')));
+        && (this.countryFilter === 'all' || this.unlockedIds.has(country.id) === (this.countryFilter === 'unlocked')))
+        .sort((a, b) => Number(this.unlockedIds.has(b.id)) - Number(this.unlockedIds.has(a.id)));
     },
     selectedCountry(): Country | undefined {
       return useCountryStore().countries.find(country => country.id === this.selectedCountryId);

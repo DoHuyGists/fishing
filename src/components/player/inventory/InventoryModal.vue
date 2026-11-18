@@ -87,7 +87,7 @@ const guildeSteps = [
         <div class="min-w-0">
           <Tab v-model="activeTab" :tabs="tabs" :aria-label="tr('InventoryModal.trang_bi')">
             <template #fishing>
-              <div class="space-y-2.5">
+              <div class="space-y-2.5 py-2">
                 <FishingEquipmentOverview />
                 <FishingEquipmentSets @request-buy="modal = 'buy'" />
               </div>

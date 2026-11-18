@@ -61,7 +61,7 @@ async function refresh() {
     <div class="flex min-h-full flex-col gap-3 text-[#24352a] md:flex-row">
       <FishingMapCountries />
       <section
-        class="min-w-0 flex-1 rounded-xl border border-[#cbd9c6] bg-[#f5f9f0] p-3 sm:p-4"
+        class="min-w-0 flex flex-col flex-1 rounded-xl border border-[#cbd9c6] bg-[#f5f9f0] p-3 sm:p-4"
         :aria-label="tr('FishingMapModal.areas')"
         :aria-busy="store.loading || store.loadingSpecies"
       >
@@ -96,7 +96,7 @@ async function refresh() {
           <template v-else>
             <div
               v-if="store.areas.length"
-              class="mt-4 grid gap-3"
+              class="mt-4 grid h-0 grow gap-3 overflow-y-scroll pr-1"
               :class="store.viewMode === 'grid' ? 'lg:grid-cols-2 xl:grid-cols-3' : 'grid-cols-1'"
             >
               <FishingMapAreaCard

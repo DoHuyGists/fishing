@@ -26,7 +26,7 @@ import { useFeatureAvailabilityStore } from "../../../stores/featureAvailability
 
 const InteractWorldMap2 = defineAsyncComponent(() => import("./InteractWorldMap.vue"));
 const AccountInfoModal = defineAsyncComponent(() => import("../account/AccountInfoModal.vue"));
-const MarketWindow = defineAsyncComponent(() => import("../market/MarketWindow.vue"));
+const MarketModal = defineAsyncComponent(() => import("../market/MarketModal.vue"));
 const ShopModal = defineAsyncComponent(() => import("../shop/ShopModal.vue"));
 const CatchDiaryModal = defineAsyncComponent(() => import("../diary/CatchDiaryModal.vue"));
 const SpinWheelModal = defineAsyncComponent(() => import("../spin-wheel/SpinWheelModal.vue"));
@@ -167,15 +167,8 @@ onUnmounted(() => {
 
 <template>
   <div class="w-screen min-h-screen p-3 relative flex flex-col gap-2 overflow-hidden">
-    <TeamMembersSticky
-      v-if="features.isAvailable('team') && configStore.showTeam && teamStore.myTeamMembers.length"
-      class="slide-fade-in from-right"
-      :members="teamStore.myTeamMembers"
-      @open-team="modalStore.open('team')"
-    />
-    <header
-      class="slide-fade-in from-top flex flex-wrap items-center justify-between gap-3 rounded-xl border border-[#cbd9c6] bg-[#f5f9f0] px-4 py-2.5 text-[#24352a]"
-    >
+    <TeamMembersSticky v-if="features.isAvailable('team') && configStore.showTeam && teamStore.myTeamMembers.length" class="slide-fade-in from-right" :members="teamStore.myTeamMembers" @open-team="modalStore.open('team')" />
+    <header class="slide-fade-in from-top flex flex-wrap items-center justify-between gap-3 rounded-xl border border-[#cbd9c6] bg-[#f5f9f0] px-4 py-2.5 text-[#24352a]">
       <span class="font-bold">{{ tr("Lobby.tieu_de") }}</span>
       <div class="flex flex-wrap items-center justify-end gap-2">
         <Cash :amount="currencyStore.formattedCash" />
@@ -204,11 +197,7 @@ onUnmounted(() => {
     <div v-if="onboarding.error" role="alert" class="text-sm text-red-700">
       {{ onboarding.error }} <button class="underline" @click="onboarding.finish()">{{ tr("Lobby.luu_lai") }}</button>
     </div>
-    <GuideTour
-      v-if="onboarding.visible && !modalStore.isModalOpening"
-      :steps="firstPlaySteps"
-      @finish="onboarding.finish()"
-    />
+    <GuideTour v-if="onboarding.visible && !modalStore.isModalOpening" :steps="firstPlaySteps" @finish="onboarding.finish()" />
     <Teleport to="body">
       <Transition name="player-window" :duration="{ enter: 220, leave: 150 }">
         <div v-if="modalStore.isModalOpening">
@@ -217,14 +206,11 @@ onUnmounted(() => {
           <RuleModal v-if="modalStore.isOpening('rule')" />
           <TutorialModal v-if="modalStore.isOpening('tutorial')" />
           <StoryModal v-if="modalStore.isOpening('story')" />
-          <MarketWindow v-if="configStore.isUnlocked('market') && modalStore.isOpening('market')" />
+          <MarketModal v-if="configStore.isUnlocked('market') && modalStore.isOpening('market')" />
           <ShopModal v-if="modalStore.isOpening('shop')" />
           <CatchDiaryModal v-if="modalStore.isOpening('diary')" />
           <SpinWheelModal v-if="configStore.isUnlocked('gacha') && modalStore.isOpening('gacha')" />
-          <InventoryModal
-            v-if="modalStore.isOpening('inventory') || modalStore.isOpening('body')"
-            :initial-tab="modalStore.isOpening('body') ? 'health' : 'fishing'"
-          />
+          <InventoryModal v-if="modalStore.isOpening('inventory') || modalStore.isOpening('body')" :initial-tab="modalStore.isOpening('body') ? 'health' : 'fishing'" />
           <SkillModal v-if="modalStore.isOpening('skill')" />
           <AquacultureModal v-if="modalStore.isOpening('aquaculture')" />
           <DispatchModal v-if="modalStore.isOpening('dispatch')" />

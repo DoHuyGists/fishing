@@ -1,5 +1,7 @@
 import type { PageSize } from './pagination';
 
+export type MarketViewMode = 'list' | 'grid' | 'species';
+
 export interface MarketHistory {
   id: string;
   created_at: string;

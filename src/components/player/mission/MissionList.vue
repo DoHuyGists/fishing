@@ -36,7 +36,7 @@ const emit = defineEmits<{
         v-for="mission in missions"
         :key="mission.id"
         type="button"
-        class="slide-fade-in from-bottom player-content-in w-full p-3 rounded-lg border text-left transition-colors"
+        class="slide-fade-in from-top player-content-in w-full p-3 rounded-lg border text-left transition-colors"
         :class="
           selectedMissionId === mission.id
             ? 'border-emerald-700 bg-emerald-100'
@@ -55,7 +55,7 @@ const emit = defineEmits<{
 
       <div v-if="selectedMission" class="pt-1">
         <div class="m-0 mb-2 text-xs font-extrabold uppercase tracking-wide text-emerald-900/65">{{ tr('MissionList.ca_can_co') }}</div>
-        <div class="space-y-2">
+        <div class="space-y-2 slide-fade-in from-left">
           <div
             v-for="(fish, index) in selectedMission.content"
             :key="`${fish.id}-${index}`"

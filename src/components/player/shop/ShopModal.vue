@@ -128,7 +128,6 @@ async function buyItem() {
 <template>
   <Modal
     :title="tr('ShopModal.cua_hang_vat_pham')"
-    :sub-title="tr('ShopModal.chon_vat_pham_va_so_luong_muon_mua')"
     :on-refresh="() => inventoryStore.loadShopItems(true)"
   >
     <div class="grid min-h-full gap-4 lg:grid-cols-[minmax(0,1fr)_18rem] text-[#24352a]">
@@ -210,7 +209,7 @@ async function buyItem() {
               {{ group.category }}
               <span class="rounded-full bg-emerald-100 px-2 py-0.5 text-[10px]">{{ group.items.length }}</span>
             </div>
-            <div :class="viewMode === 'list' ? 'flex flex-col gap-3' : 'grid grid-cols-1 gap-3 sm:grid-cols-2'">
+            <div :class="viewMode === 'list' ? 'flex flex-col gap-3' : 'grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-3'">
               <ShopItemCard
                 v-for="item in group.items"
                 :key="item.id"

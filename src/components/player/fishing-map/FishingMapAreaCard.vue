@@ -8,8 +8,8 @@ defineProps<{ area: FishingMapArea; viewMode: 'list' | 'grid' }>();
 </script>
 
 <template>
-  <article class="player-popup-in overflow-hidden rounded-xl border border-[#cbd9c6] bg-white" :class="viewMode === 'list' ? 'sm:flex' : ''">
-    <div class="flex shrink-0 items-center justify-center overflow-hidden bg-[#e5eddf]" :class="viewMode === 'list' ? 'h-36 sm:h-auto sm:w-44' : 'h-40'">
+  <article class="player-popup-in rounded-xl border border-[#cbd9c6] bg-white overflow-hidden" :class="viewMode === 'list' ? 'sm:flex' : ''">
+    <div class="flex shrink-0 items-center justify-center overflow-hidden bg-[#e5eddf]" :class="viewMode === 'list' ? 'h-36 sm:h-auto sm:w-1/3' : 'h-40'">
       <img v-if="area.scenePath" :src="area.scenePath + '/day.png'" alt="" loading="lazy" class="h-full w-full object-cover" />
       <img v-else src="/icons/check-point.svg" alt="" class="size-12 opacity-50" />
     </div>
