@@ -621,6 +621,13 @@
     "trang_sau": "Next page ▶"
   },
   "CatchDiaryModal": {
+    "countries": "Countries",
+    "conqueredSpecies": "Conquered species",
+    "conqueredCount": "{value0} species conquered",
+    "noConqueredSpecies": "You have not conquered any species in this country yet. Go fishing to add to your diary!",
+    "noMatchingCountries": "No matching countries found.",
+    "rarity": "Rarity",
+    "caughtOn": "Caught on: {value0}",
     "nhat_ky_danh_bat": "Catch diary",
     "nhat_ky_danh_bat_value0": "Catch diary: {value0}",
     "quay_lai_gia_sach": "Back to bookshelf",

@@ -625,6 +625,13 @@
     "trang_sau": "Trang sau ▶"
   },
   "CatchDiaryModal": {
+    "countries": "Quốc gia",
+    "conqueredSpecies": "Các loài đã chinh phục",
+    "conqueredCount": "{value0} loài đã chinh phục",
+    "noConqueredSpecies": "Bạn chưa chinh phục loài nào tại quốc gia này. Hãy đi câu để bổ sung nhật ký!",
+    "noMatchingCountries": "Không tìm thấy quốc gia phù hợp.",
+    "rarity": "Độ hiếm",
+    "caughtOn": "Ngày bắt: {value0}",
     "nhat_ky_danh_bat": "Nhật ký đánh bắt",
     "nhat_ky_danh_bat_value0": "Nhật ký đánh bắt: {value0}",
     "quay_lai_gia_sach": "Quay lại giá sách",

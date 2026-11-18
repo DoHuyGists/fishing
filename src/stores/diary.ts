@@ -30,6 +30,28 @@ export const useDiaryStore = defineStore("diary", {
   }),
 
   getters: {
+    caughtEntriesForCountry(state) {
+      const caughtMap = this.caughtSpeciesMap;
+      const entries = state.allSpecies
+        .filter((species) => caughtMap.has(species.id))
+        .map((species): DiaryFishEntry => ({
+          species,
+          isCaught: true,
+          caughtAt: caughtMap.get(species.id),
+        }));
+      return (code: string, name: string): DiaryFishEntry[] => {
+        const countryCode = code.trim().toLowerCase();
+        const countryName = name.trim().toLowerCase();
+        return entries.filter(({ species }) => {
+          const location = species.location?.trim().toLowerCase();
+          return Boolean(location && (
+            (countryCode && location.includes(countryCode)) ||
+            (countryName && (location.includes(countryName) || countryName.includes(location)))
+          ));
+        });
+      };
+    },
+
     caughtSpeciesMap(state): Map<string, string> {
       const map = new Map<string, string>();
       for (const entry of state.caughtDiary) {
