@@ -1,7 +1,7 @@
 import type { MapPoint } from "./fishingMap";
 import type { TensionChallenge, TensionFight } from "./tensionChallenge";
 
-export type FishingPhase = "idle" | "casting" | "waiting" | "bite" | "submitting" | "caught" | "lost";
+export type FishingPhase = "idle" | "casting" | "waiting" | "bite" | "submitting" | "unconfirmed" | "caught" | "lost";
 
 export interface FishingCatchScore {
   score: number;

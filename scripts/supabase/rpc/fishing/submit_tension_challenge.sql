@@ -1,5 +1,15 @@
 -- Deploy after submit_challenge.sql. The replay function is private;
 -- authenticated clients activate once, then submit their input replay.
+-- Execute this entire file to deploy the private receipts and both RPCs together.
+BEGIN;
+
+CREATE TABLE IF NOT EXISTS public.fishing_result_receipts (
+    session_id UUID PRIMARY KEY REFERENCES public.fishing_sessions(id) ON DELETE CASCADE,
+    response JSONB NOT NULL
+);
+ALTER TABLE public.fishing_result_receipts ENABLE ROW LEVEL SECURITY;
+REVOKE ALL ON public.fishing_result_receipts FROM PUBLIC, anon, authenticated;
+
 CREATE OR REPLACE FUNCTION public.start_tension_challenge(p_session_id UUID)
 RETURNS JSONB
 LANGUAGE plpgsql SECURITY DEFINER SET search_path = public
@@ -9,11 +19,17 @@ DECLARE
     v_now TIMESTAMPTZ;
     v_started_ms BIGINT;
     v_duration_ms BIGINT;
+    v_response JSONB;
 BEGIN
     IF auth.uid() IS NULL THEN RAISE EXCEPTION 'User not authenticated'; END IF;
     SELECT * INTO v_session FROM public.fishing_sessions
     WHERE id = p_session_id AND user_id = auth.uid() FOR UPDATE;
     IF NOT FOUND THEN RAISE EXCEPTION 'Session not found or unauthorized'; END IF;
+    SELECT response INTO v_response FROM public.fishing_result_receipts WHERE session_id = p_session_id;
+    IF FOUND THEN
+        RETURN jsonb_build_object('resolution', v_response,
+            'server_time_ms', FLOOR(EXTRACT(EPOCH FROM clock_timestamp()) * 1000)::BIGINT);
+    END IF;
     v_now := clock_timestamp();
     IF v_session.status IS DISTINCT FROM 'BITE' OR v_now < v_session.bite_at THEN
         RAISE EXCEPTION 'Session is not ready or already processed';
@@ -23,13 +39,10 @@ BEGIN
        OR v_session.challenge_data->>'sessionId' IS DISTINCT FROM p_session_id::TEXT THEN
         RAISE EXCEPTION 'Session does not contain a tension challenge';
     END IF;
-    IF v_now > v_session.expires_at THEN RAISE EXCEPTION 'Session expired'; END IF;
-
-    -- Resolve no-fish, missed hooks and overloaded rods before starting a fight.
-    -- These outcomes live in a private table, not client-readable challenge data.
-    IF EXISTS (SELECT 1 FROM public.fishing_session_mechanics
-        WHERE session_id = p_session_id AND failure_reason IS NOT NULL) THEN
-        RETURN jsonb_build_object('resolution', public.resolve_fishing_challenge(p_session_id, FALSE, 0),
+    IF v_now > v_session.expires_at THEN
+        v_response := public.resolve_fishing_challenge(p_session_id, FALSE, 0);
+        INSERT INTO public.fishing_result_receipts VALUES (p_session_id, v_response);
+        RETURN jsonb_build_object('resolution', v_response,
             'server_time_ms', FLOOR(EXTRACT(EPOCH FROM clock_timestamp()) * 1000)::BIGINT);
     END IF;
 
@@ -37,7 +50,9 @@ BEGIN
     -- These outcomes live in a private table, not client-readable challenge data.
     IF EXISTS (SELECT 1 FROM public.fishing_session_mechanics
         WHERE session_id = p_session_id AND failure_reason IS NOT NULL) THEN
-        RETURN jsonb_build_object('resolution', public.resolve_fishing_challenge(p_session_id, FALSE, 0),
+        v_response := public.resolve_fishing_challenge(p_session_id, FALSE, 0);
+        INSERT INTO public.fishing_result_receipts VALUES (p_session_id, v_response);
+        RETURN jsonb_build_object('resolution', v_response,
             'server_time_ms', FLOOR(EXTRACT(EPOCH FROM clock_timestamp()) * 1000)::BIGINT);
     END IF;
 
@@ -59,6 +74,9 @@ BEGIN
     END IF;
     RETURN jsonb_build_object('challenge_data', v_session.challenge_data,
         'server_time_ms', FLOOR(EXTRACT(EPOCH FROM clock_timestamp()) * 1000)::BIGINT);
+EXCEPTION WHEN raise_exception OR invalid_parameter_value OR invalid_text_representation THEN
+    RAISE EXCEPTION USING MESSAGE = SQLERRM, ERRCODE = SQLSTATE,
+        DETAIL = '{"code":"FISHING_RESULT_REJECTED"}';
 END;
 $function$;
 
@@ -229,6 +247,10 @@ BEGIN
     SELECT * INTO v_session FROM public.fishing_sessions
     WHERE id = v_session_id AND user_id = auth.uid() FOR UPDATE;
     IF NOT FOUND THEN RAISE EXCEPTION 'Session not found or unauthorized'; END IF;
+    -- Ownership and the session lock precede receipt lookup. Concurrent retries
+    -- observe the committed response without consuming bait or awarding again.
+    SELECT response INTO v_response FROM public.fishing_result_receipts WHERE session_id = v_session_id;
+    IF FOUND THEN RETURN v_response; END IF;
     v_now := clock_timestamp();
     IF v_session.status IS DISTINCT FROM 'BITE' THEN RAISE EXCEPTION 'Session is not ready or already processed'; END IF;
     IF v_session.challenge_data->>'type' IS DISTINCT FROM 'tension-challenge'
@@ -240,7 +262,9 @@ BEGIN
         RAISE EXCEPTION 'Tension challenge has not been started';
     END IF;
     IF v_now > v_session.expires_at + INTERVAL '5 seconds' THEN
-        RETURN public.resolve_fishing_challenge(v_session_id, FALSE, 0);
+        v_response := public.resolve_fishing_challenge(v_session_id, FALSE, 0);
+        INSERT INTO public.fishing_result_receipts VALUES (v_session_id, v_response);
+        RETURN v_response;
     END IF;
     v_rate := (v_session.challenge_data#>>'{config,tickRate}')::INTEGER;
     IF v_rate IS NULL OR v_rate NOT BETWEEN 1 AND 120 THEN RAISE EXCEPTION 'Invalid tick rate'; END IF;
@@ -267,9 +291,16 @@ BEGIN
                 WHEN 'timeout' THEN 'Hết thời gian kéo cá về bờ.'
                 ELSE 'Dây quá chùng, cá đã thoát.' END);
     END IF;
-    RETURN v_response || jsonb_build_object('verifiedResult', v_verified->>'result', 'claimedResultMatched', v_claimed = v_verified->>'result');
+    v_response := v_response || jsonb_build_object('verifiedResult', v_verified->>'result', 'claimedResultMatched', v_claimed = v_verified->>'result');
+    INSERT INTO public.fishing_result_receipts VALUES (v_session_id, v_response);
+    RETURN v_response;
+EXCEPTION WHEN raise_exception OR invalid_parameter_value OR invalid_text_representation THEN
+    RAISE EXCEPTION USING MESSAGE = SQLERRM, ERRCODE = SQLSTATE,
+        DETAIL = '{"code":"FISHING_RESULT_REJECTED"}';
 END;
 $function$;
 
 REVOKE ALL ON FUNCTION public.submit_tension_challenge(JSONB) FROM PUBLIC, anon;
 GRANT EXECUTE ON FUNCTION public.submit_tension_challenge(JSONB) TO authenticated;
+
+COMMIT;

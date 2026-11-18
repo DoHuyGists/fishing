@@ -1,6 +1,6 @@
 import type { AreaSpeciesDiaryResponse, FishDepthPreviewResponse } from "../types/model/fish";
-import type { FishingCatchScore } from '../types/model/fishingGameplay';
-import type { TensionChallenge, TensionFight, TensionInput, TensionSubmission } from "../types/model/tensionChallenge";
+import type { FishingCatchScore, FishingPhase } from '../types/model/fishingGameplay';
+import type { PendingFishingResult, TensionChallenge, TensionFight, TensionInput, TensionSubmission } from "../types/model/tensionChallenge";
 import { t as tr } from "../i18n";
 import { defineStore } from "pinia";
 import { useAuthStore } from "./auth";
@@ -16,7 +16,7 @@ import { supabaseFishingAreaRepository } from "../data/supabaseFishingAreaReposi
 import { buildDepthConfig, DEPTH_STEP_METERS } from "../data/fishingDepth";
 import { createTensionFight, isTensionChallenge, stepTensionFight, tensionMaxTicks } from "../data/tensionChallenge";
 export type FishingTool = "rod" | "line" | "reel" | "hook" | "bait";
-export type CastPhase = "idle" | "casting" | "waiting" | "bite" | "submitting" | "caught" | "lost";
+export type CastPhase = FishingPhase;
 export type CaughtFish = {
   id: string | number;
   name: string;
@@ -69,6 +69,38 @@ type SubmitChallengeResponse = {
 
 const RPC_TIMEOUT_MS = 15_000;
 
+function savePendingResult(ownerId: string, pending: PendingFishingResult | null) {
+  try {
+    const key = 'fishing-result-pending:' + ownerId;
+    if (pending) sessionStorage.setItem(key, JSON.stringify(pending));
+    else sessionStorage.removeItem(key);
+  } catch { /* Storage is optional; the current tab can still retry in memory. */ }
+}
+
+function restorePendingResult(ownerId: string): PendingFishingResult | null {
+  try {
+    const pending = JSON.parse(sessionStorage.getItem('fishing-result-pending:' + ownerId) ?? 'null');
+    if (!pending || pending.ownerId !== ownerId || typeof pending.areaId !== 'string'
+      || typeof pending.sessionId !== 'string') return null;
+    if (pending.kind === 'start') return pending;
+    const payload = pending.payload;
+    if (pending.kind === 'submit' && payload?.sessionId === pending.sessionId
+      && Number.isInteger(payload.totalTicks) && payload.totalTicks > 0 && payload.totalTicks <= 21600
+      && ['won', 'snapped', 'escaped', 'timeout'].includes(payload.claimedResult)
+      && Array.isArray(payload.inputs) && payload.inputs.length <= payload.totalTicks
+      && payload.inputs.every((input: TensionInput) => input && Number.isInteger(input.tick)
+        && input.tick >= 0 && input.tick < payload.totalTicks && typeof input.reeling === 'boolean')) return pending;
+  } catch { /* Ignore unavailable storage or malformed recovery data. */ }
+  return null;
+}
+
+function isConfirmedResultRejection(error: unknown): boolean {
+  // Only the RPC's explicit rejection contract settles an uncertain request.
+  // Permission/feature denials before the RPC cannot prove whether a prior call committed.
+  const code = (error as { code?: string } | null)?.code;
+  return code === 'FISHING_RESULT_REJECTED';
+}
+
 function withTimeout<T>(request: PromiseLike<T>, timeoutMs: number): Promise<T> {
   let timeoutId: ReturnType<typeof setTimeout> | undefined;
   const timeout = new Promise<T>((_, reject) => {
@@ -94,6 +126,7 @@ export const useFishingStore = defineStore("fishing", {
     inventoryError: "",
     selectedTool: "rod" as FishingTool,
     castPhase: "idle" as CastPhase,
+    pendingResult: null as PendingFishingResult | null,
     baitPosition: { x: 56, y: 60 },
     castMessage: tr('fishing.san_sang_tha_cau'),
     isCasting: false,
@@ -197,6 +230,13 @@ export const useFishingStore = defineStore("fishing", {
         if (this.inventoryError) throw new Error(this.inventoryError);
         useDayPhaseStore().setCurrentScenePhase(this.currentArea);
         this.sessionReady = true;
+        const pending = restorePendingResult(userId);
+        if (pending && pending.areaId === this.currentAreaId) {
+          this.pendingResult = pending;
+          this.sessionId = pending.sessionId;
+          this.castPhase = 'unconfirmed';
+          this.castMessage = tr('fishing.result_unconfirmed');
+        }
       } catch (err) {
         if (requestId !== this.sessionRequestId) return;
         this.sessionError = err instanceof Error ? err.message : tr('fishing.khong_the_chuan_bi_phien_cau');
@@ -206,6 +246,10 @@ export const useFishingStore = defineStore("fishing", {
       if (this.hasLeftArea) return true;
       if (this.isLeavingArea) return false;
       this.leaveAreaError = "";
+      if (this.pendingResult) {
+        this.leaveAreaError = tr('fishing.result_unconfirmed');
+        return false;
+      }
       if (this.isCasting || this.isRetrievingBait || this.castPhase === "submitting" || this.isStartingTensionChallenge || this.isReleasingFish) {
         this.leaveAreaError = tr('fishing.dang_xu_ly_luot_cau_hoac_tha_ca_vui_long_thu_lai_sau_giay_lat');
         return false;
@@ -569,12 +613,25 @@ export const useFishingStore = defineStore("fishing", {
       const sessionId = this.sessionId;
       if (!sessionId || !this.tensionChallenge || this.castPhase !== "bite" ||
         this.tensionStartedAt !== null || this.isStartingTensionChallenge) return;
+      const ownerId = useAuthStore().userId;
+      if (!this.currentAreaId) return;
+      this.pendingResult = { kind: 'start', ownerId, areaId: this.currentAreaId, sessionId };
+      savePendingResult(ownerId, this.pendingResult);
+      await this.activateTensionSession(sessionId);
+    },
+    async activateTensionSession(sessionId: string) {
       const requestId = this.castRequestId;
+      const auth = useAuthStore();
+      const ownerId = auth.userId;
+      const generation = auth.sessionGeneration;
+      const current = () => requestId === this.castRequestId && this.sessionId === sessionId
+        && auth.user?.id === ownerId && auth.sessionGeneration === generation;
       this.isStartingTensionChallenge = true;
+      this.castPhase = 'submitting';
       this.castMessage = tr('TensionChallenge.dang_bat_dau_dau_suc_voi_ca');
       try {
         const response = await withTimeout(supabaseFishingAreaRepository.startTensionChallenge(sessionId), RPC_TIMEOUT_MS);
-        if (requestId !== this.castRequestId || this.sessionId !== sessionId) return;
+        if (!current()) return;
         if (response.resolution) {
           await this.finishChallenge(async () => response.resolution);
           return;
@@ -591,16 +648,20 @@ export const useFishingStore = defineStore("fishing", {
         // and loading the challenge must never be replayed as released inputs.
         this.serverClockOffset = response.server_time_ms - performance.now();
         this.tensionStartedAt = challenge.startedAt - this.serverClockOffset;
+        savePendingResult(ownerId, null);
+        this.pendingResult = null;
+        this.castPhase = 'bite';
         this.castMessage = tr('fishing.giu_va_tha_de_dieu_chinh_luc_cang');
       } catch (err) {
-        if (requestId !== this.castRequestId || this.sessionId !== sessionId) return;
+        if (!current()) return;
         console.error("Không thể bắt đầu thử thách lực căng:", err);
-        this.sessionId = null;
-        this.resetTensionChallenge();
-        this.castPhase = "lost";
-        this.castMessage = tr('fishing.khong_the_bat_dau_thu_thach_hoac_phien_da_het_han_hay_tha_can_la');
+        if (isConfirmedResultRejection(err)) this.rejectPendingResult();
+        else {
+          this.castPhase = 'unconfirmed';
+          this.castMessage = tr('fishing.result_unconfirmed');
+        }
       } finally {
-        if (requestId === this.castRequestId) this.isStartingTensionChallenge = false;
+        if (current()) this.isStartingTensionChallenge = false;
       }
     },
     advanceTensionFight(now = performance.now()) {
@@ -629,6 +690,10 @@ export const useFishingStore = defineStore("fishing", {
     },
     setTensionReeling(reeling: boolean) {
       if (this.isRetrievingBait) return;
+      if (this.isStartingTensionChallenge) {
+        this.tensionReeling = reeling;
+        return;
+      }
       this.advanceTensionFight();
       if (this.tensionChallenge && this.castPhase === "bite" && this.tensionStartedAt === null) {
         this.tensionReeling = reeling;
@@ -671,19 +736,47 @@ export const useFishingStore = defineStore("fishing", {
     },
     async submitTensionChallenge(payload: TensionSubmission) {
       if (!this.tensionChallenge || this.tensionStartedAt === null || payload.sessionId !== this.sessionId || this.castPhase !== "bite") return;
-      await this.finishChallenge(() => supabaseFishingAreaRepository.submitTensionChallenge(payload));
+      if (!this.currentAreaId) return;
+      const ownerId = useAuthStore().userId;
+      // Freeze the exact replay before sending; retries and reloads reuse it.
+      const replay = { ...payload, inputs: payload.inputs.map(input => ({ ...input })) };
+      this.pendingResult = { kind: 'submit', ownerId, areaId: this.currentAreaId, sessionId: payload.sessionId, payload: replay };
+      savePendingResult(ownerId, this.pendingResult);
+      await this.finishChallenge(() => supabaseFishingAreaRepository.submitTensionChallenge(replay));
+    },
+    async retryPendingResult() {
+      const pending = this.pendingResult;
+      if (!pending || pending.ownerId !== useAuthStore().user?.id || this.castPhase !== 'unconfirmed'
+        || this.isStartingTensionChallenge || this.isLeavingArea || this.hasLeftArea) return;
+      if (pending.kind === 'start') await this.activateTensionSession(pending.sessionId);
+      else await this.finishChallenge(() => supabaseFishingAreaRepository.submitTensionChallenge(pending.payload));
+    },
+    rejectPendingResult() {
+      if (this.pendingResult) savePendingResult(this.pendingResult.ownerId, null);
+      this.pendingResult = null;
+      this.resetCast();
+      this.castPhase = 'lost';
+      this.castMessage = tr('fishing.result_rejected');
     },
     async finishChallenge(submit: () => Promise<unknown>) {
       if (this.isLeavingArea || this.hasLeftArea) return;
       const requestId = this.castRequestId;
+      const auth = useAuthStore();
+      const ownerId = auth.userId;
+      const generation = auth.sessionGeneration;
+      const current = () => requestId === this.castRequestId && auth.user?.id === ownerId
+        && auth.sessionGeneration === generation;
       this.castPhase = "submitting";
       this.castMessage = tr('TensionChallenge.dang_xac_nhan_ket_qua');
 
       try {
         const data = await withTimeout(submit(), RPC_TIMEOUT_MS);
-        if (requestId !== this.castRequestId) return;
+        if (!current()) return;
 
         const response = data as unknown as SubmitChallengeResponse;
+        if (!response || typeof response.success !== 'boolean' || (response.success && !response.caught)) {
+          throw new Error('Invalid fishing result response');
+        }
         if (response?.success && response.caught) {
           const caught: CaughtFish = {
             id: response.caught.id,
@@ -698,7 +791,7 @@ export const useFishingStore = defineStore("fishing", {
             seasonNumber: response.scoring?.season_number,
             createdAt: response.scoring?.caught_at,
           };
-          this.inventory.unshift(caught);
+          this.inventory = [caught, ...this.inventory.filter(fish => fish.id !== caught.id)];
           this.inventoryRequestId++;
           this.catchDialogOpen = true;
           this.castPhase = "caught";
@@ -709,12 +802,15 @@ export const useFishingStore = defineStore("fishing", {
         }
         this.sessionId = null;
         this.resetTensionChallenge();
-      } catch {
-        if (requestId !== this.castRequestId) return;
-        this.sessionId = null;
-        this.resetTensionChallenge();
-        this.castPhase = "lost";
-        this.castMessage = tr('fishing.khong_the_xac_nhan_ket_qua_hay_thu_lai');
+        savePendingResult(ownerId, null);
+        this.pendingResult = null;
+      } catch (error) {
+        if (!current()) return;
+        if (isConfirmedResultRejection(error)) this.rejectPendingResult();
+        else {
+          this.castPhase = 'unconfirmed';
+          this.castMessage = tr('fishing.result_unconfirmed');
+        }
       }
     },
     closeCatchDialog() {

@@ -11,6 +11,12 @@ export type TensionSubmission = {
   claimedResult: Exclude<TensionResult, "fighting">;
 };
 
+export type PendingFishingResult = {
+  ownerId: string;
+  areaId: string;
+  sessionId: string;
+} & ({ kind: 'start' } | { kind: 'submit'; payload: TensionSubmission });
+
 export type TensionChallenge = {
   sessionId: string;
   type: "tension-challenge";

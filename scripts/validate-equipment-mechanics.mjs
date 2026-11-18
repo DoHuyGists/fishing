@@ -29,7 +29,8 @@ export async function validateEquipmentMechanics({ db, query, rejects, uid, spec
   const r=await start(row);
   assert.equal(r.challenge_data,undefined); assert.equal(r.resolution.result,reason); assert.equal(r.resolution.success,false);
   assert.deepEqual(await rewardCounts(),before); assert.equal(await quantity(baitId),baitBefore-1);
-  await rejects('SELECT start_tension_challenge($1)',[row.id]); assert.equal(await quantity(baitId),baitBefore-1);
+  assert.deepEqual((await query('SELECT start_tension_challenge($1) AS r',[row.id]))[0].r.resolution,r.resolution);
+  assert.equal(await quantity(baitId),baitBefore-1);
  };
  await db.exec("UPDATE species SET rarity='COMMON',weight_min=2,weight_max=2,base_catch_rate=1,alertness=0,strength=40,fish_type='TEST',burst_multiplier=1.5");
  await setData(baitId,{quantity:1000,fish_type:['TEST']}); await setData(hookId,{catch_rate:1});
@@ -158,7 +159,8 @@ export async function validateEquipmentMechanics({ db, query, rejects, uid, spec
  const reward=(await query('SELECT submit_tension_challenge($1) AS r',[payload]))[0].r;
  assert.equal(reward.success,true);
  assert.equal(await quantity(baitId),oldQuantity-1); assert.equal(await quantity(otherBaitId),newQuantity);
- await rejects('SELECT submit_tension_challenge($1)',[payload]); assert.equal(await quantity(baitId),oldQuantity-1);
+ assert.deepEqual((await query('SELECT submit_tension_challenge($1) AS r',[payload]))[0].r,reward);
+ assert.equal(await quantity(baitId),oldQuantity-1);
  await query('UPDATE user_equipments SET bait=$1',[JSON.stringify([{inventory_id:baitId,is_used:true}])]);
 
  // Depleted bait cannot earn rewards, even with a valid winning replay.

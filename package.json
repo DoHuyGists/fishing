@@ -4,6 +4,7 @@
   "version": "0.0.0",
   "type": "module",
   "scripts": {
+    "test:fishing-result": "node --test scripts/test-fishing-result-recovery.mjs",
     "test:story": "node --test scripts/test-story.mjs",
     "test:story:browser": "node scripts/test-story-browser.mjs",
     "dev": "vite --host",

@@ -237,19 +237,29 @@ onBeforeUnmount(() => {
             <EquipmentMenu />
           </div>
         </div>
-        <TensionChallenge v-if="fishingStore.tensionChallenge" />
+        <TensionChallenge v-if="fishingStore.tensionChallenge && fishingStore.castPhase !== 'unconfirmed'" />
         <section
           v-else
           :aria-label="tr('FishingView.trang_thai_cau_ca')"
           class="flex flex-col gap-3 rounded-[15px] border border-[#cbd9c6] bg-[#f5f9f0] p-3 text-[#24352a]"
         >
           <div role="status" class="text-xs">{{ fishingStore.castMessage }}</div>
+          <button
+            v-if="fishingStore.pendingResult"
+            type="button"
+            class="rounded-[10px] border border-[#cbd9c6] bg-white px-3 py-2 text-xs font-bold enabled:hover:bg-[#e2ecdc] disabled:opacity-45"
+            :disabled="fishingStore.castPhase !== 'unconfirmed'"
+            @click="fishingStore.retryPendingResult"
+          >
+            {{ tr('fishing.retry_result') }}
+          </button>
           <div v-if="fishingStore.isFishingNetFull" role="status" class="text-xs font-bold text-amber-800">
             {{ tr('FishingBag.capacity_reached', { capacity: fishingStore.fishingNetCapacity }) }}
           </div>
           <button
             type="button"
             class="rounded-[10px] border border-[#cbd9c6] bg-white px-3 py-2 text-xs font-bold enabled:hover:bg-[#e2ecdc] disabled:cursor-not-allowed disabled:opacity-45"
+            v-if="!fishingStore.pendingResult"
             :disabled="!fishingStore.canReelIn"
             @click="fishingStore.reelInBait"
           >

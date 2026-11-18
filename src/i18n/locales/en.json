@@ -1932,6 +1932,9 @@
   },
   "fishing": {
     "san_sang_tha_cau": "Ready to cast",
+    "result_unconfirmed": "The catch result is not confirmed yet. Retry confirmation before casting again or leaving the area.",
+    "retry_result": "Retry confirmation",
+    "result_rejected": "The server rejected this cast. You can cast again.",
     "ban_chua_o_trong_bai_cau": "You are not in a fishing area yet.",
     "khong_the_chuan_bi_phien_cau": "Unable to prepare the fishing session.",
     "dang_xu_ly_luot_cau_hoac_tha_ca_vui_long_thu_lai_sau_giay_lat": "Processing a cast or fish release. Please try again shortly.",

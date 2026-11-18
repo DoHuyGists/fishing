@@ -1936,6 +1936,9 @@
   },
   "fishing": {
     "san_sang_tha_cau": "Sẵn sàng thả câu",
+    "result_unconfirmed": "Chưa xác nhận được kết quả lượt câu. Hãy thử xác nhận lại trước khi câu tiếp hoặc rời bãi.",
+    "retry_result": "Thử xác nhận lại",
+    "result_rejected": "Máy chủ đã từ chối lượt câu này. Bạn có thể thả câu lại.",
     "ban_chua_o_trong_bai_cau": "Bạn chưa ở trong bãi câu.",
     "khong_the_chuan_bi_phien_cau": "Không thể chuẩn bị phiên câu.",
     "dang_xu_ly_luot_cau_hoac_tha_ca_vui_long_thu_lai_sau_giay_lat": "Đang xử lý lượt câu hoặc thả cá. Vui lòng thử lại sau giây lát.",
