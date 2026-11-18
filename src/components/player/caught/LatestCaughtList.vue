@@ -31,10 +31,10 @@ const viewModes = computed(() => [
         <div v-else-if="!recentCaughtFishes.length" class="m-0 py-3 text-center text-xs text-gray-500">
           {{ tr('LatestCaughtList.chua_cau_duoc_con_nao') }}
         </div>
-        <div v-else class="slide-fade-in from-bottom player-content-in m-0 grid max-h-[min(55vh,520px)] gap-2 overflow-y-auto p-0" :class="mode.key === 'grid' ? 'grid-cols-2' : 'grid-cols-1'">
+        <div v-else class="slide-fade-in from-bottom player-content-in m-0 grid max-h-[min(55vh,520px)] gap-2 overflow-y-auto py-1" :class="mode.key === 'grid' ? 'grid-cols-2' : 'grid-cols-1'">
           <template v-if="mode.key === 'group'">
             <div v-for="group in caughtStore.inNetFishGroups" :key="group.fish.species?.id || 'unknown'" class="flex min-w-0 items-center gap-2 rounded-lg bg-[#f5f9f0] p-2">
-              <img :src="group.fish.species?.image || '/fish/VN/fish.jpg'" :alt="group.fish.species?.name || tr('CaughtModal.ca')" class="h-10 w-1/3 shrink-0 rounded-md object-cover" draggable="false" />
+              <img :src="group.fish.species?.image || '/fish/VN/fish.jpg'" :alt="group.fish.species?.name || tr('CaughtModal.ca')" class="w-1/3 shrink-0 rounded-md object-cover" draggable="false" />
               <div class="min-w-0 flex-1">
                 <div class="truncate text-xs font-bold" :title="group.fish.species?.name || tr('CaughtModal.ca_chua_ro_ten')">{{ group.fish.species?.name || tr('CaughtModal.ca_chua_ro_ten') }}</div>
                 <div class="text-[10px] text-gray-500">{{ group.fish.species?.rarity || tr('LatestCaughtList.thuong') }}</div>
@@ -53,7 +53,7 @@ const viewModes = computed(() => [
                 :src="fish.species?.image || '/fish/VN/fish.jpg'"
                 :alt="fish.species?.name || tr('CaughtModal.ca')"
                 class="shrink-0 rounded-md object-cover"
-                :class="mode.key === 'grid' ? 'h-20 w-full' : 'h-10 w-1/3'"
+                :class="mode.key === 'grid' ? 'w-full' : 'w-1/3'"
                 draggable="false"
               />
               <div class="min-w-0 flex-1">

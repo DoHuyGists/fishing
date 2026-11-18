@@ -164,7 +164,7 @@ function zoomTo(k: number) {
       @toggle-map="worldStore.toggleMapVisibility()"
     />
     <div v-if="isMapVisible" class="flex flex-col gap-2">
-      <div class="slide-fade-in from-top-right w-full h-fit overflow-hidden grid place-items-center border border-gray-300 rounded-xl">
+      <div class="slide-fade-in from-bottom w-full h-fit overflow-hidden grid place-items-center border border-gray-300 rounded-xl">
         <WorldMap
           ref="mapRef"
           :areas="fishingAreaStore.visibleMapAreas"
