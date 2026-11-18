@@ -1,4 +1,5 @@
 import { readCatalogPages } from './readCatalogPages';
+import type { FishingMapAreaDetails } from '../types/model/fishingMap';
 import { RepositoryError } from './repositoryError';
 import type { FishingSessionRow, FishingAreaRow, FishingAreaPayload } from "../types/table/fishingArea";
 import type { TensionSubmission } from "../types/model/tensionChallenge";
@@ -40,6 +41,18 @@ function toDbPayload(payload: FishingAreaPayload) {
 }
 
 class SupabaseFishingAreaRepository {
+  async fetchMapAreas(countryId: string): Promise<FishingMapAreaDetails[]> {
+    const rows = await readCatalogPages<any>((from, to) => supabase.from('fishing_areas')
+      .select('id, country_id, title, location, scene_path, is_available, zone_id, max_depth, allow_depth_tool, timezone, zone:zones!zone_id(id, code, name, allowed:zone_allowed_weathers(weather:weathers!weather_id(id, code, name, rarity_tier, duration_min, duration_max, image)))')
+      .eq('country_id', countryId).order('id').range(from, to));
+    return rows.map(row => ({
+      ...mapRow(row),
+      zone: row.zone ? {
+        id: row.zone.id, code: row.zone.code, name: row.zone.name,
+        weathers: (row.zone.allowed ?? []).flatMap((item: any) => item.weather ? [item.weather] : []),
+      } : null,
+    }));
+  }
   async fetchAdminPage(page: number, search: string, country: string, availability: string) {
     const result = await fetchAdminListPage<any>('fishing_areas', page, search, {
       ...(country === 'ALL' ? {} : { country_id: country }), ...(availability === 'ALL' ? {} : { is_available: availability === 'AVAILABLE' }),

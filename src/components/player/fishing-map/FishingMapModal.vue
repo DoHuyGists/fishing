@@ -9,6 +9,7 @@ import FishingMapCountries from "./FishingMapCountries.vue";
 import FishingMapToolbar from "./FishingMapToolbar.vue";
 import FishingMapAreaCard from "./FishingMapAreaCard.vue";
 import Pagination from "../../shared/Pagination.vue";
+import FishingMapSpeciesPopup from './FishingMapSpeciesPopup.vue';
 
 const store = useFishingMapStore();
 const auth = useAuthStore();
@@ -119,4 +120,5 @@ async function refresh() {
       </section>
     </div>
   </Modal>
+  <FishingMapSpeciesPopup />
 </template>

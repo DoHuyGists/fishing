@@ -4,7 +4,7 @@ import { t as tr } from "../../../i18n";
 
 import { computed, ref, watch } from "vue";
 import type { Country } from "../../../stores/country.ts";
-import BookCover from "./BookCover.vue";
+import TheBook from "./TheBook.vue";
 
 const props = defineProps<{ countries: Country[]; speciesCountByLocation: Record<string, number> }>();
 const emit = defineEmits<{ selectCountry: [country: Country] }>();
@@ -71,8 +71,8 @@ function getBookVariant(countryCode: string, speciesCount: number): BookVariant 
           class="slide-fade-in from-bottom player-content-in group relative select-none flex flex-col items-center justify-between p-3 rounded-2xl transition-all duration-300 cursor-pointer"
           @click="emit('selectCountry', country)"
         >
-          <div class="w-[140px] h-[190px] flex items-center justify-center overflow-hidden my-1">
-            <BookCover
+          <div class="h-[190px] flex items-center justify-center overflow-hidden my-1">
+            <TheBook
               :title="country.name"
               :author="tr('BookShelf.nhat_ky_cau_ca')"
               :num-up="country.code"
@@ -83,9 +83,24 @@ function getBookVariant(countryCode: string, speciesCount: number): BookVariant 
               <template #cover-icon
                 ><div class="absolute inset-0 flex flex-col items-center justify-center opacity-90 pointer-events-none">
                   <span class="text-4xl drop-shadow-md">{{ country.code }}</span>
-                </div></template
-              >
-            </BookCover>
+                </div>
+              </template>
+
+              <template #page-1>
+                <h3>Ngày 1</h3>
+                <p>Hôm nay trời mưa...</p>
+              </template>
+
+              <template #page-2>
+                <h3>Ngày 2</h3>
+                <p>Ảnh chụp buổi chiều.</p>
+              </template>
+
+              <template #page-3>
+                <h3>Ngày 3</h3>
+                <p>Ảnh chụp buổi chiều.</p>
+              </template>
+            </TheBook>
           </div>
           <div class="w-full text-center mt-2 pt-2 border-amber-800/40">
             <div class="m-0 text-xs md:text-sm font-serif font-bold truncate px-1">{{ country.name }}</div>
@@ -96,7 +111,7 @@ function getBookVariant(countryCode: string, speciesCount: number): BookVariant 
                   ? 'bg-emerald-900/80 text-white border border-emerald-600/40'
                   : 'bg-amber-950/60 text-amber-400/70 border border-amber-900/40'
               "
-              >{{ getSpeciesCount(country) }} {{ tr('BookShelf.loai_ca') }}</span
+              >{{ getSpeciesCount(country) }} {{ tr("BookShelf.loai_ca") }}</span
             >
           </div>
         </div>
@@ -106,7 +121,9 @@ function getBookVariant(countryCode: string, speciesCount: number): BookVariant 
         class="flex flex-col items-center justify-center p-12 text-amber-300/70"
       >
         <span class="text-4xl mb-2">🔍</span>
-        <div class="font-serif text-base">{{ tr('BookShelf.khong_tim_thay_quoc_gia_phu_hop_voi') }}{{ searchQuery }}"</div>
+        <div class="font-serif text-base">
+          {{ tr("BookShelf.khong_tim_thay_quoc_gia_phu_hop_voi") }}{{ searchQuery }}"
+        </div>
       </div>
     </div>
 
@@ -117,7 +134,7 @@ function getBookVariant(countryCode: string, speciesCount: number): BookVariant 
         :disabled="shelfPage === 0"
         @click="shelfPage--"
       >
-        {{ tr('BookShelf.trang_truoc') }}
+        {{ tr("BookShelf.trang_truoc") }}
       </button>
       <span class="text-amber-300 font-bold">{{ shelfPage + 1 }} / {{ totalShelfPages }}</span>
       <button
@@ -126,7 +143,7 @@ function getBookVariant(countryCode: string, speciesCount: number): BookVariant 
         :disabled="shelfPage === totalShelfPages - 1"
         @click="shelfPage++"
       >
-        {{ tr('BookShelf.trang_sau') }}
+        {{ tr("BookShelf.trang_sau") }}
       </button>
     </div>
   </div>

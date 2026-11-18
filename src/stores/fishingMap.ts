@@ -2,10 +2,9 @@ import { defineStore } from 'pinia';
 import { useAuthStore } from './auth';
 import { useCountryStore } from './country';
 import type { Country } from './country';
-import type { FishingMapArea } from '../types/model/fishingMap';
-import { useFishingAreaStore } from './fishingArea';
+import type { FishingMapArea, FishingMapAreaDetails, FishingMapSpecies } from '../types/model/fishingMap';
+import { supabaseFishingAreaRepository } from '../data/supabaseFishingAreaRepository';
 import { supabaseSpeciesInAreaRepository } from '../data/supabaseSpeciesInAreaRepository';
-import type { SpeciesInAreaRow } from '../types/table/speciesInArea';
 import { getFormattingLocale, t as tr } from '../i18n';
 
 const normalize = (value: string) => value.toLocaleLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '').replace(/đ/g, 'd').trim();
@@ -14,7 +13,8 @@ export const useFishingMapStore = defineStore('fishingMap', {
   state: () => ({
     countrySearch: '', countryFilter: 'all', selectedCountryId: '',
     search: '', speciesId: '', sort: 'name', viewMode: 'grid' as 'list' | 'grid',
-    species: [] as SpeciesInAreaRow[], loading: false, loadingSpecies: false,
+    species: [] as FishingMapSpecies[], mapAreas: [] as FishingMapAreaDetails[], selectedSpecies: null as FishingMapSpecies | null,
+    loading: false, loadingSpecies: false,
     error: '', speciesError: '', request: 0, page: 1,
   }),
   getters: {
@@ -42,14 +42,14 @@ export const useFishingMapStore = defineStore('fishingMap', {
     },
     areas(): FishingMapArea[] {
       if (!this.canView) return [];
-      const byArea = new Map<string, SpeciesInAreaRow[]>();
+      const byArea = new Map<string, FishingMapSpecies[]>();
       for (const row of this.species) {
         const rows = byArea.get(row.areaId) ?? [];
         if (!rows.some(item => item.speciesId === row.speciesId)) rows.push(row);
         byArea.set(row.areaId, rows);
       }
       const query = normalize(this.search);
-      return useFishingAreaStore().fishingAreas.filter(area => area.countryId === this.selectedCountryId)
+      return this.mapAreas.filter(area => area.countryId === this.selectedCountryId)
         .map(area => ({ ...area, species: byArea.get(area.id) ?? [] }))
         .filter(area => (!this.speciesId || area.species.some(row => row.speciesId === this.speciesId))
           && (!query || normalize(area.title ?? '').includes(query) || area.species.some(row => normalize(row.speciesName ?? '').includes(query))))
@@ -68,25 +68,29 @@ export const useFishingMapStore = defineStore('fishingMap', {
     async load(force = false) {
       const auth = useAuthStore(), generation = auth.sessionGeneration;
       this.loading = true; this.error = '';
-      const countries = useCountryStore(), areas = useFishingAreaStore();
-      await Promise.all([countries.fetchCountries(force), areas.fetchArea(force), countries.fetchMyUnlockedCountries(auth.user?.id ?? null, force)]);
+      const countries = useCountryStore();
+      await Promise.all([countries.fetchCountries(force), countries.fetchMyUnlockedCountries(auth.user?.id ?? null, force)]);
       if (auth.sessionGeneration !== generation) return;
       this.loading = false;
-      if (!countries.loaded || !areas.loaded || areas.error || countries.unlockedError) this.error = tr('FishingMapModal.loadError');
+      if (!countries.loaded || countries.unlockedError) this.error = tr('FishingMapModal.loadError');
       if (!this.canView) this.selectedCountryId = countries.countries.find(country => this.unlockedIds.has(country.id))?.id ?? '';
     },
     async loadSpecies() {
       const request = ++this.request, auth = useAuthStore(), generation = auth.sessionGeneration;
       const countryId = this.selectedCountryId;
-      this.species = []; this.speciesError = ''; this.speciesId = ''; this.loadingSpecies = false; this.page = 1;
+      this.species = []; this.mapAreas = []; this.selectedSpecies = null;
+      this.speciesError = ''; this.speciesId = ''; this.loadingSpecies = false; this.page = 1;
       if (!this.canView) return;
       this.loadingSpecies = true;
       const current = () => request === this.request && auth.sessionGeneration === generation && this.selectedCountryId === countryId && this.canView;
       try {
-        const rows = await supabaseSpeciesInAreaRepository.fetchMapSpecies(countryId);
-        if (current()) this.species = rows;
+        const [rows, areas] = await Promise.all([
+          supabaseSpeciesInAreaRepository.fetchMapSpecies(countryId),
+          supabaseFishingAreaRepository.fetchMapAreas(countryId),
+        ]);
+        if (current()) { this.species = rows; this.mapAreas = areas; }
       } catch {
-        if (current()) this.speciesError = tr('FishingMapModal.speciesError');
+        if (current()) this.speciesError = tr('FishingMapModal.loadError');
       } finally {
         if (request === this.request) this.loadingSpecies = false;
       }

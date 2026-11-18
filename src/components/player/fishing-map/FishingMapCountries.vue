@@ -5,7 +5,7 @@ const store = useFishingMapStore();
 </script>
 
 <template>
-  <aside class="w-full shrink-0 rounded-xl border border-[#cbd9c6] bg-[#f5f9f0] p-3 md:w-64">
+  <aside class="w-fit shrink-0 rounded-xl border border-[#cbd9c6] bg-[#f5f9f0] p-3">
     <div class="mb-3 text-lg font-bold">{{ tr('FishingMapModal.countries') }}</div>
     <input v-model="store.countrySearch" type="search" class="mb-2 w-full rounded-lg border border-[#cbd9c6] bg-white px-3 py-2 text-sm" :aria-label="tr('FishingMapModal.countrySearch')" :placeholder="tr('FishingMapModal.countrySearch')" />
     <select v-model="store.countryFilter" class="mb-3 w-full rounded-lg border border-[#cbd9c6] bg-white px-3 py-2 text-sm" :aria-label="tr('FishingMapModal.countryFilter')">

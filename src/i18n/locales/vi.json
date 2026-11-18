@@ -13,6 +13,11 @@
     "expression_happy": "Vui", "expression_angry": "Giận", "expression_shocked": "Bất ngờ", "expression_sad": "Buồn"
   },
   "FishingMapModal": {
+    "open": "Đang mở", "closed": "Đang đóng", "region": "Khu vực", "unknown": "Chưa có thông tin",
+    "maxDepth": "Độ sâu tối đa", "depthTool": "Dụng cụ đo sâu", "yes": "Cho phép", "no": "Không cho phép", "timezone": "Múi giờ",
+    "possibleWeathers": "Thời tiết có thể xuất hiện", "noWeathers": "Chưa có thông tin thời tiết cho khu vực này.",
+    "weight": "Cân nặng", "catchRate": "Tỷ lệ bắt cơ bản", "experience": "Kinh nghiệm", "strength": "Sức mạnh", "alertness": "Cảnh giác", "burst": "Hệ số bứt tốc",
+    "rarity": "Độ hiếm", "activeTime": "Thời gian hoạt động", "habitat": "Môi trường sống", "fishType": "Loại cá",
     "countries": "Quốc gia",
     "areas": "Bãi câu",
     "countrySearch": "Tìm quốc gia",

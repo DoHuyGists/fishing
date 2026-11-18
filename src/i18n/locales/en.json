@@ -13,6 +13,11 @@
     "expression_happy": "Happy", "expression_angry": "Angry", "expression_shocked": "Shocked", "expression_sad": "Sad"
   },
   "FishingMapModal": {
+    "open": "Open", "closed": "Closed", "region": "Region", "unknown": "Not available",
+    "maxDepth": "Maximum depth", "depthTool": "Depth tool", "yes": "Allowed", "no": "Not allowed", "timezone": "Time zone",
+    "possibleWeathers": "Possible weather", "noWeathers": "No weather information for this region yet.",
+    "weight": "Weight", "catchRate": "Base catch rate", "experience": "Experience", "strength": "Strength", "alertness": "Alertness", "burst": "Burst multiplier",
+    "rarity": "Rarity", "activeTime": "Active time", "habitat": "Habitat", "fishType": "Fish type",
     "countries": "Countries",
     "areas": "Fishing areas",
     "countrySearch": "Search countries",

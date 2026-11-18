@@ -1,4 +1,5 @@
 import type { AreaSpecies } from "../types/model/speciesInArea";
+import type { FishingMapSpecies } from '../types/model/fishingMap';
 import type { SpeciesInAreaRow, SpeciesInAreaPayload, SpeciesInAreaWeightUpdate } from "../types/table/speciesInArea";
 import supabase from "../database/connection";
 import { fetchAdminListPage } from './supabaseAdminListRepository';
@@ -24,12 +25,12 @@ function mapRow(row: any): SpeciesInAreaRow {
 }
 
 class SupabaseSpeciesInAreaRepository {
-  async fetchMapSpecies(countryId: string): Promise<SpeciesInAreaRow[]> {
-    const rows = await readCatalogPages((from, to) => supabase.from("species_in_area")
-      .select("area_id, species_id, area:fishing_areas!inner(id, title, country_id, is_available), species:species!inner(id, name, image, rarity)")
-      .eq("area.country_id", countryId).eq("area.is_available", true)
+  async fetchMapSpecies(countryId: string): Promise<FishingMapSpecies[]> {
+    const rows = await readCatalogPages<any>((from, to) => supabase.from("species_in_area")
+      .select("id, area_id, species_id, depth_scope_id, weight_rate, area:fishing_areas!inner(id, title, country_id), species:species!inner(*)")
+      .eq("area.country_id", countryId)
       .order("area_id").order("species_id").range(from, to));
-    return rows.map(mapRow);
+    return rows.map(row => ({ ...mapRow(row), details: row.species ?? null }));
   }
 
   async fetchDistribution(areaId: string): Promise<SpeciesInAreaRow[]> {
