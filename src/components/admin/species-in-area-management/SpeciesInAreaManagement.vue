@@ -10,6 +10,7 @@ import { useSpeciesInAreaStore } from "./admin-species-in-area-store.ts";
 import { mapData } from "../../../data/map";
 import { useDepthScopeStore } from "../depth-scope-management/admin-depth-scope-store.ts";
 import SpeciesInAreaForm from "./SpeciesInAreaForm.vue";
+import VisualizeSpeciesDistribution from "./VisualizeSpeciesDistribution.vue";
 
 const emit = defineEmits(["close"]);
 
@@ -58,6 +59,7 @@ const rowKey = (row: SpeciesInAreaRow) => `${row.areaId}:${row.speciesId}`;
 async function loadAll() {
   loadError.value = "";
   try {
+    if (!Object.values(store.distributions).some(state => state.saving)) store.distributions = {};
     await Promise.all([store.fetchAll(), depthScopeStore.fetchOptions()]);
   } catch (error) {
     loadError.value = error instanceof Error ? error.message : "Unable to load data";
@@ -337,7 +339,7 @@ onMounted(loadAll);
           <div
             v-for="group in groupedByArea"
             :key="group.areaId"
-            class="overflow-hidden rounded-lg border border-gray-200 bg-white shadow-sm"
+            class="shrink-0 overflow-hidden rounded-lg border border-gray-200 bg-white shadow-sm"
           >
             <button
               type="button"
@@ -358,10 +360,11 @@ onMounted(loadAll);
                 >
               </div>
               <span class="shrink-0 rounded-full bg-emerald-100 px-2.5 py-1 text-xs font-bold text-emerald-800"
-                >{{ group.items.length }} loài</span
+                >{{ store.distributions[group.areaId]?.loaded ? store.distributions[group.areaId]!.rows.length : group.items.length }} loài</span
               >
             </button>
             <div v-if="!isAreaCollapsed(group.areaId)" class="flex flex-wrap gap-3 p-4">
+              <VisualizeSpeciesDistribution :area-id="group.areaId" />
               <div
                 v-for="row in group.items"
                 :key="rowKey(row)"

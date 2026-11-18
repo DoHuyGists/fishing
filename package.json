@@ -17,6 +17,8 @@
     "test:game-cache:browser": "node scripts/test-game-cache-browser.mjs",
     "test:read-cache": "node --test scripts/test-read-cache.mjs",
     "test:pagination": "node --test scripts/test-list-pagination.mjs scripts/test-refresh-stores.mjs",
+    "test:species-distribution": "node --test scripts/test-species-distribution.mjs",
+    "test:species-distribution:browser": "node scripts/test-species-distribution-browser.mjs",
     "check:i18n": "node scripts/check-i18n.mjs && node scripts/check-i18n-runtime.mjs",
     "preview": "vite preview"
   },
