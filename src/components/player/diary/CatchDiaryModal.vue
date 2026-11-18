@@ -24,7 +24,14 @@ const entries = computed(() => selectedCountry.value
   ? diaryStore.entriesForCountry(selectedCountry.value.code, selectedCountry.value.name)
   : [],
 );
-const isLoading = computed(() => diaryStore.isLoading || countryStore.isLoadingUnlocked);
+const filteredEntries = computed(() => selectedCountry.value
+  ? diaryStore.filteredEntriesForCountry(selectedCountry.value.code, selectedCountry.value.name)
+  : [],
+);
+// The background map shares this store and polls unlocked countries. Keep the
+// diary mounted while those reads refresh an already displayed country list.
+const isLoading = computed(() => diaryStore.isLoading
+  || (countryStore.isLoadingUnlocked && !countryStore.unlockedCountries.length));
 const caughtCount = computed(() => entries.value.filter((entry) => entry.isCaught).length);
 const viewModes = computed(() => [
   { key: 'grid', label: tr('FishingMapModal.grid') },
@@ -44,6 +51,7 @@ async function retry() {
 
 watch(() => authStore.userId, () => {
   selectedCountryCode.value = "";
+  diaryStore.speciesSearch = "";
   void loadDiary();
 }, { immediate: true });
 </script>
@@ -83,13 +91,24 @@ watch(() => authStore.userId, () => {
               {{ tr('CatchDiaryModal.conqueredCount', { value0: caughtCount }) }} / {{ entries.length }}
             </span>
           </div>
+          <input
+            v-if="!diaryStore.error && entries.length"
+            v-model="diaryStore.speciesSearch"
+            type="search"
+            :aria-label="tr('CatchDiaryModal.searchSpecies')"
+            :placeholder="tr('CatchDiaryModal.searchSpecies')"
+            class="mb-3 w-full rounded-lg border border-[#cbd9c6] bg-white px-3 py-2 text-sm outline-none focus:border-[#698563] focus:ring-2 focus:ring-[#cbd9c6]"
+          />
           <div v-if="!diaryStore.error && !entries.length" role="status" class="py-12 text-center text-sm leading-6">
             {{ tr('CatchDiaryModal.noSpecies') }}
           </div>
           <Tab v-else-if="!diaryStore.error" v-model="diaryStore.viewMode" :tabs="viewModes" :aria-label="tr('CaughtModal.che_do_hien_thi')">
             <template v-for="mode in viewModes" :key="mode.key" #[mode.key]>
-              <div :key="selectedCountry.code" class="slide-fade-in from-bottom player-content-in grid gap-3 pt-3" :class="mode.key === 'grid' ? 'grid-cols-[repeat(auto-fill,minmax(min(100%,220px),1fr))]' : 'grid-cols-1'">
-                <DiarySpeciesCard v-for="entry in entries" :key="entry.species.id" :entry="entry" :list="mode.key === 'list'" />
+              <div v-if="!filteredEntries.length" role="status" class="py-12 text-center text-sm leading-6">
+                {{ tr('CatchDiaryModal.noMatchingSpecies') }}
+              </div>
+              <div v-else class="slide-fade-in from-bottom player-content-in grid gap-3 pt-3" :class="mode.key === 'grid' ? 'grid-cols-[repeat(auto-fill,minmax(min(100%,220px),1fr))]' : 'grid-cols-1'">
+                <DiarySpeciesCard v-for="entry in filteredEntries" :key="entry.species.id" :entry="entry" :list="mode.key === 'list'" />
               </div>
             </template>
           </Tab>

@@ -625,6 +625,8 @@
     "trang_sau": "Trang sau ▶"
   },
   "CatchDiaryModal": {
+    "searchSpecies": "Tìm kiếm loài...",
+    "noMatchingSpecies": "Không tìm thấy loài phù hợp.",
     "species": "Các loài trong quốc gia",
     "noSpecies": "Chưa có dữ liệu loài tại quốc gia này.",
     "notConquered": "Chưa chinh phục",

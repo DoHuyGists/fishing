@@ -4,7 +4,7 @@ const second = 1000, minute = 60 * second, hour = 60 * minute;
 // Personal snapshots deliberately stay in RAM and never fall back to stale.
 export const readCachePolicies: Record<string, ReadCachePolicy> = {
   caught: { ttl: 30 * second }, inventory: { ttl: 30 * second }, equipment: { ttl: 30 * second },
-  diaryOwned: { ttl: minute }, unlocked: { ttl: minute }, skillsOwned: { ttl: 30 * second },
+  diaryOwned: { ttl: 5 * minute }, unlocked: { ttl: 5 * minute }, skillsOwned: { ttl: 30 * second },
   wallet: { ttl: 10 * second }, profile: { ttl: 30 * second },
   notifications: { ttl: 15 * second, feature: 'notifications' }, team: { ttl: 15 * second }, friends: { ttl: 30 * second },
   market: { ttl: 5 * second }, history: { ttl: 15 * second },

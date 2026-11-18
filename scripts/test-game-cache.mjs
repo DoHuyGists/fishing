@@ -23,9 +23,30 @@ test('game cache freshness, concurrency, recovery and invalidation', async t => 
   try {
     const { createGameCache, CacheContextChangedError } = await server.ssrLoadModule('/src/utils/gameCache.ts');
     const { RepositoryError } = await server.ssrLoadModule('/src/data/repositoryError.ts');
+    const { readCachePolicies } = await server.ssrLoadModule('/src/data/readCachePolicies.ts');
     let clock = 1000;
     const base = { scope: 'project:user:a', domain: 'species', policy: { ttl: 100, maxAge: 1000 }, validate: data => Array.isArray(data) && data.every(x => typeof x === 'string') };
     const make = (storage, options = {}) => createGameCache(storage, { now: () => clock, random: () => 0, timeoutMs: 20, ...options });
+
+    await t.test('diary and country snapshots survive minute polling, expire at five minutes and allow invalidation', async () => {
+      for (const domain of ['diaryOwned', 'unlocked']) {
+        clock = 1000;
+        const cache = make(memoryStorage());
+        let calls = 0;
+        const policy = readCachePolicies[domain];
+        const options = { ...base, domain, policy: { ttl: policy.ttl, maxAge: policy.ttl },
+          load: async () => { calls++; return { data: ['snapshot'] }; } };
+        await cache.read(options);
+        clock += 60_000; await cache.read(options);
+        clock += 239_999; await cache.read(options);
+        assert.equal(calls, 1);
+        clock++; await cache.read(options);
+        assert.equal(calls, 2);
+        await cache.invalidate(base.scope, [domain]);
+        await cache.read(options);
+        assert.equal(calls, 3);
+      }
+    });
 
     await t.test('ten callers share hydration/network; RAM hits never touch disk; reload preserves original expiry', async () => {
       clock = 1000; const storage = memoryStorage(); const cache = make(storage), read = deferred(); let calls = 0;

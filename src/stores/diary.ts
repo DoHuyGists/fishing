@@ -1,5 +1,6 @@
 import { useGameCatalogStore } from './gameCatalog';
 import { useAuthStore } from './auth';
+import { useReadCacheStore } from './readCache';
 import type { Species, CaughtDiary, DiaryFishEntry } from "../types/model/diary";
 import type { AreaSpecies } from "../types/model/speciesInArea";
 import { t as tr } from "../i18n";
@@ -14,6 +15,7 @@ export type { DiaryFishEntry } from "../types/model/diary";
 export const useDiaryStore = defineStore("diary", {
   state: () => ({
     viewMode: 'grid',
+    speciesSearch: '',
     speciesDetails: {} as Record<string, SpeciesRow>,
     detailsLoading: {} as Record<string, boolean>,
     detailsErrors: {} as Record<string, string>,
@@ -32,6 +34,15 @@ export const useDiaryStore = defineStore("diary", {
   }),
 
   getters: {
+    filteredEntriesForCountry() {
+      const normalize = (value: string) => value.toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '').replace(/đ/g, 'd').trim();
+      const query = normalize(this.speciesSearch);
+      return (code: string, name: string): DiaryFishEntry[] => {
+        const entries = this.entriesForCountry(code, name);
+        return query ? entries.filter(({ species }) => normalize(species.name).includes(query)) : entries;
+      };
+    },
+
     caughtEntriesForCountry() {
       return (code: string, name: string): DiaryFishEntry[] =>
         this.entriesForCountry(code, name).filter((entry) => entry.isCaught);
@@ -161,6 +172,8 @@ export const useDiaryStore = defineStore("diary", {
       this.isLoading = true;
       this.error = null;
       try {
+        if (force) await useReadCacheStore().invalidate(['diaryOwned']);
+        if (!current()) return;
         const [, caughtData] = await Promise.all([useGameCatalogStore().get('species', { force, consumer: 'diary', onUpdate: data => this.applySpecies(data) }), userId ? supabaseDiaryRepository.fetchCaughtDiary(userId) : Promise.resolve([])]);
         if (!current()) return;
         this.caughtDiary = caughtData;

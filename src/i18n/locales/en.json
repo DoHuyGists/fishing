@@ -621,6 +621,8 @@
     "trang_sau": "Next page ▶"
   },
   "CatchDiaryModal": {
+    "searchSpecies": "Search species...",
+    "noMatchingSpecies": "No matching species found.",
     "species": "Species in this country",
     "noSpecies": "No species data is available for this country yet.",
     "notConquered": "Not yet conquered",
