@@ -853,6 +853,9 @@
     "cau_tiep": "Keep fishing"
   },
   "DayPhaseClock": {
+    "mui_gio_khong_hop_le": "Fishing area timezone is missing or invalid",
+    "ca_ban_ngay": "Fish availability: day (06:00–19:00)",
+    "ca_ban_dem": "Fish availability: night (19:00–06:00)",
     "thoi_gian_va_thoi_tiet": "Time and weather"
   },
   "EquipmentMenu": {
@@ -1724,6 +1727,9 @@
     "dong_thong_bao_value0": "Close notification: {value0}"
   },
   "use_single_session": {
+    "checking": "Checking your session…",
+    "registrationError": "Unable to verify your session. Please try again.",
+    "unsupportedBrowser": "Session locking is unavailable. Please use an up-to-date browser and access the app over HTTPS.",
     "ung_dung_da_duoc_mo_o_mot_tab_khac_tren_trinh_duyet_nay": "The app is already open in another tab in this browser.",
     "tai_khoan_cua_ban_vua_duoc_dang_nhap_tren_mot_trinh_duyet_thiet_": "Your account was just signed in on another browser/device."
   },

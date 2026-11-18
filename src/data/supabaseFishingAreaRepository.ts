@@ -1,7 +1,7 @@
 import { readCatalogPages } from './readCatalogPages';
 import type { FishingMapAreaDetails } from '../types/model/fishingMap';
 import { RepositoryError } from './repositoryError';
-import type { FishingSessionRow, FishingAreaRow, FishingAreaPayload } from "../types/table/fishingArea";
+import type { FishingSessionRow, FishingAreaRow, FishingAreaPayload, FishingAreaDetails } from "../types/table/fishingArea";
 import type { TensionSubmission } from "../types/model/tensionChallenge";
 import supabase from "../database/connection";
 import { fetchAdminListPage } from './supabaseAdminListRepository';
@@ -167,20 +167,22 @@ class SupabaseFishingAreaRepository {
       scenePath: x.scene_path,
     }));
   }
-  async fetchOneAreas(areaId: string): Promise<any> {
-    const { data, error } = await supabase.from("fishing_areas").select("id, country_id, title, location, scene_path, fishing_boundary, max_depth, allow_depth_tool").eq("id", areaId).maybeSingle();
+  async fetchOneAreas(areaId: string): Promise<FishingAreaDetails | null> {
+    const { data, error } = await supabase.from("fishing_areas").select("id, country_id, title, location, scene_path, fishing_boundary, max_depth, allow_depth_tool, timezone, country:countries!country_id(default_timezone)").eq("id", areaId).maybeSingle();
 
     if (error) throw new RepositoryError(error);
 
     if (!data) return null;
 
+    const country = Array.isArray(data.country) ? data.country[0] : data.country;
     return {
       id: data.id,
       title: data.title,
       countryId: data.country_id,
       location: data.location,
       scenePath: data.scene_path,
-      fishingBoundary: data.fishing_boundary,
+      fishingBoundary: data.fishing_boundary ?? [],
+      timezone: data.timezone?.trim() || country?.default_timezone?.trim() || null,
       maxDepth: data.max_depth == null ? null : Number(data.max_depth),
       allowDepthTool: data.allow_depth_tool === true,
     };

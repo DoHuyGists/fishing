@@ -194,6 +194,7 @@ function castAt(event: MouseEvent) {
 <template>
   <section class="fishing-scene" @contextmenu.prevent="">
     <img
+      v-if="context.sceneImage"
       :src="context.sceneImage"
       :alt="tr('FishingScene.khung_canh_bai_cau')"
       class="pond-image"

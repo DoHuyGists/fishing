@@ -2,7 +2,7 @@
 
 Ngày ghi nhận: 18/11/2026.
 
-Trạng thái: Vấn đề 1 đã sửa trong mã nguồn, chờ triển khai SQL lên Supabase và kiểm chứng thực tế. Vấn đề 2–4 chưa xử lý.
+Trạng thái: Vấn đề 1 đã sửa trong mã nguồn, chờ triển khai SQL lên Supabase và kiểm chứng thực tế. Vấn đề 2 đã sửa và kiểm thử với nhiều tab/trình duyệt bằng server giả lập; chờ kiểm chứng với Supabase thực tế. Vấn đề 3–4 đã sửa cùng nhau và kiểm thử tự động; chờ đối chiếu cấu hình bãi câu trên Supabase thực tế.
 
 Kết quả kiểm tra trước bản sửa: build thành công, 106/106 kiểm thử đạt, kiểm tra i18n đạt. Bản sửa vấn đề 1 bổ sung bộ kiểm thử phục hồi kết quả câu.
 
@@ -33,72 +33,72 @@ Kiểm chứng và triển khai:
 ## 2. Tab mới ghi đè phiên tab cũ trước khi xử lý cảnh báo trùng tab
 
 - Mức độ: Cao.
-- Vị trí: `src/composables/use-single-session.ts`, `initTabCheck`, `registerAndListenRealtime` và luồng khởi tạo; nơi gọi tại `src/layouts/PlayerLayout.vue`.
-- Hiện trạng: Kiểm tra bằng BroadcastChannel và ghi `active_session_id` chạy đồng thời. Tab mới vẫn có thể ghi đè phiên đang hoạt động dù đã nhận cảnh báo trùng tab. Chọn “Đóng tab này” không khôi phục phiên cũ.
-- Bằng chứng: Xác nhận từ luồng mã nguồn; chưa tái hiện bằng hai trình duyệt kết nối Supabase thực tế.
+- Trạng thái: Đã sửa trong mã nguồn ngày 18/11/2026; chưa kiểm chứng với Supabase thực tế.
+- Vị trí: `src/composables/use-single-session.ts`, `src/data/supabaseSessionRepository.ts`; nơi gọi tại `src/layouts/PlayerLayout.vue`.
+- Lỗi trước khi sửa: Kiểm tra bằng BroadcastChannel và ghi `active_session_id` chạy đồng thời. Tab mới có thể ghi đè phiên đang hoạt động dù đã nhận cảnh báo trùng tab. Chọn “Đóng tab này” không khôi phục phiên cũ.
 
-Các bước sửa:
+Các bước đã thực hiện:
 
-1. Chuyển việc đăng ký phiên thành luồng có thứ tự: kiểm tra tab đang hoạt động trước khi nhận quyền sở hữu phiên trên server.
-2. Khi phát hiện trùng tab và người dùng chọn đóng tab mới, không ghi đè phiên cũ.
-3. Xử lý trường hợp hai tab mở cùng lúc bằng cơ chế điều phối có kết quả xác định; xác minh quyền sở hữu sau khi đăng ký hoặc kết nối lại để không bỏ lỡ thay đổi giữa lúc ghi và subscribe.
-4. Đưa truy vấn và Realtime qua repository theo kiến trúc hiện tại; cleanup kênh và bỏ qua phản hồi bất đồng bộ sau khi composable bị hủy.
-5. Theo dõi tài khoản bằng nguồn reactive thay vì chuỗi `userId` chụp tại thời điểm khởi tạo; hủy đăng ký cũ khi tài khoản thay đổi.
+1. Thay cơ chế dò tab bằng Web Locks theo tài khoản. Khóa được giữ suốt vòng đời phiên; tab không nhận được khóa chỉ hiện cảnh báo, không đăng ký Realtime hoặc ghi phiên server. Hai tab mở đồng thời chỉ có một tab được đăng ký.
+2. Chờ Realtime subscribe thành công rồi mới ghi phiên. Đọc lại quyền sở hữu sau khi ghi, khi có thay đổi và sau mỗi lần kết nối lại; không tự ghi đè phiên khi reconnect. Giữ màn câu đang chạy trong lúc Realtime tạm mất kết nối.
+3. Đưa truy vấn, subscribe và cleanup kênh vào repository; chuyển type phiên vào `src/types/table/activeSession.ts`. Hủy request bằng AbortSignal và bỏ qua kết quả cũ khi đổi tài khoản hoặc unmount.
+4. Truyền getter tài khoản reactive từ layout. Chỉ mở màn chơi sau khi xác nhận quyền sở hữu; lỗi khởi tạo có nút thử lại và bản dịch Việt/Anh.
+5. Khi không có Web Locks, hiển thị thông báo yêu cầu trình duyệt hỗ trợ và HTTPS; không dùng cơ chế dò tab theo timeout có thể ghi đè phiên cũ. Không cần thay đổi SQL.
 
 Kiểm chứng:
 
-- Mở tab B khi tab A hoạt động, rồi đóng B: A tiếp tục dùng được và giữ quyền sở hữu phiên.
-- Mở hai tab đồng thời, tải lại tab, đổi tài khoản và unmount trong lúc đăng ký: không tạo kênh thừa hoặc ghi phiên cũ.
-- Đăng nhập từ trình duyệt khác: cảnh báo đúng theo hành vi một phiên đang được áp dụng.
-- Chạy kiểm thử nhiều tab/trình duyệt và build.
+- `npm run test:single-session`: 3/3 kiểm thử repository đạt, bao phủ truy vấn theo tài khoản, hủy request, subscribe/reconnect, timeout, lỗi và cleanup.
+- `npm run test:single-session:browser`: 8/8 tình huống đạt bằng Edge headless, Web Locks thật và server/Realtime giả lập. Bao phủ nút “Đóng tab này”, mở đồng thời, reload, trình duyệt khác qua browser context riêng, đổi tài khoản, unmount khi chờ subscribe, ghi đè giữa lúc đăng ký và phản hồi đọc đến muộn.
+- Kiểm tra i18n và build đạt.
+- Còn cần kiểm chứng trên Supabase thực tế: mở tab B rồi đóng B để A tiếp tục chơi; đăng nhập bằng trình duyệt khác và ngắt/kết nối lại Realtime để đối chiếu cảnh báo với quyền sở hữu trong `active_sessions`.
 
 ## 3. Cảnh ngày/đêm không cập nhật khi thời gian thay đổi
 
 - Mức độ: Trung bình.
+- Trạng thái: Đã sửa trong mã nguồn ngày 18/11/2026.
 - Vị trí: `src/stores/dayPhase.ts`, getter `currentPhase`; `src/views/FishingView.vue`; `src/components/player/fishing/DayPhaseClock.vue`.
-- Hiện trạng: Getter gọi `new Date()` nhưng không có phụ thuộc reactive, nên kết quả bị cache. Cảnh nền được gán riêng cũng không tự đổi khi đi qua mốc thời gian.
+- Lỗi trước khi sửa: Getter gọi `new Date()` nhưng không có phụ thuộc reactive, nên kết quả bị cache. Cảnh nền được gán riêng cũng không tự đổi khi đi qua mốc thời gian.
 - Bằng chứng: Đã tái hiện bằng cách đổi giờ từ 16 sang 21; `currentPhase` vẫn là `day`, cảnh vẫn là `/lake/day.png`.
 
-Các bước sửa:
+Các bước đã thực hiện:
 
-1. Dùng nguồn thời gian reactive dùng chung trong store hoặc composable, có cơ chế khởi động và dọn timer rõ ràng.
-2. Tính giai đoạn trong ngày từ nguồn thời gian đó; cập nhật cảnh nền, nhãn và biểu tượng cùng nhau khi chuyển giai đoạn.
-3. Cập nhật lại ngay khi tab trở về trạng thái hiển thị để xử lý timer bị trình duyệt tạm dừng.
-4. Kết hợp với nguồn múi giờ thống nhất ở vấn đề 4 để tránh triển khai hai cơ chế tính giờ khác nhau.
+1. Store `dayPhase` giữ thời gian reactive dùng chung; composable `useDayPhaseClock` giữ và trả quyền sử dụng timer theo vòng đời màn hình. Nhiều nơi sử dụng chỉ tạo một timer, nơi cuối cùng rời màn hình sẽ dọn timer và listener.
+2. Cảnh nền, nhãn, biểu tượng và đồng hồ đều được tính từ thời gian này và múi giờ bãi câu, cập nhật mỗi giây.
+3. Sự kiện `visibilitychange` cập nhật ngay khi tab hiển thị trở lại.
+4. Xem trước trên bản đồ tải chi tiết bãi qua store/repository để có múi giờ hiệu lực; dùng dữ liệu riêng và bỏ qua phản hồi cũ khi đổi lựa chọn, không ghi đè cảnh màn câu.
 
 Kiểm chứng:
 
-- Đi qua các mốc 03:00, 09:00, 17:00, 19:00 và qua nửa đêm: cảnh, nhãn và biểu tượng đổi đúng.
-- Tab bị ẩn qua một mốc thời gian rồi mở lại: cập nhật ngay, không cần tải lại trang.
-- Rời và vào lại màn câu: không nhân đôi timer.
-- Chạy kiểm thử với đồng hồ giả lập và build.
+- `npm run test:day-phase`: 7/7 kiểm thử đạt, bao phủ các mốc 03:00, 09:00, 17:00, 19:00, nửa đêm, cập nhật khi tab hiển thị trở lại và vòng đời timer bằng đồng hồ giả lập.
+- Kiểm thử cũng bao phủ phản hồi xem trước đến muộn và việc xem trước không thay đổi cảnh đang câu.
+- Kiểm tra i18n, kiểm thử hồi quy bản đồ/phục hồi kết quả câu và build đạt.
 
 ## 4. Giờ hiển thị không thống nhất với múi giờ tính cá xuất hiện
 
 - Mức độ: Trung bình.
+- Trạng thái: Đã sửa trong mã nguồn ngày 18/11/2026; không cần thay đổi SQL.
 - Vị trí: `src/stores/dayPhase.ts`; `src/data/supabaseFishingAreaRepository.ts`, `fetchOneAreas`; `scripts/supabase/rpc/fishing/cast_rod.sql`.
-- Hiện trạng: Client tính giai đoạn bằng `getHours()` theo giờ thiết bị. Server tính điều kiện xuất hiện cá theo `fishing_areas.timezone`, kế thừa `countries.default_timezone` khi chưa cấu hình. Dữ liệu chi tiết bãi câu hiện chưa trả múi giờ cho luồng hiển thị này.
+- Lỗi trước khi sửa: Client tính giai đoạn bằng `getHours()` theo giờ thiết bị. Server tính điều kiện xuất hiện cá theo `fishing_areas.timezone`, kế thừa `countries.default_timezone` khi chưa cấu hình. Dữ liệu chi tiết bãi câu chưa trả múi giờ cho luồng hiển thị này.
 - Bằng chứng: Xác nhận từ mã nguồn client và SQL; chưa đối chiếu cấu hình từng bãi câu trên Supabase thực tế.
 
-Các bước sửa:
+Các bước đã thực hiện:
 
-1. Trả múi giờ hiệu lực của bãi câu qua repository, tuân theo cùng quy tắc kế thừa như server; kiểm tra type hiện có trước khi bổ sung trường.
-2. Dùng múi giờ IANA của bãi câu để tính giờ hiển thị và giai đoạn cảnh, không phụ thuộc múi giờ thiết bị.
-3. Nếu cần đồng bộ cả thời điểm, sử dụng mốc giờ server và độ lệch thời gian thay vì chỉ dựa vào đồng hồ thiết bị.
-4. Làm rõ quan hệ giữa bốn giai đoạn cảnh và hai điều kiện cá `DAY`/`NIGHT`. Server hiện coi giờ 06–18 là `DAY`; tránh để giao diện diễn giải bốn giai đoạn cảnh như điều kiện xuất hiện cá tương đương.
-5. Xử lý múi giờ thiếu hoặc không hợp lệ một cách rõ ràng; không âm thầm dùng giờ thiết bị làm kết quả chính xác của bãi câu.
+1. `fetchOneAreas` trả múi giờ hiệu lực: ưu tiên múi giờ bãi đã trim, kế thừa múi giờ quốc gia nếu rỗng/null, đúng quy tắc `cast_rod.sql`. Type `FishingAreaDetails` tái sử dụng trường của `FishingAreaRow`.
+2. Dùng `Intl.DateTimeFormat` với `timeZone` IANA cho giờ và giai đoạn cảnh, hỗ trợ DST và không phụ thuộc múi giờ thiết bị.
+3. Phạm vi bản sửa là thống nhất múi giờ; thời điểm vẫn lấy từ `Date.now()`, chưa bổ sung đồng bộ giờ server. Đồng hồ thiết bị sai thời điểm vẫn có thể làm giao diện lệch so với server; server tiếp tục quyết định cá xuất hiện.
+4. Hiển thị riêng điều kiện cá ban ngày (06:00 đến trước 19:00) hoặc ban đêm (19:00 đến trước 06:00), kèm bản dịch Việt/Anh, để phân biệt với bốn giai đoạn cảnh.
+5. Nếu múi giờ thiếu/không hợp lệ, hiển thị thông báo và dấu “—”, không dùng múi giờ thiết bị hoặc hiển thị cảnh sai như dữ liệu hợp lệ.
 
 Kiểm chứng:
 
-- Đổi múi giờ thiết bị trong khi giữ nguyên bãi câu và thời điểm: giờ bãi câu và cảnh không thay đổi sai lệch.
-- Bãi có múi giờ riêng, bãi kế thừa múi giờ quốc gia và vùng có DST: hiển thị đúng.
-- Đối chiếu điều kiện xuất hiện cá tại 06:00 và 19:00 theo giờ bãi câu.
-- Chạy kiểm thử chuyển đổi múi giờ, kiểm tra i18n nếu đổi giao diện và build.
+- `npm run test:day-phase`: kiểm tra độc lập với múi giờ thiết bị, cả hai lần chuyển DST, múi giờ riêng/kế thừa, giá trị rỗng/sai và các mốc 06:00/19:00 theo giờ bãi câu đều đạt.
+- `npm run check:i18n` và `npm run build` đạt; 8/8 kiểm thử hồi quy bản đồ/phục hồi kết quả câu đạt.
+- Chưa đối chiếu cấu hình, quyền đọc quan hệ quốc gia và cá xuất hiện trên Supabase thực tế.
 
 ## Thứ tự thực hiện đề xuất
 
 1. Triển khai SQL và kiểm chứng thực tế bản sửa phục hồi kết quả câu khi lỗi mạng.
-2. Sửa điều phối phiên giữa các tab.
-3. Thực hiện vấn đề 3 và 4 cùng nhau vì dùng chung nguồn thời gian và cách tính cảnh.
+2. Kiểm chứng thực tế bản sửa điều phối phiên giữa các tab.
+3. Kiểm chứng thực tế bản sửa chung của vấn đề 3 và 4 theo múi giờ cấu hình tại từng bãi câu.
 
 Tuân thủ `AGENTS.md` khi triển khai: dùng Pinia/composable cho logic và state, repository cho truy cập Supabase, tái sử dụng component chung, hỗ trợ i18n ngoài phần admin, giữ UTF-8 không BOM và chạy build sau khi sửa mã nguồn.

@@ -20,7 +20,7 @@ import { useUserSettingStore } from "../stores/userSetting";
 import { useFishingBackgroundSoundStore } from "../stores/fishingBackgroundSound";
 import DayPhaseClock from "../components/player/fishing/DayPhaseClock.vue";
 import FishingFatigue from '../components/player/fishing/FishingFatigue.vue';
-import { useDayPhaseStore } from "../stores/dayPhase";
+import { useDayPhaseClock } from "../composables/useDayPhaseClock";
 import { useUserInAreaStore } from "../stores/userInArea";
 import { supabaseFishingAreaRepository } from "../data/supabaseFishingAreaRepository";
 import type { RealtimeChannel } from "@supabase/supabase-js";
@@ -31,7 +31,7 @@ const fishingStore = useFishingStore();
 const equipmentStore = useEquipmentStore();
 const userSettingStore = useUserSettingStore();
 const backgroundSoundStore = useFishingBackgroundSoundStore();
-const dayPhaseStore = useDayPhaseStore();
+const dayPhaseStore = useDayPhaseClock();
 const userInAreaStore = useUserInAreaStore();
 const selectedBait = computed(() =>
   equipmentStore.variants.bait?.find((bait) => bait.id === fishingStore.equipmentLoadout.bait),

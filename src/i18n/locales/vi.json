@@ -857,6 +857,9 @@
     "cau_tiep": "Câu tiếp"
   },
   "DayPhaseClock": {
+    "mui_gio_khong_hop_le": "Thiếu múi giờ bãi câu hoặc múi giờ không hợp lệ",
+    "ca_ban_ngay": "Điều kiện cá: ban ngày (06:00–19:00)",
+    "ca_ban_dem": "Điều kiện cá: ban đêm (19:00–06:00)",
     "thoi_gian_va_thoi_tiet": "Thời gian và thời tiết"
   },
   "EquipmentMenu": {
@@ -1728,6 +1731,9 @@
     "dong_thong_bao_value0": "Đóng thông báo: {value0}"
   },
   "use_single_session": {
+    "checking": "Đang kiểm tra phiên truy cập…",
+    "registrationError": "Không thể xác nhận phiên truy cập. Vui lòng thử lại.",
+    "unsupportedBrowser": "Trình duyệt chưa hỗ trợ khóa phiên. Vui lòng dùng trình duyệt mới nhất và truy cập qua HTTPS.",
     "ung_dung_da_duoc_mo_o_mot_tab_khac_tren_trinh_duyet_nay": "Ứng dụng đã được mở ở một tab khác trên trình duyệt này.",
     "tai_khoan_cua_ban_vua_duoc_dang_nhap_tren_mot_trinh_duyet_thiet_": "Tài khoản của bạn vừa được đăng nhập trên một trình duyệt/thiết bị khác."
   },

@@ -4,6 +4,9 @@
   "version": "0.0.0",
   "type": "module",
   "scripts": {
+    "test:day-phase": "node --test --test-isolation=none scripts/test-day-phase.mjs",
+    "test:single-session": "node --test --test-isolation=none scripts/test-single-session.mjs",
+    "test:single-session:browser": "node scripts/test-single-session-browser.mjs",
     "test:fishing-result": "node --test scripts/test-fishing-result-recovery.mjs",
     "test:story": "node --test scripts/test-story.mjs",
     "test:story:browser": "node scripts/test-story-browser.mjs",

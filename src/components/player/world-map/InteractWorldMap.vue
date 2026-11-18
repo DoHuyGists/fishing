@@ -9,7 +9,7 @@ import WorldMap from "./WorldMap.vue";
 import { useFishingAreaStore } from "../../../stores/fishingArea.ts";
 import { useUserInAreaStore } from "../../../stores/userInArea.ts";
 import { useAuthStore } from "../../../stores/auth.ts";
-import { useDayPhaseStore } from "../../../stores/dayPhase.ts";
+import { useDayPhaseClock } from "../../../composables/useDayPhaseClock";
 import { useToast } from "../../../composables/useToast.ts";
 import FishingAnchor from "./FishingAnchor.vue";
 import FishingFatigue from "../fishing/FishingFatigue.vue";
@@ -27,7 +27,7 @@ const authStore = useAuthStore();
 const countryStore = useCountryStore();
 const features = useFeatureAvailabilityStore();
 const userInAreaStore = useUserInAreaStore();
-const dayPhaseStore = useDayPhaseStore();
+const dayPhaseStore = useDayPhaseClock();
 const fishingAreaStore = useFishingAreaStore();
 const modalStore = useModalStore();
 const zoomInfo = ref({ lon: 0, lat: 0, k: 1 });
@@ -102,8 +102,8 @@ watch(
 watch(
   () => worldStore.selectedArea,
   (area) => {
+    void dayPhaseStore.loadPreviewArea(area?.id ?? null);
     if (!area?.id) return;
-    dayPhaseStore.setCurrentScenePhase(area);
     const loc = area.location;
     if (typeof loc?.lon === "number" && typeof loc?.lat === "number") {
       worldStore.lon = loc.lon;
@@ -186,7 +186,8 @@ function zoomTo(k: number) {
               </div>
               <div class="overflow-hidden rounded-md">
                 <img
-                  :src="dayPhaseStore.currentScenePhace"
+                  v-if="dayPhaseStore.previewScene"
+                  :src="dayPhaseStore.previewScene"
                   class="w-full hover:scale-110 duration-200"
                   draggable="false"
                 />

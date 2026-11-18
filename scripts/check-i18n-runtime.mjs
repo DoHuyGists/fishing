@@ -48,6 +48,7 @@ try {
   const locale = useLocaleStore(pinia);
   const currency = useCurrencyStore(pinia);
   const phases = useDayPhaseStore(pinia);
+  phases.setCurrentScenePhase({ scenePath: '/lake', timezone: 'Asia/Ho_Chi_Minh' });
   const label = computed(() => t('LoginView.dang_nhap'));
   currency.cash = 12345;
   assert.equal(locale.locale, 'en');

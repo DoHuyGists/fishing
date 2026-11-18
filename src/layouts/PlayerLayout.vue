@@ -27,7 +27,7 @@ const fishingStore = useFishingStore();
 const features = useFeatureAvailabilityStore();
 const refresh = usePlayerRefreshStore();
 const missionStore = useMissionStore();
-const { showConflictModal, modalMessage, closeCurrentTab, logoutAccount } = useSingleSession(authStore.userId);
+const { showConflictModal, modalMessage, closeCurrentTab, logoutAccount, sessionReady, sessionError, retrySession } = useSingleSession(() => authStore.user?.id);
 onBeforeMount(async () => { await useTimezoneCheck(); });
 watch(() => authStore.user?.id, (userId, _, onCleanup) => {
   currencyStore.$reset();
@@ -78,7 +78,13 @@ watch(
 
 <template>
   <div>
-    <router-view v-if="features.ready" />
+    <router-view v-if="features.ready && sessionReady" />
+    <div v-else-if="!sessionReady" class="m-4 rounded-xl border border-[#cbd9c6] bg-[#f5f9f0] p-4 text-[#24352a]" role="status">
+      {{ sessionError || tr('use_single_session.checking') }}
+      <button v-if="sessionError" type="button" class="ml-2 underline" @click="retrySession">
+        {{ tr('Maintenance.thu_lai') }}
+      </button>
+    </div>
     <div v-else class="m-4 rounded-xl border border-[#cbd9c6] bg-[#f5f9f0] p-4 text-[#24352a]" role="status">
       {{ tr(features.error ? 'FeatureAvailability.loadError' : 'FeatureAvailability.loading') }}
       <button v-if="features.error" type="button" class="ml-2 underline disabled:opacity-50" :disabled="features.loading" @click="features.load(true)">

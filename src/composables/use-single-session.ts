@@ -1,154 +1,122 @@
-import { t as tr } from "../i18n";
-// Phát hiện truy cập trên tab khác, đảm bảo chỉ được dùng trên một màn hình
+import { ref, watch, toValue, onUnmounted, type MaybeRefOrGetter } from 'vue';
+import { t as tr } from '../i18n';
+import { supabaseSessionRepository } from '../data/supabaseSessionRepository';
+import { useAuthStore } from '../stores/auth';
+import { createUuid } from '../utils/uuid';
 
-import { ref, watch, onUnmounted} from 'vue';
-import { RealtimeChannel } from '@supabase/supabase-js';
-import supabase from "../database/connection";
-import { createUuid } from "../utils/uuid";
-
-export interface ActiveSession {
-  user_id: string;
-  active_session_id: string;
-  updated_at?: string;
-}
-
-export function useSingleSession(userId: string) {
-  // Trạng thái bật/tắt dialog cảnh báo
-  const showConflictModal = ref<boolean>(false);
-  const modalMessage = ref<string>('');
-  
-  // Phân loại nguồn xung đột: 'SAME_BROWSER' (cùng trình duyệt) hay 'CROSS_BROWSER' (khác trình duyệt)
+export function useSingleSession(userId: MaybeRefOrGetter<string | null | undefined>) {
+  const showConflictModal = ref(false);
+  const modalMessage = ref('');
   const conflictType = ref<'SAME_BROWSER' | 'CROSS_BROWSER' | null>(null);
+  const sessionReady = ref(false);
+  const sessionError = ref('');
+  const attempt = ref(0);
+  const auth = useAuthStore();
+  let stopSession = () => {};
 
-  const currentSessionId = createUuid();
-  let realtimeChannel: RealtimeChannel | null = null;
-  let broadcastChannel: BroadcastChannel | null = null;
+  const stopWatch = watch([() => toValue(userId), attempt], ([uid], _, onCleanup) => {
+    showConflictModal.value = false;
+    conflictType.value = null;
+    modalMessage.value = '';
+    sessionReady.value = false;
+    sessionError.value = '';
+    if (!uid) return;
 
-  // -------------------------------------------------------------
-  // 1. KIỂM TRA CÙNG TRÌNH DUYỆT (BroadcastChannel)
-  // -------------------------------------------------------------
-  const initTabCheck = () => {
-    broadcastChannel = new BroadcastChannel('single_tab_channel');
-
-    // Hỏi xem có tab nào khác đang mở không
-    broadcastChannel.postMessage({ type: 'PING' });
-
-    broadcastChannel.onmessage = (event) => {
-      if (event.data?.type === 'PING') {
-        // Tab cũ đang sống -> Phản hồi lại
-        broadcastChannel?.postMessage({ type: 'PONG' });
-      } else if (event.data?.type === 'PONG') {
-        // Tab mới nhận phản hồi -> Phát hiện trùng tab cùng trình duyệt
-        conflictType.value = 'SAME_BROWSER';
-        modalMessage.value = tr('use_single_session.ung_dung_da_duoc_mo_o_mot_tab_khac_tren_trinh_duyet_nay');
-        showConflictModal.value = true;
-      }
+    const controller = new AbortController();
+    const sessionId = createUuid();
+    let stopped = false;
+    let claimed = false;
+    let readVersion = 0;
+    let releaseLock = () => {};
+    let stopRealtime = () => {};
+    const current = () => !stopped && toValue(userId) === uid;
+    const cleanup = () => {
+      stopped = true;
+      controller.abort();
+      stopRealtime();
+      releaseLock();
     };
-  };
+    stopSession = cleanup;
+    onCleanup(cleanup);
 
-  // -------------------------------------------------------------
-  // 2. KIỂM TRA KHÁC TRÌNH DUYỆT/THIẾT BỊ (Supabase Realtime)
-  // -------------------------------------------------------------
-  const registerAndListenRealtime = async (uid: string) => {
-    // Đăng ký Session ID của tab này lên Supabase
-    const { error } = await supabase
-      .from('active_sessions')
-      .upsert(
-        {
-          user_id: uid,
-          active_session_id: currentSessionId,
-          updated_at: new Date().toISOString(),
-        } as ActiveSession,
-        { onConflict: 'user_id' }
-      );
+    const conflict = (type: 'SAME_BROWSER' | 'CROSS_BROWSER') => {
+      if (!current()) return;
+      conflictType.value = type;
+      modalMessage.value = tr(type === 'SAME_BROWSER'
+        ? 'use_single_session.ung_dung_da_duoc_mo_o_mot_tab_khac_tren_trinh_duyet_nay'
+        : 'use_single_session.tai_khoan_cua_ban_vua_duoc_dang_nhap_tren_mot_trinh_duyet_thiet_');
+      sessionReady.value = false;
+      showConflictModal.value = true;
+      cleanup();
+    };
+    const fail = (error: unknown) => {
+      if (!current()) return;
+      console.error('[Session Error]', error);
+      sessionReady.value = false;
+      sessionError.value = tr('use_single_session.registrationError');
+      cleanup();
+    };
+    const verify = async () => {
+      const version = ++readVersion;
+      const owner = await supabaseSessionRepository.fetchOwner(uid, controller.signal);
+      if (!current() || version !== readVersion) return;
+      if (owner !== sessionId) conflict('CROSS_BROWSER');
+      else sessionReady.value = true;
+    };
 
-    if (error) {
-      console.error('[Session Error] Lỗi đăng ký session:', error.message);
+    // Atomic account-scoped arbitration covers tabs opened simultaneously.
+    // Rejected tabs never touch the server row. Hold the lock until cleanup.
+    if (!navigator.locks) {
+      sessionError.value = tr('use_single_session.unsupportedBrowser');
       return;
     }
-
-    // Lắng nghe xem có trình duyệt/thiết bị khác ghi đè Session ID không
-    realtimeChannel = supabase
-      .channel(`user-session:${uid}`)
-      .on<ActiveSession>(
-        'postgres_changes',
-        {
-          event: 'UPDATE',
-          schema: 'public',
-          table: 'active_sessions',
-          filter: `user_id=eq.${uid}`,
-        },
-        (payload) => {
-          const newSessionId = payload.new.active_session_id;
-
-          // Nếu Session ID ở DB bị đổi sang giá trị khác -> Trình duyệt cũ bị kick
-          if (newSessionId !== currentSessionId) {
-            conflictType.value = 'CROSS_BROWSER';
-            modalMessage.value = tr('use_single_session.tai_khoan_cua_ban_vua_duoc_dang_nhap_tren_mot_trinh_duyet_thiet_');
-            showConflictModal.value = true;
-          }
-        }
-      )
-      .subscribe();
-  };
-
-  // -------------------------------------------------------------
-  // 3. CÁC HÀM XỬ LÝ SỰ KIỆN TỪ DIALOG
-  // -------------------------------------------------------------
-
-  // Option 1: Đóng tab hiện tại (Giữ nguyên Session của tab/thiết bị cũ)
-  const closeCurrentTab = () => {
-    cleanup();
-    
-    // Thử đóng tab
-    window.close();
-
-    // Trường hợp trình duyệt chặn window.close() (do tab không mở qua script)
-    // Tự động chuyển hướng ra trang thông báo tĩnh
-    setTimeout(() => {
-      window.location.href = 'about:blank';
-    }, 300);
-  };
-
-  // Option 2: Đăng xuất hoàn toàn trên hệ thống
-  const logoutAccount = async () => {
-    cleanup();
-    await supabase.auth.signOut();
-    window.location.href = '/login';
-  };
-
-  const cleanup = () => {
-    if (realtimeChannel) {
-      supabase.removeChannel(realtimeChannel);
-      realtimeChannel = null;
-    }
-    if (broadcastChannel) {
-      broadcastChannel.close();
-      broadcastChannel = null;
-    }
-  };
-
-  // Theo dõi userId (nhận từ computed/ref)
-  watch(
-    () => userId,
-    (newUid) => {
-      if (newUid) {
-        initTabCheck();
-        registerAndListenRealtime(newUid);
+    void navigator.locks.request(`single-player-session:${uid}`, { ifAvailable: true }, async lock => {
+      if (!current()) return;
+      if (!lock) { conflict('SAME_BROWSER'); return; }
+      const released = new Promise<void>(resolve => { releaseLock = resolve; });
+      try {
+        const subscription = supabaseSessionRepository.listen(uid, () => {
+          if (current() && claimed) void verify().catch(fail);
+        }, connected => {
+          if (!current()) return;
+          // Discard in-flight reads from the previous connection. Keep the
+          // mounted game during transient reconnects to preserve fishing state.
+          ++readVersion;
+          if (connected && claimed) void verify().catch(fail);
+        });
+        stopRealtime = subscription.stop;
+        if (!await subscription.ready || !current()) return;
+        await supabaseSessionRepository.claim(uid, sessionId, controller.signal);
+        if (!current()) return;
+        claimed = true;
+        // Reconcile writes missed during registration and after reconnect.
+        await verify();
+        await released;
+      } catch (error) {
+        fail(error);
+      } finally {
+        stopRealtime();
       }
-    },
-    { immediate: true }
-  );
+    }).catch(fail);
+  }, { immediate: true, flush: 'sync' });
 
-  onUnmounted(() => {
-    cleanup();
-  });
+  onUnmounted(() => { stopWatch(); stopSession(); });
 
-  return {
-    showConflictModal,
-    modalMessage,
-    conflictType,
-    closeCurrentTab,
-    logoutAccount,
+  const closeCurrentTab = () => {
+    stopWatch();
+    stopSession();
+    window.close();
+    setTimeout(() => { window.location.href = 'about:blank'; }, 300);
   };
+  const logoutAccount = async () => {
+    stopSession();
+    if (await auth.signOut()) window.location.href = '/login';
+    else {
+      showConflictModal.value = false;
+      sessionError.value = auth.error || tr('use_single_session.registrationError');
+    }
+  };
+
+  return { showConflictModal, modalMessage, conflictType, sessionReady, sessionError,
+    retrySession: () => { attempt.value++; }, closeCurrentTab, logoutAccount };
 }

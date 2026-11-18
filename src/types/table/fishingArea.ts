@@ -3,6 +3,9 @@ export interface FishingSessionRow {
   status: string;
 }
 
+export type FishingAreaDetails = Pick<FishingAreaRow,
+  'id' | 'countryId' | 'title' | 'location' | 'scenePath' | 'fishingBoundary' | 'maxDepth' | 'allowDepthTool' | 'timezone'>;
+
 export interface FishingAreaRow {
   id: string;
   createdAt: string;
