@@ -14,6 +14,7 @@ export interface FishingAreaRow {
   fishingBoundary: any[];
   zoneId: string | null;
   maxDepth: number | null;
+  allowDepthTool: boolean;
 }
 
 export interface FishingAreaPayload {

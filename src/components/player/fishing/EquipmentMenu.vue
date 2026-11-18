@@ -38,7 +38,7 @@ watch(
         {{ tr('EquipmentMenu.chon_trang_bi') }}
       </button>
       <EquipmentPickerModal :open="pickerOpen && store.canAdjustDepth" @close="pickerOpen = false" />
-      <button type="button" class="slide-fade-in from-top player-content-in relative flex items-center gap-2 rounded-lg border border-[#cbd9c6] bg-[#f5f9f0] min-h-7 px-3 py-[3px] text-[11px] font-bold text-[#24352a] transition hover:border-[#70a77e] hover:bg-[#eaf5e8]" :disabled="!store.canAdjustDepth || !store.currentAreaId || store.isLoadingCurrentArea"
+      <button v-if="store.areaAllowsDepthTool" type="button" class="slide-fade-in from-top player-content-in relative flex items-center gap-2 rounded-lg border border-[#cbd9c6] bg-[#f5f9f0] min-h-7 px-3 py-[3px] text-[11px] font-bold text-[#24352a] transition hover:border-[#70a77e] hover:bg-[#eaf5e8]" :disabled="!store.canAdjustDepth || !store.currentAreaId || store.isLoadingCurrentArea"
         :title="!store.canAdjustDepth ? tr('EquipmentMenu.khong_the_dieu_chinh_do_sau_luc_nay') : store.currentAreaLoadError || undefined"
         :aria-label="!store.canAdjustDepth ? tr('EquipmentMenu.dieu_chinh_do_sau_dang_bi_khoa') : undefined" @click="openDepthAdjuster">
         <span class="absolute -top-2 right-2 rounded-full border border-[#cbd9c6] bg-white px-1.5 py-0.5 text-[9px] font-bold leading-none text-[#24352a] shadow-sm" :aria-label="tr('EquipmentMenu.do_sau_da_chon')">

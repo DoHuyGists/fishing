@@ -19,6 +19,7 @@ function mapRow(row: any): FishingAreaRow {
     fishingBoundary: row.fishing_boundary ?? [],
     zoneId: row.zone_id ?? null,
     maxDepth: row.max_depth == null ? null : Number(row.max_depth),
+    allowDepthTool: row.allow_depth_tool === true,
   };
 }
 
@@ -151,7 +152,7 @@ class SupabaseFishingAreaRepository {
     }));
   }
   async fetchOneAreas(areaId: string): Promise<any> {
-    const { data, error } = await supabase.from("fishing_areas").select("id, country_id, title, location, scene_path, fishing_boundary, max_depth").eq("id", areaId).maybeSingle();
+    const { data, error } = await supabase.from("fishing_areas").select("id, country_id, title, location, scene_path, fishing_boundary, max_depth, allow_depth_tool").eq("id", areaId).maybeSingle();
 
     if (error) throw new RepositoryError(error);
 
@@ -165,6 +166,7 @@ class SupabaseFishingAreaRepository {
       scenePath: data.scene_path,
       fishingBoundary: data.fishing_boundary,
       maxDepth: data.max_depth == null ? null : Number(data.max_depth),
+      allowDepthTool: data.allow_depth_tool === true,
     };
   }
 }

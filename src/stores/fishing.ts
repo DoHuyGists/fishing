@@ -153,11 +153,11 @@ export const useFishingStore = defineStore("fishing", {
       !s.isStartingTensionChallenge && Boolean(s.sessionId) && ["waiting", "bite"].includes(s.castPhase) &&
       (!s.tensionChallenge || s.tensionStartedAt === null),
     canAdjustDepth: (s) => s.sessionReady && !s.isLeavingArea && !s.hasLeftArea && (s.castPhase === "idle" || s.castPhase === "lost"),
-    canAdjustLakeDepth: (s) =>
-      s.sessionReady && !s.isLeavingArea && !s.hasLeftArea &&
-      (s.castPhase === "idle" || s.castPhase === "lost") &&
-      !s.isLoadingCurrentArea &&
-      Boolean(s.currentAreaId) && s.currentArea?.id === s.currentAreaId,
+    areaAllowsDepthTool: (s) => Boolean(s.currentAreaId) && s.currentArea?.id === s.currentAreaId &&
+      s.currentArea?.allowDepthTool === true,
+    canAdjustLakeDepth(): boolean {
+      return this.canAdjustDepth && !this.isLoadingCurrentArea && this.areaAllowsDepthTool;
+    },
     depthConfig: (s) => buildDepthConfig(s.currentArea?.maxDepth),
   },
   actions: {
@@ -271,6 +271,7 @@ export const useFishingStore = defineStore("fishing", {
       }
     },
     async fetchDepthPreview(castDepth: number) {
+      if (!this.canAdjustLakeDepth) return;
       const requestId = ++this.depthPreviewRequestId;
       this.isLoadingDepthPreview = true;
       this.depthPreviewError = "";
@@ -441,7 +442,7 @@ export const useFishingStore = defineStore("fishing", {
       this.selectedTool = tool;
     },
     applyDepth(depth: number) {
-      if (!this.canAdjustDepth) return false;
+      if (!this.canAdjustLakeDepth) return false;
       const step = DEPTH_STEP_METERS;
       this.appliedDepthMeters = Math.max(0, Math.min(this.depthConfig.maxMeters, Math.round(depth / step) * step));
       return true;

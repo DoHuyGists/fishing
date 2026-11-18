@@ -1,6 +1,7 @@
 -- Execute this complete definition, including the SECURITY DEFINER wrapper.
 -- Deploy equipment_mechanics.sql, 20261115_ranked_fishing.sql and both submit RPC files first.
 -- Requires fishing_areas.timezone and countries.default_timezone (IANA names).
+-- Deploy 20261118_fishing_area_depth_tool.sql before this definition.
 -- Rules v2; tension replay protocol remains v1 (only configuration changes).
 CREATE OR REPLACE FUNCTION public.cast_rod(p_area_id UUID, p_cast_depth NUMERIC)
 RETURNS JSONB
@@ -45,6 +46,7 @@ DECLARE
     v_bait_matches BOOLEAN := FALSE;
     v_bait_factor NUMERIC;
     v_timezone TEXT;
+    v_allow_depth_tool BOOLEAN := FALSE;
     v_hour INTEGER;
     v_time_bucket TEXT;
     v_species public.species%ROWTYPE;
@@ -103,8 +105,9 @@ BEGIN
     END IF;
 
     -- Blank area values inherit the country's default; invalid values fail.
-    SELECT COALESCE(NULLIF(btrim(a.timezone), ''), NULLIF(btrim(c.default_timezone), ''))
-    INTO v_timezone
+    SELECT COALESCE(NULLIF(btrim(a.timezone), ''), NULLIF(btrim(c.default_timezone), '')),
+        COALESCE(a.allow_depth_tool, FALSE)
+    INTO v_timezone, v_allow_depth_tool
     FROM public.fishing_areas a
     LEFT JOIN public.countries c ON c.id = a.country_id
     WHERE a.id = p_area_id;
@@ -208,14 +211,16 @@ BEGIN
     v_time_bucket := CASE WHEN v_hour BETWEEN 6 AND 18 THEN 'DAY' ELSE 'NIGHT' END;
 
     -- ================================================================
-    -- C. Encounter selection: depth -> relative frequency -> bait.
-    -- Bait cannot attract fish outside their depth/time distribution.
+    -- C. Encounter selection: optional depth -> relative frequency -> bait.
+    -- Only areas with allow_depth_tool = TRUE use the cast depth/scopes.
+    -- Bait cannot bypass active depth restrictions or active_time.
     -- P(species i) = final_weight_i / SUM(final_weight).
     -- A common multiplier on ALL species cancels and is intentionally absent.
     -- ================================================================
     WITH candidates AS (
         SELECT sa.species_id, sa.weight_rate, s.fish_type, s.rarity,
             CASE
+                WHEN NOT v_allow_depth_tool THEN 1.0::NUMERIC
                 WHEN ds.id IS NULL THEN 1.0::NUMERIC
                 WHEN ds.min_depth IS NULL OR ds.max_depth IS NULL OR ds.peak_depth IS NULL
                   OR ds.curve_power IS NULL OR ds.curve_power <= 0
@@ -242,7 +247,7 @@ BEGIN
             0.0::NUMERIC AS spawn_add, 1.0::NUMERIC AS spawn_multiplier
         FROM public.species_in_area sa
         JOIN public.species s ON s.id = sa.species_id
-        LEFT JOIN public.depth_scope ds ON ds.id = sa.depth_scope_id
+        LEFT JOIN public.depth_scope ds ON ds.id = sa.depth_scope_id AND v_allow_depth_tool
         WHERE sa.area_id = p_area_id
           AND (s.active_time IS NULL OR s.active_time = 'ALL' OR s.active_time = v_time_bucket)
           AND sa.weight_rate > 0

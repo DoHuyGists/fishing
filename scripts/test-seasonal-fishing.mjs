@@ -82,6 +82,8 @@ test('ranked fishing integrates server catches, fatigue, seasons, ties and perma
       assert.equal(archive.hall_of_fame.length, 1);
       await db.exec('DELETE FROM fishing_season_results; DELETE FROM fishing_hall_of_fame; DELETE FROM fishing_season_meta; DELETE FROM fishing_score_catches; DELETE FROM fishing_seasons;');
     });
+    const depthToolMigration = await read('./supabase/migrations/20261118_fishing_area_depth_tool.sql');
+    await db.exec(depthToolMigration);
     await db.exec(await read('./supabase/rpc/fishing/cast_rod.sql'));
     await db.exec(await read('./supabase/rpc/fishing/submit_challenge.sql'));
     await db.exec(await read('./supabase/migrations/20261115_leaderboard_season_best_fish.sql'));
@@ -106,9 +108,9 @@ test('ranked fishing integrates server catches, fatigue, seasons, ties and perma
     }
     await db.query('INSERT INTO user_equipments(user_id,rod,reel,line,bait,hook) VALUES($1,$2,$3,$4,$5,$6)',
       [uid, slots.rod, slots.reel, slots.line, slots.bait, slots.hook]);
-    const cast = async () => {
+    const cast = async (depth = 10) => {
       const eventsBefore = Number(await scalar('SELECT count(*) FROM daily_mission_events'));
-      const response = await rpc('public.cast_rod($1,10)', [area]);
+      const response = await rpc('public.cast_rod($1,$2)', [area, depth]);
       assert.equal(Number(await scalar('SELECT count(*) FROM daily_mission_events')), eventsBefore + 1);
       assert.deepEqual((await query('SELECT user_id,event_type,value FROM daily_mission_events ORDER BY id DESC LIMIT 1'))[0], { user_id: uid, event_type: 'CAST_ROD', value: '1' });
       return (await query('SELECT s.*,m.fish_snapshot FROM fishing_sessions s JOIN fishing_session_mechanics m ON m.session_id=s.id WHERE s.id=$1', [response.session_id]))[0];
@@ -135,6 +137,62 @@ test('ranked fishing integrates server catches, fatigue, seasons, ties and perma
       assert.ok(Math.abs(scoreAfter - (scoreBefore + (result.success ? result.scoring?.score ?? 0 : 0))) < 1e-10);
       return result;
     };
+
+    await check('area depth tool gates depth scopes while disabled casts follow relative spawn weights', async () => {
+      const scope = randomUUID();
+      const failure = session => session.fish_snapshot.species_id ?? null;
+      assert.equal(await scalar('SELECT allow_depth_tool FROM fishing_areas WHERE id=$1', [area]), false);
+      await db.query('INSERT INTO depth_scope VALUES($1,0,20,10,2)', [scope]);
+      await db.query('UPDATE species_in_area SET depth_scope_id=$1 WHERE area_id=$2', [scope, area]);
+
+      // Disabled casts can encounter fish outside their scope, including at a boundary.
+      for (const depth of [0, 10, 20, 1000]) assert.equal(failure(await cast(depth)), species[0]);
+      assert.equal(Number((await cast(1000)).cast_depth), 1000);
+      await db.query('UPDATE fishing_areas SET allow_depth_tool=NULL WHERE id=$1', [area]);
+      assert.equal(failure(await cast(1000)), species[0]);
+
+      await db.query('UPDATE fishing_areas SET allow_depth_tool=TRUE WHERE id=$1', [area]);
+      await db.exec(depthToolMigration);
+      await db.exec(depthToolMigration);
+      assert.equal(await scalar('SELECT allow_depth_tool FROM fishing_areas WHERE id=$1', [area]), true);
+      assert.equal(failure(await cast(10)), species[0]);
+      for (const depth of [0, 20, 1000]) assert.equal(failure(await cast(depth)), null);
+      await db.query('UPDATE depth_scope SET min_depth=5,max_depth=5,peak_depth=5 WHERE id=$1', [scope]);
+      assert.equal(failure(await cast(5)), species[0]);
+      assert.equal(failure(await cast(6)), null);
+      await db.query('UPDATE depth_scope SET peak_depth=6 WHERE id=$1', [scope]);
+      assert.equal(failure(await cast(5)), null);
+
+      // Invalid scopes are also ignored when the tool is disabled.
+      await db.query('UPDATE fishing_areas SET allow_depth_tool=FALSE WHERE id=$1', [area]);
+      assert.equal(failure(await cast(1000)), species[0]);
+      await db.query('UPDATE species_in_area SET weight_rate=9 WHERE species_id=$1', [species[1]]);
+      const sample = async depth => {
+        await db.exec('SELECT setseed(0.25)');
+        const selected = [];
+        for (let i = 0; i < 200; i++) selected.push(failure(await cast(depth)));
+        return selected;
+      };
+      const shallow = await sample(0), deep = await sample(1000);
+      assert.deepEqual(deep, shallow, 'Changing depth must not affect the seeded encounter sequence');
+      const frequentShare = shallow.filter(id => id === species[1]).length / shallow.length;
+      assert.ok(frequentShare > 0.82 && frequentShare < 0.98, `Expected weight ratio 9/(1+9), got ${frequentShare}`);
+
+      // The opt-out does not bypass the existing time and positive-weight filters.
+      await db.query('UPDATE species_in_area SET weight_rate=0 WHERE area_id=$1', [area]);
+      assert.equal(failure(await cast()), null);
+      await db.query('UPDATE species_in_area SET weight_rate=1 WHERE species_id=$1', [species[0]]);
+      await db.query(`UPDATE species SET active_time=CASE
+        WHEN EXTRACT(HOUR FROM now() AT TIME ZONE 'Asia/Ho_Chi_Minh') BETWEEN 6 AND 18 THEN 'NIGHT' ELSE 'DAY' END
+        WHERE id=$1`, [species[0]]);
+      assert.equal(failure(await cast()), null);
+      await db.query("UPDATE species SET active_time='ALL' WHERE id=$1", [species[0]]);
+      for (const depth of [null, -1, 'NaN', 'Infinity', '-Infinity']) {
+        await assert.rejects(cast(depth), /Invalid cast depth/);
+      }
+      await db.query('UPDATE species_in_area SET depth_scope_id=NULL WHERE area_id=$1', [area]);
+      await db.query('DELETE FROM depth_scope WHERE id=$1', [scope]);
+    });
 
     await check('repair handles invoker wrappers and legacy owners without exposing helpers to players', async () => {
       const repair = await read('./supabase/migrations/20261115_ranked_fishing_permissions.sql');

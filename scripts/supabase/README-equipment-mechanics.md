@@ -8,7 +8,7 @@ Mỗi lượt câu mới chỉ dùng tension challenge. Replay vẫn là protoco
 2. Điền dữ liệu loài cá, trang bị trong inventory và nguồn cấp vật phẩm theo các bảng bên dưới. Migration không tự suy diễn chỉ số mới từ `strength` của lưỡi cũ.
 3. Chạy toàn bộ `rpc/submit_challenge.sql`, rồi `rpc/submit_tension_challenge.sql`.
 4. Triển khai client đã hỗ trợ `start_tension_challenge.resolution`.
-5. Chạy toàn bộ `rpc/fishing/cast_rod.sql` trong SQL Editor. File này chứa định nghĩa `CREATE OR REPLACE FUNCTION` đầy đủ với chữ ký `(p_area_id UUID, p_cast_depth NUMERIC) RETURNS JSONB`, `SECURITY DEFINER` và `SET search_path = public`. Nếu RPC cũ có owner khác, áp dụng thêm `migrations/20261115_ranked_fishing_permissions.sql` theo hướng dẫn ranked fishing.
+5. Chạy `migrations/20261118_fishing_area_depth_tool.sql`, rồi toàn bộ `rpc/fishing/cast_rod.sql` trong SQL Editor. Migration thêm `fishing_areas.allow_depth_tool` mặc định `false` nếu chưa có cột, giữ nguyên cấu hình nếu cột đã tồn tại. File RPC chứa định nghĩa `CREATE OR REPLACE FUNCTION` đầy đủ với chữ ký `(p_area_id UUID, p_cast_depth NUMERIC) RETURNS JSONB`, `SECURITY DEFINER` và `SET search_path = public`. Nếu RPC cũ có owner khác, áp dụng thêm `migrations/20261115_ranked_fishing_permissions.sql` theo hướng dẫn ranked fishing.
 
 Các script được kiểm chứng bằng PostgreSQL cục bộ qua PGlite; không tự cập nhật Supabase đang chạy. Session cũ không có snapshot tiếp tục được resolver xử lý theo nhánh tương thích.
 
@@ -76,8 +76,9 @@ P_gặp_i = W_i / tổng W của các loài hợp lệ
 ```
 
 - `species_in_area.weight_rate` là tỉ trọng tương đối, không phải phần trăm. Không cần tổng bằng 100.
-- Không có `depth_scope` → hệ số 1. Ngoài khoảng → 0. Tại đỉnh → 1. Hai phía đỉnh dùng đường cong sin lũy thừa `curve_power` như trước; biên khác đỉnh có hệ số 0. Khoảng một điểm chỉ hợp lệ tại chính điểm đó. Scope sai bị loại.
-- Đúng nhóm mồi → thu hút 1.8; sai nhóm → 1. Không dùng mồi để vượt điều kiện độ sâu hoặc giờ.
+- Chỉ khi `fishing_areas.allow_depth_tool = true` mới dùng `p_cast_depth` và `depth_scope`: không có scope → hệ số 1; ngoài khoảng → 0; tại đỉnh → 1. Hai phía đỉnh dùng đường cong sin lũy thừa `curve_power` như trước; biên khác đỉnh có hệ số 0. Khoảng một điểm chỉ hợp lệ tại chính điểm đó. Scope sai bị loại.
+- Khi `allow_depth_tool` là `false` hoặc `NULL`, mọi loài có hệ số độ sâu bằng 1, kể cả scope sai hoặc ngoài khoảng. Việc chọn cá ngẫu nhiên dựa trên `weight_rate`, mồi và hiệu ứng hiện có; vẫn lọc theo giờ hoạt động. `p_cast_depth` vẫn phải là số hữu hạn không âm và được lưu vào session, nhưng không ảnh hưởng xác suất chọn cá.
+- Đúng nhóm mồi → thu hút 1.8; sai nhóm → 1. Không dùng mồi để vượt điều kiện giờ hoặc điều kiện độ sâu ở bãi đã bật công cụ.
 - Hiệu ứng tăng xuất hiện cho một nhóm loài được thêm tại `spawn_add`/`spawn_multiplier` trong CTE `candidates`. Nhân cùng một hệ số cho mọi loài không thay đổi xác suất tương đối.
 - Không có ứng viên → lưu `NO_FISH`. Tính năng preview độ sâu cần dùng cùng công thức nếu muốn hiển thị xác suất đã bao gồm mồi/hiệu ứng; SQL của RPC preview chưa có trong repo này.
 

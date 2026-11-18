@@ -91,6 +91,7 @@ export async function validateEquipmentMechanics({ db, query, rejects, uid, spec
  await resolveFailure(await castAt(),'HOOK_MISSED'); await db.exec('UPDATE species SET alertness=0');
 
  // Depth: interior/endpoint peaks, boundaries, out of range and point scope.
+ await query('UPDATE fishing_areas SET allow_depth_tool=TRUE WHERE id=$1',[areaId]);
  await query('INSERT INTO depth_scope VALUES($1,0,20,10,2)',[scopeId]);
  await query('UPDATE species_in_area SET depth_scope_id=$1',[scopeId]);
  assert.equal((await castAt(10)).mechanics.failure_reason,null);
@@ -104,6 +105,7 @@ export async function validateEquipmentMechanics({ db, query, rejects, uid, spec
  assert.equal((await castAt(6)).mechanics.failure_reason,'NO_FISH');
  await db.exec('UPDATE depth_scope SET peak_depth=6'); assert.equal((await castAt(5)).mechanics.failure_reason,'NO_FISH');
  await db.exec('UPDATE species_in_area SET depth_scope_id=NULL,weight_rate=0');
+ await query('UPDATE fishing_areas SET allow_depth_tool=FALSE WHERE id=$1',[areaId]);
  assert.equal((await castAt()).mechanics.failure_reason,'NO_FISH');
  await db.exec('UPDATE species_in_area SET weight_rate=1');
  await db.exec("UPDATE species SET active_time=CASE WHEN EXTRACT(HOUR FROM now() AT TIME ZONE 'Asia/Ho_Chi_Minh') BETWEEN 6 AND 18 THEN 'NIGHT' ELSE 'DAY' END");

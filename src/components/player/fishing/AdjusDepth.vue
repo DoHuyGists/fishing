@@ -43,7 +43,7 @@ watch(
 );
 
 watch(
-  () => store.canAdjustDepth,
+  () => store.canAdjustLakeDepth,
   (canAdjust) => {
     if (!canAdjust) close();
   },
