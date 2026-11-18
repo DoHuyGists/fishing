@@ -96,7 +96,7 @@ function claimMonthReward(_day: MonthReward, _lane: "free" | "pass") { /* Claims
         </template>
 
         <template #monthly>
-          <section class="space-y-4">
+          <section class="space-y-4 py-2">
             <div class="flex flex-wrap items-center justify-between gap-2">
               <div class="m-0 text-lg font-extrabold text-[#24352a]">{{ tr('AttendanceModal.diem_danh') }} {{ currentMonthLabel }}</div>
               <span class="rounded-full bg-[#f5f9f0] px-3 py-1 text-xs font-bold text-[#24352a]">{{ tr('AttendanceModal.da_nhan') }} {{ fishingPassStore.rewardProgress.claimed }}/{{ fishingPassStore.rewardProgress.total }} {{ tr('AttendanceModal.qua') }}</span>

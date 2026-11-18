@@ -31,7 +31,7 @@ const waitTime = computed(() => {
 </script>
 
 <template>
-  <section class="space-y-5">
+  <section class="space-y-5 py-2">
     <div class="slide-fade-in from-top player-content-in flex flex-wrap items-center justify-between gap-3 rounded-2xl border border-[#cbd9c6] bg-[#f5f9f0] p-4 sm:p-5">
       <div>
         <div class="m-0 text-lg font-extrabold text-[#24352a]">{{ tr('DailyAttendance.qua_diem_danh_ngay') }}</div>
