@@ -16,7 +16,7 @@ const fixture = `
   CREATE FUNCTION public.feature_is_enabled(p_feature text) RETURNS boolean LANGUAGE sql STABLE SECURITY DEFINER AS $$ SELECT coalesce((SELECT enabled FROM public.feature_flags WHERE feature_key=p_feature),false) $$;
   CREATE TABLE public.countries(id uuid,name text,code text,information text,created_at timestamptz,updated_at timestamptz,location jsonb);
   CREATE TABLE public.fishing_areas(id uuid,country_id uuid,title text,location jsonb,scene_path text,is_available boolean);
-  CREATE TABLE public.species(id uuid,created_at timestamptz,information text,location text,status text,name text,image text,owner_id uuid,secret_strength numeric);
+  CREATE TABLE public.species(id uuid,created_at timestamptz,information text,location text,rarity text,name text,image text,owner_id uuid,secret_strength numeric);
   ALTER TABLE public.species ENABLE ROW LEVEL SECURITY;
   CREATE POLICY species_owner ON public.species FOR SELECT TO authenticated USING(owner_id=auth.uid());
   CREATE TABLE public.guides(id uuid,title text,content text,sort_order integer,is_published boolean);
@@ -54,10 +54,17 @@ test('catalog migration executes on PostgreSQL and guards the legacy actions', a
     await db.exec(fixture);
     const sql = await readFile(new URL('./supabase/migrations/20261113_game_catalog_cache.sql', import.meta.url), 'utf8');
     await db.exec(sql); await db.exec(sql); // idempotent replay
+    await db.exec('ALTER TABLE public.species ADD COLUMN status text');
+    const rarityMigration = await readFile(new URL('./supabase/migrations/20261118_species_rarity_only.sql', import.meta.url), 'utf8');
+    const oldSpeciesRevision = BigInt(await revision('species'));
+    await db.exec(rarityMigration); await db.exec(rarityMigration);
+    assert.equal(BigInt(await revision('species')), oldSpeciesRevision + 2n);
+    assert.equal((await query("SELECT column_name FROM information_schema.columns WHERE table_schema='public' AND table_name='species' AND column_name='status'")).length, 0);
     await db.exec(`SET test.uid='${user}'; INSERT INTO public.items(id,name,price,quantity,"isDisabled") VALUES('${item}','Bait',10,1,false);
       INSERT INTO public.species(id,name,owner_id,secret_strength) VALUES('${item}','Visible','${user}',999),('${receipt}','Hidden','${receipt}',999);
       INSERT INTO public.aquaculture_species_rules VALUES('${item}',true,1,10);
       INSERT INTO public.currency_conversion_rates VALUES('cash','shells',100,1,true);`);
+    await db.query('UPDATE public.species SET rarity=$1 WHERE id=$2', ['RARE', item]);
 
     await t.test('statement triggers cover dependencies, deletes and rollback', async () => {
       const old = await revision('blueprints');
@@ -71,6 +78,7 @@ test('catalog migration executes on PostgreSQL and guards the legacy actions', a
       await db.exec('SET ROLE authenticated');
       const snapshot = (await query("SELECT public.get_game_catalog_snapshot('species') AS data"))[0].data;
       assert.equal(snapshot.data.length, 1); assert.equal(snapshot.data[0].name, 'Visible'); assert.equal(snapshot.data[0].secret_strength, undefined);
+      assert.equal(snapshot.data[0].rarity, 'RARE'); assert.equal('status' in snapshot.data[0], false);
       await assert.rejects(query('SELECT * FROM public.currency_conversion_rates'), /permission denied/);
       assert.equal((await query("SELECT public.get_game_catalog_snapshot('rates') AS data"))[0].data.data[0].source_amount, 100);
       for (const domain of ['countries','areas','guides','shop','items','blueprints','skills','aquaculture']) {

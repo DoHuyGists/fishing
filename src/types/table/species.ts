@@ -3,7 +3,6 @@ export interface SpeciesRow {
   created_at: string;
   information: string | null;
   location: string | null;
-  status: string | null;
   name: string;
   image: string | null;
   rarity: string | null;

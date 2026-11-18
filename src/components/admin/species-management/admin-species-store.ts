@@ -8,18 +8,15 @@ export const useAdminSpeciesStore = defineStore("AdminSpecies", {
     isLoading: false,
     error: "",
     search: "",
-    statusFilter: "ALL",
     rarityFilter: "ALL",
     viewMode: "list" as "list" | "grid" | "grouped",
     page: 1,
     pageSize: 10,
     total: 0,
     requestId: 0,
-    statuses: [] as string[],
     rarities: [] as string[],
   }),
   getters: {
-    statusOptions: (state) => state.statuses,
     rarityOptions: (state) => state.rarities,
     filteredSpecies: (state): SpeciesRow[] => {
       return state.species;
@@ -50,10 +47,10 @@ export const useAdminSpeciesStore = defineStore("AdminSpecies", {
       this.isLoading = true;
       this.error = "";
       try {
-        const result = await supabaseSpeciesRepository.fetchPage(page, this.search, this.statusFilter, this.rarityFilter);
+        const result = await supabaseSpeciesRepository.fetchPage(page, this.search, this.rarityFilter);
         if (request !== this.requestId) return;
         this.species = result.items; this.total = result.total; this.page = page;
-        this.statuses = result.facets.status ?? []; this.rarities = result.facets.rarity ?? [];
+        this.rarities = result.facets.rarity ?? [];
         if (!result.items.length && page > 1) await this.fetchAll(Math.max(1, Math.ceil(result.total / this.pageSize)));
       } catch (error) {
         if (request === this.requestId) this.error = error instanceof Error ? error.message : "Không thể tải danh sách loài cá";

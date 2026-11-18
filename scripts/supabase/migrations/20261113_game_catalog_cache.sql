@@ -103,7 +103,7 @@ BEGIN
     WHEN 'areas' THEN SELECT coalesce(jsonb_agg(to_jsonb(t)),'[]') INTO payload FROM
       (SELECT id,country_id AS "countryId",title,location,scene_path AS "scenePath" FROM public.fishing_areas WHERE is_available ORDER BY id) t;
     WHEN 'species' THEN SELECT coalesce(jsonb_agg(to_jsonb(t)),'[]') INTO payload FROM
-      (SELECT id,created_at,information,location,status,name,image FROM public.species ORDER BY location,name,id) t;
+      (SELECT id,created_at,information,location,rarity,name,image FROM public.species ORDER BY location,name,id) t;
     WHEN 'guides' THEN SELECT coalesce(jsonb_agg(to_jsonb(t)),'[]') INTO payload FROM
       (SELECT id,title,content,sort_order FROM public.guides WHERE is_published ORDER BY sort_order,id) t;
     WHEN 'shop' THEN SELECT coalesce(jsonb_agg(to_jsonb(t)),'[]') INTO payload FROM

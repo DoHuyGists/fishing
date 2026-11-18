@@ -8,7 +8,7 @@ class SupabaseDiaryRepository {
    * Fetch all fish species from the `species` table.
    */
   async fetchSpecies(signal?: AbortSignal): Promise<Species[]> {
-    const data = await readCatalogPages((from, to) => supabase.from("species").select("id, created_at, information, location, status, name, image").order("location", { ascending: true }).order("name", { ascending: true }).order("id").abortSignal(signal ?? new AbortController().signal).range(from, to));
+    const data = await readCatalogPages((from, to) => supabase.from("species").select("id, created_at, information, location, rarity, name, image").order("location", { ascending: true }).order("name", { ascending: true }).order("id").abortSignal(signal ?? new AbortController().signal).range(from, to));
 
     return data ?? [];
   }
@@ -17,7 +17,7 @@ class SupabaseDiaryRepository {
    * Fetch species filtered by location (matches country code or country name).
    */
   async fetchSpeciesByLocation(locationCode: string, locationName?: string): Promise<Species[]> {
-    let query = supabase.from("species").select("id, created_at, information, location, status, name, image");
+    let query = supabase.from("species").select("id, created_at, information, location, rarity, name, image");
 
     if (locationName) {
       query = query.or(`location.eq.${locationCode},location.eq.${locationName},location.ilike.%${locationCode}%,location.ilike.%${locationName}%`);

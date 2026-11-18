@@ -3,9 +3,9 @@ import supabase from "../database/connection";
 import { fetchAdminListPage } from './supabaseAdminListRepository';
 
 class SupabaseSpeciesRepository {
-  fetchPage(page: number, search: string, status: string, rarity: string) {
+  fetchPage(page: number, search: string, rarity: string) {
     return fetchAdminListPage<SpeciesRow>('species', page, search, {
-      ...(status === 'ALL' ? {} : { status }), ...(rarity === 'ALL' ? {} : { rarity }),
+      ...(rarity === 'ALL' ? {} : { rarity }),
     });
   }
   async fetchAll(): Promise<SpeciesRow[]> {

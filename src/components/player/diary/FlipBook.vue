@@ -313,7 +313,7 @@ function getSheetZIndex(sheetIndex: number): number {
                                 : 'bg-gray-200 text-gray-700 border-gray-300',
                             ]"
                           >
-                            {{ entry.isCaught ? entry.species.status || tr('FlipBook.da_cau') : tr('FlipBook.chua_bat') }}
+                            {{ entry.isCaught ? entry.species.rarity || tr('FlipBook.da_cau') : tr('FlipBook.chua_bat') }}
                           </span>
                         </div>
                         <div class="m-0 text-md text-white lg:text-amber-900/80 line-clamp-1 leading-tight italic mt-0.5">
@@ -418,7 +418,7 @@ function getSheetZIndex(sheetIndex: number): number {
                                 : 'bg-gray-200 text-gray-700 border-gray-300',
                             ]"
                           >
-                            {{ entry.isCaught ? entry.species.status || tr('FlipBook.da_cau') : tr('FlipBook.chua_bat') }}
+                            {{ entry.isCaught ? entry.species.rarity || tr('FlipBook.da_cau') : tr('FlipBook.chua_bat') }}
                           </span>
                         </div>
                         <div

@@ -21,7 +21,6 @@ interface SpeciesFormState {
   name: string;
   information: string;
   location: string;
-  status: string;
   image: string;
   rarity: string;
   weightMin: number | null;
@@ -35,7 +34,6 @@ function emptyForm(): SpeciesFormState {
     name: "",
     information: "",
     location: "",
-    status: "normal",
     image: "",
     rarity: "",
     weightMin: null,
@@ -57,7 +55,6 @@ watch(
             name: species.name,
             information: species.information ?? "",
             location: species.location ?? "",
-            status: species.status ?? "",
             image: species.image ?? "",
             rarity: species.rarity ?? "",
             weightMin: species.weight_min,
@@ -115,7 +112,6 @@ function buildPayload(): SpeciesPayload | null {
     name,
     information: form.information.trim() || null,
     location: form.location.trim() || null,
-    status: form.status.trim() || null,
     image: form.image.trim() || null,
     rarity: form.rarity.trim() || null,
     weight_min: weightMin,
@@ -181,14 +177,6 @@ async function handleSave() {
             <input
               v-model="form.location"
               placeholder="Ví dụ: VN"
-              class="rounded-md border border-gray-300 px-3 py-2 text-sm font-normal text-gray-800 focus:border-emerald-600 focus:outline-none"
-            />
-          </label>
-          <label class="flex flex-col gap-1.5 text-xs font-bold text-gray-600">
-            Trạng thái
-            <input
-              v-model="form.status"
-              placeholder="normal"
               class="rounded-md border border-gray-300 px-3 py-2 text-sm font-normal text-gray-800 focus:border-emerald-600 focus:outline-none"
             />
           </label>

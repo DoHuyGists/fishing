@@ -11,9 +11,9 @@ import SpeciesManagementForm from "./SpeciesManagementForm.vue";
 
 const emit = defineEmits(["close"]);
 const speciesStore = useAdminSpeciesStore();
-usePagedListFilters([() => speciesStore.search, () => speciesStore.statusFilter, () => speciesStore.rarityFilter], () => { void speciesStore.fetchAll(1); }, () => { ++speciesStore.requestId; });
+usePagedListFilters([() => speciesStore.search, () => speciesStore.rarityFilter], () => { void speciesStore.fetchAll(1); }, () => { ++speciesStore.requestId; });
 
-const { search, statusFilter, rarityFilter, viewMode, statusOptions, rarityOptions, filteredSpecies, speciesGroups } =
+const { search, rarityFilter, viewMode, rarityOptions, filteredSpecies, speciesGroups } =
   storeToRefs(speciesStore);
 const viewModes = [
   { value: "list", label: "Danh sách" },
@@ -77,16 +77,6 @@ onMounted(() => speciesStore.fetchAll());
           class="w-full rounded-lg border border-gray-300 bg-gray-50 px-3 py-2 text-sm focus:border-emerald-600 focus:outline-none"
         />
       </div>
-      <label class="flex items-center gap-2 text-xs font-semibold text-gray-600">
-        Trạng thái
-        <select
-          v-model="statusFilter"
-          class="rounded-lg border border-gray-300 bg-white px-2.5 py-2 text-sm text-gray-700"
-        >
-          <option value="ALL">Tất cả</option>
-          <option v-for="status in statusOptions" :key="status" :value="status">{{ status }}</option>
-        </select>
-      </label>
       <label class="flex items-center gap-2 text-xs font-semibold text-gray-600">
         Độ hiếm
         <select
@@ -174,7 +164,6 @@ onMounted(() => speciesStore.fetchAll());
                 <th class="sticky top-0 z-10 bg-gray-100 px-4 py-3">Độ hiếm</th>
                 <th class="sticky top-0 z-10 bg-gray-100 px-4 py-3">Khối lượng</th>
                 <th class="sticky top-0 z-10 bg-gray-100 px-4 py-3">Tỉ lệ bắt</th>
-                <th class="sticky top-0 z-10 bg-gray-100 px-4 py-3">Trạng thái</th>
                 <th class="sticky top-0 z-10 bg-gray-100 px-4 py-3">Ngày tạo</th>
                 <th class="sticky top-0 z-10 bg-gray-100 px-4 py-3 text-right">Thao tác</th>
               </tr>
@@ -214,13 +203,6 @@ onMounted(() => speciesStore.fetchAll());
                   {{ item.weight_min ?? "—" }} – {{ item.weight_max ?? "—" }}
                 </td>
                 <td class="px-4 py-3 text-gray-700">{{ item.base_catch_rate ?? "—" }}</td>
-                <td class="px-4 py-3">
-                  <span
-                    class="rounded-full border border-emerald-200 bg-emerald-50 px-2.5 py-1 text-xs font-semibold text-emerald-800"
-                  >
-                    {{ item.status || "—" }}
-                  </span>
-                </td>
                 <td class="whitespace-nowrap px-4 py-3 text-xs text-gray-500">{{ formatDate(item.created_at) }}</td>
                 <td class="px-4 py-3">
                   <div class="flex justify-end gap-2">
@@ -275,7 +257,6 @@ onMounted(() => speciesStore.fetchAll());
                     <div class="min-w-0"><dt class="text-gray-500">Độ hiếm</dt><dd class="m-0 mt-1 break-words text-[#24352a]">{{ item.rarity || "—" }}</dd></div>
                     <div><dt class="text-gray-500">Khối lượng</dt><dd class="m-0 mt-1 text-[#24352a]">{{ item.weight_min ?? "—" }} – {{ item.weight_max ?? "—" }}</dd></div>
                     <div><dt class="text-gray-500">Tỉ lệ bắt</dt><dd class="m-0 mt-1 text-[#24352a]">{{ item.base_catch_rate ?? "—" }}</dd></div>
-                    <div class="min-w-0"><dt class="text-gray-500">Trạng thái</dt><dd class="m-0 mt-1 break-words text-emerald-800">{{ item.status || "—" }}</dd></div>
                     <div><dt class="text-gray-500">Ngày tạo</dt><dd class="m-0 mt-1 text-[#24352a]">{{ formatDate(item.created_at) }}</dd></div>
                   </dl>
                   <div class="mt-auto flex justify-end gap-2 border-t border-[#cbd9c6] pt-3">

@@ -26,7 +26,7 @@ export interface Species {
   created_at: string;
   information: string | null;
   location: string | null;
-  status: string | null;
+  rarity: string | null;
   name: string;
   image: string | null;
 }

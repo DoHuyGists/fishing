@@ -20,7 +20,7 @@ test('list pagination keeps global filters, totals and caller RLS', async t => {
       CREATE TABLE public.user_teams(id uuid PRIMARY KEY, status text, created_at timestamptz);
       CREATE TABLE public.personal_notifications(id uuid PRIMARY KEY, user_id uuid, created_at timestamptz);
       CREATE TABLE public.system_notifications(id uuid PRIMARY KEY, created_at timestamptz);
-      CREATE TABLE public.species(id uuid PRIMARY KEY, name text, rarity text, status text, owner_id uuid);
+      CREATE TABLE public.species(id uuid PRIMARY KEY, name text, rarity text, owner_id uuid);
       CREATE TABLE public.items(id uuid PRIMARY KEY, name text, category text, created_at timestamptz);
       CREATE TABLE public.weathers(id uuid PRIMARY KEY, code text, name text);
       CREATE TABLE public.modifiers(id uuid PRIMARY KEY, code text, name text);
@@ -55,9 +55,9 @@ test('list pagination keeps global filters, totals and caller RLS', async t => {
     for (let n = 1; n <= 23; n++) {
       await db.query('INSERT INTO public.user_profile VALUES($1,$2,$3)', [id(n), n === 23 ? 'Ngư thủ đặc biệt' : 'Player ' + n, n]);
       await db.query('INSERT INTO public.user_friends VALUES($1,$2,$3,$4,$5)', [id(n), player, id(n), n <= 20 ? 'ACCEPTED' : 'PENDING', '2026-11-13T00:00:00Z']);
-      await db.query('INSERT INTO public.species VALUES($1,$2,$3,$4,$5)', [id(n), 'Fish ' + String(n).padStart(2, '0'), n === 23 ? 'LEGENDARY' : 'COMMON', n % 2 ? 'ACTIVE' : 'DISABLED', player]);
+      await db.query('INSERT INTO public.species VALUES($1,$2,$3,$4)', [id(n), 'Fish ' + String(n).padStart(2, '0'), n % 2 ? 'LEGENDARY' : 'COMMON', player]);
     }
-    await db.query('INSERT INTO public.species VALUES($1,$2,$3,$4,$1)', [id(99), 'Hidden', 'SECRET', 'ACTIVE']);
+    await db.query('INSERT INTO public.species VALUES($1,$2,$3,$1)', [id(99), 'Hidden', 'SECRET']);
     await db.exec('SET ROLE authenticated');
 
     await t.test('friend pages contain at most ten rows without overlap', async () => {
@@ -81,11 +81,11 @@ test('list pagination keeps global filters, totals and caller RLS', async t => {
       assert.deepEqual(negative.profiles, first.profiles);
     });
     await t.test('admin filters run before LIMIT and facets cover every visible row', async () => {
-      const result = await read('get_admin_list_page', ['species', 1, 'fish', { status: 'ACTIVE' }]);
+      const result = await read('get_admin_list_page', ['species', 1, 'fish', { rarity: 'LEGENDARY' }]);
       assert.equal(result.total, 12); assert.equal(result.items.length, 10);
-      assert.ok(result.items.every(row => row.status === 'ACTIVE'));
+      assert.ok(result.items.every(row => row.rarity === 'LEGENDARY'));
       assert.deepEqual(result.facets.rarity, ['COMMON', 'LEGENDARY']);
-      const last = await read('get_admin_list_page', ['species', 2, 'fish', { status: 'ACTIVE' }]);
+      const last = await read('get_admin_list_page', ['species', 2, 'fish', { rarity: 'LEGENDARY' }]);
       assert.equal(last.items.length, 2); assert.equal(last.items[1].name, 'Fish 23');
       const specific = await read('get_admin_list_page', ['species', 1, '23', {}]);
       assert.equal(specific.total, 1); assert.equal(specific.items[0].name, 'Fish 23');
