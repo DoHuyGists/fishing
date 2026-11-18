@@ -3,6 +3,12 @@ import supabase from "../database/connection";
 import { fetchAdminListPage } from './supabaseAdminListRepository';
 
 class SupabaseSpeciesRepository {
+  async fetchById(id: string): Promise<SpeciesRow> {
+    const { data, error } = await supabase.from('species').select('*').eq('id', id).single();
+    if (error) throw new Error(error.message);
+    return data as SpeciesRow;
+  }
+
   fetchPage(page: number, search: string, rarity: string) {
     return fetchAdminListPage<SpeciesRow>('species', page, search, {
       ...(rarity === 'ALL' ? {} : { rarity }),

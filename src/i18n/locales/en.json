@@ -621,6 +621,10 @@
     "trang_sau": "Next page ▶"
   },
   "CatchDiaryModal": {
+    "species": "Species in this country",
+    "noSpecies": "No species data is available for this country yet.",
+    "notConquered": "Not yet conquered",
+    "speciesDetails": "Species details",
     "countries": "Countries",
     "conqueredSpecies": "Conquered species",
     "conqueredCount": "{value0} species conquered",

@@ -625,6 +625,10 @@
     "trang_sau": "Trang sau ▶"
   },
   "CatchDiaryModal": {
+    "species": "Các loài trong quốc gia",
+    "noSpecies": "Chưa có dữ liệu loài tại quốc gia này.",
+    "notConquered": "Chưa chinh phục",
+    "speciesDetails": "Thông tin chi tiết loài",
     "countries": "Quốc gia",
     "conqueredSpecies": "Các loài đã chinh phục",
     "conqueredCount": "{value0} loài đã chinh phục",

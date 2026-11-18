@@ -1,3 +1,5 @@
+import type { SpeciesRow } from '../table/species';
+
 export type BookVariant = 'default' | 'ocean' | 'gold' | 'dark' | 'emerald'
 
 export interface BookProps {
@@ -21,7 +23,7 @@ export interface BookProps {
   scale?: number
 }
 
-export interface Species {
+export interface Species extends Partial<SpeciesRow> {
   id: string;
   created_at: string;
   information: string | null;
@@ -29,6 +31,12 @@ export interface Species {
   rarity: string | null;
   name: string;
   image: string | null;
+}
+
+export interface DiaryFishEntry {
+  species: Species;
+  isCaught: boolean;
+  caughtAt?: string;
 }
 
 export interface CaughtDiary {

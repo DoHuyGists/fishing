@@ -1,20 +1,22 @@
 import { useGameCatalogStore } from './gameCatalog';
 import { useAuthStore } from './auth';
-import type { Species, CaughtDiary } from "../types/model/diary";
+import type { Species, CaughtDiary, DiaryFishEntry } from "../types/model/diary";
 import type { AreaSpecies } from "../types/model/speciesInArea";
 import { t as tr } from "../i18n";
 import { defineStore } from "pinia";
 import { supabaseDiaryRepository } from "../data/supabaseDiaryRepository";
 import { supabaseSpeciesInAreaRepository } from "../data/supabaseSpeciesInAreaRepository";
+import { supabaseSpeciesRepository } from "../data/supabaseSpeciesRepository";
+import type { SpeciesRow } from "../types/table/species";
 
-export interface DiaryFishEntry {
-  species: Species;
-  isCaught: boolean;
-  caughtAt?: string;
-}
+export type { DiaryFishEntry } from "../types/model/diary";
 
 export const useDiaryStore = defineStore("diary", {
   state: () => ({
+    viewMode: 'grid',
+    speciesDetails: {} as Record<string, SpeciesRow>,
+    detailsLoading: {} as Record<string, boolean>,
+    detailsErrors: {} as Record<string, string>,
     allSpecies: [] as Species[],
     caughtDiary: [] as CaughtDiary[],
     locationSpecies: [] as Species[],
@@ -30,13 +32,17 @@ export const useDiaryStore = defineStore("diary", {
   }),
 
   getters: {
-    caughtEntriesForCountry(state) {
+    caughtEntriesForCountry() {
+      return (code: string, name: string): DiaryFishEntry[] =>
+        this.entriesForCountry(code, name).filter((entry) => entry.isCaught);
+    },
+
+    entriesForCountry(state) {
       const caughtMap = this.caughtSpeciesMap;
       const entries = state.allSpecies
-        .filter((species) => caughtMap.has(species.id))
         .map((species): DiaryFishEntry => ({
           species,
-          isCaught: true,
+          isCaught: caughtMap.has(species.id),
           caughtAt: caughtMap.get(species.id),
         }));
       return (code: string, name: string): DiaryFishEntry[] => {
@@ -97,9 +103,25 @@ export const useDiaryStore = defineStore("diary", {
   },
 
   actions: {
+    async loadSpeciesDetails(id: string) {
+      if (this.speciesDetails[id] || this.detailsLoading[id]) return;
+      const auth = useAuthStore(), generation = auth.sessionGeneration;
+      this.detailsLoading[id] = true;
+      delete this.detailsErrors[id];
+      try {
+        const details = await supabaseSpeciesRepository.fetchById(id);
+        if (auth.sessionGeneration === generation) this.speciesDetails[id] = details;
+      } catch (error) {
+        if (auth.sessionGeneration === generation) this.detailsErrors[id] = error instanceof Error ? error.message : tr('diary.khong_the_tai_du_lieu_nhat_ky');
+      } finally {
+        if (auth.sessionGeneration === generation) this.detailsLoading[id] = false;
+      }
+    },
+
     applySpecies(data?: Species[]) {
       this.allSpecies = data ?? [];
       if (!data) {
+        this.speciesDetails = {}; this.detailsErrors = {}; this.detailsLoading = {};
         this.caughtDiary = []; this.locationSpecies = []; this.discoveredAreaSpecies = [];
         this.areaSpeciesRequestId++; this.isLoading = false;
       } else if (this.selectedLocationCode) {
