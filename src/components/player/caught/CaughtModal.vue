@@ -9,6 +9,8 @@ import { useWorldStore } from "../../../stores/worldMap.ts";
 import Modal from "../../shared/Modal.vue";
 import FishSellConfirm from "./FishSellConfirm.vue";
 import FishReleaseConfirm from "./FishReleaseConfirm.vue";
+import CaughtFishTraits from "./CaughtFishTraits.vue";
+import ShinySparkles from "../../shared/ShinySparkles.vue";
 import { useToast } from "../../../composables/useToast.ts";
 import { formatDateTime } from "../../../utils/time.ts";
 const worldStore = useWorldStore();
@@ -148,7 +150,7 @@ async function handleRelease() {
 }
 </script>
 <template>
-  <Modal class="caught-list-modal" :title="tr('CaughtModal.tui_ca')" :sub-title="tr('CaughtModal.nhung_loai_ca_ban_san_duoc')" :on-refresh="caughtStore.loadCaughtFishes">
+  <Modal class="caught-list-modal" :title="tr('CaughtModal.tui_ca')" :on-refresh="caughtStore.loadCaughtFishes">
     <section class="h-full min-h-0 text-[#263238] flex flex-col overflow-hidden">
       <!-- Header  -->
       <div class="flex items-center justify-between gap-2 pb-3">
@@ -215,7 +217,10 @@ async function handleRelease() {
         </div>
         <template v-else-if="viewMode === 'species'">
           <article v-for="group in paginatedFishGroups" :key="group.id" class="slide-fade-in from-bottom player-content-in min-w-0 overflow-hidden h-fit border border-gray-200 hover:border-emerald-300 rounded-xl bg-gray-50/70 transition-all shadow-sm">
-            <img :src="group.fishes[0].species?.image || '/fish/VN/fish.jpg'" :alt="group.fishes[0].species?.name || tr('CaughtModal.ca')" class="object-cover bg-gray-200 w-full h-36 border-b border-gray-200" />
+            <div class="relative">
+              <img :src="group.fishes[0].species?.image || '/fish/VN/fish.jpg'" :alt="group.fishes[0].species?.name || tr('CaughtModal.ca')" class="object-cover bg-gray-200 w-full h-36 border-b border-gray-200" />
+              <ShinySparkles v-if="group.fishes.some(fish => fish.is_shiny)" />
+            </div>
             <div class="min-w-0 flex-1 p-2">
               <div class="flex items-start justify-between gap-2">
                 <div class="min-w-0">
@@ -235,11 +240,13 @@ async function handleRelease() {
                 {{ expandedSpecies === group.id ? tr('CaughtModal.an_chi_tiet') : tr('CaughtModal.xem_tung_con') }}
               </button>
               <div v-if="expandedSpecies === group.id" class="mt-2 space-y-2 border-t border-gray-200 pt-2 overflow-y-scroll h-60">
-                <div v-for="fish in group.fishes" :key="fish.id" class="rounded-lg bg-white p-2 text-[10px] text-gray-600">
+                <div v-for="fish in group.fishes" :key="fish.id" class="relative rounded-lg bg-white p-2 text-[10px] text-gray-600">
+                  <ShinySparkles v-if="fish.is_shiny" />
                   <div class="flex items-center justify-between gap-2">
-                    <span class="font-semibold text-gray-800">{{ fish.weight }} kg · {{ fish.variant_type }}</span>
+                    <span class="font-semibold text-gray-800">{{ fish.weight }} kg</span>
                     <span class="shrink-0">{{ formatDateTime(fish.created_at) }}</span>
                   </div>
+                  <CaughtFishTraits :fish="fish" class="mt-1" />
                   <button v-if="fish.origin" type="button" class="mt-1 cursor-pointer text-left hover:underline" @click="worldStore.handleMoveToArea(fish.origin)">
                     {{ fish.origin.country }} - {{ fish.origin.name }}
                   </button>
@@ -257,7 +264,8 @@ async function handleRelease() {
             </div>
           </article>
         </template>
-        <div v-else v-for="item in paginatedCaughtFishes" :key="item.id" class="slide-fade-in from-bottom player-content-in min-w-0 p-2 border border-gray-200 hover:border-emerald-300 rounded-xl bg-gray-50/70 hover:bg-emerald-50/30 transition-all shadow-sm" :class="viewMode === 'grid' ? 'flex flex-col gap-2' : 'flex items-center gap-3'">
+        <div v-else v-for="item in paginatedCaughtFishes" :key="item.id" class="slide-fade-in from-bottom player-content-in relative min-w-0 p-2 border border-gray-200 hover:border-emerald-300 rounded-xl bg-gray-50/70 hover:bg-emerald-50/30 transition-all shadow-sm" :class="viewMode === 'grid' ? 'flex flex-col gap-2' : 'flex items-center gap-3'">
+          <ShinySparkles v-if="item.is_shiny" />
           <img :src="item.species?.image || '/fish/VN/fish.jpg'" :alt="item.species?.name" class="rounded-lg object-cover border border-gray-200 bg-gray-200" :class="viewMode === 'grid' ? 'w-full h-36' : 'w-fit h-20 shrink-0'" />
           <div class="flex flex-1 min-w-0 gap-2" :class="viewMode === 'grid' ? 'flex-col' : 'items-center justify-between'">
             <div class="flex-1 min-w-0 flex flex-col gap-0.5">
@@ -276,7 +284,7 @@ async function handleRelease() {
                 <span class="px-1.5 py-1 text-[9px] font-extrabold rounded border shrink-0 uppercase" :class="getRarityBadgeClass(item.species?.rarity)">
                   {{ item.species?.rarity }}
                 </span>
-                <span class="text-xs px-1.5 py-1">{{ item.variant_type }}</span>
+                <CaughtFishTraits :fish="item" class="mt-1" />
                 <div v-if="item.origin" @click="worldStore.handleMoveToArea(item.origin)" class="text-xs mt-1 cursor-pointer hover:underline">
                   {{ item.origin.country }} - {{ item.origin.name }}
                 </div>

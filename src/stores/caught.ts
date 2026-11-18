@@ -8,6 +8,7 @@ export interface CaughtFish {
   user_id: string;
   weight: number;
   is_shiny: boolean;
+  star_rating?: number | null;
   variant_type: "NORMAL" | "GOLDEN" | "MUTATED";
   status: string;
   species: {

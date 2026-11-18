@@ -77,6 +77,7 @@ class SupabaseFishRepository {
         species_id: row.species_id ?? row.species.id,
         weight: Number(row.weight),
         is_shiny: row.is_shiny,
+        star_rating: row.star_rating == null ? null : Number(row.star_rating),
         variant_type: row.variant_type,
         status: row.status,
         species: {
@@ -103,7 +104,7 @@ class SupabaseFishRepository {
     const rows: any[] = [];
     for (let offset = 0; ; offset += 500) {
       const { data, error } = await supabase.from("caught")
-        .select("id, created_at, user_id, species_id, weight, is_shiny, variant_type, status, species(id, name, image, rarity)")
+        .select("id, created_at, user_id, species_id, weight, is_shiny, star_rating, variant_type, status, species(id, name, image, rarity)")
         .eq("user_id", userId).eq("status", "normal").is("area_id", null)
         .order("id").range(offset, offset + 499);
       if (error) throw new Error(error.message);

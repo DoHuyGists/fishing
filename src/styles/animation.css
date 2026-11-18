@@ -1,3 +1,20 @@
+.shiny-sparkle {
+  left: calc(8% + (var(--sparkle-index) - 1) * 19%);
+  top: 12%;
+  opacity: 0;
+  filter: drop-shadow(0 0 3px #fff8bf);
+  animation: shinySparkle 2.8s ease-in-out infinite;
+  animation-delay: calc(var(--sparkle-index) * -0.55s);
+}
+
+.shiny-sparkle:nth-child(even) { top: 65%; }
+.shiny-sparkle:nth-child(3) { top: 40%; }
+
+@keyframes shinySparkle {
+  0%, 70%, 100% { opacity: 0; transform: scale(0.3) rotate(0deg); }
+  35% { opacity: 1; transform: scale(1.15) rotate(90deg); }
+}
+
 .slide-fade-in {
   --slide-distance: 120px;
   --from-x: calc(-1 * var(--slide-distance));
@@ -57,6 +74,12 @@
 .player-window-leave-to .player-window-panel { transform: translateY(20px); }
 
 @media (prefers-reduced-motion: reduce) {
+  .shiny-sparkle {
+    animation: none;
+    opacity: 0.7;
+    transform: none;
+  }
+
   .slide-fade-in {
     animation: none;
     opacity: 1;
