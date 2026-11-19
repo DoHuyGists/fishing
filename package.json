@@ -4,6 +4,7 @@
   "version": "0.0.0",
   "type": "module",
   "scripts": {
+    "test:jwt-clock-skew": "node --test scripts/test-jwt-clock-skew.mjs",
     "test:day-phase": "node --test --test-isolation=none scripts/test-day-phase.mjs",
     "test:single-session": "node --test --test-isolation=none scripts/test-single-session.mjs",
     "test:single-session:browser": "node scripts/test-single-session-browser.mjs",
