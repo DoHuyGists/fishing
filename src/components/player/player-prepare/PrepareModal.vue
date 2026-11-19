@@ -11,7 +11,7 @@ import type { EquipmentSet } from "../../../stores/player-equipment-store.ts";
 import { useUserTurnsStore } from "../../../stores/player-user-turns-store.ts";
 import { supabaseUserInAreaRepository } from "../../../data/supabaseUserInAreaRepository.ts";
 import { useToast } from "../../../composables/useToast.ts";
-import { useRouter } from "vue-router";
+import { isNavigationFailure, NavigationFailureType, useRouter } from "vue-router";
 import { useWorldStore } from "../../../stores/player-world-map-store.ts";
 import Modal from "../../shared/Modal.vue";
 import { useModalStore } from "../../../stores/player-modal-store.ts";
@@ -189,13 +189,17 @@ const proceedBlockReason = computed(() => {
 
 async function confirm() {
   if (!canProceed.value) return;
+  const areaId = worldStore.selectedArea.id;
 
   try {
     await fishingTransition.coverScreen();
-    await userTurnsStore.consumeTurn();
-    await supabaseUserInAreaRepository.setUserEnterArea(worldStore.selectedArea.id);
     modalStore.close();
-    await router.push({ name: "fishing" });
+    await userTurnsStore.consumeTurn();
+    await supabaseUserInAreaRepository.setUserEnterArea(areaId);
+    const failure = await router.push({ name: "fishing" });
+    // PlayerLayout can already be navigating to fishing after refreshing area membership.
+    // Its pending navigation owns the cover when it supersedes this push.
+    if (isNavigationFailure(failure, NavigationFailureType.cancelled)) return;
     if (router.currentRoute.value.name !== "fishing") {
       fishingTransition.hide();
       if (["home", "lobby"].includes(String(router.currentRoute.value.name))) modalStore.open("prepare");

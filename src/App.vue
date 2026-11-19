@@ -23,6 +23,17 @@ const modals = useModalStore();
 const stories = useStoryStore();
 const fishingTransition = useFishingTransitionStore();
 watch(
+  () => router.currentRoute.value.name,
+  (name) => {
+    if (name === "fishing") {
+      if (modals.isOpening("prepare")) modals.close();
+    } else if (fishingTransition.visible) {
+      // A completed redirect away from fishing must not leave the screen covered.
+      fishingTransition.hide();
+    }
+  },
+);
+watch(
   () => auth.user?.id,
   (userId) => {
     stories.reset(userId ?? "");

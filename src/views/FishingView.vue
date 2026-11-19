@@ -94,15 +94,6 @@ watch(sessionReady, (ready) => {
   if (!ready) showExitConfirmation.value = false;
 });
 
-watch(
-  () => [sessionReady.value, sessionError.value] as const,
-  ([ready, error]) => {
-    if (ready || error) fishingTransition.hide();
-    else fishingTransition.show();
-  },
-  { immediate: true, flush: "post" },
-);
-
 function toggleEquipment() {
   equipmentCollapsed.value = !equipmentCollapsed.value;
 }
@@ -123,6 +114,16 @@ watch(
     }
   },
   { immediate: true },
+);
+
+watch(
+  () => [sessionReady.value, sessionError.value, sceneContext.value.sceneImage, sceneContext.value.rodImage] as const,
+  ([ready, error, sceneImage, rodImage]) => {
+    if (error) fishingTransition.hide();
+    else if (!ready) fishingTransition.show();
+    else if (fishingTransition.visible) void fishingTransition.revealScene([sceneImage, rodImage]);
+  },
+  { immediate: true, flush: "post" },
 );
 
 watch(
