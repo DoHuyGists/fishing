@@ -15,7 +15,7 @@ onUnmounted(() => { store.closeForm(); store.cancelDelete(); });
 </script>
 
 <template>
-  <AdminModal title="Quản lý kỹ năng" subtitle="Cấu hình kỹ năng, giới hạn cấp và hiệu ứng mỗi cấp." icon="✨" :close-disabled="store.busy" @close="emit('close')">
+  <AdminModal title="Quản lý kỹ năng" icon="✨" :close-disabled="store.busy" @close="emit('close')">
     <div class="flex shrink-0 flex-wrap gap-3 border-b border-[#cbd9c6] bg-white p-4">
       <input v-model="store.search" type="search" aria-label="Tìm kỹ năng" placeholder="Tìm theo mã, tên hoặc mô tả..." class="min-w-0 flex-1 rounded-lg border border-[#cbd9c6] px-3 py-2 text-sm" />
       <button type="button" :disabled="store.busy" class="rounded-lg border border-[#cbd9c6] px-3 py-2 text-sm disabled:opacity-50" @click="store.fetchAll()">{{ store.loading ? 'Đang tải...' : 'Làm mới' }}</button>

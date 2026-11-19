@@ -61,7 +61,7 @@ onMounted(() => {
 </script>
 
 <template>
-  <AdminModal :title="selectionMode ? (selectionKind === 'image' ? 'Chọn ảnh từ kho' : 'Chọn link ảnh / video') : 'Quản lý ảnh & video'" :subtitle="selectionMode ? 'Tìm hoặc tải tệp lên, rồi chọn Dùng link để đưa vào trình soạn thảo' : 'Lưu trữ và sao chép link để sử dụng trong nội dung'" :z-index="zIndex" :close-disabled="store.busy" @close="close" @keydown.esc.stop.prevent="escape">
+  <AdminModal :title="selectionMode ? (selectionKind === 'image' ? 'Chọn ảnh từ kho' : 'Chọn link ảnh / video') : 'Quản lý ảnh & video'" :z-index="zIndex" :close-disabled="store.busy" @close="close" @keydown.esc.stop.prevent="escape">
     <div class="shrink-0 space-y-3 border-b border-[#cbd9c6] p-4 sm:px-6">
       <div class="flex flex-wrap gap-3">
         <input ref="searchInput" v-model="store.search" type="search" aria-label="Tìm tên tệp" placeholder="Tìm tên tệp…" class="min-w-48 flex-1 rounded-lg border border-[#cbd9c6] bg-white px-3 py-2 text-sm focus:outline-emerald-700" />

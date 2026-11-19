@@ -33,7 +33,6 @@ const save = (payload: any, id: string | null) => (id ? store.update(id, payload
 <template>
   <AdminCrudScreen
     title="Thời tiết theo vùng"
-    subtitle="Chọn thời tiết được phép xuất hiện ở mỗi vùng (zone_allowed_weathers)"
     icon="🌦️"
     :columns="columns"
     :fields="fields"

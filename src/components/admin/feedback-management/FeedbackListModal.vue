@@ -16,7 +16,6 @@ function formatDate(value: string) {
 <template>
   <AdminModal
     title="Danh sách góp ý"
-    subtitle="Các phản hồi được gửi từ người chơi."
     :z-index="10000"
     @close="emit('close')"
   >

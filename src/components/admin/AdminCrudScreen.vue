@@ -28,7 +28,6 @@ export interface CrudColumn {
 
 const props = defineProps<{
   title: string;
-  subtitle: string;
   icon: string;
   columns: CrudColumn[];
   fields: CrudField[];
@@ -158,7 +157,6 @@ async function confirmDelete() {
   <AdminModal
     :title="title"
     :icon="icon"
-    :subtitle="subtitle"
     :close-disabled="saving"
     @close="emit('close')"
   >

@@ -26,7 +26,6 @@ onUnmounted(() => store.resetView());
 
 <template>
   <AdminModal title="Quản lý hướng dẫn" icon="📖" :close-disabled="store.busy" @close="close">
-    <template #subtitle>{{ store.rows.length }} hướng dẫn · Nội dung hiển thị cho người chơi</template>
     <form v-if="store.isFormOpen" class="min-h-0 flex-1 space-y-5 overflow-y-auto p-4 sm:p-6" @submit.prevent="store.save()">
       <div class="flex flex-wrap items-center justify-between gap-3">
         <div class="text-lg font-bold">{{ store.editingId ? 'Sửa hướng dẫn' : 'Tạo hướng dẫn' }}</div>

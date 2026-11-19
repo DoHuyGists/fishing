@@ -24,7 +24,6 @@ const save = (payload: any, id: string | null) => (id ? store.update(id, payload
 <template>
   <AdminCrudScreen
     title="Quản lý chỉ số"
-    subtitle="Thêm, sửa, xoá chỉ số (modifiers)"
     icon="📊"
     :columns="columns"
     :fields="fields"

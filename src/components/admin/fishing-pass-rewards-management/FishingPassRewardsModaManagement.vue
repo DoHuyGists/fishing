@@ -41,7 +41,6 @@ onMounted(() => store.fetchAll());
 <template>
   <AdminModal
     title="Quản lý phần thưởng vé câu"
-    subtitle="Thiết lập vật phẩm nhận theo ngày cho vé FREE và PREMIUM."
     @close="emit('close')"
     @keydown.esc="emit('close')"
   >

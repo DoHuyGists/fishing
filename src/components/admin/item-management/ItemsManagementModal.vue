@@ -30,7 +30,6 @@ onMounted(loadItems);
     icon="🎒"
     @close="emit('close')"
   >
-    <template #subtitle>{{ store.total }} vật phẩm trong danh mục</template>
 
     <div class="flex shrink-0 flex-wrap items-center gap-3 border-b border-gray-200 bg-white px-5 py-3 md:px-7">
       <div class="min-w-55 flex-1">

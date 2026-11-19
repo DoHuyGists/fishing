@@ -45,7 +45,6 @@ const fields: CrudField[] = [
 <template>
   <AdminCrudScreen
     title="Tính khả dụng của tính năng"
-    subtitle="Sửa trạng thái để bật/tắt tính năng trên mọi máy người chơi. Flag bản đồ và vào bãi câu được quản lý riêng."
     icon="🛑"
     :columns="columns" :fields="fields" :items="store.items"
     :loading="store.loading" :error="store.error"

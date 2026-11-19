@@ -26,7 +26,6 @@ onMounted(() => store.fetchRows());
     icon="🔔"
     @close="emit('close')"
   >
-    <template #subtitle>{{ store.total }} thông báo</template>
     <div class="flex shrink-0 flex-wrap items-center gap-3 border-b border-gray-200 bg-white px-5 py-3 md:px-7">
       <div class="flex rounded-lg bg-gray-100 p-1">
         <button

@@ -32,7 +32,6 @@ store.fetchAll();
 <template>
   <AdminModal
     title="Quản lý vé câu"
-    subtitle="Tạo và quản lý thời hạn, giá vé câu."
     @close="emit('close')"
     @keydown.esc="emit('close')"
   >

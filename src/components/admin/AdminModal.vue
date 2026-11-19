@@ -6,12 +6,10 @@ useDocumentScrollLock();
 
 withDefaults(defineProps<{
   title: string;
-  subtitle?: string;
   icon?: string;
   closeDisabled?: boolean;
   zIndex?: number;
 }>(), {
-  subtitle: "",
   icon: "",
   closeDisabled: false,
   zIndex: 50,
@@ -36,12 +34,7 @@ const titleId = useId();
           class="grid size-10 shrink-0 place-items-center rounded-lg border border-emerald-400/30 bg-emerald-800 text-xl"
           aria-hidden="true"
         >{{ icon }}</span>
-        <div class="min-w-0">
-          <div :id="titleId" class="m-0 break-words text-lg font-extrabold">{{ title }}</div>
-          <div v-if="subtitle || $slots.subtitle" class="m-0 mt-0.5 break-words text-xs text-emerald-200">
-            <slot name="subtitle">{{ subtitle }}</slot>
-          </div>
-        </div>
+        <div :id="titleId" class="m-0 min-w-0 break-words text-lg font-extrabold">{{ title }}</div>
       </div>
       <button
         type="button"

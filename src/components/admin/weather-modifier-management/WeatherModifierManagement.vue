@@ -40,7 +40,6 @@ const save = (payload: any, id: string | null) => {
 <template>
   <AdminCrudScreen
     title="Chỉ số theo thời tiết"
-    subtitle="Cấu hình chỉ số và khoảng giá trị của từng thời tiết (weather_modifiers)"
     icon="🎚️"
     :columns="columns"
     :fields="fields"

@@ -36,7 +36,6 @@ const save = (payload: any, id: string | null) => {
 <template>
   <AdminCrudScreen
     title="Quản lý thời tiết"
-    subtitle="Thêm, sửa, xoá thời tiết (weathers)"
     icon="⛅"
     :columns="columns"
     :fields="fields"

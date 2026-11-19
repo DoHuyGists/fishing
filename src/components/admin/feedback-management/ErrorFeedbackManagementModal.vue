@@ -39,7 +39,6 @@ function attachmentUrl(path: string) {
 <template>
   <AdminModal
     title="Quản lý báo lỗi"
-    subtitle="Xem sự cố, tệp đính kèm và cập nhật trạng thái xử lý."
     :z-index="10000"
     @close="emit('close')"
   >

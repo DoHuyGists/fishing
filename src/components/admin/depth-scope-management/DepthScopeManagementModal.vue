@@ -41,7 +41,6 @@ onMounted(() => store.fetchAll());
 <template>
   <AdminModal
     title="Quản lý phạm vi độ sâu"
-    subtitle="Tạo và cấu hình các khoảng độ sâu dùng trong trò chơi."
     @close="emit('close')"
   >
 

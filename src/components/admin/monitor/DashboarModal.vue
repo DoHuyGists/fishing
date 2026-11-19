@@ -20,7 +20,6 @@ onUnmounted(store.stop);
 <template>
   <AdminModal
     title="Giám sát thế giới"
-    subtitle="Theo dõi người chơi trong bãi câu và tổng tiền tệ của thế giới."
     icon="📊"
     @close="emit('close')"
   >

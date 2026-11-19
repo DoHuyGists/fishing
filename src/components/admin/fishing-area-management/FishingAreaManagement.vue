@@ -84,7 +84,6 @@ watch(
   <AdminModal
     title="Quản lý bãi câu"
     icon="🗺️"
-    subtitle="Thêm, sửa, xoá và tìm kiếm bãi câu (fishing_areas)"
     @close="emit('close')"
   >
 

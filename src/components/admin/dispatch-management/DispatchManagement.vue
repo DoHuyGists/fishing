@@ -36,7 +36,6 @@ const fields: CrudField[] = [
 
 <template>
   <AdminCrudScreen :title="isNpc ? 'Quản lý NPC giao việc' : 'Quản lý công việc NPC'" icon="🧭"
-    subtitle="Tìm kiếm theo mã. NPC phải đạt mọi chỉ số yêu cầu. Tắt cấu hình để ngừng lượt mới; lượt đã chạy giữ nguyên thông số và phần thưởng. Không xóa cấu hình đã có lịch sử."
     :columns="columns" :fields="fields" :items="store.items" :page="store.page" :page-size="store.pageSize" :total="store.total"
     :loading="store.loading" :error="store.error" :save="store.save" :remove="store.remove"
     @page="store.fetchAll" @refresh="store.fetchAll()" @close="emit('close')" />

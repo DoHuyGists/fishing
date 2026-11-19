@@ -41,7 +41,6 @@ const save = (payload: any, id: string | null) => (id ? store.update(id, payload
 <template>
   <AdminCrudScreen
     title="Quản lý vùng"
-    subtitle="Thêm, sửa, xoá vùng (zones)"
     icon="🌊"
     :columns="columns"
     :fields="fields"

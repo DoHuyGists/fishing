@@ -25,7 +25,6 @@ onUnmounted(() => { store.isFormOpen = false; store.confirmDeleteId = null; });
     :close-disabled="store.isSaving || store.isDeleting"
     @close="close"
   >
-    <template #subtitle>{{ store.items.length }} mẫu nhiệm vụ trong danh sách</template>
     <div class="flex shrink-0 flex-wrap items-center gap-3 border-b border-gray-200 bg-white px-5 py-3 md:px-7">
       <input v-model="store.search" type="search" aria-label="Tìm kiếm" placeholder="Tìm mã, tên, mô tả, loại sự kiện, độ khó..." class="min-w-48 flex-1 rounded-lg border border-slate-300 bg-gray-50 px-3 py-2.5 text-sm placeholder:text-slate-400 focus:border-emerald-600 focus:outline-none focus:ring-2 focus:ring-emerald-600/15" />
       <label class="flex items-center gap-2 text-sm text-slate-600">
