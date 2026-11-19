@@ -34,7 +34,7 @@ const router = createRouter({
             },
             {
               path: "/lobby",
-              name: "player",
+              name: "lobby",
               component: () => import("../views/PlayerView.vue"),
               meta: { requiresAuth: true },
             },

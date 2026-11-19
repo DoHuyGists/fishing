@@ -317,7 +317,7 @@ onBeforeUnmount(() => {
                 type="button"
                 class="px-4 py-2 border border-[#e65c5c] rounded-xl bg-[#c23b3b] hover:bg-[#d94848] text-white text-xs font-bold shadow-[0_4px_12px_rgba(194,59,59,0.4)] transition-colors cursor-pointer disabled:opacity-50"
                 :disabled="fishingStore.isLeavingArea"
-                @click="router.push({ name: 'home' })"
+                @click="router.push({ name: 'lobby' })"
               >
                 {{
                   fishingStore.isLeavingArea ? tr("FishingView.dang_quay_lai") : tr("FishingView.ket_thuc_chuyen_cau")
