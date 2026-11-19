@@ -6,8 +6,6 @@ import { computed, onBeforeUnmount, onMounted, ref } from "vue";
 import { useFishingStore } from "../../../stores/fishing.ts";
 import { TENSION_SCALE } from "../../../data/tensionChallenge.ts";
 import LineTensionMeter from "./LineTensionMeter.vue";
-import Hint from "../../shared/Hint.vue";
-
 
 const props = defineProps<{ controller?: TensionController; untimedStart?: boolean }>();
 const store = props.controller ?? useFishingStore();

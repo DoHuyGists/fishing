@@ -2,9 +2,9 @@
 import { computed, onBeforeUnmount, onMounted, useTemplateRef } from "vue";
 import type { CurrencyKind, PaymentCostLine } from "../../types/model/currency";
 import { t as tr } from "../../i18n";
-import Cash from "../player/currency/Cash.vue";
-import Shells from "../player/currency/Shells.vue";
-import Tickets from "../player/currency/Tickets.vue";
+import Cash from "../player/player-currency/Cash.vue";
+import Shells from "../player/player-currency/Shells.vue";
+import Tickets from "../player/player-currency/Tickets.vue";
 
 const props = withDefaults(defineProps<{
   title: string;

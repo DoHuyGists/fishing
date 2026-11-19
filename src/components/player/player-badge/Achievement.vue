@@ -4,7 +4,7 @@ import { t as tr } from "../../../i18n";
 import { computed, onMounted, ref } from "vue";
 import { useBadgesStore } from "../../../stores/badges.ts";
 import Modal from "../../shared/Modal.vue";
-import Cash from "../currency/Cash.vue";
+import Cash from "../player-currency/Cash.vue";
 
 const badgesStore = useBadgesStore();
 const selectedBadgeId = ref<string | null>(null);
@@ -73,16 +73,16 @@ function clearFilters() {
             <div
               class="m-0 text-[9px] font-black uppercase tracking-[0.16em] text-emerald-800 sm:text-[10px] sm:tracking-[0.22em]"
             >
-              {{ tr('Achievement.hanh_trinh_cua_ban') }}
+              {{ tr("Achievement.hanh_trinh_cua_ban") }}
             </div>
             <div
               id="badges-title"
               class="mb-0 mt-0.5 text-base font-black tracking-tight text-[#24352a] sm:mt-1 sm:text-xl"
             >
-              {{ tr('Achievement.bo_suu_tap_huy_hieu') }}
+              {{ tr("Achievement.bo_suu_tap_huy_hieu") }}
             </div>
             <div class="m-0 mt-0.5 hidden max-w-md text-xs leading-relaxed text-[#617265] sm:block">
-              {{ tr('Achievement.moi_huy_hieu_la_mot_dau_an_tren_hanh_trinh_chinh_phuc_nhung_vung') }}
+              {{ tr("Achievement.moi_huy_hieu_la_mot_dau_an_tren_hanh_trinh_chinh_phuc_nhung_vung") }}
             </div>
           </div>
           <div
@@ -98,7 +98,9 @@ function clearFilters() {
                 {{ earnedBadges.length
                 }}<span class="text-xs font-semibold text-gray-400"> / {{ badgesStore.badges.length }}</span>
               </div>
-              <div class="m-0 text-[9px] font-bold uppercase tracking-wide text-gray-500 sm:text-[10px]">{{ tr('Achievement.da_suu_tam') }}</div>
+              <div class="m-0 text-[9px] font-bold uppercase tracking-wide text-gray-500 sm:text-[10px]">
+                {{ tr("Achievement.da_suu_tam") }}
+              </div>
             </div>
           </div>
         </div>
@@ -116,14 +118,16 @@ function clearFilters() {
         <div
           class="relative mt-3 flex flex-col gap-2 border-t border-emerald-900/10 pt-2.5 sm:mt-4 sm:flex-row sm:items-center sm:justify-between sm:gap-3 sm:pt-3"
         >
-          <div class="m-0 shrink-0 text-[10px] font-bold text-[#405346] sm:text-xs">{{ tr('Achievement.nhung_chiec_cup_cua_can_thu') }}</div>
+          <div class="m-0 shrink-0 text-[10px] font-bold text-[#405346] sm:text-xs">
+            {{ tr("Achievement.nhung_chiec_cup_cua_can_thu") }}
+          </div>
           <button
             v-if="badgesStore.error"
             type="button"
             class="cursor-pointer text-xs font-bold text-emerald-800 underline"
             @click="loadBadges"
           >
-            {{ tr('Fishfarm.tai_lai') }}
+            {{ tr("Fishfarm.tai_lai") }}
           </button>
           <div
             v-else
@@ -136,7 +140,7 @@ function clearFilters() {
               :aria-pressed="statusFilter === 'all'"
               @click="statusFilter = 'all'"
             >
-              {{ tr('Achievement.tat_ca') }}
+              {{ tr("Achievement.tat_ca") }}
             </button>
             <button
               type="button"
@@ -145,7 +149,7 @@ function clearFilters() {
               :aria-pressed="statusFilter === 'earned'"
               @click="statusFilter = 'earned'"
             >
-              {{ tr('Achievement.da_dat') }} {{ earnedBadges.length }}
+              {{ tr("Achievement.da_dat") }} {{ earnedBadges.length }}
             </button>
             <button
               type="button"
@@ -156,7 +160,7 @@ function clearFilters() {
               :aria-pressed="statusFilter === 'unearned'"
               @click="statusFilter = 'unearned'"
             >
-              {{ tr('Achievement.chua_dat') }}
+              {{ tr("Achievement.chua_dat") }}
             </button>
             <button
               type="button"
@@ -167,7 +171,7 @@ function clearFilters() {
               :aria-pressed="statusFilter === 'claimable'"
               @click="statusFilter = 'claimable'"
             >
-              {{ tr('Achievement.co_thuong') }}
+              {{ tr("Achievement.co_thuong") }}
             </button>
           </div>
         </div>
@@ -175,7 +179,7 @@ function clearFilters() {
 
       <div v-if="badgesStore.badges.length" class="mt-2 flex gap-2 sm:mt-3 sm:gap-3">
         <label class="relative min-w-0 flex-1">
-          <span class="sr-only">{{ tr('Achievement.tim_huy_hieu') }}</span>
+          <span class="sr-only">{{ tr("Achievement.tim_huy_hieu") }}</span>
           <input
             v-model="searchQuery"
             type="search"
@@ -184,12 +188,12 @@ function clearFilters() {
           />
         </label>
         <label class="w-[42%] sm:w-56">
-          <span class="sr-only">{{ tr('Achievement.loc_theo_loai_huy_hieu') }}</span>
+          <span class="sr-only">{{ tr("Achievement.loc_theo_loai_huy_hieu") }}</span>
           <select
             v-model="selectedType"
             class="w-full rounded-lg border border-[#cbd9c6] bg-white px-2 py-2 text-xs text-[#24352a] outline-none focus:border-emerald-600 focus:ring-2 focus:ring-emerald-600/15 sm:rounded-xl sm:px-3 sm:py-2.5 sm:text-sm"
           >
-            <option value="all">{{ tr('Achievement.tat_ca_loai_huy_hieu') }}</option>
+            <option value="all">{{ tr("Achievement.tat_ca_loai_huy_hieu") }}</option>
             <option v-for="type in badgeTypes" :key="type" :value="type">{{ type }}</option>
           </select>
         </label>
@@ -199,40 +203,47 @@ function clearFilters() {
         v-if="badgesStore.loading && badgesStore.badges.length === 0"
         class="py-12 text-center text-sm text-gray-500"
       >
-        {{ tr('Achievement.dang_tai_bo_suu_tap') }}
+        {{ tr("Achievement.dang_tai_bo_suu_tap") }}
       </div>
       <div
         v-else-if="badgesStore.error && badgesStore.badges.length === 0"
         role="alert"
         class="mt-4 rounded-2xl border border-red-200 bg-red-50 p-4 text-sm text-red-700"
       >
-        {{ tr('Achievement.khong_the_tai_huy_hieu') }} {{ badgesStore.error }}
+        {{ tr("Achievement.khong_the_tai_huy_hieu") }} {{ badgesStore.error }}
       </div>
       <div
         v-else-if="badgesStore.badges.length === 0"
         class="mt-4 rounded-2xl border border-dashed border-[#cbd9c6] bg-[#f5f9f0] p-8 text-center"
       >
         <span class="text-4xl" aria-hidden="true">🎣</span>
-        <div class="mb-1 mt-3 text-sm font-bold text-[#24352a]">{{ tr('Achievement.ho_so_dang_cho_dau_an_dau_tien') }}</div>
-        <div class="m-0 text-xs text-gray-500">{{ tr('Achievement.huy_hieu_se_xuat_hien_tai_day_khi_co_san_trong_tro_choi') }}</div>
+        <div class="mb-1 mt-3 text-sm font-bold text-[#24352a]">
+          {{ tr("Achievement.ho_so_dang_cho_dau_an_dau_tien") }}
+        </div>
+        <div class="m-0 text-xs text-gray-500">
+          {{ tr("Achievement.huy_hieu_se_xuat_hien_tai_day_khi_co_san_trong_tro_choi") }}
+        </div>
       </div>
       <div
         v-else-if="filteredBadges.length === 0"
         class="mt-4 rounded-2xl border border-dashed border-[#cbd9c6] bg-[#f5f9f0] p-8 text-center"
       >
-        <div class="m-0 text-sm font-bold text-[#24352a]">{{ tr('Achievement.khong_tim_thay_huy_hieu_phu_hop') }}</div>
-        <div class="mb-3 mt-1 text-xs text-gray-500">{{ tr('Achievement.thu_thay_doi_tu_khoa_hoac_bo_loc_cua_ban') }}</div>
+        <div class="m-0 text-sm font-bold text-[#24352a]">{{ tr("Achievement.khong_tim_thay_huy_hieu_phu_hop") }}</div>
+        <div class="mb-3 mt-1 text-xs text-gray-500">
+          {{ tr("Achievement.thu_thay_doi_tu_khoa_hoac_bo_loc_cua_ban") }}
+        </div>
         <button
           type="button"
           class="cursor-pointer rounded-full border border-[#cbd9c6] bg-white px-4 py-2 text-xs font-bold text-emerald-800 hover:bg-emerald-50"
           @click="clearFilters"
         >
-          {{ tr('Achievement.xoa_bo_loc') }}
+          {{ tr("Achievement.xoa_bo_loc") }}
         </button>
       </div>
       <div v-else class="mt-3 sm:mt-4">
         <div class="mb-2 mt-0 text-[10px] text-gray-500 sm:mb-3 sm:text-xs">
-          {{ tr('Achievement.hien_thi') }} {{ filteredBadges.length }} / {{ badgesStore.badges.length }} {{ tr('Achievement.huy_hieu_2') }}
+          {{ tr("Achievement.hien_thi") }} {{ filteredBadges.length }} / {{ badgesStore.badges.length }}
+          {{ tr("Achievement.huy_hieu_2") }}
         </div>
         <div class="grid grid-cols-3 gap-1.5 sm:grid-cols-4 sm:gap-2 lg:grid-cols-6 xl:grid-cols-7 2xl:grid-cols-8">
           <button
@@ -246,7 +257,12 @@ function clearFilters() {
                 : 'border-[#dce4d8] bg-[#f8faf6] hover:border-emerald-200'
             "
             :style="{ animationDelay: `${index * 45}ms` }"
-            :aria-label="tr('Achievement.value0_value1_xem_chi_tiet', { value0: badge.name, value1: badge.is_earned ? tr('Achievement.earnedSuffix') : tr('Achievement.unearnedSuffix') })"
+            :aria-label="
+              tr('Achievement.value0_value1_xem_chi_tiet', {
+                value0: badge.name,
+                value1: badge.is_earned ? tr('Achievement.earnedSuffix') : tr('Achievement.unearnedSuffix'),
+              })
+            "
             @click="selectedBadgeId = badge.badge_id"
           >
             <span
@@ -294,17 +310,17 @@ function clearFilters() {
             <span
               v-if="badge.can_claim"
               class="relative mt-1 rounded-full bg-amber-100 px-1.5 py-0.5 text-[9px] font-bold leading-tight text-amber-800 sm:mt-1.5 sm:px-2 sm:text-[10px]"
-              >{{ tr('Achievement.nhan_thuong') }}</span
+              >{{ tr("Achievement.nhan_thuong") }}</span
             >
             <span
               v-else-if="badge.is_earned"
               class="relative mt-1 rounded-full bg-emerald-50 px-1.5 py-0.5 text-[9px] font-bold leading-tight text-emerald-800 sm:mt-1.5 sm:px-2 sm:text-[10px]"
-              >{{ tr('Achievement.dat') }} {{ badge.quantity }} {{ tr('Achievement.lan') }}</span
+              >{{ tr("Achievement.dat") }} {{ badge.quantity }} {{ tr("Achievement.lan") }}</span
             >
             <span
               v-else
               class="relative mt-1 rounded-full bg-gray-100 px-1.5 py-0.5 text-[9px] font-semibold leading-tight text-gray-500 sm:mt-1.5 sm:px-2 sm:text-[10px]"
-              >{{ tr('Achievement.chua_mo_khoa') }}</span
+              >{{ tr("Achievement.chua_mo_khoa") }}</span
             >
           </button>
         </div>
@@ -347,14 +363,16 @@ function clearFilters() {
               <span v-else class="text-6xl" aria-hidden="true">🏅</span>
             </div>
             <div class="mb-1 mt-5 text-[10px] font-black uppercase tracking-[0.2em] text-emerald-800">
-              {{ selectedBadge.is_earned ? tr('Achievement.dau_an_da_chinh_phuc') : tr('Achievement.muc_tieu_tiep_theo') }}
+              {{
+                selectedBadge.is_earned ? tr("Achievement.dau_an_da_chinh_phuc") : tr("Achievement.muc_tieu_tiep_theo")
+              }}
             </div>
             <div id="badge-detail-title" class="m-0 text-xl font-black text-[#24352a]">{{ selectedBadge.name }}</div>
             <div class="mb-0 mt-2 text-sm leading-relaxed text-[#617265]">
-              {{ selectedBadge.description || tr('Achievement.mot_huy_hieu_dac_biet_trong_hanh_trinh_cau_ca_cua_ban') }}
+              {{ selectedBadge.description || tr("Achievement.mot_huy_hieu_dac_biet_trong_hanh_trinh_cau_ca_cua_ban") }}
             </div>
             <div v-if="selectedBadge.reward !== null">
-              <div class="mb-0 mt-3 text-xs font-bold text-amber-800">{{ tr('Achievement.phan_thuong') }}</div>
+              <div class="mb-0 mt-3 text-xs font-bold text-amber-800">{{ tr("Achievement.phan_thuong") }}</div>
               <div class="flex justify-center">
                 <Cash :amount="selectedBadge.reward.cash" />
               </div>
@@ -363,10 +381,10 @@ function clearFilters() {
               v-if="selectedBadge.is_earned"
               class="mb-0 mt-4 inline-flex rounded-full bg-emerald-100 px-3 py-1.5 text-xs font-bold text-emerald-900"
             >
-              {{ tr('Achievement.dat_2') }} {{ selectedBadge.quantity }} {{ tr('Achievement.lan') }}
+              {{ tr("Achievement.dat_2") }} {{ selectedBadge.quantity }} {{ tr("Achievement.lan") }}
             </div>
             <div v-else class="mb-0 mt-4 inline-flex rounded-full bg-white px-3 py-1.5 text-xs font-bold text-gray-500">
-              {{ tr('Achievement.chua_mo_khoa') }}
+              {{ tr("Achievement.chua_mo_khoa") }}
             </div>
             <div v-if="selectedBadge.can_claim" class="mt-4">
               <button
@@ -375,11 +393,15 @@ function clearFilters() {
                 :disabled="!!badgesStore.claimingId"
                 @click="badgesStore.claimReward(selectedBadge.badge_id)"
               >
-                {{ badgesStore.claimingId === selectedBadge.badge_id ? tr('FishingPassRewards.dang_nhan') : tr('DailyAttendance.nhan_thuong') }}
+                {{
+                  badgesStore.claimingId === selectedBadge.badge_id
+                    ? tr("FishingPassRewards.dang_nhan")
+                    : tr("DailyAttendance.nhan_thuong")
+                }}
               </button>
             </div>
             <div v-else-if="selectedBadge.is_claim" class="mb-0 mt-3 text-xs font-semibold text-[#617265]">
-              {{ tr('Achievement.da_nhan_thuong') }}
+              {{ tr("Achievement.da_nhan_thuong") }}
             </div>
             <div v-if="badgesStore.claimError" role="alert" class="mb-0 mt-3 text-xs text-red-700">
               {{ badgesStore.claimError }}

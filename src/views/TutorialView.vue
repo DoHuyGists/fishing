@@ -3,7 +3,7 @@ import { t as tr } from "../i18n";
 
 import { computed, type Component } from "vue";
 import { useRoute } from "vue-router";
-import NewPlayerFishing from "../components/player/tutorial/NewPlayerFishing.vue";
+import NewPlayerFishing from "../components/player/player-tutorial/NewPlayerFishing.vue";
 import { useFeatureAvailabilityStore } from "../stores/featureAvailability";
 
 const route = useRoute();

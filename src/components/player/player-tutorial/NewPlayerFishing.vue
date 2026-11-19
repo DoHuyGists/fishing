@@ -3,8 +3,8 @@ import { t as tr } from "../../../i18n";
 
 import { onBeforeUnmount, onMounted } from "vue";
 import { useRouter } from "vue-router";
-import FishingScene from "../fishing/FishingScene.vue";
-import TensionChallenge from "../fishing-challenge/TensionChallenge.vue";
+import FishingScene from "../player-fishing/FishingScene.vue";
+import TensionChallenge from "../player-fishing-challenge/TensionChallenge.vue";
 import GuideTour from "../../shared/GuideTour.vue";
 import { useNewPlayerFishingStore } from "../../../stores/tutorials/newPlayerFishing";
 import { useTutorialSessionStore } from "../../../stores/tutorialSession";

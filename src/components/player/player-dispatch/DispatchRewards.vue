@@ -1,9 +1,9 @@
 <script setup lang="ts">
 import { t as tr } from '../../../i18n';
 import type { DispatchRewards } from '../../../types/table/dispatch';
-import Cash from '../currency/Cash.vue';
-import Shells from '../currency/Shells.vue';
-import Tickets from '../currency/Tickets.vue';
+import Cash from '../player-currency/Cash.vue';
+import Shells from '../player-currency/Shells.vue';
+import Tickets from '../player-currency/Tickets.vue';
 defineProps<{ rewards: DispatchRewards }>();
 </script>
 

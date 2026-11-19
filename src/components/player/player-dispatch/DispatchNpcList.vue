@@ -2,8 +2,8 @@
 import { t as tr } from '../../../i18n';
 import { dispatchEligible, dispatchText } from '../../../data/dispatch';
 import { useDispatchStore } from '../../../stores/dispatch';
-import Cash from '../currency/Cash.vue';
-import Shells from '../currency/Shells.vue';
+import Cash from '../player-currency/Cash.vue';
+import Shells from '../player-currency/Shells.vue';
 const store = useDispatchStore();
 const owned = (id: string) => store.owned.find(o => o.npc_id === id);
 const busy = (id: string) => store.runs.some(r => r.owned_npc_id === owned(id)?.id);

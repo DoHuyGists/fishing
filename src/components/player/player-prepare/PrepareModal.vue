@@ -8,7 +8,6 @@ import { supabaseEquipmentRepository } from "../../../data/supabaseEquipmentRepo
 import { equipmentCategories } from "../../../data/equipmentCatalog.ts";
 import type { FishingTool } from "../../../stores/fishing.ts";
 import type { EquipmentSet } from "../../../stores/equipment.ts";
-import UserTurn from "../stamina/UserTurn.vue";
 import { useUserTurnsStore } from "../../../stores/userTurns.ts";
 import { supabaseUserInAreaRepository } from "../../../data/supabaseUserInAreaRepository.ts";
 import { useToast } from "../../../composables/useToast.ts";
@@ -16,14 +15,14 @@ import { useRouter } from "vue-router";
 import { useWorldStore } from "../../../stores/worldMap.ts";
 import Modal from "../../shared/Modal.vue";
 import { useModalStore } from "../../../stores/modal.ts";
-import WeatherSection from "../fishing/WeatherSection.vue";
-import FishingFatigue from "../fishing/FishingFatigue.vue";
+import WeatherSection from "../player-fishing/WeatherSection.vue";
+import FishingFatigue from "../player-fishing/FishingFatigue.vue";
 import { useDiaryStore } from "../../../stores/diary.ts";
 import PrepareLakeFish from "./PrepareLakeFish.vue";
 import PrepareEquipmentSets from "./PrepareEquipmentSets.vue";
 import PrepareBodyEquipmentSets from "./PrepareBodyEquipmentSets.vue";
-import FishingEquipmentOverview from "../inventory/fishing-equipment/FishingEquipmentOverview.vue";
-import HealthOverview from "../inventory/body-equipment/HealthOverview.vue";
+import FishingEquipmentOverview from "../player-inventory/fishing-equipment/FishingEquipmentOverview.vue";
+import HealthOverview from "../player-inventory/body-equipment/HealthOverview.vue";
 import { useHealthStore } from "../../../stores/health.ts";
 
 const worldStore = useWorldStore();

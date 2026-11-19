@@ -2,7 +2,7 @@
 import { t as tr } from '../../../i18n';
 import { dispatchText } from '../../../data/dispatch';
 import { useDispatchStore } from '../../../stores/dispatch';
-import Cash from '../currency/Cash.vue';
+import Cash from '../player-currency/Cash.vue';
 const store = useDispatchStore();
 </script>
 

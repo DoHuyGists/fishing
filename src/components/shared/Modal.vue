@@ -5,12 +5,12 @@ import { computed, onMounted, onUnmounted, ref, watch } from "vue";
 import { useModalStore } from "../../stores/modal.ts";
 import { useCurrencyStore } from "../../stores/currency.ts";
 import { useUserProfileStore } from "../../stores/userProfile.ts";
-import Cash from "../player/currency/Cash.vue";
-import SkillPoints from "../player/currency/SkillPoints.vue";
+import Cash from "../player/player-currency/Cash.vue";
+import SkillPoints from "../player/player-currency/SkillPoints.vue";
 import GuideTour from "./GuideTour.vue";
-import UserTurn from "../player/stamina/UserTurn.vue";
-import Shells from "../player/currency/Shells.vue";
-import Tickets from "../player/currency/Tickets.vue";
+import UserTurn from "../player/player-stamina/UserTurn.vue";
+import Shells from "../player/player-currency/Shells.vue";
+import Tickets from "../player/player-currency/Tickets.vue";
 import { useReadCacheStore } from '../../stores/readCache';
 
 defineOptions({ inheritAttrs: false });

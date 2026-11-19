@@ -6,9 +6,7 @@
       >
         <ListItems />
       </div>
-      <div
-        class="flex min-h-0 w-full flex-1 flex-col items-center justify-center gap-4 overflow-y-auto lg:w-1/2"
-      >
+      <div class="flex min-h-0 w-full flex-1 flex-col items-center justify-center gap-4 overflow-y-auto lg:w-1/2">
         <SpinWheel
           :rewards="eligibleRewards"
           :fetch-reward-index="fetchRewardIndex"
@@ -21,17 +19,19 @@
         />
         <div class="text-center text-sm">
           <div v-if="spinWheelStore.season" class="font-semibold">{{ spinWheelStore.season.name }}</div>
-          <span v-if="spinWheelStore.loading">{{ tr('SpinWheelModal.dang_tai_mua_quay') }}</span>
+          <span v-if="spinWheelStore.loading">{{ tr("SpinWheelModal.dang_tai_mua_quay") }}</span>
           <span v-else-if="spinWheelStore.error" role="alert">{{ spinWheelStore.error }}</span>
-          <span v-else-if="!spinWheelStore.season">{{ tr('ListItems.chua_co_mua_quay_dang_dien_ra') }}</span>
-          <span v-else-if="!eligibleRewards.length">{{ tr('SpinWheelModal.mua_quay_chua_co_phan_thuong') }}</span>
-          <span v-else>{{ eligibleRewards.length }} {{ tr('SpinWheelModal.vat_pham_trong_vong_quay') }}</span>
+          <span v-else-if="!spinWheelStore.season">{{ tr("ListItems.chua_co_mua_quay_dang_dien_ra") }}</span>
+          <span v-else-if="!eligibleRewards.length">{{ tr("SpinWheelModal.mua_quay_chua_co_phan_thuong") }}</span>
+          <span v-else>{{ eligibleRewards.length }} {{ tr("SpinWheelModal.vat_pham_trong_vong_quay") }}</span>
         </div>
         <div class="flex items-center gap-2 text-xs">
-          <span>{{ tr('SpinWheelModal.chi_phi_moi_luot_quay') }}</span>
+          <span>{{ tr("SpinWheelModal.chi_phi_moi_luot_quay") }}</span>
           <Tickets :amount="1" />
         </div>
-        <div v-if="currencyStore.tickets < 1" class="text-sm text-amber-800">{{ tr('SpinWheelModal.ban_can_it_nhat_1_ve_de_quay') }}</div>
+        <div v-if="currencyStore.tickets < 1" class="text-sm text-amber-800">
+          {{ tr("SpinWheelModal.ban_can_it_nhat_1_ve_de_quay") }}
+        </div>
       </div>
     </div>
   </Modal>
@@ -46,14 +46,21 @@ import { useCurrencyStore } from "../../../stores/currency.ts";
 import ListItems from "./ListItems.vue";
 import SpinWheel from "./SpinWheel.vue";
 import Modal from "../../shared/Modal.vue";
-import Tickets from "../currency/Tickets.vue";
+import Tickets from "../player-currency/Tickets.vue";
 
 const spinWheelStore = useSpinWheelStore();
 const currencyStore = useCurrencyStore();
 const isSpinning = ref(false);
 const viewportWidth = ref(window.innerWidth);
 const eligibleRewards = computed(() => spinWheelStore.rewardList);
-const canSpin = computed(() => !spinWheelStore.loading && !spinWheelStore.error && !!spinWheelStore.season && eligibleRewards.value.length > 0 && currencyStore.tickets >= 1);
+const canSpin = computed(
+  () =>
+    !spinWheelStore.loading &&
+    !spinWheelStore.error &&
+    !!spinWheelStore.season &&
+    eligibleRewards.value.length > 0 &&
+    currencyStore.tickets >= 1,
+);
 const wheelSize = computed(() => (viewportWidth.value < 640 ? 200 : viewportWidth.value < 1024 ? 340 : 480));
 
 function updateViewportWidth() {
@@ -73,9 +80,8 @@ async function fetchRewardIndex(): Promise<number> {
   const itemId = await spinWheelStore.claimRandomItem();
   const index = eligibleRewards.value.findIndex((reward) => String(reward.id) === itemId);
   if (index === -1) {
-    throw new Error(tr('SpinWheelModal.khong_tim_thay_vat_pham_tuong_ung_voi_item_id_tra_ve'));
+    throw new Error(tr("SpinWheelModal.khong_tim_thay_vat_pham_tuong_ung_voi_item_id_tra_ve"));
   }
   return index;
 }
-
 </script>

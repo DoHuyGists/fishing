@@ -6,7 +6,7 @@ import { computed, ref, watch } from 'vue'
 import { useAquacultureStore } from '../../../stores/aquaculture'
 
 import { formatDuration } from './pondPresentation'
-import Cash from '../currency/Cash.vue'
+import Cash from '../player-currency/Cash.vue'
 
 const farm = useAquacultureStore()
 const speciesId = ref('')

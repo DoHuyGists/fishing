@@ -4,7 +4,7 @@ import { dispatchText } from '../../../data/dispatch';
 import { formatDateTime } from '../../../utils/time';
 import { useDispatchStore } from '../../../stores/dispatch';
 import Pagination from '../../shared/Pagination.vue';
-import Cash from '../currency/Cash.vue';
+import Cash from '../player-currency/Cash.vue';
 import DispatchRewards from './DispatchRewards.vue';
 const store = useDispatchStore();
 </script>

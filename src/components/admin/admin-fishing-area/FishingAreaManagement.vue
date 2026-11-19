@@ -4,7 +4,7 @@ import Pagination from '../../shared/Pagination.vue';
 import { usePagedListFilters } from '../../../composables/usePagedListFilters';
 import { computed, ref, watch } from "vue";
 import { mapData } from "../../../data/map.ts";
-import InteractWorldMap2 from "../../player/world-map/InteractWorldMap.vue";
+import InteractWorldMap2 from "../../player/player-world-map/InteractWorldMap.vue";
 import { useAdminFishingAreaStore } from "./admin-fishing-area-store.ts";
 import FishingAreaManagementForm from "./FishingAreaManagementForm.vue";
 import { useWorldStore } from "../../../stores/worldMap.ts";

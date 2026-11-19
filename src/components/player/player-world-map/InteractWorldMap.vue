@@ -12,7 +12,7 @@ import { useAuthStore } from "../../../stores/auth.ts";
 import { useDayPhaseClock } from "../../../composables/useDayPhaseClock";
 import { useToast } from "../../../composables/useToast.ts";
 import FishingAnchor from "./FishingAnchor.vue";
-import FishingFatigue from "../fishing/FishingFatigue.vue";
+import FishingFatigue from "../player-fishing/FishingFatigue.vue";
 import { useModalStore } from "../../../stores/modal.ts";
 import { useCountryStore } from "../../../stores/country.ts";
 import { useFeatureAvailabilityStore } from "../../../stores/featureAvailability";

@@ -9,9 +9,9 @@ import { useCurrencyStore } from "../../../stores/currency";
 import { useToast } from "../../../composables/useToast";
 
 import PaymentConfirmation from "../../shared/PaymentConfirmation.vue";
-import Cash from "../currency/Cash.vue";
-import Shells from "../currency/Shells.vue";
-import Tickets from "../currency/Tickets.vue";
+import Cash from "../player-currency/Cash.vue";
+import Shells from "../player-currency/Shells.vue";
+import Tickets from "../player-currency/Tickets.vue";
 
 useGameCatalogRefresh(['rates']);
 
