@@ -1,10 +1,10 @@
 import { defineStore } from 'pinia';
-import { supabaseStoryRepository as repository } from '../data/supabaseStoryRepository';
-import { storyDemo } from '../data/storyDemo';
-import { copyStory, createStoryNode, parseStory, storyText, validateStory } from '../utils/story';
-import { createUuid } from '../utils/uuid';
-import type { StoryScript } from '../types/model/story';
-import type { StoryAsset, StoryDraftRow, StoryDraftSummary } from '../types/table/story';
+import { supabaseStoryRepository as repository } from '../../../data/supabaseStoryRepository';
+import { storyDemo } from '../../../data/storyDemo';
+import { copyStory, createStoryNode, parseStory, storyText, validateStory } from '../../../utils/story';
+import { createUuid } from '../../../utils/uuid';
+import type { StoryScript } from '../../../types/model/story';
+import type { StoryAsset, StoryDraftRow, StoryDraftSummary } from '../../../types/table/story';
 
 export const useStoryEditorStore = defineStore('storyEditor', {
   state: () => ({ draft: null as StoryScript | null, rows: [] as StoryDraftSummary[], assets: [] as StoryAsset[], mediaBusy: false, selectedId: '', revision: 0, publishedVersion: null as number | null, enabled: false, sortOrder: 0, busy: false, error: '', notice: '', baseline: '', owner: '', dragId: '', panel: 'node' as 'node' | 'script' | 'assets', restored: false }),

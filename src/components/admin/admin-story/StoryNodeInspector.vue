@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { useStoryEditorStore } from '../../../stores/storyEditor';
+import { useStoryEditorStore } from './admin-story-editor-store';
 import { createUuid } from '../../../utils/uuid';
 import { storyAnimations, storyEffects, storyExpressions, storyText } from '../../../utils/story';
 import type { CharacterState } from '../../../types/model/story';

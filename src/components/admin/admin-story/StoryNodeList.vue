@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { useStoryEditorStore } from '../../../stores/storyEditor';
+import { useStoryEditorStore } from './admin-story-editor-store';
 import { localStoryText } from '../../../utils/story';
 const editor = useStoryEditorStore();
 const emit = defineEmits<{ remove: [] }>();

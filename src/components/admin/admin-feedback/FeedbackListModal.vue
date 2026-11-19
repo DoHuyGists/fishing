@@ -2,7 +2,7 @@
 import AdminModal from "../AdminModal.vue";
 import Pagination from "../../shared/Pagination.vue";
 import { onMounted } from "vue";
-import { useFeedbackListStore } from "../../../stores/feedbackList.ts";
+import { useFeedbackListStore } from "./admin-feedback-list-store.ts";
 
 const emit = defineEmits<{ close: [] }>();
 const store = useFeedbackListStore();

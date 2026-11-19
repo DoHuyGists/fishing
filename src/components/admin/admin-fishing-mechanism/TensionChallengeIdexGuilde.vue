@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import Tab from "../../shared/Tab.vue";
 import Hint from "../../shared/Hint.vue";
-import { useAdminGuideStore } from "../../../stores/adminGuide.ts";
+import { useAdminGuideStore } from "./admin-guide-store.ts";
 import { formatGuideNumber as number, tensionGuidePresets } from "../../../data/tensionChallengeGuide.ts";
 
 const guide = useAdminGuideStore();

@@ -49,7 +49,7 @@ test('playback requires explicit choices, preserves visited log and resumes with
 test('editor node edits preserve explicit graph and imports get a new chapter identity', async () => {
   setActivePinia(createPinia());
   const row = { id: storyDemo.id, draft: clone(storyDemo), revision: 2, published_version: 1, enabled: true, sort_order: 5 };
-  const { useStoryEditorStore } = load('src/stores/storyEditor.ts', { pinia: { defineStore }, '../data/supabaseStoryRepository': { supabaseStoryRepository: { draft: async () => row } }, '../data/storyDemo': { storyDemo }, '../utils/story': utils, '../utils/uuid': { createUuid: randomUUID } });
+  const { useStoryEditorStore } = load('src/components/admin/admin-story/admin-story-editor-store.ts', { pinia: { defineStore }, '../../../data/supabaseStoryRepository': { supabaseStoryRepository: { draft: async () => row } }, '../../../data/storyDemo': { storyDemo }, '../../../utils/story': utils, '../../../utils/uuid': { createUuid: randomUUID } });
   const editor = useStoryEditorStore(); editor.newScript(true);
   assert.notEqual(editor.draft.id, storyDemo.id);
   const first = editor.draft.nodes[0], second = editor.draft.nodes[1];

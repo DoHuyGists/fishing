@@ -3,7 +3,7 @@ import { t as tr } from "../i18n";
 
 import { computed, defineAsyncComponent, ref } from "vue";
 import { useRoute } from "vue-router";
-import { useAdminGuideStore } from "../stores/adminGuide";
+import { useAdminGuideStore } from "../components/admin/admin-fishing-mechanism/admin-guide-store";
 
 const guideStore = useAdminGuideStore();
 const AdminGuideModal = defineAsyncComponent(

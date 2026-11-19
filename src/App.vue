@@ -11,7 +11,7 @@ import { useModalStore } from "./stores/modal";
 import { modalFeatures } from "./data/featureAvailability";
 import ConfettiCannon from "./components/shared/ConfettiCannon.vue";
 import { useStoryStore } from './stores/story';
-import { useStoryEditorStore } from './stores/storyEditor';
+import { useStoryEditorStore } from './components/admin/admin-story/admin-story-editor-store';
 
 useLocaleStore();
 const auth = useAuthStore();

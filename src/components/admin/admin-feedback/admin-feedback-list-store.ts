@@ -1,7 +1,7 @@
-import type { OpinionFeedbackRow } from "../types/table/feedback";
-import { t as tr } from "../i18n";
+import type { OpinionFeedbackRow } from "../../../types/table/feedback";
+import { t as tr } from "../../../i18n";
 import { defineStore } from "pinia";
-import { supabaseFeedbackRepository } from "../data/supabaseFeedbackRepository";
+import { supabaseFeedbackRepository } from "../../../data/supabaseFeedbackRepository";
 
 export const useFeedbackListStore = defineStore("feedback-list", {
   state: () => ({

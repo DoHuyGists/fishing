@@ -27,7 +27,7 @@ const server = await createServer({ configFile: false, envDir: false, appType: '
         import AdminView from '/src/views/AdminView.vue';
         import { useStoryStore } from '/src/stores/story.ts';
         import { useStoryPlaybackStore } from '/src/stores/storyPlayback.ts';
-        import { useStoryEditorStore } from '/src/stores/storyEditor.ts';
+        import { useStoryEditorStore } from '/src/components/admin/admin-story/admin-story-editor-store.ts';
         import { useAuthStore } from '/src/stores/auth.ts';
         import { useFeatureAvailabilityStore } from '/src/stores/featureAvailability.ts';
         import { supabaseStoryRepository as repository } from '/src/data/supabaseStoryRepository.ts';

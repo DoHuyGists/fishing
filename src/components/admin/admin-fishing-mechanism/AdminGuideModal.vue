@@ -2,7 +2,7 @@
 import { onBeforeUnmount, onMounted, ref } from "vue";
 import AdminModal from "../AdminModal.vue";
 import Tab from "../../shared/Tab.vue";
-import { useAdminGuideStore } from "../../../stores/adminGuide.ts";
+import { useAdminGuideStore } from "./admin-guide-store.ts";
 import EquipmentGuide from "./EquipmentGuide.vue";
 import TensionChallengeIdexGuilde from "./TensionChallengeIdexGuilde.vue";
 

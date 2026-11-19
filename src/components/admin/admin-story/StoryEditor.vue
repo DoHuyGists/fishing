@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { computed, onMounted, onUnmounted, ref, watch } from "vue";
 import { useRouter } from "vue-router";
-import { useStoryEditorStore } from "../../../stores/storyEditor.ts";
+import { useStoryEditorStore } from "./admin-story-editor-store.ts";
 import { useStoryStore } from "../../../stores/story.ts";
 import { useAuthStore } from "../../../stores/auth.ts";
 import { copyStory, localStoryText, parseStory } from "../../../utils/story.ts";
