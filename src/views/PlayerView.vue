@@ -6,7 +6,7 @@ import { useAuthStore } from "../stores/auth.ts";
 import { useCaughtStore } from "../stores/player-caught-store.ts";
 import { useModalStore } from "../stores/player-modal-store.ts";
 import { useNotificationStore } from "../stores/player-notification-store.ts";
-import LatestCaughtList from "../components/player/player-caught/LatestCaughtList.vue";
+import LatestCaughtList from "../components/player/player-world-map/LatestCaughtList.vue";
 import { useConfigStore } from "../stores/player-config-store.ts";
 import { useUserTurnsStore } from "../stores/player-user-turns-store.ts";
 import { useTeamStore } from "../stores/player-team-store.ts";
@@ -23,7 +23,6 @@ import FeatureTable from "../components/player/player-world-map/FeatureTable.vue
 import GuideTour from "../components/shared/GuideTour.vue";
 import { useOnboardingStore } from "../stores/player-onboarding-store.ts";
 import { useFeatureAvailabilityStore } from "../stores/player-feature-availability-store.ts";
-import FishingSplash from "../components/player/player-fishing/FishingSplash.vue";
 
 const InteractWorldMap2 = defineAsyncComponent(
   () => import("../components/player/player-world-map/InteractWorldMap.vue"),
@@ -209,7 +208,6 @@ onUnmounted(() => {
       <div class="grid grid-cols-1 md:grid-cols-2 gap-2">
         <div class="slide-fade-in from-top-right">
           <LatestCaughtList />
-          <FishingSplash class="h-[480px]" :intensity="1.2" :hook-x="0.5" :hook-y="0.6" />
         </div>
         <div class="slide-fade-in from-right">
           <FeatureTable />

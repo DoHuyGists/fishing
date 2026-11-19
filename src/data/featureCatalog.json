@@ -324,6 +324,7 @@
     "labelKey": "Achievement.huy_hieu",
     "rpcs": [
       "get_user_badges_status",
+      "get_user_badges_page",
       "claim_badge_reward"
     ],
     "tables": [],

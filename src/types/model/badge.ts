@@ -1,3 +1,13 @@
+import type { ListPage } from "./pagination";
+
+export type BadgeStatusFilter = "all" | "earned" | "unearned" | "claimable";
+
+export interface BadgeListPage extends ListPage<UserBadgeStatus> {
+  collectionTotal: number;
+  earnedTotal: number;
+  types: string[];
+}
+
 export interface UserBadgeStatus {
   badge_id: string;
   name: string;

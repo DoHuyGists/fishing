@@ -17,6 +17,7 @@ const rod = ref<InstanceType<typeof FishingRod> | null>(null);
 const rodHolder = ref<HTMLElement | null>(null);
 const rodReference = ref<HTMLElement | null>(null);
 const restingRod = ref({ x: 100, y: 100 });
+const sceneSize = ref({ width: 0, height: 0 });
 let retrieveAnimation: Animation | undefined;
 
 watch(
@@ -51,6 +52,16 @@ const isFighting = computed(() => sceneState.value.castPhase === "bite" && scene
 // Keep the bite pose while the server starts the challenge.
 const isStartingFight = computed(() => sceneState.value.castPhase === "submitting"
   && sceneState.value.tensionStartedAt === null && sceneState.value.tensionFight?.result === "fighting");
+const fishBite = computed(() => (sceneState.value.castPhase === "bite" || isStartingFight.value)
+  && sceneState.value.tensionFight?.result === "fighting");
+const biteIntensity = computed(() => {
+  const { tensionFight: fight, tensionChallenge: challenge } = sceneState.value;
+  if (!fishBite.value || !fight || !challenge) return 1;
+  const stamina = Math.min(1, Math.max(0, fight.stamina / TENSION_SCALE));
+  const load = Math.min(1, Math.max(0, fight.tension / TENSION_SCALE / challenge.config.maxTension));
+  const burst = fight.burst > 0 && fight.burstLeft > 0 ? 0.4 : 0;
+  return Math.min(2, Math.max(0.5, 0.5 + stamina * 0.7 + load * 0.4 + burst));
+});
 const castClass = computed(() => `phase-${isFighting.value ? "fighting" : isStartingFight.value ? "bite" : sceneState.value.castPhase}`);
 const floatSide = computed<-1 | 1>(() => sceneState.value.baitPosition.x < restingRod.value.x ? -1 : 1);
 const rodAngle = computed(() => {
@@ -96,6 +107,14 @@ const floatPosition = computed(() => {
     y: castOrigin.y + (target.y - castOrigin.y) * progress - Math.sin(progress * Math.PI) * arcHeight,
   };
 });
+const buoyFrame = computed(() => {
+  const dx = (fishingRod.value.x - floatPosition.value.x) * sceneSize.value.width / 100;
+  const dy = (fishingRod.value.y - floatPosition.value.y) * sceneSize.value.height / 100;
+  // Keep the float centered and include the actual rod tip inside the bite canvas.
+  const width = fishBite.value ? Math.max(200, Math.abs(dx) * 2 + 40) : 200;
+  const height = fishBite.value ? Math.max(200, Math.abs(dy) * 2 + 40) : 200;
+  return { width, height, anchorX: 0.5 + dx / width, anchorY: 0.5 + dy / height };
+});
 const linePath = computed(() => {
   const { x: endX, y: endY } = floatPosition.value;
   const { x: rodX, y: rodY } = fishingRod.value;
@@ -133,6 +152,9 @@ function updateRodPosition(tip = rod.value?.getTipPosition()) {
 
   const sceneBounds = sceneElement.value.getBoundingClientRect();
   if (!sceneBounds.width || !sceneBounds.height) return;
+  if (sceneSize.value.width !== sceneBounds.width || sceneSize.value.height !== sceneBounds.height) {
+    sceneSize.value = { width: sceneBounds.width, height: sceneBounds.height };
+  }
   // This reference keeps the resting pose, independent of flex and player input.
   const referenceBounds = rodReference.value?.getBoundingClientRect();
   if (referenceBounds) restingRod.value = {
@@ -209,6 +231,7 @@ function castAt(event: MouseEvent) {
       :style="{ left: `${sceneState.baitPosition.x}%`, top: `${sceneState.baitPosition.y}%` }"
     ></div>
     <svg
+      v-show="!fishBite"
       class="casting-line"
       :class="castClass"
       viewBox="0 0 100 100"
@@ -224,9 +247,19 @@ function castAt(event: MouseEvent) {
       :style="{
         left: `${floatPosition.x}%`,
         top: `${floatPosition.y}%`,
+        width: `${buoyFrame.width}px`,
+        height: `${buoyFrame.height}px`,
       }"
     >
-      <BobbingBuoy :size="13" :clickable="false" ripple-color="rgba(255, 255, 255, 0.8)" />
+      <BobbingBuoy
+        :size="13"
+        :clickable="false"
+        :fish-bite="fishBite"
+        :bite-intensity="biteIntensity"
+        :line-anchor-x="buoyFrame.anchorX"
+        :line-anchor-y="buoyFrame.anchorY"
+        ripple-color="rgba(255, 255, 255, 0.8)"
+      />
     </div>
     <div class="rod-reference" aria-hidden="true">
       <span ref="rodReference" class="rod-reference-point"></span>
@@ -350,10 +383,6 @@ function castAt(event: MouseEvent) {
 .bait-float.phase-bite,
 .bait-float.phase-fighting {
   transform: translate(-50%, -50%);
-}
-
-.bait-float.phase-bite {
-  animation: bite-bob 0.24s linear infinite;
 }
 
 .rod-holder,
@@ -481,12 +510,6 @@ function castAt(event: MouseEvent) {
 
   100% {
     transform: rotate(-27deg);
-  }
-}
-
-@keyframes bite-bob {
-  50% {
-    transform: translate(-50%, -50%) scale(1.3);
   }
 }
 

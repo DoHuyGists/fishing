@@ -1,6 +1,6 @@
 <script lang="ts" setup>
 import { computed } from "vue";
-import { getFormattingLocale, t as tr } from "../../../i18n";
+import { getFormattingLocale, t as tr } from "../../../i18n/index.ts";
 import { useCaughtStore } from "../../../stores/player-caught-store.ts";
 import Tab from "../../shared/Tab.vue";
 

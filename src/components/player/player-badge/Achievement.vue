@@ -2,49 +2,32 @@
 import { t as tr } from "../../../i18n";
 
 import { computed, onMounted, ref } from "vue";
+import { storeToRefs } from "pinia";
+import { usePagedListFilters } from "../../../composables/usePagedListFilters";
+import Pagination from "../../shared/Pagination.vue";
 import { useBadgesStore } from "../../../stores/player-badges-store.ts";
 import Modal from "../../shared/Modal.vue";
 import Cash from "../player-currency/Cash.vue";
 
 const badgesStore = useBadgesStore();
 const selectedBadgeId = ref<string | null>(null);
-const searchQuery = ref("");
-const selectedType = ref("all");
-const statusFilter = ref<"all" | "earned" | "unearned" | "claimable">("all");
+const { searchQuery, selectedType, statusFilter, badgeTypes, completion } = storeToRefs(badgesStore);
 
 function loadBadges() {
   return badgesStore.fetchBadges();
 }
 
 onMounted(loadBadges);
+usePagedListFilters(
+  [searchQuery, selectedType, statusFilter],
+  () => { void badgesStore.fetchBadges(1); },
+  () => {
+    selectedBadgeId.value = null;
+    badgesStore.invalidateRequest();
+  },
+);
 
-const earnedBadges = computed(() => badgesStore.earnedBadges);
 const selectedBadge = computed(() => badgesStore.badges.find((badge) => badge.badge_id === selectedBadgeId.value));
-const completion = computed(() =>
-  badgesStore.badges.length ? Math.round((earnedBadges.value.length / badgesStore.badges.length) * 100) : 0,
-);
-const badgeTypes = computed(() =>
-  [
-    ...new Set(badgesStore.badges.map((badge) => badge.type?.trim()).filter((type): type is string => Boolean(type))),
-  ].sort((a, b) => a.localeCompare(b)),
-);
-const filteredBadges = computed(() => {
-  const query = searchQuery.value.trim().toLocaleLowerCase("vi");
-
-  return badgesStore.badges.filter((badge) => {
-    const matchesQuery =
-      !query ||
-      [badge.name, badge.description, badge.type].some((value) => value?.toLocaleLowerCase("vi").includes(query));
-    const matchesType = selectedType.value === "all" || badge.type?.trim() === selectedType.value;
-    const matchesStatus =
-      statusFilter.value === "all" ||
-      (statusFilter.value === "earned" && badge.is_earned) ||
-      (statusFilter.value === "unearned" && !badge.is_earned) ||
-      (statusFilter.value === "claimable" && badge.can_claim);
-
-    return matchesQuery && matchesType && matchesStatus;
-  });
-});
 
 function closeDetail() {
   selectedBadgeId.value = null;
@@ -81,9 +64,6 @@ function clearFilters() {
             >
               {{ tr("Achievement.bo_suu_tap_huy_hieu") }}
             </div>
-            <div class="m-0 mt-0.5 hidden max-w-md text-xs leading-relaxed text-[#617265] sm:block">
-              {{ tr("Achievement.moi_huy_hieu_la_mot_dau_an_tren_hanh_trinh_chinh_phuc_nhung_vung") }}
-            </div>
           </div>
           <div
             class="flex shrink-0 items-center gap-2 rounded-xl border border-white/80 bg-white/75 px-2.5 py-1.5 shadow-sm backdrop-blur sm:gap-3 sm:px-3 sm:py-2"
@@ -95,8 +75,8 @@ function clearFilters() {
             >
             <div>
               <div class="m-0 text-sm font-black leading-tight text-[#24352a] sm:text-base">
-                {{ earnedBadges.length
-                }}<span class="text-xs font-semibold text-gray-400"> / {{ badgesStore.badges.length }}</span>
+                {{ badgesStore.earnedTotal
+                }}<span class="text-xs font-semibold text-gray-400"> / {{ badgesStore.collectionTotal }}</span>
               </div>
               <div class="m-0 text-[9px] font-bold uppercase tracking-wide text-gray-500 sm:text-[10px]">
                 {{ tr("Achievement.da_suu_tam") }}
@@ -105,7 +85,7 @@ function clearFilters() {
           </div>
         </div>
 
-        <div v-if="badgesStore.badges.length" class="relative mt-3 flex items-center gap-2 sm:mt-4 sm:gap-3">
+        <div v-if="badgesStore.collectionTotal" class="relative mt-3 flex items-center gap-2 sm:mt-4 sm:gap-3">
           <div class="h-1.5 flex-1 overflow-hidden rounded-full bg-emerald-950/10">
             <div
               class="h-full rounded-full bg-linear-to-r from-emerald-600 to-teal-400 transition-[width] duration-700"
@@ -149,7 +129,7 @@ function clearFilters() {
               :aria-pressed="statusFilter === 'earned'"
               @click="statusFilter = 'earned'"
             >
-              {{ tr("Achievement.da_dat") }} {{ earnedBadges.length }}
+              {{ tr("Achievement.da_dat") }} {{ badgesStore.earnedTotal }}
             </button>
             <button
               type="button"
@@ -177,7 +157,7 @@ function clearFilters() {
         </div>
       </div>
 
-      <div v-if="badgesStore.badges.length" class="mt-2 flex gap-2 sm:mt-3 sm:gap-3">
+      <div v-if="badgesStore.collectionTotal" class="mt-2 flex gap-2 sm:mt-3 sm:gap-3">
         <label class="relative min-w-0 flex-1">
           <span class="sr-only">{{ tr("Achievement.tim_huy_hieu") }}</span>
           <input
@@ -200,20 +180,20 @@ function clearFilters() {
       </div>
 
       <div
-        v-if="badgesStore.loading && badgesStore.badges.length === 0"
+        v-if="badgesStore.loading"
         class="py-12 text-center text-sm text-gray-500"
       >
         {{ tr("Achievement.dang_tai_bo_suu_tap") }}
       </div>
       <div
-        v-else-if="badgesStore.error && badgesStore.badges.length === 0"
+        v-else-if="badgesStore.error"
         role="alert"
         class="mt-4 rounded-2xl border border-red-200 bg-red-50 p-4 text-sm text-red-700"
       >
         {{ tr("Achievement.khong_the_tai_huy_hieu") }} {{ badgesStore.error }}
       </div>
       <div
-        v-else-if="badgesStore.badges.length === 0"
+        v-else-if="badgesStore.collectionTotal === 0"
         class="mt-4 rounded-2xl border border-dashed border-[#cbd9c6] bg-[#f5f9f0] p-8 text-center"
       >
         <span class="text-4xl" aria-hidden="true">🎣</span>
@@ -225,7 +205,7 @@ function clearFilters() {
         </div>
       </div>
       <div
-        v-else-if="filteredBadges.length === 0"
+        v-else-if="badgesStore.badges.length === 0"
         class="mt-4 rounded-2xl border border-dashed border-[#cbd9c6] bg-[#f5f9f0] p-8 text-center"
       >
         <div class="m-0 text-sm font-bold text-[#24352a]">{{ tr("Achievement.khong_tim_thay_huy_hieu_phu_hop") }}</div>
@@ -242,12 +222,12 @@ function clearFilters() {
       </div>
       <div v-else class="mt-3 sm:mt-4">
         <div class="mb-2 mt-0 text-[10px] text-gray-500 sm:mb-3 sm:text-xs">
-          {{ tr("Achievement.hien_thi") }} {{ filteredBadges.length }} / {{ badgesStore.badges.length }}
+          {{ tr("Achievement.hien_thi") }} {{ badgesStore.badges.length }} / {{ badgesStore.collectionTotal }}
           {{ tr("Achievement.huy_hieu_2") }}
         </div>
         <div class="grid grid-cols-3 gap-1.5 sm:grid-cols-4 sm:gap-2 lg:grid-cols-6 xl:grid-cols-7 2xl:grid-cols-8">
           <button
-            v-for="(badge, index) in filteredBadges"
+            v-for="(badge, index) in badgesStore.badges"
             :key="badge.badge_id"
             type="button"
             class="slide-fade-in from-bottom player-content-in group relative flex min-h-32 cursor-pointer flex-col items-center overflow-hidden rounded-xl border p-1.5 text-center transition duration-300 hover:-translate-y-0.5 hover:shadow-md focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-emerald-700 sm:min-h-36 sm:rounded-2xl sm:p-2"
@@ -325,6 +305,14 @@ function clearFilters() {
           </button>
         </div>
       </div>
+
+      <Pagination
+        :page="badgesStore.page"
+        :total="badgesStore.total"
+        :page-size="badgesStore.pageSize"
+        :loading="badgesStore.loading"
+        @change="badgesStore.fetchBadges($event)"
+      />
 
       <Teleport to="body">
         <div
