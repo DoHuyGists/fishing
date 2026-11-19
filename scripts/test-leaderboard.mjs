@@ -24,7 +24,7 @@ async function load(path) {
   return module.exports;
 }
 dependencies['../types/model/leaderboard'] = await load('src/types/model/leaderboard.ts');
-const { useLeaderboardStore } = await load('src/stores/leaderboard.ts');
+const { useLeaderboardStore } = await load('src/stores/player-leaderboard-store.ts');
 const entry = (id, score, total_caught, bestScore = null) => ({
   id, score, total_caught, display_name: id,
   best_fish: bestScore === null ? null : { name: 'Fish', weight: 2, rarity: 'RARE', score: bestScore },

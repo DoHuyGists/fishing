@@ -2,32 +2,7 @@ import { acceptHMRUpdate, defineStore } from "pinia";
 import { useAuthStore } from "./auth";
 import { supabaseFishRepository } from "../data/supabaseFishRepository";
 import { useReadCacheStore } from "./player-read-cache";
-export interface CaughtFish {
-  id: string;
-  created_at: string;
-  user_id: string;
-  weight: number;
-  is_shiny: boolean;
-  star_rating?: number | null;
-  variant_type: "NORMAL" | "GOLDEN" | "MUTATED";
-  status: string;
-  species: {
-    id: string;
-    name: string;
-    weight: number;
-    image: string | null;
-    rarity: string | null;
-  };
-  origin: {
-    id: string;
-    country: string;
-    name: string;
-    x: number;
-    y: number;
-    location: { x: number; y: number }[];
-    isAvailable: boolean;
-  } | null;
-}
+import type { CaughtFish } from "../types/model/caughtFish";
 
 export const useCaughtStore = defineStore("Caught", {
   state: () => ({
@@ -50,6 +25,30 @@ export const useCaughtStore = defineStore("Caught", {
     storedFishes: (state) => state.caughtFishes.filter((f) => f.status === "normal"),
   },
   actions: {
+    async releaseFish(id: string): Promise<boolean> {
+      const auth = useAuthStore(), generation = auth.sessionGeneration;
+      try {
+        await supabaseFishRepository.deleteCaughtFish(id);
+      } catch (error) {
+        if (auth.sessionGeneration === generation) throw error;
+        return false;
+      }
+      if (auth.sessionGeneration !== generation) return false;
+      this.caughtFishes = this.caughtFishes.filter(fish => fish.id !== id);
+      return true;
+    },
+    async listFishForSale(id: string, price: number): Promise<boolean> {
+      const auth = useAuthStore(), generation = auth.sessionGeneration;
+      try {
+        await supabaseFishRepository.listFishOnMarket(id, price);
+      } catch (error) {
+        if (auth.sessionGeneration === generation) throw error;
+        return false;
+      }
+      if (auth.sessionGeneration !== generation) return false;
+      this.caughtFishes = this.caughtFishes.filter(fish => fish.id !== id);
+      return true;
+    },
     async moveFishes(ids: string[], status: "normal" | "in-net") {
       const auth = useAuthStore(),
         generation = auth.sessionGeneration;
@@ -63,10 +62,9 @@ export const useCaughtStore = defineStore("Caught", {
     async finishFishing() {
       const auth = useAuthStore(),
         generation = auth.sessionGeneration;
-      await supabaseFishRepository.deleteInNetFishes();
+      await supabaseFishRepository.completeFishing();
       if (auth.sessionGeneration !== generation) return;
       this.caughtFishes = this.caughtFishes.filter((f) => f.status !== "in-net");
-      await supabaseFishRepository.completeFishing();
     },
     async loadCaughtFishes(force = false) {
       const authStore = useAuthStore();

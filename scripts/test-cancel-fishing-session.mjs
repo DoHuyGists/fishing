@@ -65,9 +65,9 @@ test('bait retrieval waits for cancellation, allows retries and ignores stale re
     pinia: { defineStore },
     '../i18n': { t: key => key },
     './auth': { useAuthStore: () => ({ userId: 'user-1' }) },
-    './userProfile': { useUserProfileStore: () => ({ fishingNetCapacity: 10 }) },
-    './equipment': {}, './userInArea': {},
-    './dayPhase': { useDayPhaseStore: () => ({ $reset() {} }) },
+    './player-user-profile-store': { useUserProfileStore: () => ({ fishingNetCapacity: 10 }) },
+    './player-equipment-store': {}, './player-user-In-area-store': {},
+    './player-day-phase-store': { useDayPhaseStore: () => ({ $reset() {} }) },
     '../data/supabaseFishRepository': {},
     '../data/supabaseFishingAreaRepository': { supabaseFishingAreaRepository: {
       cancelFishingSession: id => { assert.equal(id, 'session-1'); calls++; return cancel(); },
@@ -78,7 +78,7 @@ test('bait retrieval waits for cancellation, allows retries and ignores stale re
     '../database/connection': {},
     '../data/fishingDepth': {}, '../data/tensionChallenge': {},
   };
-  const source = await readFile(new URL('../src/stores/fishing.ts', import.meta.url), 'utf8');
+  const source = await readFile(new URL('../src/stores/player-fishing-store.ts', import.meta.url), 'utf8');
   const output = ts.transpileModule(source, {
     compilerOptions: { module: ts.ModuleKind.CommonJS, target: ts.ScriptTarget.ES2022 },
   }).outputText;

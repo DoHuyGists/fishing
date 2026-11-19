@@ -1,8 +1,20 @@
 import type { FishDepthPreviewResponse, AreaSpeciesDiaryResponse } from "../types/model/fish";
 import type { CaughtRow, FishingInventoryRow } from "../types/table/fish";
+import type { NearbyCatchRow } from "../types/table/nearbyCatch";
 import supabase from "../database/connection";
 
 class SupabaseFishRepository {
+  // Preserve the existing RLS-visible scope; area-session aggregation is IC-12.
+  async fetchNearbyCatches(userIds: string[]): Promise<NearbyCatchRow[]> {
+    if (!userIds.length) return [];
+    const { data, error } = await supabase
+      .from("caught")
+      .select("user_id, weight, species(name)")
+      .in("user_id", userIds);
+    if (error) throw new Error(error.message);
+    return (data ?? []) as NearbyCatchRow[];
+  }
+
   async fetchAreaSpeciesDiary(): Promise<AreaSpeciesDiaryResponse> {
     const { data, error } = await supabase.rpc("get_area_species_diary");
 
@@ -121,16 +133,13 @@ class SupabaseFishRepository {
 
   async updateCaughtStatus(ids: string[], status: "normal" | "in-net"): Promise<void> {
     if (ids.length === 0) return;
-    await Promise.all(
-      ids.map(async (caughtId) => {
-        const { error } = await supabase.rpc("move_species", {
-          p_caught_id: caughtId,
-          p_status: status,
-        });
+    const { data, error } = await supabase.rpc("move_species", {
+      p_species_ids: ids,
+      p_status: status,
+    });
 
-        if (error) throw new Error(error.message);
-      })
-    );
+    if (error) throw new Error(error.message);
+    if (data?.success === false) throw new Error(data.message);
   }
 
   async deleteInNetFishes(): Promise<void> {

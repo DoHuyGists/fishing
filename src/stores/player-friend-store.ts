@@ -1,15 +1,8 @@
-import type { FriendUserProfile, UserFriend, FriendTab } from "../types/model/friend";
+import type { FriendUserProfile, UserFriend, FriendTab, FriendshipRelation } from "../types/model/friend";
 import { useAuthStore } from './auth';
 import { t as tr } from "../i18n";
 import { defineStore } from "pinia";
 import { supabaseFriendRepository } from "../data/supabaseFriendRepository";
-
-export type FriendshipRelation =
-  | { type: "SELF" }
-  | { type: "ACCEPTED"; record: UserFriend }
-  | { type: "SENT_PENDING"; record: UserFriend }
-  | { type: "RECEIVED_PENDING"; record: UserFriend }
-  | { type: "NONE" };
 
 export const useFriendStore = defineStore("friend", {
   state: () => ({

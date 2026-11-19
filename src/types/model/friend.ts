@@ -1,5 +1,19 @@
 export type FriendTab = "friends" | "received" | "sent" | "discover";
 
+export type FriendDeleteKind = "friend" | "sent_request" | "received_request";
+export interface FriendDeleteTarget {
+  id: string;
+  type: FriendDeleteKind;
+  targetUserId: string;
+}
+
+export type FriendshipRelation =
+  | { type: "SELF" }
+  | { type: "ACCEPTED"; record: UserFriend }
+  | { type: "SENT_PENDING"; record: UserFriend }
+  | { type: "RECEIVED_PENDING"; record: UserFriend }
+  | { type: "NONE" };
+
 export interface FriendListPage {
   profiles: FriendUserProfile[];
   friends: UserFriend[];
@@ -8,13 +22,6 @@ export interface FriendListPage {
 }
 
 export type PlayerProfileSummary = Pick<FriendUserProfile, 'id' | 'level' | 'experience_point' | 'display_name' | 'avatar_url' | 'avatar_path' | 'country_id'>;
-
-export interface FriendListPage {
-  profiles: FriendUserProfile[];
-  friends: UserFriend[];
-  total: number;
-  counts: Record<FriendTab, number>;
-}
 
 export type FriendStatus = "PENDING" | "ACCEPTED" | "REJECTED" | "BLOCKED";
 

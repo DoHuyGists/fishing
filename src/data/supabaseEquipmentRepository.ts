@@ -1,7 +1,7 @@
 import type { EquipmentRow } from "../types/table/equipment";
 import type { EquipmentVariant } from "../types/model/equipment";
 import { t as tr } from "../i18n";
-import type { FishingTool } from "../stores/player-fishing-store";
+import type { FishingTool } from "../types/model/fishing";
 import supabase from "../database/connection";
 
 import type { EquipmentSet } from "../stores/player-equipment-store";

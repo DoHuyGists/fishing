@@ -1,11 +1,12 @@
 <script lang="ts" setup>
+import type { CaughtFish } from "../../../types/model/caughtFish";
 import type { PostProductionSide as Side } from "../../../types/model/postProduction.ts";
 import { t as tr } from "../../../i18n/index.ts";
 
 import { computed, onMounted, reactive, ref } from "vue";
 import Modal from "../../shared/Modal.vue";
 import Hint from "../../shared/Hint.vue";
-import { useCaughtStore, type CaughtFish } from "../../../stores/player-caught-store.ts";
+import { useCaughtStore } from "../../../stores/player-caught-store.ts";
 import { useUserProfileStore } from "../../../stores/player-user-profile-store.ts";
 import { useModalStore } from "../../../stores/player-modal-store.ts";
 import { useToast } from "../../../composables/useToast.ts";
@@ -68,7 +69,7 @@ const panels = computed(() => [
   },
   {
     key: "stored" as Side,
-    title: "Kho",
+    title: tr("PostProduction.kho_ca"),
     total: caughtStore.storedFishes.length,
     capacity: storageCapacity.value,
     fishes: filtered(caughtStore.storedFishes, search.stored),

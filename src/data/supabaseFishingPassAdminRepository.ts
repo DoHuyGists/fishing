@@ -1,14 +1,10 @@
-import supabase from "../../../database/connection";
-import { fetchAdminListPage } from '../../../data/supabaseAdminListRepository';
+import type { FishingPass, FishingPassPayload } from "../types/model/fishingPassAdmin";
+import supabase from "../database/connection";
+import { fetchAdminListPage } from './supabaseAdminListRepository';
 
-export interface FishingPass {
-  id: string; name: string; description: string | null; price: number; totalDays: number;
-  startAt: string; endAt: string; isActive: boolean; createdAt: string;
-}
-export type FishingPassPayload = Omit<FishingPass, "id" | "createdAt">;
 const mapRow = (row: any): FishingPass => ({ id: row.id, name: row.name, description: row.description, price: Number(row.price), totalDays: row.total_days, startAt: row.start_at, endAt: row.end_at, isActive: row.is_active, createdAt: row.created_at });
 const toDb = (payload: FishingPassPayload) => ({ name: payload.name, description: payload.description, price: payload.price, total_days: payload.totalDays, start_at: payload.startAt, end_at: payload.endAt, is_active: payload.isActive });
-export const supabaseFishingPassRepository = {
+export const supabaseFishingPassAdminRepository = {
   async fetchPage(page: number, search: string, status: string) {
     const result = await fetchAdminListPage<any>('fishing_passes', page, search, status === 'all' ? {} : { is_active: status === 'active' });
     return { ...result, items: result.items.map(mapRow) };

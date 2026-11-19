@@ -11,6 +11,7 @@ import type { InventoryClassification } from "../types/model/inventory";
 export const useInventoryStore = defineStore("Inventory", {
   state: () => ({
     items: [] as UserInventory[],
+    inventoryRequest: 0,
     equipmentSets: [] as EquipmentSet[],
     savedEquipmentSets: [] as EquipmentSet[],
     shopItems: [] as ShopItem[],
@@ -103,8 +104,11 @@ export const useInventoryStore = defineStore("Inventory", {
     async setUserInventory(userId: string) {
       const auth = useAuthStore(),
         generation = auth.sessionGeneration;
+      if (auth.user?.id !== userId) return;
+      const request = ++this.inventoryRequest;
       const items = await supabaseUserInventoryRepository.fetchUserInventory(userId);
-      if (auth.user?.id === userId && auth.sessionGeneration === generation) this.items = items;
+      if (request === this.inventoryRequest && auth.user?.id === userId && auth.sessionGeneration === generation)
+        this.items = items;
     },
     async setEquipmentSet() {
       const auth = useAuthStore(),

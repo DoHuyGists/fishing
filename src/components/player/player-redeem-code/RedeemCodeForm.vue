@@ -2,34 +2,15 @@
 import { t as tr } from "../../../i18n";
 
 import { ref } from "vue";
-import supabase from "../../../database/connection.ts";
-import { useToast } from "../../../composables/useToast.ts";
+import { storeToRefs } from "pinia";
+import { useRedeemCodeStore } from "../../../stores/player-redeem-code-store";
 
-const toast = useToast();
+const redeemStore = useRedeemCodeStore();
+const { isSubmitting } = storeToRefs(redeemStore);
 const code = ref("");
-const isSubmitting = ref(false);
 
 async function redeemCode() {
-  const submittedCode = code.value.trim();
-  if (!submittedCode || isSubmitting.value) return;
-
-  isSubmitting.value = true;
-  try {
-    const { data, error } = await supabase.rpc("redeem_code", {
-      p_code: submittedCode,
-    });
-
-    if (error) throw error;
-
-    code.value = "";
-    toast.success(tr('RedeemCodeForm.doi_ma_thanh_cong'));
-    // Keep the returned value available for RPCs that provide a reward message.
-    void data;
-  } catch (error) {
-    toast.error(error instanceof Error ? error.message : tr('RedeemCodeForm.khong_the_doi_ma_vui_long_thu_lai'));
-  } finally {
-    isSubmitting.value = false;
-  }
+  if (await redeemStore.redeem(code.value)) code.value = "";
 }
 </script>
 

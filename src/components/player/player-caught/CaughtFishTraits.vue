@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { t as tr } from "../../../i18n";
-import type { CaughtFish } from "../../../stores/player-caught-store";
+import type { CaughtFish } from "../../../types/model/caughtFish";
 
 defineProps<{ fish: Pick<CaughtFish, "variant_type" | "star_rating" | "is_shiny"> }>();
 </script>

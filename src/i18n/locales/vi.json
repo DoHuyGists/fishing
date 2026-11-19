@@ -978,7 +978,22 @@
     "dang_thu_day": "Đang thu dây",
     "giu_de_thu_day": "Giữ để thu dây"
   },
+  "TheBook": {
+    "open": "Mở sách {title}",
+    "close": "Đóng sách",
+    "previous": "Trang trước",
+    "next": "Trang sau",
+    "spread": "Trang {pages} / {total}",
+    "sample_intro": "{author}\n\nTruyền prop pages để hiển thị nội dung của bạn vào đây.",
+    "sample_page_title": "Trang thứ hai",
+    "sample_page_content": "Mỗi trang gồm một tiêu đề và một đoạn nội dung. Nếu nội dung dài hơn khung trang, bạn có thể cuộn ngay trong trang.",
+    "sample_turn_title": "Lật trang",
+    "sample_turn_content": "Dùng hai nút bên dưới hoặc phím mũi tên trái/phải để lật trang. Nhấn Esc hoặc nhấn ra ngoài để đóng sách.",
+    "sample_customize_title": "Tuỳ biến",
+    "sample_customize_content": "Dùng slot page để tự render nội dung từng trang, và slot inner-cover để thay hình bìa trong bên trái."
+  },
   "PostProduction": {
+    "kho_ca": "Kho cá",
     "chua_ro_loai": "Chưa rõ loài",
     "kho_ca_da_dat_gioi_han_value0_value1_co_the_chuyen_toi_da_value2": "Kho cá đã đạt giới hạn ({value0}/{value1}). Có thể chuyển tối đa {value2} cá.",
     "da_chuyen_value0_ca_vao_kho": "Đã chuyển {value0} cá vào kho",
@@ -1674,6 +1689,8 @@
     "dong_thong_tin": "Đóng thông tin"
   },
   "Modal": {
+    "refreshing": "Đang làm mới…",
+    "refresh_error": "Không thể làm mới dữ liệu. Vui lòng thử lại.",
     "lam_moi": "Làm mới",
     "thoat": "Thoát"
   },

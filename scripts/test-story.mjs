@@ -33,7 +33,7 @@ test('story runtime validator rejects broken branches, slots, markup URLs and ma
 
 test('playback requires explicit choices, preserves visited log and resumes without duplicating current entry', () => {
   setActivePinia(createPinia());
-  const { useStoryPlaybackStore } = load('src/stores/storyPlayback.ts', { pinia: { defineStore }, '../utils/story': utils });
+  const { useStoryPlaybackStore } = load('src/stores/player-story-playback-store.ts', { pinia: { defineStore }, '../utils/story': utils });
   const player = useStoryPlaybackStore(); player.load(storyDemo); player.started = true;
   player.textLength = 10; player.advance(); assert.equal(player.nodeId, storyDemo.startNodeId); assert.equal(player.revealed, 10);
   player.advance(); assert.equal(player.nodeId, storyDemo.nodes[1].id);
@@ -68,7 +68,7 @@ test('library discards stale reads and retries ordered progress without mixing a
     release: () => new Promise(resolve => { resolveRelease = resolve; }), progress: async () => null,
     saveProgress: async value => { calls.push(value.node_id); },
   };
-  const { useStoryStore } = load('src/stores/story.ts', { pinia: { defineStore }, '../data/supabaseStoryRepository': { supabaseStoryRepository: repository }, '../data/storyDemo': { storyDemo, STORY_DEMO_ID: storyDemo.id }, '../utils/story': utils, '../i18n': { t: key => key } });
+  const { useStoryStore } = load('src/stores/player-story-store.ts', { pinia: { defineStore }, '../data/supabaseStoryRepository': { supabaseStoryRepository: repository }, '../data/storyDemo': { storyDemo, STORY_DEMO_ID: storyDemo.id }, '../utils/story': utils, '../i18n': { t: key => key } });
   const store = useStoryStore(); store.reset('a');
   const read = store.open(storyDemo.id); store.reset('b');
   resolveRelease({ script: storyDemo, version: 1 }); await read; assert.equal(store.script, null);

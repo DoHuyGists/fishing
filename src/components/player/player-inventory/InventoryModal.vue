@@ -67,7 +67,7 @@ const guildeSteps = [
   <Modal
     :title="tr('InventoryModal.trang_bi')"
     :guid-steps="activeTab === 'fishing' ? guildeSteps : []"
-    :on-refresh="load"
+    :on-refresh="async () => { await load(); }"
     :compact="compact"
     :show-count-data="!compact"
     content-width-class="max-w-6xl"

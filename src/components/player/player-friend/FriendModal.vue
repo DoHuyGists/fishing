@@ -1,6 +1,5 @@
 <script setup lang="ts">
-import type { FriendTab as ActiveTab, FriendUserProfile, UserFriend } from "../../../types/model/friend";
-import { getFormattingLocale } from "../../../i18n";
+import type { FriendTab as ActiveTab, FriendDeleteKind, FriendDeleteTarget, UserFriend } from "../../../types/model/friend";
 import { t as tr } from "../../../i18n";
 
 import { computed, onMounted, ref, watch, onUnmounted } from "vue";
@@ -8,8 +7,13 @@ import Pagination from "../../shared/Pagination.vue";
 import Modal from "../../shared/Modal.vue";
 import { useCountryStore } from "../../../stores/player-country-store.ts";
 import { useAuthStore } from "../../../stores/auth.ts";
-import { useFriendStore, type FriendshipRelation } from "../../../stores/player-friend-store.ts";
+import { useFriendStore } from "../../../stores/player-friend-store.ts";
 import { useToast } from "../../../composables/useToast.ts";
+
+import FriendAcceptedList from './FriendAcceptedList.vue';
+import FriendReceivedRequests from './FriendReceivedRequests.vue';
+import FriendSentRequests from './FriendSentRequests.vue';
+import FriendDiscovery from './FriendDiscovery.vue';
 
 const authStore = useAuthStore();
 const friendStore = useFriendStore();
@@ -46,13 +50,11 @@ onUnmounted(() => {
 });
 const directFriendIdInput = ref("");
 const copiedId = ref<string | null>(null);
+let copyTimer: ReturnType<typeof setTimeout> | undefined;
+onUnmounted(() => clearTimeout(copyTimer));
 
 // Xác nhận thao tác xóa bạn
-const deleteConfirmTarget = ref<{
-  id: string;
-  type: "friend" | "sent_request" | "received_request";
-  targetUserId: string;
-} | null>(null);
+const deleteConfirmTarget = ref<FriendDeleteTarget | null>(null);
 
 const currentUserId = computed<string>(() => {
   try {
@@ -60,29 +62,6 @@ const currentUserId = computed<string>(() => {
   } catch {
     return "";
   }
-});
-
-const profilesMap = computed(() => friendStore.profilesMap);
-
-const acceptedFriends = computed(() => friendStore.acceptedFriends);
-
-const receivedRequests = computed(() => friendStore.getReceivedRequests(currentUserId.value));
-
-const sentRequests = computed(() => friendStore.getSentRequests(currentUserId.value));
-
-// Danh sách tất cả người chơi khác từ user_profile
-const otherPlayers = computed(() => {
-  return friendStore.profiles.filter((profile) => profile.id !== currentUserId.value);
-});
-
-// Lọc người chơi ở tab Khám phá
-const filteredPlayers = computed(() => {
-  return otherPlayers.value;
-});
-
-// Lọc bạn bè ở tab Bạn bè
-const filteredFriends = computed(() => {
-  return acceptedFriends.value;
 });
 
 async function handleRefresh() {
@@ -96,18 +75,14 @@ onMounted(() => {
   }
 });
 
-function formatUuid(uuid: string): string {
-  if (!uuid || uuid.length < 12) return uuid;
-  return `${uuid.slice(0, 8)}...${uuid.slice(-4)}`;
-}
-
 async function copyToClipboard(text: string) {
   if (!text) return;
   try {
     await navigator.clipboard.writeText(text);
     copiedId.value = text;
     toast.success(tr("FriendModal.da_sao_chep_ma_nguoi_choi_vao_clipboard"));
-    setTimeout(() => {
+    clearTimeout(copyTimer);
+    copyTimer = setTimeout(() => {
       if (copiedId.value === text) {
         copiedId.value = null;
       }
@@ -118,38 +93,6 @@ async function copyToClipboard(text: string) {
 }
 
 // Bảng màu avatar ngẫu hứng dựa trên chuỗi ID
-const avatarGradients = [
-  "from-emerald-600 to-teal-700",
-  "from-blue-600 to-cyan-700",
-  "from-amber-600 to-orange-700",
-  "from-violet-600 to-purple-700",
-  "from-rose-600 to-pink-700",
-  "from-teal-600 to-emerald-800",
-];
-
-function getAvatarGradient(id: string): string {
-  if (!id) return avatarGradients[0];
-  const charCode = id.charCodeAt(0) + id.charCodeAt(id.length - 1);
-  return avatarGradients[charCode % avatarGradients.length];
-}
-
-function getFriendProfile(record: UserFriend): FriendUserProfile | undefined {
-  const friendId = record.user_id === currentUserId.value ? record.friend_id : record.user_id;
-  return profilesMap.value.get(friendId);
-}
-
-function getSenderProfile(record: UserFriend): FriendUserProfile | undefined {
-  return profilesMap.value.get(record.user_id);
-}
-
-function getRecipientProfile(record: UserFriend): FriendUserProfile | undefined {
-  return profilesMap.value.get(record.friend_id);
-}
-
-function getRelation(targetUserId: string): FriendshipRelation {
-  return friendStore.getFriendshipWithUser(targetUserId, currentUserId.value);
-}
-
 async function handleSendRequest(targetUserId: string) {
   if (!targetUserId) return;
   if (targetUserId === currentUserId.value) {
@@ -193,7 +136,7 @@ async function handleRespondRequest(recordId: string, accept: boolean) {
   }
 }
 
-function confirmDelete(record: UserFriend, type: "friend" | "sent_request" | "received_request") {
+function confirmDelete(record: UserFriend, type: FriendDeleteKind) {
   const targetUserId =
     type === "friend"
       ? record.user_id === currentUserId.value
@@ -420,492 +363,16 @@ async function executeDelete() {
       </div>
 
       <!-- ================= TAB 1: BẠN BÈ ================= -->
-      <div v-else-if="activeTab === 'friends'" class="space-y-3">
-        <div
-          v-if="filteredFriends.length === 0"
-          class="py-14 text-center bg-white/60 rounded-2xl border border-emerald-900/10 p-6"
-        >
-          <div class="text-4xl mb-2">🤝</div>
-          <div class="m-0 text-sm font-bold text-gray-800">{{ tr("FriendModal.chua_co_ban_be_nao") }}</div>
-          <div class="m-0 text-xs text-gray-500 mt-1">
-            {{
-              searchQuery
-                ? tr("FriendModal.khong_tim_thay_ban_be_phu_hop_voi_tim_kiem")
-                : tr("FriendModal.hay_chuyen_sang_tab_them_ban_be_de_ket_ban_cung_nhung_ngu_thu_kh")
-            }}
-          </div>
-          <button
-            v-if="!searchQuery"
-            type="button"
-            class="mt-4 px-4 py-2 rounded-xl bg-emerald-700 hover:bg-emerald-800 text-white text-xs font-bold transition shadow-sm cursor-pointer"
-            @click="activeTab = 'discover'"
-          >
-            {{ tr("FriendModal.tim_ban_moi_ngay") }}
-          </button>
-        </div>
-
-        <div v-else class="grid min-w-0 grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-4">
-          <div
-            v-for="record in filteredFriends"
-            :key="record.id"
-            class="slide-fade-in from-bottom player-content-in p-4 rounded-2xl border border-emerald-900/10 bg-white/95 shadow-sm hover:shadow-md transition-shadow flex flex-col justify-between gap-3"
-          >
-            <div class="flex items-start justify-between gap-3">
-              <div class="flex items-center gap-3 min-w-0">
-                <!-- Avatar -->
-                <div
-                  class="size-11 rounded-xl bg-linear-to-br flex items-center justify-center text-white text-sm font-black shadow-sm shrink-0"
-                  :class="getAvatarGradient(record.user_id === currentUserId ? record.friend_id : record.user_id)"
-                >
-                  <img
-                    v-if="getFriendProfile(record)?.avatar_url"
-                    :src="getFriendProfile(record)?.avatar_url ?? ''"
-                    :alt="tr('UpdateIdentityModal.anh_dai_dien')"
-                    class="h-full w-full rounded-xl object-cover"
-                    referrerpolicy="no-referrer"
-                  />
-                  <span v-else>{{
-                    (
-                      getFriendProfile(record)?.display_name ||
-                      (record.user_id === currentUserId ? record.friend_id : record.user_id)
-                    )
-                      .slice(0, 2)
-                      .toUpperCase()
-                  }}</span>
-                </div>
-
-                <div class="min-w-0">
-                  <div class="flex items-center gap-1.5">
-                    <span class="text-xs font-bold text-gray-900 font-mono">
-                      {{
-                        getFriendProfile(record)?.display_name ||
-                        formatUuid(record.user_id === currentUserId ? record.friend_id : record.user_id)
-                      }}
-                    </span>
-                    <button
-                      type="button"
-                      class="text-gray-400 hover:text-emerald-700 text-xs cursor-pointer"
-                      :title="tr('FriendModal.sao_chep_toan_bo_id')"
-                      @click="copyToClipboard(record.user_id === currentUserId ? record.friend_id : record.user_id)"
-                    >
-                      📋
-                    </button>
-                  </div>
-
-                  <div class="mt-1 text-[11px] text-[#556655]">
-                    {{ countryStore.getCountryName(getFriendProfile(record)?.country_id) }}
-                  </div>
-                  <!-- Thông số hồ sơ nếu có -->
-                  <div v-if="getFriendProfile(record)" class="flex items-center gap-2 mt-1 flex-wrap text-[11px]">
-                    <span
-                      class="px-2 py-0.5 rounded-full bg-amber-100 text-amber-800 font-bold border border-amber-200"
-                    >
-                      {{ tr("UserProfile.cap") }} {{ getFriendProfile(record)?.level }}
-                    </span>
-                    <span class="px-2 py-0.5 rounded-full bg-emerald-100 text-emerald-800 font-medium">
-                      ✨
-                      {{
-                        Number(getFriendProfile(record)?.experience_point ?? 0).toLocaleString(getFormattingLocale())
-                      }}
-                      EXP
-                    </span>
-                  </div>
-                  <div v-else class="text-[10px] text-gray-400 mt-0.5">
-                    {{ tr("FriendModal.chua_tai_du_lieu_ho_so") }}
-                  </div>
-                </div>
-              </div>
-
-              <!-- Nút Xóa bạn -->
-              <button
-                type="button"
-                class="px-2.5 py-1.5 rounded-lg border border-red-200 bg-red-50 hover:bg-red-100 text-red-700 text-xs font-semibold transition cursor-pointer shrink-0 disabled:opacity-50"
-                :disabled="friendStore.actionLoadingId === record.id"
-                @click="confirmDelete(record, 'friend')"
-              >
-                {{ tr("FriendModal.xoa_ban") }}
-              </button>
-            </div>
-
-            <!-- Thời gian kết bạn -->
-            <div
-              class="pt-2 border-t border-gray-100 flex flex-wrap items-center justify-between gap-x-2 gap-y-1 text-[10px] text-gray-400"
-            >
-              <span
-                >{{ tr("FriendModal.da_ket_ban_tu") }}
-                {{ new Date(record.created_at).toLocaleDateString(getFormattingLocale()) }}</span
-              >
-              <span class="text-emerald-700 font-semibold">{{ tr("FriendModal.ban_be_2") }}</span>
-            </div>
-          </div>
-        </div>
-      </div>
+<FriendAcceptedList v-else-if="activeTab === 'friends'" @copy="copyToClipboard" @delete="confirmDelete" @respond="handleRespondRequest" @send="handleSendRequest" @discover="activeTab = 'discover'" />
 
       <!-- ================= TAB 2: LỜI MỜI ĐÃ NHẬN ================= -->
-      <div v-else-if="activeTab === 'received'" class="space-y-3">
-        <div
-          v-if="receivedRequests.length === 0"
-          class="py-14 text-center bg-white/60 rounded-2xl border border-emerald-900/10 p-6"
-        >
-          <div class="text-4xl mb-2">📬</div>
-          <div class="m-0 text-sm font-bold text-gray-800">{{ tr("FriendModal.khong_co_loi_moi_nao") }}</div>
-          <div class="m-0 text-xs text-gray-500 mt-1">
-            {{ tr("FriendModal.hien_tai_ban_chua_nhan_duoc_yeu_cau_ket_ban_nao_tu_nguoi_choi_kh") }}
-          </div>
-        </div>
-
-        <div v-else class="space-y-2">
-          <div
-            v-for="record in receivedRequests"
-            :key="record.id"
-            class="slide-fade-in from-bottom player-content-in p-4 rounded-2xl border border-amber-200/60 bg-amber-50/40 shadow-sm flex flex-col sm:flex-row sm:items-center justify-between gap-3"
-          >
-            <div class="flex items-center gap-3 min-w-0">
-              <div
-                class="size-11 rounded-xl bg-linear-to-br flex items-center justify-center text-white text-sm font-black shadow-sm shrink-0"
-                :class="getAvatarGradient(record.user_id)"
-              >
-                <img
-                  v-if="getSenderProfile(record)?.avatar_url"
-                  :src="getSenderProfile(record)?.avatar_url ?? ''"
-                  :alt="tr('UpdateIdentityModal.anh_dai_dien')"
-                  class="h-full w-full rounded-xl object-cover"
-                  referrerpolicy="no-referrer"
-                />
-                <span v-else>{{
-                  (getSenderProfile(record)?.display_name || record.user_id).slice(0, 2).toUpperCase()
-                }}</span>
-              </div>
-
-              <div class="min-w-0">
-                <div class="flex items-center gap-1.5">
-                  <span class="text-xs font-bold text-gray-900 font-mono">
-                    {{ getSenderProfile(record)?.display_name || formatUuid(record.user_id) }}
-                  </span>
-                  <button
-                    type="button"
-                    class="text-gray-400 hover:text-emerald-700 text-xs cursor-pointer"
-                    :title="tr('FriendModal.sao_chep_toan_bo_id')"
-                    @click="copyToClipboard(record.user_id)"
-                  >
-                    📋
-                  </button>
-                  <span class="px-2 py-0.5 rounded text-[10px] font-bold bg-amber-200 text-amber-900">
-                    {{ tr("FriendModal.muon_ket_ban") }}
-                  </span>
-                </div>
-
-                <div class="mt-1 text-[11px] text-[#556655]">
-                  {{ countryStore.getCountryName(getSenderProfile(record)?.country_id) }}
-                </div>
-                <div v-if="getSenderProfile(record)" class="flex flex-wrap items-center gap-2 mt-1 text-[11px]">
-                  <span class="font-bold text-amber-800">
-                    {{ tr("UserProfile.cap") }} {{ getSenderProfile(record)?.level }}
-                  </span>
-                  <span class="text-gray-500">·</span>
-                  <span class="text-emerald-800 font-medium">
-                    {{
-                      Number(getSenderProfile(record)?.experience_point ?? 0).toLocaleString(getFormattingLocale())
-                    }}
-                    EXP
-                  </span>
-                  <span class="text-gray-500">·</span>
-                  <span class="text-gray-400 text-[10px]">
-                    {{ new Date(record.created_at).toLocaleDateString(getFormattingLocale()) }}
-                  </span>
-                </div>
-              </div>
-            </div>
-
-            <!-- Hành động phản hồi: Đồng ý, Từ chối, Xóa -->
-            <div class="flex flex-wrap items-center gap-2 sm:shrink-0">
-              <button
-                type="button"
-                class="px-3 py-1.5 rounded-xl bg-emerald-700 hover:bg-emerald-800 text-white text-xs font-bold transition shadow-sm cursor-pointer disabled:opacity-50 flex items-center gap-1"
-                :disabled="friendStore.actionLoadingId === record.id"
-                @click="handleRespondRequest(record.id, true)"
-              >
-                <span
-                  v-if="friendStore.actionLoadingId === record.id"
-                  class="size-3 border-2 border-white border-t-transparent rounded-full animate-spin"
-                ></span>
-                <span>{{ tr("FriendModal.dong_y") }}</span>
-              </button>
-
-              <button
-                type="button"
-                class="px-3 py-1.5 rounded-xl border border-gray-300 bg-white hover:bg-gray-100 text-gray-700 text-xs font-bold transition cursor-pointer disabled:opacity-50"
-                :disabled="friendStore.actionLoadingId === record.id"
-                @click="handleRespondRequest(record.id, false)"
-              >
-                {{ tr("FriendModal.tu_choi") }}
-              </button>
-
-              <button
-                type="button"
-                class="px-2.5 py-1.5 rounded-xl border border-red-200 bg-red-50 hover:bg-red-100 text-red-700 text-xs font-semibold transition cursor-pointer disabled:opacity-50"
-                :disabled="friendStore.actionLoadingId === record.id"
-                :title="tr('FriendModal.xoa_yeu_cau_nay')"
-                @click="confirmDelete(record, 'received_request')"
-              >
-                {{ tr("FriendModal.xoa") }}
-              </button>
-            </div>
-          </div>
-        </div>
-      </div>
+<FriendReceivedRequests v-else-if="activeTab === 'received'" @copy="copyToClipboard" @delete="confirmDelete" @respond="handleRespondRequest" @send="handleSendRequest" @discover="activeTab = 'discover'" />
 
       <!-- ================= TAB 3: LỜI MỜI ĐÃ GỬI ================= -->
-      <div v-else-if="activeTab === 'sent'" class="space-y-3">
-        <div
-          v-if="sentRequests.length === 0"
-          class="py-14 text-center bg-white/60 rounded-2xl border border-emerald-900/10 p-6"
-        >
-          <div class="text-4xl mb-2">📤</div>
-          <div class="m-0 text-sm font-bold text-gray-800">{{ tr("FriendModal.chua_gui_loi_moi_nao") }}</div>
-          <div class="m-0 text-xs text-gray-500 mt-1">
-            {{ tr("FriendModal.ban_chua_gui_yeu_cau_ket_ban_nao_dang_o_trang_thai_cho") }}
-          </div>
-        </div>
-
-        <div v-else class="space-y-2">
-          <div
-            v-for="record in sentRequests"
-            :key="record.id"
-            class="slide-fade-in from-bottom player-content-in p-4 rounded-2xl border border-emerald-900/10 bg-white/95 shadow-sm flex flex-col sm:flex-row sm:items-center justify-between gap-3"
-          >
-            <div class="flex items-center gap-3 min-w-0">
-              <div
-                class="size-11 rounded-xl bg-linear-to-br flex items-center justify-center text-white text-sm font-black shadow-sm shrink-0"
-                :class="getAvatarGradient(record.friend_id)"
-              >
-                <img
-                  v-if="getRecipientProfile(record)?.avatar_url"
-                  :src="getRecipientProfile(record)?.avatar_url ?? ''"
-                  :alt="tr('UpdateIdentityModal.anh_dai_dien')"
-                  class="h-full w-full rounded-xl object-cover"
-                  referrerpolicy="no-referrer"
-                />
-                <span v-else>{{
-                  (getRecipientProfile(record)?.display_name || record.friend_id).slice(0, 2).toUpperCase()
-                }}</span>
-              </div>
-
-              <div class="min-w-0">
-                <div class="flex items-center gap-1.5">
-                  <span class="text-xs font-bold text-gray-900 font-mono">
-                    {{ getRecipientProfile(record)?.display_name || formatUuid(record.friend_id) }}
-                  </span>
-                  <button
-                    type="button"
-                    class="text-gray-400 hover:text-emerald-700 text-xs cursor-pointer"
-                    :title="tr('FriendModal.sao_chep_toan_bo_id')"
-                    @click="copyToClipboard(record.friend_id)"
-                  >
-                    📋
-                  </button>
-                  <span
-                    class="px-2 py-0.5 rounded text-[10px] font-semibold bg-gray-100 text-gray-700 border border-gray-200"
-                  >
-                    {{ tr("FriendModal.dang_cho_dong_y") }}
-                  </span>
-                </div>
-
-                <div class="mt-1 text-[11px] text-[#556655]">
-                  {{ countryStore.getCountryName(getRecipientProfile(record)?.country_id) }}
-                </div>
-                <div v-if="getRecipientProfile(record)" class="flex flex-wrap items-center gap-2 mt-1 text-[11px]">
-                  <span class="font-bold text-amber-800">
-                    {{ tr("UserProfile.cap") }} {{ getRecipientProfile(record)?.level }}
-                  </span>
-                  <span class="text-gray-500">·</span>
-                  <span class="text-gray-400 text-[10px]">
-                    {{ tr("FriendModal.gui_luc") }}
-                    {{ new Date(record.created_at).toLocaleDateString(getFormattingLocale()) }}
-                  </span>
-                </div>
-              </div>
-            </div>
-
-            <!-- Nút Hủy / Xóa lời mời -->
-            <button
-              type="button"
-              class="px-3 py-1.5 rounded-xl border border-red-200 bg-red-50 hover:bg-red-100 text-red-700 text-xs font-semibold transition cursor-pointer shrink-0 disabled:opacity-50"
-              :disabled="friendStore.actionLoadingId === record.id"
-              @click="confirmDelete(record, 'sent_request')"
-            >
-              {{ tr("FriendModal.huy_loi_moi") }}
-            </button>
-          </div>
-        </div>
-      </div>
+<FriendSentRequests v-else-if="activeTab === 'sent'" @copy="copyToClipboard" @delete="confirmDelete" @respond="handleRespondRequest" @send="handleSendRequest" @discover="activeTab = 'discover'" />
 
       <!-- ================= TAB 4: KHÁM PHÁ & THÊM BẠN ================= -->
-      <div v-else-if="activeTab === 'discover'" class="space-y-3">
-        <div class="flex flex-wrap items-center justify-between gap-x-2 gap-y-1 text-xs text-gray-600 px-1">
-          <span>{{ tr("FriendModal.danh_sach_nguoi_choi_tu_he_thong") }}{{ filteredPlayers.length }})</span>
-          <span class="text-[11px] text-gray-400">{{ tr("FriendModal.sap_xep_theo_cap_do_cao_xuong_thap") }}</span>
-        </div>
-
-        <div
-          v-if="filteredPlayers.length === 0"
-          class="py-14 text-center bg-white/60 rounded-2xl border border-emerald-900/10 p-6"
-        >
-          <div class="text-4xl mb-2">🔍</div>
-          <div class="m-0 text-sm font-bold text-gray-800">{{ tr("FriendModal.khong_tim_thay_nguoi_choi") }}</div>
-          <div class="m-0 text-xs text-gray-500 mt-1">
-            {{ tr("FriendModal.khong_co_nguoi_choi_nao_khop_voi_tu_khoa_tim_kiem") }}
-          </div>
-        </div>
-
-        <div v-else class="grid min-w-0 grid-cols-1 gap-3 sm:grid-cols-2">
-          <div
-            v-for="player in filteredPlayers"
-            :key="player.id"
-            class="slide-fade-in from-bottom player-content-in p-4 rounded-2xl border border-emerald-900/10 bg-white/95 shadow-sm hover:shadow-md transition-shadow flex flex-col justify-between gap-3"
-          >
-            <div class="flex items-start justify-between gap-3">
-              <div class="flex items-center gap-3 min-w-0">
-                <!-- Avatar -->
-                <div
-                  class="size-11 rounded-xl bg-linear-to-br flex items-center justify-center text-white text-sm font-black shadow-sm shrink-0"
-                  :class="getAvatarGradient(player.id)"
-                >
-                  <img
-                    v-if="player.avatar_url"
-                    :src="player.avatar_url"
-                    :alt="tr('UpdateIdentityModal.anh_dai_dien')"
-                    class="h-full w-full rounded-xl object-cover"
-                    referrerpolicy="no-referrer"
-                  />
-                  <span v-else>{{ (player.display_name || player.id).slice(0, 2).toUpperCase() }}</span>
-                </div>
-
-                <div class="min-w-0">
-                  <div class="flex items-center gap-1.5">
-                    <span class="text-xs font-bold text-gray-900 font-mono">
-                      {{ player.display_name || formatUuid(player.id) }}
-                    </span>
-                    <button
-                      type="button"
-                      class="text-gray-400 hover:text-emerald-700 text-xs cursor-pointer"
-                      :title="tr('FriendModal.sao_chep_toan_bo_id')"
-                      @click="copyToClipboard(player.id)"
-                    >
-                      📋
-                    </button>
-                  </div>
-
-                  <div class="mt-1 text-[11px] text-[#556655]">
-                    {{ countryStore.getCountryName(player.country_id) }}
-                  </div>
-                  <!-- Thông số: Cấp & EXP -->
-                  <div class="flex items-center gap-2 mt-1 flex-wrap text-[11px]">
-                    <span
-                      class="px-2 py-0.5 rounded-full bg-amber-100 text-amber-800 font-bold border border-amber-200"
-                    >
-                      {{ tr("UserProfile.cap") }} {{ player.level }}
-                    </span>
-                    <span class="px-2 py-0.5 rounded-full bg-emerald-100 text-emerald-800 font-medium">
-                      ✨ {{ Number(player.experience_point).toLocaleString(getFormattingLocale()) }} EXP
-                    </span>
-                  </div>
-                </div>
-              </div>
-
-              <!-- Trạng thái hoặc Nút kết bạn -->
-              <div class="flex shrink-0 items-center gap-2">
-                <!-- Đã là bạn bè -->
-                <span
-                  v-if="getRelation(player.id).type === 'ACCEPTED'"
-                  class="px-2.5 py-1.5 rounded-lg bg-emerald-50 text-emerald-800 border border-emerald-200 text-xs font-bold"
-                >
-                  {{ tr("FriendModal.ban_be_3") }}
-                </span>
-
-                <!-- Đã gửi lời mời đang chờ -->
-                <div v-else-if="getRelation(player.id).type === 'SENT_PENDING'" class="flex items-center gap-1.5">
-                  <span
-                    class="px-2.5 py-1.5 rounded-lg bg-gray-100 text-gray-700 border border-gray-200 text-xs font-semibold"
-                  >
-                    {{ tr("FriendModal.da_gui") }}
-                  </span>
-                  <button
-                    type="button"
-                    class="px-2 py-1.5 rounded-lg border border-red-200 bg-red-50 hover:bg-red-100 text-red-600 text-xs font-bold cursor-pointer"
-                    :title="tr('FriendModal.huy_loi_moi')"
-                    @click="
-                      confirmDelete(
-                        (getRelation(player.id) as { type: 'SENT_PENDING'; record: UserFriend }).record,
-                        'sent_request',
-                      )
-                    "
-                  >
-                    ✕
-                  </button>
-                </div>
-
-                <!-- Người này đã gửi lời mời cho mình -->
-                <div v-else-if="getRelation(player.id).type === 'RECEIVED_PENDING'" class="flex items-center gap-1.5">
-                  <button
-                    type="button"
-                    class="px-2.5 py-1.5 rounded-lg bg-emerald-700 hover:bg-emerald-800 text-white text-xs font-bold cursor-pointer"
-                    @click="
-                      handleRespondRequest(
-                        (getRelation(player.id) as { type: 'RECEIVED_PENDING'; record: UserFriend }).record.id,
-                        true,
-                      )
-                    "
-                  >
-                    {{ tr("PostProduction.dong_y") }}
-                  </button>
-                  <button
-                    type="button"
-                    class="px-2 py-1.5 rounded-lg bg-gray-200 hover:bg-gray-300 text-gray-800 text-xs font-bold cursor-pointer"
-                    @click="
-                      handleRespondRequest(
-                        (getRelation(player.id) as { type: 'RECEIVED_PENDING'; record: UserFriend }).record.id,
-                        false,
-                      )
-                    "
-                  >
-                    {{ tr("FriendModal.tu_choi") }}
-                  </button>
-                </div>
-
-                <!-- Chưa có quan hệ: Nút Thêm bạn -->
-                <button
-                  v-else
-                  type="button"
-                  class="px-3 py-1.5 rounded-lg bg-[#153221] hover:bg-[#1c432d] text-white text-xs font-bold transition shadow-sm cursor-pointer disabled:opacity-50 flex items-center gap-1"
-                  :disabled="friendStore.actionLoadingId === player.id"
-                  @click="handleSendRequest(player.id)"
-                >
-                  <span
-                    v-if="friendStore.actionLoadingId === player.id"
-                    class="size-3 border-2 border-white border-t-transparent rounded-full animate-spin"
-                  ></span>
-                  <span>{{ tr("FriendModal.them_ban") }}</span>
-                </button>
-              </div>
-            </div>
-
-            <!-- Dung lượng túi & Kho cá -->
-            <div
-              class="pt-2 border-t border-gray-100 flex flex-wrap items-center justify-between gap-x-2 gap-y-1 text-[10px] text-gray-500"
-            >
-              <div class="flex flex-wrap items-center gap-x-3 gap-y-1">
-                <span>{{ tr("FriendModal.tui") }} {{ player.inventory_capacity }} {{ tr("UserProfile.o") }}</span>
-                <span>{{ tr("FriendModal.kho") }} {{ player.species_storage_capacity }} {{ tr("UserProfile.o") }}</span>
-              </div>
-              <span
-                >{{ tr("FriendModal.tham_gia") }}
-                {{ new Date(player.created_at).toLocaleDateString(getFormattingLocale()) }}</span
-              >
-            </div>
-          </div>
-        </div>
-      </div>
+<FriendDiscovery v-else-if="activeTab === 'discover'" @copy="copyToClipboard" @delete="confirmDelete" @respond="handleRespondRequest" @send="handleSendRequest" @discover="activeTab = 'discover'" />
     </div>
 
     <!-- Hộp thoại xác nhận xóa (Modal xác nhận bên trong) -->

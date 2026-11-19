@@ -46,8 +46,8 @@ test('map loads closed areas, zone weather and fish details without truncating p
     assert.deepEqual(species[0].details, fish);
 
     setActivePinia(createPinia());
-    const { useFishingMapStore } = await server.ssrLoadModule('/src/stores/fishingMap.ts');
-    const { useCountryStore } = await server.ssrLoadModule('/src/stores/country.ts');
+    const { useFishingMapStore } = await server.ssrLoadModule('/src/stores/player-fishing-map-store.ts');
+    const { useCountryStore } = await server.ssrLoadModule('/src/stores/player-country-store.ts');
     const { useAuthStore } = await server.ssrLoadModule('/src/stores/auth.ts');
     useAuthStore().user = { id: 'player' };
     const countries = useCountryStore();

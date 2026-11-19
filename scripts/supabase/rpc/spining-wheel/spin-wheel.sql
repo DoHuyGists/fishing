@@ -1,4 +1,5 @@
--- Run migrations/spin_wheel_seasons.sql first.
+-- Run migrations/spin_wheel_seasons.sql and rpc/inventory/grant_inventory_item.sql first.
+-- Run as postgres so this SECURITY DEFINER function can call the DB-only grant helper.
 BEGIN;
 
 -- Remove the old entry point so clients cannot supply their own reward pool.
@@ -14,7 +15,6 @@ DECLARE
   v_pool           jsonb;
   v_eligible_count int;
   
-  v_item           public.items%ROWTYPE;
   v_data           jsonb;
   v_inventory_id   uuid;
 
@@ -52,21 +52,7 @@ BEGIN
   v_item_id := (v_pool->'rewards'->v_random_index->>'id')::uuid;
 
   -- =====================================================
-  -- Step 4: Lấy thông tin item trúng
-  -- =====================================================
-  SELECT *
-  INTO v_item
-  FROM public.items
-  WHERE id = v_item_id
-    AND "isDisabled" = false;
-
-  IF NOT FOUND THEN
-    RAISE EXCEPTION 'Item not found or disabled: %', v_item_id
-      USING ERRCODE = 'P0003';
-  END IF;
-
-  -- =====================================================
-  -- Step 5: Khóa dòng currency & kiểm tra số dư
+  -- Step 3: Khóa dòng currency & kiểm tra số dư
   -- =====================================================
   SELECT tickets
   INTO v_tickets
@@ -79,86 +65,35 @@ BEGIN
       USING ERRCODE = 'P0004';
   END IF;
 
-  IF v_tickets < v_cost THEN
+  IF v_tickets IS NULL OR v_tickets < v_cost THEN
     RAISE EXCEPTION 'Không đủ vé. Hiện có % vé, cần % vé.', v_tickets, v_cost
       USING ERRCODE = 'P0005';
   END IF;
 
   -- =====================================================
-  -- Step 6: Trừ vé trong cùng giao dịch cấp thưởng; giữ nguyên cash.
+  -- Step 4: Trừ vé trong cùng giao dịch cấp thưởng; giữ nguyên cash.
   -- =====================================================
   UPDATE public.currency
   SET tickets = tickets - v_cost
   WHERE user_id = v_user_id;
 
-  -- =====================================================
-  -- Step 7: Xây dựng json payload theo category
-  -- =====================================================
-  CASE v_item.category
+  -- Grant the catalog item using the shared inventory rules, in the same transaction.
+  v_inventory_id := public.grant_inventory_item(
+    p_item_id => v_item_id,
+    p_user_id => v_user_id
+  );
 
-    WHEN 'rod' THEN
-      v_data := jsonb_build_object(
-        'id',           v_item.id,
-        'category',     v_item.category,
-        'icon',         v_item.icon,
-        'image',        v_item.image,
-        'name',         v_item.name,
-        'detail',       v_item.information,
-        'rodMaxWeight', round((random() * (3.0 - 0.1) + 0.1)::numeric, 2),
-        'luck_bonus',   round((0.1 + random() * (10 - 0.1))::numeric, 2)
-      );
-
-    WHEN 'hook' THEN
-      v_data := jsonb_build_object(
-        'id',           v_item.id,
-        'category',     v_item.category,
-        'icon',         v_item.icon,
-        'image',        v_item.image,
-        'name',         v_item.name,
-        'detail',       v_item.information,
-        'strength', round((0.1 + random() * (10 - 0.1))::numeric, 2),
-        'luck_bonus',   round((0.1 + random() * (10 - 0.1))::numeric, 2)
-      );
-
-    WHEN 'bait' THEN
-      v_data := jsonb_build_object(
-        'id',           v_item.id,
-        'category',     v_item.category,
-        'icon',         v_item.icon,
-        'image',        v_item.image,
-        'name',         v_item.name,
-        'detail',       v_item.information,
-        'quantity',     v_item.quantity,
-        'match_number', floor(random() * (100 - 1 + 1) + 1)::int,
-        'luck_bonus',   round((0.1 + random() * (10 - 0.1))::numeric, 2)
-      );
-
-    ELSE
-      v_data := jsonb_build_object(
-        'id',         v_item.id,
-        'category',   v_item.category,
-        'icon',       v_item.icon,
-        'image',      v_item.image,
-        'name',       v_item.name,
-        'detail',     v_item.information,
-        'luck_bonus', round((0.1 + random() * (10 - 0.1))::numeric, 2)
-      );
-
-  END CASE;
+  -- Preserve the response shape using the actual inventory data (including stacks).
+  SELECT data INTO v_data
+  FROM public.user_inventory
+  WHERE id = v_inventory_id AND user_id = v_user_id;
 
   -- =====================================================
-  -- Step 8: Lưu vào inventory
-  -- =====================================================
-  INSERT INTO public.user_inventory (user_id, data)
-  VALUES (v_user_id, v_data)
-  RETURNING id INTO v_inventory_id;
-
-  -- =====================================================
-  -- Step 9: Trả kết quả
+  -- Step 6: Trả kết quả
   -- =====================================================
   RETURN jsonb_build_object(
     'inventory_id',   v_inventory_id,
-    'item_id',        v_item.id,
+    'item_id',        v_item_id,
     'data',           v_data,
     'cost',           v_cost,
     'remaining_tickets', v_tickets - v_cost,

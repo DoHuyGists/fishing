@@ -1,7 +1,7 @@
 <script lang="ts" setup>
 import { t as tr } from "../../i18n";
 
-import { computed, onMounted, onUnmounted, ref, watch } from "vue";
+import { computed, onMounted, onUnmounted, ref } from "vue";
 import { useModalStore } from "../../stores/player-modal-store.ts";
 import { useCurrencyStore } from "../../stores/player-currency-store.ts";
 import { useUserProfileStore } from "../../stores/player-user-profile-store.ts";
@@ -12,6 +12,7 @@ import UserTurn from "../player/player-stamina/UserTurn.vue";
 import Shells from "../player/player-currency/Shells.vue";
 import Tickets from "../player/player-currency/Tickets.vue";
 import { useReadCacheStore } from "../../stores/player-read-cache.ts";
+import { useModalRefresh } from "../../composables/useModalRefresh";
 
 defineOptions({ inheritAttrs: false });
 
@@ -25,60 +26,33 @@ const {
 } = defineProps<{
   title?: string;
   guidSteps?: any[];
-  onRefresh?: () => void;
+  onRefresh?: () => void | Promise<void>;
   showCountData?: boolean;
   compact?: boolean;
   contentWidthClass?: string;
 }>();
-const hasRefreshListener = onRefresh != undefined;
+const hasRefreshListener = computed(() => onRefresh != undefined);
 const hasGuideSteps = computed(() => guidSteps.length != 0);
 
 const currencyStore = useCurrencyStore();
 const userProfileStore = useUserProfileStore();
 const modalStore = useModalStore();
-const REFRESH_COOLDOWN = 5;
-const isRefreshing = ref<boolean>(false);
-const refreshCooldown = ref(0);
+const { isRefreshing, refreshCooldown, refreshError, refreshDisabled, handleRefresh } = useModalRefresh(
+  () => onRefresh,
+  () => useReadCacheStore().invalidate(),
+  () => tr("Modal.refresh_error"),
+);
 const showGuide = ref(false);
-
-async function handleRefresh() {
-  if (isRefreshing.value) return;
-  isRefreshing.value = true;
-  refreshCooldown.value = REFRESH_COOLDOWN;
-  await useReadCacheStore().invalidate();
-  onRefresh?.();
-}
 
 function handleGuide() {
   showGuide.value = true;
 }
-
-let status: number | undefined = undefined;
-let cooldown: number | undefined = undefined;
-watch(isRefreshing, (refreshing) => {
-  if (refreshing) {
-    status = setTimeout(() => {
-      isRefreshing.value = false;
-    }, REFRESH_COOLDOWN * 1000);
-    cooldown = setInterval(() => {
-      refreshCooldown.value--;
-    }, 1000);
-  } else {
-    if (status) clearTimeout(status);
-    if (cooldown) clearInterval(cooldown);
-
-    status = undefined;
-    cooldown = undefined;
-  }
-});
 
 onMounted(() => {
   window.document.body.style.overflowY = "hidden";
 });
 
 onUnmounted(() => {
-  if (status) clearTimeout(status);
-  if (cooldown) clearInterval(cooldown);
   window.document.body.style.overflowY = "auto";
 });
 </script>
@@ -130,11 +104,12 @@ onUnmounted(() => {
             v-if="hasRefreshListener"
             type="button"
             class="px-2 py-2 rounded-md border border-emerald-900/15 bg-white/70 text-xs font-bold text-emerald-950 hover:bg-white disabled:opacity-50 disabled:cursor-not-allowed sm:px-3 sm:text-sm"
-            :disabled="isRefreshing"
+            :disabled="refreshDisabled"
+            :aria-busy="isRefreshing"
             @click="handleRefresh"
           >
             <span aria-hidden="true" class="mr-1">↻</span
-            >{{ isRefreshing ? `${refreshCooldown}s` : tr("Modal.lam_moi") }}
+            >{{ isRefreshing ? tr("Modal.refreshing") : refreshCooldown > 0 ? `${refreshCooldown}s` : tr("Modal.lam_moi") }}
           </button>
           <button
             type="button"
@@ -146,6 +121,9 @@ onUnmounted(() => {
           </button>
         </div>
       </header>
+      <div v-if="refreshError" role="alert" class="border-b border-red-200 bg-red-50 px-3 py-2 text-sm text-red-800">
+        {{ refreshError }}
+      </div>
       <div class="min-h-0 flex-1 overflow-y-auto overflow-x-hidden p-2">
         <slot></slot>
       </div>

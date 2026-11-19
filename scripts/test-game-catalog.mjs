@@ -8,11 +8,11 @@ test('Pinia catalogs preserve feature gates, login isolation and transaction ret
     define: { 'import.meta.env.VITE_SUPABASE_URL': JSON.stringify('https://example.supabase.co'), 'import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY': JSON.stringify('test-key'),
       'import.meta.env.VITE_GAME_CATALOG_VERSIONED': JSON.stringify('true') } });
   try {
-    const { useGameCatalogStore } = await server.ssrLoadModule('/src/stores/gameCatalog.ts');
+    const { useGameCatalogStore } = await server.ssrLoadModule('/src/stores/player-game-catalog-store.ts');
     const { useAuthStore } = await server.ssrLoadModule('/src/stores/auth.ts');
-    const { useFeatureAvailabilityStore } = await server.ssrLoadModule('/src/stores/featureAvailability.ts');
-    const { useCountryStore } = await server.ssrLoadModule('/src/stores/country.ts');
-    const { useInventoryStore } = await server.ssrLoadModule('/src/stores/inventory.ts');
+    const { useFeatureAvailabilityStore } = await server.ssrLoadModule('/src/stores/player-feature-availability-store.ts');
+    const { useCountryStore } = await server.ssrLoadModule('/src/stores/player-country-store.ts');
+    const { useInventoryStore } = await server.ssrLoadModule('/src/stores/player-inventory-store.ts');
     const { supabaseGameCatalogRepository: repository } = await server.ssrLoadModule('/src/data/supabaseGameCatalogRepository.ts');
     const { RepositoryError } = await server.ssrLoadModule('/src/data/repositoryError.ts');
     const { catalogPolicies } = await server.ssrLoadModule('/src/data/gameCachePolicies.ts');

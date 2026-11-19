@@ -15,10 +15,10 @@ test('fishing net capacity blocks casts and release restores space', async () =>
     pinia: { defineStore },
     '../i18n': { t: key => key },
     './auth': { useAuthStore: () => ({ userId: 'user-1' }) },
-    './userProfile': { useUserProfileStore: useProfile },
-    './equipment': { useEquipmentStore: () => ({ error: '', fetchEquipment: async () => {} }) },
-    './userInArea': { useUserInAreaStore: () => ({ setCurrentUserInArea: async () => ({ status: 'enter', area_id: 'lake-1' }) }) },
-    './dayPhase': { useDayPhaseStore: () => ({ $reset() {}, setCurrentScenePhase() {} }) },
+    './player-user-profile-store': { useUserProfileStore: useProfile },
+    './player-equipment-store': { useEquipmentStore: () => ({ error: '', fetchEquipment: async () => {} }) },
+    './player-user-In-area-store': { useUserInAreaStore: () => ({ setCurrentUserInArea: async () => ({ status: 'enter', area_id: 'lake-1' }) }) },
+    './player-day-phase-store': { useDayPhaseStore: () => ({ $reset() {}, setCurrentScenePhase() {} }) },
     '../data/supabaseFishRepository': { supabaseFishRepository: { deleteCaughtFish: async () => {} } },
     '../data/supabaseFishingAreaRepository': { supabaseFishingAreaRepository: { castRod: async () => { casts++; } } },
     '../data/supabaseEquipmentRepository': {},
@@ -27,7 +27,7 @@ test('fishing net capacity blocks casts and release restores space', async () =>
     '../data/fishingDepth': { buildDepthConfig: () => ({ maxMeters: 10 }) },
     '../data/tensionChallenge': {},
   };
-  const source = await readFile(new URL('../src/stores/fishing.ts', import.meta.url), 'utf8');
+  const source = await readFile(new URL('../src/stores/player-fishing-store.ts', import.meta.url), 'utf8');
   const output = ts.transpileModule(source, {
     compilerOptions: { module: ts.ModuleKind.CommonJS, target: ts.ScriptTarget.ES2022 },
   }).outputText;

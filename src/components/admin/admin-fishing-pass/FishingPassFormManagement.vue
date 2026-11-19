@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { computed, reactive, watch } from "vue";
-import type { FishingPass, FishingPassPayload } from "./fishing-pass-admin";
+import type { FishingPass, FishingPassPayload } from "../../../types/model/fishingPassAdmin";
 
 const props = defineProps<{ pass: FishingPass | null; saving: boolean }>();
 const emit = defineEmits<{ save: [payload: FishingPassPayload]; cancel: [] }>();

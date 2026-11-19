@@ -3,7 +3,7 @@ import type { PiniaPlugin } from 'pinia';
 import { useAuthStore } from './auth';
 
 const privateStores = new Set([
-  'Caught', 'Inventory', 'currency', 'userProfile', 'Country', 'diary', 'friend', 'faction',
+  'Caught', 'Inventory', 'currency', 'userProfile', 'Country', 'diary', 'friend', 'faction', 'redeemCode', 'playerEvents',
   'fishingPass', 'badges', 'Mission', 'notifications', 'team', 'species_market', 'feedback', 'leaderboard',
 ]);
 

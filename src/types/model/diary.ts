@@ -2,6 +2,13 @@ import type { SpeciesRow } from '../table/species';
 
 export type BookVariant = 'default' | 'ocean' | 'gold' | 'dark' | 'emerald'
 
+export interface BookPage {
+  title?: string;
+  content?: string;
+}
+
+export type BookPageItem = BookPage & { slot?: string };
+
 export interface BookProps {
   /** Tiêu đề hiển thị trên gáy sách và bìa */
   title?: string

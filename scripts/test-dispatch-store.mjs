@@ -36,7 +36,7 @@ test('dispatch state handles lost responses, stale reads and account switches', 
   }
   const { RepositoryError } = load('src/data/repositoryError.ts');
   const { dispatchEligible } = load('src/data/dispatch.ts', { '../i18n': {} });
-  const { useDispatchStore } = load('src/stores/dispatch.ts', {
+  const { useDispatchStore } = load('src/stores/player-dispatch-store.ts', {
     pinia: { defineStore }, '../i18n': { t: key => key }, '../data/dispatch': { dispatchEligible },
     '../data/supabaseDispatchRepository': { supabaseDispatchRepository: repository },
     '../data/repositoryError': { RepositoryError }, '../utils/uuid': { createUuid: randomUUID },

@@ -3,7 +3,8 @@ import type { FishingBagViewMode as ViewMode } from "../../../types/model/fishin
 import { t as tr } from "../../../i18n";
 
 import { computed, ref, watch } from "vue";
-import { useFishingStore, type CaughtFish } from "../../../stores/player-fishing-store";
+import { useFishingStore } from "../../../stores/player-fishing-store";
+import type { CaughtFish } from "../../../types/model/fishing";
 
 const store = useFishingStore();
 const viewModes: { value: ViewMode; label: string; ariaLabel: string }[] = [

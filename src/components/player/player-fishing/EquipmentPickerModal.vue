@@ -7,7 +7,8 @@ import { equipmentCategories } from "../../../data/equipmentCatalog.ts";
 import { healthSlots } from "../../../data/healthEquipment.ts";
 import { useEquipmentStore } from "../../../stores/player-equipment-store.ts";
 import { useHealthStore } from "../../../stores/player-health-store.ts";
-import { useFishingStore, type FishingTool } from "../../../stores/player-fishing-store.ts";
+import { useFishingStore } from "../../../stores/player-fishing-store.ts";
+import type { FishingTool } from "../../../types/model/fishing";
 import Tab, { type TabItem } from "../../shared/Tab.vue";
 
 const props = defineProps<{ open: boolean }>();

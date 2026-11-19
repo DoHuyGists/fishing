@@ -12,9 +12,9 @@ test('HTTP read cache preserves gameplay mutations, owners and response semantic
   const base = 'https://read-test.supabase.co/rest/v1/';
   const flush = async () => { for (let i = 0; i < 20; i++) await Promise.resolve(); };
   try {
-    const { useReadCacheStore } = await server.ssrLoadModule('/src/stores/readCache.ts');
+    const { useReadCacheStore } = await server.ssrLoadModule('/src/stores/player-read-cache.ts');
     const { useAuthStore } = await server.ssrLoadModule('/src/stores/auth.ts');
-    const { useFeatureAvailabilityStore } = await server.ssrLoadModule('/src/stores/featureAvailability.ts');
+    const { useFeatureAvailabilityStore } = await server.ssrLoadModule('/src/stores/player-feature-availability-store.ts');
     const { createReadCacheFetch, createReadCacheContextFetch, setReadCacheHandler } = await server.ssrLoadModule('/src/database/readCacheRequests.ts');
     const { createFeatureFetch, setFeatureRequestGuard } = await server.ssrLoadModule('/src/database/featureRequestGate.ts');
     const init = transport => {
@@ -182,7 +182,7 @@ test('HTTP read cache preserves gameplay mutations, owners and response semantic
       await fetch(base + 'rpc/get_current_hour_missions', { method: 'POST' }); assert.equal(calls, 2);
     });
     await t.test('the real caught store reopens without repeating get_caught_in_home; force refresh bypasses it', async () => {
-      const { useCaughtStore } = await server.ssrLoadModule('/src/stores/caught.ts');
+      const { useCaughtStore } = await server.ssrLoadModule('/src/stores/player-caught-store.ts');
       const transport = globalThis.fetch; let homeCalls = 0;
       init(async () => Response.json([]));
       const store = useCaughtStore();
@@ -199,10 +199,10 @@ test('HTTP read cache preserves gameplay mutations, owners and response semantic
       } finally { globalThis.fetch = transport; }
     });
     await t.test('account changes clear displayed snapshots and discard late inventory responses', async () => {
-      const { resetPlayerSnapshots } = await server.ssrLoadModule('/src/stores/playerSnapshotReset.ts');
-      const { useCaughtStore } = await server.ssrLoadModule('/src/stores/caught.ts');
-      const { useInventoryStore } = await server.ssrLoadModule('/src/stores/inventory.ts');
-      const { useEquipmentStore } = await server.ssrLoadModule('/src/stores/equipment.ts');
+      const { resetPlayerSnapshots } = await server.ssrLoadModule('/src/stores/player-snapshot-reset-store.ts');
+      const { useCaughtStore } = await server.ssrLoadModule('/src/stores/player-caught-store.ts');
+      const { useInventoryStore } = await server.ssrLoadModule('/src/stores/player-inventory-store.ts');
+      const { useEquipmentStore } = await server.ssrLoadModule('/src/stores/player-equipment-store.ts');
       const { supabaseUserInventoryRepository: inventoryRepo } = await server.ssrLoadModule('/src/data/supabaseUserInventoryRepository.ts');
       const pinia = createPinia(); pinia.use(resetPlayerSnapshots); createApp({}).use(pinia); setActivePinia(pinia);
       const auth = useAuthStore(); auth.applySession({ user: { id: 'a' } });
@@ -226,7 +226,7 @@ test('HTTP read cache preserves gameplay mutations, owners and response semantic
       } finally { inventoryRepo.fetchUserInventory = original; }
     });
     await t.test('notification snapshots share reads despite time-based query filters and still expire on time', async () => {
-      const { useNotificationStore } = await server.ssrLoadModule('/src/stores/notification.ts');
+      const { useNotificationStore } = await server.ssrLoadModule('/src/stores/player-notification-store.ts');
       const { supabaseNotificationRepository: repository } = await server.ssrLoadModule('/src/data/supabaseNotificationRepository.ts');
       init(async () => Response.json([]));
       const notifications = useNotificationStore(); let calls = 0;

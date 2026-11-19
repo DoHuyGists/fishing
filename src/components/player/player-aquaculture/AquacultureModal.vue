@@ -42,7 +42,7 @@ onBeforeUnmount(() => {
 </script>
 
 <template>
-  <Modal :title="tr('AquacultureModal.nong_trai_ca')" :on-refresh="() => farm.refresh(true)">
+  <Modal :title="tr('AquacultureModal.nong_trai_ca')" :on-refresh="async () => { await farm.refresh(true); }">
     <Fishfarm :paused="paused" />
   </Modal>
 </template>

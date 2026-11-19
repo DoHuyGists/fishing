@@ -20,10 +20,10 @@ const repository = {
 const imports = {
   pinia, '../data/healthEquipment': equipment,
   '../data/supabaseBodyEquipmentRepository': { supabaseBodyEquipmentRepository: repository },
-  './inventory': { useInventoryStore: () => inventory },
+  './player-inventory-store': { useInventoryStore: () => inventory },
   './auth': { useAuthStore: () => auth }, '../i18n': { t: key => key },
 };
-const source = await readFile(new URL('../src/stores/health.ts', import.meta.url), 'utf8');
+const source = await readFile(new URL('../src/stores/player-health-store.ts', import.meta.url), 'utf8');
 const compiled = ts.transpileModule(source, { compilerOptions: { module: ts.ModuleKind.CommonJS, target: ts.ScriptTarget.ES2022 } }).outputText;
 const module = { exports: {} };
 new Function('require', 'module', 'exports', compiled)(id => { assert.ok(id in imports); return imports[id]; }, module, module.exports);

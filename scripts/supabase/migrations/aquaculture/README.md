@@ -114,7 +114,7 @@ Chạy bằng migration owner tin cậy, PostgreSQL 15+. Yêu cầu các khóa I
 
 ## Ứng dụng
 
-- `src/stores/aquaculture.ts`: store người chơi riêng, lấy trạng thái thật từ server; đồng bộ xu/vỏ sò, thức ăn và sức chứa kho sau thao tác. Không còn mô phỏng tăng trưởng, tiền thử hay nút tăng tốc.
+- `src/stores/player-aquaculture-store.ts`: store người chơi riêng, lấy trạng thái thật từ server; đồng bộ xu/vỏ sò, thức ăn và sức chứa kho sau thao tác. Không còn mô phỏng tăng trưởng, tiền thử hay nút tăng tốc.
 - `src/data/supabaseAquacultureRepository.ts`: gọi RPC/đọc cấu hình, kỷ lục và số cá trong kho. `supabaseAquacultureAdminRepository.ts` chỉ ghi các bảng nguồn.
 - Mỗi lần xem một ao; chuyển ao qua thanh chọn, giữ tối đa 4 cá minh họa chuyển động chậm. Nhiều lứa có danh sách riêng; từng cá có chọn/bỏ chọn, phân trang và bán/chuyển/thả theo mảng ID. Chọn nhanh cá thường không tự chọn cá siêu đặc biệt.
 - Hai chế độ `simple`/`advanced` được đặt tên Thong thả/Chăm chút. Tính phần ăn từ tổng điểm cá của lứa, chọn đúng bản ghi túi đồ, hiện thời gian chờ và đường dẫn cửa hàng.

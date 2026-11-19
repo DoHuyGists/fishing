@@ -7,7 +7,8 @@ import { supabaseEquipmentRepository } from "../data/supabaseEquipmentRepository
 import { useReadCacheStore } from "./player-read-cache";
 import { useAuthStore } from "./auth";
 import { useUserProfileStore } from "./player-user-profile-store";
-import { useFishingStore, type FishingTool } from "./player-fishing-store";
+import { useFishingStore } from "./player-fishing-store";
+import type { FishingTool } from "../types/model/fishing";
 
 export type Category = "rod" | "line" | "reel" | "hook" | "bait";
 

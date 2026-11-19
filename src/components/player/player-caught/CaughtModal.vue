@@ -2,8 +2,8 @@
 import { t as tr } from "../../../i18n";
 
 import { computed, onMounted, ref, watch } from "vue";
-import { useCaughtStore, type CaughtFish } from "../../../stores/player-caught-store.ts";
-import { supabaseFishRepository } from "../../../data/supabaseFishRepository.ts";
+import { useCaughtStore } from "../../../stores/player-caught-store.ts";
+import type { CaughtFish } from "../../../types/model/caughtFish";
 import { useMarketStore } from "../../../stores/player-market-store.ts";
 import { useWorldStore } from "../../../stores/player-world-map-store.ts";
 import Modal from "../../shared/Modal.vue";
@@ -19,7 +19,7 @@ onMounted(() => {
   void caughtStore.loadCaughtFishes();
 });
 const marketStore = useMarketStore();
-const fishToRelease = ref<any | null>(null);
+const fishToRelease = ref<CaughtFish | null>(null);
 const searchQuery = ref("");
 const selectedRarity = ref("ALL");
 const viewMode = ref<"grid" | "list" | "species">("species");
@@ -56,7 +56,7 @@ const paginatedFishGroups = computed(() => {
   return groupedCaughtFishes.value.slice(start, start + pageSize);
 });
 const isReleasing = ref(false);
-const fishToSell = ref<any | null>(null);
+const fishToSell = ref<CaughtFish | null>(null);
 const isSelling = ref(false);
 const sellError = ref("");
 const toast = useToast();
@@ -86,7 +86,7 @@ const rarityOptions = computed(() => {
   return Array.from(set);
 });
 
-function openSellConfirm(item: any) {
+function openSellConfirm(item: CaughtFish) {
   fishToSell.value = item;
   sellError.value = "";
 }
@@ -103,8 +103,7 @@ async function handleSell(priceNum: number) {
   sellError.value = "";
 
   try {
-    await supabaseFishRepository.listFishOnMarket(fishToSell.value.id, priceNum);
-    caughtStore.caughtFishes = caughtStore.caughtFishes.filter((f) => f.id !== fishToSell.value.id);
+    if (!await caughtStore.listFishForSale(fishToSell.value.id, priceNum)) return;
     await marketStore.loadMarketListings();
     cancelSell();
     toast.success(tr("CaughtModal.da_dang_ban"), {
@@ -136,7 +135,7 @@ function getRarityBadgeClass(rarity: string | null | undefined) {
   }
 }
 
-function openReleaseConfirm(item: any) {
+function openReleaseConfirm(item: CaughtFish) {
   fishToRelease.value = item;
 }
 
@@ -148,8 +147,7 @@ async function handleRelease() {
   if (!fishToRelease.value) return;
   isReleasing.value = true;
   try {
-    await supabaseFishRepository.deleteCaughtFish(fishToRelease.value.id);
-    caughtStore.caughtFishes = caughtStore.caughtFishes.filter((f) => f.id !== fishToRelease.value.id);
+    if (!await caughtStore.releaseFish(fishToRelease.value.id)) return;
     fishToRelease.value = null;
     toast.success(tr("CaughtModal.da_tha"), {
       get title() {

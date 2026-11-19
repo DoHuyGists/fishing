@@ -25,11 +25,11 @@ const server = await createServer({ configFile: false, envDir: false, appType: '
         import { createMemoryHistory, createRouter, RouterView } from 'vue-router';
         import StoryView from '/src/views/StoryView.vue';
         import AdminView from '/src/views/AdminView.vue';
-        import { useStoryStore } from '/src/stores/story.ts';
-        import { useStoryPlaybackStore } from '/src/stores/storyPlayback.ts';
+        import { useStoryStore } from '/src/stores/player-story-store.ts';
+        import { useStoryPlaybackStore } from '/src/stores/player-story-playback-store.ts';
         import { useStoryEditorStore } from '/src/components/admin/admin-story/admin-story-editor-store.ts';
         import { useAuthStore } from '/src/stores/auth.ts';
-        import { useFeatureAvailabilityStore } from '/src/stores/featureAvailability.ts';
+        import { useFeatureAvailabilityStore } from '/src/stores/player-feature-availability-store.ts';
         import { supabaseStoryRepository as repository } from '/src/data/supabaseStoryRepository.ts';
         import { FEATURE_CATALOG } from '/src/data/featureAvailability.ts';
         import { storyDemo } from '/src/data/storyDemo.ts';

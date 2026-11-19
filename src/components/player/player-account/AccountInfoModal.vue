@@ -19,7 +19,7 @@ function loadProfile() {
   const userId = authStore.user?.id;
   if (!userId) return;
 
-  userProfileStore.fetchProfile(userId);
+  return userProfileStore.fetchProfile(userId);
 }
 
 onMounted(loadProfile);

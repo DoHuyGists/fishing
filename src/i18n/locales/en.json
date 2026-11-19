@@ -974,7 +974,22 @@
     "dang_thu_day": "Reeling in",
     "giu_de_thu_day": "Hold to reel in"
   },
+  "TheBook": {
+    "open": "Open book {title}",
+    "close": "Close book",
+    "previous": "Previous page",
+    "next": "Next page",
+    "spread": "Pages {pages} / {total}",
+    "sample_intro": "{author}\n\nPass the pages prop to display your content here.",
+    "sample_page_title": "Second page",
+    "sample_page_content": "Each page contains a title and text. If the content exceeds the page, you can scroll within it.",
+    "sample_turn_title": "Turn pages",
+    "sample_turn_content": "Use the buttons below or the left/right arrow keys to turn pages. Press Esc or click outside to close the book.",
+    "sample_customize_title": "Customize",
+    "sample_customize_content": "Use the page slot to render each page and the inner-cover slot to replace the left inside cover."
+  },
   "PostProduction": {
+    "kho_ca": "Fish storage",
     "chua_ro_loai": "Unknown species",
     "kho_ca_da_dat_gioi_han_value0_value1_co_the_chuyen_toi_da_value2": "Fish storage is full ({value0}/{value1}). You can move up to {value2} fish.",
     "da_chuyen_value0_ca_vao_kho": "Moved {value0} fish to storage",
@@ -1670,6 +1685,8 @@
     "dong_thong_tin": "Close information"
   },
   "Modal": {
+    "refreshing": "Refreshing…",
+    "refresh_error": "Unable to refresh data. Please try again.",
     "lam_moi": "Refresh",
     "thoat": "Exit"
   },

@@ -16,12 +16,12 @@ const server = await createServer({ configFile: false, envDir: false, server: { 
     load(id) { if (id === '/__cache_fixture.ts') return `
       import { createPinia, setActivePinia } from 'pinia';
       import { useAuthStore } from '/src/stores/auth.ts';
-      import { useGameCatalogStore } from '/src/stores/gameCatalog.ts';
-      import { useCountryStore } from '/src/stores/country.ts';
-      import { useFeatureAvailabilityStore } from '/src/stores/featureAvailability.ts';
+      import { useGameCatalogStore } from '/src/stores/player-game-catalog-store.ts';
+      import { useCountryStore } from '/src/stores/player-country-store.ts';
+      import { useFeatureAvailabilityStore } from '/src/stores/player-feature-availability-store.ts';
       import { catalogPolicies } from '/src/data/gameCachePolicies.ts';
       import { supabaseGameCatalogRepository as repository } from '/src/data/supabaseGameCatalogRepository.ts';
-      import { useReadCacheStore } from '/src/stores/readCache.ts';
+      import { useReadCacheStore } from '/src/stores/player-read-cache.ts';
       import { createReadCacheFetch, setReadCacheHandler } from '/src/database/readCacheRequests.ts';
       export async function setup() {
         setActivePinia(createPinia());

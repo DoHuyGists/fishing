@@ -13,7 +13,7 @@ test('area clock, scene and fish conditions share the area timezone', async t =>
     },
   });
   try {
-    const { useDayPhaseStore } = await server.ssrLoadModule('/src/stores/dayPhase.ts');
+    const { useDayPhaseStore } = await server.ssrLoadModule('/src/stores/player-day-phase-store.ts');
     const { supabaseFishingAreaRepository: repo } = await server.ssrLoadModule('/src/data/supabaseFishingAreaRepository.ts');
     const { setFeatureRequestGuard } = await server.ssrLoadModule('/src/database/featureRequestGate.ts');
     setActivePinia(createPinia());

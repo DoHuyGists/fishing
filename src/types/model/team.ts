@@ -10,6 +10,14 @@ export type TeamStatus = "PENDING" | "OPEN" | "FULL" | "FISHING" | "CLOSED";
 
 export type TeamJoinType = "everyone" | "friend" | "invited";
 
+export interface TeamEditorFields {
+  name: string;
+  description: string;
+  maxMembers: number;
+  status: TeamStatus;
+  joinType: TeamJoinType;
+}
+
 export type TeamMemberRole = "LEADER" | "MEMBER";
 
 export interface UserTeam {

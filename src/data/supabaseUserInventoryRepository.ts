@@ -2,6 +2,7 @@ import type { UserInventory } from "../types/model/userInventory";
 import type { SpinWheelResult } from "../types/model/spinWheel";
 import supabase from "../database/connection";
 import { escapeLike, listPage, pageRange } from './pagination';
+import { readCatalogPages } from './readCatalogPages';
 import type { InventoryClassification } from '../types/model/inventory';
 
 const mapInventory = (row: any): UserInventory => ({ id: row.id, data: row.data, userId: row.user_id, createdAt: row.created_at, rpc: row.rpc });
@@ -28,12 +29,10 @@ class SupabaseUserInventoryRepository {
     return { ...listPage((result.data ?? []).map(mapInventory), result.count), ownedTotal: total.count ?? 0 };
   }
   async fetchUserInventory(userId: string): Promise<UserInventory[]> {
-    const { data, error } = await supabase.from("user_inventory").select("*").eq("user_id", userId);
-
-    if (error) {
-      throw new Error(error.message);
-    }
-
+    // Calculation snapshots must contain every owned row, even when the API caps
+    // a page below the requested size. Inventory is not subject to the catalog cap.
+    const data = await readCatalogPages((from, to) => supabase.from("user_inventory")
+      .select("*").eq("user_id", userId).order("id").range(from, to), Infinity);
     return data.map(mapInventory);
   }
   async claimRandomItem(): Promise<SpinWheelResult> {

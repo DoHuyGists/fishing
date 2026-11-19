@@ -4,7 +4,7 @@ import Pagination from "../../shared/Pagination.vue";
 import { usePagedListFilters } from "../../../composables/usePagedListFilters.ts";
 import { computed, ref } from "vue";
 import { useAdminFishingPassStore } from "./admin-fishing-pass-store.ts";
-import type { FishingPass, FishingPassPayload } from "./fishing-pass-admin.ts";
+import type { FishingPass, FishingPassPayload } from "../../../types/model/fishingPassAdmin";
 import FishingPassFormManagement from "./FishingPassFormManagement.vue";
 
 const emit = defineEmits<{ close: [] }>();

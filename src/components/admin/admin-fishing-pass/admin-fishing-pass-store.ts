@@ -1,6 +1,7 @@
 import { defineStore } from "pinia";
 import { ref } from "vue";
-import { supabaseFishingPassRepository, type FishingPass, type FishingPassPayload } from "./fishing-pass-admin";
+import type { FishingPass, FishingPassPayload } from "../../../types/model/fishingPassAdmin";
+import { supabaseFishingPassAdminRepository as supabaseFishingPassRepository } from "../../../data/supabaseFishingPassAdminRepository";
 
 export const useAdminFishingPassStore = defineStore("admin-fishing-pass", () => {
   const passes = ref<FishingPass[]>([]);

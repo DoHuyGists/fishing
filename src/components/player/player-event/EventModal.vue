@@ -1,62 +1,20 @@
 <script lang="ts" setup>
-import type { EventScheduleRow } from "../../../types/table/eventSchedule";
-import { getFormattingLocale } from '../../../i18n';
-import { t as tr } from "../../../i18n";
+import { getFormattingLocale, t as tr } from '../../../i18n';
+import { onMounted } from 'vue';
+import { storeToRefs } from 'pinia';
+import { useEventStore } from '../../../stores/player-event-store';
+import { useEventScheduleClock } from '../../../composables/useEventScheduleClock';
+import EventThumbnail from './EventThumbnail.vue';
+import Modal from '../../shared/Modal.vue';
 
-import { computed, onMounted, ref } from "vue";
-import { supabaseEventScheduleRepository } from "../../../data/supabaseEventScheduleRepository.ts";
-import EventThumbnail from "./EventThumbnail.vue";
-import Modal from "../../shared/Modal.vue";
-
-const emit = defineEmits(["close"]);
-
-const schedules = ref<EventScheduleRow[]>([]);
-const selectedId = ref<string | null>(null);
-const isLoading = ref(true);
-const loadError = ref("");
-
-const activeSchedules = computed(() => schedules.value.filter((item) => !item.isDisabled));
-
-const selectedSchedule = computed(() => activeSchedules.value.find((item) => item.id === selectedId.value) ?? null);
-
-function scheduleStatus(item: EventScheduleRow): "upcoming" | "ongoing" | "ended" {
-  const now = Date.now();
-  const start = new Date(item.start).getTime();
-  const end = new Date(item.end).getTime();
-  if (now < start) return "upcoming";
-  if (now > end) return "ended";
-  return "ongoing";
-}
-
+const store = useEventStore();
+const { activeSchedules, selectedId, selectedSchedule, isLoading, loadError } = storeToRefs(store);
+const loadSchedules = () => store.loadSchedules();
+const selectSchedule = store.selectSchedule;
+const { scheduleStatus } = useEventScheduleClock();
 function formatDate(value: string) {
-  return value ? new Date(value).toLocaleString(getFormattingLocale()) : "—";
+  return value ? new Date(value).toLocaleString(getFormattingLocale()) : '—';
 }
-
-async function loadSchedules() {
-  isLoading.value = true;
-  loadError.value = "";
-  try {
-    schedules.value = await supabaseEventScheduleRepository.fetchAll();
-    if (!selectedId.value && activeSchedules.value.length) {
-      await selectSchedule(activeSchedules.value[0]);
-    }
-  } catch (error) {
-    loadError.value = error instanceof Error ? error.message : tr('EventModal.khong_the_tai_danh_sach_su_kien');
-  } finally {
-    isLoading.value = false;
-  }
-}
-
-async function selectSchedule(item: EventScheduleRow) {
-  selectedId.value = item.id;
-  try {
-    await supabaseEventScheduleRepository.incrementViewCount(item.id, item.viewCount);
-    item.viewCount += 1;
-  } catch {
-    // Không chặn người dùng xem nội dung nếu cập nhật lượt xem thất bại
-  }
-}
-
 onMounted(loadSchedules);
 </script>
 <template>

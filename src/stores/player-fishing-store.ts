@@ -1,5 +1,4 @@
 import type { AreaSpeciesDiaryResponse, FishDepthPreviewResponse } from "../types/model/fish";
-import type { FishingCatchScore, FishingPhase } from "../types/model/fishingGameplay";
 import type {
   PendingFishingResult,
   TensionChallenge,
@@ -17,61 +16,10 @@ import { useDayPhaseStore } from "./player-day-phase-store";
 import { supabaseEquipmentRepository } from "../data/supabaseEquipmentRepository";
 import { supabaseFishRepository } from "../data/supabaseFishRepository";
 import { supabaseUserInAreaRepository } from "../data/supabaseUserInAreaRepository";
-import supabase from "../database/connection";
 import { supabaseFishingAreaRepository } from "../data/supabaseFishingAreaRepository";
 import { buildDepthConfig, DEPTH_STEP_METERS } from "../data/fishingDepth";
 import { createTensionFight, isTensionChallenge, stepTensionFight, tensionMaxTicks } from "../data/tensionChallenge";
-export type FishingTool = "rod" | "line" | "reel" | "hook" | "bait";
-export type CastPhase = FishingPhase;
-export type CaughtFish = {
-  id: string | number;
-  name: string;
-  weight: string;
-  length?: string;
-  image: string;
-  createdAt?: string;
-  isShiny?: boolean;
-  variantType: "NORMAL" | "GOLDEN" | "MUTATED";
-  starRating?: number;
-  score?: number;
-  seasonId?: string;
-  seasonNumber?: number;
-};
-export type FishingPlayer = {
-  id: string | number;
-  userId?: string;
-  name: string;
-  level: number;
-  title: string;
-  caughtCount: number;
-  bestCatch: string;
-  avatar: string;
-  color: string;
-  isCurrentUser?: boolean;
-};
-
-type CastRodResponse = {
-  session_id: string;
-  wait_time_ms: number;
-  server_time_ms: number;
-};
-
-type SubmitChallengeResponse = {
-  success: boolean;
-  scoring?: FishingCatchScore | null;
-  message?: string;
-  caught?: {
-    id: string;
-    name: string;
-    rarity: string;
-    weight: number;
-    image: string | null;
-    model_3d: string | null;
-    is_shiny: boolean;
-    variant_type: "NORMAL" | "GOLDEN" | "MUTATED";
-    star_rating: number;
-  };
-};
+import type { FishingTool, CastPhase, CaughtFish, FishingPlayer, CastRodResponse, SubmitChallengeResponse } from "../types/model/fishing";
 
 const RPC_TIMEOUT_MS = 15_000;
 
@@ -401,26 +349,24 @@ export const useFishingStore = defineStore("fishing", {
       const targetAreaId = areaId || this.currentAreaId;
       if (!targetAreaId) return;
 
+      const authStore = useAuthStore();
+      const generation = authStore.sessionGeneration;
       const requestId = ++this.playersRequestId;
+      const current = () => requestId === this.playersRequestId && targetAreaId === this.currentAreaId && authStore.sessionGeneration === generation;
       this.isLoadingPlayers = true;
       try {
         const rows = await supabaseUserInAreaRepository.fetchUsersInArea(targetAreaId);
-        if (requestId !== this.playersRequestId || targetAreaId !== this.currentAreaId) return;
+        if (!current()) return;
         if (!rows.length) {
           this.nearbyPlayers = [];
           return;
         }
 
-        const authStore = useAuthStore();
         const currentUserId = authStore.userId;
         const userIds = rows.map((r) => r.user_id);
 
-        const { data: catches, error: catchesError } = await supabase
-          .from("caught")
-          .select("user_id, weight, species(name)")
-          .in("user_id", userIds);
-        if (catchesError) throw catchesError;
-        if (requestId !== this.playersRequestId || targetAreaId !== this.currentAreaId) return;
+        const catches = await supabaseFishRepository.fetchNearbyCatches(userIds);
+        if (!current()) return;
 
         const playerStats = new Map<string, { count: number; bestWeight: number; bestFishName: string }>();
         userIds.forEach((uid) => {
@@ -428,7 +374,7 @@ export const useFishingStore = defineStore("fishing", {
         });
 
         if (catches) {
-          catches.forEach((c: any) => {
+          catches.forEach((c) => {
             const stat = playerStats.get(c.user_id);
             if (!stat) return;
             stat.count++;
@@ -500,7 +446,7 @@ export const useFishingStore = defineStore("fishing", {
       } catch (err) {
         console.error("Lỗi khi tải danh sách người chơi trong khu vực:", err);
       } finally {
-        if (requestId === this.playersRequestId) this.isLoadingPlayers = false;
+        if (current()) this.isLoadingPlayers = false;
       }
     },
     async fetchCaughtFishes(areaId: string) {

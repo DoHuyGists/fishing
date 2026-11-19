@@ -1,9 +1,10 @@
 <script lang="ts" setup>
+import type { CaughtFish } from "../../../types/model/caughtFish";
 import { t as tr } from "../../../i18n";
 
 import { computed, onMounted, ref } from "vue";
 import { useMissionStore } from "../../../stores/player-mission-store.ts";
-import { useCaughtStore, type CaughtFish } from "../../../stores/player-caught-store.ts";
+import { useCaughtStore } from "../../../stores/player-caught-store.ts";
 import { useToast } from "../../../composables/useToast.ts";
 import Modal from "../../shared/Modal.vue";
 import Tab from "../../shared/Tab.vue";

@@ -6,7 +6,7 @@ import { useAuthStore } from "../../../stores/auth.ts";
 import { useInventoryStore } from "../../../stores/player-inventory-store.ts";
 import { supabaseEquipmentRepository } from "../../../data/supabaseEquipmentRepository.ts";
 import { equipmentCategories } from "../../../data/equipmentCatalog.ts";
-import type { FishingTool } from "../../../stores/player-fishing-store.ts";
+import type { FishingTool } from "../../../types/model/fishing";
 import type { EquipmentSet } from "../../../stores/player-equipment-store.ts";
 import { useUserTurnsStore } from "../../../stores/player-user-turns-store.ts";
 import { supabaseUserInAreaRepository } from "../../../data/supabaseUserInAreaRepository.ts";

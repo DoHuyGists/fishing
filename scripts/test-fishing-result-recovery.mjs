@@ -6,7 +6,7 @@ import { createPinia, defineStore, setActivePinia } from 'pinia';
 import ts from 'typescript';
 
 const read = path => readFile(new URL(path, import.meta.url), 'utf8');
-const source = ts.transpileModule(await read('../src/stores/fishing.ts'), {
+const source = ts.transpileModule(await read('../src/stores/player-fishing-store.ts'), {
   compilerOptions: { module: ts.ModuleKind.CommonJS, target: ts.ScriptTarget.ES2022 },
 }).outputText;
 const result = { success: true, caught: { id: 'fish-1', name: 'Fish', weight: 2, image: null,
@@ -30,10 +30,10 @@ function fixture({ timeout, storageUnavailable = false } = {}) {
   const profile = { profile: { id: 'owner' }, error: '', fishingNetCapacity: 10, async fetchProfile() {} };
   const imports = {
     pinia: { defineStore }, '../i18n': { t: key => key },
-    './auth': { useAuthStore: () => auth }, './userProfile': { useUserProfileStore: () => profile },
-    './equipment': { useEquipmentStore: () => ({ error: '', async fetchEquipment() {} }) },
-    './userInArea': { useUserInAreaStore: () => ({ setCurrentUserInArea: async () => ({ status: 'enter', area_id: 'lake' }) }) },
-    './dayPhase': { useDayPhaseStore: () => ({ $reset() {}, setCurrentScenePhase() {} }) },
+    './auth': { useAuthStore: () => auth }, './player-user-profile-store': { useUserProfileStore: () => profile },
+    './player-equipment-store': { useEquipmentStore: () => ({ error: '', async fetchEquipment() {} }) },
+    './player-user-In-area-store': { useUserInAreaStore: () => ({ setCurrentUserInArea: async () => ({ status: 'enter', area_id: 'lake' }) }) },
+    './player-day-phase-store': { useDayPhaseStore: () => ({ $reset() {}, setCurrentScenePhase() {} }) },
     '../data/supabaseFishingAreaRepository': { supabaseFishingAreaRepository: repository },
     '../data/supabaseEquipmentRepository': {}, '../data/supabaseFishRepository': {},
     '../data/supabaseUserInAreaRepository': {}, '../database/connection': {},

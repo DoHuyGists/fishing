@@ -26,15 +26,15 @@ test('snapshot stores preserve the selected page and login under reordered respo
   });
   try {
     const { useAuthStore } = await server.ssrLoadModule('/src/stores/auth.ts');
-    const { useMarketStore } = await server.ssrLoadModule('/src/stores/market.ts');
+    const { useMarketStore } = await server.ssrLoadModule('/src/stores/player-market-store.ts');
     const { supabaseMarketRepository: marketRepo } = await server.ssrLoadModule('/src/data/supabaseMarketRepository.ts');
-    const { useNotificationStore } = await server.ssrLoadModule('/src/stores/notification.ts');
+    const { useNotificationStore } = await server.ssrLoadModule('/src/stores/player-notification-store.ts');
     const { supabaseNotificationRepository: notificationRepo } = await server.ssrLoadModule('/src/data/supabaseNotificationRepository.ts');
-    const { useUserProfileStore } = await server.ssrLoadModule('/src/stores/userProfile.ts');
+    const { useUserProfileStore } = await server.ssrLoadModule('/src/stores/player-user-profile-store.ts');
     const { supabaseUserProfileRepository: profileRepo } = await server.ssrLoadModule('/src/data/supabaseUserProfileRepository.ts');
-    const { useFriendStore } = await server.ssrLoadModule('/src/stores/friend.ts');
+    const { useFriendStore } = await server.ssrLoadModule('/src/stores/player-friend-store.ts');
     const { supabaseFriendRepository: friendRepo } = await server.ssrLoadModule('/src/data/supabaseFriendRepository.ts');
-    const { useInventoryStore } = await server.ssrLoadModule('/src/stores/inventory.ts');
+    const { useInventoryStore } = await server.ssrLoadModule('/src/stores/player-inventory-store.ts');
     const { supabaseUserInventoryRepository: inventoryRepo } = await server.ssrLoadModule('/src/data/supabaseUserInventoryRepository.ts');
     const { setFeatureRequestGuard } = await server.ssrLoadModule('/src/database/featureRequestGate.ts');
 
@@ -166,7 +166,7 @@ test('snapshot stores preserve the selected page and login under reordered respo
       setActivePinia(createPinia());
       const auth = useAuthStore(); auth.applySession(session('a'));
       const store = useNotificationStore();
-      const { useFeatureAvailabilityStore } = await server.ssrLoadModule('/src/stores/featureAvailability.ts');
+      const { useFeatureAvailabilityStore } = await server.ssrLoadModule('/src/stores/player-feature-availability-store.ts');
       useFeatureAvailabilityStore().checkRequests = async () => null;
       const read = deferred();
       let calls = 0;
@@ -186,7 +186,7 @@ test('snapshot stores preserve the selected page and login under reordered respo
       const previousDocument = globalThis.document, previousWindow = globalThis.window;
       globalThis.document = Object.assign(new EventTarget(), { visibilityState: 'visible' });
       globalThis.window = new EventTarget();
-      const { useTeamStore } = await server.ssrLoadModule('/src/stores/team.ts');
+      const { useTeamStore } = await server.ssrLoadModule('/src/stores/player-team-store.ts');
       const { supabaseTeamRepository: teamRepo } = await server.ssrLoadModule('/src/data/supabaseTeamRepository.ts');
       setActivePinia(createPinia());
       useAuthStore().applySession(session('a'));

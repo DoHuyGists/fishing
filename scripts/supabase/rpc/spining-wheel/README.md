@@ -3,10 +3,13 @@
 Chạy bằng Supabase SQL Editor theo thứ tự:
 
 1. `../../migrations/spin_wheel_seasons.sql`
-2. `spin-wheel.sql` (xóa RPC cũ `spin_wheel(uuid[])`, tạo `spin_wheel()` không có tham số).
-3. Tạo mùa và thêm vật phẩm, sau đó triển khai frontend.
+2. `../inventory/grant_inventory_item.sql` (helper cấp vật phẩm, chỉ gọi nội bộ database).
+3. `spin-wheel.sql` (chạy bằng role `postgres`; xóa RPC cũ `spin_wheel(uuid[])`, tạo `spin_wheel()` không có tham số).
+4. Tạo mùa và thêm vật phẩm, sau đó triển khai frontend.
 
 Cột chi phí là `public.currency.tickets` (số nhiều), mỗi lượt trừ 1 vé. RPC khóa dòng tiền tệ trước khi kiểm tra và trừ vé; việc cấp vật phẩm thất bại sẽ hoàn lại toàn bộ giao dịch. Cash không thay đổi.
+
+RPC chọn ID vật phẩm từ mùa hiện tại rồi gọi `grant_inventory_item` cho người quay. Dữ liệu, số lượng, RPC sử dụng và cách cộng dồn vật phẩm tuân theo helper này; vòng quay không tự sinh chỉ số vật phẩm.
 
 Quản lý bằng SQL Editor hoặc backend dùng `service_role`. Tạo mùa ở trạng thái nháp, thêm thưởng rồi kích hoạt. Ví dụ sau cần thay các giá trị mẫu trước khi chạy:
 

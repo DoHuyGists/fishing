@@ -36,7 +36,7 @@ const server = await createServer({
         import AdminLayout from '/src/layouts/AdminLayout.vue';
         import AdminView from '/src/views/AdminView.vue';
         import { useAuthStore } from '/src/stores/auth.ts';
-        import { useReadCacheStore } from '/src/stores/readCache.ts';
+        import { useReadCacheStore } from '/src/stores/player-read-cache.ts';
         import { supabaseUserProfileRepository } from '/src/data/supabaseUserProfileRepository.ts';
         import { supabaseZoneRepository, supabaseWeatherRepository } from '/src/data/supabaseWeatherRepository.ts';
         import supabase from '/src/database/connection.ts';

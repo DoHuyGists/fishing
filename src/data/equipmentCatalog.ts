@@ -1,6 +1,6 @@
 import type { EquipmentVariant } from "../types/model/equipment";
 import { t as tr } from "../i18n";
-import type { FishingTool } from "../stores/player-fishing-store";
+import type { FishingTool } from "../types/model/fishing";
 
 export const equipmentCategories: { id: FishingTool; name: string; icon: string }[] = [
   {

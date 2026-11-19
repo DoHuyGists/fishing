@@ -1,9 +1,10 @@
 <script setup lang="ts">
+import type { CaughtFish } from "../../../types/model/caughtFish";
 import type { CaughtFishViewMode as ViewMode } from "../../../types/model/mission";
 import { t as tr } from "../../../i18n";
 
 import { computed, reactive, ref } from "vue";
-import type { CaughtFish } from "../../../stores/player-caught-store";
+
 
 const props = defineProps<{
   caughtFishes: CaughtFish[];

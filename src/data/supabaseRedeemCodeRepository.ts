@@ -3,6 +3,11 @@ import supabase from "../database/connection";
 import { fetchAdminListPage } from './supabaseAdminListRepository';
 
 class SupabaseRedeemCodeRepository {
+  async redeem(code: string): Promise<void> {
+    const { error } = await supabase.rpc("redeem_code", { p_code: code });
+    if (error) throw new Error(error.message);
+  }
+
   async fetchPage(page: number, search: string, status: string) {
     const filters = status === 'ACTIVE' ? { is_disabled: false, _expired: false }
       : status === 'DISABLED' ? { is_disabled: true } : status === 'EXPIRED' ? { _expired: true } : {};

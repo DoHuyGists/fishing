@@ -5,7 +5,7 @@ import { equipmentCategories } from "../../../data/equipmentCatalog.ts";
 import { useInventoryStore } from "../../../stores/player-inventory-store.ts";
 import { useModalStore } from "../../../stores/player-modal-store.ts";
 import type { EquipmentSet } from "../../../stores/player-equipment-store.ts";
-import type { FishingTool } from "../../../stores/player-fishing-store.ts";
+import type { FishingTool } from "../../../types/model/fishing";
 
 const props = defineProps<{
   usedSet: EquipmentSet | null;

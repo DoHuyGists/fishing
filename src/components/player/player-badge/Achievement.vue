@@ -13,7 +13,7 @@ const selectedType = ref("all");
 const statusFilter = ref<"all" | "earned" | "unearned" | "claimable">("all");
 
 function loadBadges() {
-  badgesStore.fetchBadges();
+  return badgesStore.fetchBadges();
 }
 
 onMounted(loadBadges);

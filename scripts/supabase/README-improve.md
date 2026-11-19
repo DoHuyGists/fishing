@@ -1,18 +1,26 @@
-| Ưu tiên | Chức năng | Hiện trạng và lý do chuyển |
-|---|---|---|
-| Cao | **Lưu bộ trang bị** | [UpdateSet](/D:/fishing/src/data/supabaseEquipmentRepository.ts:68) cập nhật trực tiếp JSON vào `user_equipments`. RPC cần kiểm tra vật phẩm thuộc người chơi, đúng ô trang bị, không trùng và có được phép thay đổi trong phiên câu hiện tại hay không. |
-| Cao | **Xóa vật phẩm trong kho** | [deleteInventory](/D:/fishing/src/data/supabaseUserInventoryRepository.ts:51) xóa trực tiếp `user_inventory`. Điều kiện “vật phẩm không nằm trong set” hiện được kiểm tra ở frontend; cần kiểm tra lại trong cùng giao dịch phía database để tránh dữ liệu cũ hoặc thao tác đồng thời. |
-| Cao | **Hủy đăng bán cá** | [cancelListing](/D:/fishing/src/data/supabaseMarketRepository.ts:116) chỉ cập nhật `status = cancelled`. RPC nên khóa tin bán, kiểm tra chủ sở hữu và trạng thái còn bán, rồi cập nhật trạng thái liên quan của cá nếu nghiệp vụ yêu cầu. Cần xử lý đồng thời với RPC mua cá. |
-| Cao | **Thả cá** | [deleteCaughtFish](/D:/fishing/src/data/supabaseFishRepository.ts:189) xóa trực tiếp theo ID. RPC nên xác nhận quyền sở hữu và trạng thái cho phép thả, tránh xóa cá đang được niêm yết hoặc thuộc luồng xử lý khác. |
-| Cao | **Kết thúc chuyến câu** | [finishFishing](/D:/fishing/src/stores/caught.ts:48) xóa cá trong lưới trước, sau đó gọi `user_complete_fishing`. Nếu bước sau lỗi, cá đã bị xóa. Nên gom toàn bộ vào một RPC để cùng thành công hoặc cùng hoàn tác. |
-| Cao | **Tạo và chỉnh sửa tổ đội** | [createTeam](/D:/fishing/src/data/supabaseTeamRepository.ts:151) gọi RPC tạo nhóm, rồi truy vấn nhóm và cập nhật tiếp. Nên truyền cấu hình ngay vào RPC tạo nhóm. [updateTeam](/D:/fishing/src/data/supabaseTeamRepository.ts:172) cũng nên qua RPC để kiểm tra quyền trưởng nhóm, số thành viên và quy tắc chuyển trạng thái. |
-| Trung bình | **Mời người chơi vào tổ đội** | [inviteUser](/D:/fishing/src/data/supabaseTeamRepository.ts:43) kiểm tra người chơi rồi insert lời mời. RPC nên tự lấy người mời từ phiên đăng nhập, kiểm tra quyền, trạng thái nhóm và lời mời trùng trong cùng giao dịch. |
+# Trạng thái các khuyến nghị database
 
+Đối chiếu với source ngày 19/11/2026. “Đã chuyển” mô tả mã trong repo; quyền, RLS, trigger và phiên bản RPC đang chạy vẫn cần kiểm tra trên staging. Các mục còn mở được theo dõi trong [improve-checklist.md](../../improve-checklist.md).
 
+## Đã chuyển sang RPC
 
-| Chức năng | Đề xuất |
-|---|---|
-| **Chuyển nhiều cá giữa kho và lưới** | [updateCaughtStatus](/D:/fishing/src/data/supabaseFishRepository.ts:195) đã dùng RPC nhưng gọi riêng từng cá bằng `Promise.all`. Nên dùng một RPC nhận danh sách ID, kiểm tra dung lượng kho và chuyển cả nhóm trong một giao dịch; hiện có thể chuyển thành công một phần. |
-| **Tăng lượt xem sự kiện** | [incrementViewCount](/D:/fishing/src/data/supabaseEventScheduleRepository.ts:89) ghi `currentCount + 1` từ frontend. Nên dùng RPC tăng trực tiếp `view_count = view_count + 1` để tránh mất lượt khi nhiều người xem đồng thời. |
-| **Đếm thành viên từng phe** | [fetchFactionMemberCounts](/D:/fishing/src/data/supabaseFactionRepository.ts:162) tải các dòng `user_factions` rồi đếm ở client. Nên tổng hợp tại database bằng RPC hoặc view; kết quả hiện tại phụ thuộc các dòng được RLS cho phép đọc và giới hạn trả về. |
-| **Thống kê người đang câu trong hồ** | [fetchPlayersInArea](/D:/fishing/src/stores/fishing.ts:281) tải dữ liệu cá rồi tính số lượng, cá nặng nhất tại client. Nên trả thống kê từ RPC hoặc view, đồng thời đưa truy vấn ra khỏi store. |
+| Chức năng | Source hiện tại | Kiểm chứng còn cần |
+| --- | --- | --- |
+| Lưu bộ trang bị | [supabaseEquipmentRepository.ts](../../src/data/supabaseEquipmentRepository.ts) gọi `save_equipment_set` | Đối chiếu kiểm tra owner/ô trang bị và cạnh tranh trên staging |
+| Xóa vật phẩm kho | [supabaseUserInventoryRepository.ts](../../src/data/supabaseUserInventoryRepository.ts) gọi `delete_inventory_items` | Đối chiếu khóa và kiểm tra vật phẩm trong set tại database |
+| Hủy tin bán | [supabaseMarketRepository.ts](../../src/data/supabaseMarketRepository.ts) gọi `cancel_market_listing` | Thử đồng thời hủy và mua bằng hai tài khoản |
+| Kết thúc chuyến câu | [player-caught-store.ts](../../src/stores/player-caught-store.ts) chỉ gọi complete; [function body](rpc/user-in-area/user_complete_fishing.sql) gọi `release_in_net_fishes` trong cùng transaction của RPC | Áp function body đúng chữ ký hiện có; kiểm tra trigger/live và retry theo IC-02 |
+| Chuyển nhóm cá | [supabaseFishRepository.ts](../../src/data/supabaseFishRepository.ts) gọi một `move_species` với mảng `p_species_ids`; [SQL](rpc/caught/move_species.sql) kiểm tra/khóa cả nhóm | Mảng chứa `caught.id`; test local tại `scripts/test-move-species-sql.mjs`, còn cần kiểm chứng đồng thời trên staging theo IC-03 |
+
+## Còn cần xử lý
+
+| Chức năng | Hiện trạng và bước tiếp theo |
+| --- | --- |
+| Thả cá — IC-11 | `supabaseFishRepository.deleteCaughtFish` còn DELETE trực tiếp; cần RPC kiểm tra owner/trạng thái và phối hợp với luồng chợ/chuyển cá |
+| Tạo/sửa nhóm — IC-06 | `supabaseTeamRepository` tạo qua RPC rồi truy vấn và cập nhật cấu hình; cần RPC tạo nhận đủ cấu hình và trả ID xác nhận |
+| Mời vào nhóm — IC-06 | Repository còn kiểm tra rồi INSERT; đưa kiểm tra quyền, trạng thái và chống trùng vào transaction phía server |
+| Lượt xem sự kiện — IC-14 | `supabaseEventScheduleRepository` ghi `currentCount + 1`; cần phép cộng tại database và quy tắc tính lượt rõ ràng |
+| Đếm thành viên phe — IC-13 | `supabaseFactionRepository` đếm danh sách client chưa phân trang; cần tổng hợp và phân biệt lỗi với kết quả rỗng |
+| Thống kê người cùng bãi — IC-12 | Query đã chuyển sang `supabaseFishRepository.fetchNearbyCatches`; store vẫn tính theo dữ liệu nhìn thấy qua RLS và giới hạn dòng hiện tại. Cần chốt phạm vi thống kê và hợp đồng tổng hợp công khai trước khi đổi nghiệp vụ |
+
+Refactor kiến trúc thực hiện riêng theo [từng module](../../docs/module-refactoring.md); không dùng việc chuyển file làm bằng chứng đã sửa transaction hoặc quyền dữ liệu.
