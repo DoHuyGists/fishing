@@ -1,4 +1,4 @@
-import type { useModalStore } from "../../stores/modal";
+import type { useModalStore } from "../../stores/player-modal-store";
 
 export type LobbyAction = {
   modal: NonNullable<Parameters<ReturnType<typeof useModalStore>["open"]>[0]>;

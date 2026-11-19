@@ -1,16 +1,16 @@
 <script setup lang="ts">
-import { watch } from 'vue';
-import { t as tr } from '../../../i18n';
-import { useAuthStore } from '../../../stores/auth';
-import { useLeaderboardStore } from '../../../stores/leaderboard';
-import Modal from '../../shared/Modal.vue';
-import Tab from '../../shared/Tab.vue';
-import LeaderboardScore from './LeaderboardScore.vue';
-import LeaderboardBoard from './LeaderboardBoard.vue';
-import LeaderboardCaught from './LeaderboardCaught.vue';
-import LeaderboardBestFish from './LeaderboardBestFish.vue';
-import LeaderboardSeason from './LeaderboardSeason.vue';
-import LeaderboardRules from './LeaderboardRules.vue';
+import { watch } from "vue";
+import { t as tr } from "../../../i18n";
+import { useAuthStore } from "../../../stores/auth";
+import { useLeaderboardStore } from "../../../stores/player-leaderboard-store.ts";
+import Modal from "../../shared/Modal.vue";
+import Tab from "../../shared/Tab.vue";
+import LeaderboardScore from "./LeaderboardScore.vue";
+import LeaderboardBoard from "./LeaderboardBoard.vue";
+import LeaderboardCaught from "./LeaderboardCaught.vue";
+import LeaderboardBestFish from "./LeaderboardBestFish.vue";
+import LeaderboardSeason from "./LeaderboardSeason.vue";
+import LeaderboardRules from "./LeaderboardRules.vue";
 
 const leaderboardStore = useLeaderboardStore();
 const authStore = useAuthStore();
@@ -19,15 +19,31 @@ function load() {
   return leaderboardStore.fetchLeaderboard(authStore.user?.id);
 }
 
-watch([() => authStore.user?.id, () => leaderboardStore.activeTab], () => leaderboardStore.fetchLeaderboard(authStore.user?.id, 1), { immediate: true });
+watch(
+  [() => authStore.user?.id, () => leaderboardStore.activeTab],
+  () => leaderboardStore.fetchLeaderboard(authStore.user?.id, 1),
+  { immediate: true },
+);
 </script>
 
 <template>
   <Modal :title="tr('LeaderboardModal.bang_xep_hang')" :on-refresh="load" :show-count-data="false">
-    <div class="mx-auto px-1 py-1 text-[#24352a] sm:px-4 sm:py-3" :class="leaderboardStore.activeTab === 'rules' ? 'max-w-[1440px]' : 'max-w-5xl'">
-      <Tab v-model="leaderboardStore.activeTab" class="leaderboard-tabs" :tabs="leaderboardStore.tabs" :aria-label="tr('LeaderboardModal.tieu_chi_xep_hang')" lazy wrap>
+    <div
+      class="mx-auto px-1 py-1 text-[#24352a] sm:px-4 sm:py-3"
+      :class="leaderboardStore.activeTab === 'rules' ? 'max-w-[1440px]' : 'max-w-5xl'"
+    >
+      <Tab
+        v-model="leaderboardStore.activeTab"
+        class="leaderboard-tabs"
+        :tabs="leaderboardStore.tabs"
+        :aria-label="tr('LeaderboardModal.tieu_chi_xep_hang')"
+        lazy
+        wrap
+      >
         <template #label="{ tab }">
-          <span aria-hidden="true">{{ leaderboardStore.tabs.find(category => category.key === tab.key)?.emoji }}</span>
+          <span aria-hidden="true">{{
+            leaderboardStore.tabs.find((category) => category.key === tab.key)?.emoji
+          }}</span>
           {{ tab.label }}
         </template>
         <template #score="{ active }">
@@ -54,13 +70,13 @@ watch([() => authStore.user?.id, () => leaderboardStore.activeTab], () => leader
 </template>
 
 <style scoped>
-.leaderboard-tabs :deep([role='tab']) {
+.leaderboard-tabs :deep([role="tab"]) {
   gap: 0.375rem;
   padding: 0.5rem 0.625rem;
   font-size: 0.75rem;
 }
 
-.leaderboard-tabs :deep([role='tabpanel']) {
+.leaderboard-tabs :deep([role="tabpanel"]) {
   padding-block: 0.75rem;
 }
 </style>

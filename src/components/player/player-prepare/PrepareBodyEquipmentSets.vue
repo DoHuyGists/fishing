@@ -2,8 +2,8 @@
 import { computed } from "vue";
 import { t as tr } from "../../../i18n/index.ts";
 import { healthSlots } from "../../../data/healthEquipment.ts";
-import { useHealthStore } from "../../../stores/health.ts";
-import { useModalStore } from "../../../stores/modal.ts";
+import { useHealthStore } from "../../../stores/player-health-store.ts";
+import { useModalStore } from "../../../stores/player-modal-store.ts";
 import { useToast } from "../../../composables/useToast.ts";
 import type { BodyEquipmentSet } from "../../../types/model/health.ts";
 
@@ -81,9 +81,11 @@ async function switchSet(set: BodyEquipmentSet) {
           :key="set.id"
           type="button"
           class="group flex flex-col items-start gap-0.5 rounded-lg border px-2.5 py-1 transition-all duration-150 disabled:cursor-not-allowed"
-          :class="set.is_used
-            ? 'cursor-default border-[#8eaa91] bg-[#dce9d7] shadow-sm'
-            : 'border-[#cbd9c6] bg-[#f5f9f0] text-[#405446] hover:border-[#8eaa91] hover:bg-white'"
+          :class="
+            set.is_used
+              ? 'cursor-default border-[#8eaa91] bg-[#dce9d7] shadow-sm'
+              : 'border-[#cbd9c6] bg-[#f5f9f0] text-[#405446] hover:border-[#8eaa91] hover:bg-white'
+          "
           :disabled="store.busy"
           :aria-pressed="set.is_used"
           @click="switchSet(set)"
@@ -102,7 +104,11 @@ async function switchSet(set: BodyEquipmentSet) {
       </div>
 
       <div v-if="usedSet" class="grid grid-cols-2 gap-1.5 md:grid-cols-3 xl:grid-cols-6">
-        <div v-for="slot in healthSlots" :key="slot" class="min-h-[88px] overflow-hidden rounded-md border border-[#cbd9c6] bg-[#f5f9f0]">
+        <div
+          v-for="slot in healthSlots"
+          :key="slot"
+          class="min-h-[88px] overflow-hidden rounded-md border border-[#cbd9c6] bg-[#f5f9f0]"
+        >
           <div class="flex items-center justify-between gap-1 border-b border-[#cbd9c6] bg-[#eaf2e5] px-1.5 py-1">
             <span class="text-xs font-semibold">{{ tr(`Health.slot_${slot}`) }}</span>
             <span class="text-[11px] text-[#617565]">{{ usedSet[slot].length }} {{ tr("PrepareModal.mon") }}</span>

@@ -1,32 +1,49 @@
 <script setup lang="ts">
 import type { FriendTab as ActiveTab, FriendUserProfile, UserFriend } from "../../../types/model/friend";
-import { getFormattingLocale } from '../../../i18n';
+import { getFormattingLocale } from "../../../i18n";
 import { t as tr } from "../../../i18n";
 
 import { computed, onMounted, ref, watch, onUnmounted } from "vue";
-import Pagination from '../../shared/Pagination.vue';
+import Pagination from "../../shared/Pagination.vue";
 import Modal from "../../shared/Modal.vue";
-import { useCountryStore } from "../../../stores/country.ts";
+import { useCountryStore } from "../../../stores/player-country-store.ts";
 import { useAuthStore } from "../../../stores/auth.ts";
-import { useFriendStore, type FriendshipRelation } from "../../../stores/friend.ts";
+import { useFriendStore, type FriendshipRelation } from "../../../stores/player-friend-store.ts";
 import { useToast } from "../../../composables/useToast.ts";
-
 
 const authStore = useAuthStore();
 const friendStore = useFriendStore();
 const countryStore = useCountryStore();
 const toast = useToast();
 
-const activeTab = computed<ActiveTab>({ get: () => friendStore.activeTab, set: value => { friendStore.activeTab = value; } });
-const searchQuery = computed({ get: () => friendStore.search, set: value => { friendStore.search = value; } });
+const activeTab = computed<ActiveTab>({
+  get: () => friendStore.activeTab,
+  set: (value) => {
+    friendStore.activeTab = value;
+  },
+});
+const searchQuery = computed({
+  get: () => friendStore.search,
+  set: (value) => {
+    friendStore.search = value;
+  },
+});
 let searchTimer: ReturnType<typeof setTimeout> | undefined;
-watch(activeTab, () => { clearTimeout(searchTimer); void friendStore.loadData(currentUserId.value, 1); });
+watch(activeTab, () => {
+  clearTimeout(searchTimer);
+  void friendStore.loadData(currentUserId.value, 1);
+});
 watch(searchQuery, () => {
   clearTimeout(searchTimer);
   ++friendStore.requestId;
-  searchTimer = setTimeout(() => { void friendStore.loadData(currentUserId.value, 1); }, 300);
+  searchTimer = setTimeout(() => {
+    void friendStore.loadData(currentUserId.value, 1);
+  }, 300);
 });
-onUnmounted(() => { clearTimeout(searchTimer); ++friendStore.requestId; });
+onUnmounted(() => {
+  clearTimeout(searchTimer);
+  ++friendStore.requestId;
+});
 const directFriendIdInput = ref("");
 const copiedId = ref<string | null>(null);
 
@@ -89,14 +106,14 @@ async function copyToClipboard(text: string) {
   try {
     await navigator.clipboard.writeText(text);
     copiedId.value = text;
-    toast.success(tr('FriendModal.da_sao_chep_ma_nguoi_choi_vao_clipboard'));
+    toast.success(tr("FriendModal.da_sao_chep_ma_nguoi_choi_vao_clipboard"));
     setTimeout(() => {
       if (copiedId.value === text) {
         copiedId.value = null;
       }
     }, 2000);
   } catch {
-    toast.error(tr('FriendModal.khong_the_sao_chep'));
+    toast.error(tr("FriendModal.khong_the_sao_chep"));
   }
 }
 
@@ -136,15 +153,15 @@ function getRelation(targetUserId: string): FriendshipRelation {
 async function handleSendRequest(targetUserId: string) {
   if (!targetUserId) return;
   if (targetUserId === currentUserId.value) {
-    toast.warning(tr('FriendModal.khong_the_tu_ket_ban_voi_chinh_minh'));
+    toast.warning(tr("FriendModal.khong_the_tu_ket_ban_voi_chinh_minh"));
     return;
   }
 
   try {
     await friendStore.sendFriendRequest(targetUserId, currentUserId.value);
-    toast.success(tr('FriendModal.da_gui_loi_moi_ket_ban_thanh_cong'));
+    toast.success(tr("FriendModal.da_gui_loi_moi_ket_ban_thanh_cong"));
   } catch (err) {
-    const message = err instanceof Error ? err.message : tr('FriendModal.gui_loi_moi_that_bai');
+    const message = err instanceof Error ? err.message : tr("FriendModal.gui_loi_moi_that_bai");
     toast.error(message);
   }
 }
@@ -152,7 +169,7 @@ async function handleSendRequest(targetUserId: string) {
 async function handleSendDirectId() {
   const targetId = directFriendIdInput.value.trim();
   if (!targetId) {
-    toast.warning(tr('FriendModal.vui_long_nhap_ma_id_nguoi_choi'));
+    toast.warning(tr("FriendModal.vui_long_nhap_ma_id_nguoi_choi"));
     return;
   }
 
@@ -166,12 +183,12 @@ async function handleRespondRequest(recordId: string, accept: boolean) {
   try {
     await friendStore.respondFriendRequest(recordId, accept, currentUserId.value);
     if (accept) {
-      toast.success(tr('FriendModal.da_dong_y_ket_ban'));
+      toast.success(tr("FriendModal.da_dong_y_ket_ban"));
     } else {
-      toast.info(tr('FriendModal.da_tu_choi_loi_moi_ket_ban'));
+      toast.info(tr("FriendModal.da_tu_choi_loi_moi_ket_ban"));
     }
   } catch (err) {
-    const message = err instanceof Error ? err.message : tr('FactionSelectModal.thao_tac_that_bai');
+    const message = err instanceof Error ? err.message : tr("FactionSelectModal.thao_tac_that_bai");
     toast.error(message);
   }
 }
@@ -200,17 +217,17 @@ async function executeDelete() {
   try {
     if (target.type === "friend") {
       await friendStore.removeFriend(target.targetUserId, currentUserId.value);
-      toast.success(tr('FriendModal.da_xoa_khoi_danh_sach_ban_be'));
+      toast.success(tr("FriendModal.da_xoa_khoi_danh_sach_ban_be"));
     } else if (target.type === "sent_request") {
       await friendStore.cancelFriendRequest(target.id, currentUserId.value);
-      toast.success(tr('FriendModal.da_huy_loi_moi_ket_ban'));
+      toast.success(tr("FriendModal.da_huy_loi_moi_ket_ban"));
     } else {
       await friendStore.respondFriendRequest(target.id, false, currentUserId.value);
-      toast.success(tr('FriendModal.da_tu_choi_va_xoa_yeu_cau_ket_ban'));
+      toast.success(tr("FriendModal.da_tu_choi_va_xoa_yeu_cau_ket_ban"));
     }
     deleteConfirmTarget.value = null;
   } catch (err) {
-    const message = err instanceof Error ? err.message : tr('FactionSelectModal.thao_tac_that_bai');
+    const message = err instanceof Error ? err.message : tr("FactionSelectModal.thao_tac_that_bai");
     toast.error(message);
   }
 }
@@ -230,9 +247,11 @@ async function executeDelete() {
             🎣
           </div>
           <div class="min-w-0">
-            <div class="m-0 text-base sm:text-lg font-bold text-white tracking-wide">{{ tr('FriendModal.ma_nguoi_choi_cua_ban') }}</div>
+            <div class="m-0 text-base sm:text-lg font-bold text-white tracking-wide">
+              {{ tr("FriendModal.ma_nguoi_choi_cua_ban") }}
+            </div>
             <div class="m-0 text-xs text-emerald-200/70 font-mono truncate" :title="currentUserId">
-              {{ currentUserId || tr('FriendModal.chua_dang_nhap') }}
+              {{ currentUserId || tr("FriendModal.chua_dang_nhap") }}
             </div>
           </div>
         </div>
@@ -243,7 +262,7 @@ async function executeDelete() {
           class="shrink-0 flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-emerald-600/30 hover:bg-emerald-600/50 border border-emerald-400/40 text-emerald-100 text-xs font-semibold transition cursor-pointer"
           @click="copyToClipboard(currentUserId)"
         >
-          <span>{{ copiedId === currentUserId ? tr('UserProfile.da_chep') : tr('FriendModal.sao_chep_id') }}</span>
+          <span>{{ copiedId === currentUserId ? tr("UserProfile.da_chep") : tr("FriendModal.sao_chep_id") }}</span>
         </button>
       </div>
 
@@ -261,7 +280,7 @@ async function executeDelete() {
           "
           @click="activeTab = 'friends'"
         >
-          <span>{{ tr('FriendModal.ban_be') }}</span>
+          <span>{{ tr("FriendModal.ban_be") }}</span>
           <span
             class="px-1.5 py-0.5 rounded-full text-[10px] font-black"
             :class="activeTab === 'friends' ? 'bg-emerald-800 text-emerald-200' : 'bg-gray-200 text-gray-700'"
@@ -280,7 +299,7 @@ async function executeDelete() {
           "
           @click="activeTab = 'received'"
         >
-          <span>{{ tr('FriendModal.loi_moi_da_nhan') }}</span>
+          <span>{{ tr("FriendModal.loi_moi_da_nhan") }}</span>
           <span
             v-if="friendStore.counts.received > 0"
             class="px-1.5 py-0.5 rounded-full text-[10px] font-black bg-rose-500 text-white animate-pulse"
@@ -306,7 +325,7 @@ async function executeDelete() {
           "
           @click="activeTab = 'sent'"
         >
-          <span>{{ tr('FriendModal.loi_moi_da_gui') }}</span>
+          <span>{{ tr("FriendModal.loi_moi_da_gui") }}</span>
           <span
             class="px-1.5 py-0.5 rounded-full text-[10px] font-black"
             :class="activeTab === 'sent' ? 'bg-emerald-800 text-emerald-200' : 'bg-gray-200 text-gray-700'"
@@ -325,7 +344,7 @@ async function executeDelete() {
           "
           @click="activeTab = 'discover'"
         >
-          <span>{{ tr('FriendModal.them_ban_be') }}</span>
+          <span>{{ tr("FriendModal.them_ban_be") }}</span>
           <span
             class="px-1.5 py-0.5 rounded-full text-[10px] font-black"
             :class="activeTab === 'discover' ? 'bg-emerald-800 text-emerald-200' : 'bg-gray-200 text-gray-700'"
@@ -375,7 +394,7 @@ async function executeDelete() {
               v-if="friendStore.actionLoadingId === directFriendIdInput.trim()"
               class="size-3 border-2 border-white border-t-transparent rounded-full animate-spin"
             ></span>
-            <span>{{ tr('FriendModal.gui_loi_moi') }}</span>
+            <span>{{ tr("FriendModal.gui_loi_moi") }}</span>
           </button>
         </div>
       </div>
@@ -386,7 +405,7 @@ async function executeDelete() {
         class="py-16 flex flex-col items-center justify-center gap-3 text-emerald-800"
       >
         <div class="size-8 border-3 border-emerald-600 border-t-transparent rounded-full animate-spin"></div>
-        <span class="text-xs font-semibold">{{ tr('FriendModal.dang_tai_danh_sach_ban_be') }}</span>
+        <span class="text-xs font-semibold">{{ tr("FriendModal.dang_tai_danh_sach_ban_be") }}</span>
       </div>
 
       <!-- Trạng thái lỗi -->
@@ -396,7 +415,7 @@ async function executeDelete() {
       >
         <span>{{ friendStore.error }}</span>
         <button type="button" class="font-bold underline hover:no-underline cursor-pointer" @click="handleRefresh">
-          {{ tr('Fishfarm.tai_lai') }}
+          {{ tr("Fishfarm.tai_lai") }}
         </button>
       </div>
 
@@ -407,12 +426,12 @@ async function executeDelete() {
           class="py-14 text-center bg-white/60 rounded-2xl border border-emerald-900/10 p-6"
         >
           <div class="text-4xl mb-2">🤝</div>
-          <div class="m-0 text-sm font-bold text-gray-800">{{ tr('FriendModal.chua_co_ban_be_nao') }}</div>
+          <div class="m-0 text-sm font-bold text-gray-800">{{ tr("FriendModal.chua_co_ban_be_nao") }}</div>
           <div class="m-0 text-xs text-gray-500 mt-1">
             {{
               searchQuery
-                ? tr('FriendModal.khong_tim_thay_ban_be_phu_hop_voi_tim_kiem')
-                : tr('FriendModal.hay_chuyen_sang_tab_them_ban_be_de_ket_ban_cung_nhung_ngu_thu_kh')
+                ? tr("FriendModal.khong_tim_thay_ban_be_phu_hop_voi_tim_kiem")
+                : tr("FriendModal.hay_chuyen_sang_tab_them_ban_be_de_ket_ban_cung_nhung_ngu_thu_kh")
             }}
           </div>
           <button
@@ -421,7 +440,7 @@ async function executeDelete() {
             class="mt-4 px-4 py-2 rounded-xl bg-emerald-700 hover:bg-emerald-800 text-white text-xs font-bold transition shadow-sm cursor-pointer"
             @click="activeTab = 'discover'"
           >
-            {{ tr('FriendModal.tim_ban_moi_ngay') }}
+            {{ tr("FriendModal.tim_ban_moi_ngay") }}
           </button>
         </div>
 
@@ -438,14 +457,30 @@ async function executeDelete() {
                   class="size-11 rounded-xl bg-linear-to-br flex items-center justify-center text-white text-sm font-black shadow-sm shrink-0"
                   :class="getAvatarGradient(record.user_id === currentUserId ? record.friend_id : record.user_id)"
                 >
-                  <img v-if="getFriendProfile(record)?.avatar_url" :src="getFriendProfile(record)?.avatar_url ?? ''" :alt="tr('UpdateIdentityModal.anh_dai_dien')" class="h-full w-full rounded-xl object-cover" referrerpolicy="no-referrer" />
-                  <span v-else>{{ (getFriendProfile(record)?.display_name || (record.user_id === currentUserId ? record.friend_id : record.user_id)).slice(0, 2).toUpperCase() }}</span>
+                  <img
+                    v-if="getFriendProfile(record)?.avatar_url"
+                    :src="getFriendProfile(record)?.avatar_url ?? ''"
+                    :alt="tr('UpdateIdentityModal.anh_dai_dien')"
+                    class="h-full w-full rounded-xl object-cover"
+                    referrerpolicy="no-referrer"
+                  />
+                  <span v-else>{{
+                    (
+                      getFriendProfile(record)?.display_name ||
+                      (record.user_id === currentUserId ? record.friend_id : record.user_id)
+                    )
+                      .slice(0, 2)
+                      .toUpperCase()
+                  }}</span>
                 </div>
 
                 <div class="min-w-0">
                   <div class="flex items-center gap-1.5">
                     <span class="text-xs font-bold text-gray-900 font-mono">
-                      {{ getFriendProfile(record)?.display_name || formatUuid(record.user_id === currentUserId ? record.friend_id : record.user_id) }}
+                      {{
+                        getFriendProfile(record)?.display_name ||
+                        formatUuid(record.user_id === currentUserId ? record.friend_id : record.user_id)
+                      }}
                     </span>
                     <button
                       type="button"
@@ -457,19 +492,27 @@ async function executeDelete() {
                     </button>
                   </div>
 
-                  <div class="mt-1 text-[11px] text-[#556655]">{{ countryStore.getCountryName(getFriendProfile(record)?.country_id) }}</div>
+                  <div class="mt-1 text-[11px] text-[#556655]">
+                    {{ countryStore.getCountryName(getFriendProfile(record)?.country_id) }}
+                  </div>
                   <!-- Thông số hồ sơ nếu có -->
                   <div v-if="getFriendProfile(record)" class="flex items-center gap-2 mt-1 flex-wrap text-[11px]">
                     <span
                       class="px-2 py-0.5 rounded-full bg-amber-100 text-amber-800 font-bold border border-amber-200"
                     >
-                      {{ tr('UserProfile.cap') }} {{ getFriendProfile(record)?.level }}
+                      {{ tr("UserProfile.cap") }} {{ getFriendProfile(record)?.level }}
                     </span>
                     <span class="px-2 py-0.5 rounded-full bg-emerald-100 text-emerald-800 font-medium">
-                      ✨ {{ Number(getFriendProfile(record)?.experience_point ?? 0).toLocaleString(getFormattingLocale()) }} EXP
+                      ✨
+                      {{
+                        Number(getFriendProfile(record)?.experience_point ?? 0).toLocaleString(getFormattingLocale())
+                      }}
+                      EXP
                     </span>
                   </div>
-                  <div v-else class="text-[10px] text-gray-400 mt-0.5">{{ tr('FriendModal.chua_tai_du_lieu_ho_so') }}</div>
+                  <div v-else class="text-[10px] text-gray-400 mt-0.5">
+                    {{ tr("FriendModal.chua_tai_du_lieu_ho_so") }}
+                  </div>
                 </div>
               </div>
 
@@ -480,7 +523,7 @@ async function executeDelete() {
                 :disabled="friendStore.actionLoadingId === record.id"
                 @click="confirmDelete(record, 'friend')"
               >
-                {{ tr('FriendModal.xoa_ban') }}
+                {{ tr("FriendModal.xoa_ban") }}
               </button>
             </div>
 
@@ -488,8 +531,11 @@ async function executeDelete() {
             <div
               class="pt-2 border-t border-gray-100 flex flex-wrap items-center justify-between gap-x-2 gap-y-1 text-[10px] text-gray-400"
             >
-              <span>{{ tr('FriendModal.da_ket_ban_tu') }} {{ new Date(record.created_at).toLocaleDateString(getFormattingLocale()) }}</span>
-              <span class="text-emerald-700 font-semibold">{{ tr('FriendModal.ban_be_2') }}</span>
+              <span
+                >{{ tr("FriendModal.da_ket_ban_tu") }}
+                {{ new Date(record.created_at).toLocaleDateString(getFormattingLocale()) }}</span
+              >
+              <span class="text-emerald-700 font-semibold">{{ tr("FriendModal.ban_be_2") }}</span>
             </div>
           </div>
         </div>
@@ -502,9 +548,9 @@ async function executeDelete() {
           class="py-14 text-center bg-white/60 rounded-2xl border border-emerald-900/10 p-6"
         >
           <div class="text-4xl mb-2">📬</div>
-          <div class="m-0 text-sm font-bold text-gray-800">{{ tr('FriendModal.khong_co_loi_moi_nao') }}</div>
+          <div class="m-0 text-sm font-bold text-gray-800">{{ tr("FriendModal.khong_co_loi_moi_nao") }}</div>
           <div class="m-0 text-xs text-gray-500 mt-1">
-            {{ tr('FriendModal.hien_tai_ban_chua_nhan_duoc_yeu_cau_ket_ban_nao_tu_nguoi_choi_kh') }}
+            {{ tr("FriendModal.hien_tai_ban_chua_nhan_duoc_yeu_cau_ket_ban_nao_tu_nguoi_choi_kh") }}
           </div>
         </div>
 
@@ -519,8 +565,16 @@ async function executeDelete() {
                 class="size-11 rounded-xl bg-linear-to-br flex items-center justify-center text-white text-sm font-black shadow-sm shrink-0"
                 :class="getAvatarGradient(record.user_id)"
               >
-                <img v-if="getSenderProfile(record)?.avatar_url" :src="getSenderProfile(record)?.avatar_url ?? ''" :alt="tr('UpdateIdentityModal.anh_dai_dien')" class="h-full w-full rounded-xl object-cover" referrerpolicy="no-referrer" />
-                <span v-else>{{ (getSenderProfile(record)?.display_name || record.user_id).slice(0, 2).toUpperCase() }}</span>
+                <img
+                  v-if="getSenderProfile(record)?.avatar_url"
+                  :src="getSenderProfile(record)?.avatar_url ?? ''"
+                  :alt="tr('UpdateIdentityModal.anh_dai_dien')"
+                  class="h-full w-full rounded-xl object-cover"
+                  referrerpolicy="no-referrer"
+                />
+                <span v-else>{{
+                  (getSenderProfile(record)?.display_name || record.user_id).slice(0, 2).toUpperCase()
+                }}</span>
               </div>
 
               <div class="min-w-0">
@@ -537,16 +591,23 @@ async function executeDelete() {
                     📋
                   </button>
                   <span class="px-2 py-0.5 rounded text-[10px] font-bold bg-amber-200 text-amber-900">
-                    {{ tr('FriendModal.muon_ket_ban') }}
+                    {{ tr("FriendModal.muon_ket_ban") }}
                   </span>
                 </div>
 
-                <div class="mt-1 text-[11px] text-[#556655]">{{ countryStore.getCountryName(getSenderProfile(record)?.country_id) }}</div>
+                <div class="mt-1 text-[11px] text-[#556655]">
+                  {{ countryStore.getCountryName(getSenderProfile(record)?.country_id) }}
+                </div>
                 <div v-if="getSenderProfile(record)" class="flex flex-wrap items-center gap-2 mt-1 text-[11px]">
-                  <span class="font-bold text-amber-800"> {{ tr('UserProfile.cap') }} {{ getSenderProfile(record)?.level }} </span>
+                  <span class="font-bold text-amber-800">
+                    {{ tr("UserProfile.cap") }} {{ getSenderProfile(record)?.level }}
+                  </span>
                   <span class="text-gray-500">·</span>
                   <span class="text-emerald-800 font-medium">
-                    {{ Number(getSenderProfile(record)?.experience_point ?? 0).toLocaleString(getFormattingLocale()) }} EXP
+                    {{
+                      Number(getSenderProfile(record)?.experience_point ?? 0).toLocaleString(getFormattingLocale())
+                    }}
+                    EXP
                   </span>
                   <span class="text-gray-500">·</span>
                   <span class="text-gray-400 text-[10px]">
@@ -568,7 +629,7 @@ async function executeDelete() {
                   v-if="friendStore.actionLoadingId === record.id"
                   class="size-3 border-2 border-white border-t-transparent rounded-full animate-spin"
                 ></span>
-                <span>{{ tr('FriendModal.dong_y') }}</span>
+                <span>{{ tr("FriendModal.dong_y") }}</span>
               </button>
 
               <button
@@ -577,7 +638,7 @@ async function executeDelete() {
                 :disabled="friendStore.actionLoadingId === record.id"
                 @click="handleRespondRequest(record.id, false)"
               >
-                {{ tr('FriendModal.tu_choi') }}
+                {{ tr("FriendModal.tu_choi") }}
               </button>
 
               <button
@@ -587,7 +648,7 @@ async function executeDelete() {
                 :title="tr('FriendModal.xoa_yeu_cau_nay')"
                 @click="confirmDelete(record, 'received_request')"
               >
-                {{ tr('FriendModal.xoa') }}
+                {{ tr("FriendModal.xoa") }}
               </button>
             </div>
           </div>
@@ -601,8 +662,10 @@ async function executeDelete() {
           class="py-14 text-center bg-white/60 rounded-2xl border border-emerald-900/10 p-6"
         >
           <div class="text-4xl mb-2">📤</div>
-          <div class="m-0 text-sm font-bold text-gray-800">{{ tr('FriendModal.chua_gui_loi_moi_nao') }}</div>
-          <div class="m-0 text-xs text-gray-500 mt-1">{{ tr('FriendModal.ban_chua_gui_yeu_cau_ket_ban_nao_dang_o_trang_thai_cho') }}</div>
+          <div class="m-0 text-sm font-bold text-gray-800">{{ tr("FriendModal.chua_gui_loi_moi_nao") }}</div>
+          <div class="m-0 text-xs text-gray-500 mt-1">
+            {{ tr("FriendModal.ban_chua_gui_yeu_cau_ket_ban_nao_dang_o_trang_thai_cho") }}
+          </div>
         </div>
 
         <div v-else class="space-y-2">
@@ -616,8 +679,16 @@ async function executeDelete() {
                 class="size-11 rounded-xl bg-linear-to-br flex items-center justify-center text-white text-sm font-black shadow-sm shrink-0"
                 :class="getAvatarGradient(record.friend_id)"
               >
-                <img v-if="getRecipientProfile(record)?.avatar_url" :src="getRecipientProfile(record)?.avatar_url ?? ''" :alt="tr('UpdateIdentityModal.anh_dai_dien')" class="h-full w-full rounded-xl object-cover" referrerpolicy="no-referrer" />
-                <span v-else>{{ (getRecipientProfile(record)?.display_name || record.friend_id).slice(0, 2).toUpperCase() }}</span>
+                <img
+                  v-if="getRecipientProfile(record)?.avatar_url"
+                  :src="getRecipientProfile(record)?.avatar_url ?? ''"
+                  :alt="tr('UpdateIdentityModal.anh_dai_dien')"
+                  class="h-full w-full rounded-xl object-cover"
+                  referrerpolicy="no-referrer"
+                />
+                <span v-else>{{
+                  (getRecipientProfile(record)?.display_name || record.friend_id).slice(0, 2).toUpperCase()
+                }}</span>
               </div>
 
               <div class="min-w-0">
@@ -636,16 +707,21 @@ async function executeDelete() {
                   <span
                     class="px-2 py-0.5 rounded text-[10px] font-semibold bg-gray-100 text-gray-700 border border-gray-200"
                   >
-                    {{ tr('FriendModal.dang_cho_dong_y') }}
+                    {{ tr("FriendModal.dang_cho_dong_y") }}
                   </span>
                 </div>
 
-                <div class="mt-1 text-[11px] text-[#556655]">{{ countryStore.getCountryName(getRecipientProfile(record)?.country_id) }}</div>
+                <div class="mt-1 text-[11px] text-[#556655]">
+                  {{ countryStore.getCountryName(getRecipientProfile(record)?.country_id) }}
+                </div>
                 <div v-if="getRecipientProfile(record)" class="flex flex-wrap items-center gap-2 mt-1 text-[11px]">
-                  <span class="font-bold text-amber-800"> {{ tr('UserProfile.cap') }} {{ getRecipientProfile(record)?.level }} </span>
+                  <span class="font-bold text-amber-800">
+                    {{ tr("UserProfile.cap") }} {{ getRecipientProfile(record)?.level }}
+                  </span>
                   <span class="text-gray-500">·</span>
                   <span class="text-gray-400 text-[10px]">
-                    {{ tr('FriendModal.gui_luc') }} {{ new Date(record.created_at).toLocaleDateString(getFormattingLocale()) }}
+                    {{ tr("FriendModal.gui_luc") }}
+                    {{ new Date(record.created_at).toLocaleDateString(getFormattingLocale()) }}
                   </span>
                 </div>
               </div>
@@ -658,7 +734,7 @@ async function executeDelete() {
               :disabled="friendStore.actionLoadingId === record.id"
               @click="confirmDelete(record, 'sent_request')"
             >
-              {{ tr('FriendModal.huy_loi_moi') }}
+              {{ tr("FriendModal.huy_loi_moi") }}
             </button>
           </div>
         </div>
@@ -667,8 +743,8 @@ async function executeDelete() {
       <!-- ================= TAB 4: KHÁM PHÁ & THÊM BẠN ================= -->
       <div v-else-if="activeTab === 'discover'" class="space-y-3">
         <div class="flex flex-wrap items-center justify-between gap-x-2 gap-y-1 text-xs text-gray-600 px-1">
-          <span>{{ tr('FriendModal.danh_sach_nguoi_choi_tu_he_thong') }}{{ filteredPlayers.length }})</span>
-          <span class="text-[11px] text-gray-400">{{ tr('FriendModal.sap_xep_theo_cap_do_cao_xuong_thap') }}</span>
+          <span>{{ tr("FriendModal.danh_sach_nguoi_choi_tu_he_thong") }}{{ filteredPlayers.length }})</span>
+          <span class="text-[11px] text-gray-400">{{ tr("FriendModal.sap_xep_theo_cap_do_cao_xuong_thap") }}</span>
         </div>
 
         <div
@@ -676,8 +752,10 @@ async function executeDelete() {
           class="py-14 text-center bg-white/60 rounded-2xl border border-emerald-900/10 p-6"
         >
           <div class="text-4xl mb-2">🔍</div>
-          <div class="m-0 text-sm font-bold text-gray-800">{{ tr('FriendModal.khong_tim_thay_nguoi_choi') }}</div>
-          <div class="m-0 text-xs text-gray-500 mt-1">{{ tr('FriendModal.khong_co_nguoi_choi_nao_khop_voi_tu_khoa_tim_kiem') }}</div>
+          <div class="m-0 text-sm font-bold text-gray-800">{{ tr("FriendModal.khong_tim_thay_nguoi_choi") }}</div>
+          <div class="m-0 text-xs text-gray-500 mt-1">
+            {{ tr("FriendModal.khong_co_nguoi_choi_nao_khop_voi_tu_khoa_tim_kiem") }}
+          </div>
         </div>
 
         <div v-else class="grid min-w-0 grid-cols-1 gap-3 sm:grid-cols-2">
@@ -693,7 +771,13 @@ async function executeDelete() {
                   class="size-11 rounded-xl bg-linear-to-br flex items-center justify-center text-white text-sm font-black shadow-sm shrink-0"
                   :class="getAvatarGradient(player.id)"
                 >
-                  <img v-if="player.avatar_url" :src="player.avatar_url" :alt="tr('UpdateIdentityModal.anh_dai_dien')" class="h-full w-full rounded-xl object-cover" referrerpolicy="no-referrer" />
+                  <img
+                    v-if="player.avatar_url"
+                    :src="player.avatar_url"
+                    :alt="tr('UpdateIdentityModal.anh_dai_dien')"
+                    class="h-full w-full rounded-xl object-cover"
+                    referrerpolicy="no-referrer"
+                  />
                   <span v-else>{{ (player.display_name || player.id).slice(0, 2).toUpperCase() }}</span>
                 </div>
 
@@ -712,13 +796,15 @@ async function executeDelete() {
                     </button>
                   </div>
 
-                  <div class="mt-1 text-[11px] text-[#556655]">{{ countryStore.getCountryName(player.country_id) }}</div>
+                  <div class="mt-1 text-[11px] text-[#556655]">
+                    {{ countryStore.getCountryName(player.country_id) }}
+                  </div>
                   <!-- Thông số: Cấp & EXP -->
                   <div class="flex items-center gap-2 mt-1 flex-wrap text-[11px]">
                     <span
                       class="px-2 py-0.5 rounded-full bg-amber-100 text-amber-800 font-bold border border-amber-200"
                     >
-                      {{ tr('UserProfile.cap') }} {{ player.level }}
+                      {{ tr("UserProfile.cap") }} {{ player.level }}
                     </span>
                     <span class="px-2 py-0.5 rounded-full bg-emerald-100 text-emerald-800 font-medium">
                       ✨ {{ Number(player.experience_point).toLocaleString(getFormattingLocale()) }} EXP
@@ -734,7 +820,7 @@ async function executeDelete() {
                   v-if="getRelation(player.id).type === 'ACCEPTED'"
                   class="px-2.5 py-1.5 rounded-lg bg-emerald-50 text-emerald-800 border border-emerald-200 text-xs font-bold"
                 >
-                  {{ tr('FriendModal.ban_be_3') }}
+                  {{ tr("FriendModal.ban_be_3") }}
                 </span>
 
                 <!-- Đã gửi lời mời đang chờ -->
@@ -742,7 +828,7 @@ async function executeDelete() {
                   <span
                     class="px-2.5 py-1.5 rounded-lg bg-gray-100 text-gray-700 border border-gray-200 text-xs font-semibold"
                   >
-                    {{ tr('FriendModal.da_gui') }}
+                    {{ tr("FriendModal.da_gui") }}
                   </span>
                   <button
                     type="button"
@@ -771,7 +857,7 @@ async function executeDelete() {
                       )
                     "
                   >
-                    {{ tr('PostProduction.dong_y') }}
+                    {{ tr("PostProduction.dong_y") }}
                   </button>
                   <button
                     type="button"
@@ -783,7 +869,7 @@ async function executeDelete() {
                       )
                     "
                   >
-                    {{ tr('FriendModal.tu_choi') }}
+                    {{ tr("FriendModal.tu_choi") }}
                   </button>
                 </div>
 
@@ -799,7 +885,7 @@ async function executeDelete() {
                     v-if="friendStore.actionLoadingId === player.id"
                     class="size-3 border-2 border-white border-t-transparent rounded-full animate-spin"
                   ></span>
-                  <span>{{ tr('FriendModal.them_ban') }}</span>
+                  <span>{{ tr("FriendModal.them_ban") }}</span>
                 </button>
               </div>
             </div>
@@ -809,10 +895,13 @@ async function executeDelete() {
               class="pt-2 border-t border-gray-100 flex flex-wrap items-center justify-between gap-x-2 gap-y-1 text-[10px] text-gray-500"
             >
               <div class="flex flex-wrap items-center gap-x-3 gap-y-1">
-                <span>{{ tr('FriendModal.tui') }} {{ player.inventory_capacity }} {{ tr('UserProfile.o') }}</span>
-                <span>{{ tr('FriendModal.kho') }} {{ player.species_storage_capacity }} {{ tr('UserProfile.o') }}</span>
+                <span>{{ tr("FriendModal.tui") }} {{ player.inventory_capacity }} {{ tr("UserProfile.o") }}</span>
+                <span>{{ tr("FriendModal.kho") }} {{ player.species_storage_capacity }} {{ tr("UserProfile.o") }}</span>
               </div>
-              <span>{{ tr('FriendModal.tham_gia') }} {{ new Date(player.created_at).toLocaleDateString(getFormattingLocale()) }}</span>
+              <span
+                >{{ tr("FriendModal.tham_gia") }}
+                {{ new Date(player.created_at).toLocaleDateString(getFormattingLocale()) }}</span
+              >
             </div>
           </div>
         </div>
@@ -821,18 +910,16 @@ async function executeDelete() {
 
     <!-- Hộp thoại xác nhận xóa (Modal xác nhận bên trong) -->
     <div v-if="deleteConfirmTarget" class="fixed inset-0 z-50 bg-black/50 flex items-center justify-center p-4">
-      <div
-        class="bg-white rounded-2xl max-w-sm w-full p-5 shadow-2xl border border-gray-200 space-y-4 player-popup-in"
-      >
+      <div class="bg-white rounded-2xl max-w-sm w-full p-5 shadow-2xl border border-gray-200 space-y-4 player-popup-in">
         <div class="flex items-center gap-3 text-red-600">
           <div class="size-10 rounded-full bg-red-100 flex items-center justify-center text-lg shrink-0">⚠️</div>
           <div class="m-0 text-base font-bold text-gray-900">
             {{
               deleteConfirmTarget.type === "friend"
-                ? tr('FriendModal.xac_nhan_huy_ket_ban')
+                ? tr("FriendModal.xac_nhan_huy_ket_ban")
                 : deleteConfirmTarget.type === "sent_request"
-                  ? tr('FriendModal.huy_loi_moi_ket_ban')
-                  : tr('FriendModal.xoa_yeu_cau_ket_ban')
+                  ? tr("FriendModal.huy_loi_moi_ket_ban")
+                  : tr("FriendModal.xoa_yeu_cau_ket_ban")
             }}
           </div>
         </div>
@@ -840,15 +927,15 @@ async function executeDelete() {
         <div class="m-0 text-xs text-gray-600 leading-relaxed">
           {{
             deleteConfirmTarget.type === "friend"
-              ? tr('FriendModal.ban_co_chac_chan_muon_xoa_nguoi_nay_khoi_danh_sach_ban_be_hai_ng')
+              ? tr("FriendModal.ban_co_chac_chan_muon_xoa_nguoi_nay_khoi_danh_sach_ban_be_hai_ng")
               : deleteConfirmTarget.type === "sent_request"
-                ? tr('FriendModal.ban_co_chac_chan_muon_huy_loi_moi_ket_ban_da_gui_toi_nguoi_choi_')
-                : tr('FriendModal.ban_co_chac_chan_muon_xoa_yeu_cau_ket_ban_nay')
+                ? tr("FriendModal.ban_co_chac_chan_muon_huy_loi_moi_ket_ban_da_gui_toi_nguoi_choi_")
+                : tr("FriendModal.ban_co_chac_chan_muon_xoa_yeu_cau_ket_ban_nay")
           }}
         </div>
 
         <div class="p-2.5 rounded-lg bg-gray-50 border border-gray-200 text-xs font-mono text-gray-700 truncate">
-          {{ tr('FriendModal.ma_nguoi_choi') }} {{ deleteConfirmTarget.targetUserId }}
+          {{ tr("FriendModal.ma_nguoi_choi") }} {{ deleteConfirmTarget.targetUserId }}
         </div>
 
         <div class="flex items-center justify-end gap-2 pt-2">
@@ -857,7 +944,7 @@ async function executeDelete() {
             class="px-4 py-2 rounded-xl border border-gray-300 bg-white hover:bg-gray-100 text-gray-700 text-xs font-bold transition cursor-pointer"
             @click="deleteConfirmTarget = null"
           >
-            {{ tr('FactionSelectModal.huy_bo') }}
+            {{ tr("FactionSelectModal.huy_bo") }}
           </button>
           <button
             type="button"
@@ -875,11 +962,17 @@ async function executeDelete() {
               "
               class="size-3 border-2 border-white border-t-transparent rounded-full animate-spin"
             ></span>
-            <span>{{ tr('FriendModal.xac_nhan_xoa') }}</span>
+            <span>{{ tr("FriendModal.xac_nhan_xoa") }}</span>
           </button>
         </div>
       </div>
     </div>
-    <Pagination :page="friendStore.page" :page-size="friendStore.pageSize" :total="friendStore.total" :loading="friendStore.loading" @change="friendStore.loadData(currentUserId, $event)" />
+    <Pagination
+      :page="friendStore.page"
+      :page-size="friendStore.pageSize"
+      :total="friendStore.total"
+      :loading="friendStore.loading"
+      @change="friendStore.loadData(currentUserId, $event)"
+    />
   </Modal>
 </template>

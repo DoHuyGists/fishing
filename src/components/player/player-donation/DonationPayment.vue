@@ -52,7 +52,7 @@
 import { computed, onBeforeUnmount, ref, shallowRef, watch } from 'vue';
 import { t as tr } from '../../../i18n';
 import { useAuthStore } from '../../../stores/auth';
-import { useDonationStore } from '../../../stores/donation';
+import { useDonationStore } from '../../../stores/player-donation-store';
 import { loadPayPal, type PayPalInstance } from '../../../utils/paypalCheckout';
 
 const auth = useAuthStore();

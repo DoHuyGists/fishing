@@ -4,9 +4,9 @@ import { t as tr } from "../../../i18n";
 
 import { computed, onMounted, ref } from "vue";
 import { useAuthStore } from "../../../stores/auth.ts";
-import { useCurrencyStore } from "../../../stores/currency.ts";
+import { useCurrencyStore } from "../../../stores/player-currency-store.ts";
 import { useUserProfileStore } from "../../../stores/userProfile.ts";
-import { useCountryStore } from "../../../stores/country.ts";
+import { useCountryStore } from "../../../stores/player-country-store.ts";
 import Cash from "../player-currency/Cash.vue";
 import LanguageSelector from "../../shared/LanguageSelector.vue";
 import UpdateCountryModal from "./UpdateCountryModal.vue";

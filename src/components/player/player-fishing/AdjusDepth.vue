@@ -1,10 +1,10 @@
 <script setup lang="ts">
-import { getFormattingLocale } from '../../../i18n';
+import { getFormattingLocale } from "../../../i18n";
 import { t as tr } from "../../../i18n";
 
 import { computed, onBeforeUnmount, onMounted, ref, watch } from "vue";
 import { getDepthLayer } from "../../../data/fishingDepth";
-import { useFishingStore } from "../../../stores/fishing";
+import { useFishingStore } from "../../../stores/player-fishing-store";
 
 const store = useFishingStore();
 const depthConfig = computed(() => store.depthConfig);
@@ -12,7 +12,9 @@ const draftDepth = ref(store.appliedDepthMeters);
 const depth = computed(() => Number(draftDepth.value));
 const layer = computed(() => getDepthLayer(depth.value, depthConfig.value));
 const depthPercent = computed(() => (depth.value / depthConfig.value.maxMeters) * 100);
-const formattedDepth = computed(() => new Intl.NumberFormat(getFormattingLocale(), { maximumFractionDigits: 1 }).format(depth.value));
+const formattedDepth = computed(() =>
+  new Intl.NumberFormat(getFormattingLocale(), { maximumFractionDigits: 1 }).format(depth.value),
+);
 const errorMessage = ref("");
 let depthPreviewTimeout: ReturnType<typeof setTimeout> | undefined;
 
@@ -65,7 +67,7 @@ function close() {
 
 function apply() {
   if (!store.canAdjustDepth) {
-    errorMessage.value = tr('AdjusDepth.hay_thu_moi_ve_truoc_khi_dieu_chinh_do_sau');
+    errorMessage.value = tr("AdjusDepth.hay_thu_moi_ve_truoc_khi_dieu_chinh_do_sau");
     return;
   }
   store.applyDepth(depth.value);
@@ -95,7 +97,7 @@ onBeforeUnmount(() => {
         >
           <header class="flex items-center justify-between border-b border-white/10 px-5 py-3.5 sm:px-6">
             <div id="depth-title" class="m-0 flex items-center gap-2.5 text-base font-bold">
-              <span class="text-[#5ad0b3]" aria-hidden="true">≋</span>{{ tr('AdjusDepth.dieu_chinh_do_sau') }}
+              <span class="text-[#5ad0b3]" aria-hidden="true">≋</span>{{ tr("AdjusDepth.dieu_chinh_do_sau") }}
             </div>
             <button
               type="button"
@@ -115,7 +117,11 @@ onBeforeUnmount(() => {
                 <div class="water-column">
                   <div class="water-surface"><span></span></div>
                   <div class="fishing-line" :style="{ height: `${depthPercent}%` }"></div>
-                  <div class="bait-marker" :style="{ top: `${depthPercent}%` }" :aria-label="tr('AdjusDepth.moi_cau_o_do_sau_da_chon')">
+                  <div
+                    class="bait-marker"
+                    :style="{ top: `${depthPercent}%` }"
+                    :aria-label="tr('AdjusDepth.moi_cau_o_do_sau_da_chon')"
+                  >
                     ●
                   </div>
                   <span
@@ -132,7 +138,14 @@ onBeforeUnmount(() => {
                 </div>
                 <div class="depth-labels" aria-hidden="true">
                   <span v-for="(tick, i) in depthConfig.ticksMeters" :key="tick"
-                    >{{ tick }} m<small>{{ [tr('AdjusDepth.mat_nuoc'), tr('AdjusDepth.tang_giua'), tr('AdjusDepth.tang_sau'), tr('AdjusDepth.day_ho')][i] }}</small></span
+                    >{{ tick }} m<small>{{
+                      [
+                        tr("AdjusDepth.mat_nuoc"),
+                        tr("AdjusDepth.tang_giua"),
+                        tr("AdjusDepth.tang_sau"),
+                        tr("AdjusDepth.day_ho"),
+                      ][i]
+                    }}</small></span
                   >
                 </div>
               </div>
@@ -141,7 +154,7 @@ onBeforeUnmount(() => {
             <section class="control-card" :aria-label="tr('AdjusDepth.bo_dieu_khien_do_sau')">
               <div class="flex items-start justify-between gap-2">
                 <div>
-                  <div class="m-0 text-[11px] text-[#91aaa0]">{{ tr('AdjusDepth.do_sau_hien_tai') }}</div>
+                  <div class="m-0 text-[11px] text-[#91aaa0]">{{ tr("AdjusDepth.do_sau_hien_tai") }}</div>
                   <div class="m-0 mt-1 text-[25px] font-extrabold leading-none text-white">
                     {{ formattedDepth }} <span class="text-sm font-semibold text-[#a9c4b8]">m</span>
                   </div>
@@ -177,13 +190,17 @@ onBeforeUnmount(() => {
                   </button>
                 </div>
               </div>
-              <div class="m-0 text-center text-[10px] text-[#78958a]">{{ tr('AdjusDepth.keo_thanh_hoac_dung_phim_mui_ten_de_chinh') }}</div>
+              <div class="m-0 text-center text-[10px] text-[#78958a]">
+                {{ tr("AdjusDepth.keo_thanh_hoac_dung_phim_mui_ten_de_chinh") }}
+              </div>
             </section>
 
             <section class="info-card col-span-2 md:col-span-1">
               <div class="grid grid-cols-2 md:grid-cols-1 gap-2">
                 <div>
-                  <div class="m-0 mb-3 text-[12px] font-bold text-[#d8e9e0]">{{ tr('AdjusDepth.thong_tin_tang_nuoc') }}</div>
+                  <div class="m-0 mb-3 text-[12px] font-bold text-[#d8e9e0]">
+                    {{ tr("AdjusDepth.thong_tin_tang_nuoc") }}
+                  </div>
                   <div class="m-0 list-none space-y-2.5 p-0">
                     <div
                       v-for="waterLayer in depthConfig.layers"
@@ -205,7 +222,7 @@ onBeforeUnmount(() => {
                   </div>
                 </div>
                 <div class="md:border-t md:pt-2 border-white/10">
-                  <div class="m-0 text-[11px] font-bold text-[#d8e9e0]">{{ tr('AdjusDepth.ca_co_the_xuat_hien') }}</div>
+                  <div class="m-0 text-[11px] font-bold text-[#d8e9e0]">{{ tr("AdjusDepth.ca_co_the_xuat_hien") }}</div>
                   <div
                     v-if="store.isLoadingDepthPreview"
                     class="mb-0 mt-2 flex items-center gap-2 rounded-lg bg-black/10 px-2.5 py-2 text-[10px] text-[#91aaa0]"
@@ -216,7 +233,7 @@ onBeforeUnmount(() => {
                       class="h-3 w-3 shrink-0 animate-spin rounded-full border-2 border-[#91aaa0]/30 border-t-[#5ad0b3]"
                       aria-hidden="true"
                     ></span
-                    >{{ tr('AdjusDepth.dang_cap_nhat_danh_sach_ca_o') }} {{ formattedDepth }} m...
+                    >{{ tr("AdjusDepth.dang_cap_nhat_danh_sach_ca_o") }} {{ formattedDepth }} m...
                   </div>
                   <div
                     v-else-if="store.depthPreviewError"
@@ -226,7 +243,9 @@ onBeforeUnmount(() => {
                   </div>
                   <template v-else-if="store.depthPreview">
                     <div class="mb-2 mt-1 text-[9px] text-[#91aaa0]">
-                      {{ store.depthPreview.total_species }} {{ tr('AdjusDepth.loai') }} {{ store.depthPreview.discovered_species }} {{ tr('AdjusDepth.da_kham_pha') }} {{ store.depthPreview.undiscovered_species }} {{ tr('AdjusDepth.chua_kham_pha') }}
+                      {{ store.depthPreview.total_species }} {{ tr("AdjusDepth.loai") }}
+                      {{ store.depthPreview.discovered_species }} {{ tr("AdjusDepth.da_kham_pha") }}
+                      {{ store.depthPreview.undiscovered_species }} {{ tr("AdjusDepth.chua_kham_pha") }}
                     </div>
                     <div v-if="store.depthPreview.fishes.length" class="m-0 list-none space-y-1.5 overflow-y-auto p-0">
                       <div
@@ -256,20 +275,22 @@ onBeforeUnmount(() => {
                             {{
                               fish.weight_min != null && fish.weight_max != null
                                 ? `${fish.weight_min}–${fish.weight_max} kg`
-                                : tr('AdjusDepth.chua_ro_can_nang')
+                                : tr("AdjusDepth.chua_ro_can_nang")
                             }}</span
                           >
                           <span v-if="fish.rarity" class="text-[8px] text-[#a9c4b8]">{{ fish.rarity }}</span>
                         </span>
                       </div>
                     </div>
-                    <div v-else class="mb-0 mt-2 text-[10px] text-[#91aaa0]">{{ tr('AdjusDepth.khong_co_loai_ca_o_do_sau_nay') }}</div>
+                    <div v-else class="mb-0 mt-2 text-[10px] text-[#91aaa0]">
+                      {{ tr("AdjusDepth.khong_co_loai_ca_o_do_sau_nay") }}
+                    </div>
                   </template>
                   <div
                     v-else
                     class="mb-0 mt-2 rounded-lg bg-black/10 px-2.5 py-2 text-[10px] leading-relaxed text-[#91aaa0]"
                   >
-                    {{ tr('AdjusDepth.chua_co_du_lieu_du_doan_o') }} {{ formattedDepth }} m.
+                    {{ tr("AdjusDepth.chua_co_du_lieu_du_doan_o") }} {{ formattedDepth }} m.
                   </div>
                 </div>
               </div>
@@ -279,16 +300,18 @@ onBeforeUnmount(() => {
           <footer class="flex flex-wrap items-center justify-between gap-3 border-t border-white/10 px-4 py-3 sm:px-5">
             <div v-if="errorMessage" class="m-0 text-[11px] text-[#ffc18b]" role="status">{{ errorMessage }}</div>
             <div v-else-if="!store.canAdjustDepth" class="m-0 text-[11px] text-[#d5c994]">
-              {{ tr('AdjusDepth.hay_thu_moi_ve_truoc_khi_ap_dung_thay_doi') }}
+              {{ tr("AdjusDepth.hay_thu_moi_ve_truoc_khi_ap_dung_thay_doi") }}
             </div>
-            <span v-else class="text-[10px] text-[#78958a]">{{ tr('AdjusDepth.do_sau_da_luu') }} {{ store.appliedDepthMeters }} m</span>
+            <span v-else class="text-[10px] text-[#78958a]"
+              >{{ tr("AdjusDepth.do_sau_da_luu") }} {{ store.appliedDepthMeters }} m</span
+            >
             <div class="ml-auto flex gap-2">
               <button
                 type="button"
                 class="rounded-xl border border-white/15 px-4 py-2 text-[11px] font-semibold text-[#c1d3ca] transition hover:bg-white/[0.07]"
                 @click="close"
               >
-                {{ tr('AccountInfoModal.huy') }}
+                {{ tr("AccountInfoModal.huy") }}
               </button>
               <button
                 type="button"
@@ -296,7 +319,7 @@ onBeforeUnmount(() => {
                 :disabled="!store.canAdjustDepth"
                 @click="apply"
               >
-                {{ tr('AdjusDepth.ap_dung') }}
+                {{ tr("AdjusDepth.ap_dung") }}
               </button>
             </div>
           </footer>

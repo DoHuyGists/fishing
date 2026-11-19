@@ -187,7 +187,7 @@ Nếu vẫn lỗi, gửi `code`, `requestId` và dòng log tương ứng; không
 
 ## Verification before live payments
 
-- Run `npm run build`, `npm run check:i18n`, and `node scripts/validate-paypal.mjs`.
+- Run `npm run build` and `npm run check:i18n`.
 - In sandbox, complete a PayPal transaction and an eligible guest card transaction. Verify the amount, currency, merchant, capture ID and `COMPLETED` status in `public.donations`.
 - Test invalid amounts, cancellation, a declined instrument, pending payments, unauthenticated requests, another user's donation ID, a forged webhook, and repeated/concurrent capture requests. Only a verified completed capture produces the success message.
 - Disconnect the browser during capture, reopen the modal, and use **Check / complete existing transaction**. The active attempt is retained in session storage; the server uses stable PayPal idempotency keys and reads PayPal state before capture retries. The frontend never handles card numbers or CVV.

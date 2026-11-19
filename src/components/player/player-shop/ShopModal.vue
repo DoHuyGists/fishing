@@ -1,17 +1,17 @@
 <script setup lang="ts">
-import { useGameCatalogRefresh } from '../../../composables/useGameCatalogRefresh';
+import { useGameCatalogRefresh } from "../../../composables/useGameCatalogRefresh";
 import { t as tr } from "../../../i18n";
 
 import { computed, onMounted, ref } from "vue";
 import Modal from "../../shared/Modal.vue";
 import ShopItemCard from "./ShopItemCard.vue";
 import ShopPurchaseForm from "./ShopPurchaseForm.vue";
-import { useInventoryStore } from "../../../stores/inventory.ts";
-import { useCurrencyStore } from "../../../stores/currency.ts";
+import { useInventoryStore } from "../../../stores/player-inventory-store.ts";
+import { useCurrencyStore } from "../../../stores/player-currency-store.ts";
 import { useAuthStore } from "../../../stores/auth.ts";
 import { useToast } from "../../../composables/useToast";
 
-useGameCatalogRefresh(['shop']);
+useGameCatalogRefresh(["shop"]);
 
 const inventoryStore = useInventoryStore();
 const currencyStore = useCurrencyStore();
@@ -67,7 +67,7 @@ const displayGroups = computed(() => {
 
   const groups = new Map<string, typeof filteredItems.value>();
   for (const item of filteredItems.value) {
-    const category = item.category?.trim() || tr('InventoryItems.khac');
+    const category = item.category?.trim() || tr("InventoryItems.khac");
     const items = groups.get(category) ?? [];
     items.push(item);
     groups.set(category, items);
@@ -90,10 +90,12 @@ const canBuy = computed(
 );
 
 onMounted(() => {
-  void inventoryStore.loadShopItems().catch(err => toast.error(err instanceof Error ? err.message : tr('GameCache.unavailable')));
+  void inventoryStore
+    .loadShopItems()
+    .catch((err) => toast.error(err instanceof Error ? err.message : tr("GameCache.unavailable")));
   if (authStore.userId) {
     void inventoryStore.setUserInventory(authStore.userId).catch((err: unknown) => {
-      toast.error(err instanceof Error ? err.message : tr('ShopModal.khong_the_tai_tui_do'), { position: "bottom" });
+      toast.error(err instanceof Error ? err.message : tr("ShopModal.khong_the_tai_tui_do"), { position: "bottom" });
     });
   }
 });
@@ -115,10 +117,14 @@ async function buyItem() {
       currencyStore.fetchCurrency(),
       inventoryStore.loadShopItems(),
     ]);
-    toast.success(tr('ShopModal.da_mua_value0_value1', { value0: receivedQuantity, value1: item.name }), { position: "bottom" });
+    toast.success(tr("ShopModal.da_mua_value0_value1", { value0: receivedQuantity, value1: item.name }), {
+      position: "bottom",
+    });
     selectedItemId.value = null;
   } catch (err) {
-    toast.error(err instanceof Error ? err.message : tr('ShopModal.khong_the_mua_vat_pham_vui_long_thu_lai'), { position: "bottom" });
+    toast.error(err instanceof Error ? err.message : tr("ShopModal.khong_the_mua_vat_pham_vui_long_thu_lai"), {
+      position: "bottom",
+    });
   } finally {
     busy.value = false;
   }
@@ -126,10 +132,7 @@ async function buyItem() {
 </script>
 
 <template>
-  <Modal
-    :title="tr('ShopModal.cua_hang_vat_pham')"
-    :on-refresh="() => inventoryStore.loadShopItems(true)"
-  >
+  <Modal :title="tr('ShopModal.cua_hang_vat_pham')" :on-refresh="() => inventoryStore.loadShopItems(true)">
     <div class="grid min-h-full gap-4 lg:grid-cols-[minmax(0,1fr)_18rem] text-[#24352a]">
       <section>
         <div
@@ -145,17 +148,17 @@ async function buyItem() {
             v-model="selectedClassification"
             class="rounded-lg border border-[#cbd9c6] bg-white px-3 py-2 text-sm"
           >
-            <option value="ALL">{{ tr('ShopModal.moi_nhom_vat_pham') }}</option>
+            <option value="ALL">{{ tr("ShopModal.moi_nhom_vat_pham") }}</option>
             <option v-for="value in classifications" :key="value" :value="value">{{ value }}</option>
           </select>
           <select v-model="selectedCategory" class="rounded-lg border border-[#cbd9c6] bg-white px-3 py-2 text-sm">
-            <option value="ALL">{{ tr('ShopModal.moi_loai_vat_pham') }}</option>
+            <option value="ALL">{{ tr("ShopModal.moi_loai_vat_pham") }}</option>
             <option v-for="value in categories" :key="value" :value="value">{{ value }}</option>
           </select>
           <select v-model="sort" class="rounded-lg border border-[#cbd9c6] bg-white px-3 py-2 text-sm">
-            <option value="name">{{ tr('ShopModal.ten_a_z') }}</option>
-            <option value="price-asc">{{ tr('ShopModal.gia_thap_den_cao') }}</option>
-            <option value="price-desc">{{ tr('ShopModal.gia_cao_den_thap') }}</option>
+            <option value="name">{{ tr("ShopModal.ten_a_z") }}</option>
+            <option value="price-asc">{{ tr("ShopModal.gia_thap_den_cao") }}</option>
+            <option value="price-desc">{{ tr("ShopModal.gia_cao_den_thap") }}</option>
           </select>
           <div
             class="flex items-center justify-end gap-1 border-t border-[#cbd9c6]/70 pt-2 sm:col-span-2 xl:col-span-4"
@@ -169,7 +172,7 @@ async function buyItem() {
               :aria-pressed="viewMode === 'list'"
               @click="viewMode = 'list'"
             >
-              {{ tr('CaughtModal.danh_sach') }}
+              {{ tr("CaughtModal.danh_sach") }}
             </button>
             <button
               type="button"
@@ -178,7 +181,7 @@ async function buyItem() {
               :aria-pressed="viewMode === 'grid'"
               @click="viewMode = 'grid'"
             >
-              {{ tr('CaughtModal.luoi') }}
+              {{ tr("CaughtModal.luoi") }}
             </button>
             <button
               type="button"
@@ -187,18 +190,18 @@ async function buyItem() {
               :aria-pressed="viewMode === 'group'"
               @click="viewMode = 'group'"
             >
-              {{ tr('ShopModal.nhom') }}
+              {{ tr("ShopModal.nhom") }}
             </button>
           </div>
         </div>
         <div v-if="inventoryStore.shopLoading" class="py-16 text-center text-sm text-emerald-900/60">
-          {{ tr('ShopModal.dang_tai_vat_pham') }}
+          {{ tr("ShopModal.dang_tai_vat_pham") }}
         </div>
         <div
           v-else-if="!filteredItems.length"
           class="rounded-xl border border-dashed border-[#cbd9c6] py-16 text-center text-sm text-emerald-900/60"
         >
-          {{ tr('ShopModal.khong_tim_thay_vat_pham_phu_hop') }}
+          {{ tr("ShopModal.khong_tim_thay_vat_pham_phu_hop") }}
         </div>
         <div v-else class="space-y-5">
           <section v-for="group in displayGroups" :key="group.category || 'all-items'">
@@ -209,13 +212,17 @@ async function buyItem() {
               {{ group.category }}
               <span class="rounded-full bg-emerald-100 px-2 py-0.5 text-[10px]">{{ group.items.length }}</span>
             </div>
-            <div :class="viewMode === 'list' ? 'flex flex-col gap-3' : 'grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-3'">
+            <div
+              :class="
+                viewMode === 'list' ? 'flex flex-col gap-3' : 'grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-3'
+              "
+            >
               <ShopItemCard
                 v-for="item in group.items"
                 :key="item.id"
                 :item="item"
                 :selected="selectedItemId === item.id"
-                :owned-quantity="authStore.userId ? inventoryStore.ownedQuantitiesByItemId.get(item.id) ?? 0 : 0"
+                :owned-quantity="authStore.userId ? (inventoryStore.ownedQuantitiesByItemId.get(item.id) ?? 0) : 0"
                 @select="selectItem"
                 @preview="previewImage = $event"
               />

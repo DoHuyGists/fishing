@@ -1,5 +1,5 @@
 import { defineStore } from "pinia";
-import { useCountryStore } from "./country";
+import { useCountryStore } from "./player-country-store";
 
 interface Location {
   k: number;
@@ -89,8 +89,14 @@ export const useWorldStore = defineStore("worldMap", {
       this.visibleAreaCountryId = countryId || null;
       this.targetArea({});
       const location = useCountryStore().countries.find((country) => country.id === countryId)?.location;
-      if (!location || !Number.isFinite(location.k) || location.k <= 0
-        || !Number.isFinite(location.lon) || !Number.isFinite(location.lat)) return;
+      if (
+        !location ||
+        !Number.isFinite(location.k) ||
+        location.k <= 0 ||
+        !Number.isFinite(location.lon) ||
+        !Number.isFinite(location.lat)
+      )
+        return;
 
       this.setMapLocation(location);
       this.moveMapToCachedLocation();

@@ -15,10 +15,9 @@ Chỉ dùng một bảng `assets`: cây thư mục được suy ra từ các b�
 
 Giao diện có ba chế độ: **Danh sách (List)**, **Lưới (Grid)**, **Cây (Tree)**. List/Grid mặc định tìm trong thư mục hiện tại; tùy chọn "Bao gồm thư mục con" mở rộng phạm vi. Tree luôn tìm trong cả nhánh và tự mở các nhánh có kết quả. Có thể mở/thu gọn các nhánh hoặc chọn thư mục làm gốc xem hiện tại. Các chức năng này dùng chung cho màn quản lý và trình chọn ảnh/video trong trình soạn thảo.
 
-Kiểm tra tự động, không truy cập dịch vụ thật:
+Kiểm tra build:
 
 ```sh
-node --test scripts/validate-assets.mjs
 npm run build
 ```
 
@@ -30,5 +29,3 @@ Sau khi chạy migration trên Supabase, kiểm tra thủ công bằng tài kho�
 - Chuyển tệp về gốc hoặc sang thư mục mới; đổi tên/chuyển cả nhánh. Kiểm tra URL không đổi và từ chối chuyển vào thư mục con hoặc thư mục đích đã có.
 - Mở kho từ `RichEditor`, upload/chọn tệp, lưu bài và kiểm tra ảnh/video trong nội dung.
 - Kiểm tra tài khoản không phải admin không được đọc/ghi `assets` hoặc gọi `assets_move_folder`.
-
-Kiểm thử tự động mock ranh giới I/O; không thay thế kiểm tra migration/RLS trên PostgreSQL và thao tác giao diện trong trình duyệt.

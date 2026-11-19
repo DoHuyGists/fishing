@@ -121,7 +121,6 @@ Chạy bằng migration owner tin cậy, PostgreSQL 15+. Yêu cầu các khóa I
 - Chỉ cập nhật đồng hồ khi đang mở; đồng bộ trạng thái mỗi phút hoặc khi đến hạn/vừa quay lại tab. Tăng trưởng offline do server quyết định, không cập nhật DB theo từng khung hình.
 - Mất phản hồi mạng: giữ nguyên request ID và đầu vào trong store/sessionStorage theo tài khoản. Thử lại dùng cùng mã. Nếu RPC đã thành công nhưng tải lại bị lỗi thì chỉ yêu cầu tải lại, không gửi lại thao tác đã xác nhận.
 - Hai folder admin: `aquaculture-species-management` và `aquaculture-food-management`, đã có mục trong `AdminView`. Dùng lại `AdminCrudScreen`, danh sách loài/items có sẵn, khóa các khóa chính khi sửa. Cấu hình loài có kiểm tra phiên bản để tránh ghi đè từ phiên admin khác.
-- Chạy kiểm tra logic không mạng: `node scripts/validate-aquaculture.mjs`.
 
 ## Kiểm tra cục bộ
 

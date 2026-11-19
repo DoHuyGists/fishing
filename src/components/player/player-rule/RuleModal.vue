@@ -1,19 +1,19 @@
 <script setup lang="ts">
-import { onMounted, onUnmounted, useTemplateRef } from 'vue';
-import { t as tr } from '../../../i18n';
-import { useModalStore } from '../../../stores/modal';
-import Modal from '../../shared/Modal.vue';
+import { onMounted, onUnmounted, useTemplateRef } from "vue";
+import { t as tr } from "../../../i18n";
+import { useModalStore } from "../../../stores/player-modal-store.ts";
+import Modal from "../../shared/Modal.vue";
 
 const modalStore = useModalStore();
-const content = useTemplateRef<HTMLDivElement>('content');
+const content = useTemplateRef<HTMLDivElement>("content");
 const previousFocus = document.activeElement;
 const sections = [
-  { key: 'fairPlay', icon: '⚖️' },
-  { key: 'bugs', icon: '🛠️' },
-  { key: 'respect', icon: '🤝' },
-  { key: 'trading', icon: '🛒' },
-  { key: 'security', icon: '🔒' },
-  { key: 'balance', icon: '🌿' },
+  { key: "fairPlay", icon: "⚖️" },
+  { key: "bugs", icon: "🛠️" },
+  { key: "respect", icon: "🤝" },
+  { key: "trading", icon: "🛒" },
+  { key: "security", icon: "🔒" },
+  { key: "balance", icon: "🌿" },
 ] as const;
 
 onMounted(() => content.value?.focus({ preventScroll: true }));
@@ -33,8 +33,8 @@ onUnmounted(() => {
   >
     <div ref="content" tabindex="-1" class="space-y-4 text-[#24352a] outline-none">
       <div class="rounded-xl border border-[#cbd9c6] bg-[#f5f9f0] p-4 text-sm leading-6">
-        <div class="font-bold">{{ tr('RuleModal.introTitle') }}</div>
-        <div class="mt-1">{{ tr('RuleModal.intro') }}</div>
+        <div class="font-bold">{{ tr("RuleModal.introTitle") }}</div>
+        <div class="mt-1">{{ tr("RuleModal.intro") }}</div>
       </div>
 
       <div class="grid gap-3 sm:grid-cols-2">
@@ -45,9 +45,13 @@ onUnmounted(() => {
           class="slide-fade-in from-bottom rounded-xl border border-[#cbd9c6] bg-white p-4 [--slide-distance:12px]!"
         >
           <div class="mb-3 flex items-center gap-2">
-            <span aria-hidden="true" class="flex size-9 shrink-0 items-center justify-center rounded-lg bg-[#f5f9f0] text-lg">{{ section.icon }}</span>
+            <span
+              aria-hidden="true"
+              class="flex size-9 shrink-0 items-center justify-center rounded-lg bg-[#f5f9f0] text-lg"
+              >{{ section.icon }}</span
+            >
             <div :id="`rule-${section.key}`" class="text-sm font-bold leading-5">
-              <span class="mr-1 text-[#61745d]">{{ String(index + 1).padStart(2, '0') }}.</span>
+              <span class="mr-1 text-[#61745d]">{{ String(index + 1).padStart(2, "0") }}.</span>
               {{ tr(`RuleModal.${section.key}Title`) }}
             </div>
           </div>
@@ -61,14 +65,22 @@ onUnmounted(() => {
       </div>
 
       <div class="rounded-xl border border-[#cbd9c6] bg-[#f5f9f0] p-4">
-        <div class="text-sm font-bold">{{ tr('RuleModal.reportTitle') }}</div>
-        <div class="mt-1 text-sm leading-6">{{ tr('RuleModal.reportDescription') }}</div>
+        <div class="text-sm font-bold">{{ tr("RuleModal.reportTitle") }}</div>
+        <div class="mt-1 text-sm leading-6">{{ tr("RuleModal.reportDescription") }}</div>
         <div class="mt-4 flex flex-wrap gap-2">
-          <button type="button" class="rounded-lg border border-[#527547] bg-[#527547] px-4 py-2 text-sm font-semibold text-white transition-colors hover:bg-[#405e37] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#527547]" @click="modalStore.open('feedback')">
-            {{ tr('RuleModal.reportAction') }}
+          <button
+            type="button"
+            class="rounded-lg border border-[#527547] bg-[#527547] px-4 py-2 text-sm font-semibold text-white transition-colors hover:bg-[#405e37] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#527547]"
+            @click="modalStore.open('feedback')"
+          >
+            {{ tr("RuleModal.reportAction") }}
           </button>
-          <button type="button" class="rounded-lg border border-[#cbd9c6] bg-white px-4 py-2 text-sm font-semibold transition-colors hover:bg-[#edf5e5] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#527547]" @click="modalStore.close()">
-            {{ tr('RuleModal.close') }}
+          <button
+            type="button"
+            class="rounded-lg border border-[#cbd9c6] bg-white px-4 py-2 text-sm font-semibold transition-colors hover:bg-[#edf5e5] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#527547]"
+            @click="modalStore.close()"
+          >
+            {{ tr("RuleModal.close") }}
           </button>
         </div>
       </div>

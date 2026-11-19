@@ -3,9 +3,9 @@ import type { AquacultureBatch } from "../../../types/model/aquaculture";
 import { t as tr } from "../../../i18n";
 
 import { computed, ref, watch } from "vue";
-import { useAquacultureStore } from "../../../stores/aquaculture";
-import { useCurrencyStore } from "../../../stores/currency";
-import { useModalStore } from "../../../stores/modal";
+import { useAquacultureStore } from "../../../stores/player-aquaculture-store.ts";
+import { useCurrencyStore } from "../../../stores/player-currency-store.ts";
+import { useModalStore } from "../../../stores/player-modal-store.ts";
 import { batchProgress } from "../../../data/aquaculture";
 import TwoOptionsModal from "../../shared/TwoOptionsModal.vue";
 import PaymentConfirmation from "../../shared/PaymentConfirmation.vue";

@@ -1,6 +1,6 @@
-import { useGameCatalogStore } from './gameCatalog';
-import { useAuthStore } from './auth';
-import { useReadCacheStore } from './readCache';
+import { useGameCatalogStore } from "./player-game-catalog-store";
+import { useAuthStore } from "./auth";
+import { useReadCacheStore } from "./readCache";
 import type { Species, CaughtDiary, DiaryFishEntry } from "../types/model/diary";
 import type { AreaSpecies } from "../types/model/speciesInArea";
 import { t as tr } from "../i18n";
@@ -14,8 +14,8 @@ export type { DiaryFishEntry } from "../types/model/diary";
 
 export const useDiaryStore = defineStore("diary", {
   state: () => ({
-    viewMode: 'grid',
-    speciesSearch: '',
+    viewMode: "grid",
+    speciesSearch: "",
     speciesDetails: {} as Record<string, SpeciesRow>,
     detailsLoading: {} as Record<string, boolean>,
     detailsErrors: {} as Record<string, string>,
@@ -35,7 +35,13 @@ export const useDiaryStore = defineStore("diary", {
 
   getters: {
     filteredEntriesForCountry() {
-      const normalize = (value: string) => value.toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '').replace(/đ/g, 'd').trim();
+      const normalize = (value: string) =>
+        value
+          .toLowerCase()
+          .normalize("NFD")
+          .replace(/[\u0300-\u036f]/g, "")
+          .replace(/đ/g, "d")
+          .trim();
       const query = normalize(this.speciesSearch);
       return (code: string, name: string): DiaryFishEntry[] => {
         const entries = this.entriesForCountry(code, name);
@@ -50,21 +56,23 @@ export const useDiaryStore = defineStore("diary", {
 
     entriesForCountry(state) {
       const caughtMap = this.caughtSpeciesMap;
-      const entries = state.allSpecies
-        .map((species): DiaryFishEntry => ({
+      const entries = state.allSpecies.map(
+        (species): DiaryFishEntry => ({
           species,
           isCaught: caughtMap.has(species.id),
           caughtAt: caughtMap.get(species.id),
-        }));
+        }),
+      );
       return (code: string, name: string): DiaryFishEntry[] => {
         const countryCode = code.trim().toLowerCase();
         const countryName = name.trim().toLowerCase();
         return entries.filter(({ species }) => {
           const location = species.location?.trim().toLowerCase();
-          return Boolean(location && (
-            (countryCode && location.includes(countryCode)) ||
-            (countryName && (location.includes(countryName) || countryName.includes(location)))
-          ));
+          return Boolean(
+            location &&
+            ((countryCode && location.includes(countryCode)) ||
+              (countryName && (location.includes(countryName) || countryName.includes(location)))),
+          );
         });
       };
     },
@@ -102,7 +110,10 @@ export const useDiaryStore = defineStore("diary", {
       const filtered = targetSpecies.filter((item) => {
         if (!item.location) return false;
         const loc = item.location.trim().toLowerCase();
-        return (code && (loc === code || loc.includes(code))) || (name && (loc === name || loc.includes(name) || name.includes(loc)));
+        return (
+          (code && (loc === code || loc.includes(code))) ||
+          (name && (loc === name || loc.includes(name) || name.includes(loc)))
+        );
       });
 
       return filtered.map((species) => ({
@@ -116,14 +127,16 @@ export const useDiaryStore = defineStore("diary", {
   actions: {
     async loadSpeciesDetails(id: string) {
       if (this.speciesDetails[id] || this.detailsLoading[id]) return;
-      const auth = useAuthStore(), generation = auth.sessionGeneration;
+      const auth = useAuthStore(),
+        generation = auth.sessionGeneration;
       this.detailsLoading[id] = true;
       delete this.detailsErrors[id];
       try {
         const details = await supabaseSpeciesRepository.fetchById(id);
         if (auth.sessionGeneration === generation) this.speciesDetails[id] = details;
       } catch (error) {
-        if (auth.sessionGeneration === generation) this.detailsErrors[id] = error instanceof Error ? error.message : tr('diary.khong_the_tai_du_lieu_nhat_ky');
+        if (auth.sessionGeneration === generation)
+          this.detailsErrors[id] = error instanceof Error ? error.message : tr("diary.khong_the_tai_du_lieu_nhat_ky");
       } finally {
         if (auth.sessionGeneration === generation) this.detailsLoading[id] = false;
       }
@@ -132,12 +145,21 @@ export const useDiaryStore = defineStore("diary", {
     applySpecies(data?: Species[]) {
       this.allSpecies = data ?? [];
       if (!data) {
-        this.speciesDetails = {}; this.detailsErrors = {}; this.detailsLoading = {};
-        this.caughtDiary = []; this.locationSpecies = []; this.discoveredAreaSpecies = [];
-        this.areaSpeciesRequestId++; this.isLoading = false;
+        this.speciesDetails = {};
+        this.detailsErrors = {};
+        this.detailsLoading = {};
+        this.caughtDiary = [];
+        this.locationSpecies = [];
+        this.discoveredAreaSpecies = [];
+        this.areaSpeciesRequestId++;
+        this.isLoading = false;
       } else if (this.selectedLocationCode) {
-        const matches = [this.selectedLocationCode, this.selectedLocationName].filter((value): value is string => Boolean(value)).map(value => value.toLocaleLowerCase());
-        this.locationSpecies = data.filter(species => matches.some(value => species.location?.toLocaleLowerCase().includes(value)));
+        const matches = [this.selectedLocationCode, this.selectedLocationName]
+          .filter((value): value is string => Boolean(value))
+          .map((value) => value.toLocaleLowerCase());
+        this.locationSpecies = data.filter((species) =>
+          matches.some((value) => species.location?.toLocaleLowerCase().includes(value)),
+        );
       }
     },
     async loadDiscoveredAreaSpecies(areaId: string | null | undefined, userId: string | null | undefined) {
@@ -160,32 +182,44 @@ export const useDiaryStore = defineStore("diary", {
         this.discoveredAreaSpecies = [...new Map(discovered.map((fish) => [fish.id, fish])).values()];
       } catch (err) {
         if (requestId !== this.areaSpeciesRequestId) return;
-        this.areaSpeciesError = err instanceof Error ? err.message : tr('PrepareModal.khong_the_tai_danh_sach_ca_trong_ho');
+        this.areaSpeciesError =
+          err instanceof Error ? err.message : tr("PrepareModal.khong_the_tai_danh_sach_ca_trong_ho");
       } finally {
         if (requestId === this.areaSpeciesRequestId) this.isLoadingAreaSpecies = false;
       }
     },
 
     async initDiary(userId?: string, force = false) {
-      const auth = useAuthStore(), generation = auth.sessionGeneration, request = ++this.diaryRequestId;
+      const auth = useAuthStore(),
+        generation = auth.sessionGeneration,
+        request = ++this.diaryRequestId;
       const current = () => auth.sessionGeneration === generation && request === this.diaryRequestId;
       this.isLoading = true;
       this.error = null;
       try {
-        if (force) await useReadCacheStore().invalidate(['diaryOwned']);
+        if (force) await useReadCacheStore().invalidate(["diaryOwned"]);
         if (!current()) return;
-        const [, caughtData] = await Promise.all([useGameCatalogStore().get('species', { force, consumer: 'diary', onUpdate: data => this.applySpecies(data) }), userId ? supabaseDiaryRepository.fetchCaughtDiary(userId) : Promise.resolve([])]);
+        const [, caughtData] = await Promise.all([
+          useGameCatalogStore().get("species", {
+            force,
+            consumer: "diary",
+            onUpdate: (data) => this.applySpecies(data),
+          }),
+          userId ? supabaseDiaryRepository.fetchCaughtDiary(userId) : Promise.resolve([]),
+        ]);
         if (!current()) return;
         this.caughtDiary = caughtData;
       } catch (err: any) {
-        if (current()) this.error = err?.message || tr('diary.khong_the_tai_du_lieu_nhat_ky');
+        if (current()) this.error = err?.message || tr("diary.khong_the_tai_du_lieu_nhat_ky");
       } finally {
         if (current()) this.isLoading = false;
       }
     },
 
     async selectLocation(userId: string | undefined, code: string, name: string) {
-      const auth = useAuthStore(), generation = auth.sessionGeneration, request = ++this.diaryRequestId;
+      const auth = useAuthStore(),
+        generation = auth.sessionGeneration,
+        request = ++this.diaryRequestId;
       const current = () => auth.sessionGeneration === generation && request === this.diaryRequestId;
       this.error = null;
       this.locationSpecies = [];
@@ -202,13 +236,18 @@ export const useDiaryStore = defineStore("diary", {
         }
 
         // Fetch location species
-        const all = await useGameCatalogStore().get('species', { consumer: 'diary', onUpdate: data => this.applySpecies(data) });
+        const all = await useGameCatalogStore().get("species", {
+          consumer: "diary",
+          onUpdate: (data) => this.applySpecies(data),
+        });
         if (!current()) return;
-        const matches = [code, name].filter(Boolean).map(value => value.toLocaleLowerCase());
-        const speciesData = all.filter(species => matches.some(value => species.location?.toLocaleLowerCase().includes(value)));
+        const matches = [code, name].filter(Boolean).map((value) => value.toLocaleLowerCase());
+        const speciesData = all.filter((species) =>
+          matches.some((value) => species.location?.toLocaleLowerCase().includes(value)),
+        );
         this.locationSpecies = speciesData;
       } catch (err: any) {
-        if (current()) this.error = err?.message || tr('diary.khong_the_tai_danh_sach_ca_vui_long_thu_lai');
+        if (current()) this.error = err?.message || tr("diary.khong_the_tai_danh_sach_ca_vui_long_thu_lai");
       } finally {
         if (current()) this.isLoading = false;
       }

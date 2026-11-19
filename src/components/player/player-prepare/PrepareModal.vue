@@ -3,27 +3,27 @@ import { t as tr } from "../../../i18n/index.ts";
 
 import { ref, computed, onMounted, watch } from "vue";
 import { useAuthStore } from "../../../stores/auth.ts";
-import { useInventoryStore } from "../../../stores/inventory.ts";
+import { useInventoryStore } from "../../../stores/player-inventory-store.ts";
 import { supabaseEquipmentRepository } from "../../../data/supabaseEquipmentRepository.ts";
 import { equipmentCategories } from "../../../data/equipmentCatalog.ts";
-import type { FishingTool } from "../../../stores/fishing.ts";
-import type { EquipmentSet } from "../../../stores/equipment.ts";
+import type { FishingTool } from "../../../stores/player-fishing-store.ts";
+import type { EquipmentSet } from "../../../stores/player-equipment-store.ts";
 import { useUserTurnsStore } from "../../../stores/userTurns.ts";
 import { supabaseUserInAreaRepository } from "../../../data/supabaseUserInAreaRepository.ts";
 import { useToast } from "../../../composables/useToast.ts";
 import { useRouter } from "vue-router";
 import { useWorldStore } from "../../../stores/worldMap.ts";
 import Modal from "../../shared/Modal.vue";
-import { useModalStore } from "../../../stores/modal.ts";
+import { useModalStore } from "../../../stores/player-modal-store.ts";
 import WeatherSection from "../player-fishing/WeatherSection.vue";
 import FishingFatigue from "../player-fishing/FishingFatigue.vue";
-import { useDiaryStore } from "../../../stores/diary.ts";
+import { useDiaryStore } from "../../../stores/player-diary-store.ts";
 import PrepareLakeFish from "./PrepareLakeFish.vue";
 import PrepareEquipmentSets from "./PrepareEquipmentSets.vue";
 import PrepareBodyEquipmentSets from "./PrepareBodyEquipmentSets.vue";
 import FishingEquipmentOverview from "../player-inventory/fishing-equipment/FishingEquipmentOverview.vue";
 import HealthOverview from "../player-inventory/body-equipment/HealthOverview.vue";
-import { useHealthStore } from "../../../stores/health.ts";
+import { useHealthStore } from "../../../stores/player-health-store.ts";
 
 const worldStore = useWorldStore();
 const authStore = useAuthStore();
@@ -156,7 +156,14 @@ const missingUsedSlots = computed(() => {
 
 /** Điều kiện cho phép tiếp tục: Không lỗi/loading, set đủ mỗi loại >= 1 item, và đã chọn đủ 5/5 trang bị */
 const canProceed = computed(() => {
-  return !loading.value && !error.value && !healthStore.loading && !healthStore.busy && isUsedSetComplete.value && allSlotsReady.value;
+  return (
+    !loading.value &&
+    !error.value &&
+    !healthStore.loading &&
+    !healthStore.busy &&
+    isUsedSetComplete.value &&
+    allSlotsReady.value
+  );
 });
 
 const proceedBlockReason = computed(() => {

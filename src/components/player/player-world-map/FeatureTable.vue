@@ -2,10 +2,10 @@
 import type { LobbyAction } from "../../../types/model/worldMap";
 import { t as tr } from "../../../i18n";
 
-import { useConfigStore } from "../../../stores/config.ts";
-import { useModalStore } from "../../../stores/modal.ts";
-import { useNotificationStore } from "../../../stores/notification.ts";
-import { useFeatureAvailabilityStore } from "../../../stores/featureAvailability";
+import { useConfigStore } from "../../../stores/player-config-store.ts";
+import { useModalStore } from "../../../stores/player-modal-store.ts";
+import { useNotificationStore } from "../../../stores/player-notification-store.ts";
+import { useFeatureAvailabilityStore } from "../../../stores/player-feature-availability-store.ts";
 
 const configStore = useConfigStore();
 const modalStore = useModalStore();

@@ -1,13 +1,13 @@
 <script lang="ts" setup>
 import type { TeamView as View, TeamJoinType, TeamStatus } from "../../../types/model/team";
-import { getFormattingLocale } from '../../../i18n';
+import { getFormattingLocale } from "../../../i18n";
 import { t as tr } from "../../../i18n";
 
 import { computed, onMounted, onUnmounted, ref, watch } from "vue";
-import Pagination from '../../shared/Pagination.vue';
+import Pagination from "../../shared/Pagination.vue";
 import Modal from "../../shared/Modal.vue";
 import PlayerIdentity from "../../shared/PlayerIdentity.vue";
-import { useCountryStore } from "../../../stores/country.ts";
+import { useCountryStore } from "../../../stores/player-country-store.ts";
 import { useTeamStore } from "../../../stores/team.ts";
 import { useAuthStore } from "../../../stores/auth.ts";
 
@@ -21,20 +21,36 @@ const teamStore = useTeamStore();
 const countryStore = useCountryStore();
 
 function getMemberName(id: string) {
-  return teamStore.myTeamMembers.find((member) => member.user_id === id)?.user_profile?.display_name
-    || teamStore.profilesMap.get(id)?.display_name || `${id.slice(0, 8)}…`;
+  return (
+    teamStore.myTeamMembers.find((member) => member.user_id === id)?.user_profile?.display_name ||
+    teamStore.profilesMap.get(id)?.display_name ||
+    `${id.slice(0, 8)}…`
+  );
 }
 
 const userId = computed(() => authStore.userId);
 const isLeader = computed(() => teamStore.isLeader(userId.value));
 const otherMembers = computed(() => teamStore.myTeamMembers.filter((m) => m.user_id !== userId.value));
-const teamSearch = computed({ get: () => teamStore.search, set: value => { teamStore.search = value; } });
-const teamStatusFilter = computed({ get: () => teamStore.statusFilter, set: value => { teamStore.statusFilter = value; } });
+const teamSearch = computed({
+  get: () => teamStore.search,
+  set: (value) => {
+    teamStore.search = value;
+  },
+});
+const teamStatusFilter = computed({
+  get: () => teamStore.statusFilter,
+  set: (value) => {
+    teamStore.statusFilter = value;
+  },
+});
 const filteredTeams = computed(() => teamStore.teams);
 let filterTimer: ReturnType<typeof setTimeout> | undefined;
 watch([teamSearch, teamStatusFilter], () => {
   clearTimeout(filterTimer);
-  filterTimer = setTimeout(() => { teamStore.page = 1; void teamStore.loadTeams(userId.value); }, 300);
+  filterTimer = setTimeout(() => {
+    teamStore.page = 1;
+    void teamStore.loadTeams(userId.value);
+  }, 300);
 });
 onUnmounted(() => clearTimeout(filterTimer));
 
@@ -48,9 +64,9 @@ function canJoinTeam(team: (typeof teamStore.teams)[number]) {
 }
 
 function joinRestrictionLabel(team: (typeof teamStore.teams)[number]) {
-  if (team.status !== "OPEN") return tr('TeamModal.khong_the_tham_gia');
-  if (team.join_type === "friend") return tr('TeamListSidebar.chi_ban_be_cua_truong_nhom');
-  if (team.join_type === "invited") return tr('TeamListSidebar.chi_nguoi_duoc_moi');
+  if (team.status !== "OPEN") return tr("TeamModal.khong_the_tham_gia");
+  if (team.join_type === "friend") return tr("TeamListSidebar.chi_ban_be_cua_truong_nhom");
+  if (team.join_type === "invited") return tr("TeamListSidebar.chi_nguoi_duoc_moi");
   return "";
 }
 // Khởi tạo mặc định 'list'; onMounted() sẽ cập nhật sang 'room' nếu đang trong nhóm
@@ -58,8 +74,12 @@ const view = ref<View>("list");
 
 // ─── Create form ─────────────────────────────────────────────────────────────
 const defaultTeamForm = {
-  get name() { return tr('TeamModal.doi_san_thuy_quai'); },
-  get description() { return tr('TeamModal.cung_lap_to_tha_can_va_chinh_phuc_nhung_me_ca_that_lon'); },
+  get name() {
+    return tr("TeamModal.doi_san_thuy_quai");
+  },
+  get description() {
+    return tr("TeamModal.cung_lap_to_tha_can_va_chinh_phuc_nhung_me_ca_that_lon");
+  },
 };
 const createForm = ref({
   name: defaultTeamForm.name,
@@ -88,7 +108,7 @@ async function handleCreate() {
   createError.value = "";
   const { name, description, maxMembers, status, joinType } = createForm.value;
   if (!name.trim()) {
-    createError.value = tr('TeamModal.vui_long_nhap_ten_nhom');
+    createError.value = tr("TeamModal.vui_long_nhap_ten_nhom");
     return;
   }
   const ok = await teamStore.createTeam(
@@ -111,7 +131,7 @@ async function handleUpdate() {
   createError.value = "";
   const { name, description, maxMembers, status, joinType } = createForm.value;
   if (!name.trim()) {
-    createError.value = tr('TeamModal.vui_long_nhap_ten_nhom');
+    createError.value = tr("TeamModal.vui_long_nhap_ten_nhom");
     return;
   }
   const ok = await teamStore.updateTeam(userId.value, {
@@ -214,11 +234,21 @@ async function handleTransfer() {
 
 // ─── Status badge helpers ─────────────────────────────────────────────────────
 const statusLabel: Record<string, string> = {
-  get PENDING() { return tr('MyTeamPanel.cho_duyet'); },
-  get OPEN() { return tr('MyTeamPanel.mo'); },
-  get FULL() { return tr('MyTeamPanel.day'); },
-  get FISHING() { return tr('MyTeamPanel.dang_cau'); },
-  get CLOSED() { return tr('Feedbackmodal.da_dong'); },
+  get PENDING() {
+    return tr("MyTeamPanel.cho_duyet");
+  },
+  get OPEN() {
+    return tr("MyTeamPanel.mo");
+  },
+  get FULL() {
+    return tr("MyTeamPanel.day");
+  },
+  get FISHING() {
+    return tr("MyTeamPanel.dang_cau");
+  },
+  get CLOSED() {
+    return tr("Feedbackmodal.da_dong");
+  },
 };
 const statusClass: Record<string, string> = {
   PENDING: "bg-[#f0e0e0] text-[#8a2020] border border-[#e8a0a0]",
@@ -233,9 +263,9 @@ async function loadData() {
   await Promise.all([teamStore.loadData(userId.value, false), countryStore.fetchCountries()]);
 }
 
-onUnmounted(() => teamStore.stopRefreshing('panel'));
+onUnmounted(() => teamStore.stopRefreshing("panel"));
 onMounted(async () => {
-  teamStore.startRefreshing(userId.value, 'panel');
+  teamStore.startRefreshing(userId.value, "panel");
   await loadData();
   view.value = "room";
 });
@@ -246,7 +276,7 @@ onMounted(async () => {
     <!-- ── Loading ── -->
     <div v-if="teamStore.loading" class="flex flex-col items-center justify-center gap-3 py-12 text-[#5a7a5a]">
       <span class="block w-8 h-8 border-[3px] border-[#d1e7d1] border-t-[#3b7a57] rounded-full animate-spin" />
-      <div>{{ tr('TeamModal.dang_tai_du_lieu') }}</div>
+      <div>{{ tr("TeamModal.dang_tai_du_lieu") }}</div>
     </div>
 
     <template v-else>
@@ -351,10 +381,10 @@ onMounted(async () => {
                       : 'bg-[#e8f5e2] text-[#2e6644] border border-[#b8dab0]',
                   ]"
                 >
-                  {{ member.role === "LEADER" ? tr('MyTeamPanel.truong_nhom') : tr('MyTeamPanel.thanh_vien') }}
+                  {{ member.role === "LEADER" ? tr("MyTeamPanel.truong_nhom") : tr("MyTeamPanel.thanh_vien") }}
                 </span>
                 <span class="text-xs font-semibold text-[#648064]">
-                  {{ tr('UserProfile.cap') }} {{ member.user_profile?.level ?? 1 }}
+                  {{ tr("UserProfile.cap") }} {{ member.user_profile?.level ?? 1 }}
                   <span class="mx-1 text-[#b2c8ae]">·</span>
                   {{ Number(member.user_profile?.experience_point ?? 0).toLocaleString(getFormattingLocale()) }} EXP
                 </span>
@@ -416,11 +446,11 @@ onMounted(async () => {
             :aria-label="tr('TeamModal.loc_theo_trang_thai')"
             class="px-3 py-[9px] border border-[#c0d8b8] rounded-lg bg-[#fafefc] text-[0.9rem] text-[#1a3a1a]"
           >
-            <option value="ALL">{{ tr('TeamModal.tat_ca_trang_thai') }}</option>
-            <option value="OPEN">{{ tr('MyTeamPanel.mo') }}</option>
-            <option value="FULL">{{ tr('MyTeamPanel.day') }}</option>
-            <option value="FISHING">{{ tr('MyTeamPanel.dang_cau') }}</option>
-            <option value="CLOSED">{{ tr('Feedbackmodal.da_dong') }}</option>
+            <option value="ALL">{{ tr("TeamModal.tat_ca_trang_thai") }}</option>
+            <option value="OPEN">{{ tr("MyTeamPanel.mo") }}</option>
+            <option value="FULL">{{ tr("MyTeamPanel.day") }}</option>
+            <option value="FISHING">{{ tr("MyTeamPanel.dang_cau") }}</option>
+            <option value="CLOSED">{{ tr("Feedbackmodal.da_dong") }}</option>
           </select>
         </div>
 
@@ -432,7 +462,7 @@ onMounted(async () => {
             :disabled="teamStore.actionLoading"
             @click="openEditForm"
           >
-            {{ tr('MyTeamPanel.cap_nhat_to_doi') }}
+            {{ tr("MyTeamPanel.cap_nhat_to_doi") }}
           </button>
           <button
             v-if="isLeader"
@@ -440,14 +470,14 @@ onMounted(async () => {
             :disabled="teamStore.actionLoading"
             @click="handleClose"
           >
-            {{ tr('TeamModal.huy_nhom') }}
+            {{ tr("TeamModal.huy_nhom") }}
           </button>
           <button
             class="inline-flex items-center justify-center gap-1.5 px-4 py-2 rounded-lg text-[0.87rem] font-bold bg-transparent text-[#3b7a57] border-[1.5px] border-[#3b7a57] cursor-pointer hover:bg-[#e8f5e2] active:scale-[0.97] disabled:opacity-55 disabled:cursor-not-allowed transition-colors"
             :disabled="teamStore.actionLoading"
             @click="handleLeave"
           >
-            {{ tr('TeamModal.roi_nhom') }}
+            {{ tr("TeamModal.roi_nhom") }}
           </button>
         </div>
       </div>
@@ -457,12 +487,12 @@ onMounted(async () => {
       <!-- ════════════════════════════════════════════════════════ -->
       <div v-else-if="view === 'list'">
         <div class="flex items-center justify-between gap-3 mb-4">
-          <div class="m-0 text-base font-bold text-[#1a3a1a]">{{ tr('TeamModal.nhom_dang_hoat_dong') }}</div>
+          <div class="m-0 text-base font-bold text-[#1a3a1a]">{{ tr("TeamModal.nhom_dang_hoat_dong") }}</div>
           <button
             class="inline-flex items-center justify-center gap-1.5 px-4 py-2 rounded-lg text-[0.87rem] font-bold bg-linear-to-br from-[#3b7a57] to-[#2e6644] text-white cursor-pointer hover:from-[#2e6644] hover:to-[#245236] active:scale-[0.97] transition-all"
             @click="view = 'create'"
           >
-            {{ tr('MyTeamPanel.tao_nhom') }}
+            {{ tr("MyTeamPanel.tao_nhom") }}
           </button>
         </div>
 
@@ -474,11 +504,11 @@ onMounted(async () => {
         </div>
 
         <div v-if="teamStore.teams.length === 0" class="text-center py-10 px-5 text-[#778877] text-[0.9rem]">
-          <div>{{ tr('TeamModal.chua_co_nhom_nao_hay_tao_nhom_dau_tien') }}</div>
+          <div>{{ tr("TeamModal.chua_co_nhom_nao_hay_tao_nhom_dau_tien") }}</div>
         </div>
 
         <div v-else-if="filteredTeams.length === 0" class="text-center py-8 px-5 text-[#778877] text-[0.9rem]">
-          {{ tr('TeamListSidebar.khong_tim_thay_to_doi_phu_hop') }}
+          {{ tr("TeamListSidebar.khong_tim_thay_to_doi_phu_hop") }}
         </div>
 
         <div v-else class="list-none m-0 p-0 flex flex-col gap-2.5">
@@ -500,25 +530,31 @@ onMounted(async () => {
                 </span>
               </div>
               <div v-if="team.description" class="text-[0.82rem] text-[#556655] my-1 mb-2">{{ team.description }}</div>
-              <PlayerIdentity :user-id="team.leader_id" :profile="teamStore.profilesMap.get(team.leader_id)" class="my-2" />
+              <PlayerIdentity
+                :user-id="team.leader_id"
+                :profile="teamStore.profilesMap.get(team.leader_id)"
+                class="my-2"
+              />
               <div class="text-[0.76rem] text-[#778877] my-1">
                 {{
                   team.join_type === "everyone"
-                    ? tr('TeamListSidebar.ai_cung_co_the_tham_gia')
+                    ? tr("TeamListSidebar.ai_cung_co_the_tham_gia")
                     : team.join_type === "friend"
-                      ? tr('TeamListSidebar.chi_ban_be_cua_truong_nhom')
-                      : tr('TeamListSidebar.chi_nguoi_duoc_moi')
+                      ? tr("TeamListSidebar.chi_ban_be_cua_truong_nhom")
+                      : tr("TeamListSidebar.chi_nguoi_duoc_moi")
                 }}
               </div>
               <div class="flex items-center justify-between gap-2 mt-2">
-                <span class="text-[0.78rem] text-[#778877]">{{ tr('TeamModal.cho_trong_max') }} {{ team.max_members }}</span>
+                <span class="text-[0.78rem] text-[#778877]"
+                  >{{ tr("TeamModal.cho_trong_max") }} {{ team.max_members }}</span
+                >
                 <button
                   v-if="canJoinTeam(team)"
                   class="inline-flex items-center justify-center gap-1.5 px-[10px] py-[5px] rounded-lg text-[0.78rem] font-bold bg-linear-to-br from-[#3b7a57] to-[#2e6644] text-white cursor-pointer hover:from-[#2e6644] hover:to-[#245236] active:scale-[0.97] disabled:opacity-55 disabled:cursor-not-allowed transition-all"
                   :disabled="teamStore.actionLoading"
                   @click="handleJoin(team.id)"
                 >
-                  {{ tr('TeamListSidebar.tham_gia') }}
+                  {{ tr("TeamListSidebar.tham_gia") }}
                 </button>
                 <span
                   v-else
@@ -540,16 +576,16 @@ onMounted(async () => {
             class="inline-flex items-center justify-center gap-1.5 px-4 py-2 rounded-lg text-[0.87rem] font-bold bg-transparent text-[#556655] border border-[#c0d8b8] cursor-pointer hover:bg-[#f0f7ec] active:scale-[0.97] transition-colors"
             @click="view = 'room'"
           >
-            {{ tr('TeamModal.quay_lai') }}
+            {{ tr("TeamModal.quay_lai") }}
           </button>
           <div class="m-0 text-base font-bold text-[#1a3a1a]">
-            {{ view === "edit" ? tr('MyTeamPanel.cap_nhat_to_doi') : tr('TeamModal.tao_nhom_moi') }}
+            {{ view === "edit" ? tr("MyTeamPanel.cap_nhat_to_doi") : tr("TeamModal.tao_nhom_moi") }}
           </div>
         </div>
 
         <form class="flex flex-col gap-4" @submit.prevent="view === 'edit' ? handleUpdate() : handleCreate()">
           <label class="flex flex-col gap-1.5 text-[0.85rem] font-semibold text-[#2a4a2a]">
-            {{ tr('TeamModal.ten_nhom') }} <span class="text-[#c0392b]">*</span>
+            {{ tr("TeamModal.ten_nhom") }} <span class="text-[#c0392b]">*</span>
             <input
               v-model="createForm.name"
               class="px-3 py-[9px] border border-[#c0d8b8] rounded-lg bg-[#fafefc] text-[0.9rem] text-[#1a3a1a] outline-none transition focus:border-[#3b7a57] focus:shadow-[0_0_0_3px_rgba(59,122,87,0.12)]"
@@ -561,7 +597,7 @@ onMounted(async () => {
           </label>
 
           <label class="flex flex-col gap-1.5 text-[0.85rem] font-semibold text-[#2a4a2a]">
-            {{ tr('TeamModal.mo_ta') }}
+            {{ tr("TeamModal.mo_ta") }}
             <textarea
               v-model="createForm.description"
               class="px-3 py-[9px] border border-[#c0d8b8] rounded-lg bg-[#fafefc] text-[0.9rem] text-[#1a3a1a] outline-none transition resize-y min-h-[72px] focus:border-[#3b7a57] focus:shadow-[0_0_0_3px_rgba(59,122,87,0.12)]"
@@ -572,7 +608,7 @@ onMounted(async () => {
           </label>
 
           <label class="flex flex-col gap-1.5 text-[0.85rem] font-semibold text-[#2a4a2a]">
-            {{ tr('TeamModal.so_thanh_vien_toi_da') }}
+            {{ tr("TeamModal.so_thanh_vien_toi_da") }}
             <div class="flex items-center gap-3">
               <input
                 v-model.number="createForm.maxMembers"
@@ -589,27 +625,27 @@ onMounted(async () => {
           </label>
 
           <label class="flex flex-col gap-1.5 text-[0.85rem] font-semibold text-[#2a4a2a]"
-            >{{ tr('TeamModal.trang_thai') }}
+            >{{ tr("TeamModal.trang_thai") }}
             <select
               v-model="createForm.status"
               class="px-3 py-[9px] border border-[#c0d8b8] rounded-lg bg-[#fafefc] text-[0.9rem] text-[#1a3a1a]"
             >
-              <option value="PENDING">{{ tr('TeamModal.cho_duyet_chua_hien_thi') }}</option>
-              <option value="OPEN">{{ tr('MyTeamPanel.mo') }}</option>
-              <option value="FULL">{{ tr('MyTeamPanel.day') }}</option>
-              <option value="FISHING">{{ tr('MyTeamPanel.dang_cau') }}</option>
-              <option value="CLOSED">{{ tr('Feedbackmodal.da_dong') }}</option>
+              <option value="PENDING">{{ tr("TeamModal.cho_duyet_chua_hien_thi") }}</option>
+              <option value="OPEN">{{ tr("MyTeamPanel.mo") }}</option>
+              <option value="FULL">{{ tr("MyTeamPanel.day") }}</option>
+              <option value="FISHING">{{ tr("MyTeamPanel.dang_cau") }}</option>
+              <option value="CLOSED">{{ tr("Feedbackmodal.da_dong") }}</option>
             </select>
           </label>
           <label class="flex flex-col gap-1.5 text-[0.85rem] font-semibold text-[#2a4a2a]"
-            >{{ tr('TeamModal.quyen_tham_gia') }}
+            >{{ tr("TeamModal.quyen_tham_gia") }}
             <select
               v-model="createForm.joinType"
               class="px-3 py-[9px] border border-[#c0d8b8] rounded-lg bg-[#fafefc] text-[0.9rem] text-[#1a3a1a]"
             >
-              <option value="everyone">{{ tr('TeamListSidebar.ai_cung_co_the_tham_gia') }}</option>
-              <option value="friend">{{ tr('TeamListSidebar.chi_ban_be_cua_truong_nhom') }}</option>
-              <option value="invited">{{ tr('TeamListSidebar.chi_nguoi_duoc_moi') }}</option>
+              <option value="everyone">{{ tr("TeamListSidebar.ai_cung_co_the_tham_gia") }}</option>
+              <option value="friend">{{ tr("TeamListSidebar.chi_ban_be_cua_truong_nhom") }}</option>
+              <option value="invited">{{ tr("TeamListSidebar.chi_nguoi_duoc_moi") }}</option>
             </select>
           </label>
           <div
@@ -624,7 +660,13 @@ onMounted(async () => {
             class="w-full inline-flex items-center justify-center gap-1.5 px-4 py-2 rounded-lg text-[0.87rem] font-bold bg-linear-to-br from-[#3b7a57] to-[#2e6644] text-white cursor-pointer hover:from-[#2e6644] hover:to-[#245236] active:scale-[0.97] disabled:opacity-55 disabled:cursor-not-allowed transition-all"
             :disabled="teamStore.actionLoading"
           >
-            {{ teamStore.actionLoading ? tr('ChangePasswordModal.dang_luu') : view === "edit" ? tr('TeamModal.luu_thay_doi') : tr('TeamModal.tao_nhom') }}
+            {{
+              teamStore.actionLoading
+                ? tr("ChangePasswordModal.dang_luu")
+                : view === "edit"
+                  ? tr("TeamModal.luu_thay_doi")
+                  : tr("TeamModal.tao_nhom")
+            }}
           </button>
         </form>
       </div>
@@ -661,9 +703,9 @@ onMounted(async () => {
         :on-dismiss="() => (showLeaveConfirm = false)"
       >
         <div class="mb-2 text-[0.95rem] leading-normal text-[#374151]">
-          {{ tr('TeamModal.ban_se_roi_khoi_nhom_hien_tai') }}
+          {{ tr("TeamModal.ban_se_roi_khoi_nhom_hien_tai") }}
           <template v-if="isLeader && otherMembers.length > 0">
-            {{ tr('TeamModal.tiep_theo_ban_co_the_chuyen_quyen_truong_nhom_hoac_huy_nhom') }}
+            {{ tr("TeamModal.tiep_theo_ban_co_the_chuyen_quyen_truong_nhom_hoac_huy_nhom") }}
           </template>
         </div>
       </TwoOptionsModal>
@@ -676,18 +718,21 @@ onMounted(async () => {
         <div
           class="player-popup-in bg-white rounded-2xl px-6 py-7 max-w-[380px] w-full shadow-[0_20px_60px_rgba(0,0,0,0.22)]"
         >
-          <div class="m-0 mb-2 text-[1.05rem] font-extrabold text-[#1a3a1a]">{{ tr('TeamModal.ban_la_truong_nhom') }}</div>
+          <div class="m-0 mb-2 text-[1.05rem] font-extrabold text-[#1a3a1a]">
+            {{ tr("TeamModal.ban_la_truong_nhom") }}
+          </div>
           <div class="m-0 mb-4 text-[0.88rem] text-[#445544]">
-            {{ tr('Fishfarm.con') }} {{ otherMembers.length }} {{ tr('TeamModal.thanh_vien_trong_nhom_chon_mot_tuy_chon') }}
+            {{ tr("Fishfarm.con") }} {{ otherMembers.length }}
+            {{ tr("TeamModal.thanh_vien_trong_nhom_chon_mot_tuy_chon") }}
           </div>
 
           <label class="flex flex-col gap-1.5 text-[0.85rem] font-semibold text-[#2a4a2a]">
-            {{ tr('TeamModal.chuyen_quyen_cho') }}
+            {{ tr("TeamModal.chuyen_quyen_cho") }}
             <select
               v-model="transferTargetId"
               class="px-3 py-[9px] border border-[#c0d8b8] rounded-lg bg-[#fafefc] text-[0.9rem] text-[#1a3a1a] outline-none transition focus:border-[#3b7a57]"
             >
-              <option value="" disabled>{{ tr('TeamModal.chon_thanh_vien') }}</option>
+              <option value="" disabled>{{ tr("TeamModal.chon_thanh_vien") }}</option>
               <option v-for="m in otherMembers" :key="m.user_id" :value="m.user_id">
                 {{ getMemberName(m.user_id) }}
               </option>
@@ -700,20 +745,20 @@ onMounted(async () => {
               :disabled="!transferTargetId || teamStore.actionLoading"
               @click="handleLeaveAndTransfer"
             >
-              {{ tr('TeamModal.chuyen_quyen_roi') }}
+              {{ tr("TeamModal.chuyen_quyen_roi") }}
             </button>
             <button
               class="inline-flex items-center justify-center gap-1.5 px-4 py-2 rounded-lg text-[0.87rem] font-bold bg-[#fde8e8] text-[#c0392b] border border-[#f5b7b1] cursor-pointer hover:bg-[#fbd4d4] active:scale-[0.97] disabled:opacity-55 disabled:cursor-not-allowed transition-colors"
               :disabled="teamStore.actionLoading"
               @click="handleLeaveAndClose"
             >
-              {{ tr('TeamModal.huy_nhom_roi') }}
+              {{ tr("TeamModal.huy_nhom_roi") }}
             </button>
             <button
               class="inline-flex items-center justify-center gap-1.5 px-4 py-2 rounded-lg text-[0.87rem] font-bold bg-transparent text-[#556655] border border-[#c0d8b8] cursor-pointer hover:bg-[#f0f7ec] active:scale-[0.97] transition-colors"
               @click="showLeaveOptions = false"
             >
-              {{ tr('FactionSelectModal.huy_bo') }}
+              {{ tr("FactionSelectModal.huy_bo") }}
             </button>
           </div>
         </div>
@@ -728,10 +773,16 @@ onMounted(async () => {
         <div
           class="player-popup-in bg-white rounded-2xl px-6 py-7 max-w-[380px] w-full shadow-[0_20px_60px_rgba(0,0,0,0.22)]"
         >
-          <div class="m-0 mb-2 text-[1.05rem] font-extrabold text-[#1a3a1a]">{{ tr('TeamModal.chuyen_quyen_truong_nhom') }}</div>
+          <div class="m-0 mb-2 text-[1.05rem] font-extrabold text-[#1a3a1a]">
+            {{ tr("TeamModal.chuyen_quyen_truong_nhom") }}
+          </div>
           <div class="m-0 mb-4 text-[0.88rem] text-[#445544]">
-            {{ tr('TeamModal.chuyen_cho') }} <strong>{{ getMemberName(transferTarget) }}</strong>
-            <PlayerIdentity :user-id="transferTarget" :profile="teamStore.myTeamMembers.find((member) => member.user_id === transferTarget)?.user_profile" class="mt-2" />
+            {{ tr("TeamModal.chuyen_cho") }} <strong>{{ getMemberName(transferTarget) }}</strong>
+            <PlayerIdentity
+              :user-id="transferTarget"
+              :profile="teamStore.myTeamMembers.find((member) => member.user_id === transferTarget)?.user_profile"
+              class="mt-2"
+            />
           </div>
           <div class="flex flex-col gap-2 mt-4">
             <button
@@ -739,13 +790,13 @@ onMounted(async () => {
               :disabled="teamStore.actionLoading"
               @click="handleTransfer"
             >
-              {{ tr('Fishfarm.xac_nhan') }}
+              {{ tr("Fishfarm.xac_nhan") }}
             </button>
             <button
               class="inline-flex items-center justify-center gap-1.5 px-4 py-2 rounded-lg text-[0.87rem] font-bold bg-transparent text-[#556655] border border-[#c0d8b8] cursor-pointer hover:bg-[#f0f7ec] active:scale-[0.97] transition-colors"
               @click="showTransferModal = false"
             >
-              {{ tr('FactionSelectModal.huy_bo') }}
+              {{ tr("FactionSelectModal.huy_bo") }}
             </button>
           </div>
         </div>
@@ -774,11 +825,26 @@ onMounted(async () => {
         "
       >
         <div class="mb-2 text-[0.95rem] leading-normal text-[#374151]">
-          {{ tr('MyTeamPanel.thanh_vien') }} <strong>{{ getMemberName(kickTargetId) }}</strong> {{ tr('TeamModal.se_bi_dua_khoi_to_doi') }}
-          <PlayerIdentity :user-id="kickTargetId" :profile="teamStore.myTeamMembers.find((member) => member.user_id === kickTargetId)?.user_profile" class="mt-2" />
+          {{ tr("MyTeamPanel.thanh_vien") }} <strong>{{ getMemberName(kickTargetId) }}</strong>
+          {{ tr("TeamModal.se_bi_dua_khoi_to_doi") }}
+          <PlayerIdentity
+            :user-id="kickTargetId"
+            :profile="teamStore.myTeamMembers.find((member) => member.user_id === kickTargetId)?.user_profile"
+            class="mt-2"
+          />
         </div>
       </TwoOptionsModal>
     </Teleport>
-    <Pagination v-if="view === 'list'" :page="teamStore.page" :page-size="teamStore.pageSize" :total="teamStore.total" :loading="teamStore.directoryLoading" @change="teamStore.page = $event; teamStore.loadTeams(userId)" />
+    <Pagination
+      v-if="view === 'list'"
+      :page="teamStore.page"
+      :page-size="teamStore.pageSize"
+      :total="teamStore.total"
+      :loading="teamStore.directoryLoading"
+      @change="
+        teamStore.page = $event;
+        teamStore.loadTeams(userId);
+      "
+    />
   </Modal>
 </template>

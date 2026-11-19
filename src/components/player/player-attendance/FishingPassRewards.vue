@@ -3,7 +3,7 @@ import { getFormattingLocale } from "../../../i18n";
 import { t as tr } from "../../../i18n";
 
 import { computed, onMounted, onUnmounted, ref } from "vue";
-import { useFishingPassStore } from "../../../stores/fishingPass";
+import { useFishingPassStore } from "../../../stores/player-fishing-pass-store.ts";
 import { useToast } from "../../../composables/useToast";
 import Shells from "../player-currency/Shells.vue";
 import { formatDateTime } from "../../../utils/time";

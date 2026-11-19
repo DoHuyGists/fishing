@@ -1,5 +1,5 @@
-import { useGameCatalogStore } from './gameCatalog';
-import { useReadCacheStore } from './readCache';
+import { useGameCatalogStore } from "./player-game-catalog-store";
+import { useReadCacheStore } from "./readCache";
 import type { CurrencyConversionRate } from "../types/model/currency";
 import { getFormattingLocale, t as tr } from "../i18n";
 import { defineStore } from "pinia";
@@ -7,7 +7,7 @@ import { supabaseCurrencyRepository } from "../data/supabaseCurrencyRepository";
 import { useAuthStore } from "./auth";
 import { useToast } from "../composables/useToast";
 
-import { createKeyedRefreshTask } from '../utils/refreshTask';
+import { createKeyedRefreshTask } from "../utils/refreshTask";
 const refreshWallet = createKeyedRefreshTask<Awaited<ReturnType<typeof supabaseCurrencyRepository.fetchWallet>>>();
 
 export const useCurrencyStore = defineStore("currency", {
@@ -40,18 +40,32 @@ export const useCurrencyStore = defineStore("currency", {
         : 1;
     },
     async fetchConversionRates(force = false) {
-      const auth = useAuthStore(), generation = auth.sessionGeneration;
+      const auth = useAuthStore(),
+        generation = auth.sessionGeneration;
       this.conversionRatesLoading = true;
       this.conversionRatesError = "";
       try {
-        await useGameCatalogStore().get('rates', { force, consumer: 'currency', onUpdate: data => { this.conversionRates = data ?? []; if (!data) { this.conversionRatesLoading = false; this.conversionRatesError = ''; this.conversionBatches = {}; } } });
+        await useGameCatalogStore().get("rates", {
+          force,
+          consumer: "currency",
+          onUpdate: (data) => {
+            this.conversionRates = data ?? [];
+            if (!data) {
+              this.conversionRatesLoading = false;
+              this.conversionRatesError = "";
+              this.conversionBatches = {};
+            }
+          },
+        });
         if (auth.sessionGeneration !== generation) return;
         for (const rate of this.conversionRates) {
           const key = `${rate.source_currency}-${rate.target_currency}`;
           this.conversionBatches[key] ??= 1;
         }
       } catch (error) {
-        if (auth.sessionGeneration === generation) this.conversionRatesError = error instanceof Error ? error.message : tr('currency.khong_the_tai_ty_gia_quy_doi');
+        if (auth.sessionGeneration === generation)
+          this.conversionRatesError =
+            error instanceof Error ? error.message : tr("currency.khong_the_tai_ty_gia_quy_doi");
       } finally {
         if (auth.sessionGeneration === generation) this.conversionRatesLoading = false;
       }
@@ -62,32 +76,53 @@ export const useCurrencyStore = defineStore("currency", {
     },
     hasValidConversionAmounts(rate: CurrencyConversionRate): boolean {
       const { batches, cost, received } = this.conversionAmounts(rate);
-      return Number.isSafeInteger(batches) && batches > 0
-        && Number.isSafeInteger(cost) && cost > 0
-        && Number.isSafeInteger(received) && received > 0;
+      return (
+        Number.isSafeInteger(batches) &&
+        batches > 0 &&
+        Number.isSafeInteger(cost) &&
+        cost > 0 &&
+        Number.isSafeInteger(received) &&
+        received > 0
+      );
     },
     canConvert(rate: CurrencyConversionRate): boolean {
-      return !this.converting && !this.loading && !this.error && !this.conversionRatesLoading && !this.conversionRatesError
-        && this.hasValidConversionAmounts(rate)
-        && this[rate.source_currency] >= this.conversionAmounts(rate).cost;
+      return (
+        !this.converting &&
+        !this.loading &&
+        !this.error &&
+        !this.conversionRatesLoading &&
+        !this.conversionRatesError &&
+        this.hasValidConversionAmounts(rate) &&
+        this[rate.source_currency] >= this.conversionAmounts(rate).cost
+      );
     },
     async convertCurrency(rate: CurrencyConversionRate) {
       if (!this.canConvert(rate)) return;
-      const auth = useAuthStore(), generation = auth.sessionGeneration;
+      const auth = useAuthStore(),
+        generation = auth.sessionGeneration;
       this.converting = true;
       try {
         const batches = this.conversionAmounts(rate).batches;
-        const wallet = await useGameCatalogStore().action('convert_currency', { p_source_currency: rate.source_currency, p_target_currency: rate.target_currency,
-          p_batches: batches, p_source_amount: rate.source_amount, p_target_amount: rate.target_amount }, ['rates'],
-          () => supabaseCurrencyRepository.convertCurrency(rate, batches));
+        const wallet = await useGameCatalogStore().action(
+          "convert_currency",
+          {
+            p_source_currency: rate.source_currency,
+            p_target_currency: rate.target_currency,
+            p_batches: batches,
+            p_source_amount: rate.source_amount,
+            p_target_amount: rate.target_amount,
+          },
+          ["rates"],
+          () => supabaseCurrencyRepository.convertCurrency(rate, batches),
+        );
         if (auth.sessionGeneration !== generation) return;
         this.cash = wallet.cash;
         this.shells = wallet.shells;
         this.tickets = wallet.tickets;
-        useToast().success(tr('currency.quy_doi_tien_te_thanh_cong'));
+        useToast().success(tr("currency.quy_doi_tien_te_thanh_cong"));
       } catch (error) {
         if (auth.sessionGeneration !== generation) return;
-        useToast().error(error instanceof Error ? error.message : tr('currency.khong_the_quy_doi_tien_te'));
+        useToast().error(error instanceof Error ? error.message : tr("currency.khong_the_quy_doi_tien_te"));
         await this.fetchConversionRates();
         await this.fetchCurrency();
       } finally {
@@ -99,18 +134,26 @@ export const useCurrencyStore = defineStore("currency", {
       const userId = auth.user?.id;
       const generation = auth.sessionGeneration;
       if (!userId) return;
-      if (invalidate) await useReadCacheStore().invalidate(['wallet']);
+      if (invalidate) await useReadCacheStore().invalidate(["wallet"]);
       const current = () => auth.user?.id === userId && auth.sessionGeneration === generation;
       if (!current()) return;
-      this.loading = true; this.error = '';
+      this.loading = true;
+      this.error = "";
       try {
-        const wallet = await refreshWallet(userId + ':' + generation,
-          () => supabaseCurrencyRepository.fetchWallet(userId), invalidate);
+        const wallet = await refreshWallet(
+          userId + ":" + generation,
+          () => supabaseCurrencyRepository.fetchWallet(userId),
+          invalidate,
+        );
         if (!current()) return;
-        this.cash = wallet.cash; this.shells = wallet.shells; this.tickets = wallet.tickets;
+        this.cash = wallet.cash;
+        this.shells = wallet.shells;
+        this.tickets = wallet.tickets;
       } catch (err) {
-        if (current()) this.error = err instanceof Error ? err.message : tr('currency.khong_the_lay_du_lieu_tien_te');
-      } finally { if (current()) this.loading = false; }
+        if (current()) this.error = err instanceof Error ? err.message : tr("currency.khong_the_lay_du_lieu_tien_te");
+      } finally {
+        if (current()) this.loading = false;
+      }
     },
   },
 });

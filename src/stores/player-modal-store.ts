@@ -1,5 +1,5 @@
 import { defineStore } from "pinia";
-import { useFeatureAvailabilityStore } from "./featureAvailability";
+import { useFeatureAvailabilityStore } from "./player-feature-availability-store";
 import { modalFeatures } from "../data/featureAvailability";
 
 const STORAGE_KEY = "fishing.modalOpening";

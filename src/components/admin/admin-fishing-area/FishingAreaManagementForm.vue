@@ -1,7 +1,7 @@
 <script lang="ts" setup>
 import type { FishingAreaPayload } from "../../../types/table/fishingArea";
 import { computed, onMounted, onUnmounted, ref, watch } from "vue";
-import { useCountryStore } from "../../../stores/country.ts";
+import { useCountryStore } from "../../../stores/player-country-store.ts";
 
 import { useWorldStore } from "../../../stores/worldMap.ts";
 import { useToast } from "../../../composables/useToast.ts";
@@ -266,7 +266,9 @@ onUnmounted(() => {
       </div>
 
       <div class="flex flex-col gap-1.5">
-        <label for="fishing-area-timezone" class="text-[11px] font-bold text-gray-500 uppercase">Múi giờ (timezone)</label>
+        <label for="fishing-area-timezone" class="text-[11px] font-bold text-gray-500 uppercase"
+          >Múi giờ (timezone)</label
+        >
         <select
           id="fishing-area-timezone"
           v-model="adminFishingAreaStore.target.timezone"
@@ -275,7 +277,9 @@ onUnmounted(() => {
         >
           <option :value="null">-- Theo múi giờ quốc gia --</option>
           <option
-            v-if="adminFishingAreaStore.target.timezone && !timezoneOptions.includes(adminFishingAreaStore.target.timezone)"
+            v-if="
+              adminFishingAreaStore.target.timezone && !timezoneOptions.includes(adminFishingAreaStore.target.timezone)
+            "
             :value="adminFishingAreaStore.target.timezone"
           >
             {{ adminFishingAreaStore.target.timezone }}

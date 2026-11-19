@@ -2,7 +2,7 @@
 import { t as tr } from "../../../i18n";
 
 import { reactive, ref } from "vue";
-import { useFeedbackStore } from "../../../stores/feedback";
+import { useFeedbackStore } from "../../../stores/player-feedback-store";
 
 const emit = defineEmits<{ submitted: [] }>();
 const feedbackStore = useFeedbackStore();
@@ -13,8 +13,8 @@ const textareaBase =
   "w-full resize-y rounded-lg border bg-white px-3 py-2.5 text-sm text-gray-900 placeholder:text-gray-400 focus:outline-none focus:ring-2 disabled:opacity-60";
 
 function validate() {
-  errors.like = form.like.trim() ? "" : tr('OpinionFeedbackForm.vui_long_cho_biet_ban_thich_dieu_gi');
-  errors.dislike = form.dislike.trim() ? "" : tr('OpinionFeedbackForm.vui_long_cho_biet_ban_chua_hai_long_dieu_gi');
+  errors.like = form.like.trim() ? "" : tr("OpinionFeedbackForm.vui_long_cho_biet_ban_thich_dieu_gi");
+  errors.dislike = form.dislike.trim() ? "" : tr("OpinionFeedbackForm.vui_long_cho_biet_ban_chua_hai_long_dieu_gi");
   return !errors.like && !errors.dislike;
 }
 
@@ -28,7 +28,8 @@ async function handleSubmit() {
     form.contribute = "";
     emit("submitted");
   } catch (error) {
-    submitError.value = error instanceof Error ? error.message : tr('OpinionFeedbackForm.khong_the_gui_y_kien_luc_nay_vui_long_thu_lai');
+    submitError.value =
+      error instanceof Error ? error.message : tr("OpinionFeedbackForm.khong_the_gui_y_kien_luc_nay_vui_long_thu_lai");
   }
 }
 </script>
@@ -38,7 +39,7 @@ async function handleSubmit() {
     <div class="slide-fade-in from-bottom player-content-in flex-1 space-y-5 overflow-y-auto px-6 py-5">
       <div>
         <label for="fb-like" class="mb-1.5 block text-sm font-medium text-gray-800"
-          >{{ tr('OpinionFeedbackForm.ban_thich_dieu_gi') }} <span class="text-red-500">*</span></label
+          >{{ tr("OpinionFeedbackForm.ban_thich_dieu_gi") }} <span class="text-red-500">*</span></label
         >
         <textarea
           id="fb-like"
@@ -59,7 +60,7 @@ async function handleSubmit() {
       </div>
       <div>
         <label for="fb-dislike" class="mb-1.5 block text-sm font-medium text-gray-800"
-          >{{ tr('OpinionFeedbackForm.ban_chua_hai_long_dieu_gi') }} <span class="text-red-500">*</span></label
+          >{{ tr("OpinionFeedbackForm.ban_chua_hai_long_dieu_gi") }} <span class="text-red-500">*</span></label
         >
         <textarea
           id="fb-dislike"
@@ -80,7 +81,8 @@ async function handleSubmit() {
       </div>
       <div>
         <label for="fb-contribute" class="mb-1.5 block text-sm font-medium text-gray-800"
-          >{{ tr('OpinionFeedbackForm.ban_mong_muon_dieu_gi') }} <span class="font-normal text-gray-400">{{ tr('ErrorFeedbackForm.khong_bat_buoc') }}</span></label
+          >{{ tr("OpinionFeedbackForm.ban_mong_muon_dieu_gi") }}
+          <span class="font-normal text-gray-400">{{ tr("ErrorFeedbackForm.khong_bat_buoc") }}</span></label
         >
         <textarea
           id="fb-contribute"
@@ -111,7 +113,7 @@ async function handleSubmit() {
           <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4" />
           <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 0 1 8-8v4a4 4 0 0 0-4 4H4Z" />
         </svg>
-        {{ feedbackStore.submitting ? tr('ErrorFeedbackForm.dang_gui') : tr('OpinionFeedbackForm.gui_y_kien') }}
+        {{ feedbackStore.submitting ? tr("ErrorFeedbackForm.dang_gui") : tr("OpinionFeedbackForm.gui_y_kien") }}
       </button>
     </div>
   </form>

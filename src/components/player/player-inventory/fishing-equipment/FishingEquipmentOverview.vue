@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { computed } from "vue";
 import { getFormattingLocale, t as tr } from "../../../../i18n/index.ts";
-import { useInventoryStore } from "../../../../stores/inventory.ts";
+import { useInventoryStore } from "../../../../stores/player-inventory-store.ts";
 import EquipmentStatsOverview from "../../../shared/EquipmentStatsOverview.vue";
 
 const inventory = useInventoryStore();

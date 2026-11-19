@@ -1,27 +1,55 @@
 <script setup lang="ts">
-import { getFormattingLocale } from '../../../i18n';
+import { getFormattingLocale } from "../../../i18n";
 import { t as tr } from "../../../i18n";
 
 import { onBeforeUnmount, onMounted, ref } from "vue";
 import { useAuthStore } from "../../../stores/auth";
-import { useFeedbackStore } from "../../../stores/feedback";
-import { useModalStore } from "../../../stores/modal.ts";
+import { useFeedbackStore } from "../../../stores/player-feedback-store.ts";
+import { useModalStore } from "../../../stores/player-modal-store.ts";
 import Modal from "../../shared/Modal.vue";
 import OpinionFeedbackForm from "./OpinionFeedbackForm.vue";
 import ErrorFeedbackForm from "./ErrorFeedbackForm.vue";
 import Tab from "../../shared/Tab.vue";
 
-const SUCCESS_MESSAGE = tr('Feedbackmodal.cam_on_ban_da_gui_phan_hoi');
+const SUCCESS_MESSAGE = tr("Feedbackmodal.cam_on_ban_da_gui_phan_hoi");
 const modalStore = useModalStore();
 const feedbackStore = useFeedbackStore();
 const auth = useAuthStore();
 const currentActiveTab = ref<"opinion" | "error" | "history">("opinion");
-const statusLabels = { get pending() { return tr('Feedbackmodal.cho_xu_ly'); }, get processing() { return tr('Feedbackmodal.dang_xu_ly'); }, get resolved() { return tr('Feedbackmodal.da_giai_quyet'); }, get closed() { return tr('Feedbackmodal.da_dong'); } };
+const statusLabels = {
+  get pending() {
+    return tr("Feedbackmodal.cho_xu_ly");
+  },
+  get processing() {
+    return tr("Feedbackmodal.dang_xu_ly");
+  },
+  get resolved() {
+    return tr("Feedbackmodal.da_giai_quyet");
+  },
+  get closed() {
+    return tr("Feedbackmodal.da_dong");
+  },
+};
 onMounted(() => feedbackStore.watchMyErrors(auth.userId));
 const tabs = [
-  { key: "opinion", get label() { return tr('Feedbackmodal.gop_y'); } },
-  { key: "error", get label() { return tr('Feedbackmodal.bao_loi'); } },
-  { key: "history", get label() { return tr('Feedbackmodal.bao_loi_cua_toi'); } },
+  {
+    key: "opinion",
+    get label() {
+      return tr("Feedbackmodal.gop_y");
+    },
+  },
+  {
+    key: "error",
+    get label() {
+      return tr("Feedbackmodal.bao_loi");
+    },
+  },
+  {
+    key: "history",
+    get label() {
+      return tr("Feedbackmodal.bao_loi_cua_toi");
+    },
+  },
 ];
 const toastVisible = ref(false);
 let toastTimer: ReturnType<typeof setTimeout> | undefined;
@@ -69,16 +97,52 @@ onBeforeUnmount(() => {
         </template>
         <template #history>
           <section class="space-y-3 p-4 text-sm text-[#24352a]">
-            <button type="button" class="underline" :disabled="feedbackStore.historyLoading" @click="feedbackStore.loadMyErrors(auth.userId)">{{ tr('Fishfarm.tai_lai') }}</button>
-            <div v-if="feedbackStore.historyError" role="alert" class="text-red-700">{{ feedbackStore.historyError }}</div>
-            <div v-if="feedbackStore.historyLoading">{{ tr('Feedbackmodal.dang_tai_bao_loi') }}</div>
-            <div v-else-if="!feedbackStore.myErrors.length && !feedbackStore.historyError">{{ tr('Feedbackmodal.ban_chua_gui_bao_loi_nao') }}</div>
-            <article v-for="item in feedbackStore.myErrors" :key="item.id" class="rounded-lg border border-[#cbd9c6] bg-[#f5f9f0] p-4">
-              <div class="flex flex-wrap justify-between gap-2"><div class="font-bold">{{ item.title }}</div><span>{{ statusLabels[item.status] || item.status }}</span></div>
+            <button
+              type="button"
+              class="underline"
+              :disabled="feedbackStore.historyLoading"
+              @click="feedbackStore.loadMyErrors(auth.userId)"
+            >
+              {{ tr("Fishfarm.tai_lai") }}
+            </button>
+            <div v-if="feedbackStore.historyError" role="alert" class="text-red-700">
+              {{ feedbackStore.historyError }}
+            </div>
+            <div v-if="feedbackStore.historyLoading">{{ tr("Feedbackmodal.dang_tai_bao_loi") }}</div>
+            <div v-else-if="!feedbackStore.myErrors.length && !feedbackStore.historyError">
+              {{ tr("Feedbackmodal.ban_chua_gui_bao_loi_nao") }}
+            </div>
+            <article
+              v-for="item in feedbackStore.myErrors"
+              :key="item.id"
+              class="rounded-lg border border-[#cbd9c6] bg-[#f5f9f0] p-4"
+            >
+              <div class="flex flex-wrap justify-between gap-2">
+                <div class="font-bold">{{ item.title }}</div>
+                <span>{{ statusLabels[item.status] || item.status }}</span>
+              </div>
               <div class="mt-2 whitespace-pre-wrap">{{ item.description }}</div>
-              <div class="mt-2 text-xs text-gray-600">{{ tr('Feedbackmodal.gui') }} {{ new Date(item.created_at).toLocaleString(getFormattingLocale()) }} {{ tr('Feedbackmodal.cap_nhat') }} {{ new Date(item.updated_at).toLocaleString(getFormattingLocale()) }}</div>
+              <div class="mt-2 text-xs text-gray-600">
+                {{ tr("Feedbackmodal.gui") }} {{ new Date(item.created_at).toLocaleString(getFormattingLocale()) }}
+                {{ tr("Feedbackmodal.cap_nhat") }} {{ new Date(item.updated_at).toLocaleString(getFormattingLocale()) }}
+              </div>
             </article>
-            <div class="flex items-center gap-4"><button :disabled="feedbackStore.page <= 1 || feedbackStore.historyLoading" class="underline disabled:opacity-40" @click="feedbackStore.loadMyErrors(auth.userId, feedbackStore.page - 1)">{{ tr('Fishfarm.truoc') }}</button><span>{{ tr('CaughtModal.trang') }} {{ feedbackStore.page }}</span><button :disabled="!feedbackStore.hasNext || feedbackStore.historyLoading" class="underline disabled:opacity-40" @click="feedbackStore.loadMyErrors(auth.userId, feedbackStore.page + 1)">{{ tr('Fishfarm.sau') }}</button></div>
+            <div class="flex items-center gap-4">
+              <button
+                :disabled="feedbackStore.page <= 1 || feedbackStore.historyLoading"
+                class="underline disabled:opacity-40"
+                @click="feedbackStore.loadMyErrors(auth.userId, feedbackStore.page - 1)"
+              >
+                {{ tr("Fishfarm.truoc") }}</button
+              ><span>{{ tr("CaughtModal.trang") }} {{ feedbackStore.page }}</span
+              ><button
+                :disabled="!feedbackStore.hasNext || feedbackStore.historyLoading"
+                class="underline disabled:opacity-40"
+                @click="feedbackStore.loadMyErrors(auth.userId, feedbackStore.page + 1)"
+              >
+                {{ tr("Fishfarm.sau") }}
+              </button>
+            </div>
           </section>
         </template>
       </Tab>

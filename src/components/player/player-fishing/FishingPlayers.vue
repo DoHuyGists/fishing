@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { t as tr } from "../../../i18n";
 
-import { useFishingStore } from "../../../stores/fishing";
+import { useFishingStore } from "../../../stores/player-fishing-store";
 
 const store = useFishingStore();
 </script>
@@ -22,7 +22,9 @@ const store = useFishingStore();
         >
           <header class="flex justify-between px-5 pt-[19px] pb-3 border-b border-[rgba(223,241,207,0.14)]">
             <div>
-              <div id="players-title" class="m-0 text-xl">{{ tr('FishingPlayers.nguoi_choi_dang_cau') }}{{ store.nearbyPlayers.length }})</div>
+              <div id="players-title" class="m-0 text-xl">
+                {{ tr("FishingPlayers.nguoi_choi_dang_cau") }}{{ store.nearbyPlayers.length }})
+              </div>
             </div>
             <button
               type="button"
@@ -35,14 +37,14 @@ const store = useFishingStore();
           </header>
           <!-- <div class="px-5 pt-3 pb-1.5 text-[#b7cfb9] text-xs">Chạm vào người chơi để xem thông tin.</div> -->
           <div v-if="store.isLoadingPlayers" class="py-8 text-center text-[#b7cfb9] text-xs">
-            {{ tr('FishingPlayers.dang_cap_nhat_danh_sach_nguoi_cau') }}
+            {{ tr("FishingPlayers.dang_cap_nhat_danh_sach_nguoi_cau") }}
           </div>
           <div
             v-else-if="!store.selectedPlayer && !store.nearbyPlayers.length"
             class="py-8 px-4 text-center text-[#b7cfb9] text-xs"
           >
             <span class="text-2xl mb-1 block">🎣</span>
-            <div class="m-0">{{ tr('FishingPlayers.hien_chua_co_nguoi_choi_nao_trong_khu_vuc_nay') }}</div>
+            <div class="m-0">{{ tr("FishingPlayers.hien_chua_co_nguoi_choi_nao_trong_khu_vuc_nay") }}</div>
           </div>
           <div v-else-if="!store.selectedPlayer" class="grid gap-2 m-0 p-3 list-none">
             <div v-for="player in store.nearbyPlayers" :key="player.id">
@@ -65,9 +67,11 @@ const store = useFishingStore();
                   <strong class="text-sm flex items-center gap-1.5">
                     {{ player.name }}
                   </strong>
-                  <small class="text-[#b7cfb9] text-[10px]">{{ tr('FishPond.cap') }} {{ player.level }} · {{ player.title }}</small>
+                  <small class="text-[#b7cfb9] text-[10px]"
+                    >{{ tr("FishPond.cap") }} {{ player.level }} · {{ player.title }}</small
+                  >
                 </span>
-                <span class="ml-auto text-[#e8bd62] text-[11px] font-extrabold">{{ tr('FishingPlayers.xem') }}</span>
+                <span class="ml-auto text-[#e8bd62] text-[11px] font-extrabold">{{ tr("FishingPlayers.xem") }}</span>
               </button>
             </div>
           </div>
@@ -77,7 +81,7 @@ const store = useFishingStore();
               class="justify-self-start border-0 bg-transparent text-[#e8bd62] cursor-pointer text-xs font-extrabold"
               @click="store.selectedPlayer = null"
             >
-              {{ tr('FishingPlayers.danh_sach') }}
+              {{ tr("FishingPlayers.danh_sach") }}
             </button>
             <span
               class="grid place-items-center w-[66px] h-[66px] my-2.5 border-1 border-[rgba(255,255,255,0.35)] rounded-full text-white text-lg font-black"
@@ -86,18 +90,18 @@ const store = useFishingStore();
             >
             <div class="m-0 text-xl">{{ store.selectedPlayer.name }}</div>
             <div class="mt-1 text-[#b7cfb9] text-xs">
-              {{ tr('FishPond.cap') }} {{ store.selectedPlayer.level }} · {{ store.selectedPlayer.title }}
+              {{ tr("FishPond.cap") }} {{ store.selectedPlayer.level }} · {{ store.selectedPlayer.title }}
             </div>
             <div class="grid grid-cols-2 w-full gap-2 mt-[18px]">
               <span
                 class="grid gap-1 py-[11px] px-1.5 rounded-[10px] bg-[rgba(7,28,18,0.38)] text-[#b7cfb9] text-[10px]"
                 ><b class="text-[#f4f0df] text-[13px]">{{ store.selectedPlayer.caughtCount }}</b
-                >{{ tr('FishingPlayers.ca_da_cau') }}</span
+                >{{ tr("FishingPlayers.ca_da_cau") }}</span
               >
               <span
                 class="grid gap-1 py-[11px] px-1.5 rounded-[10px] bg-[rgba(7,28,18,0.38)] text-[#b7cfb9] text-[10px]"
                 ><b class="text-[#f4f0df] text-[13px]">{{ store.selectedPlayer.bestCatch }}</b
-                >{{ tr('FishingPlayers.ky_luc') }}</span
+                >{{ tr("FishingPlayers.ky_luc") }}</span
               >
             </div>
           </article>

@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { computed, onBeforeUnmount, watch } from 'vue';
-import { useFishingFatigueStore } from '../../../stores/fishingFatigue';
+import { useFishingFatigueStore } from '../../../stores/player-fishing-fatigue-store';
 import { useAuthStore } from '../../../stores/auth';
 import { getFormattingLocale, t as tr } from '../../../i18n';
 

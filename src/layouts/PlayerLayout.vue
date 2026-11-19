@@ -8,14 +8,14 @@ import { useSingleSession } from "../composables/use-single-session";
 import { useAuthStore } from "../stores/auth";
 import { useTimezoneCheck } from "../composables/use-timezone-check";
 import { useRouter } from "vue-router";
-import { useCurrencyStore } from "../stores/currency";
+import { useCurrencyStore } from "../stores/player-currency-store.ts";
 import { useUserInAreaStore } from "../stores/userInArea";
 import TwoOptionsModal from "../components/shared/TwoOptionsModal.vue";
-import { useConfigStore } from "../stores/config.ts";
+import { useConfigStore } from "../stores/player-config-store.ts";
 import { useUserProfileStore } from "../stores/userProfile";
-import { useFishingStore } from "../stores/fishing";
-import { useFeatureAvailabilityStore } from "../stores/featureAvailability";
-import { useMissionStore } from "../stores/mission";
+import { useFishingStore } from "../stores/player-fishing-store.ts";
+import { useFeatureAvailabilityStore } from "../stores/player-feature-availability-store.ts";
+import { useMissionStore } from "../stores/player-mission-store.ts";
 
 const router = useRouter();
 const authStore = useAuthStore();
@@ -27,17 +27,27 @@ const fishingStore = useFishingStore();
 const features = useFeatureAvailabilityStore();
 const refresh = usePlayerRefreshStore();
 const missionStore = useMissionStore();
-const { showConflictModal, modalMessage, closeCurrentTab, logoutAccount, sessionReady, sessionError, retrySession } = useSingleSession(() => authStore.user?.id);
-onBeforeMount(async () => { await useTimezoneCheck(); });
-watch(() => authStore.user?.id, (userId, _, onCleanup) => {
-  currencyStore.$reset();
-  userProfileStore.$reset();
-  userInAreaStore.$reset();
-  if (!userId) return;
-  const stopArea = startVisibleRefresh(() => refresh.refresh(userId, ['area']), 15_000);
-  const stopWallet = startVisibleRefresh(() => refresh.refresh(userId, ['currency', 'profile']), 60_000);
-  onCleanup(() => { stopArea(); stopWallet(); });
-}, { immediate: true });
+const { showConflictModal, modalMessage, closeCurrentTab, logoutAccount, sessionReady, sessionError, retrySession } =
+  useSingleSession(() => authStore.user?.id);
+onBeforeMount(async () => {
+  await useTimezoneCheck();
+});
+watch(
+  () => authStore.user?.id,
+  (userId, _, onCleanup) => {
+    currencyStore.$reset();
+    userProfileStore.$reset();
+    userInAreaStore.$reset();
+    if (!userId) return;
+    const stopArea = startVisibleRefresh(() => refresh.refresh(userId, ["area"]), 15_000);
+    const stopWallet = startVisibleRefresh(() => refresh.refresh(userId, ["currency", "profile"]), 60_000);
+    onCleanup(() => {
+      stopArea();
+      stopWallet();
+    });
+  },
+  { immediate: true },
+);
 
 watch(
   () => [authStore.user?.id, features.isAvailable("mission")] as const,
@@ -56,7 +66,11 @@ watch(
     // The route guard owns navigation while it finishes the trip.
     if (fishingStore.isLeavingArea || fishingStore.hasLeftArea) return;
     if (session) {
-      if (session.status == "enter" && router.currentRoute.value.name !== "fishing" && router.currentRoute.value.name !== "admin") {
+      if (
+        session.status == "enter" &&
+        router.currentRoute.value.name !== "fishing" &&
+        router.currentRoute.value.name !== "admin"
+      ) {
         router.replace({ name: "fishing" });
       } else if (session.status == null && router.currentRoute.value.name === "fishing") {
         router.replace({ name: "home" });
@@ -79,16 +93,26 @@ watch(
 <template>
   <div>
     <router-view v-if="features.ready && sessionReady" />
-    <div v-else-if="!sessionReady" class="m-4 rounded-xl border border-[#cbd9c6] bg-[#f5f9f0] p-4 text-[#24352a]" role="status">
-      {{ sessionError || tr('use_single_session.checking') }}
+    <div
+      v-else-if="!sessionReady"
+      class="m-4 rounded-xl border border-[#cbd9c6] bg-[#f5f9f0] p-4 text-[#24352a]"
+      role="status"
+    >
+      {{ sessionError || tr("use_single_session.checking") }}
       <button v-if="sessionError" type="button" class="ml-2 underline" @click="retrySession">
-        {{ tr('Maintenance.thu_lai') }}
+        {{ tr("Maintenance.thu_lai") }}
       </button>
     </div>
     <div v-else class="m-4 rounded-xl border border-[#cbd9c6] bg-[#f5f9f0] p-4 text-[#24352a]" role="status">
-      {{ tr(features.error ? 'FeatureAvailability.loadError' : 'FeatureAvailability.loading') }}
-      <button v-if="features.error" type="button" class="ml-2 underline disabled:opacity-50" :disabled="features.loading" @click="features.load(true)">
-        {{ tr('Maintenance.thu_lai') }}
+      {{ tr(features.error ? "FeatureAvailability.loadError" : "FeatureAvailability.loading") }}
+      <button
+        v-if="features.error"
+        type="button"
+        class="ml-2 underline disabled:opacity-50"
+        :disabled="features.loading"
+        @click="features.load(true)"
+      >
+        {{ tr("Maintenance.thu_lai") }}
       </button>
     </div>
 

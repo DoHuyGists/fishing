@@ -3,14 +3,14 @@ import { t as tr } from "../i18n/index.ts";
 
 import { defineAsyncComponent, onMounted, onUnmounted, watch } from "vue";
 import { useAuthStore } from "../stores/auth.ts";
-import { useCaughtStore } from "../stores/caught.ts";
-import { useModalStore } from "../stores/modal.ts";
-import { useNotificationStore } from "../stores/notification.ts";
+import { useCaughtStore } from "../stores/player-caught-store.ts";
+import { useModalStore } from "../stores/player-modal-store.ts";
+import { useNotificationStore } from "../stores/player-notification-store.ts";
 import LatestCaughtList from "../components/player/player-caught/LatestCaughtList.vue";
-import { useConfigStore } from "../stores/config.ts";
+import { useConfigStore } from "../stores/player-config-store.ts";
 import { useUserTurnsStore } from "../stores/userTurns.ts";
 import { useTeamStore } from "../stores/team.ts";
-import { useCurrencyStore } from "../stores/currency.ts";
+import { useCurrencyStore } from "../stores/player-currency-store.ts";
 import { useUserProfileStore } from "../stores/userProfile.ts";
 import UserTurn from "../components/player/player-stamina/UserTurn.vue";
 import Cash from "../components/player/player-currency/Cash.vue";
@@ -21,11 +21,13 @@ import TeamMembersSticky from "../components/player/player-team/TeamMembersStick
 import PrepareModal from "../components/player/player-prepare/PrepareModal.vue";
 import FeatureTable from "../components/player/player-world-map/FeatureTable.vue";
 import GuideTour from "../components/shared/GuideTour.vue";
-import { useOnboardingStore } from "../stores/onboarding.ts";
-import { useFeatureAvailabilityStore } from "../stores/featureAvailability.ts";
+import { useOnboardingStore } from "../stores/player-onboarding-store.ts";
+import { useFeatureAvailabilityStore } from "../stores/player-feature-availability-store.ts";
 import FishingSplash from "../components/player/player-fishing/FishingSplash.vue";
 
-const InteractWorldMap2 = defineAsyncComponent(() => import("../components/player/player-world-map/InteractWorldMap.vue"));
+const InteractWorldMap2 = defineAsyncComponent(
+  () => import("../components/player/player-world-map/InteractWorldMap.vue"),
+);
 const AccountInfoModal = defineAsyncComponent(() => import("../components/player/player-account/AccountInfoModal.vue"));
 const MarketModal = defineAsyncComponent(() => import("../components/player/player-market/MarketModal.vue"));
 const ShopModal = defineAsyncComponent(() => import("../components/player/player-shop/ShopModal.vue"));
@@ -36,21 +38,33 @@ const Feedbackmodal = defineAsyncComponent(() => import("../components/player/pl
 const MissionModal = defineAsyncComponent(() => import("../components/player/player-mission/MissionModal.vue"));
 const EventModal = defineAsyncComponent(() => import("../components/player/player-event/EventModal.vue"));
 const RedeemCode = defineAsyncComponent(() => import("../components/player/player-redeem-code/RedeemCodeModal.vue"));
-const NotificationModal = defineAsyncComponent(() => import("../components/player/player-notification/NotificationModal.vue"));
+const NotificationModal = defineAsyncComponent(
+  () => import("../components/player/player-notification/NotificationModal.vue"),
+);
 const CaughtModal = defineAsyncComponent(() => import("../components/player/player-caught/CaughtModal.vue"));
-const FactionSelectModal = defineAsyncComponent(() => import("../components/player/player-faction/FactionSelectModal.vue"));
+const FactionSelectModal = defineAsyncComponent(
+  () => import("../components/player/player-faction/FactionSelectModal.vue"),
+);
 const Achievement = defineAsyncComponent(() => import("../components/player/player-badge/Achievement.vue"));
 const FriendModal = defineAsyncComponent(() => import("../components/player/player-friend/FriendModal.vue"));
 const WorkBenchModal = defineAsyncComponent(() => import("../components/player/player-work-bench/WorkBenchModal.vue"));
-const LeaderboardModal = defineAsyncComponent(() => import("../components/player/player-leaderboard/LeaderboardModal.vue"));
+const LeaderboardModal = defineAsyncComponent(
+  () => import("../components/player/player-leaderboard/LeaderboardModal.vue"),
+);
 const TeamModal = defineAsyncComponent(() => import("../components/player/player-team/TeamModal.vue"));
 const PostProduction = defineAsyncComponent(() => import("../components/player/player-fishing-net/PostProduction.vue"));
-const AttendanceModal = defineAsyncComponent(() => import("../components/player/player-attendance/AttendanceModal.vue"));
+const AttendanceModal = defineAsyncComponent(
+  () => import("../components/player/player-attendance/AttendanceModal.vue"),
+);
 const DonationModal = defineAsyncComponent(() => import("../components/player/player-donation/DonationModal.vue"));
 const SkillModal = defineAsyncComponent(() => import("../components/player/player-skill/SkillModal.vue"));
-const AquacultureModal = defineAsyncComponent(() => import("../components/player/player-aquaculture/AquacultureModal.vue"));
+const AquacultureModal = defineAsyncComponent(
+  () => import("../components/player/player-aquaculture/AquacultureModal.vue"),
+);
 const DispatchModal = defineAsyncComponent(() => import("../components/player/player-dispatch/DispatchModal.vue"));
-const FishingMapModal = defineAsyncComponent(() => import("../components/player/player-fishing-map/FishingMapModal.vue"));
+const FishingMapModal = defineAsyncComponent(
+  () => import("../components/player/player-fishing-map/FishingMapModal.vue"),
+);
 const GuideModal = defineAsyncComponent(() => import("../components/player/player-guide/GuideModal.vue"));
 const RuleModal = defineAsyncComponent(() => import("../components/player/player-rule/RuleModal.vue"));
 const TutorialModal = defineAsyncComponent(() => import("../components/player/player-tutorial/TutorialModal.vue"));

@@ -1,21 +1,21 @@
 <script lang="ts" setup>
-import { useGameCatalogRefresh } from '../../../composables/useGameCatalogRefresh';
+import { useGameCatalogRefresh } from "../../../composables/useGameCatalogRefresh";
 import type { PickPoint } from "../../../types/model/worldMap";
 import { t as tr } from "../../../i18n";
 
 import { computed, nextTick, onMounted, ref, watch } from "vue";
 import { useWorldStore } from "../../../stores/worldMap.ts";
 import WorldMap from "./WorldMap.vue";
-import { useFishingAreaStore } from "../../../stores/fishingArea.ts";
+import { useFishingAreaStore } from "../../../stores/player-fishing-area-store.ts";
 import { useUserInAreaStore } from "../../../stores/userInArea.ts";
 import { useAuthStore } from "../../../stores/auth.ts";
 import { useDayPhaseClock } from "../../../composables/useDayPhaseClock";
 import { useToast } from "../../../composables/useToast.ts";
 import FishingAnchor from "./FishingAnchor.vue";
 import FishingFatigue from "../player-fishing/FishingFatigue.vue";
-import { useModalStore } from "../../../stores/modal.ts";
-import { useCountryStore } from "../../../stores/country.ts";
-import { useFeatureAvailabilityStore } from "../../../stores/featureAvailability";
+import { useModalStore } from "../../../stores/player-modal-store.ts";
+import { useCountryStore } from "../../../stores/player-country-store.ts";
+import { useFeatureAvailabilityStore } from "../../../stores/player-feature-availability-store.ts";
 
 const props = withDefaults(defineProps<{ fogEnabled?: boolean; collapsible?: boolean }>(), {
   fogEnabled: true,
@@ -37,7 +37,7 @@ const pickEnabled = computed(() => worldStore.isAnchorMode);
 const anchor = computed(() => worldStore.pickedLocation);
 const worldStore = useWorldStore();
 const isMapVisible = computed(() => !props.collapsible || worldStore.isMapVisible);
-useGameCatalogRefresh(['countries', 'areas'], () => isMapVisible.value && features.isAvailable('world-map'));
+useGameCatalogRefresh(["countries", "areas"], () => isMapVisible.value && features.isAvailable("world-map"));
 const selectedArea = computed(() => (worldStore.selectedArea?.id ? worldStore.selectedArea : null));
 const pendingArea = ref<any | null>(null);
 const isEntering = ref(false);
@@ -49,7 +49,8 @@ watch(isMapVisible, async (visible) => {
 });
 
 watch(
-  () => [props.fogEnabled && isMapVisible.value && features.isAvailable('world-map'), authStore.user?.id ?? null] as const,
+  () =>
+    [props.fogEnabled && isMapVisible.value && features.isAvailable("world-map"), authStore.user?.id ?? null] as const,
   ([enabled, playerId], _, onCleanup) => {
     if (enabled) onCleanup(countryStore.watchUnlockedCountries(playerId));
   },
@@ -66,25 +67,35 @@ onMounted(async () => {
   userInAreaStore.setCurrentUserInArea(authStore.userId);
 });
 
-watch(() => features.isAvailable('world-map'), async enabled => {
-  if (enabled) void fishingAreaStore.fetchArea();
-  if (!enabled) { pendingArea.value = null; worldStore.isAnchorMode = false; }
-  else {
-    await nextTick();
-    mapRef.value?.setView(worldStore.getLocation());
-  }
-}, { immediate: true });
+watch(
+  () => features.isAvailable("world-map"),
+  async (enabled) => {
+    if (enabled) void fishingAreaStore.fetchArea();
+    if (!enabled) {
+      pendingArea.value = null;
+      worldStore.isAnchorMode = false;
+    } else {
+      await nextTick();
+      mapRef.value?.setView(worldStore.getLocation());
+    }
+  },
+  { immediate: true },
+);
 
 function togglePick() {
   if (!worldStore.anchorable) {
-    toast.info(tr('InteractWorldMap.mo_khoa_form_de_thao_tac'), { get title() { return tr('InteractWorldMap.nhac_nho'); } });
+    toast.info(tr("InteractWorldMap.mo_khoa_form_de_thao_tac"), {
+      get title() {
+        return tr("InteractWorldMap.nhac_nho");
+      },
+    });
     return;
   }
   worldStore.toggleAnchorMode();
 }
 
 function onSelectArea(area: any) {
-  if (!features.isAvailable('world-map')) return;
+  if (!features.isAvailable("world-map")) return;
   worldStore.targetArea(area);
 }
 
@@ -115,10 +126,18 @@ watch(
 );
 
 function openPrepare(area: any) {
-  const blocked = ['world-map', 'enter-area'].find(key => !features.isAvailable(key));
-  if (blocked) { features.notify(blocked); return; }
+  const blocked = ["world-map", "enter-area"].find((key) => !features.isAvailable(key));
+  if (blocked) {
+    features.notify(blocked);
+    return;
+  }
   if (!userInAreaStore.canEnterFishingArea) {
-    toast.error(tr('InteractWorldMap.can_ket_thuc_xu_ly_ca_trong_luoi_truoc'), { get title() { return tr('InteractWorldMap.thao_tac_bi_chan'); }, position: "top" });
+    toast.error(tr("InteractWorldMap.can_ket_thuc_xu_ly_ca_trong_luoi_truoc"), {
+      get title() {
+        return tr("InteractWorldMap.thao_tac_bi_chan");
+      },
+      position: "top",
+    });
     return;
   }
   pendingArea.value = area;
@@ -156,7 +175,11 @@ function zoomTo(k: number) {
 </script>
 
 <template>
-  <div v-if="features.isAvailable('world-map')" class="grid grid-cols-1 h-fit gap-2" :class="{ 'md:grid-cols-[auto_1fr]': isMapVisible }">
+  <div
+    v-if="features.isAvailable('world-map')"
+    class="grid grid-cols-1 h-fit gap-2"
+    :class="{ 'md:grid-cols-[auto_1fr]': isMapVisible }"
+  >
     <FishingAnchor
       class="slide-fade-in from-top-left"
       :collapsible="collapsible"
@@ -164,7 +187,9 @@ function zoomTo(k: number) {
       @toggle-map="worldStore.toggleMapVisibility()"
     />
     <div v-if="isMapVisible" class="flex flex-col gap-2">
-      <div class="slide-fade-in from-bottom w-full h-fit overflow-hidden grid place-items-center border border-gray-300 rounded-xl">
+      <div
+        class="slide-fade-in from-bottom w-full h-fit overflow-hidden grid place-items-center border border-gray-300 rounded-xl"
+      >
         <WorldMap
           ref="mapRef"
           :areas="fishingAreaStore.visibleMapAreas"
@@ -201,7 +226,13 @@ function zoomTo(k: number) {
                 :class="{ 'underline underline-offset-2': !features.isAvailable('enter-area') }"
                 @click="features.isAvailable('enter-area') ? openPrepare(area) : features.showDetails('enter-area')"
               >
-                {{ !features.isAvailable('enter-area') ? tr('FeatureAvailability.maintenanceBadge') : isEntering ? tr('InteractWorldMap.dang_vao') : tr('InteractWorldMap.di_den_bai_cau') }}
+                {{
+                  !features.isAvailable("enter-area")
+                    ? tr("FeatureAvailability.maintenanceBadge")
+                    : isEntering
+                      ? tr("InteractWorldMap.dang_vao")
+                      : tr("InteractWorldMap.di_den_bai_cau")
+                }}
               </button>
             </div>
           </template>
@@ -210,11 +241,11 @@ function zoomTo(k: number) {
       <div v-if="fogEnabled && countryStore.unlockedError" class="text-xs text-red-700" role="alert">
         {{ countryStore.unlockedError }}
         <button type="button" class="ml-1 underline cursor-pointer" @click="countryStore.fetchMyUnlockedCountries()">
-          {{ tr('Maintenance.thu_lai') }}
+          {{ tr("Maintenance.thu_lai") }}
         </button>
       </div>
       <div v-else-if="fogEnabled && countryStore.isLoadingUnlocked" class="text-xs text-[#24352a]" role="status">
-        {{ tr('InteractWorldMap.dang_tai_quoc_gia_da_mo_khoa') }}
+        {{ tr("InteractWorldMap.dang_tai_quoc_gia_da_mo_khoa") }}
       </div>
       <div class="slide-fade-in from-bottom-right flex gap-2">
         <button @click="zoomTo(3)" class="border border-gray-300 rounded-md px-3">3x</button>
@@ -226,8 +257,15 @@ function zoomTo(k: number) {
   </div>
   <div v-else class="rounded-xl border border-[#cbd9c6] bg-[#f5f9f0] p-4 text-sm text-[#24352a]" role="status">
     <div class="font-semibold">
-      {{ tr('FishingAnchor.ban_do') }} ·
-      <button type="button" class="cursor-pointer underline underline-offset-2" aria-haspopup="dialog" @click="features.showDetails('world-map')">{{ tr('FeatureAvailability.maintenanceBadge') }}</button>
+      {{ tr("FishingAnchor.ban_do") }} ·
+      <button
+        type="button"
+        class="cursor-pointer underline underline-offset-2"
+        aria-haspopup="dialog"
+        @click="features.showDetails('world-map')"
+      >
+        {{ tr("FeatureAvailability.maintenanceBadge") }}
+      </button>
     </div>
   </div>
 </template>

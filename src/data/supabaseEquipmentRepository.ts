@@ -1,10 +1,10 @@
 import type { EquipmentRow } from "../types/table/equipment";
 import type { EquipmentVariant } from "../types/model/equipment";
 import { t as tr } from "../i18n";
-import type { FishingTool } from "../stores/fishing";
+import type { FishingTool } from "../stores/player-fishing-store";
 import supabase from "../database/connection";
 
-import type { EquipmentSet } from "../stores/equipment";
+import type { EquipmentSet } from "../stores/player-equipment-store";
 
 const COLUMN_BY_TOOL: Record<FishingTool, string> = {
   rod: "rod",
@@ -71,7 +71,8 @@ class SupabaseEquipmentRepository {
   async UpdateSet(_userId: string, set: EquipmentSet) {
     const inventoryItems = (items: { inventory_id?: string }[]) =>
       items.map((item) => {
-        if (!item.inventory_id) throw new Error(tr('supabaseEquipmentRepository.vat_pham_trong_set_khong_co_inventory_id'));
+        if (!item.inventory_id)
+          throw new Error(tr("supabaseEquipmentRepository.vat_pham_trong_set_khong_co_inventory_id"));
         return { inventory_id: item.inventory_id };
       });
     const { error } = await supabase.rpc("save_equipment_set", {

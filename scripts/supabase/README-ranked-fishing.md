@@ -86,4 +86,4 @@ Only trusted SQL/service-role code can change fatigue rules/state, season schedu
 
 ## Verification
 
-Run `npm run test:leaderboard`, `npm run test:leaderboard:browser`, `npm run check:i18n`, and `npm run build`. The SQL integration test runs the actual migration, cast and resolver in an isolated PGlite database; it exercises scoring snapshots, cross-boundary attribution, later-catch ties, fatigue recovery/caps/effects, archive retention, randomized disjoint meta groups and client privileges. The browser fixture checks current/archive navigation, Hall of Fame, fatigue, both languages and mobile width. Neither connects to production Supabase.
+Run `npm run test:leaderboard`, `npm run check:i18n`, and `npm run build`. The SQL integration test runs the actual migration, cast and resolver in an isolated PGlite database; it exercises scoring snapshots, cross-boundary attribution, later-catch ties, fatigue recovery/caps/effects, archive retention, randomized disjoint meta groups and client privileges. It does not connect to production Supabase.

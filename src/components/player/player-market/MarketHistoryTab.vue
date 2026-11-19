@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { t as tr } from "../../../i18n/index.ts";
 import { useAuthStore } from "../../../stores/auth.ts";
-import { useMarketStore } from "../../../stores/market.ts";
+import { useMarketStore } from "../../../stores/player-market-store.ts";
 import { formatDate } from "../../../utils/marketFormatting.ts";
 import Cash from "../player-currency/Cash.vue";
 

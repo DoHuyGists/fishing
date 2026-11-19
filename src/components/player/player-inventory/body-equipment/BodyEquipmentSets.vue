@@ -2,7 +2,7 @@
 import { computed, ref, watch } from "vue";
 import { healthSlots } from "../../../../data/healthEquipment.ts";
 import { t as tr } from "../../../../i18n/index.ts";
-import { useHealthStore } from "../../../../stores/health.ts";
+import { useHealthStore } from "../../../../stores/player-health-store.ts";
 import { useToast } from "../../../../composables/useToast.ts";
 import type { BodyEquipmentSet, HealthSlot } from "../../../../types/model/health.ts";
 import EquipmentSetsPanel from "../../../shared/EquipmentSetsPanel.vue";
@@ -20,7 +20,9 @@ const filtered = computed(() =>
       const query = search.value.trim().toLowerCase();
       return (
         !query ||
-        tr("EquipmentSets.setNumber", { number: index + 1 }).toLowerCase().includes(query) ||
+        tr("EquipmentSets.setNumber", { number: index + 1 })
+          .toLowerCase()
+          .includes(query) ||
         healthSlots.some((slot) => set[slot].some((item) => name(item.inventory_id).toLowerCase().includes(query)))
       );
     }),

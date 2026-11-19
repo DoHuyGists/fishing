@@ -4,7 +4,7 @@ import { i18n, t as tr } from "../i18n";
 import { FEATURE_CATALOG, modalFeatures } from "../data/featureAvailability";
 import { supabaseFeatureFlagRepository as repository } from "../data/supabaseFeatureFlagRepository";
 import { useToast } from "../composables/useToast";
-import { useInformationModalStore } from "./informationModal";
+import { useInformationModalStore } from "./player-information-modal-store";
 import { startVisibleRefresh } from "../utils/visibleRefresh";
 
 let stopRefresh: (() => void) | null = null;
@@ -23,13 +23,15 @@ export const useFeatureAvailabilityStore = defineStore("FeatureAvailability", {
     lastFetchedAt: 0,
   }),
   getters: {
-    isAvailable: state => (key: string): boolean =>
-      state.ready && state.flags[key]?.enabled === true,
+    isAvailable:
+      (state) =>
+      (key: string): boolean =>
+        state.ready && state.flags[key]?.enabled === true,
     canOpen(): (modal: string) => boolean {
-      return modal => modalFeatures(modal).every(key => this.isAvailable(key));
+      return (modal) => modalFeatures(modal).every((key) => this.isAvailable(key));
     },
     reason(): (key: string) => string {
-      return key => {
+      return (key) => {
         if (!this.ready) return tr(this.error ? "FeatureAvailability.loadError" : "FeatureAvailability.loading");
         const flag = this.flags[key];
         const message = i18n.global.locale.value === "en" ? flag?.message_en : flag?.message_vi;
@@ -39,15 +41,15 @@ export const useFeatureAvailabilityStore = defineStore("FeatureAvailability", {
   },
   actions: {
     showDetails(key: string) {
-      const feature = FEATURE_CATALOG.find(feature => feature.key === key);
+      const feature = FEATURE_CATALOG.find((feature) => feature.key === key);
       useInformationModalStore().open({
-        name: `${feature ? tr(feature.labelKey) : tr('FeatureAvailability.title')} · ${tr('FeatureAvailability.maintenanceBadge')}`,
+        name: `${feature ? tr(feature.labelKey) : tr("FeatureAvailability.title")} · ${tr("FeatureAvailability.maintenanceBadge")}`,
         description: this.reason(key),
       });
     },
     async checkRequests(keys: string[]) {
       await this.load();
-      const blocked = keys.find(key => !this.isAvailable(key));
+      const blocked = keys.find((key) => !this.isAvailable(key));
       if (!blocked) return null;
       this.notify(blocked);
       return { message: this.reason(blocked), code: this.ready ? "FEATURE_DISABLED" : "FEATURE_FLAGS_UNAVAILABLE" };
@@ -59,7 +61,10 @@ export const useFeatureAvailabilityStore = defineStore("FeatureAvailability", {
       void this.load(true);
     },
     async load(force = false) {
-      if (pending) { if (force) refreshRequested = true; return pending; }
+      if (pending) {
+        if (force) refreshRequested = true;
+        return pending;
+      }
       if (!force && this.ready && Date.now() - this.lastFetchedAt < 30_000) return;
       const generation = epoch;
       this.loading = true;
@@ -70,10 +75,14 @@ export const useFeatureAvailabilityStore = defineStore("FeatureAvailability", {
             const rows = await repository.fetchAll();
             if (generation !== epoch) return;
             // A pending story migration must not disable existing gameplay. Missing story stays unavailable.
-            if (!FEATURE_CATALOG.filter(feature => feature.key !== 'story').every(feature => rows.some(row => row.feature_key === feature.key))) {
+            if (
+              !FEATURE_CATALOG.filter((feature) => feature.key !== "story").every((feature) =>
+                rows.some((row) => row.feature_key === feature.key),
+              )
+            ) {
               throw new Error("Incomplete feature flag configuration");
             }
-            this.flags = Object.fromEntries(rows.map(row => [row.feature_key, row]));
+            this.flags = Object.fromEntries(rows.map((row) => [row.feature_key, row]));
             this.ready = true;
             this.error = "";
             this.lastFetchedAt = Date.now();
@@ -81,7 +90,10 @@ export const useFeatureAvailabilityStore = defineStore("FeatureAvailability", {
         } catch (error) {
           if (generation === epoch) this.error = error instanceof Error ? error.message : String(error);
         } finally {
-          if (generation === epoch) { this.loading = false; pending = null; }
+          if (generation === epoch) {
+            this.loading = false;
+            pending = null;
+          }
         }
       })();
       return pending;
@@ -89,14 +101,20 @@ export const useFeatureAvailabilityStore = defineStore("FeatureAvailability", {
     notify(key: string) {
       const message = this.reason(key);
       if (message === lastNotice && Date.now() - lastNoticeAt < 2500) return;
-      lastNotice = message; lastNoticeAt = Date.now();
+      lastNotice = message;
+      lastNoticeAt = Date.now();
       useToast().warning(message, { title: tr("FeatureAvailability.title") });
     },
     async start() {
-      if (!stopRefresh) stopRefresh = startVisibleRefresh(async () => {
-        await this.load();
-        if (this.error) throw new Error(this.error);
-      }, 30_000, false);
+      if (!stopRefresh)
+        stopRefresh = startVisibleRefresh(
+          async () => {
+            await this.load();
+            if (this.error) throw new Error(this.error);
+          },
+          30_000,
+          false,
+        );
       await this.load();
     },
     stop() {

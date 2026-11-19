@@ -3,7 +3,7 @@ import type { BookVariant } from "../../../types/model/diary";
 import { t as tr } from "../../../i18n";
 
 import { computed, ref, watch } from "vue";
-import type { Country } from "../../../stores/country.ts";
+import type { Country } from "../../../stores/player-country-store.ts";
 import TheBook from "./TheBook.vue";
 
 const props = defineProps<{ countries: Country[]; speciesCountByLocation: Record<string, number> }>();

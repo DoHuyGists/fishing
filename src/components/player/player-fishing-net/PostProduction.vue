@@ -5,9 +5,9 @@ import { t as tr } from "../../../i18n/index.ts";
 import { computed, onMounted, reactive, ref } from "vue";
 import Modal from "../../shared/Modal.vue";
 import Hint from "../../shared/Hint.vue";
-import { useCaughtStore, type CaughtFish } from "../../../stores/caught.ts";
+import { useCaughtStore, type CaughtFish } from "../../../stores/player-caught-store.ts";
 import { useUserProfileStore } from "../../../stores/userProfile.ts";
-import { useModalStore } from "../../../stores/modal.ts";
+import { useModalStore } from "../../../stores/player-modal-store.ts";
 import { useToast } from "../../../composables/useToast.ts";
 import TwoOptionsModal from "../../shared/TwoOptionsModal.vue";
 

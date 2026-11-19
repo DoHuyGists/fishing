@@ -1,7 +1,7 @@
 import { storeToRefs } from "pinia";
-import { useInformationModalStore } from "../stores/informationModal";
+import { useInformationModalStore } from "../stores/player-information-modal-store";
 
-export type { InformationModalContent } from "../stores/informationModal";
+export type { InformationModalContent } from "../stores/player-information-modal-store";
 
 export function useInformationModal() {
   const store = useInformationModalStore();

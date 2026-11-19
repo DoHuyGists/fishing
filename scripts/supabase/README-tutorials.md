@@ -10,4 +10,4 @@ Từ sảnh chọn **Thực hành**, chuyển giữa Danh sách/Lưới và mở
 
 Khi thêm màn mới, tạo component và store riêng, đăng ký slug trong `TutorialView.vue`, sau đó thêm thông tin vào `public.tutorials`. Component có thể tái sử dụng `FishingScene` qua `context` và `TensionChallenge` qua `controller`, tránh khởi tạo ngữ cảnh câu cá thật.
 
-Kiểm tra: `node --test scripts/validate-tutorial.mjs` và `npm run build`.
+Kiểm tra build: `npm run build`. Kiểm tra thủ công luồng thực hành, chơi lại và thoát màn.

@@ -132,4 +132,4 @@ Kết quả đấu: CAUGHT, LINE_SNAPPED, FISH_ESCAPED hoặc TIMEOUT; EXPIRED v
 
 ## Kiểm tra cục bộ
 
-Chạy `scripts/validate-tension-challenge.mjs` với PGlite (hỗ trợ biến môi trường `PGLITE_MODULE` nếu cài ở thư mục riêng), sau đó `npm.cmd run build`. Bộ kiểm tra gồm parity client/SQL, đầy đủ rarity, độ sâu/giờ/tỉ trọng, xác suất mồi-lưỡi, quá tải, snapshot, trừ mồi một lần và quyền truy cập.
+Chạy `npm.cmd run test:fishing-result` để kiểm tra khôi phục kết quả và biên nhận giao dịch, `node --test scripts/test-depth-preview.mjs` để kiểm tra xem trước độ sâu trên PGlite, sau đó `npm.cmd run build`. Kiểm tra thêm cơ chế trang bị trên môi trường thử nghiệm trước khi triển khai.

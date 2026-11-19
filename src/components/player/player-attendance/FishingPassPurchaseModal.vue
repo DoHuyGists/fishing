@@ -2,8 +2,8 @@
 import { t as tr } from "../../../i18n";
 
 import PaymentConfirmation from "../../shared/PaymentConfirmation.vue";
-import { useCurrencyStore } from "../../../stores/currency";
-import { useFishingPassStore } from "../../../stores/fishingPass";
+import { useCurrencyStore } from "../../../stores/player-currency-store.ts";
+import { useFishingPassStore } from "../../../stores/player-fishing-pass-store.ts";
 import { useToast } from "../../../composables/useToast";
 
 const emit = defineEmits<{ close: [] }>();
@@ -16,9 +16,20 @@ async function buyFishingPass() {
     const purchased = await passStore.buyFishingPass();
     if (!purchased) return;
     emit("close");
-    toast.success(tr('FishingPassPurchaseModal.mua_fishing_pass_thanh_cong'), { get title() { return tr('FishingPassPurchaseModal.giao_dich_thanh_cong'); } });
+    toast.success(tr("FishingPassPurchaseModal.mua_fishing_pass_thanh_cong"), {
+      get title() {
+        return tr("FishingPassPurchaseModal.giao_dich_thanh_cong");
+      },
+    });
   } catch (err) {
-    toast.error(err instanceof Error ? err.message : tr('FishingPassPurchaseModal.khong_the_mua_fishing_pass_vui_long_thu_lai'), { get title() { return tr('FishingPassPurchaseModal.mua_that_bai'); } });
+    toast.error(
+      err instanceof Error ? err.message : tr("FishingPassPurchaseModal.khong_the_mua_fishing_pass_vui_long_thu_lai"),
+      {
+        get title() {
+          return tr("FishingPassPurchaseModal.mua_that_bai");
+        },
+      },
+    );
   }
 }
 </script>
@@ -34,10 +45,14 @@ async function buyFishingPass() {
     :remaining-label="tr('FishingPassPurchaseModal.so_vo_so_con_lai')"
     :confirm-text="tr('FishingPassPurchaseModal.xac_nhan_mua')"
     :busy="passStore.isBuying"
-    :error="currencyStore.shells < passStore.price ? tr('FishingPassPurchaseModal.ban_khong_du_vo_so_de_mua_fishing_pass') : ''"
+    :error="
+      currencyStore.shells < passStore.price
+        ? tr('FishingPassPurchaseModal.ban_khong_du_vo_so_de_mua_fishing_pass')
+        : ''
+    "
     @cancel="emit('close')"
     @confirm="buyFishingPass"
   >
-    <div class="text-sm text-emerald-900/70">{{ tr('FishingPassPurchaseModal.mo_khoa_phan_thuong_fishing_pass') }}</div>
+    <div class="text-sm text-emerald-900/70">{{ tr("FishingPassPurchaseModal.mo_khoa_phan_thuong_fishing_pass") }}</div>
   </PaymentConfirmation>
 </template>

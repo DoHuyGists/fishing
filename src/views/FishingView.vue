@@ -13,13 +13,13 @@ import FishingScene from "../components/player/player-fishing/FishingScene.vue";
 import LakeFishGuide from "../components/player/player-fishing/LakeFishGuide.vue";
 import Loading from "../components/Loading.vue";
 import TensionChallenge from "../components/player/player-fishing-challenge/TensionChallenge.vue";
-import { useFishingStore } from "../stores/fishing";
+import { useFishingStore } from "../stores/player-fishing-store.ts";
 import { useAuthStore } from "../stores/auth";
-import { useEquipmentStore } from "../stores/equipment";
+import { useEquipmentStore } from "../stores/player-equipment-store.ts";
 import { useUserSettingStore } from "../stores/userSetting";
-import { useFishingBackgroundSoundStore } from "../stores/fishingBackgroundSound";
+import { useFishingBackgroundSoundStore } from "../stores/player-fishing-background-sound-store.ts";
 import DayPhaseClock from "../components/player/player-fishing/DayPhaseClock.vue";
-import FishingFatigue from '../components/player/player-fishing/FishingFatigue.vue';
+import FishingFatigue from "../components/player/player-fishing/FishingFatigue.vue";
 import { useDayPhaseClock } from "../composables/useDayPhaseClock";
 import { useUserInAreaStore } from "../stores/userInArea";
 import { supabaseFishingAreaRepository } from "../data/supabaseFishingAreaRepository";
@@ -169,13 +169,13 @@ onBeforeUnmount(() => {
     class="flex min-h-screen flex-col items-center justify-center gap-4 bg-[#f5f9f0] px-6 text-center text-[#24352a]"
     role="alert"
   >
-    <div>{{ tr('FishingView.khong_the_chuan_bi_phien_cau') }} {{ sessionError }}</div>
+    <div>{{ tr("FishingView.khong_the_chuan_bi_phien_cau") }} {{ sessionError }}</div>
     <button
       type="button"
       class="rounded-lg border border-[#cbd9c6] bg-white px-4 py-2 font-medium hover:bg-[#f5f9f0]"
       @click="retrySetup"
     >
-      {{ tr('Maintenance.thu_lai') }}
+      {{ tr("Maintenance.thu_lai") }}
     </button>
     <button
       type="button"
@@ -183,14 +183,19 @@ onBeforeUnmount(() => {
       :disabled="fishingStore.isLeavingArea"
       @click="router.push({ name: 'home' })"
     >
-      {{ tr('FishingView.quay_lai_ban_do') }}
+      {{ tr("FishingView.quay_lai_ban_do") }}
     </button>
   </section>
   <main v-else class="w-full h-screen overflow-hidden touch-none overscroll-none bg-[#193224] text-[#e9f4e8]">
     <div class="fixed top-3 left-3 z-20 text-white flex justify-between items-start">
       <div class="flex flex-col gap-2">
         <DayPhaseClock :area-id="userInAreaStore.userInArea?.area_id" />
-        <FishingFatigue variant="compact" class="max-w-60" :area-id="userInAreaStore.userInArea?.area_id ?? null" presence />
+        <FishingFatigue
+          variant="compact"
+          class="max-w-60"
+          :area-id="userInAreaStore.userInArea?.area_id ?? null"
+          presence
+        />
         <div class="backdrop-blur-2xl h-fit w-fit rounded p-1">
           <button
             type="button"
@@ -198,7 +203,7 @@ onBeforeUnmount(() => {
             :disabled="fishingStore.isLeavingArea"
             @click="showExitConfirmation = true"
           >
-            {{ fishingStore.isLeavingArea ? tr('FishingView.dang_quay_lai') : tr('FishingView.ket_thuc_chuyen_cau') }}
+            {{ fishingStore.isLeavingArea ? tr("FishingView.dang_quay_lai") : tr("FishingView.ket_thuc_chuyen_cau") }}
           </button>
         </div>
       </div>
@@ -209,7 +214,7 @@ onBeforeUnmount(() => {
       aria-haspopup="dialog"
       @click="settingsOpen = true"
     >
-      {{ tr('FishingView.cai_dat') }}
+      {{ tr("FishingView.cai_dat") }}
     </button>
     <div class="grid grid-rows-[minmax(0,1fr)_auto] w-full h-dvh">
       <FishingScene :context="sceneContext" />
@@ -223,13 +228,16 @@ onBeforeUnmount(() => {
               aria-controls="equipment-menu"
               @click="toggleEquipment"
             >
-              {{ equipmentCollapsed ? tr('MyTeamPanel.mo') : tr('FishingView.thu_gon') }}
+              {{ equipmentCollapsed ? tr("MyTeamPanel.mo") : tr("FishingView.thu_gon") }}
             </button>
-            <div class="slide-fade-in from-top player-content-in flex shrink-0 items-center gap-2 rounded-lg border border-[#cbd9c6] bg-[#f5f9f0] px-2 py-1 text-[11px] leading-3 text-[#24352a]" :aria-label="tr('EquipmentMenu.moi_dang_chon')">
-              <img :src="selectedBait?.image ?? ''" class="size-6 object-contain" alt="">
+            <div
+              class="slide-fade-in from-top player-content-in flex shrink-0 items-center gap-2 rounded-lg border border-[#cbd9c6] bg-[#f5f9f0] px-2 py-1 text-[11px] leading-3 text-[#24352a]"
+              :aria-label="tr('EquipmentMenu.moi_dang_chon')"
+            >
+              <img :src="selectedBait?.image ?? ''" class="size-6 object-contain" alt="" />
               <div class="flex flex-col gap-0.5">
-                <span class="font-bold">{{ selectedBait?.name ?? tr('EquipmentMenu.chua_chon_moi') }}</span>
-                <span class="text-[#4b5f50]">{{ tr('EquipmentMenu.con') }} {{ selectedBait?.quantity ?? 0 }}</span>
+                <span class="font-bold">{{ selectedBait?.name ?? tr("EquipmentMenu.chua_chon_moi") }}</span>
+                <span class="text-[#4b5f50]">{{ tr("EquipmentMenu.con") }} {{ selectedBait?.quantity ?? 0 }}</span>
               </div>
             </div>
           </div>
@@ -251,10 +259,10 @@ onBeforeUnmount(() => {
             :disabled="fishingStore.castPhase !== 'unconfirmed'"
             @click="fishingStore.retryPendingResult"
           >
-            {{ tr('fishing.retry_result') }}
+            {{ tr("fishing.retry_result") }}
           </button>
           <div v-if="fishingStore.isFishingNetFull" role="status" class="text-xs font-bold text-amber-800">
-            {{ tr('FishingBag.capacity_reached', { capacity: fishingStore.fishingNetCapacity }) }}
+            {{ tr("FishingBag.capacity_reached", { capacity: fishingStore.fishingNetCapacity }) }}
           </div>
           <button
             type="button"
@@ -263,7 +271,7 @@ onBeforeUnmount(() => {
             :disabled="!fishingStore.canReelIn"
             @click="fishingStore.reelInBait"
           >
-            {{ tr('NewPlayerFishing.thu_moi') }}
+            {{ tr("NewPlayerFishing.thu_moi") }}
           </button>
         </section>
       </section>
@@ -286,9 +294,13 @@ onBeforeUnmount(() => {
             aria-modal="true"
             aria-labelledby="confirm-exit-title"
           >
-            <div id="confirm-exit-title" class="m-0 text-lg font-bold text-[#e8bd62]">{{ tr('FishingView.ket_thuc_chuyen_cau_2') }}</div>
+            <div id="confirm-exit-title" class="m-0 text-lg font-bold text-[#e8bd62]">
+              {{ tr("FishingView.ket_thuc_chuyen_cau_2") }}
+            </div>
             <div class="my-4 text-sm text-[#c8dccb] leading-relaxed">
-              {{ tr('FishingView.gio_ca_hien_co') }} <strong class="text-white">{{ fishingStore.inventory.length }}</strong> {{ tr('FishingView.con_ca_ban_co_chac_chan_muon_quay_lai_ban_do_khong') }}
+              {{ tr("FishingView.gio_ca_hien_co") }}
+              <strong class="text-white">{{ fishingStore.inventory.length }}</strong>
+              {{ tr("FishingView.con_ca_ban_co_chac_chan_muon_quay_lai_ban_do_khong") }}
             </div>
             <div v-if="fishingStore.leaveAreaError" role="alert" class="my-3 text-sm text-red-300">
               {{ fishingStore.leaveAreaError }}
@@ -299,7 +311,7 @@ onBeforeUnmount(() => {
                 class="px-4 py-2 border border-[rgba(255,255,255,0.2)] rounded-xl bg-[rgba(255,255,255,0.1)] hover:bg-[rgba(255,255,255,0.2)] text-white text-xs font-semibold transition-colors cursor-pointer"
                 @click="showExitConfirmation = false"
               >
-                {{ tr('FishingView.o_lai_cau') }}
+                {{ tr("FishingView.o_lai_cau") }}
               </button>
               <button
                 type="button"
@@ -307,7 +319,9 @@ onBeforeUnmount(() => {
                 :disabled="fishingStore.isLeavingArea"
                 @click="router.push({ name: 'home' })"
               >
-                {{ fishingStore.isLeavingArea ? tr('FishingView.dang_quay_lai') : tr('FishingView.ket_thuc_chuyen_cau') }}
+                {{
+                  fishingStore.isLeavingArea ? tr("FishingView.dang_quay_lai") : tr("FishingView.ket_thuc_chuyen_cau")
+                }}
               </button>
             </div>
           </section>
@@ -328,7 +342,7 @@ onBeforeUnmount(() => {
           class="max-h-[85dvh] w-full max-w-lg overflow-y-auto rounded-xl border border-[#cbd9c6] bg-[#f5f9f0] p-4 text-[#24352a]"
         >
           <header class="mb-4 flex items-center justify-between gap-4 border-b pb-2">
-            <div id="fishing-settings-title" class="text-lg font-bold">{{ tr('FishingView.cai_dat_cau_ca') }}</div>
+            <div id="fishing-settings-title" class="text-lg font-bold">{{ tr("FishingView.cai_dat_cau_ca") }}</div>
             <button
               type="button"
               class="flex size-8 shrink-0 items-center justify-center rounded-full border border-[#cbd9c6] text-2xl leading-none hover:bg-[#e2ecdc]"
@@ -340,8 +354,10 @@ onBeforeUnmount(() => {
           </header>
           <div class="flex items-center justify-between gap-4">
             <div>
-              <div id="fishing-sound-label" class="font-bold text-xl">{{ tr('FishingView.am_thanh_nen') }}</div>
-              <div class="mt-1 text-sm">{{ tr('FishingView.tieng_chim_ngau_nhien_voi_khoang_nghi_giua_cac_luot_phat') }}</div>
+              <div id="fishing-sound-label" class="font-bold text-xl">{{ tr("FishingView.am_thanh_nen") }}</div>
+              <div class="mt-1 text-sm">
+                {{ tr("FishingView.tieng_chim_ngau_nhien_voi_khoang_nghi_giua_cac_luot_phat") }}
+              </div>
             </div>
             <button
               type="button"
@@ -360,7 +376,7 @@ onBeforeUnmount(() => {
             </button>
           </div>
           <div v-if="userSettingStore.loading || userSettingStore.saving" role="status" class="mt-3 text-sm">
-            {{ userSettingStore.loading ? tr('FishingView.dang_tai_cai_dat') : tr('FishingView.dang_luu_cai_dat') }}
+            {{ userSettingStore.loading ? tr("FishingView.dang_tai_cai_dat") : tr("FishingView.dang_luu_cai_dat") }}
           </div>
           <div v-if="userSettingStore.error" role="alert" class="mt-3 text-sm text-red-700">
             <div>{{ userSettingStore.error }}</div>
@@ -370,7 +386,7 @@ onBeforeUnmount(() => {
               class="mt-2 underline"
               @click="userSettingStore.load(user?.id ?? null)"
             >
-              {{ tr('Maintenance.thu_lai') }}
+              {{ tr("Maintenance.thu_lai") }}
             </button>
           </div>
         </section>

@@ -33,5 +33,3 @@ Nếu mất phản hồi, client giữ request UUID trong sessionStorage riêng 
 ## Kiểm tra cục bộ
 
 `npm run test:dispatch` chạy migration và giao dịch trên PostgreSQL bằng PGlite, bao gồm kiểm tra nhận sớm, quyền sở hữu, chống lặp, snapshot, rollback lượt lặp, giá thay đổi và hủy không hoàn phí. Kiểm tra Pinia đi kèm xác minh phân công hai chiều, mất phản hồi rồi mở lại, đổi tài khoản và phản hồi sai thứ tự.
-
-`npm run test:dispatch:browser` kiểm tra giao diện bằng Edge/Chromium headless với dữ liệu giả lập, bao gồm Việt/Anh và màn hình điện thoại; không kết nối Supabase thật. Có thể đặt `DISPATCH_TEST_BROWSER` trỏ đến trình duyệt cục bộ.

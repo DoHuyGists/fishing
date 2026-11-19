@@ -2,7 +2,7 @@
 import { getFormattingLocale, t as tr } from "../../../i18n";
 
 import { computed } from "vue";
-import { useFishingStore } from "../../../stores/fishing";
+import { useFishingStore } from "../../../stores/player-fishing-store.ts";
 import { useToast } from "../../../composables/useToast";
 import Fishthrash from "./Fishthrash.vue";
 
@@ -23,7 +23,7 @@ async function releaseCatch() {
     await store.releaseFish(fish.id);
     if (!store.inventory.some((item) => item.id === fish.id)) store.closeCatchDialog();
   } catch {
-    toast.error(tr('CaughtModal.loi_khi_tha_ca'));
+    toast.error(tr("CaughtModal.loi_khi_tha_ca"));
   }
 }
 
@@ -62,14 +62,16 @@ const variantFrameClass = computed(() => {
           </div>
           <div class="flex min-w-0 flex-col gap-4 p-5 sm:p-6">
             <div class="flex flex-wrap items-center gap-2">
-              <span class="inline-block px-2 py-1 rounded-full bg-[#dcae52] text-[#254130] text-[9px] font-black tracking-[0.1em]">
+              <span
+                class="inline-block px-2 py-1 rounded-full bg-[#dcae52] text-[#254130] text-[9px] font-black tracking-[0.1em]"
+              >
                 {{ caught.variantType }}
               </span>
               <span
                 v-if="caught.isShiny"
                 class="inline-block px-2 py-1 rounded-full bg-[#fff1a8] text-[#6b4b00] text-[9px] font-black tracking-widest"
               >
-                {{ tr('CatchDialog.ca_xin') }}
+                {{ tr("CatchDialog.ca_xin") }}
               </span>
               <div
                 v-if="caught.starRating !== undefined"
@@ -81,11 +83,17 @@ const variantFrameClass = computed(() => {
             </div>
             <div id="catch-title" class="break-words text-2xl font-bold leading-tight">{{ caught.name }}</div>
             <div class="flex flex-wrap items-center gap-x-4 gap-y-2 text-[#b7cfb9] text-sm">
-              <span>{{ caught.weight }}</span><span v-if="caught.length">{{ caught.length }}</span>
+              <span>{{ caught.weight }}</span
+              ><span v-if="caught.length">{{ caught.length }}</span>
             </div>
-            <div v-if="caught.score !== undefined" class="flex flex-wrap gap-x-3 gap-y-1 text-sm font-bold text-[#ffd65a]">
-              <span>{{ scoreFormatter.format(caught.score) }} {{ tr('DailyMission.diem') }}</span>
-              <span v-if="caught.seasonNumber !== undefined">{{ tr('LeaderboardSeason.season', { number: caught.seasonNumber }) }}</span>
+            <div
+              v-if="caught.score !== undefined"
+              class="flex flex-wrap gap-x-3 gap-y-1 text-sm font-bold text-[#ffd65a]"
+            >
+              <span>{{ scoreFormatter.format(caught.score) }} {{ tr("DailyMission.diem") }}</span>
+              <span v-if="caught.seasonNumber !== undefined">{{
+                tr("LeaderboardSeason.season", { number: caught.seasonNumber })
+              }}</span>
             </div>
             <div class="mt-auto grid grid-cols-2 gap-3 pt-2">
               <button
@@ -94,7 +102,7 @@ const variantFrameClass = computed(() => {
                 :disabled="releaseDisabled"
                 @click="releaseCatch"
               >
-                {{ store.isReleasingFish ? tr('FishReleaseConfirm.dang_tha') : tr('CatchDialog.tha_ca') }}
+                {{ store.isReleasingFish ? tr("FishReleaseConfirm.dang_tha") : tr("CatchDialog.tha_ca") }}
               </button>
               <button
                 type="button"
@@ -102,7 +110,7 @@ const variantFrameClass = computed(() => {
                 :disabled="store.isReleasingFish"
                 @click="closeDialog"
               >
-                {{ tr('CatchDialog.cau_tiep') }}
+                {{ tr("CatchDialog.cau_tiep") }}
               </button>
             </div>
           </div>

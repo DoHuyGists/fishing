@@ -1,7 +1,7 @@
-import { readCatalogPages } from './readCatalogPages';
-import { RepositoryError } from './repositoryError';
+import { readCatalogPages } from "./readCatalogPages";
+import { RepositoryError } from "./repositoryError";
 import supabase from "../database/connection";
-import type { Country } from "../stores/country";
+import type { Country } from "../stores/player-country-store";
 
 class SupabaseCountryRepository {
   async fetchMyUnlockedCountries(playerId: string): Promise<Country[]> {
@@ -15,10 +15,15 @@ class SupabaseCountryRepository {
   }
 
   async fetchCountries(signal?: AbortSignal): Promise<Country[]> {
-    const data = await readCatalogPages((from, to) => supabase
-      .from("countries")
-      .select("id, name, code, information, created_at, updated_at, location")
-      .order("name", { ascending: true }).order("id").abortSignal(signal ?? new AbortController().signal).range(from, to));
+    const data = await readCatalogPages((from, to) =>
+      supabase
+        .from("countries")
+        .select("id, name, code, information, created_at, updated_at, location")
+        .order("name", { ascending: true })
+        .order("id")
+        .abortSignal(signal ?? new AbortController().signal)
+        .range(from, to),
+    );
     return (data ?? []) as Country[];
   }
 }

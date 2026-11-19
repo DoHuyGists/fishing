@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { t as tr } from "../../../../i18n/index.ts";
-import { useHealthStore } from "../../../../stores/health.ts";
+import { useHealthStore } from "../../../../stores/player-health-store.ts";
 import HealthOverview from "./HealthOverview.vue";
 import BodyEquipmentSets from "./BodyEquipmentSets.vue";
 

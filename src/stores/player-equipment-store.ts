@@ -4,10 +4,10 @@ import { defineStore } from "pinia";
 import { defaultEquipmentVariants } from "../data/equipmentCatalog";
 
 import { supabaseEquipmentRepository } from "../data/supabaseEquipmentRepository";
-import { useReadCacheStore } from './readCache';
-import { useAuthStore } from './auth';
-import { useUserProfileStore } from './userProfile';
-import { useFishingStore, type FishingTool } from "./fishing";
+import { useReadCacheStore } from "./readCache";
+import { useAuthStore } from "./auth";
+import { useUserProfileStore } from "./userProfile";
+import { useFishingStore, type FishingTool } from "./player-fishing-store";
 
 export type Category = "rod" | "line" | "reel" | "hook" | "bait";
 
@@ -60,10 +60,11 @@ export const useEquipmentStore = defineStore("equipment", {
       Object.assign(useFishingStore().equipmentLoadout, selected);
     },
     async fetchEquipment(userId: string, force = false) {
-      const auth = useAuthStore(), generation = auth.sessionGeneration;
+      const auth = useAuthStore(),
+        generation = auth.sessionGeneration;
       const current = () => auth.user?.id === userId && auth.sessionGeneration === generation;
       if (!current()) return;
-      if (force) await useReadCacheStore().invalidate(['equipment']);
+      if (force) await useReadCacheStore().invalidate(["equipment"]);
       if (!current()) return;
       if (pendingRequest?.userId === userId && pendingRequest.requestId === this.requestId) {
         const requestId = this.requestId;
@@ -89,7 +90,7 @@ export const useEquipmentStore = defineStore("equipment", {
         } catch (err) {
           if (!current() || requestId !== this.requestId) return;
           this.loaded = false;
-          this.error = err instanceof Error ? err.message : tr('equipment.khong_the_tai_trang_bi_tu_may_chu');
+          this.error = err instanceof Error ? err.message : tr("equipment.khong_the_tai_trang_bi_tu_may_chu");
         } finally {
           if (current() && requestId === this.requestId) this.loading = false;
         }
@@ -123,7 +124,7 @@ export const useEquipmentStore = defineStore("equipment", {
     async saveSet(userId: string, set: EquipmentSet) {
       const capacity = useUserProfileStore().equipmentCapacity;
       if (this.countSetItems(set) > capacity) {
-        throw new Error(tr('EquipmentSets.capacity_reached', { capacity }));
+        throw new Error(tr("EquipmentSets.capacity_reached", { capacity }));
       }
       return supabaseEquipmentRepository.UpdateSet(userId, set);
     },

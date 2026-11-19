@@ -11,7 +11,7 @@ import { inventoryTableContextKey, useInventoryTable } from "./useInventoryTable
 import Tab from "../../shared/Tab.vue";
 import HealthPanel from "./body-equipment/HealthPanel.vue";
 import type { InventoryTab } from "../../../types/model/inventory";
-import { useModalStore } from "../../../stores/modal";
+import { useModalStore } from "../../../stores/player-modal-store.ts";
 
 const { initialTab = "fishing", compact = false } = defineProps<{ initialTab?: InventoryTab; compact?: boolean }>();
 const inventory = useInventoryTable(initialTab);

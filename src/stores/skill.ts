@@ -1,4 +1,4 @@
-import { useGameCatalogStore } from './gameCatalog';
+import { useGameCatalogStore } from "./player-game-catalog-store";
 import type { Skill, UserSkill } from "../types/model/skill";
 import { t as tr } from "../i18n";
 import { computed, ref, watch } from "vue";
@@ -8,17 +8,38 @@ import { useAuthStore } from "./auth";
 import { useUserProfileStore } from "./userProfile";
 
 const effectLabels: Record<string, string> = {
-  get catch_rate_bonus() { return tr('skill.ty_le_cau_thanh_cong'); },
-  get xp_bonus() { return tr('skill.kinh_nghiem_nhan_duoc'); },
-  get bite_time_reduction() { return tr('skill.giam_thoi_gian_ca_can_cau'); },
-  get shiny_rate_bonus() { return tr('skill.co_hoi_gap_ca_shiny'); },
-  get luck_bonus() { return tr('skill.may_man'); },
+  get catch_rate_bonus() {
+    return tr("skill.ty_le_cau_thanh_cong");
+  },
+  get xp_bonus() {
+    return tr("skill.kinh_nghiem_nhan_duoc");
+  },
+  get bite_time_reduction() {
+    return tr("skill.giam_thoi_gian_ca_can_cau");
+  },
+  get shiny_rate_bonus() {
+    return tr("skill.co_hoi_gap_ca_shiny");
+  },
+  get luck_bonus() {
+    return tr("skill.may_man");
+  },
 };
 
 const skillIcons: Record<string, string> = {
-  fish: "🐟", star: "⭐", timer: "⏳", clock: "⏳", sparkles: "✨",
-  spark: "✨", clover: "🍀", luck: "🍀", anchor: "⚓", hook: "🪝",
-  shield: "🛡️", zap: "⚡", target: "🎯", trophy: "🏆",
+  fish: "🐟",
+  star: "⭐",
+  timer: "⏳",
+  clock: "⏳",
+  sparkles: "✨",
+  spark: "✨",
+  clover: "🍀",
+  luck: "🍀",
+  anchor: "⚓",
+  hook: "🪝",
+  shield: "🛡️",
+  zap: "⚡",
+  target: "🎯",
+  trophy: "🏆",
 };
 
 function formatEffects(effects: Record<string, unknown>) {
@@ -41,34 +62,41 @@ export const useSkillStore = defineStore("skill", () => {
   const currentEffects = ref<Record<string, Record<string, unknown>>>({});
   let requestId = 0;
 
-  watch(() => authStore.user?.id, () => {
-    requestId++;
-    skills.value = [];
-    userSkills.value = [];
-    loading.value = false;
-    upgradingId.value = "";
-    error.value = "";
-    upgradeError.value = "";
-    remainingSkillPoints.value = null;
-    currentEffects.value = {};
-  }, { flush: "sync" });
+  watch(
+    () => authStore.user?.id,
+    () => {
+      requestId++;
+      skills.value = [];
+      userSkills.value = [];
+      loading.value = false;
+      upgradingId.value = "";
+      error.value = "";
+      upgradeError.value = "";
+      remainingSkillPoints.value = null;
+      currentEffects.value = {};
+    },
+    { flush: "sync" },
+  );
 
   const skillCards = computed(() => {
     const levels = new Map(userSkills.value.map((skill) => [skill.skill_id, skill.level]));
-    return skills.value.map((skill) => {
-      const level = levels.get(skill.id) ?? 0;
-      return {
-        ...skill,
-        level,
-        isMaxLevel: level >= skill.max_level,
-        progress: Math.min(100, level / skill.max_level * 100),
-        isImageIcon: /^(https?:\/\/|\/)/i.test(skill.icon ?? ""),
-        displayIcon: skillIcons[skill.icon?.toLowerCase() ?? ""]
-          ?? (skill.icon && /\p{Extended_Pictographic}/u.test(skill.icon) ? skill.icon : "🎣"),
-        effects: formatEffects(skill.effect_per_level ?? {}),
-        currentEffects: formatEffects(currentEffects.value[skill.id] ?? {}),
-      };
-    }).sort((a, b) => b.level - a.level);
+    return skills.value
+      .map((skill) => {
+        const level = levels.get(skill.id) ?? 0;
+        return {
+          ...skill,
+          level,
+          isMaxLevel: level >= skill.max_level,
+          progress: Math.min(100, (level / skill.max_level) * 100),
+          isImageIcon: /^(https?:\/\/|\/)/i.test(skill.icon ?? ""),
+          displayIcon:
+            skillIcons[skill.icon?.toLowerCase() ?? ""] ??
+            (skill.icon && /\p{Extended_Pictographic}/u.test(skill.icon) ? skill.icon : "🎣"),
+          effects: formatEffects(skill.effect_per_level ?? {}),
+          currentEffects: formatEffects(currentEffects.value[skill.id] ?? {}),
+        };
+      })
+      .sort((a, b) => b.level - a.level);
   });
 
   const learnedCount = computed(() => skillCards.value.filter((skill) => skill.level > 0).length);
@@ -79,13 +107,19 @@ export const useSkillStore = defineStore("skill", () => {
     const currentRequest = ++requestId;
     error.value = "";
     if (!userId) {
-      error.value = tr('skill.vui_long_dang_nhap_de_xem_ky_nang');
+      error.value = tr("skill.vui_long_dang_nhap_de_xem_ky_nang");
       return false;
     }
     loading.value = true;
     try {
       const [catalog, owned] = await Promise.all([
-        useGameCatalogStore().get('skills', { force, consumer: 'skill', onUpdate: data => { skills.value = data ?? []; } }),
+        useGameCatalogStore().get("skills", {
+          force,
+          consumer: "skill",
+          onUpdate: (data) => {
+            skills.value = data ?? [];
+          },
+        }),
         supabaseSkillRepository.fetchUserSkills(userId),
       ]);
       if (currentRequest !== requestId) return false;
@@ -94,7 +128,7 @@ export const useSkillStore = defineStore("skill", () => {
       return true;
     } catch (err) {
       if (currentRequest === requestId) {
-        error.value = err instanceof Error ? err.message : tr('skill.khong_the_tai_ky_nang');
+        error.value = err instanceof Error ? err.message : tr("skill.khong_the_tai_ky_nang");
       }
       return false;
     } finally {
@@ -110,8 +144,9 @@ export const useSkillStore = defineStore("skill", () => {
     upgradingId.value = skillId;
     upgradeError.value = "";
     try {
-      const result = await useGameCatalogStore().action('upgrade_skill', { p_skill_id: skillId }, ['skills'],
-        () => supabaseSkillRepository.upgradeSkill(skillId));
+      const result = await useGameCatalogStore().action("upgrade_skill", { p_skill_id: skillId }, ["skills"], () =>
+        supabaseSkillRepository.upgradeSkill(skillId),
+      );
       if (authStore.user?.id !== userId || authStore.sessionGeneration !== generation) return false;
       const owned = userSkills.value.find((item) => item.skill_id === result.skill_id);
       if (owned) owned.level = result.current_level;
@@ -130,7 +165,8 @@ export const useSkillStore = defineStore("skill", () => {
       return result;
     } catch (err) {
       if (authStore.user?.id === userId && authStore.sessionGeneration === generation) {
-        upgradeError.value = err instanceof Error ? err.message : tr('supabaseSkillRepository.khong_the_nang_cap_ky_nang');
+        upgradeError.value =
+          err instanceof Error ? err.message : tr("supabaseSkillRepository.khong_the_nang_cap_ky_nang");
       }
       return false;
     } finally {
@@ -138,7 +174,21 @@ export const useSkillStore = defineStore("skill", () => {
     }
   }
 
-  return { skills, userSkills, currentEffects, skillCards, learnedCount, totalLevels, remainingSkillPoints, loading, upgradingId, error, upgradeError, fetchSkills, upgradeSkill };
+  return {
+    skills,
+    userSkills,
+    currentEffects,
+    skillCards,
+    learnedCount,
+    totalLevels,
+    remainingSkillPoints,
+    loading,
+    upgradingId,
+    error,
+    upgradeError,
+    fetchSkills,
+    upgradeSkill,
+  };
 });
 
 if (import.meta.hot) {

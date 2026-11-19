@@ -13,7 +13,7 @@ Migration dừng và rollback nếu phát hiện `pgrst.db_pre_request` khác đ
 
 ## Hoạt động
 
-- `src/data/featureCatalog.json` khai báo khóa, bản dịch nhãn và endpoint thuộc mỗi tính năng. Danh sách tương ứng được nhúng trong migration; `node scripts/validate-feature-flags.mjs` kiểm tra hai bản trùng nhau.
+- `src/data/featureCatalog.json` khai báo khóa, bản dịch nhãn và endpoint thuộc mỗi tính năng. Danh sách tương ứng được nhúng trong migration.
 - Repository sở hữu truy vấn và subscription Supabase. Pinia store tải snapshot, nhận Realtime, tải lại khi reconnect/focus/online và mỗi 30 giây. Snapshot đến muộn từ phiên đăng nhập cũ bị bỏ qua. Sự kiện đến trong lúc tải sẽ yêu cầu tải lại sau đó.
 - `featureRequestGate.ts` kiểm tra request của Supabase trước khi gửi. Request bị khóa nhận lỗi dạng PostgREST ngay trên client. Snapshot quá 30 giây được tải lại trước request. Nếu mất mạng sau khi đã tải, giữ trạng thái gần nhất; server vẫn kiểm tra từng request.
 - Hook `check_feature_request()` kiểm tra RPC, các bảng riêng và các thao tác ghi trong catalog. Request trực tiếp từ client cũ cũng bị từ chối khi flag tắt. Lỗi trả thông báo theo `Accept-Language` và `details: FEATURE_DISABLED:<key>`. Client đồng bộ lại ngay khi nhận lỗi này.
@@ -35,12 +35,10 @@ Migration dừng và rollback nếu phát hiện `pgrst.db_pre_request` khác đ
 ## Kiểm tra
 
 ```sh
-node scripts/validate-feature-flags.mjs
-node scripts/validate-paypal.mjs
 npm run check:i18n
 npm run build
 ```
 
-Sau khi áp dụng migration trên DB phát triển, chạy `tests/feature_flags.sql` để kiểm tra chặn endpoint, giữ đường rời bãi và quyền RLS; script rollback toàn bộ thay đổi. Kiểm tra thêm quyền admin, Storage và hai trình duyệt thực tế khi triển khai. Các kiểm tra Node dùng mock, không áp dụng migration lên DB thật.
+Sau khi áp dụng migration trên DB phát triển, chạy `tests/feature_flags.sql` để kiểm tra chặn endpoint, giữ đường rời bãi và quyền RLS; script rollback toàn bộ thay đổi. Kiểm tra thêm quyền admin, Storage và hai trình duyệt thực tế khi triển khai.
 
 Tham khảo: [Supabase — Securing your API](https://supabase.com/docs/guides/api/securing-your-api).

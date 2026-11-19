@@ -71,6 +71,6 @@ Không cần Realtime hoặc cron cho phiên bản này. Frontend chỉ truy c�
 - `npm run build`: TypeScript và production bundle.
 - `npm run test:story`: validator, state Player/Editor, thứ tự và retry checkpoint, đổi tài khoản; thực thi hai migration trên PGlite để kiểm tra RLS, quyền RPC, revision, snapshot và tiến độ.
 - `npm run test:story:browser`: Edge/Chromium headless, dữ liệu repository giả lập; kiểm tra Player, rẽ nhánh, markup, VI/EN, Editor/preview, import/export, xuất bản, tiến độ, desktop/mobile và công tắc tính năng. Đặt `STORY_TEST_BROWSER` nếu cần chỉ định browser.
-- `npm run check:i18n`: tính đầy đủ và runtime của bản dịch.
+- `npm run check:i18n`: tính đầy đủ của bản dịch và các tham chiếu trong mã nguồn.
 
-Ảnh kiểm tra nằm trong `artifacts/story/`. Kiểm tra `scripts/validate-feature-flags.mjs` hiện còn báo lỗi danh mục cũ: modal `fishing-map` chưa có feature flag tương ứng; đây không phải endpoint story.
+Ảnh kiểm tra nằm trong `artifacts/story/`.

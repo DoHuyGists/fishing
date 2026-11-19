@@ -30,11 +30,10 @@
 
 ```text
 npm.cmd run build
-node --test scripts/validate-player-features.mjs
 npm.cmd install --no-save --package-lock=false @electric-sql/pglite
 node --test scripts/validate-player-feature-sql.mjs
 ```
 
-Kiểm tra store dùng repository giả lập. Kiểm tra SQL chạy migration thật trong PostgreSQL nhúng với schema thử nghiệm, kiểm tra cooldown, RLS, ghi lịch sử trong transaction, không ghi trùng và bucket ảnh private. Cần chạy checklist trên Supabase thử nghiệm để đối chiếu với schema/RPC/trigger đang triển khai và kiểm chứng Storage, email, Realtime thực tế.
+Kiểm tra SQL chạy migration thật trong PostgreSQL nhúng với schema thử nghiệm, kiểm tra cooldown, RLS, ghi lịch sử trong transaction, không ghi trùng và bucket ảnh private. Cần chạy checklist trên Supabase thử nghiệm để đối chiếu với schema/RPC/trigger đang triển khai và kiểm chứng Storage, email, Realtime thực tế.
 
 Tài liệu luồng mật khẩu: https://supabase.com/docs/guides/auth/passwords

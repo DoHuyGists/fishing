@@ -3,13 +3,13 @@ import { t as tr } from "../../../i18n/index.ts";
 import Modal from "../../shared/Modal.vue";
 import { onUnmounted, watch } from "vue";
 import { useAuthStore } from "../../../stores/auth.ts";
-import { useCountryStore } from "../../../stores/country.ts";
-import { useFishingMapStore } from "../../../stores/fishingMap.ts";
+import { useCountryStore } from "../../../stores/player-country-store.ts";
+import { useFishingMapStore } from "../../../stores/player-fishing-map-store.ts";
 import FishingMapCountries from "./FishingMapCountries.vue";
 import FishingMapToolbar from "./FishingMapToolbar.vue";
 import FishingMapAreaCard from "./FishingMapAreaCard.vue";
 import Pagination from "../../shared/Pagination.vue";
-import FishingMapSpeciesPopup from './FishingMapSpeciesPopup.vue';
+import FishingMapSpeciesPopup from "./FishingMapSpeciesPopup.vue";
 
 const store = useFishingMapStore();
 const auth = useAuthStore();

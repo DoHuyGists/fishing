@@ -4,7 +4,7 @@ import { defineStore } from "pinia";
 
 import { supabaseUserInventoryRepository } from "../data/supabaseUserInventoryRepository.ts";
 import { supabaseSpinWheelRepository } from "../data/supabaseSpinWheelRepository";
-import { useCurrencyStore } from "./currency";
+import { useCurrencyStore } from "./player-currency-store.ts";
 
 export const useSpinWheelStore = defineStore("SpinWheel", {
   state: () => ({
@@ -34,13 +34,13 @@ export const useSpinWheelStore = defineStore("SpinWheel", {
       try {
         this.applyRewards(await supabaseSpinWheelRepository.fetchRewards());
       } catch (err) {
-        this.error = err instanceof Error ? err.message : tr('spinWheel.khong_the_tai_phan_thuong_vong_quay');
+        this.error = err instanceof Error ? err.message : tr("spinWheel.khong_the_tai_phan_thuong_vong_quay");
       } finally {
         this.loading = false;
       }
     },
     async claimRandomItem(): Promise<string> {
-      if (this.claiming) throw new Error(tr('spinWheel.dang_xu_ly_luot_quay'));
+      if (this.claiming) throw new Error(tr("spinWheel.dang_xu_ly_luot_quay"));
       this.claiming = true;
       try {
         const result = await supabaseUserInventoryRepository.claimRandomItem();

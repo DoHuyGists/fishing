@@ -2,7 +2,7 @@
 import { t as tr } from "../../../i18n";
 
 import { computed, onMounted, ref } from "vue";
-import { useBadgesStore } from "../../../stores/badges.ts";
+import { useBadgesStore } from "../../../stores/player-badges-store.ts";
 import Modal from "../../shared/Modal.vue";
 import Cash from "../player-currency/Cash.vue";
 

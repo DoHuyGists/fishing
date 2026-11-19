@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import Pagination from '../../shared/Pagination.vue';
+import Pagination from "../../shared/Pagination.vue";
 import type { NotificationKind } from "../../../types/model/notification";
 import type { NotificationRow } from "../../../types/table/notification";
 import { t as tr } from "../../../i18n";
@@ -7,7 +7,7 @@ import { t as tr } from "../../../i18n";
 import { computed, onMounted, onUnmounted, ref } from "vue";
 import Modal from "../../shared/Modal.vue";
 import { useAuthStore } from "../../../stores/auth.ts";
-import { useNotificationStore } from "../../../stores/notification.ts";
+import { useNotificationStore } from "../../../stores/player-notification-store.ts";
 
 import Tab from "../../shared/Tab.vue";
 import { formatDateTime } from "../../../utils/time.ts";
@@ -15,8 +15,20 @@ const currentTabActive = ref("personal");
 const unreadPersonalNotifyCount = computed(() => notifications.personalUnread);
 const unreadASystemNotifyCount = computed(() => notifications.systemUnread);
 const tabs = computed(() => [
-  { key: "personal", get label() { return tr('NotificationModal.ca_nhan'); }, badge: unreadPersonalNotifyCount.value },
-  { key: "system", get label() { return tr('NotificationModal.he_thong'); }, badge: unreadASystemNotifyCount.value },
+  {
+    key: "personal",
+    get label() {
+      return tr("NotificationModal.ca_nhan");
+    },
+    badge: unreadPersonalNotifyCount.value,
+  },
+  {
+    key: "system",
+    get label() {
+      return tr("NotificationModal.he_thong");
+    },
+    badge: unreadASystemNotifyCount.value,
+  },
 ]);
 
 const auth = useAuthStore();
@@ -40,7 +52,8 @@ async function selectNotification(item: NotificationRow) {
     try {
       await notifications.markAsRead(activeTab.value, item, userId);
     } catch (error) {
-      readError.value = error instanceof Error ? error.message : tr('NotificationModal.khong_the_cap_nhat_trang_thai_da_doc');
+      readError.value =
+        error instanceof Error ? error.message : tr("NotificationModal.khong_the_cap_nhat_trang_thai_da_doc");
     }
   }
 }
@@ -48,23 +61,33 @@ async function selectNotification(item: NotificationRow) {
 onMounted(() => {
   const userId = auth.user?.id;
   if (!userId) return;
-  notifications.startRefreshing(userId, 'modal');
+  notifications.startRefreshing(userId, "modal");
 });
 
 onUnmounted(() => {
-  notifications.stopRefreshing('modal');
+  notifications.stopRefreshing("modal");
 });
 </script>
 
 <template>
   <Modal :title="tr('NotificationModal.thong_bao')" :on-refresh="loadNotifications">
-    <div v-if="notifications.loadError || readError" role="alert" class="mb-3 rounded bg-red-50 p-3 text-sm text-red-700">{{ notifications.loadError || readError }}</div>
+    <div
+      v-if="notifications.loadError || readError"
+      role="alert"
+      class="mb-3 rounded bg-red-50 p-3 text-sm text-red-700"
+    >
+      {{ notifications.loadError || readError }}
+    </div>
     <Tab v-model="currentTabActive" :tabs="tabs" lazy>
       <template #personal>
         <div class="flex min-h-0 flex-1 flex-col sm:flex-row">
           <aside class="w-full shrink-0 overflow-y-auto sm:w-80 sm:border-r sm:border-gray-200">
-            <div v-if="notifications.loading" class="p-5 text-sm text-gray-500">{{ tr('NotificationModal.dang_tai_thong_bao') }}</div>
-            <div v-else-if="!notifications.personal.length" class="p-5 text-sm text-gray-500">{{ tr('NotificationModal.chua_co_thong_bao_nao') }}</div>
+            <div v-if="notifications.loading" class="p-5 text-sm text-gray-500">
+              {{ tr("NotificationModal.dang_tai_thong_bao") }}
+            </div>
+            <div v-else-if="!notifications.personal.length" class="p-5 text-sm text-gray-500">
+              {{ tr("NotificationModal.chua_co_thong_bao_nao") }}
+            </div>
             <button
               v-for="item in notifications.personal"
               :key="item.id"
@@ -104,9 +127,22 @@ onUnmounted(() => {
                 >
               </span>
             </button>
-            <Pagination :page="notifications.personalPage" :page-size="notifications.pageSize" :total="notifications.personalTotal" :loading="notifications.loading" @change="notifications.personalPage = $event; selected = null; expandedNotificationId = null; loadNotifications()" />
+            <Pagination
+              :page="notifications.personalPage"
+              :page-size="notifications.pageSize"
+              :total="notifications.personalTotal"
+              :loading="notifications.loading"
+              @change="
+                notifications.personalPage = $event;
+                selected = null;
+                expandedNotificationId = null;
+                loadNotifications();
+              "
+            />
           </aside>
-          <article class="slide-fade-in from-right player-content-in hidden min-w-0 flex-1 overflow-y-auto p-5 sm:block sm:p-8">
+          <article
+            class="slide-fade-in from-right player-content-in hidden min-w-0 flex-1 overflow-y-auto p-5 sm:block sm:p-8"
+          >
             <div v-if="selected">
               <div class="mb-4 flex flex-wrap items-center gap-2">
                 <span class="rounded-full bg-emerald-50 px-2.5 py-1 text-xs font-bold text-emerald-800">{{
@@ -117,11 +153,11 @@ onUnmounted(() => {
               <div class="m-0 text-xl font-extrabold text-[#153221]">{{ selected.title }}</div>
               <div class="mt-5 whitespace-pre-wrap text-sm leading-7 text-gray-700">{{ selected.body }}</div>
               <div v-if="readError" role="alert" class="mt-5 rounded-lg bg-red-50 p-3 text-sm text-red-700">
-                {{ tr('NotificationModal.khong_the_cap_nhat_trang_thai_da_doc_2') }} {{ readError }}
+                {{ tr("NotificationModal.khong_the_cap_nhat_trang_thai_da_doc_2") }} {{ readError }}
               </div>
             </div>
             <div v-else class="grid h-full place-items-center text-center text-sm text-gray-400">
-              {{ tr('NotificationModal.chon_mot_thong_bao_o_danh_sach_ben_trai_de_xem_noi_dung') }}
+              {{ tr("NotificationModal.chon_mot_thong_bao_o_danh_sach_ben_trai_de_xem_noi_dung") }}
             </div>
           </article>
         </div>
@@ -130,8 +166,12 @@ onUnmounted(() => {
       <template #system>
         <div class="flex min-h-0 flex-1 flex-col sm:flex-row">
           <aside class="w-full shrink-0 overflow-y-auto sm:w-80 sm:border-r sm:border-gray-200">
-            <div v-if="notifications.loading" class="p-5 text-sm text-gray-500">{{ tr('NotificationModal.dang_tai_thong_bao') }}</div>
-            <div v-else-if="!notifications.system.length" class="p-5 text-sm text-gray-500">{{ tr('NotificationModal.chua_co_thong_bao_nao') }}</div>
+            <div v-if="notifications.loading" class="p-5 text-sm text-gray-500">
+              {{ tr("NotificationModal.dang_tai_thong_bao") }}
+            </div>
+            <div v-else-if="!notifications.system.length" class="p-5 text-sm text-gray-500">
+              {{ tr("NotificationModal.chua_co_thong_bao_nao") }}
+            </div>
             <button
               v-for="item in notifications.system"
               :key="item.id"
@@ -171,9 +211,22 @@ onUnmounted(() => {
                 >
               </span>
             </button>
-            <Pagination :page="notifications.systemPage" :page-size="notifications.pageSize" :total="notifications.systemTotal" :loading="notifications.loading" @change="notifications.systemPage = $event; selected = null; expandedNotificationId = null; loadNotifications()" />
+            <Pagination
+              :page="notifications.systemPage"
+              :page-size="notifications.pageSize"
+              :total="notifications.systemTotal"
+              :loading="notifications.loading"
+              @change="
+                notifications.systemPage = $event;
+                selected = null;
+                expandedNotificationId = null;
+                loadNotifications();
+              "
+            />
           </aside>
-          <article class="slide-fade-in from-right player-content-in hidden min-w-0 flex-1 overflow-y-auto p-5 sm:block sm:p-8">
+          <article
+            class="slide-fade-in from-right player-content-in hidden min-w-0 flex-1 overflow-y-auto p-5 sm:block sm:p-8"
+          >
             <div v-if="selected">
               <div class="mb-4 flex flex-wrap items-center gap-2">
                 <span class="rounded-full bg-emerald-50 px-2.5 py-1 text-xs font-bold text-emerald-800">{{
@@ -184,11 +237,11 @@ onUnmounted(() => {
               <div class="m-0 text-xl font-extrabold text-[#153221]">{{ selected.title }}</div>
               <div class="mt-5 whitespace-pre-wrap text-sm leading-7 text-gray-700">{{ selected.body }}</div>
               <div v-if="readError" role="alert" class="mt-5 rounded-lg bg-red-50 p-3 text-sm text-red-700">
-                {{ tr('NotificationModal.khong_the_cap_nhat_trang_thai_da_doc_2') }} {{ readError }}
+                {{ tr("NotificationModal.khong_the_cap_nhat_trang_thai_da_doc_2") }} {{ readError }}
               </div>
             </div>
             <div v-else class="grid h-full place-items-center text-center text-sm text-gray-400">
-              {{ tr('NotificationModal.chon_mot_thong_bao_o_danh_sach_ben_trai_de_xem_noi_dung') }}
+              {{ tr("NotificationModal.chon_mot_thong_bao_o_danh_sach_ben_trai_de_xem_noi_dung") }}
             </div>
           </article>
         </div>

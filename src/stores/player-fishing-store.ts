@@ -1,13 +1,19 @@
 import type { AreaSpeciesDiaryResponse, FishDepthPreviewResponse } from "../types/model/fish";
-import type { FishingCatchScore, FishingPhase } from '../types/model/fishingGameplay';
-import type { PendingFishingResult, TensionChallenge, TensionFight, TensionInput, TensionSubmission } from "../types/model/tensionChallenge";
+import type { FishingCatchScore, FishingPhase } from "../types/model/fishingGameplay";
+import type {
+  PendingFishingResult,
+  TensionChallenge,
+  TensionFight,
+  TensionInput,
+  TensionSubmission,
+} from "../types/model/tensionChallenge";
 import { t as tr } from "../i18n";
 import { defineStore } from "pinia";
 import { useAuthStore } from "./auth";
 import { useUserProfileStore } from "./userProfile";
-import { useEquipmentStore } from "./equipment";
+import { useEquipmentStore } from "./player-equipment-store";
 import { useUserInAreaStore } from "./userInArea";
-import { useDayPhaseStore } from "./dayPhase";
+import { useDayPhaseStore } from "./player-day-phase-store";
 import { supabaseEquipmentRepository } from "../data/supabaseEquipmentRepository";
 import { supabaseFishRepository } from "../data/supabaseFishRepository";
 import { supabaseUserInAreaRepository } from "../data/supabaseUserInAreaRepository";
@@ -71,26 +77,48 @@ const RPC_TIMEOUT_MS = 15_000;
 
 function savePendingResult(ownerId: string, pending: PendingFishingResult | null) {
   try {
-    const key = 'fishing-result-pending:' + ownerId;
+    const key = "fishing-result-pending:" + ownerId;
     if (pending) sessionStorage.setItem(key, JSON.stringify(pending));
     else sessionStorage.removeItem(key);
-  } catch { /* Storage is optional; the current tab can still retry in memory. */ }
+  } catch {
+    /* Storage is optional; the current tab can still retry in memory. */
+  }
 }
 
 function restorePendingResult(ownerId: string): PendingFishingResult | null {
   try {
-    const pending = JSON.parse(sessionStorage.getItem('fishing-result-pending:' + ownerId) ?? 'null');
-    if (!pending || pending.ownerId !== ownerId || typeof pending.areaId !== 'string'
-      || typeof pending.sessionId !== 'string') return null;
-    if (pending.kind === 'start') return pending;
+    const pending = JSON.parse(sessionStorage.getItem("fishing-result-pending:" + ownerId) ?? "null");
+    if (
+      !pending ||
+      pending.ownerId !== ownerId ||
+      typeof pending.areaId !== "string" ||
+      typeof pending.sessionId !== "string"
+    )
+      return null;
+    if (pending.kind === "start") return pending;
     const payload = pending.payload;
-    if (pending.kind === 'submit' && payload?.sessionId === pending.sessionId
-      && Number.isInteger(payload.totalTicks) && payload.totalTicks > 0 && payload.totalTicks <= 21600
-      && ['won', 'snapped', 'escaped', 'timeout'].includes(payload.claimedResult)
-      && Array.isArray(payload.inputs) && payload.inputs.length <= payload.totalTicks
-      && payload.inputs.every((input: TensionInput) => input && Number.isInteger(input.tick)
-        && input.tick >= 0 && input.tick < payload.totalTicks && typeof input.reeling === 'boolean')) return pending;
-  } catch { /* Ignore unavailable storage or malformed recovery data. */ }
+    if (
+      pending.kind === "submit" &&
+      payload?.sessionId === pending.sessionId &&
+      Number.isInteger(payload.totalTicks) &&
+      payload.totalTicks > 0 &&
+      payload.totalTicks <= 21600 &&
+      ["won", "snapped", "escaped", "timeout"].includes(payload.claimedResult) &&
+      Array.isArray(payload.inputs) &&
+      payload.inputs.length <= payload.totalTicks &&
+      payload.inputs.every(
+        (input: TensionInput) =>
+          input &&
+          Number.isInteger(input.tick) &&
+          input.tick >= 0 &&
+          input.tick < payload.totalTicks &&
+          typeof input.reeling === "boolean",
+      )
+    )
+      return pending;
+  } catch {
+    /* Ignore unavailable storage or malformed recovery data. */
+  }
   return null;
 }
 
@@ -98,7 +126,7 @@ function isConfirmedResultRejection(error: unknown): boolean {
   // Only the RPC's explicit rejection contract settles an uncertain request.
   // Permission/feature denials before the RPC cannot prove whether a prior call committed.
   const code = (error as { code?: string } | null)?.code;
-  return code === 'FISHING_RESULT_REJECTED';
+  return code === "FISHING_RESULT_REJECTED";
 }
 
 function withTimeout<T>(request: PromiseLike<T>, timeoutMs: number): Promise<T> {
@@ -128,7 +156,7 @@ export const useFishingStore = defineStore("fishing", {
     castPhase: "idle" as CastPhase,
     pendingResult: null as PendingFishingResult | null,
     baitPosition: { x: 56, y: 60 },
-    castMessage: tr('fishing.san_sang_tha_cau'),
+    castMessage: tr("fishing.san_sang_tha_cau"),
     isCasting: false,
     isRetrievingBait: false,
     baitRetrievalSequence: 0,
@@ -179,15 +207,28 @@ export const useFishingStore = defineStore("fishing", {
       return this.inventory.length >= this.fishingNetCapacity;
     },
     canCast(): boolean {
-      return this.sessionReady && !this.isLeavingArea && !this.hasLeftArea && !this.isRetrievingBait && !this.isFishingNetFull &&
-        (this.castPhase === "idle" || this.castPhase === "lost");
+      return (
+        this.sessionReady &&
+        !this.isLeavingArea &&
+        !this.hasLeftArea &&
+        !this.isRetrievingBait &&
+        !this.isFishingNetFull &&
+        (this.castPhase === "idle" || this.castPhase === "lost")
+      );
     },
-    canReelIn: (s) => !s.isLeavingArea && !s.hasLeftArea && !s.isCasting && !s.isRetrievingBait &&
-      !s.isStartingTensionChallenge && Boolean(s.sessionId) && ["waiting", "bite"].includes(s.castPhase) &&
+    canReelIn: (s) =>
+      !s.isLeavingArea &&
+      !s.hasLeftArea &&
+      !s.isCasting &&
+      !s.isRetrievingBait &&
+      !s.isStartingTensionChallenge &&
+      Boolean(s.sessionId) &&
+      ["waiting", "bite"].includes(s.castPhase) &&
       (!s.tensionChallenge || s.tensionStartedAt === null),
-    canAdjustDepth: (s) => s.sessionReady && !s.isLeavingArea && !s.hasLeftArea && (s.castPhase === "idle" || s.castPhase === "lost"),
-    areaAllowsDepthTool: (s) => Boolean(s.currentAreaId) && s.currentArea?.id === s.currentAreaId &&
-      s.currentArea?.allowDepthTool === true,
+    canAdjustDepth: (s) =>
+      s.sessionReady && !s.isLeavingArea && !s.hasLeftArea && (s.castPhase === "idle" || s.castPhase === "lost"),
+    areaAllowsDepthTool: (s) =>
+      Boolean(s.currentAreaId) && s.currentArea?.id === s.currentAreaId && s.currentArea?.allowDepthTool === true,
     canAdjustLakeDepth(): boolean {
       return this.canAdjustDepth && !this.isLoadingCurrentArea && this.areaAllowsDepthTool;
     },
@@ -222,8 +263,8 @@ export const useFishingStore = defineStore("fishing", {
         if (useEquipmentStore().error) throw new Error(useEquipmentStore().error);
         const profileStore = useUserProfileStore();
         if (profileStore.error) throw new Error(profileStore.error);
-        if (profileStore.profile?.id !== userId) throw new Error(tr('userProfile.khong_tim_thay_ho_so'));
-        if (area?.status !== "enter" || !area.area_id) throw new Error(tr('fishing.ban_chua_o_trong_bai_cau'));
+        if (profileStore.profile?.id !== userId) throw new Error(tr("userProfile.khong_tim_thay_ho_so"));
+        if (area?.status !== "enter" || !area.area_id) throw new Error(tr("fishing.ban_chua_o_trong_bai_cau"));
         await this.initializeFishingArea(area.area_id);
         if (requestId !== this.sessionRequestId) return;
         if (this.currentAreaLoadError) throw new Error(this.currentAreaLoadError);
@@ -234,12 +275,12 @@ export const useFishingStore = defineStore("fishing", {
         if (pending && pending.areaId === this.currentAreaId) {
           this.pendingResult = pending;
           this.sessionId = pending.sessionId;
-          this.castPhase = 'unconfirmed';
-          this.castMessage = tr('fishing.result_unconfirmed');
+          this.castPhase = "unconfirmed";
+          this.castMessage = tr("fishing.result_unconfirmed");
         }
       } catch (err) {
         if (requestId !== this.sessionRequestId) return;
-        this.sessionError = err instanceof Error ? err.message : tr('fishing.khong_the_chuan_bi_phien_cau');
+        this.sessionError = err instanceof Error ? err.message : tr("fishing.khong_the_chuan_bi_phien_cau");
       }
     },
     async leaveFishingArea(): Promise<boolean> {
@@ -247,11 +288,17 @@ export const useFishingStore = defineStore("fishing", {
       if (this.isLeavingArea) return false;
       this.leaveAreaError = "";
       if (this.pendingResult) {
-        this.leaveAreaError = tr('fishing.result_unconfirmed');
+        this.leaveAreaError = tr("fishing.result_unconfirmed");
         return false;
       }
-      if (this.isCasting || this.isRetrievingBait || this.castPhase === "submitting" || this.isStartingTensionChallenge || this.isReleasingFish) {
-        this.leaveAreaError = tr('fishing.dang_xu_ly_luot_cau_hoac_tha_ca_vui_long_thu_lai_sau_giay_lat');
+      if (
+        this.isCasting ||
+        this.isRetrievingBait ||
+        this.castPhase === "submitting" ||
+        this.isStartingTensionChallenge ||
+        this.isReleasingFish
+      ) {
+        this.leaveAreaError = tr("fishing.dang_xu_ly_luot_cau_hoac_tha_ca_vui_long_thu_lai_sau_giay_lat");
         return false;
       }
       this.isLeavingArea = true;
@@ -261,7 +308,7 @@ export const useFishingStore = defineStore("fishing", {
         const area = await useUserInAreaStore().setCurrentUserInArea(useAuthStore().userId);
         if (requestId !== this.sessionRequestId) return false;
         if (area?.status === "enter") {
-          if (!area.area_id) throw new Error(tr('fishing.khong_tim_thay_bai_cau_hien_tai'));
+          if (!area.area_id) throw new Error(tr("fishing.khong_tim_thay_bai_cau_hien_tai"));
           const fishes = await supabaseFishRepository.fetchFishingInventory(area.area_id);
           if (requestId !== this.sessionRequestId) return false;
           if (fishes.length > 0) await supabaseUserInAreaRepository.setUserLeaveArea();
@@ -275,7 +322,8 @@ export const useFishingStore = defineStore("fishing", {
         return requestId === this.sessionRequestId;
       } catch (err) {
         if (requestId !== this.sessionRequestId) return false;
-        this.leaveAreaError = err instanceof Error ? err.message : tr('fishing.khong_the_ket_thuc_chuyen_cau_vui_long_thu_lai');
+        this.leaveAreaError =
+          err instanceof Error ? err.message : tr("fishing.khong_the_ket_thuc_chuyen_cau_vui_long_thu_lai");
         return false;
       } finally {
         if (requestId === this.sessionRequestId) this.isLeavingArea = false;
@@ -304,11 +352,11 @@ export const useFishingStore = defineStore("fishing", {
         const area = await supabaseFishingAreaRepository.fetchOneAreas(areaId);
         if (activeRequestId !== this.currentAreaRequestId || areaId !== this.currentAreaId) return;
         this.currentArea = area ?? {};
-        if (!area) this.currentAreaLoadError = tr('fishing.khong_tim_thay_thong_tin_ho_cau');
+        if (!area) this.currentAreaLoadError = tr("fishing.khong_tim_thay_thong_tin_ho_cau");
         this.appliedDepthMeters = Math.min(this.appliedDepthMeters, this.depthConfig.maxMeters);
       } catch (err) {
         if (activeRequestId !== this.currentAreaRequestId) return;
-        this.currentAreaLoadError = err instanceof Error ? err.message : tr('fishing.khong_the_tai_thong_tin_ho');
+        this.currentAreaLoadError = err instanceof Error ? err.message : tr("fishing.khong_the_tai_thong_tin_ho");
         console.error("Lỗi khi tải thông tin hồ câu:", err);
       } finally {
         if (activeRequestId === this.currentAreaRequestId) this.isLoadingCurrentArea = false;
@@ -326,7 +374,8 @@ export const useFishingStore = defineStore("fishing", {
       } catch (err) {
         if (requestId !== this.depthPreviewRequestId) return;
         this.depthPreview = null;
-        this.depthPreviewError = err instanceof Error ? err.message : tr('fishing.khong_the_tai_du_doan_ca_o_do_sau_nay');
+        this.depthPreviewError =
+          err instanceof Error ? err.message : tr("fishing.khong_the_tai_du_doan_ca_o_do_sau_nay");
       } finally {
         if (requestId === this.depthPreviewRequestId) this.isLoadingDepthPreview = false;
       }
@@ -342,7 +391,8 @@ export const useFishingStore = defineStore("fishing", {
       } catch (err) {
         if (requestId !== this.areaSpeciesDiaryRequestId) return;
         this.areaSpeciesDiary = null;
-        this.areaSpeciesDiaryError = err instanceof Error ? err.message : tr('LakeFishGuide.khong_the_tai_so_tay_ca_trong_ho');
+        this.areaSpeciesDiaryError =
+          err instanceof Error ? err.message : tr("LakeFishGuide.khong_the_tai_so_tay_ca_trong_ho");
       } finally {
         if (requestId === this.areaSpeciesDiaryRequestId) this.isLoadingAreaSpeciesDiary = false;
       }
@@ -365,7 +415,10 @@ export const useFishingStore = defineStore("fishing", {
         const currentUserId = authStore.userId;
         const userIds = rows.map((r) => r.user_id);
 
-        const { data: catches, error: catchesError } = await supabase.from("caught").select("user_id, weight, species(name)").in("user_id", userIds);
+        const { data: catches, error: catchesError } = await supabase
+          .from("caught")
+          .select("user_id, weight, species(name)")
+          .in("user_id", userIds);
         if (catchesError) throw catchesError;
         if (requestId !== this.playersRequestId || targetAreaId !== this.currentAreaId) return;
 
@@ -388,36 +441,48 @@ export const useFishingStore = defineStore("fishing", {
           });
         }
 
-        const colors = ["#d99157", "#a783cf", "#59a9a0", "#3b82f6", "#ef4444", "#f59e0b", "#10b981", "#8b5cf6", "#ec4899", "#14b8a6"];
+        const colors = [
+          "#d99157",
+          "#a783cf",
+          "#59a9a0",
+          "#3b82f6",
+          "#ef4444",
+          "#f59e0b",
+          "#10b981",
+          "#8b5cf6",
+          "#ec4899",
+          "#14b8a6",
+        ];
 
         this.nearbyPlayers = rows.map((row) => {
           const isCurrent = row.user_id === currentUserId;
           const stat = playerStats.get(row.user_id) || { count: 0, bestWeight: 0, bestFishName: "" };
           const level = Math.max(1, Math.floor(stat.count / 3) + 1);
 
-          let title = tr('fishing.tan_thu');
-          if (level >= 30) title = tr('fishing.huyen_thoai_mat_nuoc');
-          else if (level >= 20) title = tr('fishing.nguoi_san_ca_hiem');
-          else if (level >= 10) title = tr('fishing.tho_cau_lao_luyen');
-          else if (level >= 5) title = tr('fishing.tho_cau_ho');
+          let title = tr("fishing.tan_thu");
+          if (level >= 30) title = tr("fishing.huyen_thoai_mat_nuoc");
+          else if (level >= 20) title = tr("fishing.nguoi_san_ca_hiem");
+          else if (level >= 10) title = tr("fishing.tho_cau_lao_luyen");
+          else if (level >= 5) title = tr("fishing.tho_cau_ho");
 
           let name = "";
           let avatar = "";
 
           if (isCurrent) {
-            const rawName = authStore.user?.user_metadata?.full_name || authStore.user?.email?.split("@")[0] || tr('fishing.toi');
-            name = tr('fishing.value0_ban', { value0: rawName });
+            const rawName =
+              authStore.user?.user_metadata?.full_name || authStore.user?.email?.split("@")[0] || tr("fishing.toi");
+            name = tr("fishing.value0_ban", { value0: rawName });
             avatar = rawName.slice(0, 2).toUpperCase();
           } else {
             const shortId = row.user_id.slice(0, 5);
-            name = tr('fishing.can_thu_value0', { value0: shortId });
+            name = tr("fishing.can_thu_value0", { value0: shortId });
             avatar = shortId.slice(0, 2).toUpperCase();
           }
 
           const charCodeSum = row.user_id.split("").reduce((sum, ch) => sum + ch.charCodeAt(0), 0);
           const color = colors[charCodeSum % colors.length];
 
-          const bestCatch = stat.bestWeight > 0 ? `${stat.bestFishName} ${stat.bestWeight} kg` : tr('fishing.chua_co');
+          const bestCatch = stat.bestWeight > 0 ? `${stat.bestFishName} ${stat.bestWeight} kg` : tr("fishing.chua_co");
 
           return {
             id: row.id,
@@ -448,17 +513,17 @@ export const useFishingStore = defineStore("fishing", {
           const species = Array.isArray(row.species) ? row.species[0] : row.species;
           return {
             id: row.id,
-            name: species?.name ?? tr('CaughtModal.ca'),
+            name: species?.name ?? tr("CaughtModal.ca"),
             weight: `${row.weight} kg`,
             variantType: row.variant_type,
             image: species?.image ?? "/fish/VN/fish.jpg",
             createdAt: row.created_at ?? undefined,
-            isShiny: row.is_shiny
+            isShiny: row.is_shiny,
           };
         });
       } catch (err) {
         if (requestId !== this.inventoryRequestId) return;
-        this.inventoryError = err instanceof Error ? err.message : tr('fishing.khong_the_tai_gio_ca');
+        this.inventoryError = err instanceof Error ? err.message : tr("fishing.khong_the_tai_gio_ca");
         console.error("Lỗi khi tải danh sách cá trong túi:", err);
       }
     },
@@ -473,7 +538,7 @@ export const useFishingStore = defineStore("fishing", {
         this.inventoryRequestId++;
         this.inventory = this.inventory.filter((item) => item.id !== caughtId);
         if (!this.isFishingNetFull && (this.castPhase === "idle" || this.castPhase === "lost")) {
-          this.castMessage = tr('fishing.cham_mat_ho_de_cau_tiep');
+          this.castMessage = tr("fishing.cham_mat_ho_de_cau_tiep");
         }
       } catch (err) {
         console.error("Lỗi khi thả cá khỏi túi:", err);
@@ -512,22 +577,22 @@ export const useFishingStore = defineStore("fishing", {
     },
     async castTo(x: number, y: number) {
       if (this.sessionReady && this.isFishingNetFull) {
-        this.rejectCast(tr('FishingBag.capacity_reached', { capacity: this.fishingNetCapacity }));
+        this.rejectCast(tr("FishingBag.capacity_reached", { capacity: this.fishingNetCapacity }));
         return;
       }
       if (!this.canCast) {
-        this.rejectCast(tr('fishing.hay_thu_moi_truoc_khi_quang_moi_lai'));
+        this.rejectCast(tr("fishing.hay_thu_moi_truoc_khi_quang_moi_lai"));
         return;
       }
       const areaId = this.currentAreaId;
       if (!areaId) {
-        this.rejectCast(tr('fishing.khong_tim_thay_bai_cau_hay_thu_vao_lai_khu_vuc'));
+        this.rejectCast(tr("fishing.khong_tim_thay_bai_cau_hay_thu_vao_lai_khu_vuc"));
         return;
       }
 
       const bait = useEquipmentStore().variants.bait?.find((variant) => variant.id === this.equipmentLoadout.bait);
       if (!bait || (bait.quantity ?? 0) < 1) {
-        this.rejectCast(tr('fishing.ban_da_het_moi_hay_chon_hoac_mua_them_moi_de_quang'));
+        this.rejectCast(tr("fishing.ban_da_het_moi_hay_chon_hoac_mua_them_moi_de_quang"));
         return;
       }
 
@@ -538,10 +603,13 @@ export const useFishingStore = defineStore("fishing", {
       this.sessionId = null;
       this.isCasting = true;
       this.castPhase = "casting";
-      this.castMessage = tr('fishing.dang_ket_noi_voi_bai_cau');
+      this.castMessage = tr("fishing.dang_ket_noi_voi_bai_cau");
 
       try {
-        const data = await withTimeout(supabaseFishingAreaRepository.castRod(areaId, this.appliedDepthMeters), RPC_TIMEOUT_MS);
+        const data = await withTimeout(
+          supabaseFishingAreaRepository.castRod(areaId, this.appliedDepthMeters),
+          RPC_TIMEOUT_MS,
+        );
         if (requestId !== this.castRequestId) return;
 
         const response = data as unknown as CastRodResponse;
@@ -551,16 +619,17 @@ export const useFishingStore = defineStore("fishing", {
 
         this.sessionId = response.session_id;
         this.serverClockOffset = Number.isSafeInteger(response.server_time_ms)
-          ? response.server_time_ms - performance.now() : Date.now() - performance.now();
+          ? response.server_time_ms - performance.now()
+          : Date.now() - performance.now();
         this.isCasting = false;
         this.castPhase = "waiting";
-        this.castMessage = tr('fishing.moi_da_cham_nuoc_dang_cho_tin_hieu');
+        this.castMessage = tr("fishing.moi_da_cham_nuoc_dang_cho_tin_hieu");
       } catch {
         if (requestId !== this.castRequestId) return;
         this.sessionId = null;
         this.isCasting = false;
         this.castPhase = "lost";
-        this.castMessage = tr('fishing.khong_the_ket_noi_hay_thu_tha_can_lai');
+        this.castMessage = tr("fishing.khong_the_ket_noi_hay_thu_tha_can_lai");
       }
     },
     async startChallengeForSession(sessionId: string) {
@@ -568,9 +637,12 @@ export const useFishingStore = defineStore("fishing", {
       if (this.sessionId !== sessionId || this.castPhase !== "waiting" || this.isLoadingChallenge) return;
       const requestId = this.castRequestId;
       this.isLoadingChallenge = true;
-      this.castMessage = tr('fishing.ca_can_cau_dang_tai_thu_thach');
+      this.castMessage = tr("fishing.ca_can_cau_dang_tai_thu_thach");
       try {
-        const session = await withTimeout(supabaseFishingAreaRepository.fetchSessionChallenge(sessionId), RPC_TIMEOUT_MS);
+        const session = await withTimeout(
+          supabaseFishingAreaRepository.fetchSessionChallenge(sessionId),
+          RPC_TIMEOUT_MS,
+        );
         if (requestId !== this.castRequestId || this.sessionId !== sessionId) return;
         if (session.status !== "BITE") throw new Error("Session is not ready");
         const challenge = session.challenge_data;
@@ -583,7 +655,7 @@ export const useFishingStore = defineStore("fishing", {
         this.tensionReeling = false;
         // The scheduled bite time is not the beginning of the playable fight.
         this.tensionStartedAt = null;
-        this.castMessage = tr('fishing.co_tin_hieu_giu_nut_hoac_space_khi_san_sang_de_thu_day');
+        this.castMessage = tr("fishing.co_tin_hieu_giu_nut_hoac_space_khi_san_sang_de_thu_day");
         this.castPhase = "bite";
       } catch {
         if (requestId !== this.castRequestId) return;
@@ -593,7 +665,7 @@ export const useFishingStore = defineStore("fishing", {
         this.sessionId = null;
         this.resetTensionChallenge();
         this.castPhase = "lost";
-        this.castMessage = tr('fishing.khong_the_tai_thu_thach_hay_tha_can_lai');
+        this.castMessage = tr("fishing.khong_the_tai_thu_thach_hay_tha_can_lai");
       } finally {
         if (requestId === this.castRequestId) this.isLoadingChallenge = false;
       }
@@ -611,11 +683,17 @@ export const useFishingStore = defineStore("fishing", {
       if (this.isLeavingArea || this.hasLeftArea || this.isRetrievingBait) return;
       this.advanceTensionFight();
       const sessionId = this.sessionId;
-      if (!sessionId || !this.tensionChallenge || this.castPhase !== "bite" ||
-        this.tensionStartedAt !== null || this.isStartingTensionChallenge) return;
+      if (
+        !sessionId ||
+        !this.tensionChallenge ||
+        this.castPhase !== "bite" ||
+        this.tensionStartedAt !== null ||
+        this.isStartingTensionChallenge
+      )
+        return;
       const ownerId = useAuthStore().userId;
       if (!this.currentAreaId) return;
-      this.pendingResult = { kind: 'start', ownerId, areaId: this.currentAreaId, sessionId };
+      this.pendingResult = { kind: "start", ownerId, areaId: this.currentAreaId, sessionId };
       savePendingResult(ownerId, this.pendingResult);
       await this.activateTensionSession(sessionId);
     },
@@ -624,21 +702,31 @@ export const useFishingStore = defineStore("fishing", {
       const auth = useAuthStore();
       const ownerId = auth.userId;
       const generation = auth.sessionGeneration;
-      const current = () => requestId === this.castRequestId && this.sessionId === sessionId
-        && auth.user?.id === ownerId && auth.sessionGeneration === generation;
+      const current = () =>
+        requestId === this.castRequestId &&
+        this.sessionId === sessionId &&
+        auth.user?.id === ownerId &&
+        auth.sessionGeneration === generation;
       this.isStartingTensionChallenge = true;
-      this.castPhase = 'submitting';
-      this.castMessage = tr('TensionChallenge.dang_bat_dau_dau_suc_voi_ca');
+      this.castPhase = "submitting";
+      this.castMessage = tr("TensionChallenge.dang_bat_dau_dau_suc_voi_ca");
       try {
-        const response = await withTimeout(supabaseFishingAreaRepository.startTensionChallenge(sessionId), RPC_TIMEOUT_MS);
+        const response = await withTimeout(
+          supabaseFishingAreaRepository.startTensionChallenge(sessionId),
+          RPC_TIMEOUT_MS,
+        );
         if (!current()) return;
         if (response.resolution) {
           await this.finishChallenge(async () => response.resolution);
           return;
         }
         const challenge = response.challenge_data;
-        if (!isTensionChallenge(challenge) || challenge.sessionId !== sessionId ||
-          challenge.activatedAt !== challenge.startedAt || !Number.isSafeInteger(response.server_time_ms)) {
+        if (
+          !isTensionChallenge(challenge) ||
+          challenge.sessionId !== sessionId ||
+          challenge.activatedAt !== challenge.startedAt ||
+          !Number.isSafeInteger(response.server_time_ms)
+        ) {
           throw new Error("Invalid activated challenge");
         }
         this.tensionChallenge = challenge;
@@ -650,15 +738,15 @@ export const useFishingStore = defineStore("fishing", {
         this.tensionStartedAt = challenge.startedAt - this.serverClockOffset;
         savePendingResult(ownerId, null);
         this.pendingResult = null;
-        this.castPhase = 'bite';
-        this.castMessage = tr('fishing.giu_va_tha_de_dieu_chinh_luc_cang');
+        this.castPhase = "bite";
+        this.castMessage = tr("fishing.giu_va_tha_de_dieu_chinh_luc_cang");
       } catch (err) {
         if (!current()) return;
         console.error("Không thể bắt đầu thử thách lực căng:", err);
         if (isConfirmedResultRejection(err)) this.rejectPendingResult();
         else {
-          this.castPhase = 'unconfirmed';
-          this.castMessage = tr('fishing.result_unconfirmed');
+          this.castPhase = "unconfirmed";
+          this.castMessage = tr("fishing.result_unconfirmed");
         }
       } finally {
         if (current()) this.isStartingTensionChallenge = false;
@@ -675,17 +763,24 @@ export const useFishingStore = defineStore("fishing", {
           // Invalidate any activation request still in flight as well.
           this.resetCast();
           this.castPhase = "lost";
-          this.castMessage = tr('fishing.da_het_thoi_gian_bat_dau_thu_thach_ca_da_thoat');
+          this.castMessage = tr("fishing.da_het_thoi_gian_bat_dau_thu_thach_ca_da_thoat");
         }
         return;
       }
-      const targetTick = Math.min(tensionMaxTicks(challenge), Math.floor(((now - this.tensionStartedAt) * challenge.config.tickRate) / 1000));
+      const targetTick = Math.min(
+        tensionMaxTicks(challenge),
+        Math.floor(((now - this.tensionStartedAt) * challenge.config.tickRate) / 1000),
+      );
       while (fight.tick < targetTick && fight.result === "fighting") {
         stepTensionFight(challenge, fight, this.tensionReeling);
       }
       if (fight.result !== "fighting") {
-        void this.submitTensionChallenge({ sessionId: challenge.sessionId, inputs: this.tensionInputs.map((input) => ({ ...input })),
-          totalTicks: fight.tick, claimedResult: fight.result });
+        void this.submitTensionChallenge({
+          sessionId: challenge.sessionId,
+          inputs: this.tensionInputs.map((input) => ({ ...input })),
+          totalTicks: fight.tick,
+          claimedResult: fight.result,
+        });
       }
     },
     setTensionReeling(reeling: boolean) {
@@ -704,7 +799,8 @@ export const useFishingStore = defineStore("fishing", {
       if (this.castPhase !== "bite" || !fight || fight.result !== "fighting" || this.tensionReeling === reeling) return;
       this.tensionReeling = reeling;
       if (this.tensionInputs.at(-1)?.tick === fight.tick) this.tensionInputs.pop();
-      if ((this.tensionInputs.at(-1)?.reeling ?? false) !== reeling) this.tensionInputs.push({ tick: fight.tick, reeling });
+      if ((this.tensionInputs.at(-1)?.reeling ?? false) !== reeling)
+        this.tensionInputs.push({ tick: fight.tick, reeling });
     },
     async reelInBait() {
       const sessionId = this.sessionId;
@@ -712,7 +808,7 @@ export const useFishingStore = defineStore("fishing", {
       const requestId = this.castRequestId;
       this.isRetrievingBait = true;
       this.baitRetrievalSequence += 1;
-      this.castMessage = tr('fishing.dang_thu_moi');
+      this.castMessage = tr("fishing.dang_thu_moi");
       try {
         await withTimeout(supabaseFishingAreaRepository.cancelFishingSession(sessionId), RPC_TIMEOUT_MS);
         if (requestId !== this.castRequestId || this.sessionId !== sessionId) return;
@@ -720,7 +816,7 @@ export const useFishingStore = defineStore("fishing", {
         this.resetCast();
       } catch {
         if (requestId !== this.castRequestId || this.sessionId !== sessionId) return;
-        this.castMessage = tr('fishing.khong_the_thu_moi_hay_thu_lai');
+        this.castMessage = tr("fishing.khong_the_thu_moi_hay_thu_lai");
       } finally {
         if (requestId === this.castRequestId) this.isRetrievingBait = false;
       }
@@ -732,31 +828,50 @@ export const useFishingStore = defineStore("fishing", {
       this.isCasting = false;
       this.isRetrievingBait = false;
       this.castPhase = "idle";
-      this.castMessage = tr('fishing.san_sang_tha_cau');
+      this.castMessage = tr("fishing.san_sang_tha_cau");
     },
     async submitTensionChallenge(payload: TensionSubmission) {
-      if (!this.tensionChallenge || this.tensionStartedAt === null || payload.sessionId !== this.sessionId || this.castPhase !== "bite") return;
+      if (
+        !this.tensionChallenge ||
+        this.tensionStartedAt === null ||
+        payload.sessionId !== this.sessionId ||
+        this.castPhase !== "bite"
+      )
+        return;
       if (!this.currentAreaId) return;
       const ownerId = useAuthStore().userId;
       // Freeze the exact replay before sending; retries and reloads reuse it.
-      const replay = { ...payload, inputs: payload.inputs.map(input => ({ ...input })) };
-      this.pendingResult = { kind: 'submit', ownerId, areaId: this.currentAreaId, sessionId: payload.sessionId, payload: replay };
+      const replay = { ...payload, inputs: payload.inputs.map((input) => ({ ...input })) };
+      this.pendingResult = {
+        kind: "submit",
+        ownerId,
+        areaId: this.currentAreaId,
+        sessionId: payload.sessionId,
+        payload: replay,
+      };
       savePendingResult(ownerId, this.pendingResult);
       await this.finishChallenge(() => supabaseFishingAreaRepository.submitTensionChallenge(replay));
     },
     async retryPendingResult() {
       const pending = this.pendingResult;
-      if (!pending || pending.ownerId !== useAuthStore().user?.id || this.castPhase !== 'unconfirmed'
-        || this.isStartingTensionChallenge || this.isLeavingArea || this.hasLeftArea) return;
-      if (pending.kind === 'start') await this.activateTensionSession(pending.sessionId);
+      if (
+        !pending ||
+        pending.ownerId !== useAuthStore().user?.id ||
+        this.castPhase !== "unconfirmed" ||
+        this.isStartingTensionChallenge ||
+        this.isLeavingArea ||
+        this.hasLeftArea
+      )
+        return;
+      if (pending.kind === "start") await this.activateTensionSession(pending.sessionId);
       else await this.finishChallenge(() => supabaseFishingAreaRepository.submitTensionChallenge(pending.payload));
     },
     rejectPendingResult() {
       if (this.pendingResult) savePendingResult(this.pendingResult.ownerId, null);
       this.pendingResult = null;
       this.resetCast();
-      this.castPhase = 'lost';
-      this.castMessage = tr('fishing.result_rejected');
+      this.castPhase = "lost";
+      this.castMessage = tr("fishing.result_rejected");
     },
     async finishChallenge(submit: () => Promise<unknown>) {
       if (this.isLeavingArea || this.hasLeftArea) return;
@@ -764,18 +879,18 @@ export const useFishingStore = defineStore("fishing", {
       const auth = useAuthStore();
       const ownerId = auth.userId;
       const generation = auth.sessionGeneration;
-      const current = () => requestId === this.castRequestId && auth.user?.id === ownerId
-        && auth.sessionGeneration === generation;
+      const current = () =>
+        requestId === this.castRequestId && auth.user?.id === ownerId && auth.sessionGeneration === generation;
       this.castPhase = "submitting";
-      this.castMessage = tr('TensionChallenge.dang_xac_nhan_ket_qua');
+      this.castMessage = tr("TensionChallenge.dang_xac_nhan_ket_qua");
 
       try {
         const data = await withTimeout(submit(), RPC_TIMEOUT_MS);
         if (!current()) return;
 
         const response = data as unknown as SubmitChallengeResponse;
-        if (!response || typeof response.success !== 'boolean' || (response.success && !response.caught)) {
-          throw new Error('Invalid fishing result response');
+        if (!response || typeof response.success !== "boolean" || (response.success && !response.caught)) {
+          throw new Error("Invalid fishing result response");
         }
         if (response?.success && response.caught) {
           const caught: CaughtFish = {
@@ -791,14 +906,14 @@ export const useFishingStore = defineStore("fishing", {
             seasonNumber: response.scoring?.season_number,
             createdAt: response.scoring?.caught_at,
           };
-          this.inventory = [caught, ...this.inventory.filter(fish => fish.id !== caught.id)];
+          this.inventory = [caught, ...this.inventory.filter((fish) => fish.id !== caught.id)];
           this.inventoryRequestId++;
           this.catchDialogOpen = true;
           this.castPhase = "caught";
-          this.castMessage = tr('fishing.ban_da_cau_duoc_ca');
+          this.castMessage = tr("fishing.ban_da_cau_duoc_ca");
         } else {
           this.castPhase = "lost";
-          this.castMessage = response?.message || tr('fishing.ca_da_thoat_hay_thu_lai');
+          this.castMessage = response?.message || tr("fishing.ca_da_thoat_hay_thu_lai");
         }
         this.sessionId = null;
         this.resetTensionChallenge();
@@ -808,8 +923,8 @@ export const useFishingStore = defineStore("fishing", {
         if (!current()) return;
         if (isConfirmedResultRejection(error)) this.rejectPendingResult();
         else {
-          this.castPhase = 'unconfirmed';
-          this.castMessage = tr('fishing.result_unconfirmed');
+          this.castPhase = "unconfirmed";
+          this.castMessage = tr("fishing.result_unconfirmed");
         }
       }
     },
@@ -819,7 +934,7 @@ export const useFishingStore = defineStore("fishing", {
       this.sessionId = null;
       this.resetTensionChallenge();
       this.castPhase = "idle";
-      this.castMessage = tr('fishing.cham_mat_ho_de_cau_tiep');
+      this.castMessage = tr("fishing.cham_mat_ho_de_cau_tiep");
     },
     async openBag() {
       this.bagOpen = true;
@@ -849,7 +964,7 @@ export const useFishingStore = defineStore("fishing", {
     selectPlayer(player: FishingPlayer) {
       this.selectedPlayer = player;
     },
-    rejectCast(message = tr('fishing.chi_co_the_quang_moi_xuong_mat_nuoc')) {
+    rejectCast(message = tr("fishing.chi_co_the_quang_moi_xuong_mat_nuoc")) {
       this.castMessage = message;
     },
   },

@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { onMounted, onUnmounted, ref, watch } from "vue";
 import { t as tr } from "../../i18n";
-import { useModalStore } from "../../stores/modal";
+import { useModalStore } from "../../stores/player-modal-store";
 
 const modalStore = useModalStore();
 const quickActionsBox = ref<HTMLDivElement | null>(null);
@@ -66,7 +66,7 @@ onUnmounted(() => {
         @click="modalStore.close()"
       >
         <span aria-hidden="true">×</span>
-        {{ tr('Modal.thoat') }}
+        {{ tr("Modal.thoat") }}
       </button>
     </div>
   </Teleport>

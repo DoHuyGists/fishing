@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { getFormattingLocale, t as tr } from "../../../../i18n/index.ts";
-import { useHealthStore } from "../../../../stores/health.ts";
+import { useHealthStore } from "../../../../stores/player-health-store.ts";
 import { computed } from "vue";
 import EquipmentStatsOverview from "../../../shared/EquipmentStatsOverview.vue";
 

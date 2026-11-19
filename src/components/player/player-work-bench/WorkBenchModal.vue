@@ -1,5 +1,5 @@
 <script lang="ts" setup>
-import { useGameCatalogRefresh } from '../../../composables/useGameCatalogRefresh';
+import { useGameCatalogRefresh } from "../../../composables/useGameCatalogRefresh";
 import type { WorkBenchInventoryItem } from "../../../types/model/workBench";
 import type { UserInventory } from "../../../types/model/userInventory";
 import type { Blueprint } from "../../../types/model/blueprint";
@@ -12,13 +12,11 @@ import WorkBenchBlueprints from "./WorkBenchBlueprints.vue";
 import WorkBenchRecipe from "./WorkBenchRecipe.vue";
 
 import { useAuthStore } from "../../../stores/auth";
-import { useInventoryStore } from "../../../stores/inventory";
-import { useBlueprintStore } from "../../../stores/blueprint";
-import { useCurrencyStore } from "../../../stores/currency";
+import { useInventoryStore } from "../../../stores/player-inventory-store.ts";
+import { useBlueprintStore } from "../../../stores/player-blueprint-store.ts";
+import { useCurrencyStore } from "../../../stores/player-currency-store.ts";
 
-
-
-useGameCatalogRefresh(['blueprints', 'items']);
+useGameCatalogRefresh(["blueprints", "items"]);
 
 const authStore = useAuthStore();
 const inventoryStore = useInventoryStore();
@@ -41,7 +39,7 @@ const inventoryByItemId = computed(() => {
       id: row.id,
       itemId,
       category: typeof row.data?.category === "string" ? row.data.category : null,
-      name: typeof row.data?.name === "string" ? row.data.name : tr('ShopModal.vat_pham'),
+      name: typeof row.data?.name === "string" ? row.data.name : tr("ShopModal.vat_pham"),
       image: typeof row.data?.image === "string" ? row.data.image : null,
       icon: typeof row.data?.icon === "string" ? row.data.icon : null,
       quantity: (previous?.quantity ?? 0) + (Number.isFinite(count) ? count : 1),
@@ -53,17 +51,35 @@ const filteredInventory = computed(() => {
   const query = searchQuery.value.trim().toLocaleLowerCase();
   return [...inventoryByItemId.value.values()].filter((item) => item.name.toLocaleLowerCase().includes(query));
 });
-const selectedBlueprint = computed(() => blueprintStore.blueprints.find((bp) => bp.id === selectedBlueprintId.value) ?? null);
-const resultItem = computed(() => selectedBlueprint.value ? blueprintStore.itemsById[selectedBlueprint.value.resultItemId] : null);
-const materials = computed(() => (selectedBlueprint.value?.requiredMaterials ?? []).map((material) => ({
-  ...material,
-  item: blueprintStore.itemsById[material.item_id],
-  required: material.quantity * craftQuantity.value,
-  owned: inventoryByItemId.value.get(material.item_id)?.quantity ?? 0,
-})));
-const quantityValid = computed(() => Number.isSafeInteger(craftQuantity.value) && craftQuantity.value >= 1 && craftQuantity.value <= 1000);
+const selectedBlueprint = computed(
+  () => blueprintStore.blueprints.find((bp) => bp.id === selectedBlueprintId.value) ?? null,
+);
+const resultItem = computed(() =>
+  selectedBlueprint.value ? blueprintStore.itemsById[selectedBlueprint.value.resultItemId] : null,
+);
+const materials = computed(() =>
+  (selectedBlueprint.value?.requiredMaterials ?? []).map((material) => ({
+    ...material,
+    item: blueprintStore.itemsById[material.item_id],
+    required: material.quantity * craftQuantity.value,
+    owned: inventoryByItemId.value.get(material.item_id)?.quantity ?? 0,
+  })),
+);
+const quantityValid = computed(
+  () => Number.isSafeInteger(craftQuantity.value) && craftQuantity.value >= 1 && craftQuantity.value <= 1000,
+);
 const craftCost = computed(() => (selectedBlueprint.value?.goldCost ?? 0) * craftQuantity.value);
-const canCraft = computed(() => Boolean(quantityValid.value && selectedBlueprint.value && Number.isFinite(craftCost.value) && craftCost.value >= 0 && !currencyStore.error && currencyStore.cash >= craftCost.value && materials.value.every((material) => material.owned >= material.required)));
+const canCraft = computed(() =>
+  Boolean(
+    quantityValid.value &&
+    selectedBlueprint.value &&
+    Number.isFinite(craftCost.value) &&
+    craftCost.value >= 0 &&
+    !currencyStore.error &&
+    currencyStore.cash >= craftCost.value &&
+    materials.value.every((material) => material.owned >= material.required),
+  ),
+);
 
 async function craftSelectedBlueprint() {
   if (!selectedBlueprint.value || !canCraft.value || isLoading.value) return;
@@ -74,7 +90,7 @@ async function craftSelectedBlueprint() {
     await blueprintStore.craft(selectedBlueprint.value.id, craftQuantity.value);
     if (authStore.userId) await inventoryStore.setUserInventory(authStore.userId);
   } catch (error) {
-    errorMessage.value = error instanceof Error ? error.message : tr('WorkBenchModal.khong_the_che_tao_vat_pham');
+    errorMessage.value = error instanceof Error ? error.message : tr("WorkBenchModal.khong_the_che_tao_vat_pham");
   } finally {
     isLoading.value = false;
   }
@@ -90,10 +106,15 @@ async function loadData(force = false) {
   isLoading.value = true;
   errorMessage.value = "";
   try {
-    if (!authStore.userId) throw new Error(tr('WorkBenchModal.ban_can_dang_nhap_de_xem_ban_che_tao'));
-    await Promise.all([inventoryStore.setUserInventory(authStore.userId), blueprintStore.loadBlueprints(force), currencyStore.fetchCurrency()]);
+    if (!authStore.userId) throw new Error(tr("WorkBenchModal.ban_can_dang_nhap_de_xem_ban_che_tao"));
+    await Promise.all([
+      inventoryStore.setUserInventory(authStore.userId),
+      blueprintStore.loadBlueprints(force),
+      currencyStore.fetchCurrency(),
+    ]);
   } catch (error) {
-    errorMessage.value = error instanceof Error ? error.message : tr('WorkBenchModal.khong_the_tai_du_lieu_ban_che_tao');
+    errorMessage.value =
+      error instanceof Error ? error.message : tr("WorkBenchModal.khong_the_tai_du_lieu_ban_che_tao");
   } finally {
     isLoading.value = false;
   }
@@ -102,15 +123,41 @@ async function loadData(force = false) {
 onMounted(loadData);
 
 const guideSteps = [
-  { target: "#workbench-palette", get title() { return tr('ShopModal.vat_pham'); }, get description() { return tr('WorkBenchModal.danh_sach_vat_pham_hien_co_trong_tui'); } },
-  { target: "#workbench-blueprints", get title() { return tr('WorkBenchModal.ban_ve'); }, get description() { return tr('WorkBenchModal.chon_ban_ve_de_xem_cong_thuc_che_tao'); } },
-  { target: "#workbench-recipe", get title() { return tr('WorkBenchModal.cong_thuc'); }, get description() { return tr('WorkBenchModal.dieu_chinh_so_luong_de_tinh_nguyen_lieu_can_dung'); } },
+  {
+    target: "#workbench-palette",
+    get title() {
+      return tr("ShopModal.vat_pham");
+    },
+    get description() {
+      return tr("WorkBenchModal.danh_sach_vat_pham_hien_co_trong_tui");
+    },
+  },
+  {
+    target: "#workbench-blueprints",
+    get title() {
+      return tr("WorkBenchModal.ban_ve");
+    },
+    get description() {
+      return tr("WorkBenchModal.chon_ban_ve_de_xem_cong_thuc_che_tao");
+    },
+  },
+  {
+    target: "#workbench-recipe",
+    get title() {
+      return tr("WorkBenchModal.cong_thuc");
+    },
+    get description() {
+      return tr("WorkBenchModal.dieu_chinh_so_luong_de_tinh_nguyen_lieu_can_dung");
+    },
+  },
 ];
 </script>
 
 <template>
   <Modal :title="tr('WorkBenchModal.ban_che_tao')" :guid-steps="guideSteps" :on-refresh="() => loadData(true)">
-    <section class="grid min-h-full w-full grid-cols-1 gap-4 text-[#24352a] lg:h-full lg:min-h-0 lg:grid-cols-[minmax(15rem,0.8fr)_minmax(0,1.8fr)]">
+    <section
+      class="grid min-h-full w-full grid-cols-1 gap-4 text-[#24352a] lg:h-full lg:min-h-0 lg:grid-cols-[minmax(15rem,0.8fr)_minmax(0,1.8fr)]"
+    >
       <WorkBenchInventory
         v-model:search-query="searchQuery"
         :filtered-inventory="filteredInventory"

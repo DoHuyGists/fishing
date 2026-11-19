@@ -2,10 +2,10 @@
 import { computed } from "vue";
 import { t as tr } from "../../../i18n/index.ts";
 import { equipmentCategories } from "../../../data/equipmentCatalog.ts";
-import { useInventoryStore } from "../../../stores/inventory.ts";
-import { useModalStore } from "../../../stores/modal.ts";
-import type { EquipmentSet } from "../../../stores/equipment.ts";
-import type { FishingTool } from "../../../stores/fishing.ts";
+import { useInventoryStore } from "../../../stores/player-inventory-store.ts";
+import { useModalStore } from "../../../stores/player-modal-store.ts";
+import type { EquipmentSet } from "../../../stores/player-equipment-store.ts";
+import type { FishingTool } from "../../../stores/player-fishing-store.ts";
 
 const props = defineProps<{
   usedSet: EquipmentSet | null;
@@ -180,9 +180,7 @@ function countSetItems(s: EquipmentSet): number {
                 ]"
                 @click="emit('choose-main-item', cat.id, item)"
               >
-                <div
-                  class="flex items-center justify-center w-6 h-6 shrink-0 bg-[#eaf2e5] rounded overflow-hidden"
-                >
+                <div class="flex items-center justify-center w-6 h-6 shrink-0 bg-[#eaf2e5] rounded overflow-hidden">
                   <img
                     v-if="isImageUrl(getItemDisplay(item).iconOrImage)"
                     :src="getItemDisplay(item).iconOrImage"
@@ -226,11 +224,7 @@ function countSetItems(s: EquipmentSet): number {
                         : 'bg-[#eaf2e5] text-[#526a58] group-hover:bg-[#cbd9c6] group-hover:text-[#24352a] group-hover:font-bold'
                     "
                   >
-                    {{
-                      isItemSelected(cat.id, item.id)
-                        ? tr("PrepareModal.dang_dung")
-                        : tr("NewPlayerFishing.chon")
-                    }}
+                    {{ isItemSelected(cat.id, item.id) ? tr("PrepareModal.dang_dung") : tr("NewPlayerFishing.chon") }}
                   </span>
                 </div>
               </div>

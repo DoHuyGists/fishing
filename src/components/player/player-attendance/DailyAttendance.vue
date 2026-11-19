@@ -3,7 +3,7 @@ import type { AttendanceReward as Reward } from "../../../types/model/attendance
 import { t as tr } from "../../../i18n";
 
 import { computed, onMounted, onUnmounted, ref } from "vue";
-import { useAttendanceStore } from "../../../stores/attendance";
+import { useAttendanceStore } from "../../../stores/player-attendance-store";
 
 const props = defineProps<{
   reward: Reward | null;

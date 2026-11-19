@@ -6,7 +6,7 @@ import { t as tr } from "../../../i18n";
 import { computed, nextTick, onMounted, ref } from "vue";
 import Modal from "../../shared/Modal.vue";
 import FactionActivityRewards from "./FactionActivityRewards.vue";
-import { useFactionStore } from "../../../stores/faction.ts";
+import { useFactionStore } from "../../../stores/player-faction-store.ts";
 import { useAuthStore } from "../../../stores/auth.ts";
 import { useToast } from "../../../composables/useToast.ts";
 

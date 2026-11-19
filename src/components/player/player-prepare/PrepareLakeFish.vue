@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { t as tr } from "../../../i18n/index.ts";
 import { useAuthStore } from "../../../stores/auth.ts";
-import { useDiaryStore } from "../../../stores/diary.ts";
+import { useDiaryStore } from "../../../stores/player-diary-store.ts";
 import { useWorldStore } from "../../../stores/worldMap.ts";
 
 const authStore = useAuthStore();
