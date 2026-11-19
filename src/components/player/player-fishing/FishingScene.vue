@@ -90,15 +90,16 @@ const floatDistanceRatio = computed(() => {
   if (state.tensionStartedAt === null || !state.tensionFight || startDistance <= 0
     || (state.castPhase !== "bite" && state.castPhase !== "submitting")) return 1;
 
-  // Keep the float at least 15% of its original distance from the resting tip.
+  // Keep the float on the water, short of the bank, until the result is confirmed.
   return Math.min(1, Math.max(0.15, state.tensionFight.distance / TENSION_SCALE / startDistance));
 });
 const floatPosition = computed(() => {
   const bait = sceneState.value.baitPosition;
   const ratio = floatDistanceRatio.value;
+  const bank = { x: Math.min(95, Math.max(5, restingRod.value.x)), y: Math.max(95, bait.y) };
   const target = {
-    x: restingRod.value.x + (bait.x - restingRod.value.x) * ratio,
-    y: restingRod.value.y + (bait.y - restingRod.value.y) * ratio,
+    x: bank.x + (bait.x - bank.x) * ratio,
+    y: bank.y + (bait.y - bank.y) * ratio,
   };
   const progress = castProgress.value;
   const arcHeight = Math.min(12, Math.hypot(target.x - castOrigin.x, target.y - castOrigin.y) * 0.25);
@@ -110,9 +111,9 @@ const floatPosition = computed(() => {
 const buoyFrame = computed(() => {
   const dx = (fishingRod.value.x - floatPosition.value.x) * sceneSize.value.width / 100;
   const dy = (fishingRod.value.y - floatPosition.value.y) * sceneSize.value.height / 100;
-  // Keep the float centered and include the actual rod tip inside the bite canvas.
-  const width = fishBite.value ? Math.max(200, Math.abs(dx) * 2 + 40) : 200;
-  const height = fishBite.value ? Math.max(200, Math.abs(dy) * 2 + 40) : 200;
+  // Use a stable frame throughout the fight; rod movement must not resize the canvas.
+  const width = fishBite.value ? Math.max(200, sceneSize.value.width * 2 + 40) : 200;
+  const height = fishBite.value ? Math.max(200, sceneSize.value.height * 2 + 40) : 200;
   return { width, height, anchorX: 0.5 + dx / width, anchorY: 0.5 + dy / height };
 });
 const linePath = computed(() => {

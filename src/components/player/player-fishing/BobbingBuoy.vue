@@ -81,6 +81,8 @@ const GRAVITY = 900
 let ctx: CanvasRenderingContext2D | null = null
 let raf = 0
 let ro: ResizeObserver | null = null
+let needsResize = false
+let biteChanged = false
 let img: HTMLImageElement | null = null
 let W = 0
 let H = 0
@@ -201,6 +203,8 @@ function thrash(strength = rand(0.55, 1)) {
 }
 
 function startBite() {
+  // The scene hands its visible line to this canvas when the bite starts.
+  presence = 1
   nextThrash = simTime + 0.9
   thrash(1) // cú giật đầu tiên khi cá vừa cắn
   later(0.3, () => thrash(rand(0.6, 0.9)))
@@ -446,7 +450,17 @@ function drawDefaultFloat(c: CanvasRenderingContext2D) {
 
 function frame(now: number) {
   raf = requestAnimationFrame(frame)
+  // Resizing clears the bitmap, so do it immediately before drawing the next frame.
+  if (needsResize) {
+    resize()
+    needsResize = false
+  }
   if (!ctx) return
+  if (biteChanged) {
+    if (props.fishBite) startBite()
+    else endBite()
+    biteChanged = false
+  }
   const dt = Math.min((now - last) / 1000, 0.05)
   last = now
   const time = now / 1000
@@ -558,7 +572,7 @@ onMounted(() => {
   loadImage(props.src)
   const parent = canvasRef.value?.parentElement
   if (parent) {
-    ro = new ResizeObserver(resize)
+    ro = new ResizeObserver(() => { needsResize = true })
     ro.observe(parent)
   }
   last = performance.now()
@@ -575,7 +589,7 @@ onBeforeUnmount(() => {
 watch(() => props.src, loadImage)
 watch(
   () => props.fishBite,
-  (on) => (on ? startBite() : endBite()),
+  () => { biteChanged = true },
 )
 
 defineExpose({ thrash })
