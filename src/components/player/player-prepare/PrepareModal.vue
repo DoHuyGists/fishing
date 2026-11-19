@@ -8,11 +8,11 @@ import { supabaseEquipmentRepository } from "../../../data/supabaseEquipmentRepo
 import { equipmentCategories } from "../../../data/equipmentCatalog.ts";
 import type { FishingTool } from "../../../stores/player-fishing-store.ts";
 import type { EquipmentSet } from "../../../stores/player-equipment-store.ts";
-import { useUserTurnsStore } from "../../../stores/userTurns.ts";
+import { useUserTurnsStore } from "../../../stores/player-user-turns-store.ts";
 import { supabaseUserInAreaRepository } from "../../../data/supabaseUserInAreaRepository.ts";
 import { useToast } from "../../../composables/useToast.ts";
 import { useRouter } from "vue-router";
-import { useWorldStore } from "../../../stores/worldMap.ts";
+import { useWorldStore } from "../../../stores/player-world-map-store.ts";
 import Modal from "../../shared/Modal.vue";
 import { useModalStore } from "../../../stores/player-modal-store.ts";
 import WeatherSection from "../player-fishing/WeatherSection.vue";

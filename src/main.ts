@@ -11,12 +11,12 @@ import { useLocaleStore } from "./stores/player-locale-store.ts";
 import { setFeatureRequestGuard } from "./database/featureRequestGate";
 import { useFeatureAvailabilityStore } from "./stores/player-feature-availability-store.ts";
 import { setMutationRefreshHandler } from "./database/mutationRefresh";
-import { usePlayerRefreshStore } from "./stores/playerRefresh";
+import { usePlayerRefreshStore } from "./stores/player-refresh-store.ts";
 import { useGameCatalogStore } from "./stores/player-game-catalog-store.ts";
 import { setCatalogMutationHandler } from "./database/catalogRequests";
 import { setReadCacheHandler } from "./database/readCacheRequests";
-import { useReadCacheStore } from "./stores/readCache";
-import { resetPlayerSnapshots } from "./stores/playerSnapshotReset";
+import { useReadCacheStore } from "./stores/player-read-cache.ts";
+import { resetPlayerSnapshots } from "./stores/player-snapshot-reset-store.ts";
 
 const app = createApp(App);
 const pinia = createPinia();

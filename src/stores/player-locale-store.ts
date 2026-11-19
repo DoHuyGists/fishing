@@ -2,7 +2,7 @@ import { computed, ref, watch } from "vue";
 import { defineStore } from "pinia";
 import { i18n, t, type AppLocale } from "../i18n";
 import { useAuthStore } from "./auth";
-import { useUserProfileStore } from "./userProfile";
+import { useUserProfileStore } from "./player-user-profile-store";
 import { supabaseUserProfileRepository } from "../data/supabaseUserProfileRepository";
 
 const STORAGE_KEY = "fishing.locale";
@@ -45,7 +45,9 @@ export const useLocaleStore = defineStore("locale", () => {
 
   const locale = computed({
     get: () => i18n.global.locale.value,
-    set: (value: AppLocale) => { void setLocale(value); },
+    set: (value: AppLocale) => {
+      void setLocale(value);
+    },
   });
 
   function syncProfileLanguage(profile: { id: string; language: string | null } | null) {
@@ -55,20 +57,35 @@ export const useLocaleStore = defineStore("locale", () => {
     }
   }
 
-  watch(() => [auth.user?.id, auth.profile?.language] as const,
-    () => syncProfileLanguage(auth.profile), { immediate: true });
-  watch(() => [auth.user?.id, userProfile.profile?.id, userProfile.profile?.language] as const,
-    () => syncProfileLanguage(userProfile.profile), { immediate: true });
-  watch(() => auth.user?.id, () => { error.value = ""; });
+  watch(
+    () => [auth.user?.id, auth.profile?.language] as const,
+    () => syncProfileLanguage(auth.profile),
+    { immediate: true },
+  );
+  watch(
+    () => [auth.user?.id, userProfile.profile?.id, userProfile.profile?.language] as const,
+    () => syncProfileLanguage(userProfile.profile),
+    { immediate: true },
+  );
+  watch(
+    () => auth.user?.id,
+    () => {
+      error.value = "";
+    },
+  );
 
-  watch(locale, (value) => {
-    document.documentElement.lang = value;
-    try {
-      localStorage.setItem(STORAGE_KEY, value);
-    } catch {
-      // Keep the in-memory preference if browser storage is unavailable.
-    }
-  }, { immediate: true, flush: "sync" });
+  watch(
+    locale,
+    (value) => {
+      document.documentElement.lang = value;
+      try {
+        localStorage.setItem(STORAGE_KEY, value);
+      } catch {
+        // Keep the in-memory preference if browser storage is unavailable.
+      }
+    },
+    { immediate: true, flush: "sync" },
+  );
 
   return { locale, setLocale, saving, error };
 });

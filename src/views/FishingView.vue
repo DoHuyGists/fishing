@@ -16,12 +16,12 @@ import TensionChallenge from "../components/player/player-fishing-challenge/Tens
 import { useFishingStore } from "../stores/player-fishing-store.ts";
 import { useAuthStore } from "../stores/auth";
 import { useEquipmentStore } from "../stores/player-equipment-store.ts";
-import { useUserSettingStore } from "../stores/userSetting";
+import { useUserSettingStore } from "../stores/player-user-setting-store.ts";
 import { useFishingBackgroundSoundStore } from "../stores/player-fishing-background-sound-store.ts";
 import DayPhaseClock from "../components/player/player-fishing/DayPhaseClock.vue";
 import FishingFatigue from "../components/player/player-fishing/FishingFatigue.vue";
 import { useDayPhaseClock } from "../composables/useDayPhaseClock";
-import { useUserInAreaStore } from "../stores/userInArea";
+import { useUserInAreaStore } from "../stores/player-user-In-area-store.ts";
 import { supabaseFishingAreaRepository } from "../data/supabaseFishingAreaRepository";
 import type { RealtimeChannel } from "@supabase/supabase-js";
 

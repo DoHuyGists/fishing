@@ -4,7 +4,7 @@ import type { FishingAreaRow } from "../types/table/fishingArea";
 import { t as tr } from "../i18n";
 import { defineStore } from "pinia";
 import { useCountryStore } from "./player-country-store";
-import { useWorldStore } from "./worldMap";
+import { useWorldStore } from "./player-world-map-store";
 
 export type FishingArea = Pick<FishingAreaRow, "id" | "countryId" | "title" | "location" | "scenePath">;
 

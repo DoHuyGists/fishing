@@ -7,7 +7,7 @@ import FishingScene from "../player-fishing/FishingScene.vue";
 import TensionChallenge from "../player-fishing-challenge/TensionChallenge.vue";
 import GuideTour from "../../shared/GuideTour.vue";
 import { useNewPlayerFishingStore } from "../../../stores/tutorials/newPlayerFishing";
-import { useTutorialSessionStore } from "../../../stores/tutorialSession";
+import { useTutorialSessionStore } from "../../../stores/player-tutorial-session-store.ts";
 import { useModalStore } from "../../../stores/player-modal-store.ts";
 
 const router = useRouter();

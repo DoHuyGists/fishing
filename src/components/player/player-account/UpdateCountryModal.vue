@@ -2,7 +2,7 @@
 import { computed, onMounted, onUnmounted, ref } from "vue";
 import { t as tr } from "../../../i18n";
 import { useAuthStore } from "../../../stores/auth.ts";
-import { useUserProfileStore } from "../../../stores/userProfile.ts";
+import { useUserProfileStore } from "../../../stores/player-user-profile-store.ts";
 import { useCountryStore } from "../../../stores/player-country-store.ts";
 import { useToast } from "../../../composables/useToast";
 import TwoOptionsModal from "../../shared/TwoOptionsModal.vue";

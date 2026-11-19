@@ -1,21 +1,44 @@
 <script lang="ts" setup>
 import AdminModal from "../AdminModal.vue";
-import Pagination from '../../shared/Pagination.vue';
-import { usePagedListFilters } from '../../../composables/usePagedListFilters';
+import Pagination from "../../shared/Pagination.vue";
+import { usePagedListFilters } from "../../../composables/usePagedListFilters";
 import { computed, ref, watch } from "vue";
 import { mapData } from "../../../data/map.ts";
 import InteractWorldMap2 from "../../player/player-world-map/InteractWorldMap.vue";
 import { useAdminFishingAreaStore } from "./admin-fishing-area-store.ts";
 import FishingAreaManagementForm from "./FishingAreaManagementForm.vue";
-import { useWorldStore } from "../../../stores/worldMap.ts";
+import { useWorldStore } from "../../../stores/player-world-map-store.ts";
 
 const emit = defineEmits(["close"]);
 const adminFishingAreaStore = useAdminFishingAreaStore();
 const worldStore = useWorldStore();
-const search = computed({ get: () => adminFishingAreaStore.search, set: value => { adminFishingAreaStore.search = value; } });
-const countryFilter = computed({ get: () => adminFishingAreaStore.countryFilter, set: value => { adminFishingAreaStore.countryFilter = value; } });
-const availabilityFilter = computed({ get: () => adminFishingAreaStore.availabilityFilter, set: value => { adminFishingAreaStore.availabilityFilter = value; } });
-usePagedListFilters([search, countryFilter, availabilityFilter], () => { void adminFishingAreaStore.fetchAllAreasAdmin(1); }, () => { ++adminFishingAreaStore.requestId; });
+const search = computed({
+  get: () => adminFishingAreaStore.search,
+  set: (value) => {
+    adminFishingAreaStore.search = value;
+  },
+});
+const countryFilter = computed({
+  get: () => adminFishingAreaStore.countryFilter,
+  set: (value) => {
+    adminFishingAreaStore.countryFilter = value;
+  },
+});
+const availabilityFilter = computed({
+  get: () => adminFishingAreaStore.availabilityFilter,
+  set: (value) => {
+    adminFishingAreaStore.availabilityFilter = value;
+  },
+});
+usePagedListFilters(
+  [search, countryFilter, availabilityFilter],
+  () => {
+    void adminFishingAreaStore.fetchAllAreasAdmin(1);
+  },
+  () => {
+    ++adminFishingAreaStore.requestId;
+  },
+);
 
 const deletingId = ref<string | null>(null);
 const confirmDeleteId = ref<string | null>(null);
@@ -81,12 +104,7 @@ watch(
 </script>
 
 <template>
-  <AdminModal
-    title="Quản lý bãi câu"
-    icon="🗺️"
-    @close="emit('close')"
-  >
-
+  <AdminModal title="Quản lý bãi câu" icon="🗺️" @close="emit('close')">
     <!-- Toolbar -->
     <div
       v-if="!adminFishingAreaStore.isFormOpen"
@@ -275,7 +293,9 @@ watch(
     <div v-if="confirmDeleteId" class="fixed inset-0 z-60 bg-black/40 flex items-center justify-center p-4">
       <div class="bg-white rounded-xl shadow-lg p-5 w-full max-w-sm">
         <div class="m-0 text-sm font-extrabold text-gray-800 mb-2">Xác nhận xoá</div>
-        <div class="text-xs text-gray-500 mb-4">Bạn có chắc muốn xoá bãi câu này? Hành động này không thể hoàn tác.</div>
+        <div class="text-xs text-gray-500 mb-4">
+          Bạn có chắc muốn xoá bãi câu này? Hành động này không thể hoàn tác.
+        </div>
         <div class="flex items-center justify-end gap-2">
           <button
             type="button"
@@ -295,6 +315,13 @@ watch(
         </div>
       </div>
     </div>
-    <Pagination v-if="!adminFishingAreaStore.isFormOpen" :page="adminFishingAreaStore.page" :page-size="adminFishingAreaStore.pageSize" :total="adminFishingAreaStore.total" :loading="adminFishingAreaStore.adminLoading" @change="adminFishingAreaStore.fetchAllAreasAdmin($event)" />
+    <Pagination
+      v-if="!adminFishingAreaStore.isFormOpen"
+      :page="adminFishingAreaStore.page"
+      :page-size="adminFishingAreaStore.pageSize"
+      :total="adminFishingAreaStore.total"
+      :loading="adminFishingAreaStore.adminLoading"
+      @change="adminFishingAreaStore.fetchAllAreasAdmin($event)"
+    />
   </AdminModal>
 </template>

@@ -41,7 +41,7 @@
 import { t as tr } from "../../../i18n";
 
 import { computed, onBeforeUnmount, onMounted, ref } from "vue";
-import { useSpinWheelStore } from "../../../stores/spinWheel.ts";
+import { useSpinWheelStore } from "../../../stores/player-spin-wheel-store.ts";
 import { useCurrencyStore } from "../../../stores/player-currency-store.ts";
 import ListItems from "./ListItems.vue";
 import SpinWheel from "./SpinWheel.vue";

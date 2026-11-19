@@ -3,7 +3,7 @@ import type { FishingAreaPayload } from "../../../types/table/fishingArea";
 import { computed, onMounted, onUnmounted, ref, watch } from "vue";
 import { useCountryStore } from "../../../stores/player-country-store.ts";
 
-import { useWorldStore } from "../../../stores/worldMap.ts";
+import { useWorldStore } from "../../../stores/player-world-map-store.ts";
 import { useToast } from "../../../composables/useToast.ts";
 import { useAdminZoneStore } from "../admin-zone/admin-zone-store.ts";
 import { useAdminFishingAreaStore } from "./admin-fishing-area-store.ts";

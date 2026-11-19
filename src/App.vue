@@ -10,7 +10,7 @@ import { useFeatureAvailabilityStore } from "./stores/player-feature-availabilit
 import { useModalStore } from "./stores/player-modal-store.ts";
 import { modalFeatures } from "./data/featureAvailability";
 import ConfettiCannon from "./components/shared/ConfettiCannon.vue";
-import { useStoryStore } from "./stores/story";
+import { useStoryStore } from "./stores/player-story-store.ts";
 import { useStoryEditorStore } from "./components/admin/admin-story/admin-story-editor-store";
 
 useLocaleStore();

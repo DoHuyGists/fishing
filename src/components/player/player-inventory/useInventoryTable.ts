@@ -13,7 +13,7 @@ import {
   type ItemData,
 } from "../../../stores/player-equipment-store.ts";
 import { useCurrencyStore } from "../../../stores/player-currency-store.ts";
-import { useUserProfileStore } from "../../../stores/userProfile.ts";
+import { useUserProfileStore } from "../../../stores/player-user-profile-store.ts";
 import { useToast } from "../../../composables/useToast.ts";
 import { usePagedListFilters } from "../../../composables/usePagedListFilters";
 import { useHealthStore } from "../../../stores/player-health-store.ts";

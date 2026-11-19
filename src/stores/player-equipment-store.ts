@@ -4,9 +4,9 @@ import { defineStore } from "pinia";
 import { defaultEquipmentVariants } from "../data/equipmentCatalog";
 
 import { supabaseEquipmentRepository } from "../data/supabaseEquipmentRepository";
-import { useReadCacheStore } from "./readCache";
+import { useReadCacheStore } from "./player-read-cache";
 import { useAuthStore } from "./auth";
-import { useUserProfileStore } from "./userProfile";
+import { useUserProfileStore } from "./player-user-profile-store";
 import { useFishingStore, type FishingTool } from "./player-fishing-store";
 
 export type Category = "rod" | "line" | "reel" | "hook" | "bait";

@@ -20,7 +20,7 @@ import { defineStore } from "pinia";
 import { useAuthStore } from "./auth";
 import { useCurrencyStore } from "./player-currency-store";
 import { useInventoryStore } from "./player-inventory-store";
-import { useUserProfileStore } from "./userProfile";
+import { useUserProfileStore } from "./player-user-profile-store";
 import { supabaseCurrencyRepository } from "../data/supabaseCurrencyRepository";
 import { supabaseUserInventoryRepository } from "../data/supabaseUserInventoryRepository";
 import { supabaseUserProfileRepository } from "../data/supabaseUserProfileRepository";

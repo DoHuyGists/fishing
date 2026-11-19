@@ -8,7 +8,7 @@ import Pagination from "../../shared/Pagination.vue";
 import Modal from "../../shared/Modal.vue";
 import PlayerIdentity from "../../shared/PlayerIdentity.vue";
 import { useCountryStore } from "../../../stores/player-country-store.ts";
-import { useTeamStore } from "../../../stores/team.ts";
+import { useTeamStore } from "../../../stores/player-team-store.ts";
 import { useAuthStore } from "../../../stores/auth.ts";
 
 import TeamListSidebar from "./TeamListSidebar.vue";

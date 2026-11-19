@@ -5,7 +5,7 @@ import { computed, onMounted, ref, watch } from "vue";
 import { useCaughtStore, type CaughtFish } from "../../../stores/player-caught-store.ts";
 import { supabaseFishRepository } from "../../../data/supabaseFishRepository.ts";
 import { useMarketStore } from "../../../stores/player-market-store.ts";
-import { useWorldStore } from "../../../stores/worldMap.ts";
+import { useWorldStore } from "../../../stores/player-world-map-store.ts";
 import Modal from "../../shared/Modal.vue";
 import FishSellConfirm from "./FishSellConfirm.vue";
 import FishReleaseConfirm from "./FishReleaseConfirm.vue";

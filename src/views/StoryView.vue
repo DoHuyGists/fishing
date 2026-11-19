@@ -1,8 +1,8 @@
 <script setup lang="ts">
 import { computed, onMounted, onUnmounted, ref, watch } from "vue";
 import { onBeforeRouteLeave, useRoute, useRouter } from "vue-router";
-import { useStoryStore } from "../stores/story";
-import { useStoryPlaybackStore, useStoryPreviewPlaybackStore } from "../stores/storyPlayback";
+import { useStoryStore } from "../stores/player-story-store.ts";
+import { useStoryPlaybackStore, useStoryPreviewPlaybackStore } from "../stores/player-story-playback-store.ts";
 import { useAuthStore } from "../stores/auth";
 import { useFeatureAvailabilityStore } from "../stores/player-feature-availability-store.ts";
 import StoryPlayer from "../components/story/StoryPlayer.vue";

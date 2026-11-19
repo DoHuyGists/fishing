@@ -1,9 +1,9 @@
 import { defineStore } from "pinia";
 import { useAuthStore } from "./auth";
 import { useCurrencyStore } from "./player-currency-store";
-import { useUserProfileStore } from "./userProfile";
+import { useUserProfileStore } from "./player-user-profile-store";
 import { useCountryStore } from "./player-country-store";
-import { useUserInAreaStore } from "./userInArea";
+import { useUserInAreaStore } from "./player-user-In-area-store";
 import type { PlayerSnapshot } from "../types/model/playerRefresh";
 
 export const usePlayerRefreshStore = defineStore("playerRefresh", {

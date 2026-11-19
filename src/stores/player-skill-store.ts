@@ -5,7 +5,7 @@ import { computed, ref, watch } from "vue";
 import { acceptHMRUpdate, defineStore } from "pinia";
 import { supabaseSkillRepository } from "../data/supabaseSkillRepository";
 import { useAuthStore } from "./auth";
-import { useUserProfileStore } from "./userProfile";
+import { useUserProfileStore } from "./player-user-profile-store";
 
 const effectLabels: Record<string, string> = {
   get catch_rate_bonus() {

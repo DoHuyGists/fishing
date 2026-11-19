@@ -2,7 +2,7 @@
 import { t as tr } from "../../../i18n/index.ts";
 import { useAuthStore } from "../../../stores/auth.ts";
 import { useDiaryStore } from "../../../stores/player-diary-store.ts";
-import { useWorldStore } from "../../../stores/worldMap.ts";
+import { useWorldStore } from "../../../stores/player-world-map-store.ts";
 
 const authStore = useAuthStore();
 const diaryStore = useDiaryStore();

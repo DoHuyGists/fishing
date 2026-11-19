@@ -4,7 +4,7 @@ import { t as tr } from "../../../i18n";
 import { onMounted } from "vue";
 import { useCountryStore } from "../../../stores/player-country-store";
 import { useFishingAreaStore } from "../../../stores/player-fishing-area-store";
-import { useWorldStore } from "../../../stores/worldMap";
+import { useWorldStore } from "../../../stores/player-world-map-store";
 
 withDefaults(defineProps<{ collapsible?: boolean; mapVisible?: boolean }>(), {
   collapsible: false,

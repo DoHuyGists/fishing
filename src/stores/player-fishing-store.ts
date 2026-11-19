@@ -10,9 +10,9 @@ import type {
 import { t as tr } from "../i18n";
 import { defineStore } from "pinia";
 import { useAuthStore } from "./auth";
-import { useUserProfileStore } from "./userProfile";
+import { useUserProfileStore } from "./player-user-profile-store";
 import { useEquipmentStore } from "./player-equipment-store";
-import { useUserInAreaStore } from "./userInArea";
+import { useUserInAreaStore } from "./player-user-In-area-store";
 import { useDayPhaseStore } from "./player-day-phase-store";
 import { supabaseEquipmentRepository } from "../data/supabaseEquipmentRepository";
 import { supabaseFishRepository } from "../data/supabaseFishRepository";

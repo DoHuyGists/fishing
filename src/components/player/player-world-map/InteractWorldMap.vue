@@ -4,10 +4,10 @@ import type { PickPoint } from "../../../types/model/worldMap";
 import { t as tr } from "../../../i18n";
 
 import { computed, nextTick, onMounted, ref, watch } from "vue";
-import { useWorldStore } from "../../../stores/worldMap.ts";
+import { useWorldStore } from "../../../stores/player-world-map-store.ts";
 import WorldMap from "./WorldMap.vue";
 import { useFishingAreaStore } from "../../../stores/player-fishing-area-store.ts";
-import { useUserInAreaStore } from "../../../stores/userInArea.ts";
+import { useUserInAreaStore } from "../../../stores/player-user-In-area-store.ts";
 import { useAuthStore } from "../../../stores/auth.ts";
 import { useDayPhaseClock } from "../../../composables/useDayPhaseClock";
 import { useToast } from "../../../composables/useToast.ts";

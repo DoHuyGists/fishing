@@ -4,14 +4,14 @@ import { t as tr } from "../../i18n";
 import { computed, onMounted, onUnmounted, ref, watch } from "vue";
 import { useModalStore } from "../../stores/player-modal-store.ts";
 import { useCurrencyStore } from "../../stores/player-currency-store.ts";
-import { useUserProfileStore } from "../../stores/userProfile.ts";
+import { useUserProfileStore } from "../../stores/player-user-profile-store.ts";
 import Cash from "../player/player-currency/Cash.vue";
 import SkillPoints from "../player/player-currency/SkillPoints.vue";
 import GuideTour from "./GuideTour.vue";
 import UserTurn from "../player/player-stamina/UserTurn.vue";
 import Shells from "../player/player-currency/Shells.vue";
 import Tickets from "../player/player-currency/Tickets.vue";
-import { useReadCacheStore } from "../../stores/readCache";
+import { useReadCacheStore } from "../../stores/player-read-cache.ts";
 
 defineOptions({ inheritAttrs: false });
 

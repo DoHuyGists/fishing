@@ -2,7 +2,7 @@
 import { t as tr } from "../../../i18n";
 
 import { computed, onBeforeUnmount, onMounted, ref, watch } from "vue";
-import { useWeatherStore } from "../../../stores/weather";
+import { useWeatherStore } from "../../../stores/player-weather-store";
 import { utcToLocalMs } from "../../../utils/time";
 
 const props = withDefaults(defineProps<{ areaId: string | null | undefined; inline?: boolean }>(), {

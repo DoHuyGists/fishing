@@ -5,7 +5,7 @@ import { onMounted, ref } from "vue";
 import { useRouter } from "vue-router";
 import Modal from "../../shared/Modal.vue";
 import { useModalStore } from "../../../stores/player-modal-store.ts";
-import { useTutorialStore } from "../../../stores/tutorial";
+import { useTutorialStore } from "../../../stores/player-tutorial-store.ts";
 
 const router = useRouter();
 const modalStore = useModalStore();

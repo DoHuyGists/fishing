@@ -1,7 +1,7 @@
 import { acceptHMRUpdate, defineStore } from "pinia";
 import { useAuthStore } from "./auth";
 import { supabaseFishRepository } from "../data/supabaseFishRepository";
-import { useReadCacheStore } from './readCache';
+import { useReadCacheStore } from "./player-read-cache";
 export interface CaughtFish {
   id: string;
   created_at: string;
@@ -51,7 +51,8 @@ export const useCaughtStore = defineStore("Caught", {
   },
   actions: {
     async moveFishes(ids: string[], status: "normal" | "in-net") {
-      const auth = useAuthStore(), generation = auth.sessionGeneration;
+      const auth = useAuthStore(),
+        generation = auth.sessionGeneration;
       await supabaseFishRepository.updateCaughtStatus(ids, status);
       if (auth.sessionGeneration !== generation) return;
       const set = new Set(ids);
@@ -60,7 +61,8 @@ export const useCaughtStore = defineStore("Caught", {
       });
     },
     async finishFishing() {
-      const auth = useAuthStore(), generation = auth.sessionGeneration;
+      const auth = useAuthStore(),
+        generation = auth.sessionGeneration;
       await supabaseFishRepository.deleteInNetFishes();
       if (auth.sessionGeneration !== generation) return;
       this.caughtFishes = this.caughtFishes.filter((f) => f.status !== "in-net");
@@ -68,10 +70,11 @@ export const useCaughtStore = defineStore("Caught", {
     },
     async loadCaughtFishes(force = false) {
       const authStore = useAuthStore();
-      const userId = authStore.user?.id, generation = authStore.sessionGeneration;
+      const userId = authStore.user?.id,
+        generation = authStore.sessionGeneration;
       if (!userId) return;
       const current = () => authStore.user?.id === userId && authStore.sessionGeneration === generation;
-      if (force) await useReadCacheStore().invalidate(['caught']);
+      if (force) await useReadCacheStore().invalidate(["caught"]);
       if (!current()) return;
       this.isLoadingCaught = true;
       try {

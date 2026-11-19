@@ -1,9 +1,9 @@
-import type { SpinWheelReward as Reward, SpinWheelSeasonRewards } from "../types/model/spinWheel";
-import { t as tr } from "../i18n";
+import type { SpinWheelReward as Reward, SpinWheelSeasonRewards } from "../types/model/spinWheel.ts";
+import { t as tr } from "../i18n/index.ts";
 import { defineStore } from "pinia";
 
 import { supabaseUserInventoryRepository } from "../data/supabaseUserInventoryRepository.ts";
-import { supabaseSpinWheelRepository } from "../data/supabaseSpinWheelRepository";
+import { supabaseSpinWheelRepository } from "../data/supabaseSpinWheelRepository.ts";
 import { useCurrencyStore } from "./player-currency-store.ts";
 
 export const useSpinWheelStore = defineStore("SpinWheel", {

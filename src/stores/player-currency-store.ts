@@ -1,5 +1,5 @@
 import { useGameCatalogStore } from "./player-game-catalog-store";
-import { useReadCacheStore } from "./readCache";
+import { useReadCacheStore } from "./player-read-cache";
 import type { CurrencyConversionRate } from "../types/model/currency";
 import { getFormattingLocale, t as tr } from "../i18n";
 import { defineStore } from "pinia";

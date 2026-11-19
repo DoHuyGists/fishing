@@ -3,7 +3,7 @@ import type { WorkBenchInventoryItem } from "../../../types/model/workBench";
 import { t as tr } from "../../../i18n";
 import { computed } from "vue";
 import { storeToRefs } from "pinia";
-import { useWorkBenchInventoryStore, type WorkBenchInventoryViewMode } from "../../../stores/workBenchInventory";
+import { useWorkBenchInventoryStore, type WorkBenchInventoryViewMode } from "../../../stores/player-work-bench-inventory-store";
 
 
 const searchQuery = defineModel<string>("searchQuery", { required: true });

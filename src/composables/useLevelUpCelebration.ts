@@ -1,7 +1,7 @@
 import { onScopeDispose, ref, watch } from "vue";
 import type ConfettiCannon from "../components/shared/ConfettiCannon.vue";
 import { useAuthStore } from "../stores/auth";
-import { useUserProfileStore } from "../stores/userProfile";
+import { useUserProfileStore } from "../stores/player-user-profile-store.ts";
 
 /** Mount once in App.vue so celebrations survive route changes. */
 export function useLevelUpCelebration() {
@@ -9,11 +9,15 @@ export function useLevelUpCelebration() {
   const userProfile = useUserProfileStore();
   const confetti = ref<InstanceType<typeof ConfettiCannon> | null>(null);
 
-  watch(() => auth.user?.id, (userId) => {
-    confetti.value?.clear();
-    if (!userId) return;
-    void userProfile.fetchProfile(userId);
-  }, { immediate: true, flush: "sync" });
+  watch(
+    () => auth.user?.id,
+    (userId) => {
+      confetti.value?.clear();
+      if (!userId) return;
+      void userProfile.fetchProfile(userId);
+    },
+    { immediate: true, flush: "sync" },
+  );
 
   watch(
     () => {
@@ -22,8 +26,12 @@ export function useLevelUpCelebration() {
       return { userId, level: userId && profile?.id === userId ? profile.level : null };
     },
     (current, previous) => {
-      if (current.userId === previous?.userId && current.level != null &&
-          previous?.level != null && current.level > previous.level) {
+      if (
+        current.userId === previous?.userId &&
+        current.level != null &&
+        previous?.level != null &&
+        current.level > previous.level
+      ) {
         confetti.value?.fireCannons();
       }
     },

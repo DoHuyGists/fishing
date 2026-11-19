@@ -1,6 +1,6 @@
 import { useGameCatalogStore } from "./player-game-catalog-store";
 import { useAuthStore } from "./auth";
-import { useReadCacheStore } from "./readCache";
+import { useReadCacheStore } from "./player-read-cache";
 import type { Species, CaughtDiary, DiaryFishEntry } from "../types/model/diary";
 import type { AreaSpecies } from "../types/model/speciesInArea";
 import { t as tr } from "../i18n";
