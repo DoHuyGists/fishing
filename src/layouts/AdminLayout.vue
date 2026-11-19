@@ -9,12 +9,11 @@ const { loading, initialized, adminLoading, isAdmin } = storeToRefs(useAuthStore
 
 </script>
 <template>
-  <div v-if="!initialized || loading || adminLoading">
+  <!-- Preserve the view and its drafts while the current admin's role is refreshed. -->
+  <router-view v-if="initialized && isAdmin" />
+  <div v-else-if="!initialized || loading || adminLoading">
     <Loading />
   </div>
-  <template v-else-if="isAdmin">
-    <router-view></router-view>
-  </template>
   <div v-else>
     <Forbidden />
   </div>
