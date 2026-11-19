@@ -24,6 +24,7 @@ import PrepareBodyEquipmentSets from "./PrepareBodyEquipmentSets.vue";
 import FishingEquipmentOverview from "../player-inventory/fishing-equipment/FishingEquipmentOverview.vue";
 import HealthOverview from "../player-inventory/body-equipment/HealthOverview.vue";
 import { useHealthStore } from "../../../stores/player-health-store.ts";
+import { useFishingTransitionStore } from "../../../stores/player-fishing-transition-store";
 
 const worldStore = useWorldStore();
 const authStore = useAuthStore();
@@ -38,6 +39,7 @@ const selectingItemId = ref<string | null>(null);
 const modalStore = useModalStore();
 const diaryStore = useDiaryStore();
 const healthStore = useHealthStore();
+const fishingTransition = useFishingTransitionStore();
 
 watch(
   () => [worldStore.selectedArea.id, authStore.userId] as const,
@@ -158,6 +160,7 @@ const missingUsedSlots = computed(() => {
 const canProceed = computed(() => {
   return (
     !loading.value &&
+    !fishingTransition.visible &&
     !error.value &&
     !healthStore.loading &&
     !healthStore.busy &&
@@ -188,9 +191,18 @@ async function confirm() {
   if (!canProceed.value) return;
 
   try {
+    await fishingTransition.coverScreen();
     await userTurnsStore.consumeTurn();
     await supabaseUserInAreaRepository.setUserEnterArea(worldStore.selectedArea.id);
+    modalStore.close();
+    await router.push({ name: "fishing" });
+    if (router.currentRoute.value.name !== "fishing") {
+      fishingTransition.hide();
+      if (["home", "lobby"].includes(String(router.currentRoute.value.name))) modalStore.open("prepare");
+    }
   } catch (err) {
+    fishingTransition.hide();
+    if (["home", "lobby"].includes(String(router.currentRoute.value.name))) modalStore.open("prepare");
     console.error("Failed to consume turn or enter area:", err);
     toast.error(err instanceof Error ? err.message : tr("PrepareModal.khong_the_tru_luot_cau_ca"), {
       get title() {
@@ -199,11 +211,7 @@ async function confirm() {
       position: "top",
     });
     return;
-  } finally {
   }
-
-  router.push({ name: "fishing" });
-  modalStore.close();
 }
 </script>
 

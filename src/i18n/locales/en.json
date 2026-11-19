@@ -1,4 +1,7 @@
 {
+  "FishingSplashLoading": {
+    "lake": "Lake surface with a fishing line and a struggling fish"
+  },
   "Story": {
     "library": "Stories", "editor": "Scenario Builder", "editorDescription": "Write, test and publish interactive story chapters.",
     "visualNovel": "Journey archives", "libraryIntro": "Every signal reveals a story. Choose a chapter and begin your journey.",

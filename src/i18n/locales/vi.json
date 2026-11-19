@@ -1,4 +1,7 @@
 {
+  "FishingSplashLoading": {
+    "lake": "Mặt hồ với dây câu và cá đang giằng co"
+  },
   "Story": {
     "library": "Cốt truyện", "editor": "Biên tập kịch bản", "editorDescription": "Soạn, chạy thử và xuất bản chương truyện tương tác.",
     "visualNovel": "Hồ sơ hành trình", "libraryIntro": "Mỗi tín hiệu mở ra một câu chuyện. Chọn chương và bắt đầu hành trình của bạn.",

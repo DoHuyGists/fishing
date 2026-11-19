@@ -12,6 +12,8 @@ import { modalFeatures } from "./data/featureAvailability";
 import ConfettiCannon from "./components/shared/ConfettiCannon.vue";
 import { useStoryStore } from "./stores/player-story-store.ts";
 import { useStoryEditorStore } from "./components/admin/admin-story/admin-story-editor-store";
+import FishingSplashLoading from "./components/FishingSplashLoading.vue";
+import { useFishingTransitionStore } from "./stores/player-fishing-transition-store";
 
 useLocaleStore();
 const auth = useAuthStore();
@@ -19,6 +21,7 @@ const router = useRouter();
 const features = useFeatureAvailabilityStore();
 const modals = useModalStore();
 const stories = useStoryStore();
+const fishingTransition = useFishingTransitionStore();
 watch(
   () => auth.user?.id,
   (userId) => {
@@ -84,4 +87,9 @@ watch(
   <router-view />
   <InformationModal />
   <ModalQuickActions />
+  <Teleport to="body">
+    <Transition name="fishing-splash">
+      <FishingSplashLoading v-if="fishingTransition.visible" />
+    </Transition>
+  </Teleport>
 </template>

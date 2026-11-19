@@ -11,7 +11,7 @@ import FishingBag from "../components/player/player-fishing/FishingBag.vue";
 import FishingPlayers from "../components/player/player-fishing/FishingPlayers.vue";
 import FishingScene from "../components/player/player-fishing/FishingScene.vue";
 import LakeFishGuide from "../components/player/player-fishing/LakeFishGuide.vue";
-import Loading from "../components/Loading.vue";
+import { useFishingTransitionStore } from "../stores/player-fishing-transition-store";
 import TensionChallenge from "../components/player/player-fishing-challenge/TensionChallenge.vue";
 import { useFishingStore } from "../stores/player-fishing-store.ts";
 import { useAuthStore } from "../stores/auth";
@@ -28,6 +28,7 @@ import type { RealtimeChannel } from "@supabase/supabase-js";
 const authStore = useAuthStore();
 const router = useRouter();
 const fishingStore = useFishingStore();
+const fishingTransition = useFishingTransitionStore();
 const equipmentStore = useEquipmentStore();
 const userSettingStore = useUserSettingStore();
 const backgroundSoundStore = useFishingBackgroundSoundStore();
@@ -93,6 +94,15 @@ watch(sessionReady, (ready) => {
   if (!ready) showExitConfirmation.value = false;
 });
 
+watch(
+  () => [sessionReady.value, sessionError.value] as const,
+  ([ready, error]) => {
+    if (ready || error) fishingTransition.hide();
+    else fishingTransition.show();
+  },
+  { immediate: true, flush: "post" },
+);
+
 function toggleEquipment() {
   equipmentCollapsed.value = !equipmentCollapsed.value;
 }
@@ -150,6 +160,7 @@ onMounted(() => {
 });
 
 onBeforeUnmount(() => {
+  fishingTransition.hide();
   unsubscribeFishingSession();
   backgroundSoundStore.stop();
   fishingStore.resetSession();
@@ -163,9 +174,8 @@ onBeforeUnmount(() => {
 </script>
 
 <template>
-  <Loading v-if="!sessionReady && !sessionError" :text="tr('FishingView.dang_chuan_bi_du_lieu_cau_ca')" />
   <section
-    v-else-if="!sessionReady"
+    v-if="!sessionReady && sessionError"
     class="flex min-h-screen flex-col items-center justify-center gap-4 bg-[#f5f9f0] px-6 text-center text-[#24352a]"
     role="alert"
   >
@@ -186,7 +196,7 @@ onBeforeUnmount(() => {
       {{ tr("FishingView.quay_lai_ban_do") }}
     </button>
   </section>
-  <main v-else class="w-full h-screen overflow-hidden touch-none overscroll-none bg-[#193224] text-[#e9f4e8]">
+  <main v-else-if="sessionReady" class="w-full h-screen overflow-hidden touch-none overscroll-none bg-[#193224] text-[#e9f4e8]">
     <div class="fixed top-3 left-3 z-20 text-white flex justify-between items-start">
       <div class="flex flex-col gap-2">
         <DayPhaseClock :area-id="userInAreaStore.userInArea?.area_id" />

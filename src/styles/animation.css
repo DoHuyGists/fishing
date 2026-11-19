@@ -1,3 +1,17 @@
+.fishing-splash-leave-active {
+  transition: opacity 0.4s ease;
+}
+
+.fishing-splash-leave-to {
+  opacity: 0;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .fishing-splash-leave-active {
+    transition: none;
+  }
+}
+
 .shiny-sparkle {
   left: calc(8% + (var(--sparkle-index) - 1) * 19%);
   top: 12%;
