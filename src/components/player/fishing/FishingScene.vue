@@ -4,15 +4,19 @@ import { t as tr } from "../../../i18n";
 
 import { computed, onBeforeUnmount, onMounted, ref, watch } from "vue";
 import { isPointInWater } from "../../../data/fishingMap.ts";
+import { TENSION_SCALE } from "../../../data/tensionChallenge";
 import BobbingBuoy from "./BobbingBuoy.vue";
+import FishingRod from "./FishingRod.vue";
 
 
 const props = defineProps<{ context: FishingSceneContext }>();
 const sceneState = computed(() => props.context.state);
 
 const sceneElement = ref<HTMLElement | null>(null);
-const rodLineAnchor = ref<HTMLElement | null>(null);
+const rod = ref<InstanceType<typeof FishingRod> | null>(null);
 const rodHolder = ref<HTMLElement | null>(null);
+const rodReference = ref<HTMLElement | null>(null);
+const restingRod = ref({ x: 100, y: 100 });
 let retrieveAnimation: Animation | undefined;
 
 watch(
@@ -41,74 +45,66 @@ const fishingRod = ref({
   x: 0,
   y: 0,
 });
-const biteOffset = ref({ x: 0, y: 0 });
-const rodLineOffset = {
-  x: 0,
-  y: 0,
-};
 const ripple = ref(false);
 const invalidTap = ref(false);
-const castClass = computed(() => `phase-${sceneState.value.castPhase}`);
+const isFighting = computed(() => sceneState.value.castPhase === "bite" && sceneState.value.tensionStartedAt !== null);
+// Keep the bite pose while the server starts the challenge.
+const isStartingFight = computed(() => sceneState.value.castPhase === "submitting"
+  && sceneState.value.tensionStartedAt === null && sceneState.value.tensionFight?.result === "fighting");
+const castClass = computed(() => `phase-${isFighting.value ? "fighting" : isStartingFight.value ? "bite" : sceneState.value.castPhase}`);
+const floatSide = computed<-1 | 1>(() => sceneState.value.baitPosition.x < restingRod.value.x ? -1 : 1);
+const rodAngle = computed(() => {
+  // Lean around the resting grip so forward/backward motion stays in the scene.
+  if (isFighting.value) return -27 + floatSide.value * (sceneState.value.tensionReeling ? -14 : 14);
+  if (sceneState.value.castPhase === "bite" || isStartingFight.value) return -27 - floatSide.value * 8;
+  return -27;
+});
+const rodBend = computed(() => {
+  const state = sceneState.value;
+  if (state.castPhase !== "bite" && !isStartingFight.value) return 0;
+  if (state.tensionStartedAt === null) return 26;
+
+  const maxTension = state.tensionChallenge?.config.maxTension ?? 0;
+  const load = maxTension > 0
+    ? Math.min(1, Math.max(0, (state.tensionFight?.tension ?? 0) / TENSION_SCALE / maxTension))
+    : 0;
+  return 86 * Math.pow(load, 0.8) + (state.tensionReeling ? 4 * load : 0);
+});
 const castProgress = ref(1);
 let castStartedAt = 0;
 let castOrigin = { x: 0, y: 0 };
+const floatDistanceRatio = computed(() => {
+  const state = sceneState.value;
+  const startDistance = state.tensionChallenge?.config.startDistance ?? 0;
+  if (state.tensionStartedAt === null || !state.tensionFight || startDistance <= 0
+    || (state.castPhase !== "bite" && state.castPhase !== "submitting")) return 1;
+
+  // Keep the float at least 15% of its original distance from the resting tip.
+  return Math.min(1, Math.max(0.15, state.tensionFight.distance / TENSION_SCALE / startDistance));
+});
 const floatPosition = computed(() => {
-  const target = sceneState.value.baitPosition;
+  const bait = sceneState.value.baitPosition;
+  const ratio = floatDistanceRatio.value;
+  const target = {
+    x: restingRod.value.x + (bait.x - restingRod.value.x) * ratio,
+    y: restingRod.value.y + (bait.y - restingRod.value.y) * ratio,
+  };
   const progress = castProgress.value;
   const arcHeight = Math.min(12, Math.hypot(target.x - castOrigin.x, target.y - castOrigin.y) * 0.25);
   return {
-    x: castOrigin.x + (target.x - castOrigin.x) * progress + biteOffset.value.x,
-    y: castOrigin.y + (target.y - castOrigin.y) * progress - Math.sin(progress * Math.PI) * arcHeight + biteOffset.value.y,
+    x: castOrigin.x + (target.x - castOrigin.x) * progress,
+    y: castOrigin.y + (target.y - castOrigin.y) * progress - Math.sin(progress * Math.PI) * arcHeight,
   };
 });
 const linePath = computed(() => {
   const { x: endX, y: endY } = floatPosition.value;
   const { x: rodX, y: rodY } = fishingRod.value;
   const distance = Math.hypot(endX - rodX, endY - rodY);
-  const sag = Math.min(18, Math.max(8, distance * 0.18));
+  const sag = Math.min(18, Math.max(8, distance * 0.18)) * (1 - rodBend.value / 100);
   const controlX = (rodX + endX) / 2;
   const controlY = (rodY + endY) / 2 + sag;
   return `M ${rodX} ${rodY} Q ${controlX} ${controlY} ${endX} ${endY}`;
 });
-
-let biteMotionFrame: number | undefined;
-let biteMotionStartedAt: number | undefined;
-
-function animateBiteMotion(timestamp: number) {
-  if (sceneState.value.castPhase !== "bite") {
-    biteMotionFrame = undefined;
-    biteMotionStartedAt = undefined;
-    biteOffset.value = { x: 0, y: 0 };
-    return;
-  }
-
-  biteMotionStartedAt ??= timestamp;
-  const angle = ((timestamp - biteMotionStartedAt) / 620) * Math.PI * 2;
-  biteOffset.value = {
-    x: Math.cos(angle) * 1.1,
-    y: Math.sin(angle) * 0.55,
-  };
-  biteMotionFrame = window.requestAnimationFrame(animateBiteMotion);
-}
-
-watch(
-  () => sceneState.value.castPhase,
-  (phase) => {
-    if (phase === "bite") {
-      biteMotionStartedAt = undefined;
-      biteMotionFrame = window.requestAnimationFrame(animateBiteMotion);
-      return;
-    }
-
-    if (biteMotionFrame !== undefined) {
-      window.cancelAnimationFrame(biteMotionFrame);
-      biteMotionFrame = undefined;
-    }
-    biteMotionStartedAt = undefined;
-    biteOffset.value = { x: 0, y: 0 };
-  },
-  { immediate: true },
-);
 
 let rodPositionFrame: number | undefined;
 let invalidTapTimer: ReturnType<typeof setTimeout> | undefined;
@@ -132,19 +128,24 @@ watch(
   },
 );
 
-function updateRodPosition() {
-  if (!sceneElement.value || !rodLineAnchor.value) return;
+function updateRodPosition(tip = rod.value?.getTipPosition()) {
+  if (!sceneElement.value || !tip) return;
 
   const sceneBounds = sceneElement.value.getBoundingClientRect();
-  const anchorBounds = rodLineAnchor.value.getBoundingClientRect();
+  if (!sceneBounds.width || !sceneBounds.height) return;
+  // This reference keeps the resting pose, independent of flex and player input.
+  const referenceBounds = rodReference.value?.getBoundingClientRect();
+  if (referenceBounds) restingRod.value = {
+    x: ((referenceBounds.left - sceneBounds.left) / sceneBounds.width) * 100,
+    y: ((referenceBounds.top - sceneBounds.top) / sceneBounds.height) * 100,
+  };
   fishingRod.value = {
-    x: ((anchorBounds.left + anchorBounds.width / 2 - sceneBounds.left) / sceneBounds.width) * 100 + rodLineOffset.x,
-    y: ((anchorBounds.top + anchorBounds.height / 2 - sceneBounds.top) / sceneBounds.height) * 100 + rodLineOffset.y,
+    x: ((tip.x - sceneBounds.left) / sceneBounds.width) * 100,
+    y: ((tip.y - sceneBounds.top) / sceneBounds.height) * 100,
   };
 }
 
 function trackRodPosition(timestamp: number) {
-  updateRodPosition();
   if (castProgress.value < 1) {
     castProgress.value = Math.min(1, (timestamp - castStartedAt) / 550);
     if (castProgress.value === 1) {
@@ -158,15 +159,12 @@ function trackRodPosition(timestamp: number) {
 
 onMounted(() => {
   trackRodPosition(performance.now());
-  window.addEventListener("resize", updateRodPosition);
 });
 onBeforeUnmount(() => {
   retrieveAnimation?.cancel();
   clearTimeout(invalidTapTimer);
   clearTimeout(rippleTimer);
   if (rodPositionFrame) window.cancelAnimationFrame(rodPositionFrame);
-  if (biteMotionFrame !== undefined) window.cancelAnimationFrame(biteMotionFrame);
-  window.removeEventListener("resize", updateRodPosition);
 });
 
 function castAt(event: MouseEvent) {
@@ -204,8 +202,6 @@ function castAt(event: MouseEvent) {
     />
     <div class="scene-shade"></div>
 
-    <!-- <div class="scene-instruction">Chạm mặt hồ để vung cần đến điểm đó</div> -->
-    <div class="water-glow"></div>
     <div v-if="invalidTap" class="invalid-tap">{{ tr('FishingScene.chon_phan_mat_nuoc') }}</div>
     <div
       v-if="ripple"
@@ -232,12 +228,14 @@ function castAt(event: MouseEvent) {
     >
       <BobbingBuoy :size="13" :clickable="false" ripple-color="rgba(255, 255, 255, 0.8)" />
     </div>
-    <div ref="rodHolder" class="rod-holder" :class="castClass" aria-hidden="true">
-      <img :src="context.rodImage" alt="" class="fishing-rod" />
-      <span ref="rodLineAnchor" class="rod-line-anchor"></span>
+    <div class="rod-reference" aria-hidden="true">
+      <span ref="rodReference" class="rod-reference-point"></span>
     </div>
-    <div class="bite-alert" :class="{ visible: sceneState.castPhase === 'bite' }">{{ tr('FishingScene.ca_can_cau') }}</div>
-    <div class="scene-status" :class="{ active: sceneState.castPhase !== 'idle' }">
+    <div ref="rodHolder" class="rod-holder" :class="castClass" :style="{ '--rod-angle': `${rodAngle}deg` }" aria-hidden="true">
+      <FishingRod ref="rod" :src="context.rodImage" :max-bend="rodBend" :bend-direction="floatSide" :show-line="false" @tip-change="updateRodPosition" />
+    </div>
+    <div class="bite-alert" :class="{ visible: sceneState.castPhase === 'bite' && !isFighting }">{{ tr('FishingScene.ca_can_cau') }}</div>
+    <div class="scene-status w-fit" :class="{ active: sceneState.castPhase !== 'idle' }">
       <span class="status-dot"></span>{{ sceneState.castMessage }}
     </div>
   </section>
@@ -296,33 +294,6 @@ function castAt(event: MouseEvent) {
   height: 3px;
   border-radius: 50%;
   background: #d6dfd8;
-}
-
-.scene-instruction {
-  position: absolute;
-  z-index: 2;
-  top: 47%;
-  left: 50%;
-  padding: 8px 14px;
-  border-radius: 999px;
-  background: rgba(255, 255, 255, 0.83);
-  color: #395746;
-  font-size: 11px;
-  font-weight: 700;
-  transform: translate(-50%, -50%);
-  opacity: 0.78;
-  white-space: nowrap;
-}
-
-.water-glow {
-  position: absolute;
-  width: 58%;
-  height: 30%;
-  left: 22%;
-  top: 50%;
-  border-radius: 50%;
-  background: radial-gradient(ellipse, rgba(225, 242, 187, 0.28), transparent 68%);
-  pointer-events: none;
 }
 
 .invalid-tap {
@@ -385,7 +356,8 @@ function castAt(event: MouseEvent) {
   animation: bite-bob 0.24s linear infinite;
 }
 
-.rod-holder {
+.rod-holder,
+.rod-reference {
   position: absolute;
   z-index: 4;
   right: -8px;
@@ -394,37 +366,24 @@ function castAt(event: MouseEvent) {
   height: min(80vh, 740px);
   pointer-events: none;
   transform-origin: 64% 91%;
-  transition: transform 0.28s ease-out;
 }
 
-.fishing-rod {
-  width: 100%;
-  height: 100%;
-  object-fit: cover;
-  object-position: bottom;
-  mix-blend-mode: multiply;
-  filter: drop-shadow(-5px 7px 5px rgba(0, 0, 0, 0.25));
-}
-
-.rod-line-anchor {
-  position: absolute;
-  top: 2.2%;
-  left: 47%;
-  width: 1px;
-  height: 1px;
-  pointer-events: none;
-}
-
-.rod-holder.phase-idle,
-.rod-holder.phase-waiting,
-.rod-holder.phase-bite,
-.rod-holder.phase-lost,
-.rod-holder.phase-caught {
+.rod-reference {
+  visibility: hidden;
   transform: rotate(-27deg);
 }
 
-.rod-holder.phase-fighting {
-  animation: reel-rod 0.48s ease-in-out infinite;
+.rod-reference-point {
+  position: absolute;
+  left: 49%;
+  top: 2.8%;
+  width: 0;
+  height: 0;
+}
+
+.rod-holder {
+  transform: rotate(var(--rod-angle, -27deg));
+  transition: transform 0.32s ease-out;
 }
 
 .rod-holder.phase-casting {
@@ -453,8 +412,8 @@ function castAt(event: MouseEvent) {
 .scene-status {
   position: absolute;
   z-index: 6;
-  bottom: 19px;
-  right: 21px;
+  bottom: 5px;
+  right: 5px;
   display: flex;
   align-items: center;
   gap: 8px;
@@ -525,17 +484,6 @@ function castAt(event: MouseEvent) {
   }
 }
 
-@keyframes reel-rod {
-  0%,
-  100% {
-    transform: rotate(-27deg);
-  }
-
-  50% {
-    transform: rotate(-17deg);
-  }
-}
-
 @keyframes bite-bob {
   50% {
     transform: translate(-50%, -50%) scale(1.3);
@@ -584,26 +532,12 @@ function castAt(event: MouseEvent) {
     display: none;
   }
 
-  .scene-instruction {
-    font-size: 9px;
-  }
-
-  .scene-status {
-    bottom: 12px;
-    left: 12px;
-  }
-
-  .rod-holder {
-    position: absolute;
-    z-index: 4;
-    right: -8px;
+  .rod-holder,
+  .rod-reference {
     bottom: -10%;
     width: 90px;
     height: auto;
     aspect-ratio: 254 / 1024;
-    pointer-events: none;
-    transform-origin: 64% 91%;
-    transition: transform 0.28s ease-out;
   }
 }
 </style>

@@ -62,6 +62,8 @@ export const useTutorialSessionStore = defineStore("tutorial-session", () => {
     state: { get canCast() { return canCast.value; }, get castPhase() { return castPhase.value; },
       get baitRetrievalSequence() { return baitRetrievalSequence.value; },
       get baitPosition() { return baitPosition.value; }, get castMessage() { return castMessage.value; },
+      get tensionChallenge() { return tensionChallenge.value; }, get tensionFight() { return tensionFight.value; },
+      get tensionStartedAt() { return tensionStartedAt.value; }, get tensionReeling() { return tensionReeling.value; },
       get currentArea() { return currentArea.value; }, castTo, rejectCast },
     sceneImage: config.value?.sceneImage ?? "",
     rodImage: selectedRod.value?.image ?? "/items/rod/fishing-rob.png",

@@ -110,7 +110,7 @@ onBeforeUnmount(() => {
       <div class="h-1.5 min-w-0 flex-1 overflow-hidden rounded-full bg-[#dce6d7]" role="progressbar" :aria-label="tr('TensionChallenge.khoang_cach_ca')" :aria-valuenow="distance" :aria-valuemin="0" :aria-valuemax="challenge.config.startDistance" :aria-valuetext="tr('TensionChallenge.value0_met_keo_ve_0_met_de_thang', { value0: distance.toFixed(1) })">
         <div class="h-full rounded-full bg-sky-600" :style="{ width: Math.min(100, distance / challenge.config.startDistance * 100) + '%' }" />
       </div>
-      <span class="shrink-0 text-sm font-bold tabular-nums">{{ distance.toFixed(1) }} <span class="text-xs font-normal text-[#6a7c6b]">m</span></span>
+      <span class="shrink-0 text-sm font-bold tabular-nums">{{ distance.toFixed(1) }}</span>
     </div>
 
     <div id="tension-control-hint" class="sr-only" aria-live="polite">{{ store.castPhase === 'submitting' ? tr('TensionChallenge.dang_xac_nhan_ket_qua') : store.isStartingTensionChallenge ? tr('TensionChallenge.dang_bat_dau_dau_suc_voi_ca') : ready ? tr('TensionChallenge.giu_nut_hoac_space_de_bat_dau') : tr('TensionChallenge.giu_nut_hoac_space_de_thu_day_tha_de_nha_day') }}</div>

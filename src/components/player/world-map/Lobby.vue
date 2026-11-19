@@ -23,6 +23,7 @@ import FeatureTable from "./FeatureTable.vue";
 import GuideTour from "../../shared/GuideTour.vue";
 import { useOnboardingStore } from "../../../stores/onboarding";
 import { useFeatureAvailabilityStore } from "../../../stores/featureAvailability";
+import FishingSplash from "../fishing/FishingSplash.vue";
 
 const InteractWorldMap2 = defineAsyncComponent(() => import("./InteractWorldMap.vue"));
 const AccountInfoModal = defineAsyncComponent(() => import("../account/AccountInfoModal.vue"));
@@ -187,6 +188,7 @@ onUnmounted(() => {
       <div class="grid grid-cols-1 md:grid-cols-2 gap-2">
         <div class="slide-fade-in from-top-right">
           <LatestCaughtList />
+          <FishingSplash class="h-[480px]" :intensity="1.2" :hook-x="0.5" :hook-y="0.6" />
         </div>
         <div class="slide-fade-in from-right">
           <FeatureTable />

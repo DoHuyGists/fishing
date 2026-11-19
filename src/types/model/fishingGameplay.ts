@@ -11,7 +11,8 @@ export interface FishingCatchScore {
 }
 
 // The scene and controls consume this contract without owning a database session.
-export interface FishingSceneState {
+export interface FishingSceneState extends Pick<TensionController,
+  "tensionChallenge" | "tensionFight" | "tensionStartedAt" | "tensionReeling"> {
   canCast: boolean;
   castPhase: FishingPhase;
   baitRetrievalSequence: number;
