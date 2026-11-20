@@ -11,11 +11,11 @@ const dayPhaseStore = useDayPhaseStore();
 
 <template>
   <section
-    class="slide-fade-in from-top player-content-in flex"
+    class="slide-fade-in from-top player-content-in flex gap-2 rounded-xl border border-border-default bg-surface p-2 text-content shadow-sm"
     :aria-label="tr('DayPhaseClock.thoi_gian_va_thoi_tiet')"
   >
     <div v-if="dayPhaseStore.currentPhase" class="w-20">
-      <img :src="dayPhaseStore.currentPhase.icon" :alt="dayPhaseStore.currentPhase.label" />
+      <img :src="dayPhaseStore.currentPhase.icon" class="rounded-md" :alt="dayPhaseStore.currentPhase.label" />
     </div>
     <div class="min-w-0">
       <div class="flex items-baseline justify-between gap-2">

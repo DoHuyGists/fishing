@@ -57,7 +57,7 @@ onBeforeUnmount(() => clearInterval(timer));
           :aria-valuetext="description"
           :aria-valuemin="0"
           :aria-valuemax="100"
-          class="h-2.5 overflow-hidden rounded-full bg-surface"
+          class="h-2.5 overflow-hidden rounded-full bg-accent/15"
           :class="variant === 'compact' ? 'min-w-0 flex-1' : 'my-2'"
         >
           <div

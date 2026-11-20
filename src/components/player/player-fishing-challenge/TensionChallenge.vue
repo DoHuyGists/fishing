@@ -163,7 +163,7 @@ onBeforeUnmount(() => {
         <svg
           aria-hidden="true"
           viewBox="0 0 24 24"
-          class="size-5 shrink-0 text-primary"
+          class="size-5 shrink-0 text-sky"
           fill="none"
           stroke="currentColor"
           stroke-width="1.6"
@@ -174,7 +174,7 @@ onBeforeUnmount(() => {
           <circle cx="7" cy="11" r=".7" fill="currentColor" stroke="none" />
         </svg>
         <div
-          class="h-1.5 min-w-0 flex-1 overflow-hidden rounded-full bg-surface"
+          class="h-1.5 min-w-0 flex-1 overflow-hidden rounded-full bg-border"
           role="progressbar"
           :aria-label="tr('TensionChallenge.khoang_cach_ca')"
           :aria-valuenow="distance"
@@ -183,7 +183,7 @@ onBeforeUnmount(() => {
           :aria-valuetext="tr('TensionChallenge.value0_met_keo_ve_0_met_de_thang', { value0: distance.toFixed(1) })"
         >
           <div
-            class="h-full rounded-full bg-primary"
+            class="h-full rounded-full bg-sky"
             :style="{ width: Math.min(100, (distance / challenge.config.startDistance) * 100) + '%' }"
           />
         </div>

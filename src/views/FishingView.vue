@@ -207,10 +207,10 @@ onBeforeUnmount(() => {
           :area-id="userInAreaStore.userInArea?.area_id ?? null"
           presence
         />
-        <div class="backdrop-blur-2xl h-fit w-fit rounded-xl border border-[var(--color-ocean-gold)]/35 bg-[var(--color-ocean-deep)]/85 px-3 py-2">
+        <div class="h-fit w-fit">
           <button
             type="button"
-            class="text-sm text-[var(--color-ocean-gold)] bg-transparent border-0 cursor-pointer font-medium p-0 hover:underline disabled:opacity-50"
+            class="rounded-xl border border-danger bg-danger px-3 py-2 text-sm font-semibold text-white shadow-sm transition-colors hover:bg-content hover:border-content focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-danger disabled:cursor-not-allowed disabled:opacity-50 cursor-pointer"
             :disabled="fishingStore.isLeavingArea"
             @click="showExitConfirmation = true"
           >
@@ -444,7 +444,6 @@ onBeforeUnmount(() => {
   padding: 6px 13px;
   border: 1px solid color-mix(in srgb, var(--color-sky) 30%, transparent);
   border-radius: 16px;
-  background: linear-gradient(135deg, color-mix(in srgb, var(--color-content) 95%, transparent), color-mix(in srgb, var(--color-primary) 82%, transparent));
 }
 
 .equipment-toggle {

@@ -61,7 +61,7 @@ const vibration = computed(() => {
 
 <template>
   <div
-    class="w-full min-w-0 select-none rounded-md bg-content text-white"
+    class="w-full min-w-0 select-none rounded-md bg-primary text-content"
     :class="compact ? 'px-2 py-1.5' : 'px-4 py-3'"
     role="meter"
     :aria-label="tr('LineTensionMeter.luc_cang_day_cau')"
@@ -71,12 +71,12 @@ const vibration = computed(() => {
     :aria-valuetext="zoneInfo.label"
   >
     <div class="flex items-center justify-between gap-3" :class="compact ? 'mb-1 leading-none' : 'mb-1'">
-      <span class="inline-flex items-center gap-1.5 rounded-full bg-white/5 px-2 text-[11px] font-semibold" :class="[zoneInfo.text, compact ? 'py-0' : 'py-1']">
+      <span class="inline-flex items-center gap-1.5 rounded-full bg-white px-2 text-[11px] font-semibold" :class="[zoneInfo.text, compact ? 'py-0' : 'py-1']">
         <span aria-hidden="true" class="size-1.5 rounded-full" :class="zoneInfo.knob" />
         {{ zoneInfo.label }}
       </span>
       <span class="font-bold leading-none tabular-nums" :class="[zoneInfo.text, compact ? 'text-sm' : 'text-xl']" aria-hidden="true">
-        {{ Math.round(position) }}<span class="ml-0.5 text-xs font-normal text-white/50">%</span>
+        {{ Math.round(position) }}<span class="ml-0.5 text-xs font-normal text-content">%</span>
       </span>
     </div>
 
@@ -96,30 +96,30 @@ const vibration = computed(() => {
     <!-- Thanh chỉ số -->
     <div class="relative" :class="compact ? 'h-5' : 'h-6'">
       <div class="absolute inset-0 flex overflow-hidden rounded-lg">
-        <div class="bg-primary/70" :style="{ width: safeStart + '%' }" />
-        <div class="bg-accent/80" :style="{ width: safeEnd - safeStart + '%' }" />
+        <div class="bg-sky/25" :style="{ width: safeStart + '%' }" />
+        <div class="bg-accent" :style="{ width: safeEnd - safeStart + '%' }" />
         <div
-          class="flex-1 bg-gradient-to-r from-gold/80 to-danger/90"
+          class="flex-1 bg-gradient-to-r from-gold to-danger"
         />
       </div>
 
       <!-- Vạch ranh giới vùng an toàn -->
-      <div class="absolute inset-y-0 w-px bg-white/50" :style="{ left: safeStart + '%' }" />
-      <div class="absolute inset-y-0 w-px bg-white/50" :style="{ left: safeEnd + '%' }" />
+      <div class="absolute inset-y-0 w-px bg-white" :style="{ left: safeStart + '%' }" />
+      <div class="absolute inset-y-0 w-px bg-white" :style="{ left: safeEnd + '%' }" />
 
       <!-- Con trỏ -->
       <div
-        class="absolute -translate-x-1/2 rounded-full shadow-[0_0_0_2px_var(--color-content)] transition-[left] duration-75 ease-linear"
-        :class="[zoneInfo.knob, zone === 'danger' ? 'knob-shake' : '', compact ? '-inset-y-1 w-1' : '-inset-y-1.5 w-1.5']"
+        class="absolute -translate-x-1/2 rounded-full bg-white shadow-[0_0_0_2px_var(--color-content)] transition-[left] duration-75 ease-linear"
+        :class="[zone === 'danger' ? 'knob-shake' : '', compact ? '-inset-y-1 w-1' : '-inset-y-1.5 w-1.5']"
         :style="{ left: position + '%' }"
       />
     </div>
 
-    <div v-if="!compact" class="relative mt-2 h-4 text-white/40" aria-hidden="true">
+    <div v-if="!compact" class="relative mt-2 h-4 text-content" aria-hidden="true">
       <span class="absolute left-0" :title="tr('LineTensionMeter.day_chung')">
         <svg viewBox="0 0 24 16" class="h-4 w-5" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"><path d="M2 3c1 12 19 12 20 0" /></svg>
       </span>
-      <span class="absolute -translate-x-1/2 text-accent/80" :style="{ left: (safeStart + safeEnd) / 2 + '%' }" :title="tr('LineTensionMeter.giu_vach_trong_vung_xanh')">
+      <span class="absolute -translate-x-1/2 text-accent" :style="{ left: (safeStart + safeEnd) / 2 + '%' }" :title="tr('LineTensionMeter.giu_vach_trong_vung_xanh')">
         <svg viewBox="0 0 20 20" class="size-4" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="10" cy="10" r="7" /><path d="m6.5 10 2.3 2.3 4.7-4.6" /></svg>
       </span>
       <span class="absolute right-0" :title="tr('LineTensionMeter.nguy_co_dut_day')">
