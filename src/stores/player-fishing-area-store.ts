@@ -55,11 +55,16 @@ export const useFishingAreaStore = defineStore("fishing_areas", {
     },
 
     areasByCountry(state): FishingAreaCountryGroup[] {
-      const countries = new Map(useCountryStore().countries.map((country) => [country.id, country.name]));
+      const countryStore = useCountryStore();
+      const playerId = useAuthStore().user?.id;
+      if (!playerId || countryStore.unlockedPlayerId !== playerId || countryStore.unlockedError) return [];
+
+      const countries = new Map(countryStore.unlockedCountries.map((country) => [country.id, country.name]));
       const groups = new Map<string, FishingAreaCountryGroup>();
 
       for (const area of state.fishingAreas) {
-        const countryId = countries.has(area.countryId) ? area.countryId : "";
+        if (!countries.has(area.countryId)) continue;
+        const countryId = area.countryId;
         let group = groups.get(countryId);
         if (!group) {
           group = {

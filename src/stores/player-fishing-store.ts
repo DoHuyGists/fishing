@@ -19,7 +19,14 @@ import { supabaseUserInAreaRepository } from "../data/supabaseUserInAreaReposito
 import { supabaseFishingAreaRepository } from "../data/supabaseFishingAreaRepository";
 import { buildDepthConfig, DEPTH_STEP_METERS } from "../data/fishingDepth";
 import { createTensionFight, isTensionChallenge, stepTensionFight, tensionMaxTicks } from "../data/tensionChallenge";
-import type { FishingTool, CastPhase, CaughtFish, FishingPlayer, CastRodResponse, SubmitChallengeResponse } from "../types/model/fishing";
+import type {
+  FishingTool,
+  CastPhase,
+  CaughtFish,
+  FishingPlayer,
+  CastRodResponse,
+  SubmitChallengeResponse,
+} from "../types/model/fishing";
 
 const RPC_TIMEOUT_MS = 15_000;
 
@@ -352,7 +359,10 @@ export const useFishingStore = defineStore("fishing", {
       const authStore = useAuthStore();
       const generation = authStore.sessionGeneration;
       const requestId = ++this.playersRequestId;
-      const current = () => requestId === this.playersRequestId && targetAreaId === this.currentAreaId && authStore.sessionGeneration === generation;
+      const current = () =>
+        requestId === this.playersRequestId &&
+        targetAreaId === this.currentAreaId &&
+        authStore.sessionGeneration === generation;
       this.isLoadingPlayers = true;
       try {
         const rows = await supabaseUserInAreaRepository.fetchUsersInArea(targetAreaId);
@@ -391,7 +401,7 @@ export const useFishingStore = defineStore("fishing", {
           "#ffd166",
           "#a66bff",
           "#1abc9c",
-          "#1e5fbf",
+          "#e7ecda",
           "#f75353",
           "#ffd166",
           "#1abc9c",

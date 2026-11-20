@@ -38,6 +38,44 @@ test('snapshot stores preserve the selected page and login under reordered respo
     const { supabaseUserInventoryRepository: inventoryRepo } = await server.ssrLoadModule('/src/data/supabaseUserInventoryRepository.ts');
     const { setFeatureRequestGuard } = await server.ssrLoadModule('/src/database/featureRequestGate.ts');
 
+    await t.test('fishing anchor only groups countries unlocked by the current player', async () => {
+      const { useCountryStore } = await server.ssrLoadModule('/src/stores/player-country-store.ts');
+      const { useFishingAreaStore } = await server.ssrLoadModule('/src/stores/player-fishing-area-store.ts');
+      setActivePinia(createPinia());
+      const auth = useAuthStore();
+      auth.applySession(session('a'));
+      const countries = useCountryStore();
+      const areas = useFishingAreaStore();
+      countries.countries = [{ id: 'open', name: 'Open country' }, { id: 'locked', name: 'Locked country' }];
+      areas.fishingAreas = [
+        { id: 'open-area', countryId: 'open', title: 'Open lake' },
+        { id: 'locked-area', countryId: 'locked', title: 'Locked lake' },
+        { id: 'unknown-area', countryId: 'unknown', title: 'Unknown lake' },
+      ];
+      assert.deepEqual(areas.filteredAreasByCountry, []);
+      countries.unlockedPlayerId = 'a';
+      countries.unlockedCountries = [countries.countries[0]];
+      assert.deepEqual(areas.areasByCountry.map(group => group.id), ['open']);
+      assert.deepEqual(areas.filteredAreasByCountry[0].areas.map(area => area.id), ['open-area']);
+      areas.searchQuery = 'Locked';
+      assert.deepEqual(areas.filteredAreasByCountry, []);
+      areas.searchQuery = 'Open lake';
+      assert.equal(areas.filteredAreasByCountry[0].id, 'open');
+      countries.unlockedCountries.push(countries.countries[1]);
+      areas.searchQuery = 'Locked';
+      assert.equal(areas.filteredAreasByCountry[0].id, 'locked');
+      countries.unlockedError = 'Failed to load unlocks';
+      assert.deepEqual(areas.filteredAreasByCountry, []);
+      countries.unlockedError = '';
+      countries.unlockedCountries = [];
+      assert.deepEqual(areas.areasByCountry, []);
+      countries.unlockedCountries = [countries.countries[0]];
+      auth.applySession(session('b'));
+      assert.deepEqual(areas.areasByCountry, []);
+      auth.applySession(null);
+      assert.deepEqual(areas.areasByCountry, []);
+    });
+
     await t.test('market queries filter and sort before applying a bounded server page', async () => {
       const originalFetch = globalThis.fetch;
       let requested;

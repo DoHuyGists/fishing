@@ -93,7 +93,7 @@ export const useCountryStore = defineStore("Country", {
         if (current()) this.isLoadingUnlocked = false;
       }
     },
-    watchUnlockedCountries(playerId: string | null): () => void {
+    watchUnlockedCountries(playerId: string | null, intervalMs = 60_000): () => void {
       if (!playerId) {
         void this.fetchMyUnlockedCountries(null);
         return () => {};
@@ -101,7 +101,7 @@ export const useCountryStore = defineStore("Country", {
       return startVisibleRefresh(async () => {
         await this.fetchMyUnlockedCountries(playerId);
         if (this.unlockedError) throw new Error(this.unlockedError);
-      }, 60_000);
+      }, intervalMs);
     },
   },
 });

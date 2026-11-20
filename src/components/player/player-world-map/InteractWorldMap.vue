@@ -52,7 +52,7 @@ watch(
   () =>
     [props.fogEnabled && isMapVisible.value && features.isAvailable("world-map"), authStore.user?.id ?? null] as const,
   ([enabled, playerId], _, onCleanup) => {
-    if (enabled) onCleanup(countryStore.watchUnlockedCountries(playerId));
+    if (enabled) onCleanup(countryStore.watchUnlockedCountries(playerId, 300_000));
   },
   { immediate: true },
 );
@@ -243,9 +243,6 @@ function zoomTo(k: number) {
         <button type="button" class="ml-1 underline cursor-pointer" @click="countryStore.fetchMyUnlockedCountries()">
           {{ tr("Maintenance.thu_lai") }}
         </button>
-      </div>
-      <div v-else-if="fogEnabled && countryStore.isLoadingUnlocked" class="text-xs text-content" role="status">
-        {{ tr("InteractWorldMap.dang_tai_quoc_gia_da_mo_khoa") }}
       </div>
       <div class="slide-fade-in from-bottom-right flex gap-2">
         <button @click="zoomTo(3)" class="border border-content rounded-md px-3">3x</button>

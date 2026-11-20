@@ -4,7 +4,7 @@ export const THEME_COLORS = {
   surface: '#f5f9f0',
   border: '#cbd9c6',
   content: '#24352a',
-  primary: '#1e5fbf',
+  primary: '#e7ecda',
   sky: '#4fc3ff',
   gold: '#ffd166',
   accent: '#1abc9c',

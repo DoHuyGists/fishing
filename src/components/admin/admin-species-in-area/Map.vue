@@ -1,13 +1,49 @@
 <script setup lang="ts">
-import { useLakeEditor } from '../../../composables/useLakeEditor';
+import { useLakeEditor } from "../../../composables/useLakeEditor";
 
 const {
-  MAX_ZONES, R_MIN, R_MAX, W_MIN, W_MAX, H_MIN, H_MAX,
-  NODE_MIN, NODE_MAX, presets, shapeKey, size, locked, isNatural,
-  naturalPts, selectedNode, canRemoveNode, removeBtnPos, lake, lakePoints, handleRight,
-  handleBottom, zones, applyPreset, randomizeLake, resize, addNodeAuto, removeNode,
-  onDblClick, cells, selectedId, selected, addZone, removeZone, svgRef,
-  shapeMode, drag, startDrag, onMove, endDrag, radiusHandle, percentOf,
+  MAX_ZONES,
+  R_MIN,
+  R_MAX,
+  W_MIN,
+  W_MAX,
+  H_MIN,
+  H_MAX,
+  NODE_MIN,
+  NODE_MAX,
+  presets,
+  shapeKey,
+  size,
+  locked,
+  isNatural,
+  naturalPts,
+  selectedNode,
+  canRemoveNode,
+  removeBtnPos,
+  lake,
+  lakePoints,
+  handleRight,
+  handleBottom,
+  zones,
+  applyPreset,
+  randomizeLake,
+  resize,
+  addNodeAuto,
+  removeNode,
+  onDblClick,
+  cells,
+  selectedId,
+  selected,
+  addZone,
+  removeZone,
+  svgRef,
+  shapeMode,
+  drag,
+  startDrag,
+  onMove,
+  endDrag,
+  radiusHandle,
+  percentOf,
 } = useLakeEditor();
 </script>
 
@@ -32,13 +68,7 @@ const {
             </clipPath>
           </defs>
 
-          <polygon
-            :points="lakePoints"
-            fill="#1e5fbf"
-            stroke="#f5f9f0"
-            stroke-width="14"
-            stroke-linejoin="round"
-          />
+          <polygon :points="lakePoints" fill="#e7ecda" stroke="#f5f9f0" stroke-width="14" stroke-linejoin="round" />
 
           <g clip-path="url(#lake-clip-nodes)">
             <path
@@ -81,7 +111,7 @@ const {
                   stroke-width="3"
                   paint-order="stroke"
                 >
-                  {{ c.zone.note ? c.zone.note + ' · ' : '' }}{{ c.percent }}%
+                  {{ c.zone.note ? c.zone.note + " · " : "" }}{{ c.percent }}%
                 </text>
               </template>
             </g>
@@ -150,7 +180,7 @@ const {
                 :cx="n.x"
                 :cy="n.y"
                 :r="selectedNode === i ? 8 : 6"
-                :fill="selectedNode === i ? '#1e5fbf' : '#24352a'"
+                :fill="selectedNode === i ? '#e7ecda' : '#24352a'"
                 stroke="#ffffff"
                 stroke-width="2"
                 class="cursor-move"
@@ -188,7 +218,7 @@ const {
                   fill="#ffffff"
                   class="pointer-events-none"
                 >
-                  {{ canRemoveNode ? 'Xóa node' : 'Tối thiểu ' + NODE_MIN }}
+                  {{ canRemoveNode ? "Xóa node" : "Tối thiểu " + NODE_MIN }}
                 </text>
               </g>
             </template>
@@ -229,7 +259,8 @@ const {
       </div>
 
       <div class="mt-2 text-xs text-content">
-        Chấm tròn trắng: dời vùng. Ô vuông (khi chọn một vùng): kéo giãn diện tích. Chấm hoặc thanh đen trên bờ hồ: chỉnh hình dạng hồ.
+        Chấm tròn trắng: dời vùng. Ô vuông (khi chọn một vùng): kéo giãn diện tích. Chấm hoặc thanh đen trên bờ hồ:
+        chỉnh hình dạng hồ.
       </div>
     </div>
 
@@ -244,13 +275,19 @@ const {
             :key="p.key"
             class="flex flex-col items-center gap-0.5 rounded-lg border px-1 py-1.5 text-[11px] focus:outline-none focus-visible:ring-2 focus-visible:ring-sky"
             :class="
-              shapeKey === p.key
-                ? 'border-sky bg-surface text-primary'
-                : 'border-border text-content hover:bg-white'
+              shapeKey === p.key ? 'border-sky bg-surface text-primary' : 'border-border text-content hover:bg-white'
             "
             @click="applyPreset(p.key)"
           >
-            <svg viewBox="0 0 24 24" class="h-6 w-6" fill="currentColor" fill-opacity=".18" stroke="currentColor" stroke-width="1.5" stroke-linejoin="round">
+            <svg
+              viewBox="0 0 24 24"
+              class="h-6 w-6"
+              fill="currentColor"
+              fill-opacity=".18"
+              stroke="currentColor"
+              stroke-width="1.5"
+              stroke-linejoin="round"
+            >
               <path :d="p.icon" />
             </svg>
             {{ p.label }}
@@ -261,7 +298,15 @@ const {
             class="flex flex-col items-center gap-0.5 rounded-lg border border-dashed border-content px-1 py-1.5 text-[11px] text-content hover:bg-white focus:outline-none focus-visible:ring-2 focus-visible:ring-sky"
             @click="randomizeLake"
           >
-            <svg viewBox="0 0 24 24" class="h-6 w-6" fill="currentColor" fill-opacity=".18" stroke="currentColor" stroke-width="1.5" stroke-linejoin="round">
+            <svg
+              viewBox="0 0 24 24"
+              class="h-6 w-6"
+              fill="currentColor"
+              fill-opacity=".18"
+              stroke="currentColor"
+              stroke-width="1.5"
+              stroke-linejoin="round"
+            >
               <rect x="3.5" y="3.5" width="17" height="17" rx="3.5" />
               <circle cx="8.5" cy="8.5" r="1.2" fill="currentColor" stroke="none" />
               <circle cx="15.5" cy="8.5" r="1.2" fill="currentColor" stroke="none" />
@@ -286,15 +331,15 @@ const {
             </button>
           </div>
           <div class="text-xs text-content">
-            Kéo chấm đen để uốn bờ hồ. Bấm vào một node để hiện nút "Xóa node" (tối thiểu {{ NODE_MIN }} node).
-            Bấm đúp lên bờ để thêm node. Bấm lại "Tự nhiên" để đặt lại hình ban đầu.
+            Kéo chấm đen để uốn bờ hồ. Bấm vào một node để hiện nút "Xóa node" (tối thiểu {{ NODE_MIN }} node). Bấm đúp
+            lên bờ để thêm node. Bấm lại "Tự nhiên" để đặt lại hình ban đầu.
           </div>
         </div>
 
         <!-- Các hình khác: chỉnh bằng thanh trượt -->
         <div v-else class="mt-3 space-y-2">
           <label class="block text-xs text-content">
-            {{ locked ? 'Kích thước' : 'Chiều rộng' }}: {{ Math.round(size.w) }}
+            {{ locked ? "Kích thước" : "Chiều rộng" }}: {{ Math.round(size.w) }}
             <input
               type="range"
               :min="W_MIN"
@@ -362,9 +407,7 @@ const {
               @focus="selectedId = z.id"
               @click.stop
             />
-            <span class="w-9 shrink-0 text-right text-xs tabular-nums text-content">
-              {{ percentOf(z.id) }}%
-            </span>
+            <span class="w-9 shrink-0 text-right text-xs tabular-nums text-content"> {{ percentOf(z.id) }}% </span>
             <button
               class="shrink-0 rounded px-1.5 py-0.5 text-xs text-danger hover:bg-surface focus:outline-none focus-visible:ring-2 focus-visible:ring-danger"
               aria-label="Xoá vùng"
@@ -378,7 +421,7 @@ const {
       </section>
 
       <section v-if="selected" class="space-y-3 rounded-xl border border-border bg-white p-3">
-        <div class="text-sm font-semibold text-content">{{ selected.name || 'Vùng đang chọn' }}</div>
+        <div class="text-sm font-semibold text-content">{{ selected.name || "Vùng đang chọn" }}</div>
         <label class="block text-xs text-content">
           Ghi chú
           <input

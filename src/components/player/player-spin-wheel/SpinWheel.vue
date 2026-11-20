@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import type { SpinWheelReward as Reward, SpinWheelProps as Props } from "../../../types/model/spinWheel";
 import { t as tr } from "../../../i18n";
-import { normalizeThemeColor } from '../../../utils/themePalette';
+import { normalizeThemeColor } from "../../../utils/themePalette";
 
 /**
  * SpinningWheel.vue
@@ -19,8 +19,8 @@ import { normalizeThemeColor } from '../../../utils/themePalette';
  * />
  * -----------------------------------------------------------------------
  */
-import { ref, computed, onBeforeUnmount } from 'vue'
-import PaymentConfirmation from '../../shared/PaymentConfirmation.vue'
+import { ref, computed, onBeforeUnmount } from "vue";
+import PaymentConfirmation from "../../shared/PaymentConfirmation.vue";
 
 const props = withDefaults(defineProps<Props>(), {
   spinConfirmation: undefined,
@@ -30,154 +30,150 @@ const props = withDefaults(defineProps<Props>(), {
   size: 320,
   extraSpins: 6,
   disabled: false,
-})
+});
 
 const emit = defineEmits<{
-  (e: 'spin-start'): void
-  (e: 'spin-end', reward: Reward): void
-  (e: 'error', message: string): void
-}>()
+  (e: "spin-start"): void;
+  (e: "spin-end", reward: Reward): void;
+  (e: "error", message: string): void;
+}>();
 
-const DEFAULT_COLORS = [
-  '#f75353', '#1abc9c', '#ffd166', '#1e5fbf', '#4fc3ff', '#a66bff',
-]
+const DEFAULT_COLORS = ["#f75353", "#1abc9c", "#ffd166", "#e7ecda", "#4fc3ff", "#a66bff"];
 
-const spinning = ref(false)
-const rotation = ref(0)
-const showResult = ref(false)
-const resultReward = ref<Reward | null>(null)
-const errorMsg = ref('')
-const pendingReward = ref<Reward | null>(null)
-const showSpinConfirmation = ref(false)
+const spinning = ref(false);
+const rotation = ref(0);
+const showResult = ref(false);
+const resultReward = ref<Reward | null>(null);
+const errorMsg = ref("");
+const pendingReward = ref<Reward | null>(null);
+const showSpinConfirmation = ref(false);
 
-const segmentAngle = computed(() => 360 / Math.max(props.rewards.length, 1))
+const segmentAngle = computed(() => 360 / Math.max(props.rewards.length, 1));
 
 const gradientBackground = computed(() => {
-  const n = props.rewards.length
-  if (n === 0) return '#f5f9f0'
+  const n = props.rewards.length;
+  if (n === 0) return "#f5f9f0";
   const stops = props.rewards.map((reward, i) => {
-    const color = normalizeThemeColor(reward.color ?? DEFAULT_COLORS[i % DEFAULT_COLORS.length]!)
-    const start = i * segmentAngle.value
-    const end = (i + 1) * segmentAngle.value
-    return `${color} ${start}deg ${end}deg`
-  })
-  return `conic-gradient(${stops.join(', ')})`
-})
+    const color = normalizeThemeColor(reward.color ?? DEFAULT_COLORS[i % DEFAULT_COLORS.length]!);
+    const start = i * segmentAngle.value;
+    const end = (i + 1) * segmentAngle.value;
+    return `${color} ${start}deg ${end}deg`;
+  });
+  return `conic-gradient(${stops.join(", ")})`;
+});
 
 const wheelStyle = computed(() => ({
   background: gradientBackground.value,
   transform: `rotate(${rotation.value}deg)`,
-  transition: spinning.value
-    ? `transform ${props.spinDuration}ms cubic-bezier(0.17, 0.67, 0.2, 1.01)`
-    : 'none',
-}))
+  transition: spinning.value ? `transform ${props.spinDuration}ms cubic-bezier(0.17, 0.67, 0.2, 1.01)` : "none",
+}));
 
 function segmentContentStyle(i: number) {
-  const centerAngle = i * segmentAngle.value + segmentAngle.value / 2
-  return { transform: `rotate(${centerAngle}deg)` }
+  const centerAngle = i * segmentAngle.value + segmentAngle.value / 2;
+  return { transform: `rotate(${centerAngle}deg)` };
 }
 
 function normalizeDeg(deg: number) {
-  return ((deg % 360) + 360) % 360
+  return ((deg % 360) + 360) % 360;
 }
 
 function rotateToIndex(index: number) {
-  const centerAngle = index * segmentAngle.value + segmentAngle.value / 2
+  const centerAngle = index * segmentAngle.value + segmentAngle.value / 2;
   // Con trỏ cố định ở vị trí 12h (0deg). Cần quay bánh xe sao cho tâm của
   // lát cắt "index" trùng với vị trí con trỏ.
-  const targetMod = normalizeDeg(360 - centerAngle)
-  const currentMod = normalizeDeg(rotation.value)
-  let delta = targetMod - currentMod
-  if (delta <= 0) delta += 360
-  rotation.value += props.extraSpins * 360 + delta
+  const targetMod = normalizeDeg(360 - centerAngle);
+  const currentMod = normalizeDeg(rotation.value);
+  let delta = targetMod - currentMod;
+  if (delta <= 0) delta += 360;
+  rotation.value += props.extraSpins * 360 + delta;
 }
 
 async function getRandomIndex(): Promise<number> {
   if (props.fetchRewardIndex) {
-    return props.fetchRewardIndex()
+    return props.fetchRewardIndex();
   }
   if (props.apiUrl) {
-    const res = await fetch(props.apiUrl, { method: 'POST' })
-    if (!res.ok) throw new Error(tr('SpinWheel.request_that_bai_status_value0', { value0: res.status }))
-    const data = await res.json()
-    if (typeof data?.index !== 'number') {
-      throw new Error(tr('SpinWheel.response_khong_hop_le_thieu_truong_index'))
+    const res = await fetch(props.apiUrl, { method: "POST" });
+    if (!res.ok) throw new Error(tr("SpinWheel.request_that_bai_status_value0", { value0: res.status }));
+    const data = await res.json();
+    if (typeof data?.index !== "number") {
+      throw new Error(tr("SpinWheel.response_khong_hop_le_thieu_truong_index"));
     }
-    return data.index
+    return data.index;
   }
   // Không có apiUrl lẫn fetchRewardIndex: dùng giả lập tạm thời để demo.
   // Trong thực tế hãy truyền apiUrl hoặc fetchRewardIndex.
   return new Promise((resolve) => {
     window.setTimeout(() => {
-      resolve(Math.floor(Math.random() * props.rewards.length))
-    }, 500)
-  })
+      resolve(Math.floor(Math.random() * props.rewards.length));
+    }, 500);
+  });
 }
 
 async function spin() {
-  if (spinning.value || props.disabled || props.rewards.length === 0) return
-  errorMsg.value = ''
-  spinning.value = true
-  emit('spin-start')
+  if (spinning.value || props.disabled || props.rewards.length === 0) return;
+  errorMsg.value = "";
+  spinning.value = true;
+  emit("spin-start");
 
   try {
-    const rawIndex = await getRandomIndex()
-    const n = props.rewards.length
-    const safeIndex = ((Math.trunc(rawIndex) % n) + n) % n
-    pendingReward.value = props.rewards[safeIndex]
-    rotateToIndex(safeIndex)
+    const rawIndex = await getRandomIndex();
+    const n = props.rewards.length;
+    const safeIndex = ((Math.trunc(rawIndex) % n) + n) % n;
+    pendingReward.value = props.rewards[safeIndex];
+    rotateToIndex(safeIndex);
   } catch (err) {
-    spinning.value = false
-    errorMsg.value = err instanceof Error ? err.message : tr('SpinWheel.da_co_loi_xay_ra_vui_long_thu_lai')
-    emit('error', errorMsg.value)
+    spinning.value = false;
+    errorMsg.value = err instanceof Error ? err.message : tr("SpinWheel.da_co_loi_xay_ra_vui_long_thu_lai");
+    emit("error", errorMsg.value);
   }
 }
 
 function requestSpin() {
-  if (spinning.value || props.disabled || props.rewards.length === 0) return
+  if (spinning.value || props.disabled || props.rewards.length === 0) return;
   if (props.spinConfirmation) {
-    showSpinConfirmation.value = true
-    return
+    showSpinConfirmation.value = true;
+    return;
   }
-  void spin()
+  void spin();
 }
 
 function cancelSpin() {
-  showSpinConfirmation.value = false
+  showSpinConfirmation.value = false;
 }
 
 function confirmSpin() {
-  showSpinConfirmation.value = false
-  void spin()
+  showSpinConfirmation.value = false;
+  void spin();
 }
 
 function onTransitionEnd(e: TransitionEvent) {
-  if (e.propertyName !== 'transform' || !spinning.value) return
-  spinning.value = false
-  resultReward.value = pendingReward.value
-  pendingReward.value = null
+  if (e.propertyName !== "transform" || !spinning.value) return;
+  spinning.value = false;
+  resultReward.value = pendingReward.value;
+  pendingReward.value = null;
   if (resultReward.value) {
-    showResult.value = true
-    emit('spin-end', resultReward.value)
+    showResult.value = true;
+    emit("spin-end", resultReward.value);
   }
 }
 
 function closeResult() {
-  showResult.value = false
+  showResult.value = false;
 }
 
 // Fallback an toàn: nếu vì lý do gì đó transitionend không bắn (ví dụ tab
 // bị ẩn), vẫn đảm bảo mở khóa nút quay sau spinDuration + buffer.
-let fallbackTimer: number | undefined
+let fallbackTimer: number | undefined;
 function armFallback() {
-  if (fallbackTimer) window.clearTimeout(fallbackTimer)
+  if (fallbackTimer) window.clearTimeout(fallbackTimer);
   fallbackTimer = window.setTimeout(() => {
-    if (spinning.value) onTransitionEnd(new TransitionEvent('transitionend', { propertyName: 'transform' }))
-  }, props.spinDuration + 400)
+    if (spinning.value) onTransitionEnd(new TransitionEvent("transitionend", { propertyName: "transform" }));
+  }, props.spinDuration + 400);
 }
 onBeforeUnmount(() => {
-  if (fallbackTimer) window.clearTimeout(fallbackTimer)
-})
+  if (fallbackTimer) window.clearTimeout(fallbackTimer);
+});
 </script>
 
 <template>
@@ -198,12 +194,7 @@ onBeforeUnmount(() => {
         @transitionend="onTransitionEnd"
         @transitionrun="armFallback"
       >
-        <div
-          v-for="(reward, i) in rewards"
-          :key="reward.id"
-          class="absolute inset-0"
-          :style="segmentContentStyle(i)"
-        >
+        <div v-for="(reward, i) in rewards" :key="reward.id" class="absolute inset-0" :style="segmentContentStyle(i)">
           <div class="flex flex-col items-center gap-1 pt-5">
             <img
               v-if="reward.image"
@@ -225,7 +216,7 @@ onBeforeUnmount(() => {
         :disabled="spinning || disabled || rewards.length === 0"
         @click="requestSpin"
       >
-        {{ spinning ? '...' : 'QUAY' }}
+        {{ spinning ? "..." : "QUAY" }}
       </button>
     </div>
 
@@ -260,14 +251,14 @@ onBeforeUnmount(() => {
               :alt="resultReward.label"
               class="mx-auto mb-4 h-24 w-24 object-contain"
             />
-            <div class="mb-1 text-sm text-content">{{ tr('SpinWheel.chuc_mung_ban_da_nhan_duoc') }}</div>
+            <div class="mb-1 text-sm text-content">{{ tr("SpinWheel.chuc_mung_ban_da_nhan_duoc") }}</div>
             <div class="mb-6 text-2xl font-bold text-content">{{ resultReward?.label }}</div>
             <button
               type="button"
               class="rounded-full bg-content px-6 py-2 text-sm font-semibold text-white transition-colors hover:bg-content"
               @click="closeResult"
             >
-              {{ tr('DailyAttendance.nhan_thuong') }}
+              {{ tr("DailyAttendance.nhan_thuong") }}
             </button>
           </div>
         </div>
