@@ -5,6 +5,7 @@ import { t as tr } from "../../../i18n";
 import { computed, onMounted, ref, watch, onUnmounted } from "vue";
 import Pagination from "../../shared/Pagination.vue";
 import Modal from "../../shared/Modal.vue";
+import Tab, { type TabItem } from "../../shared/Tab.vue";
 import { useCountryStore } from "../../../stores/player-country-store.ts";
 import { useAuthStore } from "../../../stores/auth.ts";
 import { useFriendStore } from "../../../stores/player-friend-store.ts";
@@ -19,6 +20,19 @@ const authStore = useAuthStore();
 const friendStore = useFriendStore();
 const countryStore = useCountryStore();
 const toast = useToast();
+
+const tabs = computed<(TabItem & { key: ActiveTab })[]>(() => [
+  { key: "friends", label: tr("FriendModal.ban_be"), badge: friendStore.counts.friends },
+  { key: "received", label: tr("FriendModal.loi_moi_da_nhan"), badge: friendStore.counts.received },
+  { key: "sent", label: tr("FriendModal.loi_moi_da_gui"), badge: friendStore.counts.sent },
+  { key: "discover", label: tr("FriendModal.them_ban_be"), badge: friendStore.counts.discover },
+]);
+const tabComponents = {
+  friends: FriendAcceptedList,
+  received: FriendReceivedRequests,
+  sent: FriendSentRequests,
+  discover: FriendDiscovery,
+};
 
 const activeTab = computed<ActiveTab>({
   get: () => friendStore.activeTab,
@@ -210,169 +224,105 @@ async function executeDelete() {
       </div>
 
       <!-- Thanh điều hướng Tab -->
-      <div
-        class="flex items-center gap-2 border-b border-accent/10 pb-2 overflow-x-auto snap-x snap-mandatory scrollbar-thin -mx-2 px-2 sm:mx-0 sm:px-0"
+      <Tab
+        v-model="activeTab"
+        :tabs="tabs"
+        :aria-label="tr('FriendModal.quan_ly_ban_be')"
+        lazy
       >
-        <button
-          type="button"
-          class="flex shrink-0 snap-start items-center gap-2 px-3 sm:px-4 py-2 rounded-xl text-xs font-bold transition-all cursor-pointer border"
-          :class="
-            activeTab === 'friends'
-              ? 'bg-content-strong text-white border-accent shadow-sm'
-              : 'bg-white/80 text-content/80 border-accent/10 hover:bg-surface'
-          "
-          @click="activeTab = 'friends'"
-        >
-          <span>{{ tr("FriendModal.ban_be") }}</span>
+        <template #label="{ tab, active }">
+          <span>{{ tab.label }}</span>
           <span
             class="px-1.5 py-0.5 rounded-full text-[10px] font-black"
-            :class="activeTab === 'friends' ? 'bg-accent text-accent' : 'bg-surface text-content'"
+            :class="
+              tab.key === 'received' && friendStore.counts.received > 0
+                ? 'bg-danger text-white animate-pulse'
+                : active ? 'bg-accent text-white' : 'bg-surface text-content'
+            "
           >
-            {{ friendStore.counts.friends }}
+            {{ tab.badge }}
           </span>
-        </button>
+        </template>
+        <template v-for="tab in tabs" :key="tab.key" #[tab.key]="{ active }">
+          <div v-if="active" class="min-w-0 space-y-3 pt-3 sm:space-y-4 sm:pt-4">
 
-        <button
-          type="button"
-          class="flex shrink-0 snap-start items-center gap-2 px-3 sm:px-4 py-2 rounded-xl text-xs font-bold transition-all cursor-pointer border relative"
-          :class="
-            activeTab === 'received'
-              ? 'bg-content-strong text-white border-accent shadow-sm'
-              : 'bg-white/80 text-content/80 border-accent/10 hover:bg-surface'
-          "
-          @click="activeTab = 'received'"
-        >
-          <span>{{ tr("FriendModal.loi_moi_da_nhan") }}</span>
-          <span
-            v-if="friendStore.counts.received > 0"
-            class="px-1.5 py-0.5 rounded-full text-[10px] font-black bg-danger text-white animate-pulse"
-          >
-            {{ friendStore.counts.received }}
-          </span>
-          <span
-            v-else
-            class="px-1.5 py-0.5 rounded-full text-[10px] font-black"
-            :class="activeTab === 'received' ? 'bg-accent text-accent' : 'bg-surface text-content'"
-          >
-            0
-          </span>
-        </button>
+            <!-- Ô tìm kiếm & Gửi kết bạn nhanh qua ID -->
+            <div class="grid min-w-0 grid-cols-1 gap-2 sm:grid-cols-2 sm:gap-3">
+              <!-- Tìm kiếm theo ID trong danh sách -->
+              <div class="relative">
+                <input
+                  v-model="searchQuery"
+                  type="text"
+                  :placeholder="tr('FriendModal.tim_theo_ten_hoac_ma_nguoi_choi_id')"
+                  class="w-full px-3.5 py-2 pl-9 rounded-xl border border-accent/20 bg-white/90 text-xs text-content placeholder-content focus:outline-none focus:border-accent focus:ring-1 focus:ring-accent"
+                />
+                <span class="absolute left-3 top-2.5 text-xs text-content">🔍</span>
+                <button
+                  v-if="searchQuery"
+                  type="button"
+                  class="absolute right-3 top-2 text-xs text-content hover:text-content cursor-pointer"
+                  @click="searchQuery = ''"
+                >
+                  ✕
+                </button>
+              </div>
 
-        <button
-          type="button"
-          class="flex shrink-0 snap-start items-center gap-2 px-3 sm:px-4 py-2 rounded-xl text-xs font-bold transition-all cursor-pointer border"
-          :class="
-            activeTab === 'sent'
-              ? 'bg-content-strong text-white border-accent shadow-sm'
-              : 'bg-white/80 text-content/80 border-accent/10 hover:bg-surface'
-          "
-          @click="activeTab = 'sent'"
-        >
-          <span>{{ tr("FriendModal.loi_moi_da_gui") }}</span>
-          <span
-            class="px-1.5 py-0.5 rounded-full text-[10px] font-black"
-            :class="activeTab === 'sent' ? 'bg-accent text-accent' : 'bg-surface text-content'"
-          >
-            {{ friendStore.counts.sent }}
-          </span>
-        </button>
+              <!-- Nhập ID và gửi lời mời trực tiếp -->
+              <div class="flex min-w-0 items-center gap-2">
+                <input
+                  v-model="directFriendIdInput"
+                  type="text"
+                  :placeholder="tr('FriendModal.nhap_uuid_de_ket_ban_ngay')"
+                  class="min-w-0 flex-1 px-3 py-2 sm:px-3.5 rounded-xl border border-accent/20 bg-white/90 text-xs text-content placeholder-content focus:outline-none focus:border-accent focus:ring-1 focus:ring-accent font-mono"
+                  @keydown.enter="handleSendDirectId"
+                />
+                <button
+                  type="button"
+                  class="shrink-0 px-2.5 sm:px-3.5 py-2 rounded-xl bg-accent hover:bg-accent text-white text-xs font-bold transition shadow-sm cursor-pointer whitespace-nowrap disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-1"
+                  :disabled="!directFriendIdInput.trim() || friendStore.actionLoadingId === directFriendIdInput.trim()"
+                  @click="handleSendDirectId"
+                >
+                  <span
+                    v-if="friendStore.actionLoadingId === directFriendIdInput.trim()"
+                    class="size-3 border-2 border-white border-t-transparent rounded-full animate-spin"
+                  ></span>
+                  <span>{{ tr("FriendModal.gui_loi_moi") }}</span>
+                </button>
+              </div>
+            </div>
 
-        <button
-          type="button"
-          class="flex shrink-0 snap-start items-center gap-2 px-3 sm:px-4 py-2 rounded-xl text-xs font-bold transition-all cursor-pointer border"
-          :class="
-            activeTab === 'discover'
-              ? 'bg-content-strong text-white border-accent shadow-sm'
-              : 'bg-white/80 text-content/80 border-accent/10 hover:bg-surface'
-          "
-          @click="activeTab = 'discover'"
-        >
-          <span>{{ tr("FriendModal.them_ban_be") }}</span>
-          <span
-            class="px-1.5 py-0.5 rounded-full text-[10px] font-black"
-            :class="activeTab === 'discover' ? 'bg-accent text-accent' : 'bg-surface text-content'"
-          >
-            {{ friendStore.counts.discover }}
-          </span>
-        </button>
-      </div>
+            <!-- Trạng thái Loading -->
+            <div
+              v-if="friendStore.loading && !friendStore.friends.length && !friendStore.profiles.length"
+              class="py-16 flex flex-col items-center justify-center gap-3 text-content"
+            >
+              <div class="size-8 border-3 border-accent border-t-transparent rounded-full animate-spin"></div>
+              <span class="text-xs font-semibold">{{ tr("FriendModal.dang_tai_danh_sach_ban_be") }}</span>
+            </div>
 
-      <!-- Ô tìm kiếm & Gửi kết bạn nhanh qua ID -->
-      <div class="grid min-w-0 grid-cols-1 gap-2 sm:grid-cols-2 sm:gap-3">
-        <!-- Tìm kiếm theo ID trong danh sách -->
-        <div class="relative">
-          <input
-            v-model="searchQuery"
-            type="text"
-            :placeholder="tr('FriendModal.tim_theo_ten_hoac_ma_nguoi_choi_id')"
-            class="w-full px-3.5 py-2 pl-9 rounded-xl border border-accent/20 bg-white/90 text-xs text-content placeholder-content focus:outline-none focus:border-accent focus:ring-1 focus:ring-accent"
-          />
-          <span class="absolute left-3 top-2.5 text-xs text-content">🔍</span>
-          <button
-            v-if="searchQuery"
-            type="button"
-            class="absolute right-3 top-2 text-xs text-content hover:text-content cursor-pointer"
-            @click="searchQuery = ''"
-          >
-            ✕
-          </button>
-        </div>
+            <!-- Trạng thái lỗi -->
+            <div
+              v-else-if="friendStore.error && !friendStore.friends.length"
+              class="p-4 rounded-xl bg-surface border border-danger text-danger text-xs flex items-center justify-between"
+            >
+              <span>{{ friendStore.error }}</span>
+              <button type="button" class="font-bold underline hover:no-underline cursor-pointer" @click="handleRefresh">
+                {{ tr("Fishfarm.tai_lai") }}
+              </button>
+            </div>
 
-        <!-- Nhập ID và gửi lời mời trực tiếp -->
-        <div class="flex min-w-0 items-center gap-2">
-          <input
-            v-model="directFriendIdInput"
-            type="text"
-            :placeholder="tr('FriendModal.nhap_uuid_de_ket_ban_ngay')"
-            class="min-w-0 flex-1 px-3 py-2 sm:px-3.5 rounded-xl border border-accent/20 bg-white/90 text-xs text-content placeholder-content focus:outline-none focus:border-accent focus:ring-1 focus:ring-accent font-mono"
-            @keydown.enter="handleSendDirectId"
-          />
-          <button
-            type="button"
-            class="shrink-0 px-2.5 sm:px-3.5 py-2 rounded-xl bg-accent hover:bg-accent text-white text-xs font-bold transition shadow-sm cursor-pointer whitespace-nowrap disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-1"
-            :disabled="!directFriendIdInput.trim() || friendStore.actionLoadingId === directFriendIdInput.trim()"
-            @click="handleSendDirectId"
-          >
-            <span
-              v-if="friendStore.actionLoadingId === directFriendIdInput.trim()"
-              class="size-3 border-2 border-white border-t-transparent rounded-full animate-spin"
-            ></span>
-            <span>{{ tr("FriendModal.gui_loi_moi") }}</span>
-          </button>
-        </div>
-      </div>
-
-      <!-- Trạng thái Loading -->
-      <div
-        v-if="friendStore.loading && !friendStore.friends.length && !friendStore.profiles.length"
-        class="py-16 flex flex-col items-center justify-center gap-3 text-content"
-      >
-        <div class="size-8 border-3 border-accent border-t-transparent rounded-full animate-spin"></div>
-        <span class="text-xs font-semibold">{{ tr("FriendModal.dang_tai_danh_sach_ban_be") }}</span>
-      </div>
-
-      <!-- Trạng thái lỗi -->
-      <div
-        v-else-if="friendStore.error && !friendStore.friends.length"
-        class="p-4 rounded-xl bg-surface border border-danger text-danger text-xs flex items-center justify-between"
-      >
-        <span>{{ friendStore.error }}</span>
-        <button type="button" class="font-bold underline hover:no-underline cursor-pointer" @click="handleRefresh">
-          {{ tr("Fishfarm.tai_lai") }}
-        </button>
-      </div>
-
-      <!-- ================= TAB 1: BẠN BÈ ================= -->
-<FriendAcceptedList v-else-if="activeTab === 'friends'" @copy="copyToClipboard" @delete="confirmDelete" @respond="handleRespondRequest" @send="handleSendRequest" @discover="activeTab = 'discover'" />
-
-      <!-- ================= TAB 2: LỜI MỜI ĐÃ NHẬN ================= -->
-<FriendReceivedRequests v-else-if="activeTab === 'received'" @copy="copyToClipboard" @delete="confirmDelete" @respond="handleRespondRequest" @send="handleSendRequest" @discover="activeTab = 'discover'" />
-
-      <!-- ================= TAB 3: LỜI MỜI ĐÃ GỬI ================= -->
-<FriendSentRequests v-else-if="activeTab === 'sent'" @copy="copyToClipboard" @delete="confirmDelete" @respond="handleRespondRequest" @send="handleSendRequest" @discover="activeTab = 'discover'" />
-
-      <!-- ================= TAB 4: KHÁM PHÁ & THÊM BẠN ================= -->
-<FriendDiscovery v-else-if="activeTab === 'discover'" @copy="copyToClipboard" @delete="confirmDelete" @respond="handleRespondRequest" @send="handleSendRequest" @discover="activeTab = 'discover'" />
+            <component
+              :is="tabComponents[tab.key]"
+              v-else
+              @copy="copyToClipboard"
+              @delete="confirmDelete"
+              @respond="handleRespondRequest"
+              @send="handleSendRequest"
+              @discover="activeTab = 'discover'"
+            />
+          </div>
+        </template>
+      </Tab>
     </div>
 
     <!-- Hộp thoại xác nhận xóa (Modal xác nhận bên trong) -->
