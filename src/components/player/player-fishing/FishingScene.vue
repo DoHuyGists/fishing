@@ -7,6 +7,7 @@ import { isPointInWater } from "../../../data/fishingMap.ts";
 import { TENSION_SCALE } from "../../../data/tensionChallenge";
 import BobbingBuoy from "./BobbingBuoy.vue";
 import FishingRod from "./FishingRod.vue";
+import FishingSceneBackground from "./FishingSceneBackground.vue";
 
 
 const props = defineProps<{ context: FishingSceneContext }>();
@@ -214,15 +215,18 @@ function castAt(event: MouseEvent) {
 
 <template>
   <section class="fishing-scene" @contextmenu.prevent="">
-    <img
-      v-if="context.sceneImage"
-      :src="context.sceneImage"
-      :alt="tr('FishingScene.khung_canh_bai_cau')"
+    <div
       class="pond-image"
-      draggable="false"
       ref="sceneElement"
       @click="castAt"
-    />
+    >
+      <FishingSceneBackground
+        :key="context.sceneKey ?? 'tutorial'"
+        :src="context.sceneImage"
+        :fallback="context.fallbackSceneImage ?? context.sceneImage"
+        :scene-key="context.sceneKey ?? 'tutorial'"
+      />
+    </div>
     <div class="scene-shade"></div>
 
     <div v-if="invalidTap" class="invalid-tap">{{ tr('FishingScene.chon_phan_mat_nuoc') }}</div>

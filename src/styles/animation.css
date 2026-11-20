@@ -6,8 +6,20 @@
   opacity: 0;
 }
 
+.fishing-scene-background-enter-active,
+.fishing-scene-background-leave-active {
+  transition: opacity 0.4s ease;
+}
+
+.fishing-scene-background-enter-from,
+.fishing-scene-background-leave-to {
+  opacity: 0;
+}
+
 @media (prefers-reduced-motion: reduce) {
-  .fishing-splash-leave-active {
+  .fishing-splash-leave-active,
+  .fishing-scene-background-enter-active,
+  .fishing-scene-background-leave-active {
     transition: none;
   }
 }

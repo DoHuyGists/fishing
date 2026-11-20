@@ -25,8 +25,10 @@ import FishingEquipmentOverview from "../player-inventory/fishing-equipment/Fish
 import HealthOverview from "../player-inventory/body-equipment/HealthOverview.vue";
 import { useHealthStore } from "../../../stores/player-health-store.ts";
 import { useFishingTransitionStore } from "../../../stores/player-fishing-transition-store";
+import { useAreaWeather } from "../../../composables/useAreaWeather";
 
 const worldStore = useWorldStore();
+useAreaWeather(() => worldStore.selectedArea.id);
 const authStore = useAuthStore();
 const inventoryStore = useInventoryStore();
 const userTurnsStore = useUserTurnsStore();
@@ -226,7 +228,7 @@ async function confirm() {
       <div
         class="flex-1 overflow-y-auto flex flex-col gap-4 pb-1 [&::-webkit-scrollbar]:w-1.5 [&::-webkit-scrollbar-thumb]:bg-surface [&::-webkit-scrollbar-thumb]:rounded-full [&::-webkit-scrollbar-track]:bg-transparent"
       >
-        <WeatherSection :area-id="worldStore.selectedArea.id" inline />
+        <WeatherSection inline />
         <FishingFatigue variant="default" :area-id="worldStore.selectedArea.id || null" />
 
         <PrepareLakeFish />

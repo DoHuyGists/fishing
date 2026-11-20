@@ -26,6 +26,8 @@ export interface FishingSceneState extends Pick<TensionController,
 export interface FishingSceneContext {
   state: FishingSceneState;
   sceneImage: string;
+  fallbackSceneImage?: string;
+  sceneKey?: string;
   rodImage: string;
 }
 

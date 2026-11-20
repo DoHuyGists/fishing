@@ -1,19 +1,16 @@
 <script setup lang="ts">
 import { t as tr } from "../../../i18n";
 
-import { computed, onBeforeUnmount, onMounted, ref, watch } from "vue";
+import { computed, ref } from "vue";
 import { useWeatherStore } from "../../../stores/player-weather-store";
 import { utcToLocalMs } from "../../../utils/time";
 
-const props = withDefaults(defineProps<{ areaId: string | null | undefined; inline?: boolean }>(), {
+withDefaults(defineProps<{ inline?: boolean }>(), {
   inline: false,
 });
 
 const weatherStore = useWeatherStore();
 const open = ref(false);
-const nowMs = ref(Date.now());
-let timer: number | undefined;
-let lastRefetch = 0;
 
 const RARITY_LABEL: Record<string, string> = {
   get COMMON() { return tr('LatestCaughtList.thuong'); },
@@ -95,7 +92,7 @@ const modifiers = computed(() =>
 
 const remainingMs = computed(() => {
   const exp = weatherStore.zone?.weather_expires_at;
-  const ms = exp ? utcToLocalMs(exp) - nowMs.value : 0;
+  const ms = exp ? utcToLocalMs(exp) - weatherStore.now : 0;
   return Number.isFinite(ms) ? Math.max(0, ms) : 0;
 });
 const countdown = computed(() => {
@@ -110,35 +107,11 @@ const progress = computed(() => {
   const start = utcToLocalMs(z.weather_updated_at);
   const end = utcToLocalMs(z.weather_expires_at);
   if (end <= start) return 0;
-  return Math.min(100, Math.max(0, ((end - nowMs.value) / (end - start)) * 100));
+  return Math.min(100, Math.max(0, ((end - weatherStore.now) / (end - start)) * 100));
 });
 const videoSrc = computed(() => (weather.value ? WEATHER_VIDEO[weather.value.code] : undefined));
 const hasWeather = computed(() => !!weather.value);
 
-watch(
-  () => props.areaId,
-  (id) => {
-    if (id) weatherStore.init(id);
-    else weatherStore.reset();
-  },
-  { immediate: true },
-);
-
-onMounted(() => {
-  timer = window.setInterval(() => {
-    nowMs.value = Date.now();
-    // Hết hạn mà server chưa đổi thời tiết: thử tải lại mỗi 10 giây
-    const exp = weatherStore.zone?.weather_expires_at;
-    if (exp && props.areaId && utcToLocalMs(exp) <= nowMs.value && nowMs.value - lastRefetch >= 10000) {
-      lastRefetch = nowMs.value;
-      weatherStore.refresh();
-    }
-  }, 1000);
-});
-onBeforeUnmount(() => {
-  if (timer) window.clearInterval(timer);
-  weatherStore.reset();
-});
 </script>
 
 <template>
@@ -279,7 +252,7 @@ onBeforeUnmount(() => {
                 </div>
                 <TransitionGroup
                   v-if="hasWeather && modifiers.length"
-                  tag="ul"
+                  tag="div"
                   class="m-0 list-none gap-2 p-0"
                   :class="inline ? 'grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3' : 'flex flex-col'"
                   enter-active-class="transition-opacity duration-300"

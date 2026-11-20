@@ -4,8 +4,6 @@ import { t as tr } from "../../../i18n";
 import { useDayPhaseStore } from "../../../stores/player-day-phase-store.ts";
 import WeatherSection from "./WeatherSection.vue";
 
-defineProps<{ areaId: string | null | undefined }>();
-
 const dayPhaseStore = useDayPhaseStore();
 </script>
 
@@ -37,7 +35,7 @@ const dayPhaseStore = useDayPhaseStore();
         {{ tr(dayPhaseStore.fishTimeBucket === "DAY" ? "DayPhaseClock.ca_ban_ngay" : "DayPhaseClock.ca_ban_dem") }}
       </div>
       <div class="mt-[9px]">
-        <WeatherSection :area-id="areaId" />
+        <WeatherSection />
       </div>
     </div>
   </section>

@@ -2,6 +2,7 @@ import { computed, onScopeDispose, ref } from 'vue';
 import { defineStore } from 'pinia';
 import { getFormattingLocale, t as tr } from '../i18n';
 import type { FishingAreaDetails } from '../types/table/fishingArea';
+import type { FishingSceneArea } from '../types/model/fishingScene';
 import { supabaseFishingAreaRepository } from '../data/supabaseFishingAreaRepository';
 
 // Scene phases are decorative; fish availability uses DAY [06:00, 19:00).
@@ -14,7 +15,7 @@ const DAY_PHASES = [
 
 export const useDayPhaseStore = defineStore('DayPhase', () => {
   const now = ref(Date.now());
-  const area = ref<Pick<FishingAreaDetails, 'scenePath' | 'timezone'> | null>(null);
+  const area = ref<FishingSceneArea | null>(null);
   const previewArea = ref<FishingAreaDetails | null>(null);
   let previewRequest = 0;
   let consumers = 0;
@@ -85,7 +86,7 @@ export const useDayPhaseStore = defineStore('DayPhase', () => {
       if (request === previewRequest) console.error('Unable to load area scene:', error);
     }
   }
-  function setCurrentScenePhase(value: Pick<FishingAreaDetails, 'scenePath' | 'timezone'> | null) {
+  function setCurrentScenePhase(value: FishingSceneArea | null) {
     area.value = value;
   }
   function $reset() { area.value = null; updateClock(); }

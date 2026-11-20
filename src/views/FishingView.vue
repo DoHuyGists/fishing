@@ -21,6 +21,8 @@ import { useFishingBackgroundSoundStore } from "../stores/player-fishing-backgro
 import DayPhaseClock from "../components/player/player-fishing/DayPhaseClock.vue";
 import FishingFatigue from "../components/player/player-fishing/FishingFatigue.vue";
 import { useDayPhaseClock } from "../composables/useDayPhaseClock";
+import { useAreaWeather } from "../composables/useAreaWeather";
+import { useFishingSceneStore } from "../stores/player-fishing-scene-store";
 import { useUserInAreaStore } from "../stores/player-user-In-area-store.ts";
 import { supabaseFishingAreaRepository } from "../data/supabaseFishingAreaRepository";
 import type { RealtimeChannel } from "@supabase/supabase-js";
@@ -34,6 +36,8 @@ const userSettingStore = useUserSettingStore();
 const backgroundSoundStore = useFishingBackgroundSoundStore();
 const dayPhaseStore = useDayPhaseClock();
 const userInAreaStore = useUserInAreaStore();
+const fishingSceneStore = useFishingSceneStore();
+useAreaWeather(() => userInAreaStore.userInArea?.area_id);
 const selectedBait = computed(() =>
   equipmentStore.variants.bait?.find((bait) => bait.id === fishingStore.equipmentLoadout.bait),
 );
@@ -44,7 +48,9 @@ const settingsOpen = ref(false);
 const showExitConfirmation = ref(false);
 const sceneContext = computed<FishingSceneContext>(() => ({
   state: fishingStore,
-  sceneImage: dayPhaseStore.currentScenePhace,
+  sceneImage: fishingSceneStore.sceneImage,
+  fallbackSceneImage: fishingSceneStore.fallbackSceneImage,
+  sceneKey: fishingSceneStore.sceneKey,
   rodImage:
     equipmentStore.variants.rod.find((rod) => rod.id === fishingStore.equipmentLoadout.rod)?.image ||
     "/fishing-rob.png",
@@ -200,7 +206,7 @@ onBeforeUnmount(() => {
   <main v-else-if="sessionReady" class="w-full h-screen overflow-hidden touch-none overscroll-none bg-[var(--color-ocean-deep)] text-[var(--color-ocean-pearl)]">
     <div class="fixed top-3 left-3 z-20 text-white flex justify-between items-start">
       <div class="flex flex-col gap-2">
-        <DayPhaseClock :area-id="userInAreaStore.userInArea?.area_id" />
+        <DayPhaseClock />
         <FishingFatigue
           variant="compact"
           class="max-w-60"
