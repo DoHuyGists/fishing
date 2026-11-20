@@ -34,8 +34,10 @@
   --from-x: calc(-1 * var(--slide-distance));
   --from-y: 0px;
   --duration: 1.2s;
+  --delay: 0s;
   opacity: 0;
   animation: slideFadeIn var(--duration) cubic-bezier(0.22, 1, 0.36, 1) forwards;
+  animation-delay: var(--delay);
 }
 
 @keyframes slideFadeIn {

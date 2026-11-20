@@ -49,7 +49,7 @@ BEGIN
   ), page AS (
     SELECT * FROM filtered
     ORDER BY is_earned DESC, name, badge_id
-    LIMIT 10 OFFSET (greatest(coalesce(p_page, 1), 1)::bigint - 1) * 10
+    LIMIT 30 OFFSET (greatest(coalesce(p_page, 1), 1)::bigint - 1) * 30
   )
   SELECT jsonb_build_object(
     'items', coalesce((SELECT jsonb_agg(to_jsonb(p) - 'normalized_type'

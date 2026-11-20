@@ -4,7 +4,6 @@ import { defineStore } from "pinia";
 import { supabaseBadgeRepository } from "../data/supabaseBadgeRepository";
 import { useCurrencyStore } from "./player-currency-store";
 import { useAuthStore } from "./auth";
-import { LIST_PAGE_SIZE } from "../data/pagination";
 
 export const useBadgesStore = defineStore("badges", {
   state: () => ({
@@ -14,7 +13,7 @@ export const useBadgesStore = defineStore("badges", {
     error: "",
     claimError: "",
     page: 1,
-    pageSize: LIST_PAGE_SIZE,
+    pageSize: 30,
     total: 0,
     collectionTotal: 0,
     earnedTotal: 0,

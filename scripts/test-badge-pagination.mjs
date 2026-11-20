@@ -49,9 +49,9 @@ test('badge pages preserve global search, filters, totals and caller isolation',
     await db.exec(await readFile(new URL('./supabase/migrations/20261119_badge_pagination.sql', import.meta.url), 'utf8'));
     await db.exec('SET ROLE authenticated');
     const first = await read(), second = await read(2), last = await read(3);
-    assert.equal(first.items.length, 10);
-    assert.equal(second.items.length, 10);
-    assert.equal(last.items.length, 3);
+    assert.equal(first.items.length, 23);
+    assert.equal(second.items.length, 0);
+    assert.equal(last.items.length, 0);
     assert.equal(new Set([...first.items, ...second.items, ...last.items].map(b => b.badge_id)).size, 23);
     assert.equal(first.collectionTotal, 23);
     assert.equal(first.earnedTotal, 12);
@@ -63,10 +63,10 @@ test('badge pages preserve global search, filters, totals and caller isolation',
     assert.equal(first.items[0].quantity, 1);
     assert.equal(first.items[0].is_claim, false);
     assert.equal(Date.parse(first.items[0].earned_at), Date.parse('2026-11-19T00:00:00Z'));
-    assert.equal(last.items[0].earned_at, null);
-    assert.equal(last.items[0].is_claim, null);
+    assert.equal(first.items[22].earned_at, null);
+    assert.equal(first.items[22].is_claim, null);
     assert.ok(!('normalized_type' in first.items[0]));
-    assert.ok(first.items.every(b => b.is_earned));
+    assert.ok(first.items.slice(0, 12).every(b => b.is_earned));
     assert.deepEqual((await read(-1)).items, first.items);
     const found = await read(1, 'cá hiếm');
     assert.equal(found.total, 1);
@@ -84,6 +84,17 @@ test('badge pages preserve global search, filters, totals and caller isolation',
     assert.deepEqual((await read(100)).items, []);
     assert.equal((await read(1, 'missing')).total, 0);
     await assert.rejects(read(1, '', 'all', 'invalid'), /Invalid badge status/);
+    await db.exec(`
+      RESET ROLE;
+      INSERT INTO public.badge_fixture
+        SELECT auth.uid(), ('00000000-0000-0000-0000-' || lpad(n::text, 12, '0'))::uuid,
+          'Badge ' || n, 'Fishing', 'Common', false, false
+        FROM generate_series(24, 61) n;
+      SET ROLE authenticated;
+    `);
+    const pages = await Promise.all([read(1), read(2), read(3)]);
+    assert.deepEqual(pages.map(page => page.items.length), [30, 30, 1]);
+    assert.equal(new Set(pages.flatMap(page => page.items.map(b => b.badge_id))).size, 61);
     await db.exec("SET test.uid = '00000000-0000-0000-0000-000000000003'");
     assert.deepEqual(await read(), { items: [], total: 0, collectionTotal: 0, earnedTotal: 0, types: [] });
     await db.exec("SET test.uid = ''");
@@ -113,6 +124,7 @@ test('badge store ignores stale filters and refreshes only the current page afte
     const auth = useAuthStore();
     auth.user = { id: 'a' };
     const store = useBadgesStore();
+    assert.equal(store.pageSize, 30);
     store.ownerId = 'a';
     const result = id => ({ items: [{ badge_id: id }], total: 21, collectionTotal: 23, earnedTotal: 12, types: ['Common', 'Rare'] });
     const pending = [];
@@ -140,8 +152,8 @@ test('badge store ignores stale filters and refreshes only the current page afte
       return args[0] === 3 ? { ...result(''), items: [], total: 11 } : result('remaining');
     };
     assert.equal(await store.claimReward('new'), true);
-    assert.deepEqual(calls.map(args => args[0]), [3, 2]);
-    assert.equal(store.page, 2);
+    assert.deepEqual(calls.map(args => args[0]), [3, 1]);
+    assert.equal(store.page, 1);
     assert.equal(currencyRefreshes, 1);
     assert.equal(store.claimingId, '');
     assert.equal(store.loading, false);
