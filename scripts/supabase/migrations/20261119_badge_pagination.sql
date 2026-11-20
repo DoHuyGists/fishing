@@ -20,8 +20,21 @@ BEGIN
   END IF;
 
   WITH badges AS MATERIALIZED (
+    -- The status RPC returns a JSONB array, not a set of table rows.
     SELECT b.*, nullif(btrim(b.type), '') AS normalized_type
-    FROM public.get_user_badges_status() b
+    FROM jsonb_to_recordset(public.get_user_badges_status()) AS b(
+      badge_id uuid,
+      name text,
+      description text,
+      icon_url text,
+      type text,
+      reward jsonb,
+      is_earned boolean,
+      quantity integer,
+      earned_at timestamptz,
+      is_claim boolean,
+      can_claim boolean
+    )
   ), filtered AS MATERIALIZED (
     SELECT * FROM badges b
     WHERE (coalesce(btrim(p_search), '') = '' OR EXISTS (
