@@ -180,7 +180,7 @@ onUnmounted(() => {
 </script>
 
 <template>
-  <div class="w-screen min-h-screen p-3 relative flex flex-col gap-2 overflow-hidden bg-[var(--color-ocean-deep)] bg-[radial-gradient(ellipse_at_50%_0%,color-mix(in_srgb,_var(--color-sky)_12%,_transparent),transparent_65%)] text-content">
+  <div :style="{backgroundImage: 'url(/lobby_bg.png)', backgroundRepeat: 'no-repeat', backgroundSize: 'cover'}" class="w-screen min-h-screen p-3 relative flex flex-col gap-2 overflow-hidden bg-[var(--color-ocean-deep)] bg-[radial-gradient(ellipse_at_50%_0%,color-mix(in_srgb,_var(--color-sky)_12%,_transparent),transparent_65%)] text-content">
     <TeamMembersSticky
       v-if="features.isAvailable('team') && configStore.showTeam && teamStore.myTeamMembers.length"
       class="slide-fade-in from-right"

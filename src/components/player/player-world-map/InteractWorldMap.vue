@@ -186,7 +186,7 @@ function zoomTo(k: number) {
       :map-visible="isMapVisible"
       @toggle-map="worldStore.toggleMapVisibility()"
     />
-    <div v-if="isMapVisible" class="flex flex-col gap-2">
+    <div v-if="isMapVisible" class="flex flex-col gap-1 bg-surface p-1 rounded-xl h-fit">
       <div
         class="slide-fade-in from-bottom w-full h-fit overflow-hidden grid place-items-center border border-content rounded-xl"
       >
@@ -244,11 +244,11 @@ function zoomTo(k: number) {
           {{ tr("Maintenance.thu_lai") }}
         </button>
       </div>
-      <div class="slide-fade-in from-bottom-right flex gap-2">
-        <button @click="zoomTo(3)" class="border border-content rounded-md px-3">3x</button>
-        <button @click="zoomTo(6)" class="border border-content rounded-md px-3">6x</button>
-        <button @click="zoomTo(12)" class="border border-content rounded-md px-3">12x</button>
-        <button @click="zoomTo(24)" class="border border-content rounded-md px-3">24x</button>
+      <div class="slide-fade-in from-bottom-right flex gap-1 text-xs">
+        <button @click="zoomTo(3)" class="border border-content rounded-md p-1 gap-1 flex"><span>🔍</span> 3x</button>
+        <button @click="zoomTo(6)" class="border border-content rounded-md p-1 gap-1 flex"><span>🔍</span> 6x</button>
+        <button @click="zoomTo(12)" class="border border-content rounded-md p-1 gap-1 flex"><span>🔍</span> 12x</button>
+        <button @click="zoomTo(24)" class="border border-content rounded-md p-1 gap-1 flex"><span>🔍</span> 24x</button>
       </div>
     </div>
   </div>
