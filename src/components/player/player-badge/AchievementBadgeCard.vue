@@ -13,7 +13,7 @@ const emit = defineEmits<{ select: [badgeId: string] }>();
     :class="
       badge.is_earned
         ? 'border-emerald-200 bg-white hover:border-emerald-400'
-        : 'border-[#dce4d8] bg-[#f8faf6] hover:border-emerald-200'
+        : 'border-palette-dce4d8 bg-palette-f8faf6 hover:border-emerald-200'
     "
     :style="{ '--delay': `${index * 45}ms` }"
     :aria-label="
@@ -61,7 +61,7 @@ const emit = defineEmits<{ select: [badgeId: string] }>();
       >
     </span>
     <div
-      class="relative m-0 mt-1 line-clamp-2 w-full text-[10px] font-extrabold leading-tight text-[#24352a] sm:mt-1.5 sm:text-xs"
+      class="relative m-0 mt-1 line-clamp-2 w-full text-[10px] font-extrabold leading-tight text-content sm:mt-1.5 sm:text-xs"
       :title="badge.name"
     >
       {{ badge.name }}

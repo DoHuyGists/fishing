@@ -15,7 +15,7 @@ const store = useFishingStore();
         @click.self="store.closePlayers"
       >
         <section
-          class="player-popup-panel w-[min(440px,100%)] overflow-hidden border border-[rgba(255,226,149,0.68)] rounded-[20px] bg-[linear-gradient(145deg,#173d2b,#0e281b)] shadow-[0_24px_70px_rgba(0,0,0,0.48)] text-[#f4f0df]"
+          class="player-popup-panel w-[min(440px,100%)] overflow-hidden border border-[rgba(255,226,149,0.68)] rounded-[20px] bg-[linear-gradient(145deg,var(--color-palette-173d2b),var(--color-palette-0e281b))] shadow-[0_24px_70px_rgba(0,0,0,0.48)] text-palette-f4f0df"
           role="dialog"
           aria-modal="true"
           aria-labelledby="players-title"
@@ -35,13 +35,13 @@ const store = useFishingStore();
               ×
             </button>
           </header>
-          <!-- <div class="px-5 pt-3 pb-1.5 text-[#b7cfb9] text-xs">Chạm vào người chơi để xem thông tin.</div> -->
-          <div v-if="store.isLoadingPlayers" class="py-8 text-center text-[#b7cfb9] text-xs">
+          <!-- <div class="px-5 pt-3 pb-1.5 text-border-strong text-xs">Chạm vào người chơi để xem thông tin.</div> -->
+          <div v-if="store.isLoadingPlayers" class="py-8 text-center text-border-strong text-xs">
             {{ tr("FishingPlayers.dang_cap_nhat_danh_sach_nguoi_cau") }}
           </div>
           <div
             v-else-if="!store.selectedPlayer && !store.nearbyPlayers.length"
-            class="py-8 px-4 text-center text-[#b7cfb9] text-xs"
+            class="py-8 px-4 text-center text-border-strong text-xs"
           >
             <span class="text-2xl mb-1 block">🎣</span>
             <div class="m-0">{{ tr("FishingPlayers.hien_chua_co_nguoi_choi_nao_trong_khu_vuc_nay") }}</div>
@@ -50,10 +50,10 @@ const store = useFishingStore();
             <div v-for="player in store.nearbyPlayers" :key="player.id">
               <button
                 type="button"
-                class="flex items-center w-full gap-[11px] p-2.5 border rounded-xl bg-[rgba(7,28,18,0.35)] text-inherit cursor-pointer text-left hover:border-[#d8b866] hover:bg-[rgba(55,91,57,0.5)] transition-colors"
+                class="flex items-center w-full gap-[11px] p-2.5 border rounded-xl bg-[rgba(7,28,18,0.35)] text-inherit cursor-pointer text-left hover:border-palette-d8b866 hover:bg-[rgba(55,91,57,0.5)] transition-colors"
                 :class="
                   player.isCurrentUser
-                    ? 'border-[#22c55e]/60 bg-[rgba(34,197,94,0.08)]'
+                    ? 'border-palette-22c55e/60 bg-[rgba(34,197,94,0.08)]'
                     : 'border-[rgba(223,241,207,0.15)]'
                 "
                 @click="store.selectPlayer(player)"
@@ -67,18 +67,18 @@ const store = useFishingStore();
                   <strong class="text-sm flex items-center gap-1.5">
                     {{ player.name }}
                   </strong>
-                  <small class="text-[#b7cfb9] text-[10px]"
+                  <small class="text-border-strong text-[10px]"
                     >{{ tr("FishPond.cap") }} {{ player.level }} · {{ player.title }}</small
                   >
                 </span>
-                <span class="ml-auto text-[#e8bd62] text-[11px] font-extrabold">{{ tr("FishingPlayers.xem") }}</span>
+                <span class="ml-auto text-palette-e8bd62 text-[11px] font-extrabold">{{ tr("FishingPlayers.xem") }}</span>
               </button>
             </div>
           </div>
           <article v-else class="grid justify-items-center px-5 pt-4 pb-[22px] text-center">
             <button
               type="button"
-              class="justify-self-start border-0 bg-transparent text-[#e8bd62] cursor-pointer text-xs font-extrabold"
+              class="justify-self-start border-0 bg-transparent text-palette-e8bd62 cursor-pointer text-xs font-extrabold"
               @click="store.selectedPlayer = null"
             >
               {{ tr("FishingPlayers.danh_sach") }}
@@ -89,18 +89,18 @@ const store = useFishingStore();
               >{{ store.selectedPlayer.avatar }}</span
             >
             <div class="m-0 text-xl">{{ store.selectedPlayer.name }}</div>
-            <div class="mt-1 text-[#b7cfb9] text-xs">
+            <div class="mt-1 text-border-strong text-xs">
               {{ tr("FishPond.cap") }} {{ store.selectedPlayer.level }} · {{ store.selectedPlayer.title }}
             </div>
             <div class="grid grid-cols-2 w-full gap-2 mt-[18px]">
               <span
-                class="grid gap-1 py-[11px] px-1.5 rounded-[10px] bg-[rgba(7,28,18,0.38)] text-[#b7cfb9] text-[10px]"
-                ><b class="text-[#f4f0df] text-[13px]">{{ store.selectedPlayer.caughtCount }}</b
+                class="grid gap-1 py-[11px] px-1.5 rounded-[10px] bg-[rgba(7,28,18,0.38)] text-border-strong text-[10px]"
+                ><b class="text-palette-f4f0df text-[13px]">{{ store.selectedPlayer.caughtCount }}</b
                 >{{ tr("FishingPlayers.ca_da_cau") }}</span
               >
               <span
-                class="grid gap-1 py-[11px] px-1.5 rounded-[10px] bg-[rgba(7,28,18,0.38)] text-[#b7cfb9] text-[10px]"
-                ><b class="text-[#f4f0df] text-[13px]">{{ store.selectedPlayer.bestCatch }}</b
+                class="grid gap-1 py-[11px] px-1.5 rounded-[10px] bg-[rgba(7,28,18,0.38)] text-border-strong text-[10px]"
+                ><b class="text-palette-f4f0df text-[13px]">{{ store.selectedPlayer.bestCatch }}</b
                 >{{ tr("FishingPlayers.ky_luc") }}</span
               >
             </div>

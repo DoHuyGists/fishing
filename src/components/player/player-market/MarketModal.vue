@@ -205,7 +205,7 @@ onUnmounted(() => {
       <button
         type="button"
         :disabled="marketStore.isLoadingMarket || marketStore.listingPage <= 1"
-        class="rounded-lg border border-[#cbd9c6] px-3 py-1.5 disabled:opacity-40"
+        class="rounded-lg border border-border-default px-3 py-1.5 disabled:opacity-40"
         @click="marketStore.listingPage--"
       >
         {{ tr("Fishfarm.truoc") }}
@@ -214,7 +214,7 @@ onUnmounted(() => {
       <button
         type="button"
         :disabled="marketStore.isLoadingMarket || !marketStore.listingHasNext"
-        class="rounded-lg border border-[#cbd9c6] px-3 py-1.5 disabled:opacity-40"
+        class="rounded-lg border border-border-default px-3 py-1.5 disabled:opacity-40"
         @click="marketStore.listingPage++"
       >
         {{ tr("Fishfarm.sau") }}
@@ -236,7 +236,7 @@ onUnmounted(() => {
     @cancel="cancelBuy"
     @confirm="handleBuyFish"
   >
-    <div class="flex items-center gap-3 rounded-xl border border-[#cbd9c6] bg-[#f5f9f0] p-3">
+    <div class="flex items-center gap-3 rounded-xl border border-border-default bg-surface p-3">
       <img
         :src="itemToBuy.caught?.fish?.image || '/fish/VN/fish.jpg'"
         :alt="itemToBuy.caught?.fish?.name || ''"

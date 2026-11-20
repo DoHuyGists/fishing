@@ -16,28 +16,28 @@ const store = useAdminSkillStore();
     <form class="min-h-0 flex-1 overflow-y-auto p-4 sm:p-6" @submit.prevent="store.save">
       <fieldset
         :disabled="store.saving"
-        class="mx-auto grid max-w-3xl gap-4 rounded-xl border border-[#cbd9c6] bg-white p-4 sm:grid-cols-2"
+        class="mx-auto grid max-w-3xl gap-4 rounded-xl border border-border-default bg-white p-4 sm:grid-cols-2"
       >
         <legend class="px-2 text-sm font-bold">Thông tin kỹ năng</legend>
         <label class="flex flex-col gap-1 text-sm font-semibold"
           >Mã kỹ năng
-          <input v-model="store.draft.code" required class="rounded-lg border border-[#cbd9c6] px-3 py-2 font-normal" />
+          <input v-model="store.draft.code" required class="rounded-lg border border-border-default px-3 py-2 font-normal" />
         </label>
         <label class="flex flex-col gap-1 text-sm font-semibold"
           >Tên kỹ năng
-          <input v-model="store.draft.name" required class="rounded-lg border border-[#cbd9c6] px-3 py-2 font-normal" />
+          <input v-model="store.draft.name" required class="rounded-lg border border-border-default px-3 py-2 font-normal" />
         </label>
         <label class="flex flex-col gap-1 text-sm font-semibold sm:col-span-2"
           >Mô tả
           <textarea
             v-model="store.draft.description"
             rows="3"
-            class="rounded-lg border border-[#cbd9c6] px-3 py-2 font-normal"
+            class="rounded-lg border border-border-default px-3 py-2 font-normal"
           ></textarea>
         </label>
         <label class="flex flex-col gap-1 text-sm font-semibold sm:col-span-2"
           >Biểu tượng (emoji hoặc URL ảnh)
-          <input v-model="store.draft.icon" class="rounded-lg border border-[#cbd9c6] px-3 py-2 font-normal" />
+          <input v-model="store.draft.icon" class="rounded-lg border border-border-default px-3 py-2 font-normal" />
         </label>
         <label class="flex flex-col gap-1 text-sm font-semibold"
           >Cấp tối đa
@@ -48,7 +48,7 @@ const store = useAdminSkillStore();
             max="2147483647"
             step="1"
             required
-            class="rounded-lg border border-[#cbd9c6] px-3 py-2 font-normal"
+            class="rounded-lg border border-border-default px-3 py-2 font-normal"
           />
         </label>
         <label class="flex flex-col gap-1 text-sm font-semibold"
@@ -60,7 +60,7 @@ const store = useAdminSkillStore();
             max="2147483647"
             step="1"
             required
-            class="rounded-lg border border-[#cbd9c6] px-3 py-2 font-normal"
+            class="rounded-lg border border-border-default px-3 py-2 font-normal"
           />
         </label>
         <label class="flex flex-col gap-1 text-sm font-semibold sm:col-span-2"
@@ -70,7 +70,7 @@ const store = useAdminSkillStore();
             rows="8"
             required
             spellcheck="false"
-            class="rounded-lg border border-[#cbd9c6] px-3 py-2 font-mono font-normal"
+            class="rounded-lg border border-border-default px-3 py-2 font-mono font-normal"
           ></textarea>
           <span class="text-xs font-normal text-gray-500"
             >Nhập đối tượng JSON theo cấu hình hiệu ứng của trò chơi. Dùng {} nếu không có hiệu ứng.</span
@@ -87,12 +87,12 @@ const store = useAdminSkillStore();
           {{ store.formError }}
         </div>
         <div class="flex justify-end gap-2 sm:col-span-2">
-          <button type="button" class="rounded-lg border border-[#cbd9c6] px-4 py-2 text-sm" @click="store.closeForm">
+          <button type="button" class="rounded-lg border border-border-default px-4 py-2 text-sm" @click="store.closeForm">
             Hủy
           </button>
           <button
             type="submit"
-            class="rounded-lg bg-[#24352a] px-4 py-2 text-sm font-bold text-white disabled:opacity-50"
+            class="rounded-lg bg-content px-4 py-2 text-sm font-bold text-white disabled:opacity-50"
           >
             {{ store.saving ? "Đang lưu..." : "Lưu kỹ năng" }}
           </button>

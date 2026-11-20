@@ -48,8 +48,8 @@ const fishStats = [
 </script>
 
 <template>
-  <article class="mx-auto w-full max-w-6xl space-y-5 px-4 py-5 text-sm leading-relaxed text-[#24352a] sm:px-6 sm:py-7">
-    <header class="rounded-2xl bg-[#153221] p-5 text-white sm:p-7">
+  <article class="mx-auto w-full max-w-6xl space-y-5 px-4 py-5 text-sm leading-relaxed text-content sm:px-6 sm:py-7">
+    <header class="rounded-2xl bg-content-strong p-5 text-white sm:p-7">
       <div class="mb-2 mt-0 text-xs font-semibold text-emerald-100">Trang bị · 5 nhóm chỉ số</div>
       <div class="m-0 text-xl font-extrabold sm:text-2xl">Thiết lập trang bị theo sức cá</div>
       <div class="mb-0 mt-2 text-emerald-100">Chọn mồi và lưỡi để tăng cơ hội móc cá; cân bằng cần, máy và dây để đưa cá về bờ.</div>
@@ -57,10 +57,10 @@ const fishStats = [
 
     <section aria-labelledby="equipment-guide-table-title">
       <div id="equipment-guide-table-title" class="mb-3 mt-0 text-lg font-bold">Bảng đối chiếu trang bị và cá</div>
-      <div class="overflow-x-auto rounded-xl border border-[#cbd9c6]" role="region" aria-labelledby="equipment-guide-table-title" tabindex="0">
+      <div class="overflow-x-auto rounded-xl border border-border-default" role="region" aria-labelledby="equipment-guide-table-title" tabindex="0">
         <table class="w-full min-w-[900px] border-collapse text-left text-sm">
           <caption class="sr-only">Chỉ số trang bị, tác dụng, chỉ số cá tương ứng và cách tính gợi ý</caption>
-          <thead class="bg-[#f5f9f0]">
+          <thead class="bg-surface">
             <tr>
               <th scope="col" class="p-3">Trang bị</th>
               <th scope="col" class="p-3">Chỉ số thiết lập</th>
@@ -70,9 +70,9 @@ const fishStats = [
             </tr>
           </thead>
           <tbody class="bg-white">
-            <tr v-for="entry in equipmentGuide" :key="entry.key" class="border-t border-[#cbd9c6] align-top">
+            <tr v-for="entry in equipmentGuide" :key="entry.key" class="border-t border-border-default align-top">
               <th scope="row" class="p-3 font-semibold">{{ entry.name }}</th>
-              <td class="p-3"><code class="rounded-[0.25rem] bg-[#dfeadd80] px-[0.25rem] py-[0.0625rem] [overflow-wrap:anywhere] text-[0.85em]">{{ entry.key }}</code></td>
+              <td class="p-3"><code class="rounded-[0.25rem] bg-surface-code px-[0.25rem] py-[0.0625rem] [overflow-wrap:anywhere] text-[0.85em]">{{ entry.key }}</code></td>
               <td class="p-3">{{ entry.meaning }}</td>
               <td class="p-3">{{ entry.fish }}</td>
               <td class="p-3">{{ entry.calculation }}</td>
@@ -82,30 +82,30 @@ const fishStats = [
       </div>
     </section>
 
-    <section class="rounded-xl border border-[#cbd9c6] bg-white p-4" aria-labelledby="equipment-fish-stats-title">
+    <section class="rounded-xl border border-border-default bg-white p-4" aria-labelledby="equipment-fish-stats-title">
       <div id="equipment-fish-stats-title" class="mb-3 mt-0 text-lg font-bold">Các chỉ số cá cần dùng khi tính toán</div>
       <dl class="m-0 grid gap-4 sm:grid-cols-2">
         <div v-for="stat in fishStats" :key="stat.key">
-          <dt class="font-semibold"><code class="rounded-[0.25rem] bg-[#dfeadd80] px-[0.25rem] py-[0.0625rem] [overflow-wrap:anywhere] text-[0.85em]">{{ stat.key }}</code></dt>
+          <dt class="font-semibold"><code class="rounded-[0.25rem] bg-surface-code px-[0.25rem] py-[0.0625rem] [overflow-wrap:anywhere] text-[0.85em]">{{ stat.key }}</code></dt>
           <dd class="mb-0 ml-0 mt-1 text-slate-600">{{ stat.meaning }}</dd>
         </div>
       </dl>
     </section>
 
-    <section class="rounded-xl border border-[#cbd9c6] bg-[#f5f9f0] p-4" aria-labelledby="equipment-example-title">
+    <section class="rounded-xl border border-border-default bg-surface p-4" aria-labelledby="equipment-example-title">
       <div id="equipment-example-title" class="m-0 text-lg font-bold">Ví dụ cân bằng một bộ trang bị</div>
       <div class="mb-0 space-y-2 pl-5">
-        <div>Cá nặng 8 kg, cần có <code class="rounded-[0.25rem] bg-[#dfeadd80] px-[0.25rem] py-[0.0625rem] [overflow-wrap:anywhere] text-[0.85em]">max_weight = 10</code>: đủ tải; cần 6 kg thì cá xổng.</div>
-        <div>Cá ở khối lượng trung tâm có sức hiệu lực S = 40, hệ số giật 1,5: đỉnh lực kéo xấp xỉ 60 điểm/giây khi đầy thể lực. Dây có <code class="rounded-[0.25rem] bg-[#dfeadd80] px-[0.25rem] py-[0.0625rem] [overflow-wrap:anywhere] text-[0.85em]">durability = 70</code> đứt khi lực căng tích lũy chạm 70; người chơi nhả dây để giảm căng, không tự động thua khi gặp cú giật.</div>
-        <div>Máy có <code class="rounded-[0.25rem] bg-[#dfeadd80] px-[0.25rem] py-[0.0625rem] [overflow-wrap:anywhere] text-[0.85em]">pull_strength = 20</code>: tốc độ là 2 × (1 + 20 / 40) = 3 m/giây; thu hiệu quả 30 m mất khoảng 10 giây, chưa tính nhả dây.</div>
-        <div>Cá có <code class="rounded-[0.25rem] bg-[#dfeadd80] px-[0.25rem] py-[0.0625rem] [overflow-wrap:anywhere] text-[0.85em]">base_catch_rate = 0,5</code>, cảnh giác 0,2; lưỡi cộng 0,1: đúng mồi đạt (0,5 + 0,1) × 1 × 0,8 = 48%; sai mồi với hệ số 0,5 còn 24%.</div>
+        <div>Cá nặng 8 kg, cần có <code class="rounded-[0.25rem] bg-surface-code px-[0.25rem] py-[0.0625rem] [overflow-wrap:anywhere] text-[0.85em]">max_weight = 10</code>: đủ tải; cần 6 kg thì cá xổng.</div>
+        <div>Cá ở khối lượng trung tâm có sức hiệu lực S = 40, hệ số giật 1,5: đỉnh lực kéo xấp xỉ 60 điểm/giây khi đầy thể lực. Dây có <code class="rounded-[0.25rem] bg-surface-code px-[0.25rem] py-[0.0625rem] [overflow-wrap:anywhere] text-[0.85em]">durability = 70</code> đứt khi lực căng tích lũy chạm 70; người chơi nhả dây để giảm căng, không tự động thua khi gặp cú giật.</div>
+        <div>Máy có <code class="rounded-[0.25rem] bg-surface-code px-[0.25rem] py-[0.0625rem] [overflow-wrap:anywhere] text-[0.85em]">pull_strength = 20</code>: tốc độ là 2 × (1 + 20 / 40) = 3 m/giây; thu hiệu quả 30 m mất khoảng 10 giây, chưa tính nhả dây.</div>
+        <div>Cá có <code class="rounded-[0.25rem] bg-surface-code px-[0.25rem] py-[0.0625rem] [overflow-wrap:anywhere] text-[0.85em]">base_catch_rate = 0,5</code>, cảnh giác 0,2; lưỡi cộng 0,1: đúng mồi đạt (0,5 + 0,1) × 1 × 0,8 = 48%; sai mồi với hệ số 0,5 còn 24%.</div>
       </div>
       <div class="mb-0 mt-3 text-xs text-slate-600">Móc cá thành công là một bước; vẫn cần vượt qua giới hạn tải cần, sức chịu dây và thử thách kéo cá để bắt được cá.</div>
     </section>
 
-    <aside class="rounded-xl border border-[#cbd9c6] bg-[#f5f9f0] p-4">
+    <aside class="rounded-xl border border-border-default bg-surface p-4">
       <div class="m-0 font-bold">Áp dụng với tension challenge hiện tại</div>
-      <div class="mb-0 mt-2">RPC rules v2 áp dụng tension cho mọi loài. Server tính chỉ số hiệu lực theo (chỉ số gốc + tổng bonus cộng) × tích hệ số nhân, rồi sinh <code class="rounded-[0.25rem] bg-[#dfeadd80] px-[0.25rem] py-[0.0625rem] [overflow-wrap:anywhere] text-[0.85em]">config.reelSpeed</code>, <code class="rounded-[0.25rem] bg-[#dfeadd80] px-[0.25rem] py-[0.0625rem] [overflow-wrap:anywhere] text-[0.85em]">config.maxTension</code> và sức cá. Rarity điều chỉnh khoảng cách, nhịp giật và tốc độ mệt. Cấu hình được lưu cố định theo lượt; đổi đồ sau khi thả câu không thay đổi ván đang chơi. Móc trượt, quá tải cần hoặc không có cá được trả kết quả khi bắt đầu thu dây, không chạy ván đấu đã định sẵn thua.</div>
+      <div class="mb-0 mt-2">RPC rules v2 áp dụng tension cho mọi loài. Server tính chỉ số hiệu lực theo (chỉ số gốc + tổng bonus cộng) × tích hệ số nhân, rồi sinh <code class="rounded-[0.25rem] bg-surface-code px-[0.25rem] py-[0.0625rem] [overflow-wrap:anywhere] text-[0.85em]">config.reelSpeed</code>, <code class="rounded-[0.25rem] bg-surface-code px-[0.25rem] py-[0.0625rem] [overflow-wrap:anywhere] text-[0.85em]">config.maxTension</code> và sức cá. Rarity điều chỉnh khoảng cách, nhịp giật và tốc độ mệt. Cấu hình được lưu cố định theo lượt; đổi đồ sau khi thả câu không thay đổi ván đang chơi. Móc trượt, quá tải cần hoặc không có cá được trả kết quả khi bắt đầu thu dây, không chạy ván đấu đã định sẵn thua.</div>
     </aside>
   </article>
 </template>

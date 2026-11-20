@@ -188,7 +188,7 @@ onUnmounted(() => {
       @open-team="modalStore.open('team')"
     />
     <header
-      class="slide-fade-in from-top flex flex-wrap items-center justify-between gap-3 rounded-xl border border-[#cbd9c6] bg-[#f5f9f0] px-4 py-2.5 text-[#24352a]"
+      class="slide-fade-in from-top flex flex-wrap items-center justify-between gap-3 rounded-xl border border-border-default bg-surface px-4 py-2.5 text-content"
     >
       <span class="font-bold">{{ tr("Lobby.tieu_de") }}</span>
       <div class="flex flex-wrap items-center justify-end gap-2">

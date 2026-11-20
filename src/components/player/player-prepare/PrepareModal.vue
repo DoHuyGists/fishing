@@ -221,10 +221,10 @@ async function confirm() {
 
 <template>
   <Modal :title="worldStore.selectedArea.title" :on-refresh="loadData">
-    <div class="flex flex-col w-full h-full bg-[#f5f9f0] text-[#24352a] overflow-hidden">
+    <div class="flex flex-col w-full h-full bg-surface text-content overflow-hidden">
       <!-- Body -->
       <div
-        class="flex-1 overflow-y-auto flex flex-col gap-4 pb-1 [&::-webkit-scrollbar]:w-1.5 [&::-webkit-scrollbar-thumb]:bg-[#b7cbb4] [&::-webkit-scrollbar-thumb]:rounded-full [&::-webkit-scrollbar-track]:bg-transparent"
+        class="flex-1 overflow-y-auto flex flex-col gap-4 pb-1 [&::-webkit-scrollbar]:w-1.5 [&::-webkit-scrollbar-thumb]:bg-palette-b7cbb4 [&::-webkit-scrollbar-thumb]:rounded-full [&::-webkit-scrollbar-track]:bg-transparent"
       >
         <WeatherSection :area-id="worldStore.selectedArea.id" inline />
         <FishingFatigue variant="default" :area-id="worldStore.selectedArea.id || null" />
@@ -232,8 +232,8 @@ async function confirm() {
         <PrepareLakeFish />
 
         <!-- Loading state -->
-        <div v-if="loading" class="flex-1 flex flex-col items-center justify-center gap-3.5 text-[#617565] text-sm">
-          <div class="w-9 h-9 border-[3px] border-[#cbd9c6] border-t-[#526a58] rounded-full animate-spin"></div>
+        <div v-if="loading" class="flex-1 flex flex-col items-center justify-center gap-3.5 text-content-subtle text-sm">
+          <div class="w-9 h-9 border-[3px] border-border-default border-t-palette-526a58 rounded-full animate-spin"></div>
           <span>{{ tr("PrepareModal.dang_tai_trang_bi") }}</span>
         </div>
 
@@ -264,7 +264,7 @@ async function confirm() {
 
       <!-- Footer -->
       <footer
-        class="flex items-center justify-between flex-wrap gap-4 px-7 py-3.5 bg-[#eaf2e5] border-t border-[#cbd9c6]"
+        class="flex items-center justify-between flex-wrap gap-4 px-7 py-3.5 bg-surface-hover border-t border-border-default"
       >
         <div
           v-if="proceedBlockReason"
@@ -278,7 +278,7 @@ async function confirm() {
         <div class="flex items-center gap-3 ml-auto">
           <button
             type="button"
-            class="inline-flex items-center justify-center gap-2 px-4 py-2 border border-[#344f3b] rounded-xl text-sm font-bold cursor-pointer transition-all duration-150 active:scale-95 bg-[#344f3b] text-[#f5f9f0] shadow-md hover:not-disabled:bg-[#24352a] disabled:opacity-50 disabled:cursor-not-allowed"
+            class="inline-flex items-center justify-center gap-2 px-4 py-2 border border-content-secondary rounded-xl text-sm font-bold cursor-pointer transition-all duration-150 active:scale-95 bg-content-secondary text-surface shadow-md hover:not-disabled:bg-content disabled:opacity-50 disabled:cursor-not-allowed"
             :disabled="!canProceed"
             :title="proceedBlockReason || tr('PrepareModal.san_sang_tiep_tuc')"
             @click="confirm"

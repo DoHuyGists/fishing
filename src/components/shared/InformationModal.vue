@@ -22,7 +22,7 @@ watch([content, dialog], () => {
       ref="dialog"
       aria-labelledby="information-modal-title"
       aria-describedby="information-modal-description"
-      class="fixed inset-0 m-auto max-h-[85dvh] w-[calc(100%-2rem)] max-w-sm overflow-y-auto rounded-2xl border border-[#cbd9c6] bg-[#f5f9f0] p-0 text-[#24352a] shadow-xl backdrop:bg-black/40"
+      class="fixed inset-0 m-auto max-h-[85dvh] w-[calc(100%-2rem)] max-w-sm overflow-y-auto rounded-2xl border border-border-default bg-surface p-0 text-content shadow-xl backdrop:bg-black/40"
       @cancel.prevent="close"
       @close="close"
       @click.self="close"
@@ -32,7 +32,7 @@ watch([content, dialog], () => {
           type="button"
           autofocus
           :aria-label="tr('InformationModal.dong_thong_tin')"
-          class="absolute right-2 top-2 flex size-8 cursor-pointer items-center justify-center rounded-full text-2xl hover:bg-[#cbd9c6]/50 focus-visible:outline-2 focus-visible:outline-offset-2"
+          class="absolute right-2 top-2 flex size-8 cursor-pointer items-center justify-center rounded-full text-2xl hover:bg-border-default/50 focus-visible:outline-2 focus-visible:outline-offset-2"
           @click="close"
         >×</button>
         <img v-if="content.image" :src="content.image" :alt="content.name" class="mx-auto mb-4 size-16 object-contain" draggable="false">

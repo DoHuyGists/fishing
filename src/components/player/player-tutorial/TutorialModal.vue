@@ -45,15 +45,15 @@ onMounted(() => store.load());
 
 <template>
   <Modal :title="tr('TutorialModal.thuc_hanh_cau_ca')" :show-count-data="false" :on-refresh="store.load">
-    <div class="space-y-4 p-2 text-[#24352a] sm:p-4">
+    <div class="space-y-4 p-2 text-content sm:p-4">
       <div
-        class="slide-fade-in from-top player-content-in flex flex-wrap items-center justify-between gap-3 rounded-xl border border-[#cbd9c6] bg-[#f5f9f0] p-4"
+        class="slide-fade-in from-top player-content-in flex flex-wrap items-center justify-between gap-3 rounded-xl border border-border-default bg-surface p-4"
       >
         <div class="max-w-2xl text-sm leading-6">
           {{ tr("TutorialModal.tap_luyen_voi_trang_bi_co_san_ca_moi_va_tien_do_trong_man_huong_") }}
         </div>
         <div
-          class="flex gap-1 rounded-lg border border-[#cbd9c6] bg-white p-1"
+          class="flex gap-1 rounded-lg border border-border-default bg-white p-1"
           role="group"
           :aria-label="tr('CaughtModal.che_do_hien_thi')"
         >
@@ -62,8 +62,8 @@ onMounted(() => store.load());
             :key="mode.value"
             type="button"
             :aria-pressed="store.viewMode === mode.value"
-            class="rounded-md px-3 py-2 text-xs font-bold hover:bg-[#e2ecdc]"
-            :class="store.viewMode === mode.value ? 'bg-[#e2ecdc]' : ''"
+            class="rounded-md px-3 py-2 text-xs font-bold hover:bg-palette-e2ecdc"
+            :class="store.viewMode === mode.value ? 'bg-palette-e2ecdc' : ''"
             @click="store.setViewMode(mode.value)"
           >
             {{ mode.label }}
@@ -74,7 +74,7 @@ onMounted(() => store.load());
       <div v-if="store.loading" role="status" class="py-12 text-center">
         {{ tr("TutorialModal.dang_tai_man_huong_dan") }}
       </div>
-      <div v-else-if="store.error" role="alert" class="rounded-xl border border-[#cbd9c6] bg-[#f5f9f0] p-5 text-sm">
+      <div v-else-if="store.error" role="alert" class="rounded-xl border border-border-default bg-surface p-5 text-sm">
         <div>{{ store.error }}</div>
         <button type="button" class="mt-3 font-bold underline" @click="store.load">
           {{ tr("Maintenance.thu_lai") }}
@@ -95,7 +95,7 @@ onMounted(() => store.load());
           type="button"
           :disabled="opening"
           :aria-label="tr('TutorialModal.choi_man_value0', { value0: lesson.title })"
-          class="slide-fade-in from-bottom player-content-in overflow-hidden rounded-2xl border border-[#cbd9c6] bg-[#f5f9f0] text-left transition hover:border-[#70a77e] hover:shadow-md focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-emerald-700 disabled:opacity-50"
+          class="slide-fade-in from-bottom player-content-in overflow-hidden rounded-2xl border border-border-default bg-surface text-left transition hover:border-palette-70a77e hover:shadow-md focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-emerald-700 disabled:opacity-50"
           :class="store.viewMode === 'list' ? 'flex flex-col sm:flex-row' : ''"
           @click="enterLesson(lesson.slug)"
         >
@@ -108,7 +108,7 @@ onMounted(() => store.load());
             draggable="false"
           />
           <div class="flex flex-1 flex-col gap-3 p-4">
-            <div class="text-xs font-semibold text-[#61745d]">
+            <div class="text-xs font-semibold text-palette-61745d">
               {{ tr("TutorialModal.khoang") }} {{ lesson.duration_minutes }}
               {{ tr("TutorialModal.phut_tap_luyen_tu_do") }}
             </div>

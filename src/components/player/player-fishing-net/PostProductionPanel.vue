@@ -123,7 +123,7 @@ function toggleSpecies(key: string) {
         <section
           v-for="group in speciesGroups"
           :key="group.key"
-          class="overflow-hidden rounded-md border border-emerald-900/15 bg-[#f5f9f0]"
+          class="overflow-hidden rounded-md border border-emerald-900/15 bg-surface"
         >
           <button
             type="button"
@@ -136,7 +136,7 @@ function toggleSpecies(key: string) {
               :alt="group.name"
               class="h-12 w-14 shrink-0 rounded object-cover"
             />
-            <span class="min-w-0 grow truncate text-sm font-bold text-[#24352a]">{{ group.name }}</span>
+            <span class="min-w-0 grow truncate text-sm font-bold text-content">{{ group.name }}</span>
             <span class="shrink-0 rounded-full bg-white px-2 py-1 text-xs font-bold"
               >{{ group.fishes.length }} {{ tr("Fishfarm.ca_2") }}</span
             >

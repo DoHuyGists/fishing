@@ -71,7 +71,7 @@ const save = (payload: any, id: string | null) => {
         :src="value"
         :alt="item.name"
         loading="lazy"
-        class="size-16 rounded-md border border-[#cbd9c6] bg-[#f5f9f0] object-contain"
+        class="size-16 rounded-md border border-border-default bg-surface object-contain"
       />
       <span v-else class="text-gray-400">Chưa có ảnh</span>
     </template>

@@ -41,14 +41,14 @@ const caughtDate = computed(() => {
 
 <template>
   <article
-    class="min-w-0 self-start overflow-hidden rounded-xl border border-[#cbd9c6] bg-white"
+    class="min-w-0 self-start overflow-hidden rounded-xl border border-border-default bg-white"
     :class="list ? 'sm:flex' : ''"
   >
     <div
-      class="flex items-center justify-center border-[#cbd9c6] bg-[#edf3e7] p-3"
+      class="flex items-center justify-center border-border-default bg-palette-edf3e7 p-3"
       :class="list ? 'h-28 border-b sm:h-36 sm:w-40 sm:shrink-0 sm:border-b-0 sm:border-r' : 'aspect-[2/1] border-b'"
     >
-      <span v-if="!entry.isCaught" class="flex flex-col items-center gap-2 text-center text-xs text-[#52664e]">
+      <span v-if="!entry.isCaught" class="flex flex-col items-center gap-2 text-center text-xs text-palette-52664e">
         <span aria-hidden="true" class="text-3xl">🔒</span>
         {{ tr("CatchDiaryModal.notConquered") }}
       </span>
@@ -65,20 +65,20 @@ const caughtDate = computed(() => {
     <div class="min-w-0 flex-1 space-y-3 p-3">
       <div class="break-words text-base font-bold">{{ entry.species.name }}</div>
       <div class="flex flex-wrap gap-2 text-xs">
-        <span class="rounded-lg border border-[#cbd9c6] bg-[#f5f9f0] px-2 py-1">
+        <span class="rounded-lg border border-border-default bg-surface px-2 py-1">
           {{ tr("CatchDiaryModal.rarity") }}: {{ entry.species.rarity || tr("FlipBook.da_cau") }}
         </span>
-        <span v-if="caughtDate" class="rounded-lg border border-[#cbd9c6] bg-[#f5f9f0] px-2 py-1">
+        <span v-if="caughtDate" class="rounded-lg border border-border-default bg-surface px-2 py-1">
           {{ tr("CatchDiaryModal.caughtOn", { value0: caughtDate }) }}
         </span>
       </div>
       <RichTextContent :content="entry.species.information || tr('FlipBook.chua_co_thong_tin_sinh_thai')" />
       <details
-        class="group border-t border-[#cbd9c6] pt-2"
+        class="group border-t border-border-default pt-2"
         @toggle="($event.target as HTMLDetailsElement).open && diaryStore.loadSpeciesDetails(entry.species.id)"
       >
         <summary
-          class="cursor-pointer rounded text-sm font-semibold text-[#52664e] focus-visible:outline-2 focus-visible:outline-[#698563]"
+          class="cursor-pointer rounded text-sm font-semibold text-palette-52664e focus-visible:outline-2 focus-visible:outline-palette-698563"
         >
           {{ tr("CatchDiaryModal.speciesDetails") }}
         </summary>
@@ -95,9 +95,9 @@ const caughtDate = computed(() => {
           <div
             v-for="stat in stats"
             :key="stat.key"
-            class="min-w-0 rounded-lg border border-[#cbd9c6] bg-[#f5f9f0] p-2"
+            class="min-w-0 rounded-lg border border-border-default bg-surface p-2"
           >
-            <div class="text-xs text-[#52664e]">{{ tr(`FishingMapModal.${stat.key}`) }}</div>
+            <div class="text-xs text-palette-52664e">{{ tr(`FishingMapModal.${stat.key}`) }}</div>
             <div class="mt-1 break-words text-sm font-semibold">{{ stat.value }}</div>
           </div>
         </div>

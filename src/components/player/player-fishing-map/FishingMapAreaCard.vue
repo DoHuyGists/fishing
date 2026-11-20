@@ -9,11 +9,11 @@ defineProps<{ area: FishingMapArea; viewMode: "list" | "grid" }>();
 
 <template>
   <article
-    class="player-popup-in rounded-xl border border-[#cbd9c6] bg-white overflow-hidden"
+    class="player-popup-in rounded-xl border border-border-default bg-white overflow-hidden"
     :class="viewMode === 'list' ? 'sm:flex' : ''"
   >
     <div
-      class="flex shrink-0 items-center justify-center overflow-hidden bg-[#e5eddf]"
+      class="flex shrink-0 items-center justify-center overflow-hidden bg-palette-e5eddf"
       :class="viewMode === 'list' ? 'h-36 sm:h-auto sm:w-1/3' : 'h-40'"
     >
       <img
@@ -43,7 +43,7 @@ defineProps<{ area: FishingMapArea; viewMode: "list" | "grid" }>();
             v-for="species in area.species"
             :key="species.speciesId"
             type="button"
-            class="flex items-center gap-2 rounded-lg border border-[#cbd9c6] bg-[#f5f9f0] px-2 py-1 text-left text-xs transition-colors hover:bg-[#e5eddf] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-emerald-700"
+            class="flex items-center gap-2 rounded-lg border border-border-default bg-surface px-2 py-1 text-left text-xs transition-colors hover:bg-palette-e5eddf focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-emerald-700"
             aria-haspopup="dialog"
             @click="store.selectedSpecies = species"
           >
@@ -58,7 +58,7 @@ defineProps<{ area: FishingMapArea; viewMode: "list" | "grid" }>();
           </button>
         </div>
       </details>
-      <div v-else class="mt-3 text-sm text-[#607176]">{{ tr("FishingMapModal.noSpecies") }}</div>
+      <div v-else class="mt-3 text-sm text-palette-607176">{{ tr("FishingMapModal.noSpecies") }}</div>
     </div>
   </article>
 </template>

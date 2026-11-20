@@ -10,7 +10,7 @@ const store = useAdminEventStore();
     <aside class="ml-auto flex h-full w-full max-w-xl flex-col border-l border-gray-200 bg-white shadow-xl">
       <div class="flex shrink-0 items-center justify-between border-b border-gray-200 px-5 py-4">
         <div>
-          <div class="m-0 text-base font-extrabold text-[#153221]">
+          <div class="m-0 text-base font-extrabold text-content-strong">
             {{ store.form.id ? "Chỉnh sửa sự kiện" : "Thêm sự kiện" }}
           </div>
           <div class="m-0 mt-1 text-xs text-gray-500">Thông tin trong bảng event</div>
@@ -76,7 +76,7 @@ const store = useAdminEventStore();
         <button
           type="button"
           :disabled="store.isSaving"
-          class="rounded-lg bg-[#153221] px-4 py-2 text-sm font-bold text-white hover:bg-emerald-800 disabled:opacity-50"
+          class="rounded-lg bg-content-strong px-4 py-2 text-sm font-bold text-white hover:bg-emerald-800 disabled:opacity-50"
           @click="store.save()"
         >
           {{ store.isSaving ? "Đang lưu..." : "Lưu sự kiện" }}

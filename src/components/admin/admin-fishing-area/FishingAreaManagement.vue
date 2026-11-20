@@ -185,7 +185,7 @@ watch(
       <button
         type="button"
         @click="adminFishingAreaStore.openForm()"
-        class="px-3 py-1.5 rounded-lg bg-[#153221] hover:bg-emerald-800 text-white text-xs font-bold flex items-center gap-1.5 cursor-pointer transition-colors"
+        class="px-3 py-1.5 rounded-lg bg-content-strong hover:bg-emerald-800 text-white text-xs font-bold flex items-center gap-1.5 cursor-pointer transition-colors"
       >
         <span>+ Thêm bãi câu</span>
       </button>

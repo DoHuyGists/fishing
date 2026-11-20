@@ -20,11 +20,11 @@ const emit = defineEmits<{
     type="button"
     class="slide-fade-in from-bottom player-content-in group flex w-full min-w-0 overflow-hidden rounded-xl border bg-white text-left shadow-sm transition hover:-translate-y-0.5 hover:shadow-md"
     :class="
-      selected ? 'border-emerald-700 ring-2 ring-emerald-700/20' : 'border-[#cbd9c6]'
+      selected ? 'border-emerald-700 ring-2 ring-emerald-700/20' : 'border-border-default'
     "
     @click="emit('select', item.id)"
   >
-    <div class="grid h-40 aspect-square shrink-0 place-items-center overflow-hidden bg-[#f5f9f0]">
+    <div class="grid h-40 aspect-square shrink-0 place-items-center overflow-hidden bg-surface">
       <img
         v-if="item.image"
         :src="item.image"
@@ -47,7 +47,7 @@ const emit = defineEmits<{
       <div class="m-0 truncate text-sm font-extrabold" :title="item.name">{{ item.name }}</div>
       <div class="m-0 mt-1 line-clamp-2 text-xs text-emerald-950/65">{{ item.information }}</div>
       <div
-        class="mt-auto flex items-center justify-between gap-1 border-t border-[#cbd9c6]/70 pt-2 text-xs"
+        class="mt-auto flex items-center justify-between gap-1 border-t border-border-default/70 pt-2 text-xs"
       >
         <span class="rounded bg-emerald-50 px-1.5 py-0.5 text-emerald-900">{{
           item.category || tr('ShopModal.vat_pham')

@@ -544,7 +544,7 @@ const close = () => {
   <div class="min-h-screen bg-slate-50 text-slate-800 lg:flex">
     <!-- Sidebar -->
     <aside
-      class="hidden lg:sticky lg:top-0 lg:flex lg:h-dvh lg:w-52 lg:shrink-0 lg:self-start flex-col overflow-hidden bg-[#153221] text-emerald-50"
+      class="hidden lg:sticky lg:top-0 lg:flex lg:h-dvh lg:w-52 lg:shrink-0 lg:self-start flex-col overflow-hidden bg-content-strong text-emerald-50"
     >
       <div class="shrink-0 px-3 py-2 border-b border-white/10">
         <div class="text-sm font-bold leading-tight">{{ tr("AdminView.quan_tri") }}</div>
@@ -578,15 +578,15 @@ const close = () => {
 
     <!-- Main -->
     <main class="flex-1 min-w-0">
-      <header class="bg-white border-b border-[#cbd9c6] px-3 py-2 flex flex-wrap items-center gap-2 justify-between">
+      <header class="bg-white border-b border-border-default px-3 py-2 flex flex-wrap items-center gap-2 justify-between">
         <div>
-          <div class="text-sm font-bold text-[#153221]">{{ tr("AdminView.bang_dieu_khien") }}</div>
+          <div class="text-sm font-bold text-content-strong">{{ tr("AdminView.bang_dieu_khien") }}</div>
         </div>
 
         <div class="flex w-full flex-wrap items-center gap-1.5 sm:w-auto sm:justify-end">
           <button
             type="button"
-            class="rounded-md border border-[#cbd9c6] bg-[#f5f9f0] px-2.5 py-1.5 text-xs font-semibold text-[#24352a] hover:bg-emerald-100 focus-visible:outline-2 focus-visible:outline-emerald-600"
+            class="rounded-md border border-border-default bg-surface px-2.5 py-1.5 text-xs font-semibold text-content hover:bg-emerald-100 focus-visible:outline-2 focus-visible:outline-emerald-600"
             aria-haspopup="dialog"
             :aria-expanded="monitorOpen"
             @click="monitorOpen = true"
@@ -595,7 +595,7 @@ const close = () => {
           </button>
           <button
             type="button"
-            class="rounded-md border border-[#cbd9c6] bg-[#f5f9f0] px-2.5 py-1.5 text-xs font-semibold text-[#24352a] hover:bg-emerald-100 focus-visible:outline-2 focus-visible:outline-emerald-600"
+            class="rounded-md border border-border-default bg-surface px-2.5 py-1.5 text-xs font-semibold text-content hover:bg-emerald-100 focus-visible:outline-2 focus-visible:outline-emerald-600"
             aria-haspopup="dialog"
             :aria-expanded="guideStore.isOpen"
             @click="guideStore.open"
@@ -622,7 +622,7 @@ const close = () => {
               v-model="keyword"
               type="search"
               :placeholder="tr('AdminView.tim_muc_quan_ly_2')"
-              class="w-full rounded-md border border-[#cbd9c6] bg-white py-1.5 pl-8 pr-2 text-xs placeholder:text-slate-400 focus:border-emerald-600 focus:outline-none focus:ring-2 focus:ring-emerald-600/25"
+              class="w-full rounded-md border border-border-default bg-white py-1.5 pl-8 pr-2 text-xs placeholder:text-slate-400 focus:border-emerald-600 focus:outline-none focus:ring-2 focus:ring-emerald-600/25"
             />
             <span class="pointer-events-none absolute left-3 top-1/2 -translate-y-1/2 text-slate-400" aria-hidden="true"
               >🔍</span
@@ -635,30 +635,30 @@ const close = () => {
         <section
           v-for="group in filteredGroups"
           :key="group.title"
-          class="mb-2 break-inside-avoid rounded-md border border-[#cbd9c6] bg-white p-2"
+          class="mb-2 break-inside-avoid rounded-md border border-border-default bg-white p-2"
         >
-          <div class="mb-1 border-b border-[#cbd9c6] pb-1 text-xs font-bold text-[#24352a]">{{ group.title }}</div>
+          <div class="mb-1 border-b border-border-default pb-1 text-xs font-bold text-content">{{ group.title }}</div>
 
           <div class="grid gap-0.5">
             <button
               v-for="m in group.modules"
               :key="m.key"
               type="button"
-              class="flex min-h-8 items-center gap-2 rounded px-1.5 py-1 text-left transition-colors hover:bg-[#f5f9f0] cursor-pointer focus-visible:outline-2 focus-visible:outline-emerald-600"
+              class="flex min-h-8 items-center gap-2 rounded px-1.5 py-1 text-left transition-colors hover:bg-surface cursor-pointer focus-visible:outline-2 focus-visible:outline-emerald-600"
               :title="m.desc"
               @click="open(m.key)"
             >
               <span class="w-5 shrink-0 text-center text-sm" aria-hidden="true">
                 {{ m.icon }}
               </span>
-              <span class="min-w-0 text-xs leading-4 font-medium text-[#24352a]">{{ m.label }}</span>
+              <span class="min-w-0 text-xs leading-4 font-medium text-content">{{ m.label }}</span>
             </button>
           </div>
         </section>
 
         <div
           v-if="filteredGroups.length === 0"
-          class="rounded-md border border-dashed border-[#cbd9c6] bg-white p-3 text-center text-xs text-slate-500"
+          class="rounded-md border border-dashed border-border-default bg-white p-3 text-center text-xs text-slate-500"
         >
           {{ tr("AdminView.khong_co_muc_nao_khop_voi") }}{{ keyword }}{{ tr("AdminView.hay_thu_tu_khoa_khac") }}
         </div>

@@ -8,17 +8,17 @@ const goBack = () => {
 </script>
 
 <template>
-  <main class="flex min-h-screen items-center justify-center bg-[#f5f9f0] px-6 py-16 text-[#24352a]">
+  <main class="flex min-h-screen items-center justify-center bg-surface px-6 py-16 text-content">
     <section class="w-full max-w-xl" aria-labelledby="error-title">
       <!-- Khung liền nét kèm biểu tượng khóa -->
       <div
-        class="relative flex aspect-[16/7] w-full items-center justify-center rounded-2xl border-2 border-[#cbd9c6] bg-[#cbd9c6]/20"
+        class="relative flex aspect-[16/7] w-full items-center justify-center rounded-2xl border-2 border-border-default bg-border-default/20"
         aria-hidden="true"
       >
         <span class="select-none text-7xl font-semibold tracking-tight sm:text-8xl">403</span>
 
         <span
-          class="absolute right-4 top-4 flex h-11 w-11 items-center justify-center rounded-full border border-[#cbd9c6] bg-[#f5f9f0]"
+          class="absolute right-4 top-4 flex h-11 w-11 items-center justify-center rounded-full border border-border-default bg-surface"
         >
           <svg
             class="h-5 w-5"
@@ -38,20 +38,20 @@ const goBack = () => {
       <div id="error-title" class="mt-10 text-2xl font-semibold tracking-tight sm:text-3xl">
         {{ tr('Forbidden.ban_khong_co_quyen_truy_cap') }}
       </div>
-      <div class="mt-3 max-w-md text-base leading-relaxed text-[#24352a]/70">
+      <div class="mt-3 max-w-md text-base leading-relaxed text-content/70">
         {{ tr('Forbidden.tai_khoan_hien_tai_chua_duoc_cap_quyen_xem_trang_nay_hay_dang_nh') }}
       </div>
 
       <div class="mt-8 flex flex-wrap gap-3">
         <a
           href="/login"
-          class="inline-flex items-center rounded-lg border border-[#24352a] bg-[#24352a] px-5 py-2.5 text-sm font-medium text-[#f5f9f0] transition-colors hover:bg-[#24352a]/90 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#24352a]"
+          class="inline-flex items-center rounded-lg border border-content bg-content px-5 py-2.5 text-sm font-medium text-surface transition-colors hover:bg-content/90 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-content"
         >
           {{ tr('Forbidden.dang_nhap_tai_khoan_khac') }}
         </a>
         <button
           type="button"
-          class="inline-flex items-center rounded-lg border border-[#cbd9c6] bg-[#f5f9f0] px-5 py-2.5 text-sm font-medium text-[#24352a] transition-colors hover:bg-[#cbd9c6]/40 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#24352a]"
+          class="inline-flex items-center rounded-lg border border-border-default bg-surface px-5 py-2.5 text-sm font-medium text-content transition-colors hover:bg-border-default/40 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-content"
           @click="goBack"
         >
           {{ tr('Forbidden.quay_lai') }}

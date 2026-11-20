@@ -58,7 +58,7 @@ onMounted(() => {
 <template>
   <section
     :aria-label="tr('CurrencyConvertTable.quy_doi_tien_te')"
-    class="slide-fade-in from-left player-content-in min-w-0 w-full rounded-2xl border border-[#cbd9c6] bg-[#f5f9f0] p-4 text-[#24352a] sm:p-6"
+    class="slide-fade-in from-left player-content-in min-w-0 w-full rounded-2xl border border-border-default bg-surface p-4 text-content sm:p-6"
   >
     <div class="text-lg font-bold">{{ tr("CurrencyConvertTable.quy_doi_tien_te") }}</div>
     <div class="mt-1 text-sm">
@@ -85,7 +85,7 @@ onMounted(() => {
           }}
         </caption>
         <thead>
-          <tr class="border-b border-[#cbd9c6]">
+          <tr class="border-b border-border-default">
             <th scope="col" class="w-[20%] whitespace-nowrap px-2 py-3">
               {{ tr("CurrencyConvertTable.chi_moi_goi") }}
             </th>
@@ -103,7 +103,7 @@ onMounted(() => {
           <tr
             v-for="rate in currencyStore.conversionRates"
             :key="`${rate.source_currency}-${rate.target_currency}`"
-            class="border-b border-[#cbd9c6] last:border-0"
+            class="border-b border-border-default last:border-0"
           >
             <td class="px-2 py-3">
               <component :is="currencies[rate.source_currency]" :amount="rate.source_amount" :size="22" />
@@ -122,7 +122,7 @@ onMounted(() => {
                     !!pendingConversion ||
                     currencyStore.conversionAmounts(rate).batches <= 1
                   "
-                  class="flex size-11 shrink-0 items-center justify-center rounded-lg border border-[#cbd9c6] bg-white text-lg font-bold hover:bg-[#e7efdf] focus-visible:outline-2 focus-visible:outline-emerald-700 disabled:cursor-not-allowed disabled:opacity-50"
+                  class="flex size-11 shrink-0 items-center justify-center rounded-lg border border-border-default bg-white text-lg font-bold hover:bg-palette-e7efdf focus-visible:outline-2 focus-visible:outline-emerald-700 disabled:cursor-not-allowed disabled:opacity-50"
                   @click="currencyStore.adjustConversionBatches(rate, -1)"
                 >
                   −
@@ -140,7 +140,7 @@ onMounted(() => {
                     })
                   "
                   :disabled="currencyStore.converting || !!pendingConversion"
-                  class="min-h-11 w-20 rounded-lg border border-[#cbd9c6] bg-white px-2 py-2 text-center outline-none focus:border-emerald-700 focus:ring-2 focus:ring-emerald-700/15 disabled:opacity-50"
+                  class="min-h-11 w-20 rounded-lg border border-border-default bg-white px-2 py-2 text-center outline-none focus:border-emerald-700 focus:ring-2 focus:ring-emerald-700/15 disabled:opacity-50"
                 />
                 <button
                   type="button"
@@ -151,7 +151,7 @@ onMounted(() => {
                     !!pendingConversion ||
                     currencyStore.conversionAmounts(rate).batches >= Number.MAX_SAFE_INTEGER
                   "
-                  class="flex size-11 shrink-0 items-center justify-center rounded-lg border border-[#cbd9c6] bg-white text-lg font-bold hover:bg-[#e7efdf] focus-visible:outline-2 focus-visible:outline-emerald-700 disabled:cursor-not-allowed disabled:opacity-50"
+                  class="flex size-11 shrink-0 items-center justify-center rounded-lg border border-border-default bg-white text-lg font-bold hover:bg-palette-e7efdf focus-visible:outline-2 focus-visible:outline-emerald-700 disabled:cursor-not-allowed disabled:opacity-50"
                   @click="currencyStore.adjustConversionBatches(rate, 1)"
                 >
                   +
@@ -225,7 +225,7 @@ onMounted(() => {
       {{ pendingConversion.batches.toLocaleString(getFormattingLocale()) }} {{ tr("CurrencyConvertTable.goi") }}
     </div>
     <template #after-summary>
-      <div class="flex flex-wrap items-center gap-2 rounded-lg border border-[#cbd9c6] bg-[#f5f9f0] p-3 text-sm">
+      <div class="flex flex-wrap items-center gap-2 rounded-lg border border-border-default bg-surface p-3 text-sm">
         <component
           :is="currencies[pendingConversion.rate.source_currency]"
           :amount="pendingConversion.cost"

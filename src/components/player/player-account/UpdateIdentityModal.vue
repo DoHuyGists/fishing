@@ -99,24 +99,24 @@ async function saveIdentity() {
     @keydown.esc.stop="close"
   >
     <section
-      class="player-popup-in max-h-[90dvh] w-full max-w-md overflow-y-auto rounded-2xl border border-[#cbd9c6] bg-[#f5f9f0] text-sm text-[#24352a] shadow-2xl"
+      class="player-popup-in max-h-[90dvh] w-full max-w-md overflow-y-auto rounded-2xl border border-border-default bg-surface text-sm text-content shadow-2xl"
       role="dialog"
       aria-modal="true"
       aria-labelledby="update-identity-title"
     >
-      <div class="flex items-start justify-between gap-3 border-b border-[#cbd9c6] px-5 py-4">
+      <div class="flex items-start justify-between gap-3 border-b border-border-default px-5 py-4">
         <div>
           <div id="update-identity-title" class="text-lg font-bold">
             {{ tr("UpdateIdentityModal.ten_va_anh_dai_dien") }}
           </div>
-          <div class="mt-1 text-xs text-[#52654f]">
+          <div class="mt-1 text-xs text-content-muted">
             {{ tr("UpdateIdentityModal.cap_nhat_cach_ban_xuat_hien_trong_tro_choi") }}
           </div>
         </div>
         <button
           type="button"
           :aria-label="tr('ChangePasswordModal.dong')"
-          class="flex size-8 shrink-0 items-center justify-center rounded-full text-2xl transition hover:bg-[#cbd9c6]/40 focus-visible:outline-2 focus-visible:outline-offset-2 disabled:opacity-50"
+          class="flex size-8 shrink-0 items-center justify-center rounded-full text-2xl transition hover:bg-border-default/40 focus-visible:outline-2 focus-visible:outline-offset-2 disabled:opacity-50"
           :disabled="identityBusy"
           @click="close"
         >
@@ -127,9 +127,9 @@ async function saveIdentity() {
         <fieldset :disabled="identityBusy" class="min-w-0 space-y-5 p-5 disabled:opacity-60">
           <div>
             <div class="mb-3 font-semibold">{{ tr("UpdateIdentityModal.anh_dai_dien") }}</div>
-            <div class="flex items-center gap-4 rounded-xl border border-[#cbd9c6] bg-white p-4">
+            <div class="flex items-center gap-4 rounded-xl border border-border-default bg-white p-4">
               <div
-                class="flex size-20 shrink-0 items-center justify-center overflow-hidden rounded-full border border-[#cbd9c6] bg-[#e7ecda] text-3xl font-bold"
+                class="flex size-20 shrink-0 items-center justify-center overflow-hidden rounded-full border border-border-default bg-surface-muted text-3xl font-bold"
               >
                 <img
                   v-if="previewUrl && !previewFailed"
@@ -155,15 +155,15 @@ async function saveIdentity() {
                 />
                 <button
                   type="button"
-                  class="rounded-lg border border-[#cbd9c6] bg-[#f5f9f0] px-3 py-2 font-semibold transition hover:bg-[#e7ecda] focus-visible:outline-2 focus-visible:outline-offset-2"
+                  class="rounded-lg border border-border-default bg-surface px-3 py-2 font-semibold transition hover:bg-surface-muted focus-visible:outline-2 focus-visible:outline-offset-2"
                   @click="avatarInput?.click()"
                 >
                   {{ avatarFile ? tr("UpdateIdentityModal.doi_anh") : tr("UpdateIdentityModal.chon_anh") }}
                 </button>
-                <div class="mt-2 text-xs leading-relaxed text-[#52654f]">
+                <div class="mt-2 text-xs leading-relaxed text-content-muted">
                   {{ tr("UpdateIdentityModal.jpg_png_webp_toi_da_2_mb") }}
                 </div>
-                <div v-if="avatarFile" class="mt-1 truncate text-xs text-[#52654f]" :title="avatarFile.name">
+                <div v-if="avatarFile" class="mt-1 truncate text-xs text-content-muted" :title="avatarFile.name">
                   {{ avatarFile.name }}
                 </div>
               </div>
@@ -183,7 +183,7 @@ async function saveIdentity() {
               <button
                 v-if="previewUrl"
                 type="button"
-                class="rounded text-xs font-medium text-[#52654f] underline underline-offset-4 focus-visible:outline-2 focus-visible:outline-offset-2"
+                class="rounded text-xs font-medium text-content-muted underline underline-offset-4 focus-visible:outline-2 focus-visible:outline-offset-2"
                 @click="removeAvatar"
               >
                 {{ tr("UpdateIdentityModal.dung_chu_cai_dai_dien") }}
@@ -209,16 +209,16 @@ async function saveIdentity() {
               minlength="2"
               maxlength="40"
               aria-describedby="identity-name-hint"
-              class="mt-2 w-full rounded-lg border border-[#cbd9c6] bg-white px-3 py-2.5 focus:border-[#52654f] focus:outline-2 focus:outline-[#cbd9c6]"
+              class="mt-2 w-full rounded-lg border border-border-default bg-white px-3 py-2.5 focus:border-content-muted focus:outline-2 focus:outline-border-default"
             />
-            <div id="identity-name-hint" class="mt-1.5 text-xs text-[#52654f]">
+            <div id="identity-name-hint" class="mt-1.5 text-xs text-content-muted">
               {{ tr("UpdateIdentityModal.tu_2_den_40_ky_tu") }}
             </div>
           </div>
-          <details class="rounded-xl border border-[#cbd9c6] bg-white px-4 py-3">
+          <details class="rounded-xl border border-border-default bg-white px-4 py-3">
             <summary class="cursor-pointer font-medium">{{ tr("UpdateIdentityModal.dung_duong_dan_anh") }}</summary>
             <div class="mt-3">
-              <label for="identity-avatar-url" class="text-xs text-[#52654f]">{{
+              <label for="identity-avatar-url" class="text-xs text-content-muted">{{
                 tr("UpdateIdentityModal.duong_dan_anh_https")
               }}</label>
               <input
@@ -228,9 +228,9 @@ async function saveIdentity() {
                 :disabled="!!avatarFile"
                 placeholder="https://…"
                 aria-describedby="identity-url-hint"
-                class="mt-1.5 w-full rounded-lg border border-[#cbd9c6] bg-[#f5f9f0] px-3 py-2.5 focus:outline-2 focus:outline-[#cbd9c6] disabled:opacity-50"
+                class="mt-1.5 w-full rounded-lg border border-border-default bg-surface px-3 py-2.5 focus:outline-2 focus:outline-border-default disabled:opacity-50"
               />
-              <div id="identity-url-hint" class="mt-2 text-xs leading-relaxed text-[#52654f]">
+              <div id="identity-url-hint" class="mt-2 text-xs leading-relaxed text-content-muted">
                 {{
                   avatarFile
                     ? tr("UpdateIdentityModal.bo_anh_vua_chon_de_dung_duong_dan_anh")
@@ -247,11 +247,11 @@ async function saveIdentity() {
         >
           {{ identityError }}
         </div>
-        <div class="flex justify-end gap-3 border-t border-[#cbd9c6] px-5 py-4">
+        <div class="flex justify-end gap-3 border-t border-border-default px-5 py-4">
           <button
             type="button"
             :disabled="identityBusy"
-            class="rounded-lg border border-[#cbd9c6] px-4 py-2.5 font-medium transition hover:bg-[#e7ecda] focus-visible:outline-2 focus-visible:outline-offset-2 disabled:opacity-50"
+            class="rounded-lg border border-border-default px-4 py-2.5 font-medium transition hover:bg-surface-muted focus-visible:outline-2 focus-visible:outline-offset-2 disabled:opacity-50"
             @click="close"
           >
             {{ tr("ChangePasswordModal.dong") }}
@@ -259,7 +259,7 @@ async function saveIdentity() {
           <button
             type="submit"
             :disabled="identityBusy"
-            class="rounded-lg bg-[#24352a] px-4 py-2.5 font-semibold text-white transition hover:bg-[#364c3d] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#24352a] disabled:opacity-50"
+            class="rounded-lg bg-content px-4 py-2.5 font-semibold text-white transition hover:bg-palette-364c3d focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-content disabled:opacity-50"
           >
             {{ identityBusy ? tr("ChangePasswordModal.dang_luu") : tr("UpdateIdentityModal.luu_ho_so") }}
           </button>

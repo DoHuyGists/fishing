@@ -19,7 +19,7 @@ const fields = [
   <dl class="m-0 grid grid-cols-2 gap-3 text-xs">
     <div v-for="field in fields" :key="field.key" class="min-w-0">
       <dt class="text-gray-500">{{ field.label }}</dt>
-      <dd class="m-0 mt-1 break-words text-[#24352a]">{{ species[field.key] ?? "—" }}</dd>
+      <dd class="m-0 mt-1 break-words text-content">{{ species[field.key] ?? "—" }}</dd>
     </div>
   </dl>
 </template>

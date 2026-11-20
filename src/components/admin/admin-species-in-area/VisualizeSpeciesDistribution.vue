@@ -40,7 +40,7 @@ onMounted(() => {
 
 <template>
   <section
-    class="player-popup-in w-full rounded-xl border border-[#cbd9c6] bg-[#f5f9f0] p-3 text-[#24352a] sm:p-4"
+    class="player-popup-in w-full rounded-xl border border-border-default bg-surface p-3 text-content sm:p-4"
     :aria-busy="state?.loading || state?.saving"
   >
     <div class="mb-3 flex flex-wrap items-center justify-between gap-2">
@@ -51,7 +51,7 @@ onMounted(() => {
         >
         <button
           type="button"
-          class="rounded-lg border border-[#cbd9c6] bg-white px-3 py-1.5 text-xs font-semibold disabled:opacity-40"
+          class="rounded-lg border border-border-default bg-white px-3 py-1.5 text-xs font-semibold disabled:opacity-40"
           :disabled="state?.loading || state?.saving"
           @click="store.loadDistribution(areaId, true)"
         >
@@ -83,7 +83,7 @@ onMounted(() => {
             <label
               v-for="row in rows"
               :key="row.speciesId"
-              class="flex items-center gap-2 rounded-lg border border-[#cbd9c6] bg-white px-2.5 py-2"
+              class="flex items-center gap-2 rounded-lg border border-border-default bg-white px-2.5 py-2"
             >
               <img
                 v-if="row.speciesImage"
@@ -96,7 +96,7 @@ onMounted(() => {
                 <span class="block truncate text-xs font-semibold" :title="row.speciesName || ''">{{
                   row.speciesName || "Chưa đặt tên"
                 }}</span>
-                <span class="block text-[11px] text-[#24352a]/70">{{ percent(row.speciesId) }}%</span>
+                <span class="block text-[11px] text-content/70">{{ percent(row.speciesId) }}%</span>
               </span>
               <input
                 type="number"
@@ -105,12 +105,12 @@ onMounted(() => {
                 :value="weights[row.speciesId]"
                 :aria-label="`Tỉ trọng ${row.speciesName || row.speciesId}`"
                 :disabled="state.saving"
-                class="w-28 rounded-md border border-[#cbd9c6] bg-[#f5f9f0] px-2 py-1.5 text-right text-xs focus:outline-emerald-600 disabled:opacity-50"
+                class="w-28 rounded-md border border-border-default bg-surface px-2 py-1.5 text-right text-xs focus:outline-emerald-600 disabled:opacity-50"
                 @input="setWeight(row.speciesId, $event)"
               />
             </label>
           </div>
-          <div class="mt-3 text-xs leading-relaxed text-[#24352a]/70">
+          <div class="mt-3 text-xs leading-relaxed text-content/70">
             Tỉ trọng là giá trị tương đối, không bắt buộc tổng bằng 100. Biểu đồ luôn bao gồm mọi loài của bãi câu, kể
             cả khi danh sách đang lọc hoặc phân trang.
           </div>
@@ -122,7 +122,7 @@ onMounted(() => {
           </div>
         </div>
       </div>
-      <div class="mt-3 flex flex-wrap items-center justify-end gap-2 border-t border-[#cbd9c6] pt-3">
+      <div class="mt-3 flex flex-wrap items-center justify-end gap-2 border-t border-border-default pt-3">
         <span v-if="state.saved" role="status" class="mr-auto text-xs font-semibold text-emerald-800"
           >Đã lưu phân bổ.</span
         >
@@ -130,7 +130,7 @@ onMounted(() => {
         <button
           type="button"
           :disabled="!dirty || state.saving"
-          class="rounded-lg border border-[#cbd9c6] bg-white px-3 py-2 text-xs font-bold disabled:opacity-40"
+          class="rounded-lg border border-border-default bg-white px-3 py-2 text-xs font-bold disabled:opacity-40"
           @click="store.resetDistribution(areaId)"
         >
           Hoàn tác
@@ -138,7 +138,7 @@ onMounted(() => {
         <button
           type="button"
           :disabled="!dirty || !valid || state.saving"
-          class="rounded-lg bg-[#153221] px-3 py-2 text-xs font-bold text-white hover:bg-emerald-800 disabled:opacity-40"
+          class="rounded-lg bg-content-strong px-3 py-2 text-xs font-bold text-white hover:bg-emerald-800 disabled:opacity-40"
           @click="store.saveDistribution(areaId)"
         >
           {{ state.saving ? "Đang lưu..." : "Lưu phân bổ" }}

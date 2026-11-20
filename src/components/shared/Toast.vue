@@ -118,7 +118,7 @@ onBeforeUnmount(() => activeTimers.forEach(clearTimeout));
         <article
           v-for="toast in group.items"
           :key="toast.id"
-          class="pointer-events-auto flex items-start gap-3 rounded-2xl border border-[#cbd9c6] border-l-4 bg-[#f5f9f0] px-4 py-4 text-[#24352a] shadow-[0_16px_40px_rgba(36,53,42,0.16)] ring-1 ring-white/80 transition-[opacity,transform,box-shadow] duration-200 ease-out hover:shadow-[0_20px_48px_rgba(36,53,42,0.2)] motion-reduce:transition-none"
+          class="pointer-events-auto flex items-start gap-3 rounded-2xl border border-border-default border-l-4 bg-surface px-4 py-4 text-content shadow-[0_16px_40px_rgba(36,53,42,0.16)] ring-1 ring-white/80 transition-[opacity,transform,box-shadow] duration-200 ease-out hover:shadow-[0_20px_48px_rgba(36,53,42,0.2)] motion-reduce:transition-none"
           :class="variantClasses[toast.variant]"
           :role="toast.variant === 'error' ? 'alert' : 'status'"
           @mouseenter="clearTimer(toast.id)"
@@ -134,10 +134,10 @@ onBeforeUnmount(() => activeTimers.forEach(clearTimeout));
             <strong v-if="toast.title" class="mb-1 block text-sm font-bold leading-snug tracking-[0.01em]">{{
               toast.title
             }}</strong>
-            <div class="m-0 break-words text-sm leading-relaxed text-[#526354]">{{ toast.message }}</div>
+            <div class="m-0 break-words text-sm leading-relaxed text-palette-526354">{{ toast.message }}</div>
             <button
               v-if="toast.action"
-              class="mt-2 inline-flex rounded-md bg-transparent p-0 text-sm font-bold underline decoration-1 underline-offset-4 transition-colors hover:brightness-75 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#78906f] focus-visible:ring-offset-2"
+              class="mt-2 inline-flex rounded-md bg-transparent p-0 text-sm font-bold underline decoration-1 underline-offset-4 transition-colors hover:brightness-75 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-palette-78906f focus-visible:ring-offset-2"
               :class="variantTextClasses[toast.variant]"
               type="button"
               @click="runAction(toast)"
@@ -147,7 +147,7 @@ onBeforeUnmount(() => activeTimers.forEach(clearTimeout));
           </div>
           <button
             v-if="toast.dismissible"
-            class="-mr-1 -mt-1 grid h-8 w-8 flex-none place-items-center rounded-lg bg-transparent text-xl leading-none transition-colors hover:bg-black/5 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#78906f]"
+            class="-mr-1 -mt-1 grid h-8 w-8 flex-none place-items-center rounded-lg bg-transparent text-xl leading-none transition-colors hover:bg-black/5 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-palette-78906f"
             :class="variantTextClasses[toast.variant]"
             type="button"
             :aria-label="tr('Toast.dong_thong_bao_value0', { value0: toast.message })"

@@ -29,7 +29,7 @@ watch(
 <template>
   <Modal :title="tr('LeaderboardModal.bang_xep_hang')" :on-refresh="load" :show-count-data="false">
     <div
-      class="mx-auto px-1 py-1 text-[#24352a] sm:px-4 sm:py-3"
+      class="mx-auto px-1 py-1 text-content sm:px-4 sm:py-3"
       :class="leaderboardStore.activeTab === 'rules' ? 'max-w-[1440px]' : 'max-w-5xl'"
     >
       <Tab

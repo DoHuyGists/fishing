@@ -20,18 +20,18 @@ withDefaults(
     role="status"
     aria-live="polite"
     :class="[
-      'flex items-center justify-center bg-[#f5f9f0] px-6 text-[#24352a]',
+      'flex items-center justify-center bg-surface px-6 text-content',
       fullscreen ? 'fixed inset-0 z-50 min-h-screen' : 'min-h-[240px] w-full',
     ]"
   >
     <div class="flex flex-col items-center gap-5">
       <!-- Vòng xoay: đường viền nhạt + cung đậm chạy quanh -->
       <span
-        class="loading-ring h-12 w-12 rounded-full border-[3px] border-[#cbd9c6] border-t-[#24352a]"
+        class="loading-ring h-12 w-12 rounded-full border-[3px] border-border-default border-t-content"
         aria-hidden="true"
       />
 
-      <div class="flex items-baseline text-sm font-medium text-[#24352a]/70">
+      <div class="flex items-baseline text-sm font-medium text-content/70">
         {{ text }}
         <span class="loading-dots ml-0.5 inline-flex" aria-hidden="true">
           <span>.</span><span>.</span><span>.</span>

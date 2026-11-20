@@ -90,18 +90,18 @@ onBeforeUnmount(() => {
         @click.self="close"
       >
         <section
-          class="player-popup-panel depth-panel w-[min(980px,100%)] overflow-hidden rounded-[22px] border border-[#315b4d] bg-[#071f1a] text-[#e8f2ed] shadow-[0_28px_90px_rgba(0,0,0,0.58)]"
+          class="player-popup-panel depth-panel w-[min(980px,100%)] overflow-hidden rounded-[22px] border border-palette-315b4d bg-palette-071f1a text-palette-e8f2ed shadow-[0_28px_90px_rgba(0,0,0,0.58)]"
           role="dialog"
           aria-modal="true"
           aria-labelledby="depth-title"
         >
           <header class="flex items-center justify-between border-b border-white/10 px-5 py-3.5 sm:px-6">
             <div id="depth-title" class="m-0 flex items-center gap-2.5 text-base font-bold">
-              <span class="text-[#5ad0b3]" aria-hidden="true">≋</span>{{ tr("AdjusDepth.dieu_chinh_do_sau") }}
+              <span class="text-palette-5ad0b3" aria-hidden="true">≋</span>{{ tr("AdjusDepth.dieu_chinh_do_sau") }}
             </div>
             <button
               type="button"
-              class="grid h-9 w-9 place-items-center rounded-full text-2xl text-[#b8ccc4] transition hover:bg-white/10 hover:text-white"
+              class="grid h-9 w-9 place-items-center rounded-full text-2xl text-palette-b8ccc4 transition hover:bg-white/10 hover:text-white"
               :aria-label="tr('AdjusDepth.dong_bang_dieu_chinh_do_sau')"
               @click="close"
             >
@@ -154,12 +154,12 @@ onBeforeUnmount(() => {
             <section class="control-card" :aria-label="tr('AdjusDepth.bo_dieu_khien_do_sau')">
               <div class="flex items-start justify-between gap-2">
                 <div>
-                  <div class="m-0 text-[11px] text-[#91aaa0]">{{ tr("AdjusDepth.do_sau_hien_tai") }}</div>
+                  <div class="m-0 text-[11px] text-palette-91aaa0">{{ tr("AdjusDepth.do_sau_hien_tai") }}</div>
                   <div class="m-0 mt-1 text-[25px] font-extrabold leading-none text-white">
-                    {{ formattedDepth }} <span class="text-sm font-semibold text-[#a9c4b8]">m</span>
+                    {{ formattedDepth }} <span class="text-sm font-semibold text-palette-a9c4b8">m</span>
                   </div>
                 </div>
-                <span class="mt-1 rounded-full bg-[#174a3d] px-2.5 py-1 text-[10px] font-bold text-[#b9ebd8]">{{
+                <span class="mt-1 rounded-full bg-palette-174a3d px-2.5 py-1 text-[10px] font-bold text-palette-b9ebd8">{{
                   layer.label
                 }}</span>
               </div>
@@ -190,7 +190,7 @@ onBeforeUnmount(() => {
                   </button>
                 </div>
               </div>
-              <div class="m-0 text-center text-[10px] text-[#78958a]">
+              <div class="m-0 text-center text-[10px] text-palette-78958a">
                 {{ tr("AdjusDepth.keo_thanh_hoac_dung_phim_mui_ten_de_chinh") }}
               </div>
             </section>
@@ -198,7 +198,7 @@ onBeforeUnmount(() => {
             <section class="info-card col-span-2 md:col-span-1">
               <div class="grid grid-cols-2 md:grid-cols-1 gap-2">
                 <div>
-                  <div class="m-0 mb-3 text-[12px] font-bold text-[#d8e9e0]">
+                  <div class="m-0 mb-3 text-[12px] font-bold text-palette-d8e9e0">
                     {{ tr("AdjusDepth.thong_tin_tang_nuoc") }}
                   </div>
                   <div class="m-0 list-none space-y-2.5 p-0">
@@ -213,8 +213,8 @@ onBeforeUnmount(() => {
                         :style="{ backgroundColor: waterLayer.color }"
                       ></span>
                       <span class="min-w-0 text-[10px] leading-[1.45]"
-                        ><b class="text-[#e4eee8]">{{ waterLayer.label }}</b
-                        ><span class="ml-1.5 text-[#93aa9f]"
+                        ><b class="text-palette-e4eee8">{{ waterLayer.label }}</b
+                        ><span class="ml-1.5 text-palette-93aa9f"
                           >{{ waterLayer.minMeters }}–{{ waterLayer.maxMeters }} m</span
                         ></span
                       >
@@ -222,27 +222,27 @@ onBeforeUnmount(() => {
                   </div>
                 </div>
                 <div class="md:border-t md:pt-2 border-white/10">
-                  <div class="m-0 text-[11px] font-bold text-[#d8e9e0]">{{ tr("AdjusDepth.ca_co_the_xuat_hien") }}</div>
+                  <div class="m-0 text-[11px] font-bold text-palette-d8e9e0">{{ tr("AdjusDepth.ca_co_the_xuat_hien") }}</div>
                   <div
                     v-if="store.isLoadingDepthPreview"
-                    class="mb-0 mt-2 flex items-center gap-2 rounded-lg bg-black/10 px-2.5 py-2 text-[10px] text-[#91aaa0]"
+                    class="mb-0 mt-2 flex items-center gap-2 rounded-lg bg-black/10 px-2.5 py-2 text-[10px] text-palette-91aaa0"
                     role="status"
                     aria-live="polite"
                   >
                     <span
-                      class="h-3 w-3 shrink-0 animate-spin rounded-full border-2 border-[#91aaa0]/30 border-t-[#5ad0b3]"
+                      class="h-3 w-3 shrink-0 animate-spin rounded-full border-2 border-palette-91aaa0/30 border-t-palette-5ad0b3"
                       aria-hidden="true"
                     ></span
                     >{{ tr("AdjusDepth.dang_cap_nhat_danh_sach_ca_o") }} {{ formattedDepth }} m...
                   </div>
                   <div
                     v-else-if="store.depthPreviewError"
-                    class="mb-0 mt-2 rounded-lg bg-black/10 px-2.5 py-2 text-[10px] leading-relaxed text-[#ffc18b]"
+                    class="mb-0 mt-2 rounded-lg bg-black/10 px-2.5 py-2 text-[10px] leading-relaxed text-palette-ffc18b"
                   >
                     {{ store.depthPreviewError }}
                   </div>
                   <template v-else-if="store.depthPreview">
-                    <div class="mb-2 mt-1 text-[9px] text-[#91aaa0]">
+                    <div class="mb-2 mt-1 text-[9px] text-palette-91aaa0">
                       {{ store.depthPreview.total_species }} {{ tr("AdjusDepth.loai") }}
                       {{ store.depthPreview.discovered_species }} {{ tr("AdjusDepth.da_kham_pha") }}
                       {{ store.depthPreview.undiscovered_species }} {{ tr("AdjusDepth.chua_kham_pha") }}
@@ -262,15 +262,15 @@ onBeforeUnmount(() => {
                         />
                         <span
                           v-else
-                          class="grid h-8 w-8 shrink-0 place-items-center rounded-md bg-white/10 text-sm text-[#91aaa0]"
+                          class="grid h-8 w-8 shrink-0 place-items-center rounded-md bg-white/10 text-sm text-palette-91aaa0"
                           aria-hidden="true"
                           >?</span
                         >
                         <span class="min-w-0 flex-1">
-                          <span class="block truncate text-[10px] font-semibold text-[#d8e9e0]">{{
+                          <span class="block truncate text-[10px] font-semibold text-palette-d8e9e0">{{
                             fish.display_name
                           }}</span>
-                          <span class="block text-[9px] text-[#91aaa0]"
+                          <span class="block text-[9px] text-palette-91aaa0"
                             >{{ fish.spawn_chance }}% ·
                             {{
                               fish.weight_min != null && fish.weight_max != null
@@ -278,17 +278,17 @@ onBeforeUnmount(() => {
                                 : tr("AdjusDepth.chua_ro_can_nang")
                             }}</span
                           >
-                          <span v-if="fish.rarity" class="text-[8px] text-[#a9c4b8]">{{ fish.rarity }}</span>
+                          <span v-if="fish.rarity" class="text-[8px] text-palette-a9c4b8">{{ fish.rarity }}</span>
                         </span>
                       </div>
                     </div>
-                    <div v-else class="mb-0 mt-2 text-[10px] text-[#91aaa0]">
+                    <div v-else class="mb-0 mt-2 text-[10px] text-palette-91aaa0">
                       {{ tr("AdjusDepth.khong_co_loai_ca_o_do_sau_nay") }}
                     </div>
                   </template>
                   <div
                     v-else
-                    class="mb-0 mt-2 rounded-lg bg-black/10 px-2.5 py-2 text-[10px] leading-relaxed text-[#91aaa0]"
+                    class="mb-0 mt-2 rounded-lg bg-black/10 px-2.5 py-2 text-[10px] leading-relaxed text-palette-91aaa0"
                   >
                     {{ tr("AdjusDepth.chua_co_du_lieu_du_doan_o") }} {{ formattedDepth }} m.
                   </div>
@@ -298,24 +298,24 @@ onBeforeUnmount(() => {
           </div>
 
           <footer class="flex flex-wrap items-center justify-between gap-3 border-t border-white/10 px-4 py-3 sm:px-5">
-            <div v-if="errorMessage" class="m-0 text-[11px] text-[#ffc18b]" role="status">{{ errorMessage }}</div>
-            <div v-else-if="!store.canAdjustDepth" class="m-0 text-[11px] text-[#d5c994]">
+            <div v-if="errorMessage" class="m-0 text-[11px] text-palette-ffc18b" role="status">{{ errorMessage }}</div>
+            <div v-else-if="!store.canAdjustDepth" class="m-0 text-[11px] text-palette-d5c994">
               {{ tr("AdjusDepth.hay_thu_moi_ve_truoc_khi_ap_dung_thay_doi") }}
             </div>
-            <span v-else class="text-[10px] text-[#78958a]"
+            <span v-else class="text-[10px] text-palette-78958a"
               >{{ tr("AdjusDepth.do_sau_da_luu") }} {{ store.appliedDepthMeters }} m</span
             >
             <div class="ml-auto flex gap-2">
               <button
                 type="button"
-                class="rounded-xl border border-white/15 px-4 py-2 text-[11px] font-semibold text-[#c1d3ca] transition hover:bg-white/[0.07]"
+                class="rounded-xl border border-white/15 px-4 py-2 text-[11px] font-semibold text-palette-c1d3ca transition hover:bg-white/[0.07]"
                 @click="close"
               >
                 {{ tr("AccountInfoModal.huy") }}
               </button>
               <button
                 type="button"
-                class="rounded-xl bg-gradient-to-r from-[#3f9d70] to-[#59bb79] px-5 py-2 text-[11px] font-extrabold text-white shadow-lg shadow-emerald-950/30 transition hover:brightness-110 disabled:cursor-not-allowed disabled:opacity-45"
+                class="rounded-xl bg-gradient-to-r from-palette-3f9d70 to-palette-59bb79 px-5 py-2 text-[11px] font-extrabold text-white shadow-lg shadow-emerald-950/30 transition hover:brightness-110 disabled:cursor-not-allowed disabled:opacity-45"
                 :disabled="!store.canAdjustDepth"
                 @click="apply"
               >
@@ -352,12 +352,12 @@ onBeforeUnmount(() => {
   height: 100%;
   overflow: hidden;
   border-radius: 3px;
-  /* background: linear-gradient(180deg, #53c7d0 0%, #138c9b 22%, #07546d 58%, #07324d 82%, #102d37 100%); */
+  /* background: linear-gradient(180deg, var(--color-palette-53c7d0) 0%, var(--color-palette-138c9b) 22%, var(--color-palette-07546d) 58%, var(--color-palette-07324d) 82%, var(--color-palette-102d37) 100%); */
   background-image: url("/Mystical Underwater Lightbeams.png");
   background-position: bottom;
   background-size: cover;
   background-repeat: no-repeat;
-  box-shadow: inset 0 0 22px #031f2d88;
+  box-shadow: inset 0 0 22px var(--color-palette-031f2d88);
 }
 
 .water-surface {
@@ -367,16 +367,16 @@ onBeforeUnmount(() => {
   left: -5%;
   width: 110%;
   height: 14px;
-  border-top: 2px solid #d4ffff;
+  border-top: 2px solid var(--color-palette-d4ffff);
   border-radius: 50%;
-  filter: drop-shadow(0 0 4px #a6ffff);
+  filter: drop-shadow(0 0 4px var(--color-palette-a6ffff));
 }
 
 .water-surface span {
   position: absolute;
   inset: -3px 0 auto;
   height: 5px;
-  background: linear-gradient(90deg, transparent, #e5ffffaa, transparent);
+  background: linear-gradient(90deg, transparent, var(--color-palette-e5ffffaa), transparent);
   filter: blur(3px);
 }
 
@@ -386,8 +386,8 @@ onBeforeUnmount(() => {
   top: 0;
   left: 50%;
   width: 1px;
-  background: #d8fff7cc;
-  box-shadow: 0 0 4px #b4fff0;
+  background: var(--color-palette-d8fff7cc);
+  box-shadow: 0 0 4px var(--color-palette-b4fff0);
   pointer-events: none;
 }
 
@@ -399,13 +399,13 @@ onBeforeUnmount(() => {
   width: 21px;
   height: 21px;
   place-items: center;
-  border: 2px solid #eaffdd;
+  border: 2px solid var(--color-palette-eaffdd);
   border-radius: 50%;
-  background: #60c78a;
-  color: #f4ffd5;
+  background: var(--color-palette-60c78a);
+  color: var(--color-palette-f4ffd5);
   font-size: 10px;
   transform: translate(-50%, -50%);
-  box-shadow: 0 0 12px #7dffc3;
+  box-shadow: 0 0 12px var(--color-palette-7dffc3);
 }
 
 .depth-tick {
@@ -413,8 +413,8 @@ onBeforeUnmount(() => {
   z-index: 1;
   right: 7px;
   left: 7px;
-  border-top: 1px solid #d6fff599;
-  color: #d8f4f0aa;
+  border-top: 1px solid var(--color-palette-d6fff599);
+  color: var(--color-palette-d8f4f0aa);
   font-size: 8px;
   text-align: right;
   transform: translateY(-50%);
@@ -429,7 +429,7 @@ onBeforeUnmount(() => {
 
 .bottom-depth-tick {
   border-top: 0;
-  border-bottom: 1px solid #d6fff599;
+  border-bottom: 1px solid var(--color-palette-d6fff599);
   transform: translateY(-100%);
 }
 
@@ -438,7 +438,7 @@ onBeforeUnmount(() => {
   flex-direction: column;
   justify-content: space-between;
   padding: 0 0 0 1px;
-  color: #dcebe5;
+  color: var(--color-palette-dcebe5);
   font-size: 10px;
   font-weight: 700;
 }
@@ -446,7 +446,7 @@ onBeforeUnmount(() => {
 .depth-labels small {
   display: block;
   margin-top: 2px;
-  color: #8eaaa0;
+  color: var(--color-palette-8eaaa0);
   font-size: 8px;
   font-weight: 400;
   white-space: nowrap;
@@ -475,7 +475,7 @@ onBeforeUnmount(() => {
   width: 190px;
   height: 28px;
   margin: 0;
-  accent-color: #62d9b9;
+  accent-color: var(--color-palette-62d9b9);
   cursor: pointer;
   touch-action: none;
   transform: translate(-50%, -50%) rotate(-90deg);
@@ -490,20 +490,20 @@ onBeforeUnmount(() => {
 
 .quick-stops button {
   min-width: 56px;
-  border: 1px solid #315d50;
+  border: 1px solid var(--color-palette-315d50);
   border-radius: 999px;
-  background: #102d25;
+  background: var(--color-palette-102d25);
   padding: 5px 10px;
-  color: #b8ccc4;
+  color: var(--color-palette-b8ccc4);
   font-size: 10px;
   cursor: pointer;
 }
 
 .quick-stops button.active,
 .quick-stops button:hover {
-  border-color: #5cbd8a;
-  background: #28694b;
-  color: #f0fff3;
+  border-color: var(--color-palette-5cbd8a);
+  background: var(--color-palette-28694b);
+  color: var(--color-palette-f0fff3);
 }
 
 @media (max-width: 639px) {

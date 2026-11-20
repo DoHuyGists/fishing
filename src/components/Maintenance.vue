@@ -13,24 +13,24 @@ const retry = () => {
 </script>
 
 <template>
-  <main class="flex min-h-screen items-center justify-center bg-[#f5f9f0] px-6 py-16 text-[#24352a]">
+  <main class="flex min-h-screen items-center justify-center bg-surface px-6 py-16 text-content">
     <section class="w-full max-w-xl" aria-labelledby="error-title">
       <!-- Khung có thanh trạng thái đang bảo trì -->
       <div
-        class="relative flex aspect-[16/7] w-full items-center justify-center overflow-hidden rounded-2xl border-2 border-[#cbd9c6]"
+        class="relative flex aspect-[16/7] w-full items-center justify-center overflow-hidden rounded-2xl border-2 border-border-default"
         aria-hidden="true"
       >
         <span class="select-none text-7xl font-semibold tracking-tight sm:text-8xl">503</span>
 
-        <div class="absolute inset-x-0 bottom-0 h-1.5 bg-[#cbd9c6]/50">
-          <div class="h-full w-1/3 animate-[slide_2.4s_ease-in-out_infinite] bg-[#24352a]" />
+        <div class="absolute inset-x-0 bottom-0 h-1.5 bg-border-default/50">
+          <div class="h-full w-1/3 animate-[slide_2.4s_ease-in-out_infinite] bg-content" />
         </div>
       </div>
 
       <div id="error-title" class="mt-10 text-2xl font-semibold tracking-tight sm:text-3xl">
         {{ tr('Maintenance.dich_vu_tam_thoi_gian_doan') }}
       </div>
-      <div class="mt-3 max-w-md text-base leading-relaxed text-[#24352a]/70">
+      <div class="mt-3 max-w-md text-base leading-relaxed text-content/70">
         {{ tr('Maintenance.may_chu_dang_bao_tri_hoac_qua_tai_du_lieu_cua_ban_khong_bi_anh_h') }}
       </div>
 
@@ -38,7 +38,7 @@ const retry = () => {
         <button
           type="button"
           :disabled="retrying"
-          class="inline-flex items-center gap-2 rounded-lg border border-[#24352a] bg-[#24352a] px-5 py-2.5 text-sm font-medium text-[#f5f9f0] transition-colors hover:bg-[#24352a]/90 disabled:cursor-wait disabled:opacity-70 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#24352a]"
+          class="inline-flex items-center gap-2 rounded-lg border border-content bg-content px-5 py-2.5 text-sm font-medium text-surface transition-colors hover:bg-content/90 disabled:cursor-wait disabled:opacity-70 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-content"
           @click="retry"
         >
           <svg
@@ -57,7 +57,7 @@ const retry = () => {
         </button>
         <a
           href="/"
-          class="inline-flex items-center rounded-lg border border-[#cbd9c6] bg-[#f5f9f0] px-5 py-2.5 text-sm font-medium text-[#24352a] transition-colors hover:bg-[#cbd9c6]/40 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#24352a]"
+          class="inline-flex items-center rounded-lg border border-border-default bg-surface px-5 py-2.5 text-sm font-medium text-content transition-colors hover:bg-border-default/40 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-content"
         >
           {{ tr('Maintenance.ve_trang_chu') }}
         </a>

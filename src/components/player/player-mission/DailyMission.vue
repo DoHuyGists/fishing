@@ -93,9 +93,9 @@ onMounted(() => void loadDailyMissions());
 
 <template>
   <section
-    class="mx-auto flex h-full min-h-0 w-full flex-col gap-3 overflow-y-auto px-1 text-[#24352a] lg:overflow-hidden py-1.5"
+    class="mx-auto flex h-full min-h-0 w-full flex-col gap-3 overflow-y-auto px-1 text-content lg:overflow-hidden py-1.5"
   >
-    <div v-if="isLoading" class="rounded-xl border border-[#cbd9c6] bg-white p-6 text-center text-sm">
+    <div v-if="isLoading" class="rounded-xl border border-border-default bg-white p-6 text-center text-sm">
       {{ tr("DailyMission.dang_tai_nhiem_vu_hang_ngay") }}
     </div>
     <div
@@ -110,7 +110,7 @@ onMounted(() => void loadDailyMissions());
     </div>
     <template v-else-if="missionStore.dailyMissions">
       <header
-        class="slide-fade-in from-top player-content-in shrink-0 rounded-xl border border-[#cbd9c6] bg-[#f5f9f0] px-3 py-2 sm:px-4"
+        class="slide-fade-in from-top player-content-in shrink-0 rounded-xl border border-border-default bg-surface px-3 py-2 sm:px-4"
       >
         <div class="flex flex-wrap items-center justify-between gap-2">
           <div>
@@ -129,7 +129,7 @@ onMounted(() => void loadDailyMissions());
       <div class="grid shrink-0 gap-3 lg:min-h-0 lg:flex-1 lg:grid-cols-[minmax(260px,0.9fr)_minmax(0,2fr)] xl:gap-4">
         <section
           :aria-label="tr('DailyMission.moc_thuong')"
-          class="slide-fade-in from-left player-content-in order-1 flex min-h-0 min-w-0 flex-col gap-2 rounded-xl border border-[#cbd9c6] bg-[#f5f9f0] p-3 lg:overflow-y-auto xl:p-4"
+          class="slide-fade-in from-left player-content-in order-1 flex min-h-0 min-w-0 flex-col gap-2 rounded-xl border border-border-default bg-surface p-3 lg:overflow-y-auto xl:p-4"
         >
           <div class="flex items-end justify-between gap-2">
             <div>
@@ -159,13 +159,13 @@ onMounted(() => void loadDailyMissions());
               >
                 <span
                   class="absolute left-1.5 top-1/2 z-10 flex size-6 -translate-y-1/2 items-center justify-center rounded-full border-2 border-white shadow-sm"
-                  :class="reward.is_unlocked ? 'bg-emerald-600' : 'bg-[#cbd9c6]'"
+                  :class="reward.is_unlocked ? 'bg-emerald-600' : 'bg-border-default'"
                 >
                   <span v-if="reward.is_claimed" class="text-xs font-black text-white">✓</span>
                 </span>
                 <article
                   class="rounded-lg border p-2 transition-colors xl:p-2.5"
-                  :class="reward.is_unlocked ? 'border-emerald-300 bg-white shadow-sm' : 'border-[#cbd9c6] bg-white/70'"
+                  :class="reward.is_unlocked ? 'border-emerald-300 bg-white shadow-sm' : 'border-border-default bg-white/70'"
                 >
                   <div class="mb-1.5 flex items-center justify-between gap-2">
                     <strong class="text-xs">{{ reward.required_points }} {{ tr("DailyMission.diem") }}</strong>
@@ -174,7 +174,7 @@ onMounted(() => void loadDailyMissions());
                       :class="
                         reward.is_claimed || reward.is_unlocked
                           ? 'bg-emerald-100 text-emerald-800'
-                          : 'bg-[#f5f9f0] text-emerald-900/55'
+                          : 'bg-surface text-emerald-900/55'
                       "
                     >
                       {{
@@ -190,7 +190,7 @@ onMounted(() => void loadDailyMissions());
                     <div
                       v-for="(item, itemIndex) in reward.reward_data"
                       :key="itemIndex"
-                      class="group relative flex size-8 items-center justify-center rounded-lg border border-[#cbd9c6] bg-[#f5f9f0] p-1 xl:size-9"
+                      class="group relative flex size-8 items-center justify-center rounded-lg border border-border-default bg-surface p-1 xl:size-9"
                       :title="rewardLabel(item)"
                     >
                       <img
@@ -201,7 +201,7 @@ onMounted(() => void loadDailyMissions());
                       />
                       <span v-else class="text-xl" aria-hidden="true">{{ rewardVisual(item).icon }}</span>
                       <span
-                        class="pointer-events-none absolute bottom-full left-1/2 z-20 mb-1 hidden w-max max-w-48 -translate-x-1/2 rounded-md bg-[#24352a] px-2 py-1 text-[10px] text-white group-hover:block group-focus-within:block"
+                        class="pointer-events-none absolute bottom-full left-1/2 z-20 mb-1 hidden w-max max-w-48 -translate-x-1/2 rounded-md bg-content px-2 py-1 text-[10px] text-white group-hover:block group-focus-within:block"
                         >{{ rewardLabel(item) }}</span
                       >
                     </div>
@@ -252,13 +252,13 @@ onMounted(() => void loadDailyMissions());
               v-for="mission in missionStore.dailyMissionProgress"
               :key="mission.id"
               class="slide-fade-in from-bottom player-content-in rounded-lg border p-2.5 xl:p-3"
-              :class="mission.isTargetReached ? 'border-emerald-300 bg-[#f5f9f0]' : 'border-[#cbd9c6] bg-white'"
+              :class="mission.isTargetReached ? 'border-emerald-300 bg-surface' : 'border-border-default bg-white'"
             >
               <div class="flex flex-wrap items-start justify-between gap-2">
                 <div class="min-w-0 flex-1">
                   <div class="flex flex-wrap items-center gap-2">
                     <div class="m-0 text-xs font-bold">{{ mission.name }}</div>
-                    <span class="rounded-full bg-[#f5f9f0] px-2 py-0.5 text-[10px] font-bold">{{
+                    <span class="rounded-full bg-surface px-2 py-0.5 text-[10px] font-bold">{{
                       difficultyLabel(mission.difficulty)
                     }}</span>
                   </div>
@@ -289,7 +289,7 @@ onMounted(() => void loadDailyMissions());
             </article>
             <div
               v-if="!missionStore.dailyMissions.missions.length"
-              class="rounded-xl bg-[#f5f9f0] p-5 text-center text-sm"
+              class="rounded-xl bg-surface p-5 text-center text-sm"
             >
               {{ tr("DailyMission.hom_nay_chua_co_nhiem_vu") }}
             </div>

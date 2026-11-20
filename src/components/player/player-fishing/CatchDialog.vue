@@ -31,9 +31,9 @@ const scoreFormatter = computed(() => new Intl.NumberFormat(getFormattingLocale(
 const variantFrameClass = computed(() => {
   switch (caught.value?.variantType) {
     case "GOLDEN":
-      return "border-[#ffd54a] shadow-[0_24px_70px_rgba(255,190,45,0.38)]";
+      return "border-palette-ffd54a shadow-[0_24px_70px_rgba(255,190,45,0.38)]";
     case "MUTATED":
-      return "border-[#b47cff] shadow-[0_24px_70px_rgba(150,75,255,0.38)]";
+      return "border-palette-b47cff shadow-[0_24px_70px_rgba(150,75,255,0.38)]";
     default:
       return "border-[rgba(255,226,149,0.68)]";
   }
@@ -50,7 +50,7 @@ const variantFrameClass = computed(() => {
         @click.self="closeDialog"
       >
         <section
-          class="player-popup-panel catch-card grid w-full max-w-[680px] max-h-[calc(100dvh-40px)] overflow-y-auto border-2 rounded-[22px] bg-[linear-gradient(145deg,#173d2b,#0e281b)] shadow-[0_24px_70px_rgba(0,0,0,0.48)] text-[#f4f0df] sm:grid-cols-[260px_minmax(0,1fr)]"
+          class="player-popup-panel catch-card grid w-full max-w-[680px] max-h-[calc(100dvh-40px)] overflow-y-auto border-2 rounded-[22px] bg-[linear-gradient(145deg,var(--color-palette-173d2b),var(--color-palette-0e281b))] shadow-[0_24px_70px_rgba(0,0,0,0.48)] text-palette-f4f0df sm:grid-cols-[260px_minmax(0,1fr)]"
           :class="variantFrameClass"
           role="dialog"
           aria-modal="true"
@@ -63,32 +63,32 @@ const variantFrameClass = computed(() => {
           <div class="flex min-w-0 flex-col gap-4 p-5 sm:p-6">
             <div class="flex flex-wrap items-center gap-2">
               <span
-                class="inline-block px-2 py-1 rounded-full bg-[#dcae52] text-[#254130] text-[9px] font-black tracking-[0.1em]"
+                class="inline-block px-2 py-1 rounded-full bg-palette-dcae52 text-palette-254130 text-[9px] font-black tracking-[0.1em]"
               >
                 {{ caught.variantType }}
               </span>
               <span
                 v-if="caught.isShiny"
-                class="inline-block px-2 py-1 rounded-full bg-[#fff1a8] text-[#6b4b00] text-[9px] font-black tracking-widest"
+                class="inline-block px-2 py-1 rounded-full bg-palette-fff1a8 text-palette-6b4b00 text-[9px] font-black tracking-widest"
               >
                 {{ tr("CatchDialog.ca_xin") }}
               </span>
               <div
                 v-if="caught.starRating !== undefined"
-                class="text-[#ffd65a] text-sm font-black"
+                class="text-palette-ffd65a text-sm font-black"
                 :aria-label="tr('CatchDialog.star_rating', { count: caught.starRating })"
               >
                 {{ "★".repeat(Math.max(0, Math.floor(caught.starRating))) }}
               </div>
             </div>
             <div id="catch-title" class="break-words text-2xl font-bold leading-tight">{{ caught.name }}</div>
-            <div class="flex flex-wrap items-center gap-x-4 gap-y-2 text-[#b7cfb9] text-sm">
+            <div class="flex flex-wrap items-center gap-x-4 gap-y-2 text-border-strong text-sm">
               <span>{{ caught.weight }}</span
               ><span v-if="caught.length">{{ caught.length }}</span>
             </div>
             <div
               v-if="caught.score !== undefined"
-              class="flex flex-wrap gap-x-3 gap-y-1 text-sm font-bold text-[#ffd65a]"
+              class="flex flex-wrap gap-x-3 gap-y-1 text-sm font-bold text-palette-ffd65a"
             >
               <span>{{ scoreFormatter.format(caught.score) }} {{ tr("DailyMission.diem") }}</span>
               <span v-if="caught.seasonNumber !== undefined">{{
@@ -98,7 +98,7 @@ const variantFrameClass = computed(() => {
             <div class="mt-auto grid grid-cols-2 gap-3 pt-2">
               <button
                 type="button"
-                class="rounded-[10px] border border-[#cbd9c6] bg-[#f5f9f0] px-3 py-3 text-sm font-bold text-[#24352a] cursor-pointer transition-colors hover:bg-[#e4eddd] disabled:cursor-not-allowed disabled:opacity-50"
+                class="rounded-[10px] border border-border-default bg-surface px-3 py-3 text-sm font-bold text-content cursor-pointer transition-colors hover:bg-palette-e4eddd disabled:cursor-not-allowed disabled:opacity-50"
                 :disabled="releaseDisabled"
                 @click="releaseCatch"
               >
@@ -106,7 +106,7 @@ const variantFrameClass = computed(() => {
               </button>
               <button
                 type="button"
-                class="p-3 border-0 rounded-[10px] bg-[#e1aa49] text-sm text-[#173223] cursor-pointer font-black transition-colors hover:bg-[#edbd66] disabled:cursor-not-allowed disabled:opacity-50"
+                class="p-3 border-0 rounded-[10px] bg-palette-e1aa49 text-sm text-palette-173223 cursor-pointer font-black transition-colors hover:bg-palette-edbd66 disabled:cursor-not-allowed disabled:opacity-50"
                 :disabled="store.isReleasingFish"
                 @click="closeDialog"
               >

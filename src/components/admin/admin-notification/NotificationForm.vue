@@ -15,7 +15,7 @@ const store = useAdminNotificationStore();
       @submit.prevent="store.save()"
     >
       <header class="border-b border-gray-200 px-5 py-4">
-        <div class="m-0 text-base font-extrabold text-[#153221]">
+        <div class="m-0 text-base font-extrabold text-content-strong">
           {{
             store.editing
               ? "Sửa thông báo"
@@ -73,7 +73,7 @@ const store = useAdminNotificationStore();
         ><button
           type="submit"
           :disabled="store.saving"
-          class="rounded-lg bg-[#153221] px-4 py-2 text-sm font-bold text-white disabled:opacity-50"
+          class="rounded-lg bg-content-strong px-4 py-2 text-sm font-bold text-white disabled:opacity-50"
         >
           {{ store.saving ? "Đang lưu..." : "Lưu thông báo" }}
         </button>

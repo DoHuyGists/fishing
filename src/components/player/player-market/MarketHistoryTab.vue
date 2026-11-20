@@ -11,7 +11,7 @@ const marketStore = useMarketStore();
 
 <template>
   <section
-    class="space-y-3 py-2 text-sm text-[#24352a]"
+    class="space-y-3 py-2 text-sm text-content"
     :aria-busy="marketStore.historyLoading"
     :aria-label="tr('MarketWindow.lich_su_mua_ban_cua_ban')"
   >
@@ -35,7 +35,7 @@ const marketStore = useMarketStore();
     </div>
     <div
       v-else-if="!marketStore.history.length && !marketStore.historyError"
-      class="rounded-xl border border-dashed border-[#cbd9c6] bg-[#f5f9f0] px-4 py-8 text-center"
+      class="rounded-xl border border-dashed border-border-default bg-surface px-4 py-8 text-center"
     >
       <div class="font-semibold">{{ tr("MarketWindow.chua_co_giao_dich_mua_ban") }}</div>
       <div class="mt-1 text-xs text-gray-500">
@@ -44,14 +44,14 @@ const marketStore = useMarketStore();
     </div>
     <div
       v-if="marketStore.history.length"
-      class="slide-fade-in from-bottom player-content-in max-h-[min(50dvh,26rem)] overflow-y-auto rounded-xl border border-[#cbd9c6]"
+      class="slide-fade-in from-bottom player-content-in max-h-[min(50dvh,26rem)] overflow-y-auto rounded-xl border border-border-default"
       :class="marketStore.historyLoading ? 'opacity-60' : ''"
     >
-      <div class="divide-y divide-[#cbd9c6]/60">
+      <div class="divide-y divide-border-default/60">
         <div
           v-for="entry in marketStore.history"
           :key="entry.id"
-          class="flex items-center gap-2 bg-[#f5f9f0]/60 px-3 py-2.5 sm:gap-3"
+          class="flex items-center gap-2 bg-surface/60 px-3 py-2.5 sm:gap-3"
         >
           <span
             class="shrink-0 rounded-md px-2 py-1 text-[11px] font-semibold"
@@ -86,7 +86,7 @@ const marketStore = useMarketStore();
       <button
         type="button"
         :disabled="marketStore.historyLoading || marketStore.historyPage <= 1"
-        class="rounded-lg border border-[#cbd9c6] px-3 py-1.5 hover:bg-[#f5f9f0] disabled:cursor-not-allowed disabled:opacity-40"
+        class="rounded-lg border border-border-default px-3 py-1.5 hover:bg-surface disabled:cursor-not-allowed disabled:opacity-40"
         @click="marketStore.loadHistory(authStore.userId, marketStore.historyPage - 1)"
       >
         {{ tr("Fishfarm.truoc") }}
@@ -95,7 +95,7 @@ const marketStore = useMarketStore();
       <button
         type="button"
         :disabled="marketStore.historyLoading || !marketStore.historyHasNext"
-        class="rounded-lg border border-[#cbd9c6] px-3 py-1.5 hover:bg-[#f5f9f0] disabled:cursor-not-allowed disabled:opacity-40"
+        class="rounded-lg border border-border-default px-3 py-1.5 hover:bg-surface disabled:cursor-not-allowed disabled:opacity-40"
         @click="marketStore.loadHistory(authStore.userId, marketStore.historyPage + 1)"
       >
         {{ tr("Fishfarm.sau") }}

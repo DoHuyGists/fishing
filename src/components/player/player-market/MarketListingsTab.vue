@@ -86,7 +86,7 @@ function confirmBuy(item: MarketListing) {
       <button
         type="button"
         class="rounded-md px-2 py-1 text-[11px] font-bold"
-        :class="viewMode === 'list' ? 'bg-[#153221] text-white' : 'text-gray-600 hover:bg-gray-100'"
+        :class="viewMode === 'list' ? 'bg-content-strong text-white' : 'text-gray-600 hover:bg-gray-100'"
         :aria-pressed="viewMode === 'list'"
         @click="viewMode = 'list'"
       >
@@ -95,7 +95,7 @@ function confirmBuy(item: MarketListing) {
       <button
         type="button"
         class="rounded-md px-2 py-1 text-[11px] font-bold"
-        :class="viewMode === 'grid' ? 'bg-[#153221] text-white' : 'text-gray-600 hover:bg-gray-100'"
+        :class="viewMode === 'grid' ? 'bg-content-strong text-white' : 'text-gray-600 hover:bg-gray-100'"
         :aria-pressed="viewMode === 'grid'"
         @click="viewMode = 'grid'"
       >
@@ -104,7 +104,7 @@ function confirmBuy(item: MarketListing) {
       <button
         type="button"
         class="rounded-md px-2 py-1 text-[11px] font-bold"
-        :class="viewMode === 'species' ? 'bg-[#153221] text-white' : 'text-gray-600 hover:bg-gray-100'"
+        :class="viewMode === 'species' ? 'bg-content-strong text-white' : 'text-gray-600 hover:bg-gray-100'"
         :aria-pressed="viewMode === 'species'"
         @click="viewMode = 'species'"
       >
@@ -195,7 +195,7 @@ function confirmBuy(item: MarketListing) {
               <button
                 v-else
                 type="button"
-                class="rounded bg-[#153221] px-2 py-1 text-[10px] font-bold text-white"
+                class="rounded bg-content-strong px-2 py-1 text-[10px] font-bold text-white"
                 @click="confirmBuy(item)"
               >
                 {{ tr("InventoryModal.mua") }}
@@ -249,7 +249,7 @@ function confirmBuy(item: MarketListing) {
 
             <!-- Thông tin chi tiết -->
             <div class="flex flex-col gap-1 mb-3" :class="viewMode === 'list' ? 'min-w-0 flex-1' : ''">
-              <div class="m-0 font-bold text-sm text-[#263238] truncate">{{ item.caught?.fish?.name }}</div>
+              <div class="m-0 font-bold text-sm text-palette-263238 truncate">{{ item.caught?.fish?.name }}</div>
               <div class="flex items-center gap-2 text-[11px] text-gray-500 font-medium">
                 <span
                   >⚖️
@@ -291,7 +291,7 @@ function confirmBuy(item: MarketListing) {
               v-else
               type="button"
               @click="confirmBuy(item)"
-              class="px-3 py-1.5 bg-[#153221] hover:bg-[#1a3e29] text-white font-bold text-xs rounded-lg transition-colors shadow-xs cursor-pointer flex items-center gap-1"
+              class="px-3 py-1.5 bg-content-strong hover:bg-palette-1a3e29 text-white font-bold text-xs rounded-lg transition-colors shadow-xs cursor-pointer flex items-center gap-1"
             >
               <span>{{ tr("MarketWindow.mua_ca") }}</span>
             </button>

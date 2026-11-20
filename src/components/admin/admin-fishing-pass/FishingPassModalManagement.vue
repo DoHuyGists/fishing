@@ -61,21 +61,21 @@ store.fetchAll();
       <FishingPassFormManagement :pass="editing" :saving="store.saving" @save="save" @cancel="formOpen = false" />
     </div>
     <template v-else>
-      <div class="flex flex-wrap items-center gap-3 border-b border-[#cbd9c6] p-4 sm:px-6">
+      <div class="flex flex-wrap items-center gap-3 border-b border-border-default p-4 sm:px-6">
         <input
           v-model="search"
           type="search"
           placeholder="Tìm tên hoặc mô tả…"
-          class="min-w-48 flex-1 rounded-lg border border-[#cbd9c6] bg-white px-3 py-2 text-sm"
+          class="min-w-48 flex-1 rounded-lg border border-border-default bg-white px-3 py-2 text-sm"
         />
-        <select v-model="status" class="rounded-lg border border-[#cbd9c6] bg-white px-3 py-2 text-sm">
+        <select v-model="status" class="rounded-lg border border-border-default bg-white px-3 py-2 text-sm">
           <option value="all">Tất cả trạng thái</option>
           <option value="active">Đang hoạt động</option>
           <option value="inactive">Đã tắt</option>
         </select>
         <button
           type="button"
-          class="rounded-lg border border-[#cbd9c6] bg-white px-3 py-2 text-sm"
+          class="rounded-lg border border-border-default bg-white px-3 py-2 text-sm"
           :disabled="store.loading"
           @click="store.fetchAll()"
         >
@@ -93,18 +93,18 @@ store.fetchAll();
         {{ store.error }}
       </div>
       <div class="min-h-0 flex-1 overflow-auto p-4 sm:p-6">
-        <div v-if="store.loading && !store.passes.length" class="py-12 text-center text-sm text-[#24352a]/70">
+        <div v-if="store.loading && !store.passes.length" class="py-12 text-center text-sm text-content/70">
           Đang tải danh sách vé…
         </div>
         <div
           v-else-if="!filtered.length"
-          class="rounded-xl border border-dashed border-[#cbd9c6] bg-white p-10 text-center text-sm text-[#24352a]/70"
+          class="rounded-xl border border-dashed border-border-default bg-white p-10 text-center text-sm text-content/70"
         >
           Chưa có vé câu phù hợp.
         </div>
-        <div v-else class="overflow-x-auto rounded-xl border border-[#cbd9c6] bg-white">
+        <div v-else class="overflow-x-auto rounded-xl border border-border-default bg-white">
           <table class="w-full min-w-[850px] text-left text-sm">
-            <thead class="bg-[#eaf1e5] text-xs uppercase text-[#24352a]/70">
+            <thead class="bg-palette-eaf1e5 text-xs uppercase text-content/70">
               <tr>
                 <th class="px-4 py-3">Tên vé</th>
                 <th class="px-4 py-3">Giá / số ngày</th>
@@ -114,16 +114,16 @@ store.fetchAll();
               </tr>
             </thead>
             <tbody>
-              <tr v-for="pass in filtered" :key="pass.id" class="border-t border-[#e5ece1] align-top">
+              <tr v-for="pass in filtered" :key="pass.id" class="border-t border-palette-e5ece1 align-top">
                 <td class="max-w-72 px-4 py-3">
                   <div class="font-semibold">{{ pass.name }}</div>
-                  <div v-if="pass.description" class="mt-1 line-clamp-2 text-xs text-[#24352a]/65">
+                  <div v-if="pass.description" class="mt-1 line-clamp-2 text-xs text-content/65">
                     {{ pass.description }}
                   </div>
                 </td>
                 <td class="whitespace-nowrap px-4 py-3">
                   {{ money(pass.price) }}
-                  <div class="text-xs text-[#24352a]/65">{{ pass.totalDays }} ngày</div>
+                  <div class="text-xs text-content/65">{{ pass.totalDays }} ngày</div>
                 </td>
                 <td class="whitespace-nowrap px-4 py-3 text-xs">
                   {{ date(pass.startAt) }}
@@ -139,7 +139,7 @@ store.fetchAll();
                 <td class="whitespace-nowrap px-4 py-3 text-right">
                   <button
                     type="button"
-                    class="rounded-lg border border-[#cbd9c6] px-3 py-1.5 text-xs font-semibold hover:bg-[#f5f9f0]"
+                    class="rounded-lg border border-border-default px-3 py-1.5 text-xs font-semibold hover:bg-surface"
                     @click="openEdit(pass)"
                   >
                     Sửa</button

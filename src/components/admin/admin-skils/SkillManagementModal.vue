@@ -30,18 +30,18 @@ onUnmounted(() => {
 
 <template>
   <AdminModal title="Quản lý kỹ năng" icon="✨" :close-disabled="store.busy" @close="emit('close')">
-    <div class="flex shrink-0 flex-wrap gap-3 border-b border-[#cbd9c6] bg-white p-4">
+    <div class="flex shrink-0 flex-wrap gap-3 border-b border-border-default bg-white p-4">
       <input
         v-model="store.search"
         type="search"
         aria-label="Tìm kỹ năng"
         placeholder="Tìm theo mã, tên hoặc mô tả..."
-        class="min-w-0 flex-1 rounded-lg border border-[#cbd9c6] px-3 py-2 text-sm"
+        class="min-w-0 flex-1 rounded-lg border border-border-default px-3 py-2 text-sm"
       />
       <button
         type="button"
         :disabled="store.busy"
-        class="rounded-lg border border-[#cbd9c6] px-3 py-2 text-sm disabled:opacity-50"
+        class="rounded-lg border border-border-default px-3 py-2 text-sm disabled:opacity-50"
         @click="store.fetchAll()"
       >
         {{ store.loading ? "Đang tải..." : "Làm mới" }}
@@ -49,7 +49,7 @@ onUnmounted(() => {
       <button
         type="button"
         :disabled="store.busy"
-        class="rounded-lg bg-[#24352a] px-4 py-2 text-sm font-bold text-white disabled:opacity-50"
+        class="rounded-lg bg-content px-4 py-2 text-sm font-bold text-white disabled:opacity-50"
         @click="store.openForm()"
       >
         + Thêm kỹ năng
@@ -71,10 +71,10 @@ onUnmounted(() => {
       </div>
       <div
         v-else-if="store.filteredItems.length"
-        class="min-h-0 min-w-0 flex-1 overflow-auto rounded-xl border border-[#cbd9c6] bg-white"
+        class="min-h-0 min-w-0 flex-1 overflow-auto rounded-xl border border-border-default bg-white"
       >
         <table class="w-full min-w-[800px] text-left text-sm">
-          <thead class="sticky top-0 z-10 bg-[#f5f9f0]">
+          <thead class="sticky top-0 z-10 bg-surface">
             <tr>
               <th class="p-3">Thứ tự</th>
               <th class="p-3">Mã</th>
@@ -85,7 +85,7 @@ onUnmounted(() => {
             </tr>
           </thead>
           <tbody>
-            <tr v-for="item in store.filteredItems" :key="item.id" class="border-t border-[#cbd9c6]">
+            <tr v-for="item in store.filteredItems" :key="item.id" class="border-t border-border-default">
               <td class="p-3">{{ item.sort_order }}</td>
               <td class="p-3 font-mono">{{ item.code }}</td>
               <td class="max-w-sm p-3">
@@ -101,7 +101,7 @@ onUnmounted(() => {
                   <button
                     type="button"
                     :disabled="store.busy"
-                    class="rounded-lg border border-[#cbd9c6] px-3 py-1.5 disabled:opacity-50"
+                    class="rounded-lg border border-border-default px-3 py-1.5 disabled:opacity-50"
                     @click="store.openForm(item)"
                   >
                     Sửa

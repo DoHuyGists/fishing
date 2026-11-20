@@ -61,7 +61,7 @@ function confirm() {
       required
       :aria-label="tr('FishSellConfirm.nhap_gia_ban')"
       :placeholder="tr('FishSellConfirm.nhap_gia_ban')"
-      class="w-full rounded-lg border border-[#cbd9c6] px-3 py-2 text-sm focus-visible:outline-2 focus-visible:outline-emerald-700"
+      class="w-full rounded-lg border border-border-default px-3 py-2 text-sm focus-visible:outline-2 focus-visible:outline-emerald-700"
       @keydown="
         (e: KeyboardEvent) => {
           if (['e', 'E', '+', '-', '.'].includes(e.key)) e.preventDefault();

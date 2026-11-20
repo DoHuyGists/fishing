@@ -280,7 +280,7 @@ function castAt(event: MouseEvent) {
   position: relative;
   min-height: 0;
   overflow: hidden;
-  background: #294430;
+  background: var(--color-palette-294430);
 }
 
 .pond-image {
@@ -319,7 +319,7 @@ function castAt(event: MouseEvent) {
 }
 
 .weather span {
-  color: #ffcf67;
+  color: var(--color-palette-ffcf67);
   font-size: 16px;
 }
 
@@ -327,7 +327,7 @@ function castAt(event: MouseEvent) {
   width: 3px;
   height: 3px;
   border-radius: 50%;
-  background: #d6dfd8;
+  background: var(--color-palette-d6dfd8);
 }
 
 .invalid-tap {
@@ -338,7 +338,7 @@ function castAt(event: MouseEvent) {
   padding: 8px 12px;
   border-radius: 999px;
   background: rgba(91, 39, 24, 0.86);
-  color: #fff2da;
+  color: var(--color-palette-fff2da);
   font-size: 11px;
   font-weight: 700;
   transform: translate(-50%, -50%);
@@ -458,12 +458,12 @@ function castAt(event: MouseEvent) {
   width: 7px;
   height: 7px;
   border-radius: 50%;
-  background: #9bdf73;
+  background: var(--color-palette-9bdf73);
   box-shadow: 0 0 0 3px rgba(155, 223, 115, 0.18);
 }
 
 .scene-status.active .status-dot {
-  background: #ffc653;
+  background: var(--color-palette-ffc653);
   animation: pulse 0.8s infinite;
 }
 
@@ -473,11 +473,11 @@ function castAt(event: MouseEvent) {
   top: 42%;
   left: 50%;
   padding: 10px 18px;
-  border: 2px solid #fff1bd;
+  border: 2px solid var(--color-palette-fff1bd);
   border-radius: 11px;
-  background: #c24d36;
+  background: var(--color-palette-c24d36);
   box-shadow:
-    0 4px 0 #742c25,
+    0 4px 0 var(--color-palette-742c25),
     0 0 26px rgba(255, 169, 79, 0.7);
   color: white;
   font-size: 14px;

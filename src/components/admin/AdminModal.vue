@@ -21,13 +21,13 @@ const titleId = useId();
 
 <template>
   <section
-    class="fixed inset-0 flex min-h-0 flex-col overflow-hidden bg-[#f5f9f0] text-[#24352a]"
+    class="fixed inset-0 flex min-h-0 flex-col overflow-hidden bg-surface text-content"
     :style="{ zIndex }"
     role="dialog"
     aria-modal="true"
     :aria-labelledby="titleId"
   >
-    <header class="flex shrink-0 items-center justify-between gap-3 border-b border-[#cbd9c6] bg-[#153221] px-4 py-3 text-white sm:px-6">
+    <header class="flex shrink-0 items-center justify-between gap-3 border-b border-border-default bg-content-strong px-4 py-3 text-white sm:px-6">
       <div class="flex min-w-0 items-center gap-3">
         <span
           v-if="icon"

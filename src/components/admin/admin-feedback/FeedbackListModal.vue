@@ -15,7 +15,7 @@ function formatDate(value: string) {
 
 <template>
   <AdminModal title="Danh sách góp ý" :z-index="10000" @close="emit('close')">
-    <div class="flex shrink-0 justify-end border-b border-[#cbd9c6] bg-white px-4 py-3 sm:px-6">
+    <div class="flex shrink-0 justify-end border-b border-border-default bg-white px-4 py-3 sm:px-6">
       <button
         type="button"
         class="rounded-lg border border-slate-300 px-3 py-2 text-sm hover:bg-slate-50"

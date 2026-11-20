@@ -34,7 +34,7 @@ const userTurnsStore = useUserTurnsStore();
     <img src="/currency/turn.svg" class="w-4 sm:w-6" alt="" />
     <span
       v-if="userTurnsStore.status && userTurnsStore.status.turns < userTurnsStore.status.max_turns"
-      class="text-xs w-20 text-[#617565]"
+      class="text-xs w-20 text-content-subtle"
     >
       {{ tr("UserTurn.1_sau") }} {{ userTurnsStore.countdown }}
     </span>

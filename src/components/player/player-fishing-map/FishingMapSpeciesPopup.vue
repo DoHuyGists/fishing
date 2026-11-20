@@ -44,7 +44,7 @@ watch(
     <dialog
       ref="dialog"
       aria-labelledby="map-species-title"
-      class="m-auto max-h-[85dvh] w-[calc(100%-2rem)] max-w-xl overflow-y-auto rounded-2xl border border-[#cbd9c6] bg-[#f5f9f0] p-0 text-[#24352a] shadow-xl backdrop:bg-black/40"
+      class="m-auto max-h-[85dvh] w-[calc(100%-2rem)] max-w-xl overflow-y-auto rounded-2xl border border-border-default bg-surface p-0 text-content shadow-xl backdrop:bg-black/40"
       @cancel.prevent="close"
       @close="close"
       @click.self="close"
@@ -54,7 +54,7 @@ watch(
           type="button"
           autofocus
           :aria-label="tr('InformationModal.dong_thong_tin')"
-          class="absolute right-2 top-2 flex size-9 items-center justify-center rounded-full text-2xl hover:bg-[#cbd9c6]/50"
+          class="absolute right-2 top-2 flex size-9 items-center justify-center rounded-full text-2xl hover:bg-border-default/50"
           @click="close"
         >
           ×
@@ -74,10 +74,10 @@ watch(
           <div
             v-for="stat in stats"
             :key="stat.key"
-            class="flex flex-col items-center justify-center gap-1 rounded-xl border border-[#cbd9c6] bg-white p-3 text-center"
+            class="flex flex-col items-center justify-center gap-1 rounded-xl border border-border-default bg-white p-3 text-center"
           >
             <span aria-hidden="true" class="text-xl">{{ stat.icon }}</span>
-            <span class="text-xs text-[#607176]">{{ tr(`FishingMapModal.${stat.key}`) }}</span>
+            <span class="text-xs text-palette-607176">{{ tr(`FishingMapModal.${stat.key}`) }}</span>
             <span class="text-sm font-bold">{{ stat.value }}</span>
           </div>
         </div>
@@ -90,9 +90,9 @@ watch(
               { key: 'fishType', value: fish?.fish_type },
             ]"
             :key="detail.key"
-            class="min-w-0 rounded-lg border border-[#cbd9c6] p-3"
+            class="min-w-0 rounded-lg border border-border-default p-3"
           >
-            <div class="text-xs text-[#607176]">{{ tr(`FishingMapModal.${detail.key}`) }}</div>
+            <div class="text-xs text-palette-607176">{{ tr(`FishingMapModal.${detail.key}`) }}</div>
             <div class="mt-1 break-words font-semibold">{{ detail.value || tr("FishingMapModal.unknown") }}</div>
           </div>
         </div>

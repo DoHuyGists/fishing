@@ -68,14 +68,14 @@ onUnmounted(() => {
       :class="
         compact
           ? [
-              'max-h-[calc(100dvh-1.5rem)] w-full overflow-hidden rounded-2xl border border-[#cbd9c6] shadow-xl',
+              'max-h-[calc(100dvh-1.5rem)] w-full overflow-hidden rounded-2xl border border-border-default shadow-xl',
               contentWidthClass,
             ]
           : 'h-[100vh] w-screen supports-[height:100dvh]:h-[100dvh]'
       "
     >
       <header
-        class="grid grid-cols-2 md:grid-cols-[auto_1fr_auto] gap-x-3 gap-y-2 p-2 border-b border-emerald-950/10 bg-[#e7ecda] sm:flex-nowrap sm:gap-4"
+        class="grid grid-cols-2 md:grid-cols-[auto_1fr_auto] gap-x-3 gap-y-2 p-2 border-b border-emerald-950/10 bg-surface-muted sm:flex-nowrap sm:gap-4"
       >
         <div class="min-w-0 flex-1 sm:flex-none order-1 md:order-1">
           <div class="m-0 mt-1 break-words text-lg font-bold sm:text-xl">{{ title }}</div>

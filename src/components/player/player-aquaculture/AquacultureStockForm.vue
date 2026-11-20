@@ -31,13 +31,13 @@ async function submit() {
 
 <template>
   <details
-    class="slide-fade-in from-right player-content-in rounded-xl border border-[#cbd9c6] bg-white"
+    class="slide-fade-in from-right player-content-in rounded-xl border border-border-default bg-white"
     :open="!farm.activePond?.fish.length"
   >
     <summary class="cursor-pointer px-4 py-3 text-sm font-bold">
       {{ tr("AquacultureStockForm.tha_mot_lua_moi") }}
     </summary>
-    <form class="space-y-3 border-t border-[#cbd9c6] p-4 text-xs" @submit.prevent="submit">
+    <form class="space-y-3 border-t border-border-default p-4 text-xs" @submit.prevent="submit">
       <div class="m-0 leading-relaxed text-stone-600">
         {{ tr("AquacultureStockForm.moi_lua_mot_loai_ban_co_the_tha_nhieu_loai_chung_ao_neu_con_suc_") }}
       </div>
@@ -46,7 +46,7 @@ async function submit() {
         <select
           v-model="speciesId"
           required
-          class="mt-1 w-full rounded-lg border border-[#cbd9c6] bg-white p-2"
+          class="mt-1 w-full rounded-lg border border-border-default bg-white p-2"
           :disabled="!farm.canMutate"
         >
           <option value="">{{ tr("AquacultureStockForm.chon_loai_ca") }}</option>
@@ -65,7 +65,7 @@ async function submit() {
         {{ tr("AquacultureStockForm.chua_co_loai_nao_duoc_mo_nuoi") }}
       </div>
       <template v-if="rule">
-        <div class="grid grid-cols-2 gap-2 rounded-lg bg-[#f5f9f0] p-3">
+        <div class="grid grid-cols-2 gap-2 rounded-lg bg-surface p-3">
           <span>{{ rule.capacity_per_fish }} {{ tr("AquacultureStockForm.suc_chua_con") }}</span
           ><span>{{ formatDuration(rule.grow_seconds) }}{{ tr("AquacultureStockForm.lua") }}</span>
           <span class="flex flex-wrap items-center gap-1"
@@ -83,12 +83,12 @@ async function submit() {
             step="1"
             required
             :disabled="!farm.canMutate || !maximum"
-            class="mt-1 w-full rounded-lg border border-[#cbd9c6] p-2"
+            class="mt-1 w-full rounded-lg border border-border-default p-2"
           />
         </label>
         <fieldset class="space-y-2" :disabled="!farm.canMutate">
           <legend class="mb-2 font-semibold">{{ tr("AquacultureStockForm.cach_nuoi") }}</legend>
-          <label class="flex items-start gap-2 rounded-lg border border-[#cbd9c6] p-2">
+          <label class="flex items-start gap-2 rounded-lg border border-border-default p-2">
             <input v-model="mode" type="radio" value="simple" name="care-mode" class="mt-0.5" />
             <span
               ><b>{{ tr("AquacultureStockForm.thong_tha") }}</b
@@ -97,7 +97,7 @@ async function submit() {
               }}</span></span
             >
           </label>
-          <label class="flex items-start gap-2 rounded-lg border border-[#cbd9c6] p-2">
+          <label class="flex items-start gap-2 rounded-lg border border-border-default p-2">
             <input v-model="mode" type="radio" value="advanced" name="care-mode" class="mt-0.5" />
             <span
               ><b>{{ tr("AquacultureStockForm.cham_chut") }}</b

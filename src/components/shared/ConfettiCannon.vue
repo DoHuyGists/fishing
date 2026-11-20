@@ -15,7 +15,7 @@ import { onBeforeUnmount, onMounted, ref } from 'vue'
 //   })
 
 // Bảng màu riêng
-// confetti.value?.fire({ colors: ['#fde047', '#f59e0b', '#ffffff'] })
+// confetti.value?.fire({ colors: ['#fde047', '#f59e0b', '#fff'] })
 
 interface Particle {
   x: number

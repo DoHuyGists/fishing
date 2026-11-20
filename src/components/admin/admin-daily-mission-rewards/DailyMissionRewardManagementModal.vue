@@ -91,7 +91,7 @@ onUnmounted(() => {
         </button>
         <button
           type="button"
-          class="rounded-lg bg-[#153221] px-4 py-2.5 text-sm font-bold text-white hover:bg-emerald-800 focus-visible:outline-2 focus-visible:outline-emerald-600"
+          class="rounded-lg bg-content-strong px-4 py-2.5 text-sm font-bold text-white hover:bg-emerald-800 focus-visible:outline-2 focus-visible:outline-emerald-600"
           @click="store.openCreateForm()"
         >
           + Thêm mốc thưởng

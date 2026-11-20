@@ -123,7 +123,7 @@ onMounted(() => {
             </div>
             <button
               type="button"
-              class="rounded-md w-full bg-[#153221] px-3 py-2 text-sm font-bold text-white hover:bg-[#1a3e29] disabled:cursor-not-allowed disabled:opacity-50"
+              class="rounded-md w-full bg-content-strong px-3 py-2 text-sm font-bold text-white hover:bg-palette-1a3e29 disabled:cursor-not-allowed disabled:opacity-50"
               :disabled="isMoving || selected.net.size === 0"
               @click="move('net')"
             >
@@ -131,7 +131,7 @@ onMounted(() => {
             </button>
             <button
               type="button"
-              class="rounded-md w-full bg-[#153221] px-3 py-2 text-sm font-bold text-white hover:bg-[#1a3e29] disabled:cursor-not-allowed disabled:opacity-50"
+              class="rounded-md w-full bg-content-strong px-3 py-2 text-sm font-bold text-white hover:bg-palette-1a3e29 disabled:cursor-not-allowed disabled:opacity-50"
               :disabled="isMoving || selected.stored.size === 0"
               @click="move('stored')"
             >

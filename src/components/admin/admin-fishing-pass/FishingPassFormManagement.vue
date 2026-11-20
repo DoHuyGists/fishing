@@ -29,18 +29,18 @@ function submit() {
 
 <template>
   <form class="space-y-4" @submit.prevent="submit">
-    <label class="block text-sm font-medium text-[#24352a]">Tên vé <input v-model="form.name" required maxlength="160" class="mt-1 w-full rounded-lg border border-[#cbd9c6] px-3 py-2" /></label>
-    <label class="block text-sm font-medium text-[#24352a]">Mô tả <textarea v-model="form.description" rows="3" class="mt-1 w-full rounded-lg border border-[#cbd9c6] px-3 py-2" /></label>
+    <label class="block text-sm font-medium text-content">Tên vé <input v-model="form.name" required maxlength="160" class="mt-1 w-full rounded-lg border border-border-default px-3 py-2" /></label>
+    <label class="block text-sm font-medium text-content">Mô tả <textarea v-model="form.description" rows="3" class="mt-1 w-full rounded-lg border border-border-default px-3 py-2" /></label>
     <div class="grid gap-3 sm:grid-cols-2">
-      <label class="text-sm font-medium text-[#24352a]">Giá vé <input v-model.number="form.price" type="number" min="0" step="1" required class="mt-1 w-full rounded-lg border border-[#cbd9c6] px-3 py-2" /></label>
-      <label class="text-sm font-medium text-[#24352a]">Số ngày <input v-model.number="form.totalDays" type="number" min="1" step="1" required class="mt-1 w-full rounded-lg border border-[#cbd9c6] px-3 py-2" /></label>
-      <label class="text-sm font-medium text-[#24352a]">Bắt đầu <input v-model="form.startAt" type="datetime-local" required class="mt-1 w-full rounded-lg border border-[#cbd9c6] px-3 py-2" /></label>
-      <label class="text-sm font-medium text-[#24352a]">Kết thúc <input v-model="form.endAt" type="datetime-local" required class="mt-1 w-full rounded-lg border border-[#cbd9c6] px-3 py-2" /></label>
+      <label class="text-sm font-medium text-content">Giá vé <input v-model.number="form.price" type="number" min="0" step="1" required class="mt-1 w-full rounded-lg border border-border-default px-3 py-2" /></label>
+      <label class="text-sm font-medium text-content">Số ngày <input v-model.number="form.totalDays" type="number" min="1" step="1" required class="mt-1 w-full rounded-lg border border-border-default px-3 py-2" /></label>
+      <label class="text-sm font-medium text-content">Bắt đầu <input v-model="form.startAt" type="datetime-local" required class="mt-1 w-full rounded-lg border border-border-default px-3 py-2" /></label>
+      <label class="text-sm font-medium text-content">Kết thúc <input v-model="form.endAt" type="datetime-local" required class="mt-1 w-full rounded-lg border border-border-default px-3 py-2" /></label>
     </div>
-    <label class="flex items-center gap-2 text-sm text-[#24352a]"><input v-model="form.isActive" type="checkbox" class="accent-emerald-700" /> Đang hoạt động</label>
+    <label class="flex items-center gap-2 text-sm text-content"><input v-model="form.isActive" type="checkbox" class="accent-emerald-700" /> Đang hoạt động</label>
     <div v-if="error" class="text-sm text-red-600">{{ error }}</div>
-    <div class="flex justify-end gap-2 border-t border-[#cbd9c6] pt-4">
-      <button type="button" class="rounded-lg border border-[#cbd9c6] px-4 py-2 text-sm" @click="emit('cancel')">Huỷ</button>
+    <div class="flex justify-end gap-2 border-t border-border-default pt-4">
+      <button type="button" class="rounded-lg border border-border-default px-4 py-2 text-sm" @click="emit('cancel')">Huỷ</button>
       <button type="submit" :disabled="saving || !!error" class="rounded-lg bg-emerald-800 px-4 py-2 text-sm font-semibold text-white disabled:opacity-50">{{ saving ? 'Đang lưu…' : pass ? 'Lưu thay đổi' : 'Tạo vé' }}</button>
     </div>
   </form>

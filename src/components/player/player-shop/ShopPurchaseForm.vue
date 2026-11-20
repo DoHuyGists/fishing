@@ -18,7 +18,7 @@ const emit = defineEmits<{ buy: [] }>();
 </script>
 
 <template>
-  <aside class="slide-fade-in from-right player-content-in h-fit rounded-xl border border-[#cbd9c6] bg-[#f5f9f0] p-4 lg:sticky lg:top-0">
+  <aside class="slide-fade-in from-right player-content-in h-fit rounded-xl border border-border-default bg-surface p-4 lg:sticky lg:top-0">
     <PaymentConfirmation
       v-if="selectedItem"
       embedded
@@ -33,7 +33,7 @@ const emit = defineEmits<{ buy: [] }>();
     >
       <div class="flex items-center gap-3">
         <div
-          class="grid size-14 shrink-0 place-items-center overflow-hidden rounded-lg border border-[#cbd9c6] bg-white text-2xl"
+          class="grid size-14 shrink-0 place-items-center overflow-hidden rounded-lg border border-border-default bg-white text-2xl"
         >
           <img
             v-if="selectedItem.image"
@@ -54,7 +54,7 @@ const emit = defineEmits<{ buy: [] }>();
           type="number"
           min="1"
           step="1"
-          class="mt-1 w-full rounded-lg border border-[#cbd9c6] bg-white px-3 py-2 text-sm"
+          class="mt-1 w-full rounded-lg border border-border-default bg-white px-3 py-2 text-sm"
         />
       </label>
       <template #summary>

@@ -82,7 +82,7 @@ const userInitial = computed(() => {
         <span v-else>{{ userInitial }}</span>
       </div>
       <div class="flex flex-col min-w-0 flex-1">
-        <span class="font-bold text-sm text-[#263238] truncate" :title="authStore.user?.email || ''">
+        <span class="font-bold text-sm text-palette-263238 truncate" :title="authStore.user?.email || ''">
           {{ userProfileStore.profile?.display_name || authStore.user?.email || tr("UserProfile.chua_cap_nhat_email") }}
         </span>
         <div class="flex flex-wrap items-center gap-2 mt-1.5">
@@ -109,7 +109,7 @@ const userInitial = computed(() => {
           <div class="flex items-center gap-1.5 text-gray-500 text-[11px] font-medium">
             <span>🎒</span><span>{{ tr("UserProfile.suc_chua_tui_do") }}</span>
           </div>
-          <span class="text-sm font-bold text-[#263238]">
+          <span class="text-sm font-bold text-palette-263238">
             {{ userProfileStore.inventoryCapacity }}
             <span class="text-xs font-normal text-gray-500">{{ tr("UserProfile.o") }}</span>
           </span>
@@ -118,7 +118,7 @@ const userInitial = computed(() => {
           <div class="flex items-center gap-1.5 text-gray-500 text-[11px] font-medium">
             <span>🐟</span><span>{{ tr("UserProfile.suc_chua_kho_ca") }}</span>
           </div>
-          <span class="text-sm font-bold text-[#263238]">
+          <span class="text-sm font-bold text-palette-263238">
             {{ userProfileStore.speciesStorageCapacity }}
             <span class="text-xs font-normal text-gray-500">{{ tr("UserProfile.con") }}</span>
           </span>
@@ -127,7 +127,7 @@ const userInitial = computed(() => {
           <div class="flex items-center gap-1.5 text-gray-500 text-[11px] font-medium">
             <span>🎣</span><span>{{ tr("UserProfile.suc_chua_bo_trang_bi") }}</span>
           </div>
-          <span class="text-sm font-bold text-[#263238]">
+          <span class="text-sm font-bold text-palette-263238">
             {{ userProfileStore.equipmentCapacity }}
             <span class="text-xs font-normal text-gray-500">{{ tr("UserProfile.o") }}</span>
           </span>
@@ -136,7 +136,7 @@ const userInitial = computed(() => {
           <div class="flex items-center gap-1.5 text-gray-500 text-[11px] font-medium">
             <span>🧺</span><span>{{ tr("UserProfile.suc_chua_gio_ca") }}</span>
           </div>
-          <span class="text-sm font-bold text-[#263238]">
+          <span class="text-sm font-bold text-palette-263238">
             {{ userProfileStore.fishingNetCapacity }}
             <span class="text-xs font-normal text-gray-500">{{ tr("UserProfile.con") }}</span>
           </span>
@@ -145,7 +145,7 @@ const userInitial = computed(() => {
           <div class="flex items-center gap-1.5 text-gray-500 text-[11px] font-medium">
             <span>🏆</span><span>{{ tr("UserProfile.cap_do") }}</span>
           </div>
-          <span class="text-sm font-bold text-[#263238]"
+          <span class="text-sm font-bold text-palette-263238"
             >{{ tr("UserProfile.level") }} {{ userProfileStore.level }}</span
           >
         </div>
@@ -153,7 +153,7 @@ const userInitial = computed(() => {
           <div class="flex items-center gap-1.5 text-gray-500 text-[11px] font-medium">
             <span>⚡</span><span>{{ tr("UserProfile.diem_kinh_nghiem") }}</span>
           </div>
-          <div class="flex items-center gap-1 text-md text-[#263238]">
+          <div class="flex items-center gap-1 text-md text-palette-263238">
             <span class="font-bold">{{ formattedExp }}</span
             ><span>/</span><span>{{ maxExp }}</span>
           </div>
@@ -170,7 +170,7 @@ const userInitial = computed(() => {
       >
         <div class="flex justify-between items-center gap-3 px-3.5 py-2.5">
           <span class="text-gray-500 font-medium">{{ tr("UserProfile.quoc_gia") }}</span>
-          <span class="text-right font-semibold text-[#24352a]">{{
+          <span class="text-right font-semibold text-content">{{
             currentCountry?.name ||
             (countryStore.isLoading ? tr("UserProfile.dang_tai_quoc_gia") : tr("UserProfile.chua_co_thong_tin"))
           }}</span>
@@ -194,7 +194,7 @@ const userInitial = computed(() => {
         </div>
         <div class="flex justify-between items-center px-3.5 py-2.5">
           <span class="text-gray-500 font-medium">{{ tr("UserProfile.ngay_tham_gia") }}</span>
-          <span class="font-semibold text-[#24352a]">{{ joinedDate }}</span>
+          <span class="font-semibold text-content">{{ joinedDate }}</span>
         </div>
       </div>
     </div>
@@ -203,7 +203,7 @@ const userInitial = computed(() => {
       <LanguageSelector />
       <button
         type="button"
-        class="rounded-lg border border-[#cbd9c6] bg-[#f5f9f0] px-4 py-2 text-sm font-semibold text-[#24352a] transition-colors hover:bg-emerald-100 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-emerald-600"
+        class="rounded-lg border border-border-default bg-surface px-4 py-2 text-sm font-semibold text-content transition-colors hover:bg-emerald-100 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-emerald-600"
         aria-haspopup="dialog"
         @click="showCountryModal = true"
       >
@@ -211,7 +211,7 @@ const userInitial = computed(() => {
       </button>
       <button
         type="button"
-        class="rounded-lg border border-[#cbd9c6] bg-[#f5f9f0] px-4 py-2 text-sm font-semibold text-[#24352a] transition-colors hover:bg-emerald-100 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-emerald-600"
+        class="rounded-lg border border-border-default bg-surface px-4 py-2 text-sm font-semibold text-content transition-colors hover:bg-emerald-100 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-emerald-600"
         aria-haspopup="dialog"
         @click="showIdentityModal = true"
       >
@@ -219,7 +219,7 @@ const userInitial = computed(() => {
       </button>
       <button
         type="button"
-        class="rounded-lg border border-[#cbd9c6] bg-[#f5f9f0] px-4 py-2 text-sm font-semibold text-[#24352a] transition-colors hover:bg-emerald-100 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-emerald-600"
+        class="rounded-lg border border-border-default bg-surface px-4 py-2 text-sm font-semibold text-content transition-colors hover:bg-emerald-100 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-emerald-600"
         aria-haspopup="dialog"
         @click="showPasswordModal = true"
       >

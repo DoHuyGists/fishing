@@ -67,7 +67,7 @@ const {
           <template #summary>
             <span
               class="ml-2 font-normal"
-              :class="equipmentStore.countSetItems(set) >= equipmentCapacity ? 'text-amber-700' : 'text-[#526650]'"
+              :class="equipmentStore.countSetItems(set) >= equipmentCapacity ? 'text-amber-700' : 'text-palette-526650'"
             >
               {{
                 tr("EquipmentSets.capacity_usage", {
@@ -94,7 +94,7 @@ const {
               'min-w-0 cursor-pointer rounded-md border p-1.5 transition',
               isActiveSlot(set.id, slot)
                 ? 'border-emerald-600 bg-emerald-50 ring-1 ring-emerald-600'
-                : 'border-[#cbd9c6] hover:border-teal-500',
+                : 'border-border-default hover:border-teal-500',
             ]"
             @click="toggleActive(set.id, slot)"
           >
@@ -113,19 +113,19 @@ const {
               <div
                 v-for="eq in set[slot]"
                 :key="eq.id"
-                class="mt-1 flex min-w-0 items-center justify-between gap-1 rounded bg-[#f5f9f0] p-1 text-xs"
+                class="mt-1 flex min-w-0 items-center justify-between gap-1 rounded bg-surface p-1 text-xs"
               >
                 <span class="truncate" :title="itemName(eq, eq.id)">{{ itemName(eq, eq.id) }}</span>
                 <button
                   type="button"
-                  class="shrink-0 rounded px-1 text-[#526650] hover:bg-rose-100 hover:text-rose-700 disabled:opacity-40"
+                  class="shrink-0 rounded px-1 text-palette-526650 hover:bg-rose-100 hover:text-rose-700 disabled:opacity-40"
                   :aria-label="tr('EquipmentSets.go_value0_khoi_set', { value0: itemName(eq, eq.id) })"
                   @click.stop="removeFromSet(set, slot, eq)"
                 >
                   ×
                 </button>
               </div>
-            <div v-if="set[slot].length === 0" class="py-2 text-center text-xs text-[#526650]">
+            <div v-if="set[slot].length === 0" class="py-2 text-center text-xs text-palette-526650">
               {{ tr("FlipBook.trong") }}
             </div>
           </div>

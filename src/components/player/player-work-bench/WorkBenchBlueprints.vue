@@ -17,13 +17,13 @@ const emit = defineEmits<{
 </script>
 
 <template>
-  <aside id="workbench-blueprints" class="slide-fade-in from-bottom player-content-in flex min-h-0 flex-col rounded-lg border border-[#cbd9c6] bg-[#f5f9f0] p-3">
+  <aside id="workbench-blueprints" class="slide-fade-in from-bottom player-content-in flex min-h-0 flex-col rounded-lg border border-border-default bg-surface p-3">
     <div class="mb-3 text-sm font-bold">{{ tr('WorkBenchModal.ban_ve') }}</div>
     <div v-if="loading" class="py-4 text-center text-xs opacity-60">{{ tr('WorkBenchModal.dang_tai_ban_ve') }}</div>
     <div v-else class="flex max-h-[min(65vh,44rem)] flex-col gap-2 overflow-y-auto lg:min-h-0 lg:max-h-none lg:flex-1">
       <div v-for="blueprint in blueprints" :key="blueprint.id">
-        <button type="button" class="flex w-full items-center gap-2 rounded-md border p-2 text-left transition" :class="selectedBlueprintId === blueprint.id ? 'border-emerald-700 bg-emerald-100' : 'border-[#cbd9c6] bg-white hover:bg-[#e7ecda]'" @click="emit('select', blueprint)">
-          <span class="grid size-11 shrink-0 place-items-center overflow-hidden rounded bg-[#f5f9f0] text-lg">
+        <button type="button" class="flex w-full items-center gap-2 rounded-md border p-2 text-left transition" :class="selectedBlueprintId === blueprint.id ? 'border-emerald-700 bg-emerald-100' : 'border-border-default bg-white hover:bg-surface-muted'" @click="emit('select', blueprint)">
+          <span class="grid size-11 shrink-0 place-items-center overflow-hidden rounded bg-surface text-lg">
             <img v-if="itemsById[blueprint.resultItemId]?.image" :src="itemsById[blueprint.resultItemId]?.image ?? undefined" :alt="itemsById[blueprint.resultItemId]?.name ?? ''" class="h-full w-full object-contain p-1" />
             <span v-else>{{ itemsById[blueprint.resultItemId]?.icon || "?" }}</span>
           </span>

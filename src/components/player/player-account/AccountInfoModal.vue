@@ -96,7 +96,7 @@ async function signOut() {
         aria-modal="true"
         aria-labelledby="sign-out-title"
       >
-        <div id="sign-out-title" class="m-0 text-lg font-bold text-[#263238]">
+        <div id="sign-out-title" class="m-0 text-lg font-bold text-palette-263238">
           {{ tr("AccountInfoModal.xac_nhan_dang_xuat") }}
         </div>
         <div class="my-3 text-sm leading-relaxed text-gray-600">

@@ -25,7 +25,7 @@ const zones = {
 
 <template>
   <article class="mx-auto w-full max-w-6xl px-4 py-5 text-sm leading-relaxed sm:px-6 sm:py-7">
-    <div class="mb-5 rounded-2xl bg-[#153221] p-5 text-white sm:p-7">
+    <div class="mb-5 rounded-2xl bg-content-strong p-5 text-white sm:p-7">
       <div class="mb-2 flex flex-wrap gap-2 text-xs font-semibold text-emerald-100">
         <span class="rounded-full bg-white/10 px-3 py-1">🎣 Tension challenge</span>
         <span class="rounded-full bg-white/10 px-3 py-1">25 chỉ số · 2 nhóm</span>
@@ -34,12 +34,12 @@ const zones = {
       <div class="mb-0 mt-2 max-w-3xl text-emerald-100">
         Người chơi giữ nút để thu dây, thả nút để nhả dây. Bạn điều chỉnh luật trong
         <code
-          class="rounded-[0.25rem] bg-[#dfeadd80] px-[0.25rem] py-[0.0625rem] [overflow-wrap:anywhere] text-[0.85em]"
+          class="rounded-[0.25rem] bg-surface-code px-[0.25rem] py-[0.0625rem] [overflow-wrap:anywhere] text-[0.85em]"
           >config</code
         >
         và sức kéo trong
         <code
-          class="rounded-[0.25rem] bg-[#dfeadd80] px-[0.25rem] py-[0.0625rem] [overflow-wrap:anywhere] text-[0.85em]"
+          class="rounded-[0.25rem] bg-surface-code px-[0.25rem] py-[0.0625rem] [overflow-wrap:anywhere] text-[0.85em]"
           >fish</code
         >
         để tạo cuộc đấu vừa sức, có nhịp nghỉ và có cơ hội xử lý.
@@ -50,51 +50,51 @@ const zones = {
       <template #mechanics>
         <div class="space-y-5">
           <div class="grid gap-3 sm:grid-cols-3">
-            <section class="guide-card border border-[#cbd9c6] rounded-[0.875rem] bg-white p-4">
+            <section class="guide-card border border-border-default rounded-[0.875rem] bg-white p-4">
               <span class="text-2xl" aria-hidden="true">✊</span>
               <div class="guide-title m-0 text-[0.9375rem] font-bold!">Giữ: kéo cá lại gần</div>
               <div>
                 Cộng
                 <code
-                  class="rounded-[0.25rem] bg-[#dfeadd80] px-[0.25rem] py-[0.0625rem] [overflow-wrap:anywhere] text-[0.85em]"
+                  class="rounded-[0.25rem] bg-surface-code px-[0.25rem] py-[0.0625rem] [overflow-wrap:anywhere] text-[0.85em]"
                   >reelRate</code
                 >
                 vào lực cá. Khoảng cách giảm theo
                 <code
-                  class="rounded-[0.25rem] bg-[#dfeadd80] px-[0.25rem] py-[0.0625rem] [overflow-wrap:anywhere] text-[0.85em]"
+                  class="rounded-[0.25rem] bg-surface-code px-[0.25rem] py-[0.0625rem] [overflow-wrap:anywhere] text-[0.85em]"
                   >reelSpeed</code
                 >
                 khi dây đạt
                 <code
-                  class="rounded-[0.25rem] bg-[#dfeadd80] px-[0.25rem] py-[0.0625rem] [overflow-wrap:anywhere] text-[0.85em]"
+                  class="rounded-[0.25rem] bg-surface-code px-[0.25rem] py-[0.0625rem] [overflow-wrap:anywhere] text-[0.85em]"
                   >safeMin</code
                 >.
               </div>
             </section>
-            <section class="guide-card border border-[#cbd9c6] rounded-[0.875rem] bg-white p-4">
+            <section class="guide-card border border-border-default rounded-[0.875rem] bg-white p-4">
               <span class="text-2xl" aria-hidden="true">🖐️</span>
               <div class="guide-title m-0 text-[0.9375rem] font-bold!">Thả: bớt căng dây</div>
               <div>
                 Cộng
                 <code
-                  class="rounded-[0.25rem] bg-[#dfeadd80] px-[0.25rem] py-[0.0625rem] [overflow-wrap:anywhere] text-[0.85em]"
+                  class="rounded-[0.25rem] bg-surface-code px-[0.25rem] py-[0.0625rem] [overflow-wrap:anywhere] text-[0.85em]"
                   >releaseRate</code
                 >
                 là số âm. Nếu cá giật quá mạnh, tổng lực vẫn dương và dây vẫn căng lên.
               </div>
             </section>
-            <section class="guide-card border border-[#cbd9c6] rounded-[0.875rem] bg-white p-4">
+            <section class="guide-card border border-border-default rounded-[0.875rem] bg-white p-4">
               <span class="text-2xl" aria-hidden="true">🟢</span>
               <div class="guide-title m-0 text-[0.9375rem] font-bold!">Vùng xanh: làm cá mệt</div>
               <div>
                 Trong đoạn
                 <code
-                  class="rounded-[0.25rem] bg-[#dfeadd80] px-[0.25rem] py-[0.0625rem] [overflow-wrap:anywhere] text-[0.85em]"
+                  class="rounded-[0.25rem] bg-surface-code px-[0.25rem] py-[0.0625rem] [overflow-wrap:anywhere] text-[0.85em]"
                   >safeMin</code
                 >
                 đến
                 <code
-                  class="rounded-[0.25rem] bg-[#dfeadd80] px-[0.25rem] py-[0.0625rem] [overflow-wrap:anywhere] text-[0.85em]"
+                  class="rounded-[0.25rem] bg-surface-code px-[0.25rem] py-[0.0625rem] [overflow-wrap:anywhere] text-[0.85em]"
                   >safeMax</code
                 >, cá hao thể lực và yếu dần, kể cả khi đang nhả dây.
               </div>
@@ -102,7 +102,7 @@ const zones = {
           </div>
 
           <section
-            class="guide-card border border-[#cbd9c6] rounded-[0.875rem] bg-white p-4 overflow-hidden"
+            class="guide-card border border-border-default rounded-[0.875rem] bg-white p-4 overflow-hidden"
             aria-labelledby="tension-preview-title"
           >
             <div class="mb-4 flex flex-wrap items-start justify-between gap-3">
@@ -114,7 +114,7 @@ const zones = {
               </div>
               <button
                 type="button"
-                class="guide-button border border-[#cbd9c6] rounded-lg bg-white px-3 py-2 text-[0.8125rem] font-semibold! cursor-pointer hover:border-[#047857] hover:bg-[#f5f9f0] focus-visible:outline-2 focus-visible:outline-[#047857] focus-visible:outline-offset-2 [&.selected-button]:border-[#047857] [&.selected-button]:bg-[#047857] [&.selected-button]:text-white"
+                class="guide-button border border-border-default rounded-lg bg-white px-3 py-2 text-[0.8125rem] font-semibold! cursor-pointer hover:border-accent hover:bg-surface focus-visible:outline-2 focus-visible:outline-accent focus-visible:outline-offset-2 [&.selected-button]:border-accent [&.selected-button]:bg-accent [&.selected-button]:text-white"
                 @click="guide.resetPreview"
               >
                 Đặt lại minh họa
@@ -125,7 +125,7 @@ const zones = {
                 <label class="block font-semibold">
                   Tình huống
                   <select
-                    class="guide-input w-full border border-[#cbd9c6] rounded-lg bg-white px-3 py-2.5 text-sm font-normal! focus-visible:outline-2 focus-visible:outline-[#047857] focus-visible:outline-offset-2 mt-1"
+                    class="guide-input w-full border border-border-default rounded-lg bg-white px-3 py-2.5 text-sm font-normal! focus-visible:outline-2 focus-visible:outline-accent focus-visible:outline-offset-2 mt-1"
                     :value="guide.selectedPresetId"
                     @change="guide.selectPreset(($event.target as HTMLSelectElement).value)"
                   >
@@ -156,7 +156,7 @@ const zones = {
                       }"
                     />
                     <div
-                      class="absolute -inset-y-1 w-1 -translate-x-1/2 rounded-full bg-[#24352a] ring-2 ring-white"
+                      class="absolute -inset-y-1 w-1 -translate-x-1/2 rounded-full bg-content ring-2 ring-white"
                       :style="{ left: `${(guide.previewTension / guide.selectedPreset.config.maxTension) * 100}%` }"
                     />
                   </div>
@@ -196,7 +196,7 @@ const zones = {
                   <input v-model="guide.previewBurst" type="checkbox" class="size-4 accent-emerald-700" />
                   Giả sử cá đang giật gần mức
                   <code
-                    class="rounded-[0.25rem] bg-[#dfeadd80] px-[0.25rem] py-[0.0625rem] [overflow-wrap:anywhere] text-[0.85em]"
+                    class="rounded-[0.25rem] bg-surface-code px-[0.25rem] py-[0.0625rem] [overflow-wrap:anywhere] text-[0.85em]"
                     >burstMax</code
                   >
                 </label>
@@ -204,7 +204,7 @@ const zones = {
                   <legend class="mb-1 font-semibold">Thao tác người chơi</legend>
                   <button
                     type="button"
-                    class="guide-button border border-[#cbd9c6] rounded-lg bg-white px-3 py-2 text-[0.8125rem] font-semibold! cursor-pointer hover:border-[#047857] hover:bg-[#f5f9f0] focus-visible:outline-2 focus-visible:outline-[#047857] focus-visible:outline-offset-2 [&.selected-button]:border-[#047857] [&.selected-button]:bg-[#047857] [&.selected-button]:text-white"
+                    class="guide-button border border-border-default rounded-lg bg-white px-3 py-2 text-[0.8125rem] font-semibold! cursor-pointer hover:border-accent hover:bg-surface focus-visible:outline-2 focus-visible:outline-accent focus-visible:outline-offset-2 [&.selected-button]:border-accent [&.selected-button]:bg-accent [&.selected-button]:text-white"
                     :class="{ 'selected-button': guide.previewReeling }"
                     :aria-pressed="guide.previewReeling"
                     @click="guide.previewReeling = true"
@@ -213,7 +213,7 @@ const zones = {
                   </button>
                   <button
                     type="button"
-                    class="guide-button border border-[#cbd9c6] rounded-lg bg-white px-3 py-2 text-[0.8125rem] font-semibold! cursor-pointer hover:border-[#047857] hover:bg-[#f5f9f0] focus-visible:outline-2 focus-visible:outline-[#047857] focus-visible:outline-offset-2 [&.selected-button]:border-[#047857] [&.selected-button]:bg-[#047857] [&.selected-button]:text-white"
+                    class="guide-button border border-border-default rounded-lg bg-white px-3 py-2 text-[0.8125rem] font-semibold! cursor-pointer hover:border-accent hover:bg-surface focus-visible:outline-2 focus-visible:outline-accent focus-visible:outline-offset-2 [&.selected-button]:border-accent [&.selected-button]:bg-accent [&.selected-button]:text-white"
                     :class="{ 'selected-button': !guide.previewReeling }"
                     :aria-pressed="!guide.previewReeling"
                     @click="guide.previewReeling = false"
@@ -222,7 +222,7 @@ const zones = {
                   </button>
                 </fieldset>
               </div>
-              <div class="space-y-3 rounded-xl border border-[#cbd9c6] bg-[#f5f9f0] p-4">
+              <div class="space-y-3 rounded-xl border border-border-default bg-surface p-4">
                 <div class="m-0 text-xs font-bold uppercase tracking-wide text-emerald-800">
                   Lực căng sẽ thay đổi thế nào?
                 </div>
@@ -281,7 +281,7 @@ const zones = {
                   </div>
                 </div>
                 <details class="rounded-lg bg-white p-3 text-xs text-slate-600">
-                  <summary class="cursor-pointer font-semibold text-[#24352a]">
+                  <summary class="cursor-pointer font-semibold text-content">
                     Các con số này được tính ra sao?
                   </summary>
                   <div>Lực cá ≈ (nền + giật) × sức riêng × sức theo thể lực × hệ số vào dây.</div>
@@ -293,7 +293,7 @@ const zones = {
                   <div class="mb-0">
                     Minh họa dùng nền ở mức trung tâm
                     <code
-                      class="rounded-[0.25rem] bg-[#dfeadd80] px-[0.25rem] py-[0.0625rem] [overflow-wrap:anywhere] text-[0.85em]"
+                      class="rounded-[0.25rem] bg-surface-code px-[0.25rem] py-[0.0625rem] [overflow-wrap:anywhere] text-[0.85em]"
                       >basePull</code
                     >
                     và bỏ qua làm tròn từng tick. Trong ván thật, nền dao động và seed quyết định chuỗi giật.
@@ -307,66 +307,66 @@ const zones = {
           </section>
 
           <div class="grid gap-3 sm:grid-cols-3">
-            <section class="guide-card border border-[#cbd9c6] rounded-[0.875rem] bg-white p-4">
+            <section class="guide-card border border-border-default rounded-[0.875rem] bg-white p-4">
               <div class="guide-title m-0 text-[0.9375rem] font-bold! text-emerald-800">
                 🏁 Thắng khi khoảng cách ≤ 0
               </div>
               <div>
                 Cần thu dây hiệu quả đủ lâu để đưa cá về gần. Thời gian ván bị giới hạn bởi
                 <code
-                  class="rounded-[0.25rem] bg-[#dfeadd80] px-[0.25rem] py-[0.0625rem] [overflow-wrap:anywhere] text-[0.85em]"
+                  class="rounded-[0.25rem] bg-surface-code px-[0.25rem] py-[0.0625rem] [overflow-wrap:anywhere] text-[0.85em]"
                   >expiresAt</code
                 >; RPC hiện đặt 90 giây.
               </div>
             </section>
-            <section class="guide-card border border-[#cbd9c6] rounded-[0.875rem] bg-white p-4">
+            <section class="guide-card border border-border-default rounded-[0.875rem] bg-white p-4">
               <div class="guide-title m-0 text-[0.9375rem] font-bold! text-red-800">💥 Thua khi dây đứt</div>
               <div>
                 Chạm
                 <code
-                  class="rounded-[0.25rem] bg-[#dfeadd80] px-[0.25rem] py-[0.0625rem] [overflow-wrap:anywhere] text-[0.85em]"
+                  class="rounded-[0.25rem] bg-surface-code px-[0.25rem] py-[0.0625rem] [overflow-wrap:anywhere] text-[0.85em]"
                   >maxTension</code
                 >
                 là đứt. Vượt
                 <code
-                  class="rounded-[0.25rem] bg-[#dfeadd80] px-[0.25rem] py-[0.0625rem] [overflow-wrap:anywhere] text-[0.85em]"
+                  class="rounded-[0.25rem] bg-surface-code px-[0.25rem] py-[0.0625rem] [overflow-wrap:anywhere] text-[0.85em]"
                   >safeMax</code
                 >
                 chỉ là cảnh báo, vẫn còn cơ hội nhả dây.
               </div>
             </section>
-            <section class="guide-card border border-[#cbd9c6] rounded-[0.875rem] bg-white p-4">
+            <section class="guide-card border border-border-default rounded-[0.875rem] bg-white p-4">
               <div class="guide-title m-0 text-[0.9375rem] font-bold! text-sky-800">🐟 Thua khi cá thoát</div>
               <div>
                 Dưới
                 <code
-                  class="rounded-[0.25rem] bg-[#dfeadd80] px-[0.25rem] py-[0.0625rem] [overflow-wrap:anywhere] text-[0.85em]"
+                  class="rounded-[0.25rem] bg-surface-code px-[0.25rem] py-[0.0625rem] [overflow-wrap:anywhere] text-[0.85em]"
                   >safeMin × slackThresholdRatio</code
                 >
                 liên tục quá
                 <code
-                  class="rounded-[0.25rem] bg-[#dfeadd80] px-[0.25rem] py-[0.0625rem] [overflow-wrap:anywhere] text-[0.85em]"
+                  class="rounded-[0.25rem] bg-surface-code px-[0.25rem] py-[0.0625rem] [overflow-wrap:anywhere] text-[0.85em]"
                   >slackEscapeSeconds</code
                 >
                 thì cá thoát. Dây hồi lên ngưỡng này sẽ xóa bộ đếm.
               </div>
             </section>
           </div>
-          <aside class="rounded-xl border border-[#cbd9c6] bg-emerald-50 p-4">
+          <aside class="rounded-xl border border-border-default bg-emerald-50 p-4">
             <div class="guide-title m-0 text-[0.9375rem] font-bold!">Một ván, một bộ luật đã lưu</div>
             <div class="mb-0">
               Server lưu
               <code
-                class="rounded-[0.25rem] bg-[#dfeadd80] px-[0.25rem] py-[0.0625rem] [overflow-wrap:anywhere] text-[0.85em]"
+                class="rounded-[0.25rem] bg-surface-code px-[0.25rem] py-[0.0625rem] [overflow-wrap:anywhere] text-[0.85em]"
                 >config</code
               >,
               <code
-                class="rounded-[0.25rem] bg-[#dfeadd80] px-[0.25rem] py-[0.0625rem] [overflow-wrap:anywhere] text-[0.85em]"
+                class="rounded-[0.25rem] bg-surface-code px-[0.25rem] py-[0.0625rem] [overflow-wrap:anywhere] text-[0.85em]"
                 >fish</code
               >
               và
               <code
-                class="rounded-[0.25rem] bg-[#dfeadd80] px-[0.25rem] py-[0.0625rem] [overflow-wrap:anywhere] text-[0.85em]"
+                class="rounded-[0.25rem] bg-surface-code px-[0.25rem] py-[0.0625rem] [overflow-wrap:anywhere] text-[0.85em]"
                 >seed</code
               >
               trong session. Cùng seed và thao tác theo tick sẽ tạo cùng diễn biến ở client và server. Khi cân bằng lại,
@@ -379,13 +379,13 @@ const zones = {
       <template #indices>
         <div class="mb-4 space-y-3">
           <div class="grid gap-3 sm:grid-cols-2">
-            <div class="rounded-xl border border-[#cbd9c6] bg-white p-4">
+            <div class="rounded-xl border border-border-default bg-white p-4">
               <strong>⚙️ config · Luật và trang bị</strong>
               <div class="mb-0 mt-1 text-slate-600">
                 Vùng lực căng, cách thu/nhả, tốc độ kéo cá và các điều kiện thoát.
               </div>
             </div>
-            <div class="rounded-xl border border-[#cbd9c6] bg-white p-4">
+            <div class="rounded-xl border border-border-default bg-white p-4">
               <strong>🐟 fish · Tính cách con cá</strong>
               <div class="mb-0 mt-1 text-slate-600">Lực kéo nền, sức giật, thời lượng nhịp và tốc độ mệt.</div>
             </div>
@@ -396,7 +396,7 @@ const zones = {
               v-model="guide.keyword"
               type="search"
               placeholder="Ví dụ: releaseRate, dây chùng, thể lực..."
-              class="guide-input w-full border border-[#cbd9c6] rounded-lg bg-white px-3 py-2.5 text-sm font-normal! focus-visible:outline-2 focus-visible:outline-[#047857] focus-visible:outline-offset-2 mt-1"
+              class="guide-input w-full border border-border-default rounded-lg bg-white px-3 py-2.5 text-sm font-normal! focus-visible:outline-2 focus-visible:outline-accent focus-visible:outline-offset-2 mt-1"
             />
           </label>
           <div class="flex flex-wrap items-center gap-2" role="group" aria-label="Lọc nhóm chỉ số">
@@ -404,7 +404,7 @@ const zones = {
               v-for="filter in filters"
               :key="filter.key"
               type="button"
-              class="guide-button border border-[#cbd9c6] rounded-lg bg-white px-3 py-2 text-[0.8125rem] font-semibold! cursor-pointer hover:border-[#047857] hover:bg-[#f5f9f0] focus-visible:outline-2 focus-visible:outline-[#047857] focus-visible:outline-offset-2 [&.selected-button]:border-[#047857] [&.selected-button]:bg-[#047857] [&.selected-button]:text-white"
+              class="guide-button border border-border-default rounded-lg bg-white px-3 py-2 text-[0.8125rem] font-semibold! cursor-pointer hover:border-accent hover:bg-surface focus-visible:outline-2 focus-visible:outline-accent focus-visible:outline-offset-2 [&.selected-button]:border-accent [&.selected-button]:bg-accent [&.selected-button]:text-white"
               :class="{ 'selected-button': guide.section === filter.key }"
               :aria-pressed="guide.section === filter.key"
               @click="guide.section = filter.key"
@@ -422,14 +422,14 @@ const zones = {
           <section
             v-for="entry in guide.filteredEntries"
             :key="`${entry.section}.${entry.key}`"
-            class="guide-card border border-[#cbd9c6] rounded-[0.875rem] bg-white p-4"
+            class="guide-card border border-border-default rounded-[0.875rem] bg-white p-4"
           >
             <div class="flex flex-wrap items-center justify-between gap-2">
               <code
-                class="break-all font-bold text-emerald-800 rounded-[0.25rem] bg-[#dfeadd80] px-[0.25rem] py-[0.0625rem] [overflow-wrap:anywhere] text-[0.85em]"
+                class="break-all font-bold text-emerald-800 rounded-[0.25rem] bg-surface-code px-[0.25rem] py-[0.0625rem] [overflow-wrap:anywhere] text-[0.85em]"
                 >{{ entry.section }}.{{ entry.key }}</code
               >
-              <span class="rounded-full bg-[#f5f9f0] px-2 py-1 text-xs font-semibold">{{ number(entry.value) }}</span>
+              <span class="rounded-full bg-surface px-2 py-1 text-xs font-semibold">{{ number(entry.value) }}</span>
             </div>
             <div class="mb-1 mt-3 font-bold">
               {{ entry.name }} <span class="font-normal text-slate-500">· {{ entry.unit }}</span>
@@ -452,7 +452,7 @@ const zones = {
         </div>
         <div
           v-if="!guide.filteredEntries.length"
-          class="rounded-xl border border-dashed border-[#cbd9c6] p-8 text-center text-slate-600"
+          class="rounded-xl border border-dashed border-border-default p-8 text-center text-slate-600"
         >
           Không tìm thấy chỉ số. Thử key khác hoặc chọn “Tất cả”.
         </div>
@@ -472,9 +472,9 @@ const zones = {
               v-for="preset in tensionGuidePresets"
               :key="preset.id"
               type="button"
-              class="guide-card border border-[#cbd9c6] rounded-[0.875rem] bg-white p-4 cursor-pointer text-left transition-colors hover:border-emerald-600 focus-visible:outline-2 focus-visible:outline-emerald-700"
+              class="guide-card border border-border-default rounded-[0.875rem] bg-white p-4 cursor-pointer text-left transition-colors hover:border-emerald-600 focus-visible:outline-2 focus-visible:outline-emerald-700"
               :class="{
-                'selected-preset [&.selected-preset]:border-[#047857] [&.selected-preset]:bg-[#ecfdf5] [&.selected-preset]:shadow-[inset_0_0_0_1px_#047857]':
+                'selected-preset [&.selected-preset]:border-accent [&.selected-preset]:bg-palette-ecfdf5 [&.selected-preset]:shadow-[inset_0_0_0_1px_var(--color-accent)]':
                   guide.selectedPresetId === preset.id,
               }"
               :aria-pressed="guide.selectedPresetId === preset.id"
@@ -485,15 +485,15 @@ const zones = {
               ><span class="text-xs text-slate-600">{{ preset.audience }}</span>
             </button>
           </div>
-          <section class="guide-card border border-[#cbd9c6] rounded-[0.875rem] bg-white p-4">
+          <section class="guide-card border border-border-default rounded-[0.875rem] bg-white p-4">
             <div class="m-0 text-lg font-bold">{{ guide.selectedPreset.icon }} {{ guide.selectedPreset.title }}</div>
             <div>{{ guide.selectedPreset.reason }}</div>
-            <div v-if="guide.presetChanges.length" class="overflow-x-auto rounded-lg border border-[#cbd9c6]">
+            <div v-if="guide.presetChanges.length" class="overflow-x-auto rounded-lg border border-border-default">
               <table class="w-full border-collapse text-left text-xs sm:text-sm">
                 <caption class="sr-only">
                   Các chỉ số thay đổi so với cấu hình RARE gốc
                 </caption>
-                <thead class="bg-[#f5f9f0]">
+                <thead class="bg-surface">
                   <tr>
                     <th scope="col" class="p-3">Chỉ số</th>
                     <th scope="col" class="p-3">Gốc</th>
@@ -501,10 +501,10 @@ const zones = {
                   </tr>
                 </thead>
                 <tbody>
-                  <tr v-for="change in guide.presetChanges" :key="change.key" class="border-t border-[#cbd9c6]">
+                  <tr v-for="change in guide.presetChanges" :key="change.key" class="border-t border-border-default">
                     <th scope="row" class="p-3 font-normal">
                       <code
-                        class="break-all text-emerald-800 rounded-[0.25rem] bg-[#dfeadd80] px-[0.25rem] py-[0.0625rem] [overflow-wrap:anywhere] text-[0.85em]"
+                        class="break-all text-emerald-800 rounded-[0.25rem] bg-surface-code px-[0.25rem] py-[0.0625rem] [overflow-wrap:anywhere] text-[0.85em]"
                         >{{ change.key }}</code
                       ><span class="mt-0.5 block text-xs text-slate-500">{{ change.name }} · {{ change.unit }}</span>
                     </th>
@@ -514,9 +514,9 @@ const zones = {
                 </tbody>
               </table>
             </div>
-            <div v-else class="rounded-lg bg-[#f5f9f0] p-3">Giữ nguyên cả 25 key để làm mốc so sánh.</div>
+            <div v-else class="rounded-lg bg-surface p-3">Giữ nguyên cả 25 key để làm mốc so sánh.</div>
             <div class="mt-4 grid gap-3 sm:grid-cols-3">
-              <div class="rounded-lg bg-[#f5f9f0] p-3">
+              <div class="rounded-lg bg-surface p-3">
                 <span class="block text-xs text-slate-600"
                   >Thu hiệu quả đủ {{ number(guide.selectedPreset.config.startDistance) }} m</span
                 ><strong class="text-xl">≈ {{ number(guide.preview.minimumReelSeconds) }} giây</strong>
@@ -524,7 +524,7 @@ const zones = {
                   Ước tính khi luôn giữ nút và dây đủ căng. Ván thật còn thời gian nhả và cá lùi.
                 </div>
               </div>
-              <div class="rounded-lg bg-[#f5f9f0] p-3">
+              <div class="rounded-lg bg-surface p-3">
                 <span class="block text-xs text-slate-600">Một nhịp vùng vẫy</span
                 ><strong class="text-xl"
                   >{{ number(guide.selectedPreset.fish.burstMinTicks / guide.selectedPreset.config.tickRate) }}–{{
@@ -536,7 +536,7 @@ const zones = {
                   Cả nhịp có giật và nhịp nghỉ đều dùng khoảng thời lượng này.
                 </div>
               </div>
-              <div class="rounded-lg bg-[#f5f9f0] p-3">
+              <div class="rounded-lg bg-surface p-3">
                 <span class="block text-xs text-slate-600">Ngưỡng dây quá chùng</span
                 ><strong class="text-xl">&lt; {{ number(guide.preview.slackThreshold) }}</strong>
                 <div class="mb-0 mt-1 text-xs text-slate-600">
@@ -549,14 +549,14 @@ const zones = {
             </div>
             <button
               type="button"
-              class="guide-button border border-[#cbd9c6] rounded-lg bg-white px-3 py-2 text-[0.8125rem] font-semibold! cursor-pointer hover:border-[#047857] hover:bg-[#f5f9f0] focus-visible:outline-2 focus-visible:outline-[#047857] focus-visible:outline-offset-2 [&.selected-button]:border-[#047857] [&.selected-button]:bg-[#047857] [&.selected-button]:text-white"
+              class="guide-button border border-border-default rounded-lg bg-white px-3 py-2 text-[0.8125rem] font-semibold! cursor-pointer hover:border-accent hover:bg-surface focus-visible:outline-2 focus-visible:outline-accent focus-visible:outline-offset-2 [&.selected-button]:border-accent [&.selected-button]:bg-accent [&.selected-button]:text-white"
               @click="guide.activeTab = 'mechanics'"
             >
               Xem tình huống này trên thanh lực căng →
             </button>
           </section>
 
-          <section class="guide-card border border-[#cbd9c6] rounded-[0.875rem] bg-white p-4">
+          <section class="guide-card border border-border-default rounded-[0.875rem] bg-white p-4">
             <div class="guide-title m-0 text-[0.9375rem] font-bold!">Sửa gì khi người chơi gặp vấn đề?</div>
             <div class="mt-3 grid gap-4 md:grid-cols-2">
               <div>
@@ -564,20 +564,20 @@ const zones = {
                 <div class="mb-0 mt-1 text-slate-600">
                   Kiểm tra
                   <code
-                    class="rounded-[0.25rem] bg-[#dfeadd80] px-[0.25rem] py-[0.0625rem] [overflow-wrap:anywhere] text-[0.85em]"
+                    class="rounded-[0.25rem] bg-surface-code px-[0.25rem] py-[0.0625rem] [overflow-wrap:anywhere] text-[0.85em]"
                     >baseStrength</code
                   >,
                   <code
-                    class="rounded-[0.25rem] bg-[#dfeadd80] px-[0.25rem] py-[0.0625rem] [overflow-wrap:anywhere] text-[0.85em]"
+                    class="rounded-[0.25rem] bg-surface-code px-[0.25rem] py-[0.0625rem] [overflow-wrap:anywhere] text-[0.85em]"
                     >burstMax</code
                   >
                   và
                   <code
-                    class="rounded-[0.25rem] bg-[#dfeadd80] px-[0.25rem] py-[0.0625rem] [overflow-wrap:anywhere] text-[0.85em]"
+                    class="rounded-[0.25rem] bg-surface-code px-[0.25rem] py-[0.0625rem] [overflow-wrap:anywhere] text-[0.85em]"
                     >burstMaxTicks</code
                   >. Giảm đỉnh hoặc độ dài cú giật; thử nhả mạnh hơn bằng
                   <code
-                    class="rounded-[0.25rem] bg-[#dfeadd80] px-[0.25rem] py-[0.0625rem] [overflow-wrap:anywhere] text-[0.85em]"
+                    class="rounded-[0.25rem] bg-surface-code px-[0.25rem] py-[0.0625rem] [overflow-wrap:anywhere] text-[0.85em]"
                     >releaseRate</code
                   >
                   âm hơn.
@@ -588,16 +588,16 @@ const zones = {
                 <div class="mb-0 mt-1 text-slate-600">
                   Đưa
                   <code
-                    class="rounded-[0.25rem] bg-[#dfeadd80] px-[0.25rem] py-[0.0625rem] [overflow-wrap:anywhere] text-[0.85em]"
+                    class="rounded-[0.25rem] bg-surface-code px-[0.25rem] py-[0.0625rem] [overflow-wrap:anywhere] text-[0.85em]"
                     >startTension</code
                   >
                   vào vùng xanh hoặc tăng
                   <code
-                    class="rounded-[0.25rem] bg-[#dfeadd80] px-[0.25rem] py-[0.0625rem] [overflow-wrap:anywhere] text-[0.85em]"
+                    class="rounded-[0.25rem] bg-surface-code px-[0.25rem] py-[0.0625rem] [overflow-wrap:anywhere] text-[0.85em]"
                     >slackEscapeSeconds</code
                   >. Kiểm tra ngưỡng
                   <code
-                    class="rounded-[0.25rem] bg-[#dfeadd80] px-[0.25rem] py-[0.0625rem] [overflow-wrap:anywhere] text-[0.85em]"
+                    class="rounded-[0.25rem] bg-surface-code px-[0.25rem] py-[0.0625rem] [overflow-wrap:anywhere] text-[0.85em]"
                     >safeMin × slackThresholdRatio</code
                   >.
                 </div>
@@ -607,16 +607,16 @@ const zones = {
                 <div class="mb-0 mt-1 text-slate-600">
                   Tăng
                   <code
-                    class="rounded-[0.25rem] bg-[#dfeadd80] px-[0.25rem] py-[0.0625rem] [overflow-wrap:anywhere] text-[0.85em]"
+                    class="rounded-[0.25rem] bg-surface-code px-[0.25rem] py-[0.0625rem] [overflow-wrap:anywhere] text-[0.85em]"
                     >reelSpeed</code
                   >, giảm
                   <code
-                    class="rounded-[0.25rem] bg-[#dfeadd80] px-[0.25rem] py-[0.0625rem] [overflow-wrap:anywhere] text-[0.85em]"
+                    class="rounded-[0.25rem] bg-surface-code px-[0.25rem] py-[0.0625rem] [overflow-wrap:anywhere] text-[0.85em]"
                     >startDistance</code
                   >
                   hoặc giảm tiến độ mất do
                   <code
-                    class="rounded-[0.25rem] bg-[#dfeadd80] px-[0.25rem] py-[0.0625rem] [overflow-wrap:anywhere] text-[0.85em]"
+                    class="rounded-[0.25rem] bg-surface-code px-[0.25rem] py-[0.0625rem] [overflow-wrap:anywhere] text-[0.85em]"
                     >slackDistanceRate</code
                   >. Đối chiếu thời hạn 90 giây trong RPC.
                 </div>
@@ -626,12 +626,12 @@ const zones = {
                 <div class="mb-0 mt-1 text-slate-600">
                   Kiểm tra thời gian ở vùng xanh, tăng
                   <code
-                    class="rounded-[0.25rem] bg-[#dfeadd80] px-[0.25rem] py-[0.0625rem] [overflow-wrap:anywhere] text-[0.85em]"
+                    class="rounded-[0.25rem] bg-surface-code px-[0.25rem] py-[0.0625rem] [overflow-wrap:anywhere] text-[0.85em]"
                     >staminaDrain</code
                   >
                   hoặc giảm
                   <code
-                    class="rounded-[0.25rem] bg-[#dfeadd80] px-[0.25rem] py-[0.0625rem] [overflow-wrap:anywhere] text-[0.85em]"
+                    class="rounded-[0.25rem] bg-surface-code px-[0.25rem] py-[0.0625rem] [overflow-wrap:anywhere] text-[0.85em]"
                     >minimumStrength</code
                   >. Cá không hao thể lực ngoài vùng xanh.
                 </div>
@@ -639,7 +639,7 @@ const zones = {
             </div>
           </section>
 
-          <section class="guide-card border border-[#cbd9c6] rounded-[0.875rem] bg-white p-4">
+          <section class="guide-card border border-border-default rounded-[0.875rem] bg-white p-4">
             <div class="guide-title m-0 text-[0.9375rem] font-bold!">
               Các giới hạn cần nhớ
               <Hint
@@ -649,13 +649,13 @@ const zones = {
             <div class="mb-0 space-y-2 pl-5 text-slate-600">
               <div>
                 <code
-                  class="rounded-[0.25rem] bg-[#dfeadd80] px-[0.25rem] py-[0.0625rem] [overflow-wrap:anywhere] text-[0.85em]"
+                  class="rounded-[0.25rem] bg-surface-code px-[0.25rem] py-[0.0625rem] [overflow-wrap:anywhere] text-[0.85em]"
                   >0 &lt; safeMin &lt; safeMax &lt; maxTension ≤ 1000</code
                 >; lực ban đầu từ 0 đến dưới ngưỡng đứt.
               </div>
               <div>
                 <code
-                  class="rounded-[0.25rem] bg-[#dfeadd80] px-[0.25rem] py-[0.0625rem] [overflow-wrap:anywhere] text-[0.85em]"
+                  class="rounded-[0.25rem] bg-surface-code px-[0.25rem] py-[0.0625rem] [overflow-wrap:anywhere] text-[0.85em]"
                   >tickRate</code
                 >
                 là số nguyên 1–120; thời hạn tối đa 180 giây ở client và 21.600 tick khi phát lại trên server. RPC hiện
@@ -663,79 +663,79 @@ const zones = {
               </div>
               <div>
                 <code
-                  class="rounded-[0.25rem] bg-[#dfeadd80] px-[0.25rem] py-[0.0625rem] [overflow-wrap:anywhere] text-[0.85em]"
+                  class="rounded-[0.25rem] bg-surface-code px-[0.25rem] py-[0.0625rem] [overflow-wrap:anywhere] text-[0.85em]"
                   >reelRate</code
                 >,
                 <code
-                  class="rounded-[0.25rem] bg-[#dfeadd80] px-[0.25rem] py-[0.0625rem] [overflow-wrap:anywhere] text-[0.85em]"
+                  class="rounded-[0.25rem] bg-surface-code px-[0.25rem] py-[0.0625rem] [overflow-wrap:anywhere] text-[0.85em]"
                   >reelSpeed</code
                 >
                 dương;
                 <code
-                  class="rounded-[0.25rem] bg-[#dfeadd80] px-[0.25rem] py-[0.0625rem] [overflow-wrap:anywhere] text-[0.85em]"
+                  class="rounded-[0.25rem] bg-surface-code px-[0.25rem] py-[0.0625rem] [overflow-wrap:anywhere] text-[0.85em]"
                   >releaseRate</code
                 >
                 âm. Tốc độ có độ lớn tối đa 1000; khoảng cách ban đầu phải dương và ≤ 1000.
               </div>
               <div>
                 <code
-                  class="rounded-[0.25rem] bg-[#dfeadd80] px-[0.25rem] py-[0.0625rem] [overflow-wrap:anywhere] text-[0.85em]"
+                  class="rounded-[0.25rem] bg-surface-code px-[0.25rem] py-[0.0625rem] [overflow-wrap:anywhere] text-[0.85em]"
                   >burstChance</code
                 >,
                 <code
-                  class="rounded-[0.25rem] bg-[#dfeadd80] px-[0.25rem] py-[0.0625rem] [overflow-wrap:anywhere] text-[0.85em]"
+                  class="rounded-[0.25rem] bg-surface-code px-[0.25rem] py-[0.0625rem] [overflow-wrap:anywhere] text-[0.85em]"
                   >staminaDrain</code
                 >,
                 <code
-                  class="rounded-[0.25rem] bg-[#dfeadd80] px-[0.25rem] py-[0.0625rem] [overflow-wrap:anywhere] text-[0.85em]"
+                  class="rounded-[0.25rem] bg-surface-code px-[0.25rem] py-[0.0625rem] [overflow-wrap:anywhere] text-[0.85em]"
                   >minimumStrength</code
                 >
                 trong 0–1;
                 <code
-                  class="rounded-[0.25rem] bg-[#dfeadd80] px-[0.25rem] py-[0.0625rem] [overflow-wrap:anywhere] text-[0.85em]"
+                  class="rounded-[0.25rem] bg-surface-code px-[0.25rem] py-[0.0625rem] [overflow-wrap:anywhere] text-[0.85em]"
                   >slackThresholdRatio</code
                 >
                 lớn hơn 0 và ≤ 1.
               </div>
               <div>
                 <code
-                  class="rounded-[0.25rem] bg-[#dfeadd80] px-[0.25rem] py-[0.0625rem] [overflow-wrap:anywhere] text-[0.85em]"
+                  class="rounded-[0.25rem] bg-surface-code px-[0.25rem] py-[0.0625rem] [overflow-wrap:anywhere] text-[0.85em]"
                   >0 &lt; baseStrength ≤ 10</code
                 >,
                 <code
-                  class="rounded-[0.25rem] bg-[#dfeadd80] px-[0.25rem] py-[0.0625rem] [overflow-wrap:anywhere] text-[0.85em]"
+                  class="rounded-[0.25rem] bg-surface-code px-[0.25rem] py-[0.0625rem] [overflow-wrap:anywhere] text-[0.85em]"
                   >0 ≤ fishPullMultiplier ≤ 10</code
                 >;
                 <code
-                  class="rounded-[0.25rem] bg-[#dfeadd80] px-[0.25rem] py-[0.0625rem] [overflow-wrap:anywhere] text-[0.85em]"
+                  class="rounded-[0.25rem] bg-surface-code px-[0.25rem] py-[0.0625rem] [overflow-wrap:anywhere] text-[0.85em]"
                   >0 ≤ burstMin ≤ burstMax ≤ 1000</code
                 >
                 và
                 <code
-                  class="rounded-[0.25rem] bg-[#dfeadd80] px-[0.25rem] py-[0.0625rem] [overflow-wrap:anywhere] text-[0.85em]"
+                  class="rounded-[0.25rem] bg-surface-code px-[0.25rem] py-[0.0625rem] [overflow-wrap:anywhere] text-[0.85em]"
                   >0 ≤ pullAmplitude ≤ basePull ≤ 1000</code
                 >.
               </div>
               <div>
                 <code
-                  class="rounded-[0.25rem] bg-[#dfeadd80] px-[0.25rem] py-[0.0625rem] [overflow-wrap:anywhere] text-[0.85em]"
+                  class="rounded-[0.25rem] bg-surface-code px-[0.25rem] py-[0.0625rem] [overflow-wrap:anywhere] text-[0.85em]"
                   >pullPeriodTicks</code
                 >
                 là số nguyên ≥ 4; hai mốc độ dài cú giật là số nguyên với
                 <code
-                  class="rounded-[0.25rem] bg-[#dfeadd80] px-[0.25rem] py-[0.0625rem] [overflow-wrap:anywhere] text-[0.85em]"
+                  class="rounded-[0.25rem] bg-surface-code px-[0.25rem] py-[0.0625rem] [overflow-wrap:anywhere] text-[0.85em]"
                   >1 ≤ burstMinTicks ≤ burstMaxTicks</code
                 >.
               </div>
               <div>
                 Phép tính dùng thang số nguyên 10.000 và cắt phần lẻ mỗi tick. Ví dụ ở 60 tick/giây,
                 <code
-                  class="rounded-[0.25rem] bg-[#dfeadd80] px-[0.25rem] py-[0.0625rem] [overflow-wrap:anywhere] text-[0.85em]"
+                  class="rounded-[0.25rem] bg-surface-code px-[0.25rem] py-[0.0625rem] [overflow-wrap:anywhere] text-[0.85em]"
                   >staminaDrain = 0,001</code
                 >
                 cho
                 <code
-                  class="rounded-[0.25rem] bg-[#dfeadd80] px-[0.25rem] py-[0.0625rem] [overflow-wrap:anywhere] text-[0.85em]"
+                  class="rounded-[0.25rem] bg-surface-code px-[0.25rem] py-[0.0625rem] [overflow-wrap:anywhere] text-[0.85em]"
                   >trunc(10 / 60) = 0</code
                 >, nên cá sẽ không hao thể lực.
               </div>

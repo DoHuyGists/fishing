@@ -57,12 +57,12 @@ onUnmounted(() => {
     <div
       v-if="modalStore.isModalOpening && modalStore.quickActions.visible"
       ref="quickActionsBox"
-      class="fixed z-[10001] flex h-12 w-28 max-w-screen items-center rounded-lg border border-[#cbd9c6] bg-[#f5f9f0] p-1 text-[#24352a] shadow-lg"
+      class="fixed z-[10001] flex h-12 w-28 max-w-screen items-center rounded-lg border border-border-default bg-surface p-1 text-content shadow-lg"
       :style="{ left: `${modalStore.quickActions.x}px`, top: `${modalStore.quickActions.y}px` }"
     >
       <button
         type="button"
-        class="flex h-full w-full cursor-pointer items-center justify-center gap-2 rounded-md text-sm font-semibold hover:bg-[#cbd9c6] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#24352a]"
+        class="flex h-full w-full cursor-pointer items-center justify-center gap-2 rounded-md text-sm font-semibold hover:bg-border-default focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-content"
         @click="modalStore.close()"
       >
         <span aria-hidden="true">×</span>

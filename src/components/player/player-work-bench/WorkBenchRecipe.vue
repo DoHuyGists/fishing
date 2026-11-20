@@ -25,10 +25,10 @@ const emit = defineEmits<{
 </script>
 
 <template>
-  <section id="workbench-recipe" class="slide-fade-in from-right player-content-in min-h-72 rounded-lg border border-[#cbd9c6] bg-[#f5f9f0] p-4 lg:min-h-0 lg:overflow-y-auto">
+  <section id="workbench-recipe" class="slide-fade-in from-right player-content-in min-h-72 rounded-lg border border-border-default bg-surface p-4 lg:min-h-0 lg:overflow-y-auto">
     <template v-if="selectedBlueprint">
-      <div class="flex flex-col items-center border-b border-[#cbd9c6] pb-5 text-center">
-        <span class="relative grid size-24 place-items-center rounded-xl border border-[#cbd9c6] bg-white text-3xl">
+      <div class="flex flex-col items-center border-b border-border-default pb-5 text-center">
+        <span class="relative grid size-24 place-items-center rounded-xl border border-border-default bg-white text-3xl">
           <img v-if="resultItem?.image" :src="resultItem.image" :alt="resultItem.name" class="h-full w-full object-contain p-2" />
           <span v-else>{{ resultItem?.icon || resultItem?.name.charAt(0) }}</span>
           <span class="absolute -right-2 -top-2 rounded-full bg-emerald-700 px-2 py-1 text-xs font-bold text-white">×{{ selectedBlueprint.resultQuantity * craftQuantity }}</span>
@@ -41,18 +41,18 @@ const emit = defineEmits<{
         <div class="text-sm font-bold">{{ tr('WorkBenchModal.nguyen_lieu_can_thiet') }}</div>
         <div class="flex items-center gap-2">
           <span class="text-xs">{{ tr('WorkBenchModal.so_lan_che_tao') }}</span>
-          <button type="button" :aria-label="tr('WorkBenchModal.giam_so_lan_che_tao')" class="grid size-8 place-items-center rounded border border-[#cbd9c6] bg-white font-bold disabled:opacity-40" :disabled="craftQuantity <= 1" @click="craftQuantity = Math.max(1, craftQuantity - 1)">−</button>
-          <input v-model.number="craftQuantity" type="number" min="1" max="1000" step="1" class="w-16 rounded border border-[#cbd9c6] bg-white px-2 py-1.5 text-center text-sm" />
-          <button type="button" :aria-label="tr('WorkBenchModal.tang_so_lan_che_tao')" class="grid size-8 place-items-center rounded border border-[#cbd9c6] bg-white font-bold" @click="craftQuantity = Math.max(1, craftQuantity) + 1">+</button>
+          <button type="button" :aria-label="tr('WorkBenchModal.giam_so_lan_che_tao')" class="grid size-8 place-items-center rounded border border-border-default bg-white font-bold disabled:opacity-40" :disabled="craftQuantity <= 1" @click="craftQuantity = Math.max(1, craftQuantity - 1)">−</button>
+          <input v-model.number="craftQuantity" type="number" min="1" max="1000" step="1" class="w-16 rounded border border-border-default bg-white px-2 py-1.5 text-center text-sm" />
+          <button type="button" :aria-label="tr('WorkBenchModal.tang_so_lan_che_tao')" class="grid size-8 place-items-center rounded border border-border-default bg-white font-bold" @click="craftQuantity = Math.max(1, craftQuantity) + 1">+</button>
         </div>
       </div>
 
       <div class="grid grid-cols-2 gap-2 sm:grid-cols-3">
-        <div v-for="material in materials" :key="material.item_id" class="flex min-w-0 flex-col items-center gap-1 rounded-lg border border-[#cbd9c6] bg-white p-3 text-center">
-          <span class="relative grid size-16 place-items-center rounded-lg bg-[#f5f9f0] text-xl">
+        <div v-for="material in materials" :key="material.item_id" class="flex min-w-0 flex-col items-center gap-1 rounded-lg border border-border-default bg-white p-3 text-center">
+          <span class="relative grid size-16 place-items-center rounded-lg bg-surface text-xl">
             <img v-if="material.item?.image" :src="material.item.image" :alt="material.item.name" class="h-full w-full object-contain p-1" />
             <span v-else>{{ material.item?.icon || material.item?.name.charAt(0) || "?" }}</span>
-            <span class="absolute -right-2 -top-2 rounded-full bg-[#24352a] px-2 py-1 text-[10px] font-bold text-white">×{{ material.required }}</span>
+            <span class="absolute -right-2 -top-2 rounded-full bg-content px-2 py-1 text-[10px] font-bold text-white">×{{ material.required }}</span>
           </span>
           <span class="line-clamp-2 text-xs font-bold">{{ material.item?.name ?? tr('WorkBenchModal.nguyen_lieu') }}</span>
           <span class="text-[10px]" :class="material.owned >= material.required ? 'text-emerald-700' : 'text-red-600'">{{ tr('WorkBenchModal.co') }} {{ material.owned }}</span>

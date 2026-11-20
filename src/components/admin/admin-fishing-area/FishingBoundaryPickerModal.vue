@@ -51,9 +51,9 @@ function addBoundaryPoint(event: MouseEvent) {
         role="dialog"
         aria-modal="true"
         aria-labelledby="fishing-boundary-picker-title"
-        class="flex max-h-full w-full max-w-5xl flex-col overflow-hidden rounded-xl border border-[#cbd9c6] bg-[#f5f9f0] text-[#24352a] shadow-2xl"
+        class="flex max-h-full w-full max-w-5xl flex-col overflow-hidden rounded-xl border border-border-default bg-surface text-content shadow-2xl"
       >
-        <header class="flex items-center justify-between gap-3 border-b border-[#cbd9c6] px-4 py-3 sm:px-5">
+        <header class="flex items-center justify-between gap-3 border-b border-border-default px-4 py-3 sm:px-5">
           <div>
             <div id="fishing-boundary-picker-title" class="m-0 text-sm font-extrabold">Thiết lập vùng câu</div>
             <div class="m-0 mt-1 text-xs text-gray-600">Nhấn vào ảnh để thêm các điểm giới hạn vùng câu.</div>
@@ -99,7 +99,7 @@ function addBoundaryPoint(event: MouseEvent) {
           </div>
         </div>
 
-        <footer class="flex items-center justify-between gap-3 border-t border-[#cbd9c6] px-4 py-3 sm:px-5">
+        <footer class="flex items-center justify-between gap-3 border-t border-border-default px-4 py-3 sm:px-5">
           <div class="flex items-center gap-3">
             <span class="text-xs text-gray-600">{{ boundaryDraft.length }} điểm</span>
             <button
@@ -131,7 +131,7 @@ function addBoundaryPoint(event: MouseEvent) {
               type="button"
               @click="emit('complete', boundaryDraft.map(({ x, y }) => ({ x, y })))"
               :disabled="sceneImageError"
-              class="rounded-lg bg-[#153221] px-3 py-2 text-xs font-bold text-white hover:bg-emerald-800 disabled:cursor-not-allowed disabled:opacity-50"
+              class="rounded-lg bg-content-strong px-3 py-2 text-xs font-bold text-white hover:bg-emerald-800 disabled:cursor-not-allowed disabled:opacity-50"
             >
               Hoàn tất
             </button>

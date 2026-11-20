@@ -58,17 +58,17 @@ async function refresh() {
 
 <template>
   <Modal :title="tr('FishingMapModal.title')" :on-refresh="refresh">
-    <div class="flex min-h-full flex-col gap-3 text-[#24352a] md:flex-row">
+    <div class="flex min-h-full flex-col gap-3 text-content md:flex-row">
       <FishingMapCountries />
       <section
-        class="min-w-0 flex flex-col flex-1 rounded-xl border border-[#cbd9c6] bg-[#f5f9f0] p-3 sm:p-4"
+        class="min-w-0 flex flex-col flex-1 rounded-xl border border-border-default bg-surface p-3 sm:p-4"
         :aria-label="tr('FishingMapModal.areas')"
         :aria-busy="store.loading || store.loadingSpecies"
       >
         <div v-if="store.loading" role="status" class="py-10 text-center">{{ tr("FishingMapModal.loading") }}</div>
         <div v-else-if="store.error || countries.unlockedError" role="alert" class="py-10 text-center">
           <div>{{ store.error || countries.unlockedError }}</div>
-          <button type="button" class="mt-3 rounded-lg border border-[#cbd9c6] bg-white px-4 py-2" @click="refresh">
+          <button type="button" class="mt-3 rounded-lg border border-border-default bg-white px-4 py-2" @click="refresh">
             {{ tr("Maintenance.thu_lai") }}
           </button>
         </div>
@@ -87,7 +87,7 @@ async function refresh() {
             <div>{{ store.speciesError }}</div>
             <button
               type="button"
-              class="mt-3 rounded-lg border border-[#cbd9c6] bg-white px-4 py-2"
+              class="mt-3 rounded-lg border border-border-default bg-white px-4 py-2"
               @click="store.loadSpecies()"
             >
               {{ tr("Maintenance.thu_lai") }}

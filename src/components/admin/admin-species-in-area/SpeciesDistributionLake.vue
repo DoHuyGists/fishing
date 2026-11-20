@@ -76,7 +76,7 @@ const percentOf = (id: string) => {
       @remove="boundaryEditor.removeNode"
     />
     <div
-      class="overflow-hidden rounded-xl border border-[#cbd9c6] bg-[#e5e9d6]"
+      class="overflow-hidden rounded-xl border border-border-default bg-palette-e5e9d6"
       :class="{ 'pointer-events-none opacity-60': disabled }"
     >
       <svg
@@ -289,7 +289,7 @@ const percentOf = (id: string) => {
         </text>
       </svg>
     </div>
-    <div class="mt-2 text-xs leading-relaxed text-[#24352a]/70">
+    <div class="mt-2 text-xs leading-relaxed text-content/70">
       Kéo chấm tròn trắng để dời vùng. Chọn vùng rồi kéo ô vuông quanh tâm để đổi bán kính và diện tích. Vòng nét đứt
       thể hiện bán kính ảnh hưởng; diện tích thực tế phụ thuộc vị trí tâm, các vùng lân cận và bờ hồ. Bật “Chỉnh vòng
       biên” để sửa hình dạng hồ. Nút “Lưu phân bổ” lưu cả tỉ trọng và vòng biên.

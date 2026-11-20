@@ -71,7 +71,7 @@ const emit = defineEmits<{
                     </button>
                   </div>
 
-                  <div class="mt-1 text-[11px] text-[#556655]">
+                  <div class="mt-1 text-[11px] text-content-caption">
                     {{ countryStore.getCountryName(player.country_id) }}
                   </div>
                   <!-- Thông số: Cấp & EXP -->
@@ -152,7 +152,7 @@ const emit = defineEmits<{
                 <button
                   v-else
                   type="button"
-                  class="px-3 py-1.5 rounded-lg bg-[#153221] hover:bg-[#1c432d] text-white text-xs font-bold transition shadow-sm cursor-pointer disabled:opacity-50 flex items-center gap-1"
+                  class="px-3 py-1.5 rounded-lg bg-content-strong hover:bg-palette-1c432d text-white text-xs font-bold transition shadow-sm cursor-pointer disabled:opacity-50 flex items-center gap-1"
                   :disabled="friendStore.actionLoadingId === player.id"
                   @click="emit('send', player.id)"
                 >

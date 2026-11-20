@@ -85,7 +85,7 @@ onMounted(() => store.loadAll());
         <button
           type="button"
           :disabled="!store.eventOptions.length"
-          class="rounded-lg bg-[#153221] px-3.5 py-2 text-sm font-bold text-white hover:bg-emerald-800 disabled:opacity-50"
+          class="rounded-lg bg-content-strong px-3.5 py-2 text-sm font-bold text-white hover:bg-emerald-800 disabled:opacity-50"
           @click="store.openCreateForm()"
         >
           + Thêm lịch

@@ -36,7 +36,7 @@ const inputClass =
     <aside class="ml-auto flex h-full w-full max-w-xl flex-col border-l border-gray-200 bg-white shadow-xl">
       <div class="flex shrink-0 items-center justify-between border-b border-gray-200 px-5 py-4">
         <div>
-          <div class="m-0 text-base font-extrabold text-[#153221]">
+          <div class="m-0 text-base font-extrabold text-content-strong">
             {{ store.form.id ? "Chỉnh sửa nhiệm vụ giờ" : "Thêm nhiệm vụ giờ" }}
           </div>
           <div class="m-0 mt-1 text-xs text-gray-500">Giờ lưu theo múi giờ UTC</div>
@@ -98,7 +98,7 @@ const inputClass =
             <div
               v-for="(fish, index) in store.form.content"
               :key="fish.id"
-              class="relative flex flex-col items-center gap-1 rounded-lg border border-[#cbd9c6] bg-[#f5f9f0] p-3 text-center"
+              class="relative flex flex-col items-center gap-1 rounded-lg border border-border-default bg-surface p-3 text-center"
             >
               <button
                 type="button"
@@ -110,7 +110,7 @@ const inputClass =
               </button>
               <img v-if="fish.image" :src="fish.image" :alt="fish.name" class="h-16 w-full object-contain" />
               <div v-else class="h-16" />
-              <span class="text-sm font-bold text-[#24352a]">{{ fish.name }}</span>
+              <span class="text-sm font-bold text-content">{{ fish.name }}</span>
               <span class="text-xs text-gray-500">{{ fish.rarity }}</span>
               <span v-if="fish.length" class="text-xs text-gray-500">{{ fish.length }}</span>
             </div>
@@ -136,7 +136,7 @@ const inputClass =
         <button
           type="button"
           :disabled="store.isSaving"
-          class="rounded-lg bg-[#153221] px-4 py-2 text-sm font-bold text-white hover:bg-emerald-800 disabled:opacity-50"
+          class="rounded-lg bg-content-strong px-4 py-2 text-sm font-bold text-white hover:bg-emerald-800 disabled:opacity-50"
           @click="store.save()"
         >
           {{ store.isSaving ? "Đang lưu..." : "Lưu nhiệm vụ" }}

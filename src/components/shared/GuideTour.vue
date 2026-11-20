@@ -393,7 +393,7 @@ onUnmounted(() => {
 
 .guide-tour__border {
   fill: none;
-  stroke: #fff;
+  stroke: var(--color-white);
   stroke-width: 2;
   vector-effect: non-scaling-stroke;
   filter: drop-shadow(0 0 5px rgba(255, 255, 255, 0.8));
@@ -407,9 +407,9 @@ onUnmounted(() => {
   overflow-y: auto;
   z-index: 10;
   padding: 18px;
-  color: #f8fafc;
-  background: #17191f;
-  border: 1px solid #3b3f49;
+  color: var(--color-palette-f8fafc);
+  background: var(--color-palette-17191f);
+  border: 1px solid var(--color-palette-3b3f49);
   border-radius: 14px;
   box-shadow: 0 12px 40px rgba(0, 0, 0, 0.4);
   pointer-events: auto;
@@ -418,7 +418,7 @@ onUnmounted(() => {
 
 .guide-tour__progress {
   margin-bottom: 8px;
-  color: #a5b4fc;
+  color: var(--color-palette-a5b4fc);
   font-size: 11px;
   font-weight: 700;
   letter-spacing: 1px;
@@ -432,7 +432,7 @@ onUnmounted(() => {
 
 .guide-tour__description {
   margin: 0;
-  color: #c4c8d1;
+  color: var(--color-palette-c4c8d1);
   font-size: 13px;
   line-height: 1.6;
 }
@@ -498,13 +498,13 @@ onUnmounted(() => {
 
 .guide-tour__skip,
 .guide-tour__back {
-  color: #c4c8d1;
+  color: var(--color-palette-c4c8d1);
   background: transparent;
 }
 
 .guide-tour__next {
-  color: #111827;
-  background: #fff;
+  color: var(--color-palette-111827);
+  background: var(--color-white);
 }
 
 .guide-tooltip-enter-active,

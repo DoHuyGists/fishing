@@ -167,12 +167,12 @@ async function handleRelease() {
 </script>
 <template>
   <Modal class="caught-list-modal" :title="tr('CaughtModal.tui_ca')" :on-refresh="caughtStore.loadCaughtFishes">
-    <section class="h-full min-h-0 text-[#263238] flex flex-col overflow-hidden">
+    <section class="h-full min-h-0 text-palette-263238 flex flex-col overflow-hidden">
       <!-- Header  -->
       <div class="flex items-center justify-between gap-2 pb-3">
         <div class="flex items-center gap-2">
-          <div class="m-0 text-base font-bold text-[#263238]">{{ tr("CaughtModal.tong_so_ca") }}</div>
-          <span class="px-2 py-0.5 rounded-full bg-[#153221] text-white text-[11px] font-extrabold shadow-xs">
+          <div class="m-0 text-base font-bold text-palette-263238">{{ tr("CaughtModal.tong_so_ca") }}</div>
+          <span class="px-2 py-0.5 rounded-full bg-content-strong text-white text-[11px] font-extrabold shadow-xs">
             {{ caughtStore.caughtFishes.length }}
           </span>
         </div>
@@ -185,7 +185,7 @@ async function handleRelease() {
             <button
               type="button"
               class="rounded-md px-2 py-1.5 text-xs font-bold transition-colors cursor-pointer"
-              :class="viewMode === 'grid' ? 'bg-[#153221] text-white' : 'text-gray-600 hover:bg-gray-100'"
+              :class="viewMode === 'grid' ? 'bg-content-strong text-white' : 'text-gray-600 hover:bg-gray-100'"
               :aria-pressed="viewMode === 'grid'"
               :aria-label="tr('CaughtModal.hien_thi_dang_luoi')"
               @click="viewMode = 'grid'"
@@ -195,7 +195,7 @@ async function handleRelease() {
             <button
               type="button"
               class="rounded-md px-2 py-1.5 text-xs font-bold transition-colors cursor-pointer"
-              :class="viewMode === 'list' ? 'bg-[#153221] text-white' : 'text-gray-600 hover:bg-gray-100'"
+              :class="viewMode === 'list' ? 'bg-content-strong text-white' : 'text-gray-600 hover:bg-gray-100'"
               :aria-pressed="viewMode === 'list'"
               :aria-label="tr('CaughtModal.hien_thi_dang_danh_sach')"
               @click="viewMode = 'list'"
@@ -205,7 +205,7 @@ async function handleRelease() {
             <button
               type="button"
               class="rounded-md px-2 py-1.5 text-xs font-bold transition-colors cursor-pointer"
-              :class="viewMode === 'species' ? 'bg-[#153221] text-white' : 'text-gray-600 hover:bg-gray-100'"
+              :class="viewMode === 'species' ? 'bg-content-strong text-white' : 'text-gray-600 hover:bg-gray-100'"
               :aria-pressed="viewMode === 'species'"
               :aria-label="tr('CaughtModal.gom_theo_loai')"
               @click="viewMode = 'species'"
@@ -249,7 +249,7 @@ async function handleRelease() {
             class="px-2 py-0.5 rounded-md border text-[11px] transition-colors cursor-pointer whitespace-nowrap"
             :class="
               selectedRarity === 'ALL'
-                ? 'bg-[#153221] text-white border-gray-300 font-bold'
+                ? 'bg-content-strong text-white border-gray-300 font-bold'
                 : 'bg-gray-100 text-gray-700 border-gray-200 hover:bg-gray-200'
             "
             @click="selectedRarity = 'ALL'"
@@ -263,7 +263,7 @@ async function handleRelease() {
             class="px-2 py-0.5 rounded-md border text-[11px] transition-colors cursor-pointer whitespace-nowrap"
             :class="
               selectedRarity === rarity
-                ? 'bg-[#153221] text-white border-gray-300 font-bold'
+                ? 'bg-content-strong text-white border-gray-300 font-bold'
                 : 'bg-gray-100 text-gray-700 border-gray-200 hover:bg-gray-200'
             "
             @click="selectedRarity = rarity"
@@ -305,7 +305,7 @@ async function handleRelease() {
             <div class="min-w-0 flex-1 p-2">
               <div class="flex items-start justify-between gap-2">
                 <div class="min-w-0">
-                  <div class="m-0 truncate font-bold text-xs text-[#263238]">
+                  <div class="m-0 truncate font-bold text-xs text-palette-263238">
                     {{ group.fishes[0].species?.name || tr("CaughtModal.ca_chua_ro_ten") }}
                   </div>
                   <span
@@ -316,7 +316,7 @@ async function handleRelease() {
                     {{ group.fishes[0].species?.rarity }}
                   </span>
                 </div>
-                <span class="shrink-0 px-2 py-1 rounded-full bg-[#153221] text-white text-[10px] font-extrabold">
+                <span class="shrink-0 px-2 py-1 rounded-full bg-content-strong text-white text-[10px] font-extrabold">
                   {{ group.fishes.length }} {{ tr("UserProfile.con") }}
                 </span>
               </div>
@@ -395,7 +395,7 @@ async function handleRelease() {
           >
             <div class="flex-1 min-w-0 flex flex-col gap-0.5">
               <div class="flex items-center justify-between gap-1">
-                <span class="font-bold text-xs truncate text-[#263238]">{{ item.species?.name }}</span>
+                <span class="font-bold text-xs truncate text-palette-263238">{{ item.species?.name }}</span>
               </div>
               <div class="flex items-center gap-2 text-[11px] text-gray-600">
                 <span>{{

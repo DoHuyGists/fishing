@@ -509,7 +509,7 @@ defineExpose({ setView, resetView });
   margin: -5px 0 0 -5px;
   padding: 0;
   border-radius: 50%;
-  border: 1.5px solid #fff;
+  border: 1.5px solid var(--color-white);
   background: red;
   cursor: pointer;
 }
@@ -519,7 +519,7 @@ defineExpose({ setView, resetView });
   inset: -10px;
 }
 .world-map-marker__dot.is-selected {
-  background: #22c55e;
+  background: var(--color-palette-22c55e);
 }
 .world-map-marker__pulse {
   position: absolute;
@@ -559,11 +559,11 @@ defineExpose({ setView, resetView });
   border-radius: 50%;
 }
 .world-map-tip__dot {
-  border: 2px solid #fff;
-  background: #2563eb;
+  border: 2px solid var(--color-white);
+  background: var(--color-palette-2563eb);
 }
 .world-map-tip__pulse {
-  background: #2563eb;
+  background: var(--color-palette-2563eb);
   animation: world-map-pulse 1.5s ease-out infinite;
 }
 </style>

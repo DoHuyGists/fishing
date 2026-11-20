@@ -95,7 +95,7 @@ watch(
     <router-view v-if="features.ready && sessionReady" />
     <div
       v-else-if="!sessionReady"
-      class="m-4 rounded-xl border border-[#cbd9c6] bg-[#f5f9f0] p-4 text-[#24352a]"
+      class="m-4 rounded-xl border border-border-default bg-surface p-4 text-content"
       role="status"
     >
       {{ sessionError || tr("use_single_session.checking") }}
@@ -103,7 +103,7 @@ watch(
         {{ tr("Maintenance.thu_lai") }}
       </button>
     </div>
-    <div v-else class="m-4 rounded-xl border border-[#cbd9c6] bg-[#f5f9f0] p-4 text-[#24352a]" role="status">
+    <div v-else class="m-4 rounded-xl border border-border-default bg-surface p-4 text-content" role="status">
       {{ tr(features.error ? "FeatureAvailability.loadError" : "FeatureAvailability.loading") }}
       <button
         v-if="features.error"

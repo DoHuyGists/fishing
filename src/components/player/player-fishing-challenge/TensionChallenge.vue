@@ -105,11 +105,11 @@ onBeforeUnmount(() => {
   <section
     v-if="challenge"
     :aria-label="tr('TensionChallenge.dau_suc_voi_ca')"
-    class="flex min-w-0 flex-col gap-1 rounded-xl border border-[#cbd9c6] bg-[#f5f9f0] p-1.5 text-[#24352a] shadow-lg"
+    class="flex min-w-0 flex-col gap-1 rounded-xl border border-border-default bg-surface p-1.5 text-content shadow-lg"
   >
     <header class="flex items-center justify-between gap-3">
       <div class="flex min-w-0 items-center gap-2">
-        <span aria-hidden="true" class="grid size-6 shrink-0 place-items-center rounded-lg bg-[#e2ecdc] text-sm"
+        <span aria-hidden="true" class="grid size-6 shrink-0 place-items-center rounded-lg bg-palette-e2ecdc text-sm"
           >🎣</span
         >
         <span class="text-sm font-bold">{{
@@ -117,7 +117,7 @@ onBeforeUnmount(() => {
         }}</span>
       </div>
       <span
-        class="inline-flex shrink-0 items-center gap-1.5 rounded-full border border-[#dce6d7] bg-white/70 px-2 py-0.5 text-xs font-semibold tabular-nums"
+        class="inline-flex shrink-0 items-center gap-1.5 rounded-full border border-palette-dce6d7 bg-white/70 px-2 py-0.5 text-xs font-semibold tabular-nums"
         :aria-label="
           ready
             ? untimedStart
@@ -174,7 +174,7 @@ onBeforeUnmount(() => {
           <circle cx="7" cy="11" r=".7" fill="currentColor" stroke="none" />
         </svg>
         <div
-          class="h-1.5 min-w-0 flex-1 overflow-hidden rounded-full bg-[#dce6d7]"
+          class="h-1.5 min-w-0 flex-1 overflow-hidden rounded-full bg-palette-dce6d7"
           role="progressbar"
           :aria-label="tr('TensionChallenge.khoang_cach_ca')"
           :aria-valuenow="distance"
@@ -204,7 +204,7 @@ onBeforeUnmount(() => {
       <button
         ref="reelControl"
         type="button"
-        class="flex min-h-7 touch-none select-none items-center justify-center gap-1.5 rounded-lg bg-emerald-700 px-2 py-1 text-xs font-bold leading-4 text-white shadow-[0_2px_0_#065f46] transition-colors hover:bg-emerald-800 focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-emerald-700 disabled:opacity-50"
+        class="flex min-h-7 touch-none select-none items-center justify-center gap-1.5 rounded-lg bg-emerald-700 px-2 py-1 text-xs font-bold leading-4 text-white shadow-[0_2px_0_var(--color-palette-065f46)] transition-colors hover:bg-emerald-800 focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-emerald-700 disabled:opacity-50"
         :class="{ 'bg-emerald-900': store.tensionReeling }"
         :disabled="store.castPhase !== 'bite'"
         :aria-pressed="store.tensionReeling"

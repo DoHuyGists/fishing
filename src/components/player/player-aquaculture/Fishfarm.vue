@@ -89,8 +89,8 @@ async function confirm() {
 </script>
 
 <template>
-  <div class="fishfarm min-h-full border-[#cbd9c6] bg-[#f5f9f0] text-[#24352a]" :aria-busy="farm.busy || farm.loading">
-    <header class="flex flex-wrap items-center justify-between gap-3 border-b border-[#cbd9c6] p-4">
+  <div class="fishfarm min-h-full border-border-default bg-surface text-content" :aria-busy="farm.busy || farm.loading">
+    <header class="flex flex-wrap items-center justify-between gap-3 border-b border-border-default p-4">
       <div>
         <div class="m-0 mt-1 text-xs text-stone-600">
           {{ tr("Fishfarm.ca_van_lon_khi_ban_di_cau_hoac_thoat_game_cham_soc_la_phan_thuon") }}
@@ -102,7 +102,7 @@ async function confirm() {
       >
       <button
         type="button"
-        class="cursor-pointer disabled:cursor-not-allowed! disabled:opacity-45! focus-visible:outline-2 focus-visible:outline-[#347552] focus-visible:outline-offset-[3px] action-button border border-[#cbd9c6] rounded-lg px-2.5 py-2 bg-[#f5f9f0] text-xs font-semibold! hover:bg-[#e8f0e0] [&.primary]:border-[#047857] [&.primary]:bg-[#047857] [&.primary]:text-white"
+        class="cursor-pointer disabled:cursor-not-allowed! disabled:opacity-45! focus-visible:outline-2 focus-visible:outline-brand-hover focus-visible:outline-offset-[3px] action-button border border-border-default rounded-lg px-2.5 py-2 bg-surface text-xs font-semibold! hover:bg-palette-e8f0e0 [&.primary]:border-accent [&.primary]:bg-accent [&.primary]:text-white"
         aria-haspopup="dialog"
         @click="recordsDialog?.showModal()"
       >
@@ -114,7 +114,7 @@ async function confirm() {
       <button
         v-if="farm.pending"
         type="button"
-        class="cursor-pointer disabled:cursor-not-allowed! disabled:opacity-45! focus-visible:outline-2 focus-visible:outline-[#347552] focus-visible:outline-offset-[3px] action-button border border-[#cbd9c6] rounded-lg px-2.5 py-2 bg-[#f5f9f0] text-xs font-semibold! hover:bg-[#e8f0e0] [&.primary]:border-[#047857] [&.primary]:bg-[#047857] [&.primary]:text-white"
+        class="cursor-pointer disabled:cursor-not-allowed! disabled:opacity-45! focus-visible:outline-2 focus-visible:outline-brand-hover focus-visible:outline-offset-[3px] action-button border border-border-default rounded-lg px-2.5 py-2 bg-surface text-xs font-semibold! hover:bg-palette-e8f0e0 [&.primary]:border-accent [&.primary]:bg-accent [&.primary]:text-white"
         :disabled="farm.busy || farm.loading"
         @click="farm.retryPending()"
       >
@@ -123,7 +123,7 @@ async function confirm() {
       <button
         v-else
         type="button"
-        class="cursor-pointer disabled:cursor-not-allowed! disabled:opacity-45! focus-visible:outline-2 focus-visible:outline-[#347552] focus-visible:outline-offset-[3px] action-button border border-[#cbd9c6] rounded-lg px-2.5 py-2 bg-[#f5f9f0] text-xs font-semibold! hover:bg-[#e8f0e0] [&.primary]:border-[#047857] [&.primary]:bg-[#047857] [&.primary]:text-white"
+        class="cursor-pointer disabled:cursor-not-allowed! disabled:opacity-45! focus-visible:outline-2 focus-visible:outline-brand-hover focus-visible:outline-offset-[3px] action-button border border-border-default rounded-lg px-2.5 py-2 bg-surface text-xs font-semibold! hover:bg-palette-e8f0e0 [&.primary]:border-accent [&.primary]:bg-accent [&.primary]:text-white"
         :disabled="farm.busy || farm.loading"
         @click="farm.refresh(true)"
       >
@@ -140,9 +140,9 @@ async function confirm() {
           v-for="pond in farm.farm.ponds"
           :key="pond.id"
           type="button"
-          class="cursor-pointer disabled:cursor-not-allowed! disabled:opacity-45! focus-visible:outline-2 focus-visible:outline-[#347552] focus-visible:outline-offset-[3px] pond-tab min-w-[100px] border border-[#cbd9c6] rounded-xl px-3 py-2.5 bg-white text-left text-xs"
+          class="cursor-pointer disabled:cursor-not-allowed! disabled:opacity-45! focus-visible:outline-2 focus-visible:outline-brand-hover focus-visible:outline-offset-[3px] pond-tab min-w-[100px] border border-border-default rounded-xl px-3 py-2.5 bg-white text-left text-xs"
           :class="{
-            'pond-tab-active [&.pond-tab-active]:border-[#347552] [&.pond-tab-active]:bg-[#dcebd6] [&.pond-tab-active]:shadow-[inset_0_0_0_1px_#347552]':
+            'pond-tab-active [&.pond-tab-active]:border-brand-hover [&.pond-tab-active]:bg-palette-dcebd6 [&.pond-tab-active]:shadow-[inset_0_0_0_1px_var(--color-brand-hover)]':
               pond.id === farm.selectedPondId,
           }"
           :aria-pressed="pond.id === farm.selectedPondId"
@@ -158,7 +158,7 @@ async function confirm() {
         <button
           v-if="farm.farm.pond_slot < 5"
           type="button"
-          class="cursor-pointer disabled:cursor-not-allowed! disabled:opacity-45! focus-visible:outline-2 focus-visible:outline-[#347552] focus-visible:outline-offset-[3px] pond-tab min-w-[100px] border border-[#cbd9c6] rounded-xl px-3 py-2.5 bg-white text-left text-xs border-dashed"
+          class="cursor-pointer disabled:cursor-not-allowed! disabled:opacity-45! focus-visible:outline-2 focus-visible:outline-brand-hover focus-visible:outline-offset-[3px] pond-tab min-w-[100px] border border-border-default rounded-xl px-3 py-2.5 bg-white text-left text-xs border-dashed"
           :disabled="!farm.canMutate || currency.shells < 300"
           @click="ask('buy')"
         >
@@ -175,11 +175,11 @@ async function confirm() {
         class="farm-workspace grid grid-cols-[minmax(0,1fr)_370px] items-start gap-5 p-5 [@media(max-width:1023px)]:grid-cols-1 [@media(max-width:1023px)]:p-4"
       >
         <main class="min-w-0 space-y-4">
-          <div class="pond-area grid min-h-[clamp(400px,50vh,540px)] bg-[#dce8cd] rounded-2xl p-4 sm:p-6">
+          <div class="pond-area grid min-h-[clamp(400px,50vh,540px)] bg-palette-dce8cd rounded-2xl p-4 sm:p-6">
             <FishPond :pond="farm.activePond" :swimmers="farm.pondSwimmers" :paused="paused" />
           </div>
 
-          <section class="slide-fade-in from-bottom player-content-in rounded-xl border border-[#cbd9c6] bg-white p-4">
+          <section class="slide-fade-in from-bottom player-content-in rounded-xl border border-border-default bg-white p-4">
             <div class="mb-3 flex items-center justify-between gap-2">
               <div class="m-0 text-sm font-bold">{{ tr("Fishfarm.cac_lua_trong_ao") }}</div>
               <span class="text-xs text-stone-500">{{ tr("Fishfarm.chon_mot_lua_de_cham_hoac_thu_ca") }}</span>
@@ -192,9 +192,9 @@ async function confirm() {
                 v-for="(batch, index) in farm.activePond.batches"
                 :key="batch.id"
                 type="button"
-                class="cursor-pointer disabled:cursor-not-allowed! disabled:opacity-45! focus-visible:outline-2 focus-visible:outline-[#347552] focus-visible:outline-offset-[3px] batch-card border border-[#cbd9c6] rounded-[10px] p-3 text-left text-xs"
+                class="cursor-pointer disabled:cursor-not-allowed! disabled:opacity-45! focus-visible:outline-2 focus-visible:outline-brand-hover focus-visible:outline-offset-[3px] batch-card border border-border-default rounded-[10px] p-3 text-left text-xs"
                 :class="{
-                  'batch-card-active [&.batch-card-active]:border-[#347552] [&.batch-card-active]:bg-[#f5f9f0] [&.batch-card-active]:shadow-[inset_0_0_0_1px_#347552]':
+                  'batch-card-active [&.batch-card-active]:border-brand-hover [&.batch-card-active]:bg-surface [&.batch-card-active]:shadow-[inset_0_0_0_1px_var(--color-brand-hover)]':
                     batch.id === farm.selectedBatchId,
                 }"
                 :aria-pressed="batch.id === farm.selectedBatchId"
@@ -213,7 +213,7 @@ async function confirm() {
                   }}
                   · {{ farm.activePond.fish.filter((f) => f.batch_id === batch.id).length }} {{ tr("Fishfarm.ca_2") }}
                 </div>
-                <div class="h-1.5 overflow-hidden rounded-full bg-[#dfe8d8]">
+                <div class="h-1.5 overflow-hidden rounded-full bg-palette-dfe8d8">
                   <div class="h-full bg-emerald-600" :style="{ width: batchProgress(batch, farm.now) + '%' }" />
                 </div>
                 <div
@@ -231,7 +231,7 @@ async function confirm() {
           <AquacultureStockForm />
           <section
             v-if="farm.activePond.batches.some((b) => b.mode === 'advanced' && b.status === 'growing')"
-            class="slide-fade-in from-right player-content-in panel p-4 border border-[#cbd9c6] rounded-xl bg-white space-y-3"
+            class="slide-fade-in from-right player-content-in panel p-4 border border-border-default rounded-xl bg-white space-y-3"
           >
             <div class="m-0 text-sm font-bold">{{ tr("Fishfarm.cham_ao") }}</div>
             <div class="m-0 text-xs text-stone-500">
@@ -240,7 +240,7 @@ async function confirm() {
             <div class="grid grid-cols-2 gap-2">
               <button
                 type="button"
-                class="cursor-pointer disabled:cursor-not-allowed! disabled:opacity-45! focus-visible:outline-2 focus-visible:outline-[#347552] focus-visible:outline-offset-[3px] action-button border border-[#cbd9c6] rounded-lg px-2.5 py-2 bg-[#f5f9f0] text-xs font-semibold! hover:bg-[#e8f0e0] [&.primary]:border-[#047857] [&.primary]:bg-[#047857] [&.primary]:text-white"
+                class="cursor-pointer disabled:cursor-not-allowed! disabled:opacity-45! focus-visible:outline-2 focus-visible:outline-brand-hover focus-visible:outline-offset-[3px] action-button border border-border-default rounded-lg px-2.5 py-2 bg-surface text-xs font-semibold! hover:bg-palette-e8f0e0 [&.primary]:border-accent [&.primary]:bg-accent [&.primary]:text-white"
                 :disabled="!farm.canCare"
                 @click="farm.care('water')"
               >
@@ -249,7 +249,7 @@ async function confirm() {
               </button>
               <button
                 type="button"
-                class="cursor-pointer disabled:cursor-not-allowed! disabled:opacity-45! focus-visible:outline-2 focus-visible:outline-[#347552] focus-visible:outline-offset-[3px] action-button border border-[#cbd9c6] rounded-lg px-2.5 py-2 bg-[#f5f9f0] text-xs font-semibold! hover:bg-[#e8f0e0] [&.primary]:border-[#047857] [&.primary]:bg-[#047857] [&.primary]:text-white"
+                class="cursor-pointer disabled:cursor-not-allowed! disabled:opacity-45! focus-visible:outline-2 focus-visible:outline-brand-hover focus-visible:outline-offset-[3px] action-button border border-border-default rounded-lg px-2.5 py-2 bg-surface text-xs font-semibold! hover:bg-palette-e8f0e0 [&.primary]:border-accent [&.primary]:bg-accent [&.primary]:text-white"
                 :disabled="!farm.canCare"
                 @click="farm.care('oxygen')"
               >
@@ -265,7 +265,7 @@ async function confirm() {
 
           <section
             v-if="farm.activeBatch"
-            class="slide-fade-in from-right player-content-in panel p-4 border border-[#cbd9c6] rounded-xl bg-white space-y-3"
+            class="slide-fade-in from-right player-content-in panel p-4 border border-border-default rounded-xl bg-white space-y-3"
           >
             <div class="flex flex-wrap items-center justify-between gap-2">
               <div class="m-0 text-sm font-bold">{{ farm.speciesName(farm.activeBatch.species_id) }}</div>
@@ -280,12 +280,12 @@ async function confirm() {
                   : tr("AquacultureStockForm.cham_chut")
               }}
             </div>
-            <div v-if="farm.activeBatch.mode === 'advanced'" class="space-y-2 rounded-lg bg-[#f5f9f0] p-3 text-xs">
+            <div v-if="farm.activeBatch.mode === 'advanced'" class="space-y-2 rounded-lg bg-surface p-3 text-xs">
               <div class="flex justify-between">
                 <span>{{ tr("Fishfarm.chat_luong") }}</span
                 ><b>{{ Math.round(farm.activeBatch.quality_score * 100) }}%</b>
               </div>
-              <div class="h-1.5 overflow-hidden rounded-full bg-[#dfe8d8]">
+              <div class="h-1.5 overflow-hidden rounded-full bg-palette-dfe8d8">
                 <div class="h-full bg-emerald-600" :style="{ width: farm.activeBatch.quality_score * 100 + '%' }" />
               </div>
               <template v-if="farm.activeBatch.status === 'growing'">
@@ -293,7 +293,7 @@ async function confirm() {
                   >{{ tr("Fishfarm.thuc_an_cho_lua_nay") }}
                   <select
                     v-model="foodId"
-                    class="mt-1 w-full rounded-lg border border-[#cbd9c6] bg-white p-2"
+                    class="mt-1 w-full rounded-lg border border-border-default bg-white p-2"
                     :disabled="!farm.canFeed"
                   >
                     <option value="">{{ tr("Fishfarm.chon_thuc_an_trong_tui") }}</option>
@@ -310,7 +310,7 @@ async function confirm() {
                 </label>
                 <button
                   type="button"
-                  class="cursor-pointer disabled:cursor-not-allowed! disabled:opacity-45! focus-visible:outline-2 focus-visible:outline-[#347552] focus-visible:outline-offset-[3px] action-button border border-[#cbd9c6] rounded-lg px-2.5 py-2 bg-[#f5f9f0] text-xs font-semibold! hover:bg-[#e8f0e0] [&.primary]:border-[#047857] [&.primary]:bg-[#047857] [&.primary]:text-white w-full"
+                  class="cursor-pointer disabled:cursor-not-allowed! disabled:opacity-45! focus-visible:outline-2 focus-visible:outline-brand-hover focus-visible:outline-offset-[3px] action-button border border-border-default rounded-lg px-2.5 py-2 bg-surface text-xs font-semibold! hover:bg-palette-e8f0e0 [&.primary]:border-accent [&.primary]:bg-accent [&.primary]:text-white w-full"
                   :disabled="!farm.canFeed || !chosenFood || chosenFood.owned < chosenFood.needed"
                   @click="farm.feed(foodId)"
                 >
@@ -323,7 +323,7 @@ async function confirm() {
                 </div>
                 <button
                   type="button"
-                  class="cursor-pointer disabled:cursor-not-allowed! disabled:opacity-45! focus-visible:outline-2 focus-visible:outline-[#347552] focus-visible:outline-offset-[3px] text-emerald-700 underline"
+                  class="cursor-pointer disabled:cursor-not-allowed! disabled:opacity-45! focus-visible:outline-2 focus-visible:outline-brand-hover focus-visible:outline-offset-[3px] text-emerald-700 underline"
                   :disabled="farm.busy"
                   @click="modal.open('shop')"
                 >
@@ -336,7 +336,7 @@ async function confirm() {
               <b>{{ tr("Fishfarm.tung_ca_trong_lua") }}</b
               ><button
                 type="button"
-                class="cursor-pointer disabled:cursor-not-allowed! disabled:opacity-45! focus-visible:outline-2 focus-visible:outline-[#347552] focus-visible:outline-offset-[3px] text-emerald-700 underline disabled:opacity-50"
+                class="cursor-pointer disabled:cursor-not-allowed! disabled:opacity-45! focus-visible:outline-2 focus-visible:outline-brand-hover focus-visible:outline-offset-[3px] text-emerald-700 underline disabled:opacity-50"
                 :disabled="!farm.canMutate"
                 @click="farm.selectOrdinaryReadyFish()"
               >
@@ -348,7 +348,7 @@ async function confirm() {
                 v-for="fish in farm.pagedFish"
                 :key="fish.id"
                 class="flex cursor-pointer items-center gap-2 rounded-lg border p-2 text-xs"
-                :class="fish.is_super_special ? 'border-amber-300 bg-amber-50' : 'border-[#cbd9c6]'"
+                :class="fish.is_super_special ? 'border-amber-300 bg-amber-50' : 'border-border-default'"
               >
                 <input
                   type="checkbox"
@@ -376,7 +376,7 @@ async function confirm() {
             <div v-if="farm.fishPages > 1" class="flex items-center justify-between text-xs">
               <button
                 type="button"
-                class="cursor-pointer disabled:cursor-not-allowed! disabled:opacity-45! focus-visible:outline-2 focus-visible:outline-[#347552] focus-visible:outline-offset-[3px] action-button border border-[#cbd9c6] rounded-lg px-2.5 py-2 bg-[#f5f9f0] text-xs font-semibold! hover:bg-[#e8f0e0] [&.primary]:border-[#047857] [&.primary]:bg-[#047857] [&.primary]:text-white"
+                class="cursor-pointer disabled:cursor-not-allowed! disabled:opacity-45! focus-visible:outline-2 focus-visible:outline-brand-hover focus-visible:outline-offset-[3px] action-button border border-border-default rounded-lg px-2.5 py-2 bg-surface text-xs font-semibold! hover:bg-palette-e8f0e0 [&.primary]:border-accent [&.primary]:bg-accent [&.primary]:text-white"
                 :disabled="farm.fishPage <= 1 || farm.busy"
                 @click="farm.fishPage--"
               >
@@ -384,20 +384,20 @@ async function confirm() {
               ><span>{{ farm.fishPage }} / {{ farm.fishPages }}</span
               ><button
                 type="button"
-                class="cursor-pointer disabled:cursor-not-allowed! disabled:opacity-45! focus-visible:outline-2 focus-visible:outline-[#347552] focus-visible:outline-offset-[3px] action-button border border-[#cbd9c6] rounded-lg px-2.5 py-2 bg-[#f5f9f0] text-xs font-semibold! hover:bg-[#e8f0e0] [&.primary]:border-[#047857] [&.primary]:bg-[#047857] [&.primary]:text-white"
+                class="cursor-pointer disabled:cursor-not-allowed! disabled:opacity-45! focus-visible:outline-2 focus-visible:outline-brand-hover focus-visible:outline-offset-[3px] action-button border border-border-default rounded-lg px-2.5 py-2 bg-surface text-xs font-semibold! hover:bg-palette-e8f0e0 [&.primary]:border-accent [&.primary]:bg-accent [&.primary]:text-white"
                 :disabled="farm.fishPage >= farm.fishPages || farm.busy"
                 @click="farm.fishPage++"
               >
                 {{ tr("Fishfarm.sau") }}
               </button>
             </div>
-            <div class="space-y-2 border-t border-[#cbd9c6] pt-3">
+            <div class="space-y-2 border-t border-border-default pt-3">
               <div class="m-0 text-xs">
                 {{ tr("Fishfarm.da_chon") }} {{ farm.selectedFishIds.length }} {{ tr("Fishfarm.ca_2") }}
                 <button
                   v-if="farm.selectedFishIds.length"
                   type="button"
-                  class="cursor-pointer disabled:cursor-not-allowed! disabled:opacity-45! focus-visible:outline-2 focus-visible:outline-[#347552] focus-visible:outline-offset-[3px] ml-2 text-stone-500 underline"
+                  class="cursor-pointer disabled:cursor-not-allowed! disabled:opacity-45! focus-visible:outline-2 focus-visible:outline-brand-hover focus-visible:outline-offset-[3px] ml-2 text-stone-500 underline"
                   :disabled="!farm.canMutate"
                   @click="farm.selectedFishIds = []"
                 >
@@ -406,7 +406,7 @@ async function confirm() {
               </div>
               <button
                 type="button"
-                class="cursor-pointer disabled:cursor-not-allowed! disabled:opacity-45! focus-visible:outline-2 focus-visible:outline-[#347552] focus-visible:outline-offset-[3px] action-button border border-[#cbd9c6] rounded-lg px-2.5 py-2 bg-[#f5f9f0] text-xs font-semibold! hover:bg-[#e8f0e0] [&.primary]:border-[#047857] [&.primary]:bg-[#047857] [&.primary]:text-white primary w-full"
+                class="cursor-pointer disabled:cursor-not-allowed! disabled:opacity-45! focus-visible:outline-2 focus-visible:outline-brand-hover focus-visible:outline-offset-[3px] action-button border border-border-default rounded-lg px-2.5 py-2 bg-surface text-xs font-semibold! hover:bg-palette-e8f0e0 [&.primary]:border-accent [&.primary]:bg-accent [&.primary]:text-white primary w-full"
                 :disabled="!farm.canMutate || !farm.selectionReady"
                 @click="ask('sell')"
               >
@@ -414,7 +414,7 @@ async function confirm() {
               </button>
               <button
                 type="button"
-                class="cursor-pointer disabled:cursor-not-allowed! disabled:opacity-45! focus-visible:outline-2 focus-visible:outline-[#347552] focus-visible:outline-offset-[3px] action-button border border-[#cbd9c6] rounded-lg px-2.5 py-2 bg-[#f5f9f0] text-xs font-semibold! hover:bg-[#e8f0e0] [&.primary]:border-[#047857] [&.primary]:bg-[#047857] [&.primary]:text-white w-full"
+                class="cursor-pointer disabled:cursor-not-allowed! disabled:opacity-45! focus-visible:outline-2 focus-visible:outline-brand-hover focus-visible:outline-offset-[3px] action-button border border-border-default rounded-lg px-2.5 py-2 bg-surface text-xs font-semibold! hover:bg-palette-e8f0e0 [&.primary]:border-accent [&.primary]:bg-accent [&.primary]:text-white w-full"
                 :disabled="
                   !farm.canMutate || !farm.selectionReady || farm.selectedFishIds.length > farm.storageAvailable
                 "
@@ -424,7 +424,7 @@ async function confirm() {
               </button>
               <button
                 type="button"
-                class="cursor-pointer disabled:cursor-not-allowed! disabled:opacity-45! focus-visible:outline-2 focus-visible:outline-[#347552] focus-visible:outline-offset-[3px] w-full py-1 text-xs text-red-700 underline disabled:opacity-40"
+                class="cursor-pointer disabled:cursor-not-allowed! disabled:opacity-45! focus-visible:outline-2 focus-visible:outline-brand-hover focus-visible:outline-offset-[3px] w-full py-1 text-xs text-red-700 underline disabled:opacity-40"
                 :disabled="!farm.canMutate || !farm.selectedFishIds.length"
                 @click="ask('release')"
               >
@@ -463,7 +463,7 @@ async function confirm() {
       :on-second="confirm"
       :on-dismiss="() => (confirmation = null)"
     >
-      <div class="flex flex-wrap items-center gap-1 text-sm text-[#24352a]">
+      <div class="flex flex-wrap items-center gap-1 text-sm text-content">
         {{ confirmation.message
         }}<template v-if="confirmation.kind === 'sell'"><Cash :amount="confirmation.cash" :size="20" />?</template>
       </div>
@@ -472,7 +472,7 @@ async function confirm() {
       <dialog
         ref="recordsDialog"
         aria-labelledby="aquaculture-records-title"
-        class="player-popup-in fixed inset-0 m-auto max-h-[80dvh] w-[calc(100%-2rem)] max-w-md overflow-y-auto rounded-2xl border border-[#cbd9c6] bg-[#f5f9f0] p-0 text-[#24352a] shadow-xl backdrop:bg-black/40"
+        class="player-popup-in fixed inset-0 m-auto max-h-[80dvh] w-[calc(100%-2rem)] max-w-md overflow-y-auto rounded-2xl border border-border-default bg-surface p-0 text-content shadow-xl backdrop:bg-black/40"
         @click.self="recordsDialog?.close()"
       >
         <div class="p-4" @click.stop>
@@ -484,7 +484,7 @@ async function confirm() {
               type="button"
               autofocus
               :aria-label="tr('Fishfarm.dong_thanh_qua_nuoi_ca')"
-              class="cursor-pointer disabled:cursor-not-allowed! disabled:opacity-45! focus-visible:outline-2 focus-visible:outline-[#347552] focus-visible:outline-offset-[3px] size-8 rounded-full text-2xl hover:bg-[#cbd9c6]/50"
+              class="cursor-pointer disabled:cursor-not-allowed! disabled:opacity-45! focus-visible:outline-2 focus-visible:outline-brand-hover focus-visible:outline-offset-[3px] size-8 rounded-full text-2xl hover:bg-border-default/50"
               @click="recordsDialog?.close()"
             >
               ×
@@ -494,7 +494,7 @@ async function confirm() {
             <div
               v-for="record in farm.records"
               :key="record.species_id"
-              class="rounded-lg border border-[#cbd9c6] bg-white p-3 text-xs"
+              class="rounded-lg border border-border-default bg-white p-3 text-xs"
             >
               <b>{{ farm.speciesName(record.species_id) }}</b>
               <div class="mb-0 mt-1 text-stone-600">

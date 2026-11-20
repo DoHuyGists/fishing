@@ -5,18 +5,18 @@ const store = useFishingMapStore();
 </script>
 
 <template>
-  <aside class="w-fit shrink-0 rounded-xl border border-[#cbd9c6] bg-[#f5f9f0] p-3">
+  <aside class="w-fit shrink-0 rounded-xl border border-border-default bg-surface p-3">
     <div class="mb-3 text-lg font-bold">{{ tr("FishingMapModal.countries") }}</div>
     <input
       v-model="store.countrySearch"
       type="search"
-      class="mb-2 w-full rounded-lg border border-[#cbd9c6] bg-white px-3 py-2 text-sm"
+      class="mb-2 w-full rounded-lg border border-border-default bg-white px-3 py-2 text-sm"
       :aria-label="tr('FishingMapModal.countrySearch')"
       :placeholder="tr('FishingMapModal.countrySearch')"
     />
     <select
       v-model="store.countryFilter"
-      class="mb-3 w-full rounded-lg border border-[#cbd9c6] bg-white px-3 py-2 text-sm"
+      class="mb-3 w-full rounded-lg border border-border-default bg-white px-3 py-2 text-sm"
       :aria-label="tr('FishingMapModal.countryFilter')"
     >
       <option value="all">{{ tr("FishingMapModal.allCountries") }}</option>
@@ -31,11 +31,11 @@ const store = useFishingMapStore();
         v-for="country in store.countries"
         :key="country.id"
         type="button"
-        class="flex w-full items-center gap-2 rounded-lg border border-[#cbd9c6] px-3 py-3 text-left text-sm disabled:cursor-not-allowed disabled:opacity-50 focus-visible:outline-2 focus-visible:outline-[#24352a]"
+        class="flex w-full items-center gap-2 rounded-lg border border-border-default px-3 py-3 text-left text-sm disabled:cursor-not-allowed disabled:opacity-50 focus-visible:outline-2 focus-visible:outline-content"
         :class="
           store.selectedCountryId === country.id && store.canView
-            ? 'bg-[#dce9d4] font-bold'
-            : 'bg-white enabled:hover:bg-[#e5eddf]'
+            ? 'bg-palette-dce9d4 font-bold'
+            : 'bg-white enabled:hover:bg-palette-e5eddf'
         "
         :disabled="store.loading || !store.unlockedIds.has(country.id)"
         :aria-current="store.selectedCountryId === country.id && store.canView ? 'true' : undefined"

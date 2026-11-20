@@ -36,7 +36,7 @@ async function changePassword() {
 <template>
   <div class="fixed inset-0 z-[10000] flex items-center justify-center bg-black/60 p-4 backdrop-blur-sm" @click.self="close" @keydown.esc.stop="close">
     <section
-      class="player-popup-in max-h-[90dvh] w-full max-w-md overflow-y-auto rounded-2xl border border-[#cbd9c6] bg-[#f5f9f0] p-5 text-sm text-[#24352a] shadow-2xl"
+      class="player-popup-in max-h-[90dvh] w-full max-w-md overflow-y-auto rounded-2xl border border-border-default bg-surface p-5 text-sm text-content shadow-2xl"
       role="dialog"
       aria-modal="true"
       aria-labelledby="change-password-title"
@@ -47,14 +47,14 @@ async function changePassword() {
       </div>
       <form class="space-y-3" @submit.prevent="changePassword">
         <fieldset :disabled="authStore.passwordBusy" class="space-y-3">
-          <label class="block">{{ tr('ChangePasswordModal.mat_khau_hien_tai') }}<input v-model="currentPassword" required type="password" autocomplete="current-password" class="mt-1 w-full rounded border border-[#cbd9c6] bg-white p-2" /></label>
-          <label class="block">{{ tr('ChangePasswordModal.mat_khau_moi') }}<input v-model="newPassword" required minlength="8" type="password" autocomplete="new-password" class="mt-1 w-full rounded border border-[#cbd9c6] bg-white p-2" /></label>
-          <label class="block">{{ tr('ChangePasswordModal.xac_nhan_mat_khau_moi') }}<input v-model="confirmPassword" required minlength="8" type="password" autocomplete="new-password" class="mt-1 w-full rounded border border-[#cbd9c6] bg-white p-2" /></label>
+          <label class="block">{{ tr('ChangePasswordModal.mat_khau_hien_tai') }}<input v-model="currentPassword" required type="password" autocomplete="current-password" class="mt-1 w-full rounded border border-border-default bg-white p-2" /></label>
+          <label class="block">{{ tr('ChangePasswordModal.mat_khau_moi') }}<input v-model="newPassword" required minlength="8" type="password" autocomplete="new-password" class="mt-1 w-full rounded border border-border-default bg-white p-2" /></label>
+          <label class="block">{{ tr('ChangePasswordModal.xac_nhan_mat_khau_moi') }}<input v-model="confirmPassword" required minlength="8" type="password" autocomplete="new-password" class="mt-1 w-full rounded border border-border-default bg-white p-2" /></label>
         </fieldset>
         <div v-if="passwordError" role="alert" class="text-red-700">{{ passwordError }}</div>
         <div class="flex justify-end gap-2">
-          <button type="button" :disabled="authStore.passwordBusy" class="rounded border border-[#cbd9c6] px-4 py-2 disabled:opacity-50" @click="close">{{ tr('ChangePasswordModal.dong') }}</button>
-          <button type="submit" :disabled="authStore.passwordBusy" class="rounded bg-[#24352a] px-4 py-2 text-white disabled:opacity-50">{{ authStore.passwordBusy ? tr('ChangePasswordModal.dang_luu') : tr('ChangePasswordModal.doi_mat_khau') }}</button>
+          <button type="button" :disabled="authStore.passwordBusy" class="rounded border border-border-default px-4 py-2 disabled:opacity-50" @click="close">{{ tr('ChangePasswordModal.dong') }}</button>
+          <button type="submit" :disabled="authStore.passwordBusy" class="rounded bg-content px-4 py-2 text-white disabled:opacity-50">{{ authStore.passwordBusy ? tr('ChangePasswordModal.dang_luu') : tr('ChangePasswordModal.doi_mat_khau') }}</button>
         </div>
       </form>
     </section>

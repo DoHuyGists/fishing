@@ -74,7 +74,7 @@ function selectionClass(caught: CaughtFish) {
       <div class="m-0 text-sm font-bold">{{ tr("FishingPlayers.ca_da_cau") }}</div>
       <span class="text-xs text-emerald-900/60">{{ caughtFishes.length }} {{ tr("UserProfile.con") }}</span>
       <div
-        class="flex rounded-md border border-[#cbd9c6] p-0.5 text-xs font-bold"
+        class="flex rounded-md border border-border-default p-0.5 text-xs font-bold"
         role="group"
         :aria-label="tr('CaughtFishList.che_do_xem_ca_da_cau')"
       >
@@ -116,7 +116,7 @@ function selectionClass(caught: CaughtFish) {
         <section
           v-for="group in groupedBySpecies"
           :key="group.key"
-          class="slide-fade-in from-bottom player-content-in overflow-hidden rounded-lg border border-[#cbd9c6] bg-[#f5f9f0]"
+          class="slide-fade-in from-bottom player-content-in overflow-hidden rounded-lg border border-border-default bg-surface"
         >
           <button
             type="button"
@@ -129,7 +129,7 @@ function selectionClass(caught: CaughtFish) {
               :alt="group.name"
               class="h-12 shrink-0 rounded-md bg-emerald-950/5 object-cover"
             />
-            <span class="min-w-0 flex-1 truncate text-sm font-bold text-[#24352a]">{{ group.name }}</span>
+            <span class="min-w-0 flex-1 truncate text-sm font-bold text-content">{{ group.name }}</span>
             <span class="shrink-0 rounded-full bg-white px-2 py-1 text-xs font-bold"
               >{{ group.fishes.length }} {{ tr("UserProfile.con") }}</span
             >
@@ -137,7 +137,7 @@ function selectionClass(caught: CaughtFish) {
           </button>
           <div
             v-if="expandedSpecies.has(group.key)"
-            class="m-0 flex max-h-48 list-none flex-col gap-1 overflow-y-auto border-t border-[#cbd9c6] p-2"
+            class="m-0 flex max-h-48 list-none flex-col gap-1 overflow-y-auto border-t border-border-default p-2"
           >
             <div v-for="caught in group.fishes" :key="caught.id">
               <button

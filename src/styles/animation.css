@@ -16,7 +16,7 @@
   left: calc(8% + (var(--sparkle-index) - 1) * 19%);
   top: 12%;
   opacity: 0;
-  filter: drop-shadow(0 0 3px #fff8bf);
+  filter: drop-shadow(0 0 3px var(--color-palette-fff8bf));
   animation: shinySparkle 2.8s ease-in-out infinite;
   animation-delay: calc(var(--sparkle-index) * -0.55s);
 }

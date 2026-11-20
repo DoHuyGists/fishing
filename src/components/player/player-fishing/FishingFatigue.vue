@@ -41,7 +41,7 @@ onBeforeUnmount(() => clearInterval(timer));
 <template>
   <section
     v-if="areaId"
-    class="slide-fade-in from-left player-content-in w-full rounded-lg border border-[#cbd9c6] bg-[#f5f9f0] p-2 text-xs text-[#24352a]"
+    class="slide-fade-in from-left player-content-in w-full rounded-lg border border-border-default bg-surface p-2 text-xs text-content"
     :aria-label="tr('FishingFatigue.label')"
     :aria-busy="!!store.loading[key]"
     :title="variant === 'compact' ? description : undefined"
@@ -57,7 +57,7 @@ onBeforeUnmount(() => clearInterval(timer));
           :aria-valuetext="description"
           :aria-valuemin="0"
           :aria-valuemax="100"
-          class="h-2.5 overflow-hidden rounded-full bg-[#dce8d5]"
+          class="h-2.5 overflow-hidden rounded-full bg-palette-dce8d5"
           :class="variant === 'compact' ? 'min-w-0 flex-1' : 'my-2'"
         >
           <div
@@ -69,19 +69,19 @@ onBeforeUnmount(() => clearInterval(timer));
         </div>
       </div>
       <template v-if="snapshot && variant !== 'compact'">
-        <div class="flex justify-between text-[10px] text-[#52654f]">
+        <div class="flex justify-between text-[10px] text-content-muted">
           <span>{{ tr('FishingFatigue.rested') }}</span>
           <span>{{ tr('FishingFatigue.exhausted') }}</span>
         </div>
-        <div class="mt-2 border-t border-[#cbd9c6] pt-2">
+        <div class="mt-2 border-t border-border-default pt-2">
           <div class="mb-1 font-semibold">{{ tr('FishingFatigue.effects') }}</div>
-          <div v-if="!snapshot.effects.length" class="text-[#52654f]">{{ tr('FishingFatigue.noEffects') }}</div>
-          <div v-for="(effect, index) in snapshot.effects" :key="`${effect.code}:${effect.target}:${index}`" class="flex justify-between gap-2 text-[#52654f]">
+          <div v-if="!snapshot.effects.length" class="text-content-muted">{{ tr('FishingFatigue.noEffects') }}</div>
+          <div v-for="(effect, index) in snapshot.effects" :key="`${effect.code}:${effect.target}:${index}`" class="flex justify-between gap-2 text-content-muted">
             <span>{{ tr(`FishingFatigue.${effect.target}`) }}</span>
             <span class="shrink-0 font-semibold text-red-700">{{ formatter.format(effect.value) }}%</span>
           </div>
         </div>
-        <div class="mt-2 text-[10px] leading-relaxed text-[#52654f]">{{ tr('FishingFatigue.recovery') }}</div>
+        <div class="mt-2 text-[10px] leading-relaxed text-content-muted">{{ tr('FishingFatigue.recovery') }}</div>
       </template>
     </template>
     <div v-else-if="!store.errors[key]" role="status">{{ tr('FishingFatigue.loading') }}</div>

@@ -8,7 +8,7 @@ const localeStore = useLocaleStore();
 <template>
   <div class="slide-fade-in player-content-in from-top grid gap-2">
     <label
-      class="flex flex-wrap items-center justify-between gap-3 rounded-lg border border-[#cbd9c6] bg-[#f5f9f0] px-3.5 py-2.5 text-xs text-[#24352a]"
+      class="flex flex-wrap items-center justify-between gap-3 rounded-lg border border-border-default bg-surface px-3.5 py-2.5 text-xs text-content"
     >
       <span class="font-medium">{{ tr("language.label") }}</span>
       <select

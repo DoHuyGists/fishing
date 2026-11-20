@@ -20,20 +20,20 @@ const dayPhaseStore = useDayPhaseStore();
     <div class="min-w-0">
       <div class="flex items-baseline justify-between gap-2">
         <time
-          class="text-[#fff1c8] text-lg [font-variant-numeric:tabular-nums] font-[750] leading-none whitespace-nowrap"
+          class="text-palette-fff1c8 text-lg [font-variant-numeric:tabular-nums] font-[750] leading-none whitespace-nowrap"
           >{{ dayPhaseStore.timeLabel || "—" }}</time
         >
       </div>
       <div class="mt-1.5 flex items-center gap-1.5">
         <span
-          class="h-1.5 w-1.5 shrink-0 rounded-full bg-[#edc46f] shadow-[0_0_8px_rgba(237,196,111,0.7)]"
+          class="h-1.5 w-1.5 shrink-0 rounded-full bg-palette-edc46f shadow-[0_0_8px_rgba(237,196,111,0.7)]"
           aria-hidden="true"
         ></span>
-        <span class="overflow-hidden text-[#e1ebdf] text-[11px] font-semibold text-ellipsis whitespace-nowrap">{{
+        <span class="overflow-hidden text-palette-e1ebdf text-[11px] font-semibold text-ellipsis whitespace-nowrap">{{
           dayPhaseStore.currentPhase?.label ?? tr("DayPhaseClock.mui_gio_khong_hop_le")
         }}</span>
       </div>
-      <div v-if="dayPhaseStore.fishTimeBucket" class="mt-1 text-[11px] text-[#e1ebdf]">
+      <div v-if="dayPhaseStore.fishTimeBucket" class="mt-1 text-[11px] text-palette-e1ebdf">
         {{ tr(dayPhaseStore.fishTimeBucket === "DAY" ? "DayPhaseClock.ca_ban_ngay" : "DayPhaseClock.ca_ban_dem") }}
       </div>
       <div class="mt-[9px]">

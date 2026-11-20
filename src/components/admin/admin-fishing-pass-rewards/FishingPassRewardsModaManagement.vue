@@ -82,22 +82,22 @@ onMounted(() => store.fetchAll());
       />
     </div>
     <template v-else>
-      <div class="flex flex-wrap items-center gap-3 border-b border-[#cbd9c6] p-4 sm:px-6">
+      <div class="flex flex-wrap items-center gap-3 border-b border-border-default p-4 sm:px-6">
         <input
           v-model="search"
           type="search"
           placeholder="Tìm vé hoặc vật phẩm…"
-          class="min-w-44 flex-1 rounded-lg border border-[#cbd9c6] bg-white px-3 py-2 text-sm"
-        /><select v-model="passFilter" class="max-w-56 rounded-lg border border-[#cbd9c6] bg-white px-3 py-2 text-sm">
+          class="min-w-44 flex-1 rounded-lg border border-border-default bg-white px-3 py-2 text-sm"
+        /><select v-model="passFilter" class="max-w-56 rounded-lg border border-border-default bg-white px-3 py-2 text-sm">
           <option value="ALL">Tất cả vé câu</option>
           <option v-for="pass in store.passes" :key="pass.id" :value="pass.id">{{ pass.name }}</option></select
-        ><select v-model="typeFilter" class="rounded-lg border border-[#cbd9c6] bg-white px-3 py-2 text-sm">
+        ><select v-model="typeFilter" class="rounded-lg border border-border-default bg-white px-3 py-2 text-sm">
           <option value="ALL">Tất cả loại</option>
           <option value="FREE">FREE</option>
           <option value="PREMIUM">PREMIUM</option></select
         ><button
           type="button"
-          class="rounded-lg border border-[#cbd9c6] bg-white px-3 py-2 text-sm"
+          class="rounded-lg border border-border-default bg-white px-3 py-2 text-sm"
           :disabled="store.loading"
           @click="store.fetchAll()"
         >
@@ -115,18 +115,18 @@ onMounted(() => store.fetchAll());
         {{ store.error }}
       </div>
       <div class="min-h-0 flex-1 overflow-auto p-4 sm:p-6">
-        <div v-if="store.loading && !store.rewards.length" class="py-12 text-center text-sm text-[#24352a]/70">
+        <div v-if="store.loading && !store.rewards.length" class="py-12 text-center text-sm text-content/70">
           Đang tải phần thưởng…
         </div>
         <div
           v-else-if="!filtered.length"
-          class="rounded-xl border border-dashed border-[#cbd9c6] bg-white p-10 text-center text-sm text-[#24352a]/70"
+          class="rounded-xl border border-dashed border-border-default bg-white p-10 text-center text-sm text-content/70"
         >
           Chưa có phần thưởng phù hợp.
         </div>
-        <div v-else class="overflow-x-auto rounded-xl border border-[#cbd9c6] bg-white">
+        <div v-else class="overflow-x-auto rounded-xl border border-border-default bg-white">
           <table class="w-full min-w-[760px] text-left text-sm">
-            <thead class="bg-[#eaf1e5] text-xs uppercase text-[#24352a]/70">
+            <thead class="bg-palette-eaf1e5 text-xs uppercase text-content/70">
               <tr>
                 <th class="px-4 py-3">Vé câu</th>
                 <th class="px-4 py-3">Ngày</th>
@@ -137,7 +137,7 @@ onMounted(() => store.fetchAll());
               </tr>
             </thead>
             <tbody>
-              <tr v-for="reward in filtered" :key="reward.id" class="border-t border-[#e5ece1]">
+              <tr v-for="reward in filtered" :key="reward.id" class="border-t border-palette-e5ece1">
                 <td class="px-4 py-3 font-medium">{{ reward.passName }}</td>
                 <td class="px-4 py-3">Ngày {{ reward.dayNumber }}</td>
                 <td class="px-4 py-3">
@@ -152,7 +152,7 @@ onMounted(() => store.fetchAll());
                 <td class="whitespace-nowrap px-4 py-3 text-right">
                   <button
                     type="button"
-                    class="rounded-lg border border-[#cbd9c6] px-3 py-1.5 text-xs font-semibold hover:bg-[#f5f9f0]"
+                    class="rounded-lg border border-border-default px-3 py-1.5 text-xs font-semibold hover:bg-surface"
                     @click="edit(reward)"
                   >
                     Sửa</button

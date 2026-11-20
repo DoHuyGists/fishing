@@ -64,8 +64,8 @@ onBeforeUnmount(() => {
     aria-modal="true"
     :aria-label="tr('Dispatch.title')"
   >
-    <div class="dispatch-content w-full min-w-0 space-y-2 bg-[#f5f9f0] p-2 text-xs text-[#24352a]">
-      <div class="text-xs text-[#61745d]">{{ tr("Dispatch.rules") }}</div>
+    <div class="dispatch-content w-full min-w-0 space-y-2 bg-surface p-2 text-xs text-content">
+      <div class="text-xs text-palette-61745d">{{ tr("Dispatch.rules") }}</div>
       <div v-if="store.error" role="alert" class="rounded-lg border border-red-200 bg-white p-3 text-sm text-red-700">
         {{ store.error }}
       </div>
@@ -96,7 +96,7 @@ onBeforeUnmount(() => {
 <style>
 @reference 'tailwindcss';
 .dispatch-button {
-  @apply min-h-8 rounded-md border border-[#cbd9c6] bg-[#24352a] px-2.5 py-1.5 text-xs font-semibold text-white transition-colors hover:bg-[#3d5941] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#527547] disabled:cursor-not-allowed disabled:opacity-50;
+  @apply min-h-8 rounded-md border border-[var(--color-border-default)] bg-[var(--color-content)] px-2.5 py-1.5 text-xs font-semibold text-white transition-colors hover:bg-[var(--color-palette-3d5941)] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--color-palette-527547)] disabled:cursor-not-allowed disabled:opacity-50;
 }
 .dispatch-grid {
   display: grid;
@@ -104,7 +104,7 @@ onBeforeUnmount(() => {
   gap: 0.5rem;
 }
 .dispatch-card {
-  @apply min-w-0 space-y-2 rounded-lg border border-[#cbd9c6] bg-white p-2.5 text-xs;
+  @apply min-w-0 space-y-2 rounded-lg border border-[var(--color-border-default)] bg-white p-2.5 text-xs;
   overflow-wrap: anywhere;
 }
 .dispatch-content [role="tablist"] > button {

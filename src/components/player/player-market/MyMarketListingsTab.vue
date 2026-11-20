@@ -54,7 +54,7 @@ const myMarketListings = computed(() => marketStore.marketListings.filter((item)
           </div>
 
           <div class="flex flex-col gap-1 mb-3">
-            <div class="m-0 font-bold text-sm text-[#263238] truncate">{{ item.caught?.fish?.name }}</div>
+            <div class="m-0 font-bold text-sm text-palette-263238 truncate">{{ item.caught?.fish?.name }}</div>
             <div class="flex items-center gap-2 text-[11px] text-gray-500 font-medium">
               <span
                 >⚖️

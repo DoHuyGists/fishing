@@ -15,7 +15,7 @@ defineEmits<{ choose: [event: Event]; save: [] }>();
 </script>
 
 <template>
-  <article class="slide-fade-in from-bottom player-content-in min-w-0 rounded-lg border border-[#cbd9c6] bg-white p-2">
+  <article class="slide-fade-in from-bottom player-content-in min-w-0 rounded-lg border border-border-default bg-white p-2">
     <div class="mb-2 flex flex-wrap items-center justify-between gap-2 text-xs">
       <div class="min-w-0 font-semibold">
         {{ tr("EquipmentSets.setNumber", { number }) }}

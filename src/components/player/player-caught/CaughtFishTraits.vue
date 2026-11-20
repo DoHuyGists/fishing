@@ -14,7 +14,7 @@ defineProps<{ fish: Pick<CaughtFish, "variant_type" | "star_rating" | "is_shiny"
           ? 'border-amber-300 bg-amber-50 text-amber-800'
           : fish.variant_type === 'MUTATED'
             ? 'border-purple-300 bg-purple-50 text-purple-800'
-            : 'border-[#cbd9c6] bg-[#f5f9f0] text-[#24352a]'
+            : 'border-border-default bg-surface text-content'
       "
     >
       {{ fish.variant_type }}

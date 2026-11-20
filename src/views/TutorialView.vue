@@ -18,7 +18,7 @@ const lesson = computed(() =>
 <template>
   <main
     v-if="!features.isAvailable('tutorial')"
-    class="grid min-h-dvh place-content-center gap-4 bg-[#f5f9f0] p-6 text-center text-[#24352a]"
+    class="grid min-h-dvh place-content-center gap-4 bg-surface p-6 text-center text-content"
     role="status"
   >
     <div>{{ features.reason("tutorial") }}</div>
@@ -31,15 +31,15 @@ const lesson = computed(() =>
     >
       {{ tr("Maintenance.thu_lai") }}
     </button>
-    <RouterLink :to="{ name: 'home' }" class="rounded-lg border border-[#cbd9c6] bg-white px-4 py-2 font-bold">{{
+    <RouterLink :to="{ name: 'home' }" class="rounded-lg border border-border-default bg-white px-4 py-2 font-bold">{{
       tr("TutorialView.ve_sanh_cau_ca")
     }}</RouterLink>
   </main>
   <component :is="lesson" v-else-if="lesson" :key="String(route.params.slug)" />
-  <main v-else class="grid min-h-dvh place-content-center gap-4 bg-[#f5f9f0] p-6 text-center text-[#24352a]">
+  <main v-else class="grid min-h-dvh place-content-center gap-4 bg-surface p-6 text-center text-content">
     <div class="text-xl font-bold">{{ tr("TutorialView.khong_tim_thay_man_huong_dan") }}</div>
     <div>{{ tr("TutorialView.man_choi_nay_chua_co_hoac_chua_duoc_ho_tro") }}</div>
-    <RouterLink :to="{ name: 'home' }" class="rounded-lg border border-[#cbd9c6] bg-white px-4 py-2 font-bold">{{
+    <RouterLink :to="{ name: 'home' }" class="rounded-lg border border-border-default bg-white px-4 py-2 font-bold">{{
       tr("TutorialView.ve_sanh_cau_ca")
     }}</RouterLink>
   </main>

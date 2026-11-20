@@ -288,7 +288,7 @@ onMounted(loadAll);
         <button
           type="button"
           class="rounded-md px-2.5 py-1.5 text-xs font-bold transition-colors"
-          :class="viewMode === 'table' ? 'bg-white text-[#153221] shadow-sm' : 'text-gray-500 hover:text-gray-700'"
+          :class="viewMode === 'table' ? 'bg-white text-content-strong shadow-sm' : 'text-gray-500 hover:text-gray-700'"
           @click="viewMode = 'table'"
         >
           ☰ Bảng
@@ -296,7 +296,7 @@ onMounted(loadAll);
         <button
           type="button"
           class="rounded-md px-2.5 py-1.5 text-xs font-bold transition-colors"
-          :class="viewMode === 'grouped' ? 'bg-white text-[#153221] shadow-sm' : 'text-gray-500 hover:text-gray-700'"
+          :class="viewMode === 'grouped' ? 'bg-white text-content-strong shadow-sm' : 'text-gray-500 hover:text-gray-700'"
           @click="viewMode = 'grouped'"
         >
           🗂️ Gom nhóm bãi câu
@@ -328,7 +328,7 @@ onMounted(loadAll);
         </button>
         <button
           type="button"
-          class="rounded-lg bg-[#153221] px-3.5 py-2 text-sm font-bold text-white hover:bg-emerald-800"
+          class="rounded-lg bg-content-strong px-3.5 py-2 text-sm font-bold text-white hover:bg-emerald-800"
           @click="openCreateForm"
         >
           + Thêm cấu hình
@@ -372,7 +372,7 @@ onMounted(loadAll);
                   :class="{ '-rotate-90': isAreaCollapsed(group.areaId) }"
                   >▾</span
                 >
-                <span class="truncate text-sm font-extrabold text-[#153221]">📍 {{ group.areaTitle }}</span>
+                <span class="truncate text-sm font-extrabold text-content-strong">📍 {{ group.areaTitle }}</span>
                 <span
                   v-if="group.areaCountryId"
                   class="shrink-0 rounded-full border border-emerald-200 bg-white px-2 py-0.5 text-[10px] font-semibold text-emerald-700"
@@ -396,7 +396,7 @@ onMounted(loadAll);
                 class="flex min-w-52 flex-1 items-center gap-3 rounded-lg border border-gray-200 bg-gray-50/60 px-3 py-2.5"
               >
                 <div
-                  class="grid size-12 shrink-0 place-items-center overflow-hidden rounded-md border border-[#cbd9c6] bg-[#f5f9f0]"
+                  class="grid size-12 shrink-0 place-items-center overflow-hidden rounded-md border border-border-default bg-surface"
                 >
                   <img
                     v-if="row.speciesImage"
@@ -405,7 +405,7 @@ onMounted(loadAll);
                     loading="lazy"
                     class="size-full object-contain p-1"
                   />
-                  <span v-else class="text-center text-[10px] text-[#24352a]">Chưa có ảnh</span>
+                  <span v-else class="text-center text-[10px] text-content">Chưa có ảnh</span>
                 </div>
                 <div class="min-w-0 flex-1">
                   <div class="truncate text-sm font-bold text-gray-800" :title="row.speciesName || ''">

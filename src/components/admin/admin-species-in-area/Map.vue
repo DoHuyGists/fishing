@@ -15,7 +15,7 @@ const {
   <div class="mx-auto flex w-full max-w-5xl flex-col gap-4 p-4 lg:flex-row">
     <!-- Bản đồ -->
     <div class="flex-1">
-      <div class="overflow-hidden rounded-xl border border-slate-300 bg-[#d9d2b8] shadow-sm">
+      <div class="overflow-hidden rounded-xl border border-slate-300 bg-palette-d9d2b8 shadow-sm">
         <svg
           ref="svgRef"
           viewBox="0 0 600 400"

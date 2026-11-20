@@ -10,7 +10,7 @@ const emit = defineEmits<{ refresh: [] }>();
 
 <template>
   <div
-    class="slide-fade-in from-top player-content-in relative isolate overflow-hidden rounded-2xl border border-[#cbd9c6] bg-linear-to-br from-[#f5f9f0] via-white to-emerald-50 p-3 shadow-sm sm:p-4"
+    class="slide-fade-in from-top player-content-in relative isolate overflow-hidden rounded-2xl border border-border-default bg-linear-to-br from-surface via-white to-emerald-50 p-3 shadow-sm sm:p-4"
   >
     <div
       aria-hidden="true"
@@ -25,7 +25,7 @@ const emit = defineEmits<{ refresh: [] }>();
         </div>
         <div
           id="badges-title"
-          class="mb-0 mt-0.5 text-base font-black tracking-tight text-[#24352a] sm:mt-1 sm:text-xl"
+          class="mb-0 mt-0.5 text-base font-black tracking-tight text-content sm:mt-1 sm:text-xl"
         >
           {{ tr("Achievement.bo_suu_tap_huy_hieu") }}
         </div>
@@ -39,7 +39,7 @@ const emit = defineEmits<{ refresh: [] }>();
           >🏆</span
         >
         <div>
-          <div class="m-0 text-sm font-black leading-tight text-[#24352a] sm:text-base">
+          <div class="m-0 text-sm font-black leading-tight text-content sm:text-base">
             {{ badgesStore.earnedTotal
             }}<span class="text-xs font-semibold text-gray-400"> / {{ badgesStore.collectionTotal }}</span>
           </div>
@@ -63,7 +63,7 @@ const emit = defineEmits<{ refresh: [] }>();
     <div
       class="relative mt-3 flex flex-col gap-2 border-t border-emerald-900/10 pt-2.5 sm:mt-4 sm:flex-row sm:items-center sm:justify-between sm:gap-3 sm:pt-3"
     >
-      <div class="m-0 shrink-0 text-[10px] font-bold text-[#405346] sm:text-xs">
+      <div class="m-0 shrink-0 text-[10px] font-bold text-palette-405346 sm:text-xs">
         {{ tr("Achievement.nhung_chiec_cup_cua_can_thu") }}
       </div>
       <button

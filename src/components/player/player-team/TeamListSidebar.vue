@@ -89,11 +89,11 @@ const statusLabel: Record<string, string> = {
   },
 };
 const statusClass: Record<string, string> = {
-  PENDING: "bg-[#f0e0e0] text-[#8a2020] border border-[#e8a0a0]",
-  OPEN: "bg-[#d4f4dd] text-[#1a6e35] border border-[#9de2b4]",
-  FULL: "bg-[#fde8cc] text-[#8a4500] border border-[#f7bf7f]",
-  FISHING: "bg-[#dceeff] text-[#1a4fa0] border border-[#9ac4f7]",
-  CLOSED: "bg-[#f0e0e0] text-[#8a2020] border border-[#e8a0a0]",
+  PENDING: "bg-palette-f0e0e0 text-palette-8a2020 border border-palette-e8a0a0",
+  OPEN: "bg-palette-d4f4dd text-palette-1a6e35 border border-palette-9de2b4",
+  FULL: "bg-palette-fde8cc text-palette-8a4500 border border-palette-f7bf7f",
+  FISHING: "bg-palette-dceeff text-palette-1a4fa0 border border-palette-9ac4f7",
+  CLOSED: "bg-palette-f0e0e0 text-palette-8a2020 border border-palette-e8a0a0",
 };
 const filteredTeams = computed(() => props.teams);
 
@@ -108,12 +108,12 @@ function joinTypeLabel(team: UserTeam) {
 
 <template>
   <aside
-    class="slide-fade-in from-left player-content-in flex min-h-0 flex-col gap-3 rounded-2xl border border-[#cde0c9] bg-[#f5f9f0] p-3 sm:max-h-[62vh]"
+    class="slide-fade-in from-left player-content-in flex min-h-0 flex-col gap-3 rounded-2xl border border-palette-cde0c9 bg-surface p-3 sm:max-h-[62vh]"
   >
     <div class="flex items-center justify-between gap-2">
-      <div class="m-0 text-base font-bold text-[#1a3a1a]">{{ tr("TeamListSidebar.to_doi_hien_hanh") }}</div>
+      <div class="m-0 text-base font-bold text-palette-1a3a1a">{{ tr("TeamListSidebar.to_doi_hien_hanh") }}</div>
       <button
-        class="inline-flex items-center justify-center rounded-lg bg-linear-to-br from-[#3b7a57] to-[#2e6644] px-3 py-2 text-[0.8rem] font-bold text-white transition-all hover:from-[#2e6644] hover:to-[#245236]"
+        class="inline-flex items-center justify-center rounded-lg bg-linear-to-br from-brand to-palette-2e6644 px-3 py-2 text-[0.8rem] font-bold text-white transition-all hover:from-palette-2e6644 hover:to-palette-245236"
         @click="emit('create')"
       >
         {{ tr("TeamListSidebar.tao") }}
@@ -124,7 +124,7 @@ function joinTypeLabel(team: UserTeam) {
       type="search"
       :aria-label="tr('TeamListSidebar.tim_to_doi')"
       :placeholder="tr('TeamListSidebar.tim_to_doi_2')"
-      class="min-w-0 rounded-lg border border-[#c0d8b8] bg-[#fafefc] px-3 py-2 text-[0.85rem] text-[#1a3a1a]"
+      class="min-w-0 rounded-lg border border-palette-c0d8b8 bg-palette-fafefc px-3 py-2 text-[0.85rem] text-palette-1a3a1a"
     />
     <Tab
       v-model="status"
@@ -133,45 +133,45 @@ function joinTypeLabel(team: UserTeam) {
       class="min-h-0"
     >
       <template v-for="tab in statusTabs" :key="tab.key" #[tab.key]>
-        <div v-if="teams.length === 0" class="m-0 py-8 text-center text-[0.85rem] text-[#778877]">
+        <div v-if="teams.length === 0" class="m-0 py-8 text-center text-[0.85rem] text-palette-778877">
           {{ tr("TeamListSidebar.chua_co_to_doi_nao") }}
         </div>
-        <div v-else-if="filteredTeams.length === 0" class="m-0 py-8 text-center text-[0.85rem] text-[#778877]">
+        <div v-else-if="filteredTeams.length === 0" class="m-0 py-8 text-center text-[0.85rem] text-palette-778877">
           {{ tr("TeamListSidebar.khong_tim_thay_to_doi_phu_hop") }}
         </div>
         <div v-else class="m-0 flex min-h-0 list-none flex-col gap-2 overflow-y-auto p-0 pr-1">
-          <div v-for="team in filteredTeams" :key="team.id" class="rounded-xl border border-[#cde0c9] bg-white p-3">
+          <div v-for="team in filteredTeams" :key="team.id" class="rounded-xl border border-palette-cde0c9 bg-white p-3">
             <div class="flex items-start justify-between gap-2">
-              <span class="font-bold text-[#1a3a1a]">{{ team.name }}</span
+              <span class="font-bold text-palette-1a3a1a">{{ team.name }}</span
               ><span
                 :class="['shrink-0 rounded-full px-2 py-[2px] text-[0.68rem] font-bold', statusClass[team.status]]"
               >
                 {{ statusLabel[team.status] }}
               </span>
             </div>
-            <div v-if="team.description" class="my-1 line-clamp-2 text-[0.78rem] text-[#556655]">
+            <div v-if="team.description" class="my-1 line-clamp-2 text-[0.78rem] text-content-caption">
               {{ team.description }}
             </div>
-            <div class="my-1 text-[0.72rem] text-[#778877]">
+            <div class="my-1 text-[0.72rem] text-palette-778877">
               {{ joinTypeLabel(team) }} {{ tr("TeamListSidebar.toi_da") }} {{ team.max_members }}
             </div>
-            <div class="mt-2 text-[11px] text-[#556655]">{{ tr("TeamListSidebar.truong_nhom") }}</div>
+            <div class="mt-2 text-[11px] text-content-caption">{{ tr("TeamListSidebar.truong_nhom") }}</div>
             <PlayerIdentity :user-id="team.leader_id" :profile="profiles.get(team.leader_id)" class="mt-1" />
             <div class="mt-2 flex justify-end">
               <span
                 v-if="team.id === currentTeamId"
-                class="rounded-full bg-[#e8f5e2] px-2 py-1 text-[0.68rem] font-bold text-[#2e6644]"
+                class="rounded-full bg-palette-e8f5e2 px-2 py-1 text-[0.68rem] font-bold text-palette-2e6644"
                 >{{ tr("TeamListSidebar.doi_cua_ban") }}</span
               >
               <button
                 v-else-if="canJoin(team)"
                 :disabled="actionLoading"
-                class="rounded-lg bg-[#3b7a57] px-3 py-1.5 text-[0.76rem] font-bold text-white disabled:opacity-55"
+                class="rounded-lg bg-brand px-3 py-1.5 text-[0.76rem] font-bold text-white disabled:opacity-55"
                 @click="emit('join', team.id)"
               >
                 {{ tr("TeamListSidebar.tham_gia") }}
               </button>
-              <span v-else class="rounded-full bg-[#fde8cc] px-2 py-1 text-[0.68rem] font-bold text-[#8a4500]">
+              <span v-else class="rounded-full bg-palette-fde8cc px-2 py-1 text-[0.68rem] font-bold text-palette-8a4500">
                 {{ joinRestrictionLabel(team) }}
               </span>
             </div>

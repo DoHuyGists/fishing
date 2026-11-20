@@ -80,20 +80,20 @@ function handleKeydown(event: KeyboardEvent) {
     :tabindex="embedded ? undefined : -1"
     :aria-label="title"
     :aria-busy="busy"
-    :class="embedded ? 'text-[#24352a]' : 'fixed inset-0 z-[10001] flex items-center justify-center overflow-y-auto bg-black/50 p-4 text-[#24352a] backdrop-blur-xs outline-none'"
+    :class="embedded ? 'text-content' : 'fixed inset-0 z-[10001] flex items-center justify-center overflow-y-auto bg-black/50 p-4 text-content backdrop-blur-xs outline-none'"
     @keydown="handleKeydown"
     @click.self="!embedded && cancel()"
   >
     <form
       class="min-w-0 space-y-4"
-      :class="embedded ? 'w-full' : 'player-popup-in my-auto w-full max-w-sm rounded-2xl border border-[#cbd9c6] bg-white p-5 shadow-xl'"
+      :class="embedded ? 'w-full' : 'player-popup-in my-auto w-full max-w-sm rounded-2xl border border-border-default bg-white p-5 shadow-xl'"
       @submit.prevent="confirm"
     >
       <div role="heading" aria-level="2" class="text-base font-extrabold">{{ title }}</div>
       <fieldset :disabled="busy" class="m-0 min-w-0 space-y-4 border-0 p-0">
         <slot />
       </fieldset>
-      <div class="space-y-3 rounded-xl border border-[#cbd9c6] bg-[#f5f9f0] p-3 text-sm">
+      <div class="space-y-3 rounded-xl border border-border-default bg-surface p-3 text-sm">
         <div class="flex items-center justify-between gap-3">
           <span>{{ balanceLabel || tr('FishSellConfirm.so_du_hien_tai') }}</span>
           <component :is="currencies[currency]" :amount="balance" :size="22" :interactive="false" class="shrink-0" />
@@ -103,7 +103,7 @@ function handleKeydown(event: KeyboardEvent) {
           <span>{{ cost.label }}</span>
           <component :is="currencies[currency]" :amount="cost.amount" :size="22" :interactive="false" class="shrink-0" />
         </div>
-        <div class="flex items-center justify-between gap-3 border-t border-[#cbd9c6] pt-3 font-bold">
+        <div class="flex items-center justify-between gap-3 border-t border-border-default pt-3 font-bold">
           <span>{{ totalLabel || tr('ShopModal.thanh_tien') }}</span>
           <component :is="currencies[currency]" :amount="total" :size="22" :interactive="false" class="shrink-0" />
         </div>
@@ -115,10 +115,10 @@ function handleKeydown(event: KeyboardEvent) {
       <slot name="after-summary" />
       <div v-if="errorMessage" role="alert" class="text-sm font-semibold text-red-700">{{ errorMessage }}</div>
       <div class="flex justify-end gap-2">
-        <button v-if="!embedded" type="button" class="min-h-11 rounded-lg border border-[#cbd9c6] px-4 py-2 text-sm font-bold hover:bg-[#f5f9f0] focus-visible:outline-2 focus-visible:outline-emerald-700 disabled:cursor-not-allowed disabled:opacity-50" :disabled="busy" @click="cancel">
+        <button v-if="!embedded" type="button" class="min-h-11 rounded-lg border border-border-default px-4 py-2 text-sm font-bold hover:bg-surface focus-visible:outline-2 focus-visible:outline-emerald-700 disabled:cursor-not-allowed disabled:opacity-50" :disabled="busy" @click="cancel">
           {{ tr('AccountInfoModal.huy') }}
         </button>
-        <button type="submit" class="min-h-11 rounded-lg bg-[#24352a] px-4 py-2 text-sm font-bold text-white hover:bg-emerald-900 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-emerald-700 disabled:cursor-not-allowed disabled:opacity-50" :class="{ 'w-full': embedded }" :disabled="!canConfirm">
+        <button type="submit" class="min-h-11 rounded-lg bg-content px-4 py-2 text-sm font-bold text-white hover:bg-emerald-900 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-emerald-700 disabled:cursor-not-allowed disabled:opacity-50" :class="{ 'w-full': embedded }" :disabled="!canConfirm">
           {{ busy ? (busyText || tr('DailyAttendance.dang_xu_ly')) : (confirmText || tr('Fishfarm.xac_nhan')) }}
         </button>
       </div>

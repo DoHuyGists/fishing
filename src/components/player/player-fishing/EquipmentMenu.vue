@@ -35,7 +35,7 @@ watch(
     <div class="equipment-actions flex flex-wrap items-start gap-2" :aria-label="tr('EquipmentMenu.dung_cu_cau_ca')">
       <button
         type="button"
-        class="slide-fade-in from-top player-content-in flex items-center gap-2 rounded-lg border border-[#cbd9c6] bg-[#f5f9f0] min-h-7 px-3 py-[3px] text-[11px] font-bold text-[#24352a] transition hover:border-[#70a77e] hover:bg-[#eaf5e8]"
+        class="slide-fade-in from-top player-content-in flex items-center gap-2 rounded-lg border border-border-default bg-surface min-h-7 px-3 py-[3px] text-[11px] font-bold text-content transition hover:border-palette-70a77e hover:bg-palette-eaf5e8"
         :disabled="!store.canAdjustDepth"
         @click="openPicker"
       >
@@ -46,7 +46,7 @@ watch(
       <button
         v-if="store.areaAllowsDepthTool"
         type="button"
-        class="slide-fade-in from-top player-content-in relative flex items-center gap-2 rounded-lg border border-[#cbd9c6] bg-[#f5f9f0] min-h-7 px-3 py-[3px] text-[11px] font-bold text-[#24352a] transition hover:border-[#70a77e] hover:bg-[#eaf5e8]"
+        class="slide-fade-in from-top player-content-in relative flex items-center gap-2 rounded-lg border border-border-default bg-surface min-h-7 px-3 py-[3px] text-[11px] font-bold text-content transition hover:border-palette-70a77e hover:bg-palette-eaf5e8"
         :disabled="!store.canAdjustDepth || !store.currentAreaId || store.isLoadingCurrentArea"
         :title="
           !store.canAdjustDepth
@@ -57,12 +57,12 @@ watch(
         @click="openDepthAdjuster"
       >
         <span
-          class="absolute -top-2 right-2 rounded-full border border-[#cbd9c6] bg-white px-1.5 py-0.5 text-[9px] font-bold leading-none text-[#24352a] shadow-sm"
+          class="absolute -top-2 right-2 rounded-full border border-border-default bg-white px-1.5 py-0.5 text-[9px] font-bold leading-none text-content shadow-sm"
           :aria-label="tr('EquipmentMenu.do_sau_da_chon')"
         >
           {{ store.appliedDepthMeters }} m
         </span>
-        <span aria-hidden="true" class="text-base text-[#398d80]">≋</span>
+        <span aria-hidden="true" class="text-base text-palette-398d80">≋</span>
         {{
           store.isLoadingCurrentArea
             ? tr("EquipmentMenu.dang_tai_thong_tin_ho")
@@ -76,7 +76,7 @@ watch(
           aria-hidden="true"
         >
           <span
-            class="flex size-6 items-center justify-center rounded-full border border-[#cbd9c6] bg-[#f5f9f0] text-[#24352a] shadow-sm"
+            class="flex size-6 items-center justify-center rounded-full border border-border-default bg-surface text-content shadow-sm"
           >
             <svg
               class="size-3.5"
@@ -97,13 +97,13 @@ watch(
       <AdjusDepth />
       <button
         type="button"
-        class="slide-fade-in from-top player-content-in relative flex items-center gap-2 rounded-lg border border-[#cbd9c6] bg-[#f5f9f0] min-h-7 px-3 py-[3px] text-[11px] font-bold text-[#24352a] transition hover:border-[#70a77e] hover:bg-[#eaf5e8]"
+        class="slide-fade-in from-top player-content-in relative flex items-center gap-2 rounded-lg border border-border-default bg-surface min-h-7 px-3 py-[3px] text-[11px] font-bold text-content transition hover:border-palette-70a77e hover:bg-palette-eaf5e8"
         @click="store.openBag"
       >
         <span aria-hidden="true" class="text-base">🕸️</span>
         {{ tr("CaughtModal.tui_ca") }}
         <b
-          class="absolute -top-2 right-2 grid h-[17px] min-w-[17px] place-items-center rounded-full border border-[#cbd9c6] bg-white px-1 text-[9px] font-bold leading-none text-[#24352a] shadow-sm"
+          class="absolute -top-2 right-2 grid h-[17px] min-w-[17px] place-items-center rounded-full border border-border-default bg-white px-1 text-[9px] font-bold leading-none text-content shadow-sm"
           :aria-label="tr('EquipmentMenu.so_ca_trong_tui')"
         >
           {{ store.inventory.length }}/{{ store.fishingNetCapacity }}
@@ -111,13 +111,13 @@ watch(
       </button>
       <button
         type="button"
-        class="slide-fade-in from-top player-content-in relative flex items-center gap-2 rounded-lg border border-[#cbd9c6] bg-[#f5f9f0] min-h-7 px-3 py-[3px] text-[11px] font-bold text-[#24352a] transition hover:border-[#70a77e] hover:bg-[#eaf5e8]"
+        class="slide-fade-in from-top player-content-in relative flex items-center gap-2 rounded-lg border border-border-default bg-surface min-h-7 px-3 py-[3px] text-[11px] font-bold text-content transition hover:border-palette-70a77e hover:bg-palette-eaf5e8"
         @click="store.openLakeGuide"
       >
         <span aria-hidden="true" class="text-base">🐠</span>
         {{ tr("EquipmentMenu.ca_trong_ho") }}
         <b
-          class="absolute -top-2 right-2 grid h-[17px] min-w-[17px] place-items-center rounded-full border border-[#cbd9c6] bg-white px-1 text-[9px] font-bold leading-none text-[#24352a] shadow-sm"
+          class="absolute -top-2 right-2 grid h-[17px] min-w-[17px] place-items-center rounded-full border border-border-default bg-white px-1 text-[9px] font-bold leading-none text-content shadow-sm"
           :aria-label="tr('EquipmentMenu.so_loai_ca_trong_ho')"
         >
           {{ store.areaSpeciesDiary?.fishes.length ?? 0 }}
@@ -125,13 +125,13 @@ watch(
       </button>
       <button
         type="button"
-        class="slide-fade-in from-top player-content-in relative flex items-center gap-2 rounded-lg border border-[#cbd9c6] bg-[#f5f9f0] min-h-7 px-3 py-[3px] text-[11px] font-bold text-[#24352a] transition hover:border-[#70a77e] hover:bg-[#eaf5e8]"
+        class="slide-fade-in from-top player-content-in relative flex items-center gap-2 rounded-lg border border-border-default bg-surface min-h-7 px-3 py-[3px] text-[11px] font-bold text-content transition hover:border-palette-70a77e hover:bg-palette-eaf5e8"
         @click="store.openPlayers"
       >
         <span aria-hidden="true" class="text-base">👥</span>
         {{ tr("EquipmentMenu.nguoi_cau") }}
         <b
-          class="absolute -top-2 right-2 grid h-[17px] min-w-[17px] place-items-center rounded-full border border-[#cbd9c6] bg-white px-1 text-[9px] font-bold leading-none text-[#24352a] shadow-sm"
+          class="absolute -top-2 right-2 grid h-[17px] min-w-[17px] place-items-center rounded-full border border-border-default bg-white px-1 text-[9px] font-bold leading-none text-content shadow-sm"
           :aria-label="tr('EquipmentMenu.so_nguoi_cau_gan_day')"
         >
           {{ store.nearbyPlayers.length }}

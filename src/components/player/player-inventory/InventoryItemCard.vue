@@ -83,9 +83,9 @@ function showDetails() {
 <template>
   <div
     :class="[
-      'slide-fade-in from-bottom player-content-in relative min-w-0 cursor-pointer rounded-md border text-[#24352a] transition',
+      'slide-fade-in from-bottom player-content-in relative min-w-0 cursor-pointer rounded-md border text-content transition',
       list ? 'flex items-start gap-3 px-3 py-2' : 'p-3',
-      selected.has(item.id) ? 'border-red-400 bg-red-50' : 'border-[#cbd9c6] bg-white hover:bg-[#f5f9f0]',
+      selected.has(item.id) ? 'border-red-400 bg-red-50' : 'border-border-default bg-white hover:bg-surface',
       hasActiveSlot && isCompatible(item) ? 'ring-2 ring-teal-400' : '',
       hasActiveSlot && !isCompatible(item) ? 'opacity-40' : '',
     ]"
@@ -103,7 +103,7 @@ function showDetails() {
 
     <div
       :class="[
-        'flex items-center justify-center overflow-hidden rounded bg-[#f5f9f0] text-slate-400',
+        'flex items-center justify-center overflow-hidden rounded bg-surface text-slate-400',
         list ? 'h-12 w-12 shrink-0' : 'mx-auto mb-2 h-16 w-16',
       ]"
     >
@@ -122,13 +122,13 @@ function showDetails() {
       <div class="mt-2" :class="list ? '' : 'text-center'">
         <button
           type="button"
-          class="cursor-pointer rounded border border-[#cbd9c6] bg-[#f5f9f0] px-2 py-1 text-xs text-[#24352a] hover:bg-[#cbd9c6]/50 focus-visible:outline-2 focus-visible:outline-offset-2"
+          class="cursor-pointer rounded border border-border-default bg-surface px-2 py-1 text-xs text-content hover:bg-border-default/50 focus-visible:outline-2 focus-visible:outline-offset-2"
           @click.stop="showDetails"
         >
           {{ tr("InventoryItemCard.xem_chi_tiet") }}
         </button>
       </div>
-      <div v-if="details.length" class="mt-2 space-y-1 border-t border-[#cbd9c6] pt-2 text-xs">
+      <div v-if="details.length" class="mt-2 space-y-1 border-t border-border-default pt-2 text-xs">
         <div v-for="detail in details" :key="detail.label" class="flex flex-wrap justify-between gap-x-2 gap-y-0.5">
           <span class="text-slate-500">{{ detail.label }}</span>
           <span class="min-w-0 break-words font-medium">{{ detail.value }}</span>
@@ -144,7 +144,7 @@ function showDetails() {
       <button
         v-if="activeTab === 'health' && healthItem.slot"
         type="button"
-        class="mt-2 min-h-8 w-full rounded border border-[#cbd9c6] bg-[#f5f9f0] px-2 py-1 text-xs disabled:opacity-50"
+        class="mt-2 min-h-8 w-full rounded border border-border-default bg-surface px-2 py-1 text-xs disabled:opacity-50"
         :disabled="
           !healthStore.selectedSlot ||
           !isCompatible(item) ||

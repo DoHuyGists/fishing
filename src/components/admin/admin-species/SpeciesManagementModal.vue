@@ -89,14 +89,14 @@ onMounted(() => speciesStore.fetchAll());
           <option v-for="rarity in rarityOptions" :key="rarity" :value="rarity">{{ rarity }}</option>
         </select>
       </label>
-      <div role="group" aria-label="Chế độ hiển thị" class="flex rounded-lg border border-[#cbd9c6] bg-[#f5f9f0] p-1">
+      <div role="group" aria-label="Chế độ hiển thị" class="flex rounded-lg border border-border-default bg-surface p-1">
         <button
           v-for="mode in viewModes"
           :key="mode.value"
           type="button"
           :aria-pressed="viewMode === mode.value"
           class="rounded-md px-3 py-1.5 text-xs font-semibold transition-colors focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-emerald-700"
-          :class="viewMode === mode.value ? 'bg-white text-[#24352a] shadow-sm' : 'text-gray-600 hover:bg-white/60'"
+          :class="viewMode === mode.value ? 'bg-white text-content shadow-sm' : 'text-gray-600 hover:bg-white/60'"
           @click="viewMode = mode.value"
         >
           {{ mode.label }}
@@ -128,7 +128,7 @@ onMounted(() => speciesStore.fetchAll());
         </button>
         <button
           type="button"
-          class="rounded-lg bg-[#153221] px-3.5 py-2 text-sm font-bold text-white hover:bg-emerald-800"
+          class="rounded-lg bg-content-strong px-3.5 py-2 text-sm font-bold text-white hover:bg-emerald-800"
           @click="openCreateForm"
         >
           + Thêm loài
@@ -238,7 +238,7 @@ onMounted(() => speciesStore.fetchAll());
           <section v-for="group in speciesGroups" :key="group.location" class="space-y-3">
             <div
               v-if="viewMode === 'grouped'"
-              class="m-0 flex items-center gap-2 rounded-lg border border-[#cbd9c6] bg-[#f5f9f0] px-4 py-3 text-sm font-bold text-[#24352a]"
+              class="m-0 flex items-center gap-2 rounded-lg border border-border-default bg-surface px-4 py-3 text-sm font-bold text-content"
             >
               <span class="min-w-0 break-words">{{ group.location || "Chưa có khu vực" }}</span>
               <span class="shrink-0 text-xs font-normal">({{ group.species.length }} loài)</span>
@@ -247,9 +247,9 @@ onMounted(() => speciesStore.fetchAll());
               <article
                 v-for="item in group.species"
                 :key="item.id"
-                class="flex min-w-0 flex-col overflow-hidden rounded-lg border border-[#cbd9c6] bg-white shadow-sm"
+                class="flex min-w-0 flex-col overflow-hidden rounded-lg border border-border-default bg-white shadow-sm"
               >
-                <div class="grid h-40 place-items-center bg-[#f5f9f0]">
+                <div class="grid h-40 place-items-center bg-surface">
                   <img
                     v-if="item.image"
                     :src="item.image"
@@ -261,7 +261,7 @@ onMounted(() => speciesStore.fetchAll());
                 </div>
                 <div class="flex flex-1 flex-col gap-3 p-4">
                   <div>
-                    <div class="m-0 break-words text-sm font-bold text-[#24352a]">{{ item.name }}</div>
+                    <div class="m-0 break-words text-sm font-bold text-content">{{ item.name }}</div>
                     <div class="mt-2 break-all text-xs text-gray-500">ID: {{ item.id }}</div>
                     <div class="m-0 mt-1 line-clamp-2 text-xs text-gray-500" :title="item.information || ''">
                       {{ item.information || "Chưa có mô tả" }}
@@ -270,33 +270,33 @@ onMounted(() => speciesStore.fetchAll());
                   <dl class="m-0 grid grid-cols-2 gap-3 text-xs">
                     <div class="min-w-0">
                       <dt class="text-gray-500">Khu vực</dt>
-                      <dd class="m-0 mt-1 break-words text-[#24352a]">{{ item.location || "—" }}</dd>
+                      <dd class="m-0 mt-1 break-words text-content">{{ item.location || "—" }}</dd>
                     </div>
                     <div class="min-w-0">
                       <dt class="text-gray-500">Độ hiếm</dt>
-                      <dd class="m-0 mt-1 break-words text-[#24352a]">{{ item.rarity || "—" }}</dd>
+                      <dd class="m-0 mt-1 break-words text-content">{{ item.rarity || "—" }}</dd>
                     </div>
                     <div>
                       <dt class="text-gray-500">Khối lượng</dt>
-                      <dd class="m-0 mt-1 text-[#24352a]">
+                      <dd class="m-0 mt-1 text-content">
                         {{ item.weight_min ?? "—" }} – {{ item.weight_max ?? "—" }}
                       </dd>
                     </div>
                     <div>
                       <dt class="text-gray-500">Tỉ lệ bắt</dt>
-                      <dd class="m-0 mt-1 text-[#24352a]">{{ item.base_catch_rate ?? "—" }}</dd>
+                      <dd class="m-0 mt-1 text-content">{{ item.base_catch_rate ?? "—" }}</dd>
                     </div>
                     <div>
                       <dt class="text-gray-500">Ngày tạo</dt>
-                      <dd class="m-0 mt-1 text-[#24352a]">{{ formatDate(item.created_at) }}</dd>
+                      <dd class="m-0 mt-1 text-content">{{ formatDate(item.created_at) }}</dd>
                     </div>
                   </dl>
                   <SpeciesManagementStats :species="item" />
-                  <div class="mt-auto flex justify-end gap-2 border-t border-[#cbd9c6] pt-3">
+                  <div class="mt-auto flex justify-end gap-2 border-t border-border-default pt-3">
                     <button
                       type="button"
                       :aria-label="`Sửa ${item.name}`"
-                      class="rounded-md border border-[#cbd9c6] px-2.5 py-1.5 text-xs font-bold text-[#24352a] hover:bg-[#f5f9f0]"
+                      class="rounded-md border border-border-default px-2.5 py-1.5 text-xs font-bold text-content hover:bg-surface"
                       @click="openEditForm(item)"
                     >
                       Sửa

@@ -16,7 +16,7 @@ const undiscoveredFishes = computed(() => store.areaSpeciesDiary?.fishes.filter(
         @click.self="store.closeLakeGuide"
       >
         <section
-          class="player-popup-panel w-[min(500px,100%)] overflow-hidden border border-[rgba(255,226,149,0.68)] rounded-[20px] bg-[linear-gradient(145deg,#173d2b,#0e281b)] shadow-[0_24px_70px_rgba(0,0,0,0.48)] text-[#f4f0df]"
+          class="player-popup-panel w-[min(500px,100%)] overflow-hidden border border-[rgba(255,226,149,0.68)] rounded-[20px] bg-[linear-gradient(145deg,var(--color-palette-173d2b),var(--color-palette-0e281b))] shadow-[0_24px_70px_rgba(0,0,0,0.48)] text-palette-f4f0df"
           role="dialog"
           aria-modal="true"
         >
@@ -33,10 +33,10 @@ const undiscoveredFishes = computed(() => store.areaSpeciesDiary?.fishes.filter(
             </button>
           </header>
           <div class="px-5 py-4">
-            <div v-if="store.isLoadingAreaSpeciesDiary" class="py-8 text-center text-sm text-[#b7cfb9]" role="status">
+            <div v-if="store.isLoadingAreaSpeciesDiary" class="py-8 text-center text-sm text-border-strong" role="status">
               {{ tr("CaughtModal.dang_tai_danh_sach_ca") }}
             </div>
-            <div v-else-if="store.areaSpeciesDiaryError" class="py-6 text-center text-sm text-[#f3b8a8]" role="alert">
+            <div v-else-if="store.areaSpeciesDiaryError" class="py-6 text-center text-sm text-palette-f3b8a8" role="alert">
               <div class="mb-3">{{ tr("LakeFishGuide.khong_the_tai_so_tay_ca_trong_ho") }}</div>
               <button
                 type="button"
@@ -50,23 +50,23 @@ const undiscoveredFishes = computed(() => store.areaSpeciesDiary?.fishes.filter(
               <div class="mb-4 grid grid-cols-3 gap-2 text-center">
                 <div class="rounded-xl bg-white/[0.07] p-2">
                   <strong class="block text-lg">{{ store.areaSpeciesDiary.total_species }}</strong>
-                  <span class="text-[10px] text-[#b7cfb9]">{{ tr("LakeFishGuide.tong_loai") }}</span>
+                  <span class="text-[10px] text-border-strong">{{ tr("LakeFishGuide.tong_loai") }}</span>
                 </div>
                 <div class="rounded-xl bg-white/[0.07] p-2">
-                  <strong class="block text-lg text-[#c7e6a5]">{{ store.areaSpeciesDiary.discovered_species }}</strong>
-                  <span class="text-[10px] text-[#b7cfb9]">{{ tr("LakeFishGuide.da_kham_pha") }}</span>
+                  <strong class="block text-lg text-palette-c7e6a5">{{ store.areaSpeciesDiary.discovered_species }}</strong>
+                  <span class="text-[10px] text-border-strong">{{ tr("LakeFishGuide.da_kham_pha") }}</span>
                 </div>
                 <div class="rounded-xl bg-white/[0.07] p-2">
-                  <strong class="block text-lg text-[#e8bd62]">{{
+                  <strong class="block text-lg text-palette-e8bd62">{{
                     store.areaSpeciesDiary.undiscovered_species
                   }}</strong>
-                  <span class="text-[10px] text-[#b7cfb9]">{{ tr("LakeFishGuide.chua_kham_pha") }}</span>
+                  <span class="text-[10px] text-border-strong">{{ tr("LakeFishGuide.chua_kham_pha") }}</span>
                 </div>
               </div>
 
               <div class="max-h-[min(55vh,420px)] space-y-4 overflow-y-auto pr-1">
                 <section v-if="discoveredFishes.length">
-                  <div class="mb-2 text-xs font-bold uppercase tracking-wide text-[#c7e6a5]">
+                  <div class="mb-2 text-xs font-bold uppercase tracking-wide text-palette-c7e6a5">
                     {{ tr("LakeFishGuide.da_kham_pha") }}
                   </div>
                   <div class="m-0 space-y-2 p-0">
@@ -83,15 +83,15 @@ const undiscoveredFishes = computed(() => store.areaSpeciesDiary?.fishes.filter(
                       />
                       <div class="min-w-0 flex-1">
                         <div class="m-0 font-semibold">{{ fish.display_name || fish.name }}</div>
-                        <div class="m-0 text-[10px] text-[#e8bd62]">
+                        <div class="m-0 text-[10px] text-palette-e8bd62">
                           {{ fish.rarity || tr("LakeFishGuide.chua_ro_do_hiem") }}
                         </div>
-                        <div v-if="fish.information" class="mb-0 mt-1 text-xs leading-relaxed text-[#b7cfb9]">
+                        <div v-if="fish.information" class="mb-0 mt-1 text-xs leading-relaxed text-border-strong">
                           {{ fish.information }}
                         </div>
                         <div
                           v-if="fish.weight_min != null || fish.weight_max != null"
-                          class="mb-0 mt-1 text-[10px] text-[#b7cfb9]"
+                          class="mb-0 mt-1 text-[10px] text-border-strong"
                         >
                           {{ tr("LakeFishGuide.can_nang") }} {{ fish.weight_min ?? "?" }}–{{
                             fish.weight_max ?? "?"
@@ -104,7 +104,7 @@ const undiscoveredFishes = computed(() => store.areaSpeciesDiary?.fishes.filter(
                 </section>
 
                 <section v-if="undiscoveredFishes.length">
-                  <div class="mb-2 text-xs font-bold uppercase tracking-wide text-[#e8bd62]">
+                  <div class="mb-2 text-xs font-bold uppercase tracking-wide text-palette-e8bd62">
                     {{ tr("LakeFishGuide.chua_kham_pha") }}
                   </div>
                   <div class="m-0 grid grid-cols-2 gap-2 p-0">
@@ -114,22 +114,22 @@ const undiscoveredFishes = computed(() => store.areaSpeciesDiary?.fishes.filter(
                       class="flex min-h-16 items-center gap-2 rounded-xl border border-dashed border-white/15 bg-black/10 p-2.5"
                     >
                       <span
-                        class="grid h-9 w-9 shrink-0 place-items-center rounded-full bg-white/[0.08] text-lg text-[#b7cfb9]"
+                        class="grid h-9 w-9 shrink-0 place-items-center rounded-full bg-white/[0.08] text-lg text-border-strong"
                         aria-hidden="true"
                         >?</span
                       >
-                      <span class="text-xs font-semibold text-[#d3dfd0]">{{
+                      <span class="text-xs font-semibold text-palette-d3dfd0">{{
                         fish.display_name || tr("LakeFishGuide.chua_kham_pha")
                       }}</span>
                     </div>
                   </div>
                 </section>
-                <div v-if="!store.areaSpeciesDiary.fishes.length" class="m-0 py-6 text-center text-sm text-[#b7cfb9]">
+                <div v-if="!store.areaSpeciesDiary.fishes.length" class="m-0 py-6 text-center text-sm text-border-strong">
                   {{ tr("LakeFishGuide.chua_co_du_lieu_loai_ca_o_khu_vuc_nay") }}
                 </div>
               </div>
             </template>
-            <div v-else class="m-0 py-8 text-center text-sm text-[#b7cfb9]">
+            <div v-else class="m-0 py-8 text-center text-sm text-border-strong">
               {{ tr("LakeFishGuide.chua_co_khu_vuc_cau_ca_duoc_chon") }}
             </div>
           </div>

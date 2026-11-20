@@ -133,42 +133,42 @@ async function buyItem() {
 
 <template>
   <Modal :title="tr('ShopModal.cua_hang_vat_pham')" :on-refresh="() => inventoryStore.loadShopItems(true)">
-    <div class="grid min-h-full gap-4 lg:grid-cols-[minmax(0,1fr)_18rem] text-[#24352a]">
+    <div class="grid min-h-full gap-4 lg:grid-cols-[minmax(0,1fr)_18rem] text-content">
       <section>
         <div
-          class="sticky top-0 z-10 mb-4 grid gap-2 rounded-xl border border-[#cbd9c6] bg-[#f5f9f0] p-3 sm:grid-cols-2 xl:grid-cols-4"
+          class="sticky top-0 z-10 mb-4 grid gap-2 rounded-xl border border-border-default bg-surface p-3 sm:grid-cols-2 xl:grid-cols-4"
         >
           <input
             v-model="search"
             type="search"
             :placeholder="tr('ShopModal.tim_vat_pham')"
-            class="rounded-lg border border-[#cbd9c6] bg-white px-3 py-2 text-sm outline-none focus:ring-2 focus:ring-emerald-700/30"
+            class="rounded-lg border border-border-default bg-white px-3 py-2 text-sm outline-none focus:ring-2 focus:ring-emerald-700/30"
           />
           <select
             v-model="selectedClassification"
-            class="rounded-lg border border-[#cbd9c6] bg-white px-3 py-2 text-sm"
+            class="rounded-lg border border-border-default bg-white px-3 py-2 text-sm"
           >
             <option value="ALL">{{ tr("ShopModal.moi_nhom_vat_pham") }}</option>
             <option v-for="value in classifications" :key="value" :value="value">{{ value }}</option>
           </select>
-          <select v-model="selectedCategory" class="rounded-lg border border-[#cbd9c6] bg-white px-3 py-2 text-sm">
+          <select v-model="selectedCategory" class="rounded-lg border border-border-default bg-white px-3 py-2 text-sm">
             <option value="ALL">{{ tr("ShopModal.moi_loai_vat_pham") }}</option>
             <option v-for="value in categories" :key="value" :value="value">{{ value }}</option>
           </select>
-          <select v-model="sort" class="rounded-lg border border-[#cbd9c6] bg-white px-3 py-2 text-sm">
+          <select v-model="sort" class="rounded-lg border border-border-default bg-white px-3 py-2 text-sm">
             <option value="name">{{ tr("ShopModal.ten_a_z") }}</option>
             <option value="price-asc">{{ tr("ShopModal.gia_thap_den_cao") }}</option>
             <option value="price-desc">{{ tr("ShopModal.gia_cao_den_thap") }}</option>
           </select>
           <div
-            class="flex items-center justify-end gap-1 border-t border-[#cbd9c6]/70 pt-2 sm:col-span-2 xl:col-span-4"
+            class="flex items-center justify-end gap-1 border-t border-border-default/70 pt-2 sm:col-span-2 xl:col-span-4"
             role="group"
             :aria-label="tr('CaughtModal.che_do_hien_thi')"
           >
             <button
               type="button"
               class="rounded-md px-3 py-1.5 text-xs font-bold transition"
-              :class="viewMode === 'list' ? 'bg-[#24352a] text-white' : 'text-[#24352a] hover:bg-white'"
+              :class="viewMode === 'list' ? 'bg-content text-white' : 'text-content hover:bg-white'"
               :aria-pressed="viewMode === 'list'"
               @click="viewMode = 'list'"
             >
@@ -177,7 +177,7 @@ async function buyItem() {
             <button
               type="button"
               class="rounded-md px-3 py-1.5 text-xs font-bold transition"
-              :class="viewMode === 'grid' ? 'bg-[#24352a] text-white' : 'text-[#24352a] hover:bg-white'"
+              :class="viewMode === 'grid' ? 'bg-content text-white' : 'text-content hover:bg-white'"
               :aria-pressed="viewMode === 'grid'"
               @click="viewMode = 'grid'"
             >
@@ -186,7 +186,7 @@ async function buyItem() {
             <button
               type="button"
               class="rounded-md px-3 py-1.5 text-xs font-bold transition"
-              :class="viewMode === 'group' ? 'bg-[#24352a] text-white' : 'text-[#24352a] hover:bg-white'"
+              :class="viewMode === 'group' ? 'bg-content text-white' : 'text-content hover:bg-white'"
               :aria-pressed="viewMode === 'group'"
               @click="viewMode = 'group'"
             >
@@ -199,7 +199,7 @@ async function buyItem() {
         </div>
         <div
           v-else-if="!filteredItems.length"
-          class="rounded-xl border border-dashed border-[#cbd9c6] py-16 text-center text-sm text-emerald-900/60"
+          class="rounded-xl border border-dashed border-border-default py-16 text-center text-sm text-emerald-900/60"
         >
           {{ tr("ShopModal.khong_tim_thay_vat_pham_phu_hop") }}
         </div>
@@ -207,7 +207,7 @@ async function buyItem() {
           <section v-for="group in displayGroups" :key="group.category || 'all-items'">
             <div
               v-if="viewMode === 'group'"
-              class="mb-2 mt-0 flex items-center gap-2 border-b border-[#cbd9c6] pb-2 text-sm font-extrabold uppercase tracking-wide text-emerald-900"
+              class="mb-2 mt-0 flex items-center gap-2 border-b border-border-default pb-2 text-sm font-extrabold uppercase tracking-wide text-emerald-900"
             >
               {{ group.category }}
               <span class="rounded-full bg-emerald-100 px-2 py-0.5 text-[10px]">{{ group.items.length }}</span>

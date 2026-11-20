@@ -20,7 +20,7 @@ onUnmounted(store.stop);
 <template>
   <AdminModal title="Giám sát thế giới" icon="📊" @close="emit('close')">
     <div
-      class="flex shrink-0 flex-wrap items-center justify-between gap-3 border-b border-[#cbd9c6] bg-white px-4 py-3 sm:px-6"
+      class="flex shrink-0 flex-wrap items-center justify-between gap-3 border-b border-border-default bg-white px-4 py-3 sm:px-6"
     >
       <div class="text-xs text-slate-600" aria-live="polite">
         <div class="mb-1 flex items-center gap-2">
@@ -38,7 +38,7 @@ onUnmounted(store.stop);
       </div>
       <button
         type="button"
-        class="rounded-lg border border-[#cbd9c6] bg-[#f5f9f0] px-4 py-2 text-sm font-semibold text-[#24352a] hover:bg-emerald-100 focus-visible:outline-2 focus-visible:outline-emerald-600 disabled:cursor-wait disabled:opacity-50"
+        class="rounded-lg border border-border-default bg-surface px-4 py-2 text-sm font-semibold text-content hover:bg-emerald-100 focus-visible:outline-2 focus-visible:outline-emerald-600 disabled:cursor-wait disabled:opacity-50"
         :disabled="store.reportLoading"
         @click="store.refresh()"
       >

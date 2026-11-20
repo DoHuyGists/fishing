@@ -20,7 +20,7 @@ onMounted(loadSchedules);
 <template>
   <Modal :title="tr('EventModal.bang_su_kien')" :on-refresh="loadSchedules">
     <section
-      class="relative flex max-w-none h-full flex-col overflow-hidden border-0 bg-[#f4f5e9] text-[#20372a]"
+      class="relative flex max-w-none h-full flex-col overflow-hidden border-0 bg-palette-f4f5e9 text-palette-20372a"
       role="dialog"
       aria-modal="true"
       aria-labelledby="event-title"
@@ -115,7 +115,7 @@ onMounted(loadSchedules);
               <span>👁️ {{ selectedSchedule.viewCount }} {{ tr('EventModal.luot_xem') }}</span>
             </div>
             <hr class="my-5 border-emerald-950/10" />
-            <div class="prose prose-sm max-w-none whitespace-pre-line text-[15px] leading-relaxed text-[#20372a]">
+            <div class="prose prose-sm max-w-none whitespace-pre-line text-[15px] leading-relaxed text-palette-20372a">
               {{ selectedSchedule.eventDescription || tr('EventModal.su_kien_chua_co_mo_ta_chi_tiet') }}
             </div>
           </article>

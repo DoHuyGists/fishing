@@ -78,7 +78,7 @@ onMounted(() => {
     @close="close"
     @keydown.esc.stop.prevent="escape"
   >
-    <div class="shrink-0 space-y-3 border-b border-[#cbd9c6] p-4 sm:px-6">
+    <div class="shrink-0 space-y-3 border-b border-border-default p-4 sm:px-6">
       <div class="flex flex-wrap gap-3">
         <input
           ref="searchInput"
@@ -86,19 +86,19 @@ onMounted(() => {
           type="search"
           aria-label="Tìm tên tệp"
           placeholder="Tìm tên tệp…"
-          class="min-w-48 flex-1 rounded-lg border border-[#cbd9c6] bg-white px-3 py-2 text-sm focus:outline-emerald-700"
+          class="min-w-48 flex-1 rounded-lg border border-border-default bg-white px-3 py-2 text-sm focus:outline-emerald-700"
         />
         <select
           v-if="selectionKind !== 'image'"
           v-model="store.kind"
           aria-label="Lọc loại tệp"
-          class="rounded-lg border border-[#cbd9c6] bg-white px-3 py-2 text-sm"
+          class="rounded-lg border border-border-default bg-white px-3 py-2 text-sm"
         >
           <option value="all">Tất cả</option>
           <option value="image">Ảnh</option>
           <option value="video">Video</option>
         </select>
-        <div role="group" aria-label="Chế độ xem" class="flex rounded-lg border border-[#cbd9c6] bg-white p-1">
+        <div role="group" aria-label="Chế độ xem" class="flex rounded-lg border border-border-default bg-white p-1">
           <button
             v-for="mode in viewModes"
             :key="mode.value"
@@ -107,7 +107,7 @@ onMounted(() => {
             :aria-pressed="store.viewMode === mode.value"
             :disabled="store.busy"
             class="rounded-md px-3 py-1 text-sm font-semibold disabled:opacity-50"
-            :class="store.viewMode === mode.value ? 'bg-emerald-800 text-white' : 'hover:bg-[#f5f9f0]'"
+            :class="store.viewMode === mode.value ? 'bg-emerald-800 text-white' : 'hover:bg-surface'"
             @click="store.viewMode = mode.value"
           >
             {{ mode.label }}
@@ -116,7 +116,7 @@ onMounted(() => {
         <button
           type="button"
           :disabled="store.loading || store.busy"
-          class="rounded-lg border border-[#cbd9c6] bg-white px-3 py-2 text-sm font-semibold disabled:opacity-50"
+          class="rounded-lg border border-border-default bg-white px-3 py-2 text-sm font-semibold disabled:opacity-50"
           @click="store.fetchRows()"
         >
           {{ store.loading ? "Đang tải…" : "Làm mới" }}
@@ -161,7 +161,7 @@ onMounted(() => {
           :value="store.currentFolder"
           aria-label="Đi đến thư mục"
           :disabled="store.loading || store.busy"
-          class="max-w-64 rounded-lg border border-[#cbd9c6] bg-white px-2 py-1.5 text-xs"
+          class="max-w-64 rounded-lg border border-border-default bg-white px-2 py-1.5 text-xs"
           @change="store.navigate(($event.target as HTMLSelectElement).value)"
         >
           <option value="">Thư mục gốc</option>
@@ -170,7 +170,7 @@ onMounted(() => {
         <button
           type="button"
           :disabled="store.loading || store.busy || !!store.error"
-          class="rounded-lg border border-[#cbd9c6] bg-white px-3 py-1.5 text-xs font-semibold disabled:opacity-50"
+          class="rounded-lg border border-border-default bg-white px-3 py-1.5 text-xs font-semibold disabled:opacity-50"
           @click="store.openFolderDialog('create')"
         >
           + Tạo thư mục
@@ -179,7 +179,7 @@ onMounted(() => {
           v-if="store.currentFolder"
           type="button"
           :disabled="store.loading || store.busy || !!store.error"
-          class="rounded-lg border border-[#cbd9c6] bg-white px-3 py-1.5 text-xs font-semibold disabled:opacity-50"
+          class="rounded-lg border border-border-default bg-white px-3 py-1.5 text-xs font-semibold disabled:opacity-50"
           @click="store.openFolderDialog('move-folder')"
         >
           Đổi tên / chuyển thư mục
@@ -196,7 +196,7 @@ onMounted(() => {
           </button>
         </div>
       </div>
-      <div class="text-xs text-[#24352a]/70">
+      <div class="text-xs text-content/70">
         Tải lên vào: <strong class="break-all">{{ store.currentFolder || "Thư mục gốc" }}</strong> ·
         {{
           store.viewMode === "tree" || store.includeDescendants
@@ -204,7 +204,7 @@ onMounted(() => {
             : "Tìm trong thư mục này."
         }}
       </div>
-      <div class="text-xs text-[#24352a]/70">
+      <div class="text-xs text-content/70">
         JPG, PNG, GIF, WebP, AVIF, MP4, WebM, MOV · Tối đa 50 MB/tệp · Link công khai, không hết hạn.
       </div>
       <div v-if="store.uploading" role="status" aria-live="polite" class="text-sm font-semibold">
@@ -241,7 +241,7 @@ onMounted(() => {
       </div>
       <div
         v-else-if="!store.visibleEntries.length && !store.error"
-        class="rounded-xl border border-dashed border-[#cbd9c6] bg-white p-10 text-center text-sm"
+        class="rounded-xl border border-dashed border-border-default bg-white p-10 text-center text-sm"
       >
         {{
           store.search.trim() || store.kind !== "all"
@@ -265,14 +265,14 @@ onMounted(() => {
         >
           <div
             v-if="entry.type === 'folder'"
-            class="flex h-full min-w-0 items-center gap-2 rounded-xl border border-[#cbd9c6] bg-[#eaf1e5] p-3"
+            class="flex h-full min-w-0 items-center gap-2 rounded-xl border border-border-default bg-palette-eaf1e5 p-3"
           >
             <button
               v-if="store.viewMode === 'tree'"
               type="button"
               :aria-label="`${entry.expanded ? 'Thu gọn' : 'Mở rộng'} ${entry.folder}`"
               :aria-expanded="entry.expanded"
-              class="size-8 shrink-0 rounded border border-[#cbd9c6] bg-white font-bold hover:bg-emerald-100"
+              class="size-8 shrink-0 rounded border border-border-default bg-white font-bold hover:bg-emerald-100"
               @click="store.toggleFolder(entry.folder)"
             >
               {{ entry.expanded ? "−" : "+" }}
@@ -285,13 +285,13 @@ onMounted(() => {
               @click="store.navigate(entry.folder)"
             >
               <span class="block break-words text-sm font-bold">📁 {{ entry.name }}</span>
-              <span class="text-xs text-[#24352a]/70">{{ entry.count }} tệp phù hợp trong nhánh</span>
+              <span class="text-xs text-content/70">{{ entry.count }} tệp phù hợp trong nhánh</span>
             </button>
             <button
               type="button"
               :disabled="store.loading || store.busy"
               :aria-label="`Đổi tên hoặc chuyển ${entry.folder}`"
-              class="shrink-0 rounded-lg border border-[#cbd9c6] bg-white px-2 py-1.5 text-xs disabled:opacity-50"
+              class="shrink-0 rounded-lg border border-border-default bg-white px-2 py-1.5 text-xs disabled:opacity-50"
               @click="store.openFolderDialog('move-folder', entry.folder)"
             >
               Sửa
@@ -299,11 +299,11 @@ onMounted(() => {
           </div>
           <article
             v-else
-            class="min-w-0 overflow-hidden rounded-xl border border-[#cbd9c6] bg-white"
+            class="min-w-0 overflow-hidden rounded-xl border border-border-default bg-white"
             :class="{ 'sm:flex sm:items-center': store.viewMode !== 'grid' }"
           >
             <div
-              class="flex shrink-0 items-center justify-center bg-[#eaf1e5]"
+              class="flex shrink-0 items-center justify-center bg-palette-eaf1e5"
               :class="store.viewMode === 'grid' ? 'aspect-video' : 'h-32 sm:h-24 sm:w-32'"
             >
               <img
@@ -329,7 +329,7 @@ onMounted(() => {
             >
               <div class="min-w-0 space-y-1" :class="{ 'min-w-36 flex-1': store.viewMode !== 'grid' }">
                 <div class="break-words text-sm font-bold">{{ entry.row.name }}</div>
-                <div class="text-xs text-[#24352a]/70">
+                <div class="text-xs text-content/70">
                   {{ entry.row.kind === "image" ? "Ảnh" : "Video" }} · {{ formatSize(entry.row.size) }} ·
                   {{ formatDate(entry.row.createdAt) }}
                 </div>
@@ -346,7 +346,7 @@ onMounted(() => {
                 :value="entry.row.url"
                 readonly
                 :aria-label="`Link ${entry.row.name}`"
-                class="min-w-0 rounded border border-[#cbd9c6] bg-[#f5f9f0] px-2 py-1.5 text-xs"
+                class="min-w-0 rounded border border-border-default bg-surface px-2 py-1.5 text-xs"
                 :class="store.viewMode === 'grid' ? 'w-full' : 'w-full sm:w-48'"
                 @focus="($event.target as HTMLInputElement).select()"
               />
@@ -364,7 +364,7 @@ onMounted(() => {
                 <button
                   type="button"
                   :aria-label="`Sao chép link ${entry.row.name}`"
-                  class="rounded-lg border border-[#cbd9c6] px-3 py-1.5 text-xs font-semibold hover:bg-emerald-100"
+                  class="rounded-lg border border-border-default px-3 py-1.5 text-xs font-semibold hover:bg-emerald-100"
                   @click="store.copyLink(entry.row)"
                 >
                   Copy link
@@ -373,7 +373,7 @@ onMounted(() => {
                   type="button"
                   :disabled="store.loading || store.busy"
                   :aria-label="`Chuyển thư mục cho ${entry.row.name}`"
-                  class="rounded-lg border border-[#cbd9c6] px-3 py-1.5 text-xs font-semibold hover:bg-emerald-100 disabled:opacity-50"
+                  class="rounded-lg border border-border-default px-3 py-1.5 text-xs font-semibold hover:bg-emerald-100 disabled:opacity-50"
                   @click="store.requestMove(entry.row)"
                 >
                   Chuyển
@@ -430,14 +430,14 @@ onMounted(() => {
           :aria-invalid="!!store.folderError"
           type="text"
           placeholder="folder1/folder2/"
-          class="mt-2 w-full rounded-lg border border-[#cbd9c6] px-3 py-2 text-sm"
+          class="mt-2 w-full rounded-lg border border-border-default px-3 py-2 text-sm"
           @keydown.enter.prevent="store.saveFolder()"
         />
       </label>
       <datalist :id="folderOptionsId">
         <option v-for="folder in store.folderPaths" :key="folder" :value="folder" />
       </datalist>
-      <div class="mt-2 text-xs text-[#24352a]/70">
+      <div class="mt-2 text-xs text-content/70">
         Dùng dấu / để phân cấp.
         {{
           store.folderDialog.mode === "create"

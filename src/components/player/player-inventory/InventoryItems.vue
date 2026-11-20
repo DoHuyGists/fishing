@@ -103,7 +103,7 @@ const displayedGroups = computed(() =>
         </button>
       </div>
 
-      <div v-if="activeTab === 'health' && healthStore.selectedSlot" class="flex flex-wrap items-center justify-between gap-2 rounded-md bg-[#f5f9f0] px-3 py-2 text-xs text-[#24352a]">
+      <div v-if="activeTab === 'health' && healthStore.selectedSlot" class="flex flex-wrap items-center justify-between gap-2 rounded-md bg-surface px-3 py-2 text-xs text-content">
         <span>{{ tr('Health.filterSlot', { slot: tr(`Health.slot_${healthStore.selectedSlot}`) }) }} · {{ tr('Health.pickInventoryItem') }}</span>
         <button type="button" class="min-h-8 underline" @click="healthStore.selectedSlot = null">{{ tr('AccountInfoModal.huy') }}</button>
       </div>

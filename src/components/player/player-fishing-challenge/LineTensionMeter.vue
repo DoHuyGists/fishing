@@ -61,7 +61,7 @@ const vibration = computed(() => {
 
 <template>
   <div
-    class="w-full min-w-0 select-none rounded-md bg-[#0E2A33] text-[#E8F1EE]"
+    class="w-full min-w-0 select-none rounded-md bg-palette-0e2a33 text-palette-e8f1ee"
     :class="compact ? 'px-2 py-1.5' : 'px-4 py-3'"
     role="meter"
     :aria-label="tr('LineTensionMeter.luc_cang_day_cau')"
@@ -76,7 +76,7 @@ const vibration = computed(() => {
         {{ zoneInfo.label }}
       </span>
       <span class="font-bold leading-none tabular-nums" :class="[zoneInfo.text, compact ? 'text-sm' : 'text-xl']" aria-hidden="true">
-        {{ Math.round(position) }}<span class="ml-0.5 text-xs font-normal text-[#E8F1EE]/50">%</span>
+        {{ Math.round(position) }}<span class="ml-0.5 text-xs font-normal text-palette-e8f1ee/50">%</span>
       </span>
     </div>
 
@@ -109,13 +109,13 @@ const vibration = computed(() => {
 
       <!-- Con trỏ -->
       <div
-        class="absolute -translate-x-1/2 rounded-full shadow-[0_0_0_2px_#0E2A33] transition-[left] duration-75 ease-linear"
+        class="absolute -translate-x-1/2 rounded-full shadow-[0_0_0_2px_var(--color-palette-0e2a33)] transition-[left] duration-75 ease-linear"
         :class="[zoneInfo.knob, zone === 'danger' ? 'knob-shake' : '', compact ? '-inset-y-1 w-1' : '-inset-y-1.5 w-1.5']"
         :style="{ left: position + '%' }"
       />
     </div>
 
-    <div v-if="!compact" class="relative mt-2 h-4 text-[#E8F1EE]/40" aria-hidden="true">
+    <div v-if="!compact" class="relative mt-2 h-4 text-palette-e8f1ee/40" aria-hidden="true">
       <span class="absolute left-0" :title="tr('LineTensionMeter.day_chung')">
         <svg viewBox="0 0 24 16" class="h-4 w-5" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"><path d="M2 3c1 12 19 12 20 0" /></svg>
       </span>

@@ -96,7 +96,7 @@ onBeforeUnmount(() => {
           <ErrorFeedbackForm @submitted="showToast" />
         </template>
         <template #history>
-          <section class="space-y-3 p-4 text-sm text-[#24352a]">
+          <section class="space-y-3 p-4 text-sm text-content">
             <button
               type="button"
               class="underline"
@@ -115,7 +115,7 @@ onBeforeUnmount(() => {
             <article
               v-for="item in feedbackStore.myErrors"
               :key="item.id"
-              class="rounded-lg border border-[#cbd9c6] bg-[#f5f9f0] p-4"
+              class="rounded-lg border border-border-default bg-surface p-4"
             >
               <div class="flex flex-wrap justify-between gap-2">
                 <div class="font-bold">{{ item.title }}</div>

@@ -88,7 +88,7 @@ const emit = defineEmits<{
                     </button>
                   </div>
 
-                  <div class="mt-1 text-[11px] text-[#556655]">
+                  <div class="mt-1 text-[11px] text-content-caption">
                     {{ countryStore.getCountryName(getFriendProfile(record)?.country_id) }}
                   </div>
                   <!-- Thông số hồ sơ nếu có -->

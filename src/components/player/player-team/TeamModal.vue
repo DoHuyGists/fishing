@@ -252,11 +252,11 @@ const statusLabel: Record<string, string> = {
   },
 };
 const statusClass: Record<string, string> = {
-  PENDING: "bg-[#f0e0e0] text-[#8a2020] border border-[#e8a0a0]",
-  OPEN: "bg-[#d4f4dd] text-[#1a6e35] border border-[#9de2b4]",
-  FULL: "bg-[#fde8cc] text-[#8a4500] border border-[#f7bf7f]",
-  FISHING: "bg-[#dceeff] text-[#1a4fa0] border border-[#9ac4f7]",
-  CLOSED: "bg-[#f0e0e0] text-[#8a2020] border border-[#e8a0a0]",
+  PENDING: "bg-palette-f0e0e0 text-palette-8a2020 border border-palette-e8a0a0",
+  OPEN: "bg-palette-d4f4dd text-palette-1a6e35 border border-palette-9de2b4",
+  FULL: "bg-palette-fde8cc text-palette-8a4500 border border-palette-f7bf7f",
+  FISHING: "bg-palette-dceeff text-palette-1a4fa0 border border-palette-9ac4f7",
+  CLOSED: "bg-palette-f0e0e0 text-palette-8a2020 border border-palette-e8a0a0",
 };
 
 // ─── Lifecycle ───────────────────────────────────────────────────────────────
@@ -275,8 +275,8 @@ onMounted(async () => {
 <template>
   <Modal :title="tr('TeamModal.lap_doi_cau')" :on-refresh="loadData">
     <!-- ── Loading ── -->
-    <div v-if="teamStore.loading" class="flex flex-col items-center justify-center gap-3 py-12 text-[#5a7a5a]">
-      <span class="block w-8 h-8 border-[3px] border-[#d1e7d1] border-t-[#3b7a57] rounded-full animate-spin" />
+    <div v-if="teamStore.loading" class="flex flex-col items-center justify-center gap-3 py-12 text-palette-5a7a5a">
+      <span class="block w-8 h-8 border-[3px] border-palette-d1e7d1 border-t-brand rounded-full animate-spin" />
       <div>{{ tr("TeamModal.dang_tai_du_lieu") }}</div>
     </div>
 
@@ -298,7 +298,7 @@ onMounted(async () => {
         <div class="min-w-0">
           <div
             v-if="teamStore.error"
-            class="mb-3 rounded-lg border border-[#f5c6c3] bg-[#fef0ef] px-3 py-2 text-[0.83rem] text-[#c0392b]"
+            class="mb-3 rounded-lg border border-palette-f5c6c3 bg-palette-fef0ef px-3 py-2 text-[0.83rem] text-danger"
           >
             {{ teamStore.error }}
           </div>
@@ -338,11 +338,11 @@ onMounted(async () => {
       <div v-if="view === 'list' && teamStore.myTeam" class="flex flex-col gap-4">
         <!-- Room header -->
         <div
-          class="slide-fade-in from-top player-content-in flex items-start justify-between gap-3 p-4 bg-linear-to-br from-[#e8f5e2] to-[#d4edcc] rounded-2xl border border-[#b8dab0]"
+          class="slide-fade-in from-top player-content-in flex items-start justify-between gap-3 p-4 bg-linear-to-br from-palette-e8f5e2 to-palette-d4edcc rounded-2xl border border-palette-b8dab0"
         >
           <div>
-            <div class="m-0 mb-1 text-[1.1rem] font-extrabold text-[#1a3a1a]">{{ teamStore.myTeam.name }}</div>
-            <div v-if="teamStore.myTeam.description" class="m-0 mb-2 text-[0.82rem] text-[#556655]">
+            <div class="m-0 mb-1 text-[1.1rem] font-extrabold text-palette-1a3a1a">{{ teamStore.myTeam.name }}</div>
+            <div v-if="teamStore.myTeam.description" class="m-0 mb-2 text-[0.82rem] text-content-caption">
               {{ teamStore.myTeam.description }}
             </div>
             <span
@@ -355,7 +355,7 @@ onMounted(async () => {
             </span>
           </div>
           <div class="shrink-0">
-            <span class="flex items-center gap-1 font-bold text-base text-[#2e6644]">
+            <span class="flex items-center gap-1 font-bold text-base text-palette-2e6644">
               {{ teamStore.memberCount }} / {{ teamStore.myTeam.max_members }}
               <svg viewBox="0 0 20 20" fill="currentColor" width="16" height="16">
                 <path d="M9 6a3 3 0 1 1 6 0A3 3 0 0 1 9 6zM3 17a6 6 0 1 1 12 0H3z" />
@@ -369,7 +369,7 @@ onMounted(async () => {
           <div
             v-for="member in teamStore.myTeamMembers"
             :key="member.id"
-            class="slide-fade-in from-bottom player-content-in flex flex-col gap-3 p-4 bg-linear-to-br from-white to-[#f5faf2] border border-[#daefd4] rounded-2xl shadow-sm"
+            class="slide-fade-in from-bottom player-content-in flex flex-col gap-3 p-4 bg-linear-to-br from-white to-palette-f5faf2 border border-palette-daefd4 rounded-2xl shadow-sm"
           >
             <div class="flex items-center gap-3 min-w-0">
               <PlayerIdentity :user-id="member.user_id" :profile="member.user_profile" class="flex-1" />
@@ -378,15 +378,15 @@ onMounted(async () => {
                   :class="[
                     'inline-block px-[7px] py-[1px] rounded-full text-[0.7rem] font-bold',
                     member.role === 'LEADER'
-                      ? 'bg-[#fff3cd] text-[#7d6000] border border-[#ffd454]'
-                      : 'bg-[#e8f5e2] text-[#2e6644] border border-[#b8dab0]',
+                      ? 'bg-palette-fff3cd text-palette-7d6000 border border-palette-ffd454'
+                      : 'bg-palette-e8f5e2 text-palette-2e6644 border border-palette-b8dab0',
                   ]"
                 >
                   {{ member.role === "LEADER" ? tr("MyTeamPanel.truong_nhom") : tr("MyTeamPanel.thanh_vien") }}
                 </span>
-                <span class="text-xs font-semibold text-[#648064]">
+                <span class="text-xs font-semibold text-palette-648064">
                   {{ tr("UserProfile.cap") }} {{ member.user_profile?.level ?? 1 }}
-                  <span class="mx-1 text-[#b2c8ae]">·</span>
+                  <span class="mx-1 text-palette-b2c8ae">·</span>
                   {{ Number(member.user_profile?.experience_point ?? 0).toLocaleString(getFormattingLocale()) }} EXP
                 </span>
               </div>
@@ -394,10 +394,10 @@ onMounted(async () => {
             <!-- Leader actions for members -->
             <div
               v-if="isLeader && member.user_id !== userId"
-              class="flex gap-1.5 justify-end border-t border-[#e3eee0] pt-2"
+              class="flex gap-1.5 justify-end border-t border-palette-e3eee0 pt-2"
             >
               <button
-                class="inline-flex items-center justify-center px-[10px] py-[5px] rounded-lg text-[0.78rem] font-bold bg-transparent text-[#556655] border border-[#c0d8b8] cursor-pointer hover:bg-[#f0f7ec] active:scale-[0.97] disabled:opacity-55 disabled:cursor-not-allowed transition-colors"
+                class="inline-flex items-center justify-center px-[10px] py-[5px] rounded-lg text-[0.78rem] font-bold bg-transparent text-content-caption border border-palette-c0d8b8 cursor-pointer hover:bg-palette-f0f7ec active:scale-[0.97] disabled:opacity-55 disabled:cursor-not-allowed transition-colors"
                 :disabled="teamStore.actionLoading"
                 @click="
                   () => {
@@ -410,7 +410,7 @@ onMounted(async () => {
                 👑
               </button>
               <button
-                class="inline-flex items-center justify-center px-[10px] py-[5px] rounded-lg text-[0.78rem] font-bold bg-[#fde8e8] text-[#c0392b] border border-[#f5b7b1] cursor-pointer hover:bg-[#fbd4d4] active:scale-[0.97] disabled:opacity-55 disabled:cursor-not-allowed transition-colors"
+                class="inline-flex items-center justify-center px-[10px] py-[5px] rounded-lg text-[0.78rem] font-bold bg-palette-fde8e8 text-danger border border-palette-f5b7b1 cursor-pointer hover:bg-palette-fbd4d4 active:scale-[0.97] disabled:opacity-55 disabled:cursor-not-allowed transition-colors"
                 :disabled="teamStore.actionLoading"
                 @click="
                   () => {
@@ -429,7 +429,7 @@ onMounted(async () => {
         <!-- Error -->
         <div
           v-if="teamStore.error"
-          class="m-0 text-[#c0392b] bg-[#fef0ef] border border-[#f5c6c3] rounded-lg px-3 py-2 text-[0.83rem]"
+          class="m-0 text-danger bg-palette-fef0ef border border-palette-f5c6c3 rounded-lg px-3 py-2 text-[0.83rem]"
         >
           {{ teamStore.error }}
         </div>
@@ -440,12 +440,12 @@ onMounted(async () => {
             type="search"
             :aria-label="tr('TeamListSidebar.tim_to_doi')"
             :placeholder="tr('TeamModal.tim_theo_ten_hoac_mo_ta')"
-            class="min-w-0 px-3 py-[9px] border border-[#c0d8b8] rounded-lg bg-[#fafefc] text-[0.9rem] text-[#1a3a1a]"
+            class="min-w-0 px-3 py-[9px] border border-palette-c0d8b8 rounded-lg bg-palette-fafefc text-[0.9rem] text-palette-1a3a1a"
           />
           <select
             v-model="teamStatusFilter"
             :aria-label="tr('TeamModal.loc_theo_trang_thai')"
-            class="px-3 py-[9px] border border-[#c0d8b8] rounded-lg bg-[#fafefc] text-[0.9rem] text-[#1a3a1a]"
+            class="px-3 py-[9px] border border-palette-c0d8b8 rounded-lg bg-palette-fafefc text-[0.9rem] text-palette-1a3a1a"
           >
             <option value="ALL">{{ tr("TeamModal.tat_ca_trang_thai") }}</option>
             <option value="OPEN">{{ tr("MyTeamPanel.mo") }}</option>
@@ -459,7 +459,7 @@ onMounted(async () => {
         <div class="flex gap-2.5 justify-end pt-1">
           <button
             v-if="isLeader"
-            class="inline-flex items-center justify-center gap-1.5 px-4 py-2 rounded-lg text-[0.87rem] font-bold bg-transparent text-[#3b7a57] border-[1.5px] border-[#3b7a57] cursor-pointer hover:bg-[#e8f5e2]"
+            class="inline-flex items-center justify-center gap-1.5 px-4 py-2 rounded-lg text-[0.87rem] font-bold bg-transparent text-brand border-[1.5px] border-brand cursor-pointer hover:bg-palette-e8f5e2"
             :disabled="teamStore.actionLoading"
             @click="openEditForm"
           >
@@ -467,14 +467,14 @@ onMounted(async () => {
           </button>
           <button
             v-if="isLeader"
-            class="inline-flex items-center justify-center gap-1.5 px-4 py-2 rounded-lg text-[0.87rem] font-bold bg-[#fde8e8] text-[#c0392b] border border-[#f5b7b1] cursor-pointer hover:bg-[#fbd4d4] active:scale-[0.97] disabled:opacity-55 disabled:cursor-not-allowed transition-colors"
+            class="inline-flex items-center justify-center gap-1.5 px-4 py-2 rounded-lg text-[0.87rem] font-bold bg-palette-fde8e8 text-danger border border-palette-f5b7b1 cursor-pointer hover:bg-palette-fbd4d4 active:scale-[0.97] disabled:opacity-55 disabled:cursor-not-allowed transition-colors"
             :disabled="teamStore.actionLoading"
             @click="handleClose"
           >
             {{ tr("TeamModal.huy_nhom") }}
           </button>
           <button
-            class="inline-flex items-center justify-center gap-1.5 px-4 py-2 rounded-lg text-[0.87rem] font-bold bg-transparent text-[#3b7a57] border-[1.5px] border-[#3b7a57] cursor-pointer hover:bg-[#e8f5e2] active:scale-[0.97] disabled:opacity-55 disabled:cursor-not-allowed transition-colors"
+            class="inline-flex items-center justify-center gap-1.5 px-4 py-2 rounded-lg text-[0.87rem] font-bold bg-transparent text-brand border-[1.5px] border-brand cursor-pointer hover:bg-palette-e8f5e2 active:scale-[0.97] disabled:opacity-55 disabled:cursor-not-allowed transition-colors"
             :disabled="teamStore.actionLoading"
             @click="handleLeave"
           >
@@ -488,9 +488,9 @@ onMounted(async () => {
       <!-- ════════════════════════════════════════════════════════ -->
       <div v-else-if="view === 'list'">
         <div class="flex items-center justify-between gap-3 mb-4">
-          <div class="m-0 text-base font-bold text-[#1a3a1a]">{{ tr("TeamModal.nhom_dang_hoat_dong") }}</div>
+          <div class="m-0 text-base font-bold text-palette-1a3a1a">{{ tr("TeamModal.nhom_dang_hoat_dong") }}</div>
           <button
-            class="inline-flex items-center justify-center gap-1.5 px-4 py-2 rounded-lg text-[0.87rem] font-bold bg-linear-to-br from-[#3b7a57] to-[#2e6644] text-white cursor-pointer hover:from-[#2e6644] hover:to-[#245236] active:scale-[0.97] transition-all"
+            class="inline-flex items-center justify-center gap-1.5 px-4 py-2 rounded-lg text-[0.87rem] font-bold bg-linear-to-br from-brand to-palette-2e6644 text-white cursor-pointer hover:from-palette-2e6644 hover:to-palette-245236 active:scale-[0.97] transition-all"
             @click="view = 'create'"
           >
             {{ tr("MyTeamPanel.tao_nhom") }}
@@ -499,16 +499,16 @@ onMounted(async () => {
 
         <div
           v-if="teamStore.error"
-          class="m-0 text-[#c0392b] bg-[#fef0ef] border border-[#f5c6c3] rounded-lg px-3 py-2 text-[0.83rem]"
+          class="m-0 text-danger bg-palette-fef0ef border border-palette-f5c6c3 rounded-lg px-3 py-2 text-[0.83rem]"
         >
           {{ teamStore.error }}
         </div>
 
-        <div v-if="teamStore.teams.length === 0" class="text-center py-10 px-5 text-[#778877] text-[0.9rem]">
+        <div v-if="teamStore.teams.length === 0" class="text-center py-10 px-5 text-palette-778877 text-[0.9rem]">
           <div>{{ tr("TeamModal.chua_co_nhom_nao_hay_tao_nhom_dau_tien") }}</div>
         </div>
 
-        <div v-else-if="filteredTeams.length === 0" class="text-center py-8 px-5 text-[#778877] text-[0.9rem]">
+        <div v-else-if="filteredTeams.length === 0" class="text-center py-8 px-5 text-palette-778877 text-[0.9rem]">
           {{ tr("TeamListSidebar.khong_tim_thay_to_doi_phu_hop") }}
         </div>
 
@@ -516,11 +516,11 @@ onMounted(async () => {
           <div
             v-for="team in filteredTeams"
             :key="team.id"
-            class="slide-fade-in from-bottom player-content-in bg-[#f5f9f0] border border-[#cde0c9] rounded-xl overflow-hidden transition-shadow hover:shadow-[0_4px_16px_rgba(59,122,87,0.12)]"
+            class="slide-fade-in from-bottom player-content-in bg-surface border border-palette-cde0c9 rounded-xl overflow-hidden transition-shadow hover:shadow-[0_4px_16px_rgba(59,122,87,0.12)]"
           >
             <div class="px-4 py-[14px]">
               <div class="flex items-center justify-between gap-2 mb-1">
-                <span class="font-bold text-[0.97rem] text-[#1a3a1a]">{{ team.name }}</span>
+                <span class="font-bold text-[0.97rem] text-palette-1a3a1a">{{ team.name }}</span>
                 <span
                   :class="[
                     'inline-block px-[10px] py-[2px] rounded-full text-[0.72rem] font-bold tracking-wide',
@@ -530,13 +530,13 @@ onMounted(async () => {
                   {{ statusLabel[team.status] }}
                 </span>
               </div>
-              <div v-if="team.description" class="text-[0.82rem] text-[#556655] my-1 mb-2">{{ team.description }}</div>
+              <div v-if="team.description" class="text-[0.82rem] text-content-caption my-1 mb-2">{{ team.description }}</div>
               <PlayerIdentity
                 :user-id="team.leader_id"
                 :profile="teamStore.profilesMap.get(team.leader_id)"
                 class="my-2"
               />
-              <div class="text-[0.76rem] text-[#778877] my-1">
+              <div class="text-[0.76rem] text-palette-778877 my-1">
                 {{
                   team.join_type === "everyone"
                     ? tr("TeamListSidebar.ai_cung_co_the_tham_gia")
@@ -546,12 +546,12 @@ onMounted(async () => {
                 }}
               </div>
               <div class="flex items-center justify-between gap-2 mt-2">
-                <span class="text-[0.78rem] text-[#778877]"
+                <span class="text-[0.78rem] text-palette-778877"
                   >{{ tr("TeamModal.cho_trong_max") }} {{ team.max_members }}</span
                 >
                 <button
                   v-if="canJoinTeam(team)"
-                  class="inline-flex items-center justify-center gap-1.5 px-[10px] py-[5px] rounded-lg text-[0.78rem] font-bold bg-linear-to-br from-[#3b7a57] to-[#2e6644] text-white cursor-pointer hover:from-[#2e6644] hover:to-[#245236] active:scale-[0.97] disabled:opacity-55 disabled:cursor-not-allowed transition-all"
+                  class="inline-flex items-center justify-center gap-1.5 px-[10px] py-[5px] rounded-lg text-[0.78rem] font-bold bg-linear-to-br from-brand to-palette-2e6644 text-white cursor-pointer hover:from-palette-2e6644 hover:to-palette-245236 active:scale-[0.97] disabled:opacity-55 disabled:cursor-not-allowed transition-all"
                   :disabled="teamStore.actionLoading"
                   @click="handleJoin(team.id)"
                 >
@@ -559,7 +559,7 @@ onMounted(async () => {
                 </button>
                 <span
                   v-else
-                  class="inline-block px-[10px] py-[2px] rounded-full text-[0.72rem] font-bold tracking-wide bg-[#fde8cc] text-[#8a4500] border border-[#f7bf7f]"
+                  class="inline-block px-[10px] py-[2px] rounded-full text-[0.72rem] font-bold tracking-wide bg-palette-fde8cc text-palette-8a4500 border border-palette-f7bf7f"
                   >{{ joinRestrictionLabel(team) }}</span
                 >
               </div>
@@ -606,7 +606,7 @@ onMounted(async () => {
         :on-second="confirmLeave"
         :on-dismiss="() => (showLeaveConfirm = false)"
       >
-        <div class="mb-2 text-[0.95rem] leading-normal text-[#374151]">
+        <div class="mb-2 text-[0.95rem] leading-normal text-palette-374151">
           {{ tr("TeamModal.ban_se_roi_khoi_nhom_hien_tai") }}
           <template v-if="isLeader && otherMembers.length > 0">
             {{ tr("TeamModal.tiep_theo_ban_co_the_chuyen_quyen_truong_nhom_hoac_huy_nhom") }}
@@ -622,19 +622,19 @@ onMounted(async () => {
         <div
           class="player-popup-in bg-white rounded-2xl px-6 py-7 max-w-[380px] w-full shadow-[0_20px_60px_rgba(0,0,0,0.22)]"
         >
-          <div class="m-0 mb-2 text-[1.05rem] font-extrabold text-[#1a3a1a]">
+          <div class="m-0 mb-2 text-[1.05rem] font-extrabold text-palette-1a3a1a">
             {{ tr("TeamModal.ban_la_truong_nhom") }}
           </div>
-          <div class="m-0 mb-4 text-[0.88rem] text-[#445544]">
+          <div class="m-0 mb-4 text-[0.88rem] text-palette-445544">
             {{ tr("Fishfarm.con") }} {{ otherMembers.length }}
             {{ tr("TeamModal.thanh_vien_trong_nhom_chon_mot_tuy_chon") }}
           </div>
 
-          <label class="flex flex-col gap-1.5 text-[0.85rem] font-semibold text-[#2a4a2a]">
+          <label class="flex flex-col gap-1.5 text-[0.85rem] font-semibold text-palette-2a4a2a">
             {{ tr("TeamModal.chuyen_quyen_cho") }}
             <select
               v-model="transferTargetId"
-              class="px-3 py-[9px] border border-[#c0d8b8] rounded-lg bg-[#fafefc] text-[0.9rem] text-[#1a3a1a] outline-none transition focus:border-[#3b7a57]"
+              class="px-3 py-[9px] border border-palette-c0d8b8 rounded-lg bg-palette-fafefc text-[0.9rem] text-palette-1a3a1a outline-none transition focus:border-brand"
             >
               <option value="" disabled>{{ tr("TeamModal.chon_thanh_vien") }}</option>
               <option v-for="m in otherMembers" :key="m.user_id" :value="m.user_id">
@@ -645,21 +645,21 @@ onMounted(async () => {
 
           <div class="flex flex-col gap-2 mt-4">
             <button
-              class="inline-flex items-center justify-center gap-1.5 px-4 py-2 rounded-lg text-[0.87rem] font-bold bg-linear-to-br from-[#3b7a57] to-[#2e6644] text-white cursor-pointer hover:from-[#2e6644] hover:to-[#245236] active:scale-[0.97] disabled:opacity-55 disabled:cursor-not-allowed transition-all"
+              class="inline-flex items-center justify-center gap-1.5 px-4 py-2 rounded-lg text-[0.87rem] font-bold bg-linear-to-br from-brand to-palette-2e6644 text-white cursor-pointer hover:from-palette-2e6644 hover:to-palette-245236 active:scale-[0.97] disabled:opacity-55 disabled:cursor-not-allowed transition-all"
               :disabled="!transferTargetId || teamStore.actionLoading"
               @click="handleLeaveAndTransfer"
             >
               {{ tr("TeamModal.chuyen_quyen_roi") }}
             </button>
             <button
-              class="inline-flex items-center justify-center gap-1.5 px-4 py-2 rounded-lg text-[0.87rem] font-bold bg-[#fde8e8] text-[#c0392b] border border-[#f5b7b1] cursor-pointer hover:bg-[#fbd4d4] active:scale-[0.97] disabled:opacity-55 disabled:cursor-not-allowed transition-colors"
+              class="inline-flex items-center justify-center gap-1.5 px-4 py-2 rounded-lg text-[0.87rem] font-bold bg-palette-fde8e8 text-danger border border-palette-f5b7b1 cursor-pointer hover:bg-palette-fbd4d4 active:scale-[0.97] disabled:opacity-55 disabled:cursor-not-allowed transition-colors"
               :disabled="teamStore.actionLoading"
               @click="handleLeaveAndClose"
             >
               {{ tr("TeamModal.huy_nhom_roi") }}
             </button>
             <button
-              class="inline-flex items-center justify-center gap-1.5 px-4 py-2 rounded-lg text-[0.87rem] font-bold bg-transparent text-[#556655] border border-[#c0d8b8] cursor-pointer hover:bg-[#f0f7ec] active:scale-[0.97] transition-colors"
+              class="inline-flex items-center justify-center gap-1.5 px-4 py-2 rounded-lg text-[0.87rem] font-bold bg-transparent text-content-caption border border-palette-c0d8b8 cursor-pointer hover:bg-palette-f0f7ec active:scale-[0.97] transition-colors"
               @click="showLeaveOptions = false"
             >
               {{ tr("FactionSelectModal.huy_bo") }}
@@ -677,10 +677,10 @@ onMounted(async () => {
         <div
           class="player-popup-in bg-white rounded-2xl px-6 py-7 max-w-[380px] w-full shadow-[0_20px_60px_rgba(0,0,0,0.22)]"
         >
-          <div class="m-0 mb-2 text-[1.05rem] font-extrabold text-[#1a3a1a]">
+          <div class="m-0 mb-2 text-[1.05rem] font-extrabold text-palette-1a3a1a">
             {{ tr("TeamModal.chuyen_quyen_truong_nhom") }}
           </div>
-          <div class="m-0 mb-4 text-[0.88rem] text-[#445544]">
+          <div class="m-0 mb-4 text-[0.88rem] text-palette-445544">
             {{ tr("TeamModal.chuyen_cho") }} <strong>{{ getMemberName(transferTarget) }}</strong>
             <PlayerIdentity
               :user-id="transferTarget"
@@ -690,14 +690,14 @@ onMounted(async () => {
           </div>
           <div class="flex flex-col gap-2 mt-4">
             <button
-              class="inline-flex items-center justify-center gap-1.5 px-4 py-2 rounded-lg text-[0.87rem] font-bold bg-linear-to-br from-[#3b7a57] to-[#2e6644] text-white cursor-pointer hover:from-[#2e6644] hover:to-[#245236] active:scale-[0.97] disabled:opacity-55 disabled:cursor-not-allowed transition-all"
+              class="inline-flex items-center justify-center gap-1.5 px-4 py-2 rounded-lg text-[0.87rem] font-bold bg-linear-to-br from-brand to-palette-2e6644 text-white cursor-pointer hover:from-palette-2e6644 hover:to-palette-245236 active:scale-[0.97] disabled:opacity-55 disabled:cursor-not-allowed transition-all"
               :disabled="teamStore.actionLoading"
               @click="handleTransfer"
             >
               {{ tr("Fishfarm.xac_nhan") }}
             </button>
             <button
-              class="inline-flex items-center justify-center gap-1.5 px-4 py-2 rounded-lg text-[0.87rem] font-bold bg-transparent text-[#556655] border border-[#c0d8b8] cursor-pointer hover:bg-[#f0f7ec] active:scale-[0.97] transition-colors"
+              class="inline-flex items-center justify-center gap-1.5 px-4 py-2 rounded-lg text-[0.87rem] font-bold bg-transparent text-content-caption border border-palette-c0d8b8 cursor-pointer hover:bg-palette-f0f7ec active:scale-[0.97] transition-colors"
               @click="showTransferModal = false"
             >
               {{ tr("FactionSelectModal.huy_bo") }}
@@ -728,7 +728,7 @@ onMounted(async () => {
           }
         "
       >
-        <div class="mb-2 text-[0.95rem] leading-normal text-[#374151]">
+        <div class="mb-2 text-[0.95rem] leading-normal text-palette-374151">
           {{ tr("MyTeamPanel.thanh_vien") }} <strong>{{ getMemberName(kickTargetId) }}</strong>
           {{ tr("TeamModal.se_bi_dua_khoi_to_doi") }}
           <PlayerIdentity

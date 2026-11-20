@@ -69,7 +69,7 @@ const emit = defineEmits<{
                   </span>
                 </div>
 
-                <div class="mt-1 text-[11px] text-[#556655]">
+                <div class="mt-1 text-[11px] text-content-caption">
                   {{ countryStore.getCountryName(getSenderProfile(record)?.country_id) }}
                 </div>
                 <div v-if="getSenderProfile(record)" class="flex flex-wrap items-center gap-2 mt-1 text-[11px]">

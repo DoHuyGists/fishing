@@ -104,7 +104,7 @@ function getEffectTypeBadge(type: string) {
     case "BUFF":
       return {
         get label() { return tr('FactionSelectModal.hieu_qua_phe'); },
-        class: "bg-[#dce9d7] text-[#344f3b] border-[#b7cbb4]",
+        class: "bg-surface-selected text-content-secondary border-palette-b7cbb4",
         icon: "✦",
       };
     case "DEBUFF":
@@ -122,7 +122,7 @@ function getEffectTypeBadge(type: string) {
     default:
       return {
         label: type,
-        class: "bg-[#eaf2e5] text-[#405446] border-[#cbd9c6]",
+        class: "bg-surface-hover text-palette-405446 border-border-default",
         icon: "•",
       };
   }
@@ -146,24 +146,24 @@ onMounted(() => {
 
 <template>
   <Modal :title="tr('FactionSelectModal.phe_phai')" :on-refresh="handleRefresh">
-    <div class="faction-screen [font-family:inherit]! min-h-full p-5 sm:p-8 space-y-6 bg-[#f5f9f0] text-[#24352a]">
+    <div class="faction-screen [font-family:inherit]! min-h-full p-5 sm:p-8 space-y-6 bg-surface text-content">
       <!-- Thanh trạng thái người chơi -->
       <section
-        class="slide-fade-in from-top player-content-in flex flex-wrap items-center justify-between gap-3 px-4 py-3 rounded-lg border border-[#cbd9c6] bg-[#f5f9f0] text-[#24352a] shadow-inner"
+        class="slide-fade-in from-top player-content-in flex flex-wrap items-center justify-between gap-3 px-4 py-3 rounded-lg border border-border-default bg-surface text-content shadow-inner"
       >
         <div class="flex items-center gap-2 text-xs sm:text-sm">
-          <span class="text-[#526a58] font-serif">❖</span>
-          <span class="text-[#617565] uppercase tracking-wider text-[11px] font-bold">{{ tr('FactionSelectModal.phe_hien_tai') }}</span>
-          <span v-if="joinedFaction" class="font-bold text-[#344f3b] font-serif text-sm sm:text-base">
+          <span class="text-palette-526a58 font-serif">❖</span>
+          <span class="text-content-subtle uppercase tracking-wider text-[11px] font-bold">{{ tr('FactionSelectModal.phe_hien_tai') }}</span>
+          <span v-if="joinedFaction" class="font-bold text-content-secondary font-serif text-sm sm:text-base">
             {{ joinedFaction.name }} ({{ joinedFaction.code }})
           </span>
-          <span v-else class="text-[#617565] italic"> {{ tr('FactionSelectModal.chua_gia_nhap_phe_nao') }} </span>
+          <span v-else class="text-content-subtle italic"> {{ tr('FactionSelectModal.chua_gia_nhap_phe_nao') }} </span>
         </div>
 
         <div v-if="joinedFaction && activeFaction && activeFaction.id !== joinedFaction.id">
           <button
             type="button"
-            class="px-3 py-1 rounded border border-[#8eaa91] bg-[#dce9d7] hover:bg-[#cbd9c6] text-xs font-bold text-[#344f3b] transition-colors cursor-pointer"
+            class="px-3 py-1 rounded border border-content-disabled bg-surface-selected hover:bg-border-default text-xs font-bold text-content-secondary transition-colors cursor-pointer"
             @click="handleResetToJoined"
           >
             {{ tr('FactionSelectModal.tro_ve_phe_cua_ban') }}
@@ -172,8 +172,8 @@ onMounted(() => {
       </section>
 
       <!-- Loading State -->
-      <div v-if="factionStore.loading" class="py-16 text-center text-[#526a5e] space-y-2">
-        <div class="inline-block animate-spin text-2xl text-[#526a58]">❖</div>
+      <div v-if="factionStore.loading" class="py-16 text-center text-palette-526a5e space-y-2">
+        <div class="inline-block animate-spin text-2xl text-palette-526a58">❖</div>
         <div class="text-xs uppercase tracking-widest font-bold">{{ tr('FactionSelectModal.dang_tai_thong_tin_phe_phai') }}</div>
       </div>
 
@@ -201,20 +201,20 @@ onMounted(() => {
         <section
           v-if="activeFaction"
           ref="topSectionRef"
-          class="slide-fade-in from-bottom player-content-in top-faction-card rounded-xl border border-[#cbd9c6] bg-[#f5f9f0] text-[#24352a] p-5 sm:p-7 shadow-xl relative overflow-hidden"
+          class="slide-fade-in from-bottom player-content-in top-faction-card rounded-xl border border-border-default bg-surface text-content p-5 sm:p-7 shadow-xl relative overflow-hidden"
         >
           <!-- Nền hoa văn mờ trang nghiêm -->
           <!-- <div
-            class="absolute top-0 right-0 w-full h-full opacity-5 pointer-events-none select-none font-serif text-[200px] leading-none text-[#344f3b] flex items-center justify-center"
+            class="absolute top-0 right-0 w-full h-full opacity-5 pointer-events-none select-none font-serif text-[200px] leading-none text-content-secondary flex items-center justify-center"
             aria-hidden="true"
           >
             {{ activeFaction.symbol || "❖" }}
           </div> -->
 
           <!-- Nhãn đầu section -->
-          <div class="mb-5 flex flex-wrap items-center justify-between gap-2 border-b border-[#cbd9c6] pb-3">
+          <div class="mb-5 flex flex-wrap items-center justify-between gap-2 border-b border-border-default pb-3">
             <div class="flex items-center gap-2">
-              <span class="text-xs uppercase tracking-widest font-extrabold text-[#344f3b] font-serif">
+              <span class="text-xs uppercase tracking-widest font-extrabold text-content-secondary font-serif">
                 {{
                   isActiveJoined
                     ? tr('FactionSelectModal.phe_hien_tai_2')
@@ -225,17 +225,17 @@ onMounted(() => {
               </span>
               <span
                 v-if="isActiveJoined"
-                class="px-2 py-0.5 rounded text-[10px] font-extrabold uppercase bg-[#dce9d7] text-[#344f3b] border border-[#b7cbb4]"
+                class="px-2 py-0.5 rounded text-[10px] font-extrabold uppercase bg-surface-selected text-content-secondary border border-palette-b7cbb4"
               >
                 {{ tr('FactionSelectModal.dang_kich_hoat') }}
               </span>
             </div>
-            <div class="flex items-center gap-2.5 text-xs text-[#405446] font-serif">
+            <div class="flex items-center gap-2.5 text-xs text-palette-405446 font-serif">
               <span v-if="activeFaction.element">
-                {{ tr('FactionSelectModal.menh') }} <span class="font-bold text-[#526a58]">{{ activeFaction.element }}</span>
+                {{ tr('FactionSelectModal.menh') }} <span class="font-bold text-palette-526a58">{{ activeFaction.element }}</span>
               </span>
               <span
-                class="inline-flex items-center gap-1 px-2 py-0.5 rounded bg-[#eaf2e5] border border-[#cbd9c6] text-[#344f3b] font-sans font-medium text-[11px]"
+                class="inline-flex items-center gap-1 px-2 py-0.5 rounded bg-surface-hover border border-border-default text-content-secondary font-sans font-medium text-[11px]"
               >
                 <span>👥</span>
                 <span class="font-bold">{{ getMemberCount(activeFaction.id).toLocaleString(getFormattingLocale()) }}</span> {{ tr('FactionSelectModal.thanh_vien') }}
@@ -247,33 +247,33 @@ onMounted(() => {
           <div class="grid grid-cols-1 lg:grid-cols-12 gap-6 items-start">
             <!-- Cột Trái (4 cols) -->
             <div
-              class="lg:col-span-4 flex flex-col items-center text-center p-5 rounded-lg border border-[#d5e1d0] bg-[#eaf2e5]"
+              class="lg:col-span-4 flex flex-col items-center text-center p-5 rounded-lg border border-palette-d5e1d0 bg-surface-hover"
             >
               <!-- Huy hiệu / Symbol -->
               <div
-                class="size-24 sm:size-28 rounded-full border-2 border-[#8eaa91] bg-[#f5f9f0] flex items-center justify-center text-4xl sm:text-5xl shadow-md text-[#344f3b] mb-4 select-none"
+                class="size-24 sm:size-28 rounded-full border-2 border-content-disabled bg-surface flex items-center justify-center text-4xl sm:text-5xl shadow-md text-content-secondary mb-4 select-none"
               >
                 {{ activeFaction.symbol || "⚔️" }}
               </div>
 
               <!-- Tên Phe -->
-              <div class="m-0 text-xl sm:text-2xl font-bold font-serif text-[#24352a] tracking-wide">
+              <div class="m-0 text-xl sm:text-2xl font-bold font-serif text-content tracking-wide">
                 {{ activeFaction.name }}
               </div>
 
               <!-- Mã Phe & Thuộc tính & Số lượng thành viên -->
-              <div class="mt-2 flex flex-wrap justify-center gap-1.5 text-[11px] text-[#617565]">
-                <span class="px-2 py-0.5 rounded bg-[#f5f9f0] border border-[#cbd9c6] font-mono">
+              <div class="mt-2 flex flex-wrap justify-center gap-1.5 text-[11px] text-content-subtle">
+                <span class="px-2 py-0.5 rounded bg-surface border border-border-default font-mono">
                   {{ tr('FactionSelectModal.ma') }} {{ activeFaction.code }}
                 </span>
                 <span
                   v-if="activeFaction.is_neutral"
-                  class="px-2 py-0.5 rounded bg-[#eaf2e5] text-[#405446] border border-[#cbd9c6]"
+                  class="px-2 py-0.5 rounded bg-surface-hover text-palette-405446 border border-border-default"
                 >
                   {{ tr('FactionSelectModal.trung_lap') }}
                 </span>
                 <span
-                  class="px-2 py-0.5 rounded bg-[#f5f9f0] border border-[#cbd9c6] text-[#344f3b] flex items-center gap-1"
+                  class="px-2 py-0.5 rounded bg-surface border border-border-default text-content-secondary flex items-center gap-1"
                 >
                   <span>👥</span>
                   <span class="font-sans font-bold">{{
@@ -284,11 +284,11 @@ onMounted(() => {
               </div>
 
               <!-- Trạng thái / Hành động -->
-              <div class="mt-6 w-full pt-4 border-t border-[#cbd9c6]">
+              <div class="mt-6 w-full pt-4 border-t border-border-default">
                 <!-- Đang là phe đã gia nhập -->
                 <div
                   v-if="isActiveJoined"
-                  class="w-full py-2.5 px-3 rounded-lg bg-[#dce9d7] border border-[#b7cbb4] text-[#344f3b] text-xs font-bold flex items-center justify-center gap-1.5"
+                  class="w-full py-2.5 px-3 rounded-lg bg-surface-selected border border-palette-b7cbb4 text-content-secondary text-xs font-bold flex items-center justify-center gap-1.5"
                 >
                   <span>✓</span>
                   <span>{{ tr('FactionSelectModal.dang_thu_huong_toan_bo_hieu_ung') }}</span>
@@ -298,7 +298,7 @@ onMounted(() => {
                 <button
                   v-else-if="!hasJoined"
                   type="button"
-                  class="w-full py-2.5 px-4 rounded-lg bg-[#344f3b] hover:bg-[#24352a] border border-[#24352a] text-[#f5f9f0] font-serif font-bold text-sm tracking-wide shadow-md transition-colors cursor-pointer disabled:opacity-50"
+                  class="w-full py-2.5 px-4 rounded-lg bg-content-secondary hover:bg-content border border-content text-surface font-serif font-bold text-sm tracking-wide shadow-md transition-colors cursor-pointer disabled:opacity-50"
                   :disabled="factionStore.actionLoading"
                   @click="promptJoin(activeFaction)"
                 >
@@ -309,7 +309,7 @@ onMounted(() => {
                 <button
                   v-else
                   type="button"
-                  class="w-full py-2.5 px-4 rounded-lg bg-[#344f3b] hover:bg-[#24352a] border border-[#24352a] text-[#f5f9f0] font-serif font-bold text-sm tracking-wide shadow-md transition-colors cursor-pointer disabled:opacity-50"
+                  class="w-full py-2.5 px-4 rounded-lg bg-content-secondary hover:bg-content border border-content text-surface font-serif font-bold text-sm tracking-wide shadow-md transition-colors cursor-pointer disabled:opacity-50"
                   :disabled="factionStore.actionLoading"
                   @click="promptChange(activeFaction)"
                 >
@@ -321,33 +321,33 @@ onMounted(() => {
             <!-- Cột Phải (8 cols): Thông tin chi tiết & Hiệu ứng -->
             <div class="lg:col-span-4 space-y-5">
               <!-- Giới thiệu / Tôn chỉ -->
-              <div class="p-4 rounded-lg border border-[#d5e1d0] bg-[#eaf2e5]">
+              <div class="p-4 rounded-lg border border-palette-d5e1d0 bg-surface-hover">
                 <div
-                  class="m-0 mb-2 text-xs uppercase tracking-widest font-extrabold text-[#344f3b] font-serif flex items-center gap-1.5"
+                  class="m-0 mb-2 text-xs uppercase tracking-widest font-extrabold text-content-secondary font-serif flex items-center gap-1.5"
                 >
                   <span>📜</span>
                   <span>{{ tr('FactionSelectModal.ton_chi_gioi_thieu') }}</span>
                 </div>
-                <div class="m-0 text-sm leading-relaxed text-[#405446] whitespace-pre-line">
+                <div class="m-0 text-sm leading-relaxed text-palette-405446 whitespace-pre-line">
                   {{ activeFaction.description || tr('FactionSelectModal.chua_co_van_tu_mo_ta_cho_phe_nay') }}
                 </div>
               </div>
 
               <!-- Danh sách Hiệu ứng Phe -->
-              <div class="p-4 rounded-lg border border-[#d5e1d0] bg-[#eaf2e5] space-y-3">
-                <div class="flex items-center justify-between border-b border-[#cbd9c6] pb-2">
+              <div class="p-4 rounded-lg border border-palette-d5e1d0 bg-surface-hover space-y-3">
+                <div class="flex items-center justify-between border-b border-border-default pb-2">
                   <div
-                    class="m-0 text-xs uppercase tracking-widest font-extrabold text-[#344f3b] font-serif flex items-center gap-1.5"
+                    class="m-0 text-xs uppercase tracking-widest font-extrabold text-content-secondary font-serif flex items-center gap-1.5"
                   >
                     <span>⚡</span>
                     <span>{{ tr('FactionSelectModal.hieu_ung_ap_dung') }}{{ displayedEffects.length }})</span>
                   </div>
-                  <span v-if="isActiveJoined" class="text-[11px] text-[#526a58] font-medium">
+                  <span v-if="isActiveJoined" class="text-[11px] text-palette-526a58 font-medium">
                     {{ tr('FactionSelectModal.kich_hoat_theo_tai_khoan') }}
                   </span>
                 </div>
 
-                <div v-if="displayedEffects.length === 0" class="py-6 text-center text-xs text-[#617565] italic">
+                <div v-if="displayedEffects.length === 0" class="py-6 text-center text-xs text-content-subtle italic">
                   {{ tr('FactionSelectModal.phe_nay_hien_chua_co_hieu_ung_duoc_cong_bo') }}
                 </div>
 
@@ -355,7 +355,7 @@ onMounted(() => {
                   <article
                     v-for="effect in displayedEffects"
                     :key="effect.id ?? effect.code"
-                    class="p-3 rounded-lg border border-[#cbd9c6] bg-[#f5f9f0] hover:border-[#8eaa91] transition-colors"
+                    class="p-3 rounded-lg border border-border-default bg-surface hover:border-content-disabled transition-colors"
                   >
                     <div class="flex flex-wrap items-center justify-between gap-2 mb-1.5">
                       <div class="flex items-center gap-2">
@@ -366,28 +366,28 @@ onMounted(() => {
                           {{ getEffectTypeBadge(effect.effect_type).icon }}
                           {{ getEffectTypeBadge(effect.effect_type).label }}
                         </span>
-                        <div class="m-0 text-sm font-bold text-[#24352a] font-serif">
+                        <div class="m-0 text-sm font-bold text-content font-serif">
                           {{ effect.name }}
                         </div>
                       </div>
-                      <span class="text-[11px] font-mono text-[#617565]">
-                        {{ tr('FactionSelectModal.chi_so') }} <strong class="text-[#344f3b]">{{ effect.target_stat }}</strong>
+                      <span class="text-[11px] font-mono text-content-subtle">
+                        {{ tr('FactionSelectModal.chi_so') }} <strong class="text-content-secondary">{{ effect.target_stat }}</strong>
                       </span>
                     </div>
 
-                    <div v-if="effect.description" class="m-0 text-xs text-[#405446] leading-relaxed">
+                    <div v-if="effect.description" class="m-0 text-xs text-palette-405446 leading-relaxed">
                       {{ effect.description }}
                     </div>
 
                     <!-- Chi tiết config nếu có -->
                     <div
                       v-if="formatConfig(effect.config).length > 0"
-                      class="mt-2 pt-1.5 border-t border-[#d5e1d0] flex flex-wrap gap-2 text-[10px]"
+                      class="mt-2 pt-1.5 border-t border-palette-d5e1d0 flex flex-wrap gap-2 text-[10px]"
                     >
                       <span
                         v-for="cfg in formatConfig(effect.config)"
                         :key="cfg.key"
-                        class="px-2 py-0.5 rounded bg-[#eaf2e5] border border-[#cbd9c6] text-[#344f3b] font-mono"
+                        class="px-2 py-0.5 rounded bg-surface-hover border border-border-default text-content-secondary font-mono"
                       >
                         {{ cfg.key }}: {{ cfg.value }}
                       </span>
@@ -405,17 +405,17 @@ onMounted(() => {
 
         <!-- ================= BOTTOM SECTION: CÁC PHE CÒN LẠI ================= -->
         <section class="space-y-4 pt-2">
-          <div class="flex items-center justify-between border-b border-[#cbd9c6] pb-2">
+          <div class="flex items-center justify-between border-b border-border-default pb-2">
             <div
-              class="m-0 text-xs sm:text-sm uppercase tracking-widest font-extrabold text-[#526a58] font-serif flex items-center gap-2"
+              class="m-0 text-xs sm:text-sm uppercase tracking-widest font-extrabold text-palette-526a58 font-serif flex items-center gap-2"
             >
               <span>🏛️</span>
               <span>{{ tr('FactionSelectModal.cac_phe_khac') }}{{ otherFactions.length }})</span>
             </div>
-            <span class="text-[11px] text-[#617565]"> {{ tr('FactionSelectModal.chon_phe_ben_duoi_de_xem_chi_tiet_ben_tren') }} </span>
+            <span class="text-[11px] text-content-subtle"> {{ tr('FactionSelectModal.chon_phe_ben_duoi_de_xem_chi_tiet_ben_tren') }} </span>
           </div>
 
-          <div v-if="otherFactions.length === 0" class="py-8 text-center text-xs text-[#617565] italic">
+          <div v-if="otherFactions.length === 0" class="py-8 text-center text-xs text-content-subtle italic">
             {{ tr('FactionSelectModal.khong_con_phe_nao_khac') }}
           </div>
 
@@ -423,47 +423,47 @@ onMounted(() => {
             <article
               v-for="faction in otherFactions"
               :key="faction.id"
-              class="slide-fade-in from-bottom player-content-in rounded-xl border border-[#cbd9c6] bg-[#f5f9f0] hover:border-[#8eaa91] p-4 flex flex-col justify-between transition-all duration-200 shadow-sm hover:shadow-md"
+              class="slide-fade-in from-bottom player-content-in rounded-xl border border-border-default bg-surface hover:border-content-disabled p-4 flex flex-col justify-between transition-all duration-200 shadow-sm hover:shadow-md"
             >
               <div>
                 <!-- Header card: Symbol, Name, Element -->
                 <div class="flex items-start gap-3 mb-3">
                   <div
-                    class="size-12 shrink-0 rounded-full border border-[#8eaa91] bg-[#eaf2e5] flex items-center justify-center text-xl text-[#344f3b] select-none"
+                    class="size-12 shrink-0 rounded-full border border-content-disabled bg-surface-hover flex items-center justify-center text-xl text-content-secondary select-none"
                   >
                     {{ faction.symbol || "⚔️" }}
                   </div>
                   <div class="min-w-0 flex-1">
-                    <div class="m-0 text-base font-bold font-serif text-[#24352a] truncate">
+                    <div class="m-0 text-base font-bold font-serif text-content truncate">
                       {{ faction.name }}
                     </div>
-                    <div class="mt-0.5 flex items-center gap-1.5 text-[11px] text-[#617565]">
+                    <div class="mt-0.5 flex items-center gap-1.5 text-[11px] text-content-subtle">
                       <span class="font-mono text-[10px]">{{ faction.code }}</span>
-                      <span v-if="faction.element" class="text-[#344f3b]">{{ tr('FactionSelectModal.he') }} {{ faction.element }}</span>
+                      <span v-if="faction.element" class="text-content-secondary">{{ tr('FactionSelectModal.he') }} {{ faction.element }}</span>
                     </div>
                   </div>
                 </div>
 
                 <!-- Mô tả tóm tắt -->
-                <div class="m-0 text-xs text-[#405446] line-clamp-2 leading-relaxed mb-3">
+                <div class="m-0 text-xs text-palette-405446 line-clamp-2 leading-relaxed mb-3">
                   {{ faction.description || tr('FactionSelectModal.chua_co_mo_ta_chi_tiet') }}
                 </div>
 
                 <!-- Tóm tắt số thành viên & số hiệu ứng -->
                 <div class="mb-4 flex flex-wrap gap-1.5 text-[10px]">
                   <span
-                    class="px-1.5 py-0.5 rounded bg-[#eaf2e5] border border-[#cbd9c6] text-[#344f3b] flex items-center gap-1"
+                    class="px-1.5 py-0.5 rounded bg-surface-hover border border-border-default text-content-secondary flex items-center gap-1"
                   >
                     <span>👥</span>
                     <span class="font-sans font-bold">{{ getMemberCount(faction.id).toLocaleString(getFormattingLocale()) }}</span>
                     {{ tr('FactionSelectModal.thanh_vien') }}
                   </span>
-                  <span class="px-1.5 py-0.5 rounded bg-[#eaf2e5] border border-[#cbd9c6] text-[#405446]">
+                  <span class="px-1.5 py-0.5 rounded bg-surface-hover border border-border-default text-palette-405446">
                     {{ (faction.faction_effects ?? []).length }} {{ tr('FactionSelectModal.hieu_ung') }}
                   </span>
                   <span
                     v-if="faction.is_neutral"
-                    class="px-1.5 py-0.5 rounded bg-[#eaf2e5] text-[#405446] border border-[#cbd9c6]"
+                    class="px-1.5 py-0.5 rounded bg-surface-hover text-palette-405446 border border-border-default"
                   >
                     {{ tr('FactionSelectModal.trung_lap_2') }}
                   </span>
@@ -471,10 +471,10 @@ onMounted(() => {
               </div>
 
               <!-- Nút hành động -->
-              <div class="flex items-center gap-2 pt-3 border-t border-[#d5e1d0]">
+              <div class="flex items-center gap-2 pt-3 border-t border-palette-d5e1d0">
                 <button
                   type="button"
-                  class="flex-1 py-1.5 px-2 rounded-lg border border-[#b7cbb4] bg-[#eaf2e5] hover:bg-[#dce9d7] text-xs font-bold text-[#344f3b] transition-colors cursor-pointer"
+                  class="flex-1 py-1.5 px-2 rounded-lg border border-palette-b7cbb4 bg-surface-hover hover:bg-surface-selected text-xs font-bold text-content-secondary transition-colors cursor-pointer"
                   @click="handleViewDetail(faction.id)"
                 >
                   {{ tr('FactionSelectModal.xem_chi_tiet') }}
@@ -484,7 +484,7 @@ onMounted(() => {
                 <button
                   v-if="!hasJoined"
                   type="button"
-                  class="py-1.5 px-3 rounded-lg border border-[#24352a] bg-[#344f3b] hover:bg-[#24352a] text-xs font-bold text-[#f5f9f0] transition-colors cursor-pointer"
+                  class="py-1.5 px-3 rounded-lg border border-content bg-content-secondary hover:bg-content text-xs font-bold text-surface transition-colors cursor-pointer"
                   @click="promptJoin(faction)"
                 >
                   {{ tr('FactionSelectModal.gia_nhap') }}
@@ -494,7 +494,7 @@ onMounted(() => {
                 <button
                   v-else
                   type="button"
-                  class="py-1.5 px-3 rounded-lg border border-[#8eaa91] bg-[#dce9d7] hover:bg-[#cbd9c6] text-xs font-bold text-[#344f3b] transition-colors cursor-pointer"
+                  class="py-1.5 px-3 rounded-lg border border-content-disabled bg-surface-selected hover:bg-border-default text-xs font-bold text-content-secondary transition-colors cursor-pointer"
                   @click="promptChange(faction)"
                 >
                   {{ tr('FactionSelectModal.chuyen_phe') }}
@@ -509,35 +509,35 @@ onMounted(() => {
       <Teleport to="body">
         <div v-if="confirmingAction" class="fixed inset-0 z-[10001] bg-black/75 flex items-center justify-center p-4">
           <div
-            class="w-full max-w-md rounded-xl border border-[#cbd9c6] bg-[#f5f9f0] text-[#24352a] p-6 shadow-2xl space-y-4 player-popup-in"
+            class="w-full max-w-md rounded-xl border border-border-default bg-surface text-content p-6 shadow-2xl space-y-4 player-popup-in"
           >
             <div class="text-center space-y-2">
               <div
-                class="size-14 mx-auto rounded-full border-2 border-[#8eaa91] bg-[#eaf2e5] flex items-center justify-center text-2xl text-[#344f3b]"
+                class="size-14 mx-auto rounded-full border-2 border-content-disabled bg-surface-hover flex items-center justify-center text-2xl text-content-secondary"
               >
                 {{ confirmingAction.faction.symbol || "❖" }}
               </div>
-              <div class="m-0 text-lg font-bold font-serif text-[#24352a]">
+              <div class="m-0 text-lg font-bold font-serif text-content">
                 {{ confirmingAction.type === "join" ? tr('FactionSelectModal.xac_nhan_gia_nhap_phe') : tr('FactionSelectModal.xac_nhan_chuyen_doi_phe') }}
               </div>
-              <div class="m-0 text-xs text-[#405446] leading-relaxed">
+              <div class="m-0 text-xs text-palette-405446 leading-relaxed">
                 <template v-if="confirmingAction.type === 'join'">
                   {{ tr('FactionSelectModal.ban_dang_chuan_bi_gia_nhap_phe') }}
-                  <strong class="text-[#344f3b] font-serif text-sm">{{ confirmingAction.faction.name }}</strong
+                  <strong class="text-content-secondary font-serif text-sm">{{ confirmingAction.faction.name }}</strong
                   >{{ tr('FactionSelectModal.sau_khi_gia_nhap_cac_hieu_ung_chuc_phuc_va_rang_buoc_se_duoc_kic') }}
                 </template>
                 <template v-else>
                   {{ tr('FactionSelectModal.ban_dang_chon_chuyen_sang') }}
-                  <strong class="text-[#344f3b] font-serif text-sm">{{ confirmingAction.faction.name }}</strong
+                  <strong class="text-content-secondary font-serif text-sm">{{ confirmingAction.faction.name }}</strong
                   >{{ tr('FactionSelectModal.moi_hieu_ung_cua_phe_hien_tai_se_duoc_thay_the_bang_hieu_ung_cua') }}
                 </template>
               </div>
             </div>
 
-            <div class="pt-2 flex items-center justify-end gap-3 border-t border-[#cbd9c6]">
+            <div class="pt-2 flex items-center justify-end gap-3 border-t border-border-default">
               <button
                 type="button"
-                class="px-4 py-2 rounded-lg border border-[#b7cbb4] bg-[#eaf2e5] hover:bg-[#dce9d7] text-xs font-bold text-[#405446] transition-colors cursor-pointer"
+                class="px-4 py-2 rounded-lg border border-palette-b7cbb4 bg-surface-hover hover:bg-surface-selected text-xs font-bold text-palette-405446 transition-colors cursor-pointer"
                 :disabled="factionStore.actionLoading"
                 @click="cancelConfirm"
               >
@@ -545,7 +545,7 @@ onMounted(() => {
               </button>
               <button
                 type="button"
-                class="px-5 py-2 rounded-lg border border-[#24352a] bg-[#344f3b] hover:bg-[#24352a] text-[#f5f9f0] font-serif font-bold text-xs tracking-wide transition-colors cursor-pointer shadow-md disabled:opacity-50"
+                class="px-5 py-2 rounded-lg border border-content bg-content-secondary hover:bg-content text-surface font-serif font-bold text-xs tracking-wide transition-colors cursor-pointer shadow-md disabled:opacity-50"
                 :disabled="factionStore.actionLoading"
                 @click="executeConfirm"
               >

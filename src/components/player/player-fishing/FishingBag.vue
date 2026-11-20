@@ -96,7 +96,7 @@ function getRewardEffect(variant: "NORMAL" | "GOLDEN" | "MUTATED") {
         @click.self="store.closeBag"
       >
         <section
-          class="player-popup-panel w-[min(460px,100%)] max-h-[min(580px,80vh)] overflow-auto border border-[rgba(255,226,149,0.68)] rounded-[20px] bg-[linear-gradient(145deg,#173d2b,#0e281b)] shadow-[0_24px_70px_rgba(0,0,0,0.48)] text-[#f4f0df]"
+          class="player-popup-panel w-[min(460px,100%)] max-h-[min(580px,80vh)] overflow-auto border border-[rgba(255,226,149,0.68)] rounded-[20px] bg-[linear-gradient(145deg,var(--color-palette-173d2b),var(--color-palette-0e281b))] shadow-[0_24px_70px_rgba(0,0,0,0.48)] text-palette-f4f0df"
           role="dialog"
           aria-modal="true"
           aria-labelledby="bag-title"
@@ -106,7 +106,7 @@ function getRewardEffect(variant: "NORMAL" | "GOLDEN" | "MUTATED") {
           >
             <div>
               <div id="bag-title" class="m-0 text-xl">{{ tr("FishingBag.thanh_qua_cau_duoc") }}</div>
-              <div class="mt-1 text-xs text-[#b7cfb9]">
+              <div class="mt-1 text-xs text-border-strong">
                 {{
                   tr("FishingBag.capacity_usage", { count: store.inventory.length, capacity: store.fishingNetCapacity })
                 }}
@@ -121,7 +121,7 @@ function getRewardEffect(variant: "NORMAL" | "GOLDEN" | "MUTATED") {
               ×
             </button>
           </header>
-          <div v-if="!store.inventory.length" class="py-[35px] px-5 text-[#b7cfb9] text-center text-[13px]">
+          <div v-if="!store.inventory.length" class="py-[35px] px-5 text-border-strong text-center text-[13px]">
             {{ tr("FishingBag.tui_con_trong_hay_ra_ho_cau_mot_con_ca") }}
           </div>
           <template v-else>
@@ -138,8 +138,8 @@ function getRewardEffect(variant: "NORMAL" | "GOLDEN" | "MUTATED") {
                   class="rounded-md px-2 py-1 text-xs font-bold transition-colors cursor-pointer"
                   :class="
                     viewMode === mode.value
-                      ? 'bg-[#e8bd62] text-[#173d2b]'
-                      : 'text-[#b7cfb9] hover:bg-[rgba(235,243,219,0.13)]'
+                      ? 'bg-palette-e8bd62 text-palette-173d2b'
+                      : 'text-border-strong hover:bg-[rgba(235,243,219,0.13)]'
                   "
                   :aria-pressed="viewMode === mode.value"
                   :aria-label="mode.ariaLabel"
@@ -188,16 +188,16 @@ function getRewardEffect(variant: "NORMAL" | "GOLDEN" | "MUTATED") {
                     :class="`flex items-center justify-between gap-3 p-2 border ${fish.isShiny ? getRewardEffect(fish.variantType) : ''} rounded-lg border-[rgba(223,241,207,0.15)]`"
                   >
                     <div class="grid gap-0.5 min-w-0">
-                      <span class="text-[#e8bd62] text-[9px] font-black tracking-[0.09em] uppercase">{{
+                      <span class="text-palette-e8bd62 text-[9px] font-black tracking-[0.09em] uppercase">{{
                         fish.variantType
                       }}</span>
-                      <small class="text-[#b7cfb9] text-[11px]"
+                      <small class="text-border-strong text-[11px]"
                         >{{ fish.weight }}<span v-if="fish.length"> · {{ fish.length }}</span></small
                       >
                     </div>
                     <button
                       type="button"
-                      class="flex-shrink-0 px-3 py-1.5 border border-[rgba(235,110,110,0.4)] rounded-lg bg-[rgba(194,59,59,0.2)] hover:bg-[rgba(194,59,59,0.4)] text-[#ffaaaa] hover:text-white text-xs font-bold transition-colors cursor-pointer"
+                      class="flex-shrink-0 px-3 py-1.5 border border-[rgba(235,110,110,0.4)] rounded-lg bg-[rgba(194,59,59,0.2)] hover:bg-[rgba(194,59,59,0.4)] text-palette-ffaaaa hover:text-white text-xs font-bold transition-colors cursor-pointer"
                       @click.stop="openReleaseConfirm(fish)"
                     >
                       {{ tr("Fishfarm.tha") }}
@@ -223,18 +223,18 @@ function getRewardEffect(variant: "NORMAL" | "GOLDEN" | "MUTATED") {
                     :class="viewMode === 'grid' ? 'w-full' : 'h-12'"
                   />
                   <div class="grid gap-0.5 min-w-0">
-                    <span class="text-[#e8bd62] text-[9px] font-black tracking-[0.09em] uppercase">{{
+                    <span class="text-palette-e8bd62 text-[9px] font-black tracking-[0.09em] uppercase">{{
                       fish.variantType
                     }}</span>
                     <strong class="text-sm truncate">{{ fish.name }}</strong>
-                    <small class="text-[#b7cfb9] text-[11px]"
+                    <small class="text-border-strong text-[11px]"
                       >{{ fish.weight }}<span v-if="fish.length"> · {{ fish.length }}</span></small
                     >
                   </div>
                 </div>
                 <button
                   type="button"
-                  class="flex-shrink-0 px-3 py-1.5 border border-[rgba(235,110,110,0.4)] rounded-lg bg-[rgba(194,59,59,0.2)] hover:bg-[rgba(194,59,59,0.4)] text-[#ffaaaa] hover:text-white text-xs font-bold transition-colors cursor-pointer"
+                  class="flex-shrink-0 px-3 py-1.5 border border-[rgba(235,110,110,0.4)] rounded-lg bg-[rgba(194,59,59,0.2)] hover:bg-[rgba(194,59,59,0.4)] text-palette-ffaaaa hover:text-white text-xs font-bold transition-colors cursor-pointer"
                   @click.stop="openReleaseConfirm(fish)"
                 >
                   {{ tr("Fishfarm.tha") }}
@@ -255,15 +255,15 @@ function getRewardEffect(variant: "NORMAL" | "GOLDEN" | "MUTATED") {
         @click.self="cancelRelease"
       >
         <div
-          class="player-popup-panel w-[min(380px,100%)] p-5 border border-[rgba(255,226,149,0.5)] rounded-[20px] bg-[linear-gradient(145deg,#1b4531,#0f2e1f)] shadow-[0_24px_70px_rgba(0,0,0,0.6)] text-[#f4f0df] text-center"
+          class="player-popup-panel w-[min(380px,100%)] p-5 border border-[rgba(255,226,149,0.5)] rounded-[20px] bg-[linear-gradient(145deg,var(--color-palette-1b4531),var(--color-palette-0f2e1f))] shadow-[0_24px_70px_rgba(0,0,0,0.6)] text-palette-f4f0df text-center"
           role="dialog"
           aria-modal="true"
           aria-labelledby="confirm-release-title"
         >
-          <div id="confirm-release-title" class="m-0 text-lg font-bold text-[#e8bd62]">
+          <div id="confirm-release-title" class="m-0 text-lg font-bold text-palette-e8bd62">
             {{ tr("FishReleaseConfirm.xac_nhan_tha_ca") }}
           </div>
-          <div class="my-4 text-sm text-[#c8dccb] leading-relaxed">
+          <div class="my-4 text-sm text-palette-c8dccb leading-relaxed">
             {{ tr("FishReleaseConfirm.ban_co_chac_chan_muon_tha") }}
             <strong class="text-white">{{ selectedFishToRelease.name }}</strong> ({{ selectedFishToRelease.weight
             }}{{ tr("FishingBag.ve_lai_ho_khong") }}
@@ -278,7 +278,7 @@ function getRewardEffect(variant: "NORMAL" | "GOLDEN" | "MUTATED") {
             </button>
             <button
               type="button"
-              class="px-4 py-2 border border-[#e65c5c] rounded-xl bg-[#c23b3b] hover:bg-[#d94848] text-white text-xs font-bold shadow-[0_4px_12px_rgba(194,59,59,0.4)] transition-colors cursor-pointer disabled:opacity-50"
+              class="px-4 py-2 border border-palette-e65c5c rounded-xl bg-palette-c23b3b hover:bg-palette-d94848 text-white text-xs font-bold shadow-[0_4px_12px_rgba(194,59,59,0.4)] transition-colors cursor-pointer disabled:opacity-50"
               :disabled="isReleasing"
               @click="handleRelease"
             >

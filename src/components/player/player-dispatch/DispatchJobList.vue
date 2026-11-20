@@ -13,7 +13,7 @@ const store = useDispatchStore();
       v-for="job in store.jobs"
       :key="job.id"
       class="dispatch-card slide-fade-in player-content-in"
-      :class="{ 'ring-2 ring-[#527547]': store.selectedJobId === job.id }"
+      :class="{ 'ring-2 ring-palette-527547': store.selectedJobId === job.id }"
     >
       <div class="flex items-center gap-2">
         <img
@@ -26,12 +26,12 @@ const store = useDispatchStore();
         <span
           v-else
           aria-hidden="true"
-          class="flex size-10 shrink-0 items-center justify-center rounded-md bg-[#f5f9f0] text-2xl"
+          class="flex size-10 shrink-0 items-center justify-center rounded-md bg-surface text-2xl"
           >🧭</span
         >
         <div class="min-w-0">
           <div class="font-bold">{{ dispatchText(job.name) }}</div>
-          <div class="text-xs text-[#61745d]">
+          <div class="text-xs text-palette-61745d">
             {{ tr("Dispatch.duration", { minutes: Math.ceil(job.duration_seconds / 60) }) }}
           </div>
         </div>
@@ -39,7 +39,7 @@ const store = useDispatchStore();
       <div>{{ dispatchText(job.description) }}</div>
       <div class="text-xs">{{ tr("Dispatch.requirements") }}</div>
       <div class="flex flex-wrap gap-1 text-[11px]">
-        <span v-for="(value, key) in job.data.requirements" :key="key" class="rounded bg-[#f5f9f0] px-1.5 py-0.5"
+        <span v-for="(value, key) in job.data.requirements" :key="key" class="rounded bg-surface px-1.5 py-0.5"
           >{{ key }} ≥ {{ value }}</span
         >
         <span v-if="!Object.keys(job.data.requirements ?? {}).length">{{ tr("Dispatch.noRequirements") }}</span>

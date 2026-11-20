@@ -166,7 +166,7 @@ async function handleSave() {
   <aside class="player-popup-in ml-auto flex h-full w-full max-w-xl flex-col border-l border-gray-200 bg-white shadow-xl" @click.stop>
     <div class="flex shrink-0 items-center justify-between border-b border-gray-200 px-5 py-4">
       <div>
-        <div class="m-0 text-base font-extrabold text-[#153221]">
+        <div class="m-0 text-base font-extrabold text-content-strong">
           {{ species ? "Chỉnh sửa loài cá" : "Thêm loài cá" }}
         </div>
       </div>
@@ -247,29 +247,29 @@ async function handleSave() {
           </label>
           <label class="flex flex-col gap-1.5 text-xs font-bold text-gray-600">
             Thời gian hoạt động
-            <input v-model="form.activeTime" placeholder="ALL, DAY, NIGHT..." class="rounded-md border border-[#cbd9c6] px-3 py-2 text-sm font-normal text-[#24352a] focus:border-emerald-600 focus:outline-none" />
+            <input v-model="form.activeTime" placeholder="ALL, DAY, NIGHT..." class="rounded-md border border-border-default px-3 py-2 text-sm font-normal text-content focus:border-emerald-600 focus:outline-none" />
           </label>
           <label class="flex flex-col gap-1.5 text-xs font-bold text-gray-600">
             Loại cá
-            <input v-model="form.fishType" class="rounded-md border border-[#cbd9c6] px-3 py-2 text-sm font-normal text-[#24352a] focus:border-emerald-600 focus:outline-none" />
+            <input v-model="form.fishType" class="rounded-md border border-border-default px-3 py-2 text-sm font-normal text-content focus:border-emerald-600 focus:outline-none" />
           </label>
           <label class="flex flex-col gap-1.5 text-xs font-bold text-gray-600">
             Điểm kinh nghiệm *
-            <input v-model.number="form.experiencePoint" type="number" min="0" step="1" required class="rounded-md border border-[#cbd9c6] px-3 py-2 text-sm font-normal text-[#24352a] focus:border-emerald-600 focus:outline-none" />
+            <input v-model.number="form.experiencePoint" type="number" min="0" step="1" required class="rounded-md border border-border-default px-3 py-2 text-sm font-normal text-content focus:border-emerald-600 focus:outline-none" />
           </label>
           <label class="flex flex-col gap-1.5 text-xs font-bold text-gray-600">
             Sức mạnh kéo
-            <input v-model.number="form.strength" type="number" min="0" step="any" class="rounded-md border border-[#cbd9c6] px-3 py-2 text-sm font-normal text-[#24352a] focus:border-emerald-600 focus:outline-none" />
+            <input v-model.number="form.strength" type="number" min="0" step="any" class="rounded-md border border-border-default px-3 py-2 text-sm font-normal text-content focus:border-emerald-600 focus:outline-none" />
           </label>
           <label class="flex flex-col gap-1.5 text-xs font-bold text-gray-600">
             Độ cảnh giác
-            <input v-model.number="form.alertness" type="number" min="0" step="any" class="rounded-md border border-[#cbd9c6] px-3 py-2 text-sm font-normal text-[#24352a] focus:border-emerald-600 focus:outline-none" />
+            <input v-model.number="form.alertness" type="number" min="0" step="any" class="rounded-md border border-border-default px-3 py-2 text-sm font-normal text-content focus:border-emerald-600 focus:outline-none" />
           </label>
           <label class="flex flex-col gap-1.5 text-xs font-bold text-gray-600">
             Hệ số bùng nổ (1–10)
-            <input v-model.number="form.burstMultiplier" type="number" min="1" max="10" step="any" class="rounded-md border border-[#cbd9c6] px-3 py-2 text-sm font-normal text-[#24352a] focus:border-emerald-600 focus:outline-none" />
+            <input v-model.number="form.burstMultiplier" type="number" min="1" max="10" step="any" class="rounded-md border border-border-default px-3 py-2 text-sm font-normal text-content focus:border-emerald-600 focus:outline-none" />
           </label>
-          <div class="rounded-md border border-[#cbd9c6] bg-[#f5f9f0] p-3 text-xs text-[#24352a] sm:col-span-2">
+          <div class="rounded-md border border-border-default bg-surface p-3 text-xs text-content sm:col-span-2">
             Trọng số theo mùa: {{ species?.season_weight ?? 1 }} (tự động theo mùa, không phải %)
             <template v-if="species">
               <div class="mt-2 break-all">ID: {{ species.id }}</div>
@@ -306,7 +306,7 @@ async function handleSave() {
         <button
           type="submit"
           :disabled="isSaving"
-          class="rounded-lg bg-[#153221] px-4 py-2 text-sm font-bold text-white hover:bg-emerald-800 disabled:opacity-50"
+          class="rounded-lg bg-content-strong px-4 py-2 text-sm font-bold text-white hover:bg-emerald-800 disabled:opacity-50"
         >
           {{ isSaving ? "Đang lưu..." : "Lưu loài cá" }}
         </button>

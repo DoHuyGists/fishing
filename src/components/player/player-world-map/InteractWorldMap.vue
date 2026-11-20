@@ -244,7 +244,7 @@ function zoomTo(k: number) {
           {{ tr("Maintenance.thu_lai") }}
         </button>
       </div>
-      <div v-else-if="fogEnabled && countryStore.isLoadingUnlocked" class="text-xs text-[#24352a]" role="status">
+      <div v-else-if="fogEnabled && countryStore.isLoadingUnlocked" class="text-xs text-content" role="status">
         {{ tr("InteractWorldMap.dang_tai_quoc_gia_da_mo_khoa") }}
       </div>
       <div class="slide-fade-in from-bottom-right flex gap-2">
@@ -255,7 +255,7 @@ function zoomTo(k: number) {
       </div>
     </div>
   </div>
-  <div v-else class="rounded-xl border border-[#cbd9c6] bg-[#f5f9f0] p-4 text-sm text-[#24352a]" role="status">
+  <div v-else class="rounded-xl border border-border-default bg-surface p-4 text-sm text-content" role="status">
     <div class="font-semibold">
       {{ tr("FishingAnchor.ban_do") }} ·
       <button

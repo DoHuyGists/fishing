@@ -23,8 +23,8 @@ function isConfigured(itemId: string) {
 </script>
 
 <template>
-  <div class="flex flex-col gap-4 text-[#24352a]">
-    <div class="rounded-lg border border-[#cbd9c6] bg-[#f5f9f0] px-3 py-2 text-xs">
+  <div class="flex flex-col gap-4 text-content">
+    <div class="rounded-lg border border-border-default bg-surface px-3 py-2 text-xs">
       Mỗi cấu hình gắn một vật phẩm thức ăn với một loài đã cấu hình nuôi. Khi chỉnh sửa, loài và vật phẩm được giữ cố
       định.
     </div>
@@ -47,13 +47,13 @@ function isConfigured(itemId: string) {
         v-if="editing && field.immutable"
         :value="field.options?.find((option) => option.value === String(form[field.key]))?.label ?? form[field.key]"
         disabled
-        class="rounded-lg border border-[#cbd9c6] bg-[#f5f9f0] px-3 py-2 font-normal"
+        class="rounded-lg border border-border-default bg-surface px-3 py-2 font-normal"
       />
       <select
         v-else-if="field.type === 'select'"
         v-model="form[field.key]"
         :required="field.required"
-        class="rounded-lg border border-[#cbd9c6] bg-white px-3 py-2 font-normal"
+        class="rounded-lg border border-border-default bg-white px-3 py-2 font-normal"
       >
         <option value="">-- Chọn --</option>
         <option
@@ -74,7 +74,7 @@ function isConfigured(itemId: string) {
         :min="field.min"
         :max="field.max"
         :step="field.step ?? 'any'"
-        class="rounded-lg border border-[#cbd9c6] bg-white px-3 py-2 font-normal"
+        class="rounded-lg border border-border-default bg-white px-3 py-2 font-normal"
       />
       <span v-if="field.key === 'capacity_units_per_item'" class="font-normal text-gray-500">
         Số phần ăn mỗi lượt = làm tròn lên (tổng điểm sức chứa của lứa / điểm mỗi phần).

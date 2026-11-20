@@ -39,14 +39,14 @@ function confirm() {
 }
 
 const viewBtn = (active: boolean) =>
-  `rounded-md px-3 py-1.5 text-xs font-bold ${active ? "bg-[#153221] text-white" : "text-[#24352a] hover:bg-[#f5f9f0]"}`;
+  `rounded-md px-3 py-1.5 text-xs font-bold ${active ? "bg-content-strong text-white" : "text-content hover:bg-surface"}`;
 </script>
 
 <template>
   <div class="fixed inset-0 z-40 flex items-center justify-center bg-black/40 p-4" @click.self="emit('close')">
-    <div class="flex max-h-[90vh] w-full max-w-3xl flex-col rounded-xl border border-[#cbd9c6] bg-white shadow-xl">
-      <div class="flex shrink-0 items-center justify-between border-b border-[#cbd9c6] px-5 py-3">
-        <div class="m-0 text-base font-extrabold text-[#24352a]">Chọn cá ({{ picked.size }})</div>
+    <div class="flex max-h-[90vh] w-full max-w-3xl flex-col rounded-xl border border-border-default bg-white shadow-xl">
+      <div class="flex shrink-0 items-center justify-between border-b border-border-default px-5 py-3">
+        <div class="m-0 text-base font-extrabold text-content">Chọn cá ({{ picked.size }})</div>
         <button
           type="button"
           aria-label="Đóng"
@@ -57,14 +57,14 @@ const viewBtn = (active: boolean) =>
         </button>
       </div>
 
-      <div class="flex shrink-0 items-center gap-3 border-b border-[#cbd9c6] bg-[#f5f9f0] px-5 py-3">
+      <div class="flex shrink-0 items-center gap-3 border-b border-border-default bg-surface px-5 py-3">
         <input
           v-model="search"
           type="search"
           placeholder="Tìm tên cá..."
-          class="min-w-0 flex-1 rounded-md border border-[#cbd9c6] bg-white px-3 py-2 text-sm text-[#24352a] focus:border-emerald-600 focus:outline-none"
+          class="min-w-0 flex-1 rounded-md border border-border-default bg-white px-3 py-2 text-sm text-content focus:border-emerald-600 focus:outline-none"
         />
-        <div class="flex rounded-md border border-[#cbd9c6] bg-white p-0.5">
+        <div class="flex rounded-md border border-border-default bg-white p-0.5">
           <button type="button" :class="viewBtn(viewMode === 'list')" @click="viewMode = 'list'">Danh sách</button>
           <button type="button" :class="viewBtn(viewMode === 'grid')" @click="viewMode = 'grid'">Lưới</button>
         </div>
@@ -81,7 +81,7 @@ const viewBtn = (active: boolean) =>
           <div v-for="item in filtered" :key="item.id">
             <label
               class="flex cursor-pointer items-center gap-3 rounded-lg border px-3 py-2"
-              :class="picked.has(item.id) ? 'border-emerald-700 bg-[#f5f9f0]' : 'border-[#cbd9c6] hover:bg-[#f5f9f0]'"
+              :class="picked.has(item.id) ? 'border-emerald-700 bg-surface' : 'border-border-default hover:bg-surface'"
             >
               <input
                 type="checkbox"
@@ -90,7 +90,7 @@ const viewBtn = (active: boolean) =>
                 @change="toggle(item.id)"
               />
               <img v-if="item.image" :src="item.image" :alt="item.name" class="size-10 object-contain" />
-              <span class="min-w-0 flex-1 truncate text-sm font-bold text-[#24352a]">{{ item.name }}</span>
+              <span class="min-w-0 flex-1 truncate text-sm font-bold text-content">{{ item.name }}</span>
               <span class="text-xs text-gray-500">{{ item.rarity }}</span>
             </label>
           </div>
@@ -100,7 +100,7 @@ const viewBtn = (active: boolean) =>
           <div v-for="item in filtered" :key="item.id">
             <label
               class="relative flex h-full cursor-pointer flex-col items-center gap-1 rounded-lg border p-3 text-center"
-              :class="picked.has(item.id) ? 'border-emerald-700 bg-[#f5f9f0]' : 'border-[#cbd9c6] hover:bg-[#f5f9f0]'"
+              :class="picked.has(item.id) ? 'border-emerald-700 bg-surface' : 'border-border-default hover:bg-surface'"
             >
               <input
                 type="checkbox"
@@ -110,14 +110,14 @@ const viewBtn = (active: boolean) =>
               />
               <img v-if="item.image" :src="item.image" :alt="item.name" class="h-20 w-full object-contain" />
               <div v-else class="h-20" />
-              <span class="text-sm font-bold text-[#24352a]">{{ item.name }}</span>
+              <span class="text-sm font-bold text-content">{{ item.name }}</span>
               <span class="text-xs text-gray-500">{{ item.rarity }}</span>
             </label>
           </div>
         </div>
       </div>
 
-      <div class="flex shrink-0 justify-end gap-2 border-t border-[#cbd9c6] px-5 py-3">
+      <div class="flex shrink-0 justify-end gap-2 border-t border-border-default px-5 py-3">
         <button
           type="button"
           class="rounded-lg border border-gray-300 px-4 py-2 text-sm font-bold text-gray-700 hover:bg-gray-100"
@@ -127,7 +127,7 @@ const viewBtn = (active: boolean) =>
         </button>
         <button
           type="button"
-          class="rounded-lg bg-[#153221] px-4 py-2 text-sm font-bold text-white hover:bg-emerald-800"
+          class="rounded-lg bg-content-strong px-4 py-2 text-sm font-bold text-white hover:bg-emerald-800"
           @click="confirm"
         >
           Xác nhận

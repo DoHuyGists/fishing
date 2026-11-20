@@ -166,7 +166,7 @@ onBeforeUnmount(() => {
         <div
           class="player-popup-panel relative flex flex-col overflow-hidden rounded-xl border"
           :class="inline
-            ? 'slide-fade-in from-top player-content-in w-full border-[#cbd9c6] bg-[#f5f9f0] text-[#24352a] shadow-sm'
+            ? 'slide-fade-in from-top player-content-in w-full border-border-default bg-surface text-content shadow-sm'
             : 'max-h-[90vh] w-[min(720px,100%)] border-emerald-900/15 bg-white text-emerald-950'"
           :role="inline ? 'region' : 'dialog'"
           :aria-modal="inline ? undefined : true"
@@ -202,7 +202,7 @@ onBeforeUnmount(() => {
             <div
               v-if="!inline || (weatherStore.zone && !weatherStore.error)"
               class="flex items-center gap-4 border-b border-emerald-900/10"
-              :class="inline ? 'flex-wrap bg-[#eaf2e5] px-3 py-3 sm:flex-nowrap' : 'px-5 py-4 pr-14'"
+              :class="inline ? 'flex-wrap bg-surface-hover px-3 py-3 sm:flex-nowrap' : 'px-5 py-4 pr-14'"
             >
               <div
                 class="grid h-16 w-16 shrink-0 place-items-center rounded-full border border-emerald-700/30 bg-emerald-100 text-3xl"

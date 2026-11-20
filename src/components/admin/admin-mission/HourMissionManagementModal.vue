@@ -150,7 +150,7 @@ onUnmounted(() => clearInterval(clockInterval));
         </button>
         <button
           type="button"
-          class="rounded-lg bg-[#153221] px-3.5 py-2 text-sm font-bold text-white hover:bg-emerald-800"
+          class="rounded-lg bg-content-strong px-3.5 py-2 text-sm font-bold text-white hover:bg-emerald-800"
           @click="store.openCreateForm()"
         >
           + Thêm nhiệm vụ

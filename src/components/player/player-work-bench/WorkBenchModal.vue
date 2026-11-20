@@ -156,7 +156,7 @@ const guideSteps = [
 <template>
   <Modal :title="tr('WorkBenchModal.ban_che_tao')" :guid-steps="guideSteps" :on-refresh="() => loadData(true)">
     <section
-      class="grid min-h-full w-full grid-cols-1 gap-4 text-[#24352a] lg:h-full lg:min-h-0 lg:grid-cols-[minmax(15rem,0.8fr)_minmax(0,1.8fr)]"
+      class="grid min-h-full w-full grid-cols-1 gap-4 text-content lg:h-full lg:min-h-0 lg:grid-cols-[minmax(15rem,0.8fr)_minmax(0,1.8fr)]"
     >
       <WorkBenchInventory
         v-model:search-query="searchQuery"

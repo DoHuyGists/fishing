@@ -12,7 +12,7 @@ const store = useDispatchStore();
   <div class="grid gap-2 lg:grid-cols-2 2xl:grid-cols-3">
     <article v-for="run in store.runs" :key="run.id" class="dispatch-card slide-fade-in player-content-in">
       <div class="font-bold">{{ dispatchText(run.npc_snapshot.name) }} · {{ dispatchText(run.job_snapshot.name) }}</div>
-      <div class="space-y-1 text-xs text-[#61745d]">
+      <div class="space-y-1 text-xs text-palette-61745d">
         <div>{{ tr("Dispatch.startedAt") }}: {{ formatDateTime(run.started_at) }}</div>
         <div>{{ tr("Dispatch.endsAt") }}: {{ formatDateTime(run.ends_at) }}</div>
       </div>
@@ -22,10 +22,10 @@ const store = useDispatchStore();
         :aria-valuenow="Math.floor(dispatchProgress(run, store.now))"
         :aria-valuemin="0"
         :aria-valuemax="100"
-        class="h-3 overflow-hidden rounded-full bg-[#e7ecda]"
+        class="h-3 overflow-hidden rounded-full bg-surface-muted"
       >
         <div
-          class="h-full rounded-full bg-[#527547] transition-[width] duration-700 motion-reduce:transition-none"
+          class="h-full rounded-full bg-palette-527547 transition-[width] duration-700 motion-reduce:transition-none"
           :style="{ width: dispatchProgress(run, store.now) + '%' }"
         ></div>
       </div>

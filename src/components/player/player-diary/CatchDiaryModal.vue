@@ -64,7 +64,7 @@ watch(
 
 <template>
   <Modal :title="tr('CatchDiaryModal.nhat_ky_danh_bat')" :on-refresh="retry">
-    <div class="flex h-full min-h-[420px] flex-col gap-3 text-[#24352a]">
+    <div class="flex h-full min-h-[420px] flex-col gap-3 text-content">
       <div
         v-if="diaryStore.error || countryStore.unlockedError"
         role="alert"
@@ -78,13 +78,13 @@ watch(
       <div
         v-if="isLoading"
         role="status"
-        class="rounded-xl border border-[#cbd9c6] bg-[#f5f9f0] p-8 text-center text-sm"
+        class="rounded-xl border border-border-default bg-surface p-8 text-center text-sm"
       >
         {{ tr("CatchDiaryModal.dang_tai_nhat_ky") }}
       </div>
       <div
         v-else-if="!countryStore.unlockedCountries.length && !countryStore.unlockedError"
-        class="rounded-xl border border-[#cbd9c6] bg-[#f5f9f0] p-8 text-center text-sm"
+        class="rounded-xl border border-border-default bg-surface p-8 text-center text-sm"
       >
         {{ tr("CatchDiaryModal.ban_chua_mo_quoc_gia_nao_hay_mo_mot_khu_vuc_tren_ban_do_de_bat_d") }}
       </div>
@@ -99,12 +99,12 @@ watch(
           @select="selectedCountryCode = $event"
         />
         <section
-          class="min-w-0 overflow-y-auto rounded-xl border border-[#cbd9c6] bg-[#f5f9f0] p-3 sm:p-5"
+          class="min-w-0 overflow-y-auto rounded-xl border border-border-default bg-surface p-3 sm:p-5"
           :aria-label="tr('CatchDiaryModal.species')"
         >
-          <div class="mb-4 flex flex-wrap items-center justify-between gap-2 border-b border-[#cbd9c6] pb-3">
+          <div class="mb-4 flex flex-wrap items-center justify-between gap-2 border-b border-border-default pb-3">
             <div class="break-words text-base font-bold sm:text-xl">{{ selectedCountry.name }}</div>
-            <span class="rounded-full border border-[#cbd9c6] bg-white px-3 py-1 text-xs font-semibold">
+            <span class="rounded-full border border-border-default bg-white px-3 py-1 text-xs font-semibold">
               {{ tr("CatchDiaryModal.conqueredCount", { value0: caughtCount }) }} / {{ entries.length }}
             </span>
           </div>
@@ -114,7 +114,7 @@ watch(
             type="search"
             :aria-label="tr('CatchDiaryModal.searchSpecies')"
             :placeholder="tr('CatchDiaryModal.searchSpecies')"
-            class="mb-3 w-full rounded-lg border border-[#cbd9c6] bg-white px-3 py-2 text-sm outline-none focus:border-[#698563] focus:ring-2 focus:ring-[#cbd9c6]"
+            class="mb-3 w-full rounded-lg border border-border-default bg-white px-3 py-2 text-sm outline-none focus:border-palette-698563 focus:ring-2 focus:ring-border-default"
           />
           <div v-if="!diaryStore.error && !entries.length" role="status" class="py-12 text-center text-sm leading-6">
             {{ tr("CatchDiaryModal.noSpecies") }}

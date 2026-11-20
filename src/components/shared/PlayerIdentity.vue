@@ -20,9 +20,9 @@ watch(
 </script>
 
 <template>
-  <div class="flex min-w-0 items-center gap-3 text-[#24352a]">
+  <div class="flex min-w-0 items-center gap-3 text-content">
     <div
-      class="flex size-10 shrink-0 items-center justify-center overflow-hidden rounded-full bg-[#3b7a57] text-sm font-bold text-white"
+      class="flex size-10 shrink-0 items-center justify-center overflow-hidden rounded-full bg-brand text-sm font-bold text-white"
     >
       <img
         v-if="profile?.avatar_url && !failedAvatar"
@@ -36,7 +36,7 @@ watch(
     </div>
     <div class="min-w-0 flex-1">
       <div class="truncate text-xs font-bold" :title="`${displayName} (${userId})`">{{ displayName }}</div>
-      <div class="mt-0.5 truncate text-[11px] text-[#556655]" :title="countryStore.getCountryName(profile?.country_id)">
+      <div class="mt-0.5 truncate text-[11px] text-content-caption" :title="countryStore.getCountryName(profile?.country_id)">
         {{ countryStore.getCountryName(profile?.country_id) }}
       </div>
       <slot />

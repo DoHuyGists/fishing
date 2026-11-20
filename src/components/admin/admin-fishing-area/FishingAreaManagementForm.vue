@@ -190,7 +190,7 @@ onUnmounted(() => {
   >
     <div class="p-5 flex flex-col gap-4">
       <div class="flex items-center justify-between">
-        <div class="m-0 text-sm font-extrabold text-[#153221]">
+        <div class="m-0 text-sm font-extrabold text-content-strong">
           {{ adminFishingAreaStore.isUpdate ? "Chỉnh sửa bãi câu" : "Thêm bãi câu mới" }}
         </div>
         <button
@@ -273,7 +273,7 @@ onUnmounted(() => {
           id="fishing-area-timezone"
           v-model="adminFishingAreaStore.target.timezone"
           :disabled="adminFishingAreaStore.isFormLock"
-          class="px-3 py-1.5 border border-[#cbd9c6] rounded-lg text-xs bg-[#f5f9f0] text-[#24352a] focus:outline-none focus:border-emerald-500"
+          class="px-3 py-1.5 border border-border-default rounded-lg text-xs bg-surface text-content focus:outline-none focus:border-emerald-500"
         >
           <option :value="null">-- Theo múi giờ quốc gia --</option>
           <option
@@ -288,7 +288,7 @@ onUnmounted(() => {
         </select>
       </div>
 
-      <label class="flex items-center gap-2 text-xs font-medium text-[#24352a] cursor-pointer select-none">
+      <label class="flex items-center gap-2 text-xs font-medium text-content cursor-pointer select-none">
         <input
           v-model="adminFishingAreaStore.target.allowDepthTool"
           type="checkbox"
@@ -314,7 +314,7 @@ onUnmounted(() => {
           <button
             type="button"
             @click="toggleAnchorMode"
-            class="shrink-0 rounded-lg border border-[#cbd9c6] bg-[#f5f9f0] px-3 py-1.5 text-xs font-bold text-[#24352a] transition-colors hover:bg-[#eaf2e3]"
+            class="shrink-0 rounded-lg border border-border-default bg-surface px-3 py-1.5 text-xs font-bold text-content transition-colors hover:bg-palette-eaf2e3"
           >
             {{ worldStore.isAnchorMode ? "Tắt xác định vị trí" : "Bật xác định vị trí" }}
           </button>
@@ -347,7 +347,7 @@ onUnmounted(() => {
             type="button"
             @click="openBoundaryPicker"
             :disabled="adminFishingAreaStore.isFormLock"
-            class="self-start px-3 py-1.5 rounded-lg border border-[#cbd9c6] bg-[#f5f9f0] text-[#24352a] text-xs font-bold hover:bg-[#eaf2e3] cursor-pointer transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+            class="self-start px-3 py-1.5 rounded-lg border border-border-default bg-surface text-content text-xs font-bold hover:bg-palette-eaf2e3 cursor-pointer transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
           >
             Thiết lập vùng câu
           </button>
@@ -366,7 +366,7 @@ onUnmounted(() => {
           type="button"
           @click="handleSave"
           :disabled="isSaving"
-          class="flex-1 px-3 py-2 rounded-lg bg-[#153221] hover:bg-emerald-800 text-white text-xs font-bold cursor-pointer transition-colors disabled:opacity-50"
+          class="flex-1 px-3 py-2 rounded-lg bg-content-strong hover:bg-emerald-800 text-white text-xs font-bold cursor-pointer transition-colors disabled:opacity-50"
         >
           {{ isSaving ? "Đang lưu..." : "Lưu" }}
         </button>

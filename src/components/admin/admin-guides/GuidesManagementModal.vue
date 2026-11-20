@@ -53,7 +53,7 @@ onUnmounted(() => store.resetView());
         <button
           type="button"
           :disabled="store.saving"
-          class="rounded-lg border border-[#cbd9c6] bg-white px-3 py-2 text-sm disabled:opacity-50"
+          class="rounded-lg border border-border-default bg-white px-3 py-2 text-sm disabled:opacity-50"
           @click="store.closeForm()"
         >
           Quay lại danh sách
@@ -74,7 +74,7 @@ onUnmounted(() => store.resetView());
             v-model="store.form.title"
             type="text"
             required
-            class="mt-1 w-full rounded-lg border border-[#cbd9c6] bg-white px-3 py-2 font-normal focus:outline-emerald-700"
+            class="mt-1 w-full rounded-lg border border-border-default bg-white px-3 py-2 font-normal focus:outline-emerald-700"
             placeholder="Nhập tiêu đề hướng dẫn"
           />
         </label>
@@ -88,7 +88,7 @@ onUnmounted(() => store.resetView());
               min="-2147483648"
               max="2147483647"
               required
-              class="mt-1 block w-48 rounded-lg border border-[#cbd9c6] bg-white px-3 py-2 font-normal focus:outline-emerald-700"
+              class="mt-1 block w-48 rounded-lg border border-border-default bg-white px-3 py-2 font-normal focus:outline-emerald-700"
             />
           </label>
           <label class="flex min-h-10 items-center gap-2 text-sm font-semibold"
@@ -96,7 +96,7 @@ onUnmounted(() => store.resetView());
             người chơi</label
           >
         </div>
-        <div class="text-xs text-[#24352a]/70">
+        <div class="text-xs text-content/70">
           Số thứ tự nhỏ hơn được hiển thị trước. Bỏ chọn xuất bản để ẩn hướng dẫn.
         </div>
         <div class="flex flex-wrap items-center justify-between gap-3">
@@ -104,13 +104,13 @@ onUnmounted(() => store.resetView());
           <button
             type="button"
             :aria-pressed="preview"
-            class="rounded-lg border border-[#cbd9c6] bg-white px-3 py-1.5 text-xs font-semibold"
+            class="rounded-lg border border-border-default bg-white px-3 py-1.5 text-xs font-semibold"
             @click="preview = !preview"
           >
             {{ preview ? "Tiếp tục soạn thảo" : "Xem trước" }}
           </button>
         </div>
-        <div v-if="preview" class="min-h-72 rounded-xl border border-[#cbd9c6] bg-white p-4">
+        <div v-if="preview" class="min-h-72 rounded-xl border border-border-default bg-white p-4">
           <div class="mb-4 break-words text-xl font-bold">{{ store.form.title || "Tiêu đề hướng dẫn" }}</div>
           <RichTextContent :content="store.form.content" />
         </div>
@@ -125,7 +125,7 @@ onUnmounted(() => store.resetView());
         <button
           type="button"
           :disabled="store.saving"
-          class="rounded-lg border border-[#cbd9c6] bg-white px-4 py-2 text-sm font-semibold disabled:opacity-50"
+          class="rounded-lg border border-border-default bg-white px-4 py-2 text-sm font-semibold disabled:opacity-50"
           @click="store.closeForm()"
         >
           Hủy
@@ -140,18 +140,18 @@ onUnmounted(() => store.resetView());
       </div>
     </form>
     <template v-else>
-      <div class="flex shrink-0 flex-wrap items-center gap-3 border-b border-[#cbd9c6] p-4 sm:px-6">
+      <div class="flex shrink-0 flex-wrap items-center gap-3 border-b border-border-default p-4 sm:px-6">
         <input
           v-model="store.search"
           type="search"
           aria-label="Tìm hướng dẫn"
           placeholder="Tìm tiêu đề hoặc nội dung…"
-          class="min-w-48 flex-1 rounded-lg border border-[#cbd9c6] bg-white px-3 py-2 text-sm focus:outline-emerald-700"
+          class="min-w-48 flex-1 rounded-lg border border-border-default bg-white px-3 py-2 text-sm focus:outline-emerald-700"
         />
         <select
           v-model="store.status"
           aria-label="Lọc trạng thái xuất bản"
-          class="rounded-lg border border-[#cbd9c6] bg-white px-3 py-2 text-sm"
+          class="rounded-lg border border-border-default bg-white px-3 py-2 text-sm"
         >
           <option value="all">Tất cả trạng thái</option>
           <option value="published">Đã xuất bản</option>
@@ -160,7 +160,7 @@ onUnmounted(() => store.resetView());
         <button
           type="button"
           :disabled="store.loading || store.busy"
-          class="rounded-lg border border-[#cbd9c6] bg-white px-3 py-2 text-sm font-semibold disabled:opacity-50"
+          class="rounded-lg border border-border-default bg-white px-3 py-2 text-sm font-semibold disabled:opacity-50"
           @click="store.fetchRows()"
         >
           {{ store.loading ? "Đang tải…" : "Làm mới" }}
@@ -187,13 +187,13 @@ onUnmounted(() => store.resetView());
         </div>
         <div
           v-else-if="!store.filteredRows.length"
-          class="rounded-xl border border-dashed border-[#cbd9c6] bg-white p-10 text-center text-sm text-[#24352a]/70"
+          class="rounded-xl border border-dashed border-border-default bg-white p-10 text-center text-sm text-content/70"
         >
           {{ store.rows.length ? "Không có hướng dẫn phù hợp với bộ lọc." : "Chưa có hướng dẫn nào." }}
         </div>
-        <div v-else class="overflow-x-auto rounded-xl border border-[#cbd9c6] bg-white">
+        <div v-else class="overflow-x-auto rounded-xl border border-border-default bg-white">
           <table class="w-full min-w-[760px] text-left text-sm">
-            <thead class="bg-[#eaf1e5] text-xs uppercase">
+            <thead class="bg-palette-eaf1e5 text-xs uppercase">
               <tr>
                 <th scope="col" class="px-4 py-3">Thứ tự</th>
                 <th scope="col" class="px-4 py-3">Hướng dẫn</th>
@@ -206,12 +206,12 @@ onUnmounted(() => store.resetView());
               <tr
                 v-for="row in store.filteredRows"
                 :key="row.id"
-                class="border-t border-[#cbd9c6] align-top hover:bg-[#f5f9f0]"
+                class="border-t border-border-default align-top hover:bg-surface"
               >
                 <td class="px-4 py-3 tabular-nums">{{ row.sort_order }}</td>
                 <td class="max-w-md px-4 py-3">
                   <div class="break-words font-bold">{{ row.title }}</div>
-                  <div class="mt-1 line-clamp-2 break-words text-xs text-[#24352a]/65">{{ row.excerpt }}</div>
+                  <div class="mt-1 line-clamp-2 break-words text-xs text-content/65">{{ row.excerpt }}</div>
                 </td>
                 <td class="whitespace-nowrap px-4 py-3">
                   <span
@@ -226,7 +226,7 @@ onUnmounted(() => store.resetView());
                     <button
                       type="button"
                       :disabled="store.loading || store.busy"
-                      class="rounded-lg border border-[#cbd9c6] px-3 py-1.5 text-xs font-semibold hover:bg-emerald-100 disabled:opacity-50"
+                      class="rounded-lg border border-border-default px-3 py-1.5 text-xs font-semibold hover:bg-emerald-100 disabled:opacity-50"
                       :aria-label="`Sửa hướng dẫn ${row.title}`"
                       @click="openEdit(row)"
                     >

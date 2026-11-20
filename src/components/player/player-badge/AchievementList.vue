@@ -23,10 +23,10 @@ const emit = defineEmits<{ select: [badgeId: string]; "clear-filters": [] }>();
   </div>
   <div
     v-else-if="badgesStore.collectionTotal === 0"
-    class="mt-4 rounded-2xl border border-dashed border-[#cbd9c6] bg-[#f5f9f0] p-8 text-center"
+    class="mt-4 rounded-2xl border border-dashed border-border-default bg-surface p-8 text-center"
   >
     <span class="text-4xl" aria-hidden="true">🎣</span>
-    <div class="mb-1 mt-3 text-sm font-bold text-[#24352a]">
+    <div class="mb-1 mt-3 text-sm font-bold text-content">
       {{ tr("Achievement.ho_so_dang_cho_dau_an_dau_tien") }}
     </div>
     <div class="m-0 text-xs text-gray-500">
@@ -35,15 +35,15 @@ const emit = defineEmits<{ select: [badgeId: string]; "clear-filters": [] }>();
   </div>
   <div
     v-else-if="badgesStore.badges.length === 0"
-    class="mt-4 rounded-2xl border border-dashed border-[#cbd9c6] bg-[#f5f9f0] p-8 text-center"
+    class="mt-4 rounded-2xl border border-dashed border-border-default bg-surface p-8 text-center"
   >
-    <div class="m-0 text-sm font-bold text-[#24352a]">{{ tr("Achievement.khong_tim_thay_huy_hieu_phu_hop") }}</div>
+    <div class="m-0 text-sm font-bold text-content">{{ tr("Achievement.khong_tim_thay_huy_hieu_phu_hop") }}</div>
     <div class="mb-3 mt-1 text-xs text-gray-500">
       {{ tr("Achievement.thu_thay_doi_tu_khoa_hoac_bo_loc_cua_ban") }}
     </div>
     <button
       type="button"
-      class="cursor-pointer rounded-full border border-[#cbd9c6] bg-white px-4 py-2 text-xs font-bold text-emerald-800 hover:bg-emerald-50"
+      class="cursor-pointer rounded-full border border-border-default bg-white px-4 py-2 text-xs font-bold text-emerald-800 hover:bg-emerald-50"
       @click="emit('clear-filters')"
     >
       {{ tr("Achievement.xoa_bo_loc") }}

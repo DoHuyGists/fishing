@@ -9,14 +9,14 @@ const store = useFishingMapStore();
     <input
       v-model="store.search"
       type="search"
-      class="min-w-40 flex-1 rounded-lg border border-[#cbd9c6] bg-white px-3 py-2 text-sm"
+      class="min-w-40 flex-1 rounded-lg border border-border-default bg-white px-3 py-2 text-sm"
       :aria-label="tr('FishingMapModal.search')"
       :placeholder="tr('FishingMapModal.search')"
     />
     <select
       v-model="store.speciesId"
       :disabled="store.loadingSpecies"
-      class="max-w-full rounded-lg border border-[#cbd9c6] bg-white px-3 py-2 text-sm"
+      class="max-w-full rounded-lg border border-border-default bg-white px-3 py-2 text-sm"
       :aria-label="tr('FishingMapModal.speciesFilter')"
     >
       <option value="">{{ tr("FishingMapModal.allSpecies") }}</option>
@@ -24,7 +24,7 @@ const store = useFishingMapStore();
     </select>
     <select
       v-model="store.sort"
-      class="rounded-lg border border-[#cbd9c6] bg-white px-3 py-2 text-sm"
+      class="rounded-lg border border-border-default bg-white px-3 py-2 text-sm"
       :aria-label="tr('FishingMapModal.sort')"
     >
       <option value="name">{{ tr("FishingMapModal.sortName") }}</option>
@@ -35,8 +35,8 @@ const store = useFishingMapStore();
         v-for="mode in ['list', 'grid'] as const"
         :key="mode"
         type="button"
-        class="rounded-lg border border-[#cbd9c6] px-3 py-2 text-sm"
-        :class="store.viewMode === mode ? 'bg-[#dce9d4] font-bold' : 'bg-white'"
+        class="rounded-lg border border-border-default px-3 py-2 text-sm"
+        :class="store.viewMode === mode ? 'bg-palette-dce9d4 font-bold' : 'bg-white'"
         :aria-pressed="store.viewMode === mode"
         @click="store.viewMode = mode"
       >
@@ -46,7 +46,7 @@ const store = useFishingMapStore();
     <button
       v-if="store.search || store.speciesId || store.sort !== 'name'"
       type="button"
-      class="rounded-lg border border-[#cbd9c6] bg-white px-3 py-2 text-sm"
+      class="rounded-lg border border-border-default bg-white px-3 py-2 text-sm"
       @click="
         store.search = '';
         store.speciesId = '';

@@ -8,35 +8,35 @@ const goBack = () => {
 </script>
 
 <template>
-  <main class="flex min-h-screen items-center justify-center bg-[#f5f9f0] px-6 py-16 text-[#24352a]">
+  <main class="flex min-h-screen items-center justify-center bg-surface px-6 py-16 text-content">
     <section class="w-full max-w-xl" aria-labelledby="error-title">
       <!-- Khung nét đứt thể hiện "trang bị thiếu" -->
       <div
-        class="flex aspect-[16/7] w-full items-center justify-center rounded-2xl border-2 border-dashed border-[#cbd9c6]"
+        class="flex aspect-[16/7] w-full items-center justify-center rounded-2xl border-2 border-dashed border-border-default"
         aria-hidden="true"
       >
         <span class="select-none text-7xl font-semibold tracking-tight sm:text-8xl">
-          4<span class="inline-block -translate-y-1 text-[#24352a]/30">0</span>4
+          4<span class="inline-block -translate-y-1 text-content/30">0</span>4
         </span>
       </div>
 
       <div id="error-title" class="mt-10 text-2xl font-semibold tracking-tight sm:text-3xl">
         {{ tr('NotFound.khong_tim_thay_trang') }}
       </div>
-      <div class="mt-3 max-w-md text-base leading-relaxed text-[#24352a]/70">
+      <div class="mt-3 max-w-md text-base leading-relaxed text-content/70">
         {{ tr('NotFound.dia_chi_nay_khong_ton_tai_hoac_da_duoc_chuyen_di_hay_kiem_tra_la') }}
       </div>
 
       <div class="mt-8 flex flex-wrap gap-3">
         <a
           href="/"
-          class="inline-flex items-center rounded-lg border border-[#24352a] bg-[#24352a] px-5 py-2.5 text-sm font-medium text-[#f5f9f0] transition-colors hover:bg-[#24352a]/90 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#24352a]"
+          class="inline-flex items-center rounded-lg border border-content bg-content px-5 py-2.5 text-sm font-medium text-surface transition-colors hover:bg-content/90 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-content"
         >
           {{ tr('Maintenance.ve_trang_chu') }}
         </a>
         <button
           type="button"
-          class="inline-flex items-center rounded-lg border border-[#cbd9c6] bg-[#f5f9f0] px-5 py-2.5 text-sm font-medium text-[#24352a] transition-colors hover:bg-[#cbd9c6]/40 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#24352a]"
+          class="inline-flex items-center rounded-lg border border-border-default bg-surface px-5 py-2.5 text-sm font-medium text-content transition-colors hover:bg-border-default/40 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-content"
           @click="goBack"
         >
           {{ tr('Forbidden.quay_lai') }}

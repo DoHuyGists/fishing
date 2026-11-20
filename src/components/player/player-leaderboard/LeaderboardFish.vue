@@ -9,7 +9,7 @@ const dateFormatter = computed(() => new Intl.DateTimeFormat(getFormattingLocale
 </script>
 
 <template>
-  <div class="min-w-0 text-[#52654f]" :class="compact ? 'grid grid-cols-[auto_minmax(0,1fr)] items-center gap-x-1.5 text-[10px]' : 'text-xs'">
+  <div class="min-w-0 text-content-muted" :class="compact ? 'grid grid-cols-[auto_minmax(0,1fr)] items-center gap-x-1.5 text-[10px]' : 'text-xs'">
     <img v-if="fish.image" :src="fish.image" alt="" class="inline-block rounded object-contain" :class="compact ? 'row-span-2 size-6' : 'size-8'" loading="lazy" />
     <div class="col-start-2 truncate font-semibold" :title="fish.name">{{ fish.name }}</div>
     <div class="col-start-2">{{ formatter.format(fish.weight) }} kg<template v-if="fish.rarity"> · {{ fish.rarity }}</template></div>

@@ -91,8 +91,8 @@ function closeCountryModal() {
     :on-second="updateCountry"
     @keydown.esc.stop="closeCountryModal"
   >
-    <div class="max-h-[calc(100dvh-14rem)] space-y-4 overflow-y-auto text-sm text-[#24352a]">
-      <div class="rounded-lg border border-[#cbd9c6] bg-[#f5f9f0] p-3 text-xs leading-relaxed">
+    <div class="max-h-[calc(100dvh-14rem)] space-y-4 overflow-y-auto text-sm text-content">
+      <div class="rounded-lg border border-border-default bg-surface p-3 text-xs leading-relaxed">
         <div class="mb-1 font-semibold">{{ tr("UserProfile.luu_y_truoc_khi_doi") }}</div>
         <div>{{ tr("UserProfile.chon_quoc_gia_anh_huong_mui_gio") }}</div>
         <div class="mt-1">{{ tr("UserProfile.sau_khi_cap_nhat_quoc_gia_ban_can_cho_365_ngay_de_co_the_doi_tie") }}</div>
@@ -120,9 +120,9 @@ function closeCountryModal() {
           autocomplete="off"
           :placeholder="tr('UserProfile.tim_quoc_gia')"
           :aria-label="tr('UserProfile.tim_quoc_gia_2')"
-          class="w-full rounded-lg border border-[#cbd9c6] bg-white px-3 py-2 outline-none focus:ring-2 focus:ring-emerald-600"
+          class="w-full rounded-lg border border-border-default bg-white px-3 py-2 outline-none focus:ring-2 focus:ring-emerald-600"
         />
-        <div class="max-h-40 overflow-y-auto rounded-lg border border-[#cbd9c6] bg-[#f5f9f0]">
+        <div class="max-h-40 overflow-y-auto rounded-lg border border-border-default bg-surface">
           <div v-if="countryStore.isLoading" role="status" class="px-3 py-2 text-xs text-gray-500">
             {{ tr("UserProfile.dang_tai_quoc_gia") }}
           </div>
@@ -130,15 +130,15 @@ function closeCountryModal() {
             <label
               v-for="country in filteredCountries"
               :key="country.id"
-              class="flex cursor-pointer items-center gap-2 px-3 py-2 hover:bg-[#e7ecda]"
-              :class="{ 'bg-[#e7ecda]': selectedCountryId === country.id }"
+              class="flex cursor-pointer items-center gap-2 px-3 py-2 hover:bg-surface-muted"
+              :class="{ 'bg-surface-muted': selectedCountryId === country.id }"
             >
               <input
                 v-model="selectedCountryId"
                 type="radio"
                 name="profile-country"
                 :value="country.id"
-                class="accent-[#24352a]"
+                class="accent-content"
                 @change="countryError = ''"
               />
               <span>{{ country.name }}</span>

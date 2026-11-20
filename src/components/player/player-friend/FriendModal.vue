@@ -181,7 +181,7 @@ async function executeDelete() {
     <div class="w-full min-w-0 space-y-3 pb-6 sm:space-y-4 sm:pb-10">
       <!-- ID Người chơi hiện tại & Banner -->
       <div
-        class="slide-fade-in from-top player-content-in bg-linear-to-r from-[#173223] via-[#1c3f2d] to-[#122b1e] rounded-2xl p-3 sm:p-5 border border-emerald-800/40 shadow-md text-emerald-50 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 sm:gap-4"
+        class="slide-fade-in from-top player-content-in bg-linear-to-r from-palette-173223 via-palette-1c3f2d to-palette-122b1e rounded-2xl p-3 sm:p-5 border border-emerald-800/40 shadow-md text-emerald-50 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 sm:gap-4"
       >
         <div class="flex items-center gap-3.5 min-w-0">
           <div
@@ -218,7 +218,7 @@ async function executeDelete() {
           class="flex shrink-0 snap-start items-center gap-2 px-3 sm:px-4 py-2 rounded-xl text-xs font-bold transition-all cursor-pointer border"
           :class="
             activeTab === 'friends'
-              ? 'bg-[#153221] text-white border-emerald-800 shadow-sm'
+              ? 'bg-content-strong text-white border-emerald-800 shadow-sm'
               : 'bg-white/80 text-emerald-950/80 border-emerald-900/10 hover:bg-emerald-50'
           "
           @click="activeTab = 'friends'"
@@ -237,7 +237,7 @@ async function executeDelete() {
           class="flex shrink-0 snap-start items-center gap-2 px-3 sm:px-4 py-2 rounded-xl text-xs font-bold transition-all cursor-pointer border relative"
           :class="
             activeTab === 'received'
-              ? 'bg-[#153221] text-white border-emerald-800 shadow-sm'
+              ? 'bg-content-strong text-white border-emerald-800 shadow-sm'
               : 'bg-white/80 text-emerald-950/80 border-emerald-900/10 hover:bg-emerald-50'
           "
           @click="activeTab = 'received'"
@@ -263,7 +263,7 @@ async function executeDelete() {
           class="flex shrink-0 snap-start items-center gap-2 px-3 sm:px-4 py-2 rounded-xl text-xs font-bold transition-all cursor-pointer border"
           :class="
             activeTab === 'sent'
-              ? 'bg-[#153221] text-white border-emerald-800 shadow-sm'
+              ? 'bg-content-strong text-white border-emerald-800 shadow-sm'
               : 'bg-white/80 text-emerald-950/80 border-emerald-900/10 hover:bg-emerald-50'
           "
           @click="activeTab = 'sent'"
@@ -282,7 +282,7 @@ async function executeDelete() {
           class="flex shrink-0 snap-start items-center gap-2 px-3 sm:px-4 py-2 rounded-xl text-xs font-bold transition-all cursor-pointer border"
           :class="
             activeTab === 'discover'
-              ? 'bg-[#153221] text-white border-emerald-800 shadow-sm'
+              ? 'bg-content-strong text-white border-emerald-800 shadow-sm'
               : 'bg-white/80 text-emerald-950/80 border-emerald-900/10 hover:bg-emerald-50'
           "
           @click="activeTab = 'discover'"

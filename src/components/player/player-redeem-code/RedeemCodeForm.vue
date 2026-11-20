@@ -16,7 +16,7 @@ async function redeemCode() {
 
 <template>
   <form
-    class="slide-fade-in from-right player-content-in min-w-0 w-full rounded-2xl border border-[#cbd9c6] bg-white p-5 shadow-sm sm:p-6"
+    class="slide-fade-in from-right player-content-in min-w-0 w-full rounded-2xl border border-border-default bg-white p-5 shadow-sm sm:p-6"
     @submit.prevent="redeemCode"
   >
     <label for="redeem-code" class="mb-2 block text-sm font-bold">{{ tr('RedeemCodeForm.ma_doi_thuong') }}</label>
@@ -29,7 +29,7 @@ async function redeemCode() {
       required
       :disabled="isSubmitting"
       :placeholder="tr('RedeemCodeForm.nhap_ma_cua_ban')"
-      class="w-full rounded-lg border border-[#cbd9c6] px-3 py-3 text-sm outline-none transition focus:border-emerald-700 focus:ring-2 focus:ring-emerald-700/15 disabled:bg-gray-100"
+      class="w-full rounded-lg border border-border-default px-3 py-3 text-sm outline-none transition focus:border-emerald-700 focus:ring-2 focus:ring-emerald-700/15 disabled:bg-gray-100"
     />
 
     <div class="mt-5 flex justify-center">

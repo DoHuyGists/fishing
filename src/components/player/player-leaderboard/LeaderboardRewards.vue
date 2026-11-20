@@ -17,7 +17,7 @@ const store = useLeaderboardStore();
     <div class="rounded-xl border border-amber-200 bg-amber-50 px-4 py-3 text-xs text-amber-900">
       {{ tr("LeaderboardRules.reward_status") }}
     </div>
-    <div class="grid gap-3 text-xs text-[#52654f] md:grid-cols-2">
+    <div class="grid gap-3 text-xs text-content-muted md:grid-cols-2">
       <div>{{ tr("LeaderboardRules.reward_categories") }}</div>
       <div>{{ tr("LeaderboardRules.reward_period") }}</div>
     </div>
@@ -26,9 +26,9 @@ const store = useLeaderboardStore();
       <div
         v-for="tier in store.rewardTiers"
         :key="tier.minPlayers"
-        class="overflow-hidden rounded-2xl border border-[#cbd9c6] bg-[#f5f9f0]"
+        class="overflow-hidden rounded-2xl border border-border-default bg-surface"
       >
-        <div class="border-b border-[#cbd9c6] bg-[#e7ecda] px-4 py-3 text-xs font-bold">
+        <div class="border-b border-border-default bg-surface-muted px-4 py-3 text-xs font-bold">
           {{
             tier.maxPlayers === null
               ? tr("LeaderboardRules.players_from", { count: tier.minPlayers })
@@ -37,7 +37,7 @@ const store = useLeaderboardStore();
         </div>
         <div
           v-if="!tier.rewards.length"
-          class="flex min-h-36 flex-col items-center justify-center gap-3 px-4 py-6 text-center text-xs text-[#52654f]"
+          class="flex min-h-36 flex-col items-center justify-center gap-3 px-4 py-6 text-center text-xs text-content-muted"
         >
           <span aria-hidden="true" class="text-3xl">🌱</span>
           {{ tr("LeaderboardRules.no_rewards") }}
@@ -48,14 +48,14 @@ const store = useLeaderboardStore();
               tr("LeaderboardRules.reward_table")
             }}
           </caption>
-          <thead class="text-[#52654f]">
-            <tr class="border-b border-[#cbd9c6]">
+          <thead class="text-content-muted">
+            <tr class="border-b border-border-default">
               <th scope="col" class="w-1/5 px-2 py-2">{{ tr("LeaderboardRules.rank") }}</th>
               <th scope="col" class="px-2 py-2">{{ tr("LeaderboardRules.fishing_categories") }}</th>
               <th scope="col" class="px-2 py-2">{{ tr("leaderboard.tieu_cash") }}</th>
             </tr>
           </thead>
-          <tbody class="divide-y divide-[#cbd9c6]/50">
+          <tbody class="divide-y divide-border-default/50">
             <tr
               v-for="reward in tier.rewards"
               :key="reward.fromRank"
@@ -80,7 +80,7 @@ const store = useLeaderboardStore();
         </table>
       </div>
     </div>
-    <div class="text-xs text-[#52654f]">{{ tr("LeaderboardRules.per_player") }}</div>
+    <div class="text-xs text-content-muted">{{ tr("LeaderboardRules.per_player") }}</div>
     <div class="flex items-start gap-3 rounded-2xl border border-amber-200 bg-amber-50 p-4">
       <span aria-hidden="true" class="text-2xl">🏅</span>
       <div>
@@ -97,10 +97,10 @@ const store = useLeaderboardStore();
           ['claim_heading', 'claim'],
         ]"
         :key="title"
-        class="rounded-xl border border-[#cbd9c6] p-4"
+        class="rounded-xl border border-border-default p-4"
       >
         <div class="text-sm font-bold">{{ tr(`LeaderboardRules.${title}`) }}</div>
-        <div class="mt-2 text-xs text-[#52654f]">{{ tr(`LeaderboardRules.${content}`) }}</div>
+        <div class="mt-2 text-xs text-content-muted">{{ tr(`LeaderboardRules.${content}`) }}</div>
       </div>
     </div>
   </section>

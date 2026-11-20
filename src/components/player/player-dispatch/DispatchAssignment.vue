@@ -8,7 +8,7 @@ const store = useDispatchStore();
 
 <template>
   <form
-    class="space-y-2 rounded-lg border border-[#cbd9c6] bg-white p-2.5"
+    class="space-y-2 rounded-lg border border-border-default bg-white p-2.5"
     @submit.prevent="
       store.selectedOwned && store.selectedJob && store.ask('start', store.selectedOwned.id, store.selectedJob.id)
     "
@@ -19,7 +19,7 @@ const store = useDispatchStore();
         <span>{{ tr("Dispatch.chooseNpc") }}</span>
         <select
           v-model="store.selectedNpcId"
-          class="min-h-8 w-full min-w-0 rounded-md border border-[#cbd9c6] bg-[#f5f9f0] px-2 py-1"
+          class="min-h-8 w-full min-w-0 rounded-md border border-border-default bg-surface px-2 py-1"
           :disabled="store.locked"
         >
           <option value="">{{ tr("Dispatch.chooseNpc") }}</option>
@@ -41,7 +41,7 @@ const store = useDispatchStore();
         <span>{{ tr("Dispatch.chooseJob") }}</span>
         <select
           v-model="store.selectedJobId"
-          class="min-h-8 w-full min-w-0 rounded-md border border-[#cbd9c6] bg-[#f5f9f0] px-2 py-1"
+          class="min-h-8 w-full min-w-0 rounded-md border border-border-default bg-surface px-2 py-1"
           :disabled="store.locked"
         >
           <option value="">{{ tr("Dispatch.chooseJob") }}</option>

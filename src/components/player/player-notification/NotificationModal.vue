@@ -110,10 +110,10 @@ onUnmounted(() => {
               >
               <span
                 v-if="expandedNotificationId === item.id"
-                class="mt-3 block border-t border-[#cbd9c6] pt-3 sm:hidden"
+                class="mt-3 block border-t border-border-default pt-3 sm:hidden"
               >
                 <span class="mb-2 flex flex-wrap items-center gap-2">
-                  <span class="rounded-full bg-[#f5f9f0] px-2.5 py-1 text-xs font-bold text-[#24352a]">{{
+                  <span class="rounded-full bg-surface px-2.5 py-1 text-xs font-bold text-content">{{
                     item.type || "general"
                   }}</span>
                   <span class="text-xs text-gray-500">{{ formatDateTime(item.created_at) }}</span>
@@ -150,7 +150,7 @@ onUnmounted(() => {
                 }}</span
                 ><span class="text-xs text-gray-500">{{ formatDateTime(selected.created_at) }}</span>
               </div>
-              <div class="m-0 text-xl font-extrabold text-[#153221]">{{ selected.title }}</div>
+              <div class="m-0 text-xl font-extrabold text-content-strong">{{ selected.title }}</div>
               <div class="mt-5 whitespace-pre-wrap text-sm leading-7 text-gray-700">{{ selected.body }}</div>
               <div v-if="readError" role="alert" class="mt-5 rounded-lg bg-red-50 p-3 text-sm text-red-700">
                 {{ tr("NotificationModal.khong_the_cap_nhat_trang_thai_da_doc_2") }} {{ readError }}
@@ -194,10 +194,10 @@ onUnmounted(() => {
               >
               <span
                 v-if="expandedNotificationId === item.id"
-                class="mt-3 block border-t border-[#cbd9c6] pt-3 sm:hidden"
+                class="mt-3 block border-t border-border-default pt-3 sm:hidden"
               >
                 <span class="mb-2 flex flex-wrap items-center gap-2">
-                  <span class="rounded-full bg-[#f5f9f0] px-2.5 py-1 text-xs font-bold text-[#24352a]">{{
+                  <span class="rounded-full bg-surface px-2.5 py-1 text-xs font-bold text-content">{{
                     item.type || "system"
                   }}</span>
                   <span class="text-xs text-gray-500">{{ formatDateTime(item.created_at) }}</span>
@@ -234,7 +234,7 @@ onUnmounted(() => {
                 }}</span
                 ><span class="text-xs text-gray-500">{{ formatDateTime(selected.created_at) }}</span>
               </div>
-              <div class="m-0 text-xl font-extrabold text-[#153221]">{{ selected.title }}</div>
+              <div class="m-0 text-xl font-extrabold text-content-strong">{{ selected.title }}</div>
               <div class="mt-5 whitespace-pre-wrap text-sm leading-7 text-gray-700">{{ selected.body }}</div>
               <div v-if="readError" role="alert" class="mt-5 rounded-lg bg-red-50 p-3 text-sm text-red-700">
                 {{ tr("NotificationModal.khong_the_cap_nhat_trang_thai_da_doc_2") }} {{ readError }}

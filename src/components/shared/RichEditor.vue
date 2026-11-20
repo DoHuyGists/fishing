@@ -421,13 +421,13 @@ function applyMedia() {
 
 <template>
   <div
-    class="overflow-hidden rounded-xl border border-[#cbd9c6] bg-white text-[#24352a] focus-within:ring-2 focus-within:ring-emerald-700/20"
+    class="overflow-hidden rounded-xl border border-border-default bg-white text-content focus-within:ring-2 focus-within:ring-emerald-700/20"
     :class="{ 'opacity-60': disabled }"
   >
     <div
       role="group"
       :aria-label="tr('RichEditor.dinh_dang_noi_dung')"
-      class="flex flex-wrap gap-1 border-b border-[#cbd9c6] bg-[#f5f9f0] p-2"
+      class="flex flex-wrap gap-1 border-b border-border-default bg-surface p-2"
     >
       <button
         v-for="tool in tools"
@@ -453,7 +453,7 @@ function applyMedia() {
         :disabled="disabled || !editor"
         :aria-expanded="linkOpen"
         :aria-pressed="editor?.isActive('link')"
-        class="rounded-md border border-[#cbd9c6] px-2.5 py-1.5 text-xs font-semibold hover:bg-emerald-100 disabled:opacity-40"
+        class="rounded-md border border-border-default px-2.5 py-1.5 text-xs font-semibold hover:bg-emerald-100 disabled:opacity-40"
         @mousedown.prevent
         @click="openLink"
       >
@@ -464,14 +464,14 @@ function applyMedia() {
         :disabled="disabled || !editor"
         :aria-expanded="mediaOpen"
         :aria-controls="mediaPanelId"
-        class="rounded-md border border-[#cbd9c6] px-2.5 py-1.5 text-xs font-semibold hover:bg-emerald-100 disabled:opacity-40"
+        class="rounded-md border border-border-default px-2.5 py-1.5 text-xs font-semibold hover:bg-emerald-100 disabled:opacity-40"
         @mousedown.prevent
         @click="openMedia"
       >
         {{ tr("RichEditor.chen_anh_video") }}
       </button>
     </div>
-    <div v-if="linkOpen" class="space-y-2 border-b border-[#cbd9c6] bg-[#f5f9f0] p-3">
+    <div v-if="linkOpen" class="space-y-2 border-b border-border-default bg-surface p-3">
       <label class="block text-xs font-semibold"
         >{{ tr("RichEditor.van_ban_hien_thi") }}
         <input
@@ -479,7 +479,7 @@ function applyMedia() {
           type="text"
           :placeholder="tr('RichEditor.vi_du_xem_huong_dan')"
           :disabled="disabled"
-          class="mt-1 w-full rounded-lg border border-[#cbd9c6] bg-white px-3 py-2 text-sm"
+          class="mt-1 w-full rounded-lg border border-border-default bg-white px-3 py-2 text-sm"
           @keydown.enter.prevent="applyLink"
         />
       </label>
@@ -491,7 +491,7 @@ function applyMedia() {
           type="url"
           placeholder="https://..."
           :disabled="disabled"
-          class="mt-1 w-full rounded-lg border border-[#cbd9c6] bg-white px-3 py-2 text-sm"
+          class="mt-1 w-full rounded-lg border border-border-default bg-white px-3 py-2 text-sm"
           @keydown.enter.prevent="applyLink"
         />
       </label>
@@ -500,7 +500,7 @@ function applyMedia() {
         <button
           type="button"
           :disabled="disabled || !editor"
-          class="rounded-lg border border-[#cbd9c6] bg-white px-3 py-1.5 text-xs font-semibold hover:bg-emerald-100 disabled:opacity-40"
+          class="rounded-lg border border-border-default bg-white px-3 py-1.5 text-xs font-semibold hover:bg-emerald-100 disabled:opacity-40"
           @click="openAssets('link')"
         >
           {{ tr("RichEditor.chon_tu_kho_anh_video") }}
@@ -516,12 +516,12 @@ function applyMedia() {
         <button
           type="button"
           :disabled="disabled || !editor?.isActive('link')"
-          class="rounded-lg border border-[#cbd9c6] px-3 py-1.5 text-xs disabled:opacity-40"
+          class="rounded-lg border border-border-default px-3 py-1.5 text-xs disabled:opacity-40"
           @click="removeLink"
         >
           {{ tr("RichEditor.go_lien_ket") }}
         </button>
-        <button type="button" class="rounded-lg border border-[#cbd9c6] px-3 py-1.5 text-xs" @click="linkOpen = false">
+        <button type="button" class="rounded-lg border border-border-default px-3 py-1.5 text-xs" @click="linkOpen = false">
           {{ tr("ChangePasswordModal.dong") }}
         </button>
       </div>
@@ -529,7 +529,7 @@ function applyMedia() {
     <div
       v-if="mediaOpen"
       :id="mediaPanelId"
-      class="space-y-2 border-b border-[#cbd9c6] bg-[#f5f9f0] p-3"
+      class="space-y-2 border-b border-border-default bg-surface p-3"
       @keydown.esc.stop.prevent="mediaOpen = false"
     >
       <label class="block text-xs font-semibold"
@@ -541,7 +541,7 @@ function applyMedia() {
           :placeholder="tr('RichEditor.https_example_com_anh_jpg_hoac_video_mp4')"
           :disabled="disabled"
           :aria-invalid="!!mediaError"
-          class="mt-1 w-full rounded-lg border border-[#cbd9c6] bg-white px-3 py-2 text-sm"
+          class="mt-1 w-full rounded-lg border border-border-default bg-white px-3 py-2 text-sm"
           @keydown.enter.prevent="applyMedia"
         />
       </label>
@@ -550,14 +550,14 @@ function applyMedia() {
         <select
           v-model="manualMediaKind"
           :disabled="disabled"
-          class="mt-1 block rounded-lg border border-[#cbd9c6] bg-white px-3 py-2 text-sm"
+          class="mt-1 block rounded-lg border border-border-default bg-white px-3 py-2 text-sm"
         >
           <option disabled value="">{{ tr("RichEditor.chon_anh_hoac_video") }}</option>
           <option value="image">{{ tr("RichEditor.anh") }}</option>
           <option value="video">Video</option>
         </select>
       </label>
-      <div class="text-xs text-[#24352a]/70">
+      <div class="text-xs text-content/70">
         {{ tr("RichEditor.video_dung_link_truc_tiep_den_tep_vi_du_mp4_hoac_webm_chon_tu_kh") }}
       </div>
       <label class="block text-xs font-semibold"
@@ -567,7 +567,7 @@ function applyMedia() {
           type="text"
           :placeholder="tr('RichEditor.mo_ta_noi_dung_anh_video')"
           :disabled="disabled"
-          class="mt-1 w-full rounded-lg border border-[#cbd9c6] bg-white px-3 py-2 text-sm"
+          class="mt-1 w-full rounded-lg border border-border-default bg-white px-3 py-2 text-sm"
           @keydown.enter.prevent="applyMedia"
         />
       </label>
@@ -576,7 +576,7 @@ function applyMedia() {
         <button
           type="button"
           :disabled="disabled || !editor"
-          class="rounded-lg border border-[#cbd9c6] bg-white px-3 py-1.5 text-xs font-semibold hover:bg-emerald-100 disabled:opacity-40"
+          class="rounded-lg border border-border-default bg-white px-3 py-1.5 text-xs font-semibold hover:bg-emerald-100 disabled:opacity-40"
           @click="openAssets('media')"
         >
           {{ tr("RichEditor.chon_anh_video_tu_kho") }}
@@ -593,13 +593,13 @@ function applyMedia() {
               : tr("RichEditor.chen_vao_noi_dung")
           }}
         </button>
-        <button type="button" class="rounded-lg border border-[#cbd9c6] px-3 py-1.5 text-xs" @click="mediaOpen = false">
+        <button type="button" class="rounded-lg border border-border-default px-3 py-1.5 text-xs" @click="mediaOpen = false">
           {{ tr("ChangePasswordModal.dong") }}
         </button>
       </div>
     </div>
     <EditorContent :editor="editor" class="guide-editor max-h-[55dvh] overflow-y-auto text-sm leading-7" />
-    <div class="border-t border-[#cbd9c6] px-3 py-2 text-xs text-[#24352a]/65">
+    <div class="border-t border-border-default px-3 py-2 text-xs text-content/65">
       {{ characterCount }} {{ tr("RichEditor.ky_tu_enter_de_xuong_doan_shift_enter_de_xuong_dong") }}
     </div>
     <Teleport to="body">
@@ -627,7 +627,7 @@ function applyMedia() {
 .guide-editor :deep(pre) {
   overflow-x: auto;
   border-radius: 0.5rem;
-  background: #eef2e9;
+  background: var(--color-palette-eef2e9);
   padding: 0.75rem;
 }
 .guide-editor :deep(img) {
@@ -638,7 +638,7 @@ function applyMedia() {
   border-radius: 0.5rem;
 }
 .guide-editor :deep(img.ProseMirror-selectednode) {
-  outline: 2px solid #047857;
+  outline: 2px solid var(--color-accent);
   outline-offset: 2px;
 }
 .guide-editor :deep(video) {
@@ -647,14 +647,14 @@ function applyMedia() {
   max-height: 55dvh;
   margin: 0.75rem 0;
   border-radius: 0.5rem;
-  background: #000;
+  background: var(--color-black);
 }
 .guide-editor :deep(video.ProseMirror-selectednode) {
-  outline: 2px solid #047857;
+  outline: 2px solid var(--color-accent);
   outline-offset: 2px;
 }
 .guide-editor :deep(a) {
-  color: #047857;
+  color: var(--color-accent);
   text-decoration: underline;
   text-underline-offset: 2px;
 }

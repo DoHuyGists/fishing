@@ -56,7 +56,7 @@ async function upgrade(skillId: string) {
 <template>
   <Modal :title="tr('SkillModal.ky_nang')" :on-refresh="() => refresh(true)">
     <section
-      class="skill-board bg-[#edf2e6] bg-[radial-gradient(#b6c6a84d_0.7px,transparent_0.7px)] bg-size-[12px_12px] min-h-full w-full space-y-4 rounded-2xl p-3 text-[#24352a] sm:p-4"
+      class="skill-board bg-palette-edf2e6 bg-[radial-gradient(#b6c6a84d_0.7px,transparent_0.7px)] bg-size-[12px_12px] min-h-full w-full space-y-4 rounded-2xl p-3 text-content sm:p-4"
       :aria-busy="skillStore.loading"
     >
       <button
@@ -73,22 +73,22 @@ async function upgrade(skillId: string) {
       </div>
       <div
         v-else-if="!skillStore.error && !skillStore.skillCards.length"
-        class="rounded-xl border border-dashed border-[#cbd9c6] p-8 text-center text-sm"
+        class="rounded-xl border border-dashed border-border-default p-8 text-center text-sm"
       >
         {{ tr("SkillModal.chua_co_ky_nang_nao") }}
       </div>
 
       <div class="flex flex-wrap items-center gap-3">
-        <div class="m-0 text-[11px] font-extrabold uppercase tracking-[0.18em] text-[#60745d]">
+        <div class="m-0 text-[11px] font-extrabold uppercase tracking-[0.18em] text-palette-60745d">
           {{ tr("SkillModal.chon_ky_nang_de_ren_luyen") }}
         </div>
-        <span aria-hidden="true" class="h-px flex-1 bg-[#cbd9c6]"></span>
+        <span aria-hidden="true" class="h-px flex-1 bg-border-default"></span>
         <div
           v-if="skillStore.remainingSkillPoints !== null"
           role="status"
-          class="m-0 rounded-lg border border-[#cbd9c6] bg-[#f5f9f0] px-3 py-1.5 text-xs text-[#52634c]"
+          class="m-0 rounded-lg border border-border-default bg-surface px-3 py-1.5 text-xs text-palette-52634c"
         >
-          <span aria-hidden="true" class="mr-1 text-[#8b651b]">✦</span> {{ tr("SkillModal.diem_ky_nang") }}
+          <span aria-hidden="true" class="mr-1 text-palette-8b651b">✦</span> {{ tr("SkillModal.diem_ky_nang") }}
           <strong class="tabular-nums text-emerald-800">{{ skillStore.remainingSkillPoints }}</strong>
         </div>
       </div>

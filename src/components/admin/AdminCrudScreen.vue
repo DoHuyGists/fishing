@@ -164,7 +164,7 @@ async function confirmDelete() {
     <div class="px-6 py-3 bg-gray-50 border-b border-gray-200 flex items-center gap-3 shrink-0">
       <input v-model="search" type="text" placeholder="Tìm kiếm..." class="flex-1 px-3 py-1.5 text-xs border border-gray-300 rounded-lg bg-white focus:outline-none" />
       <button type="button" :disabled="isOpen || loading" class="px-3 py-1.5 border border-gray-300 rounded-lg bg-white hover:bg-gray-100 text-xs font-bold cursor-pointer disabled:opacity-50" @click="emit('refresh')">Làm mới</button>
-      <button v-if="allowCreate !== false" type="button" class="px-3 py-1.5 rounded-lg bg-[#153221] hover:bg-emerald-800 text-white text-xs font-bold cursor-pointer" @click="openForm()">+ Thêm mới</button>
+      <button v-if="allowCreate !== false" type="button" class="px-3 py-1.5 rounded-lg bg-content-strong hover:bg-emerald-800 text-white text-xs font-bold cursor-pointer" @click="openForm()">+ Thêm mới</button>
     </div>
 
     <div v-if="error || actionError" class="mx-6 mt-3 shrink-0 px-3 py-2 text-xs rounded-lg bg-red-50 border border-red-200 text-red-700">{{ error || actionError }}</div>
@@ -225,7 +225,7 @@ async function confirmDelete() {
         </fieldset>
         <div class="px-5 py-3 border-t border-gray-200 flex justify-end gap-2">
           <button type="button" :disabled="saving" class="px-3 py-1.5 border border-gray-300 rounded-lg text-xs font-bold cursor-pointer" @click="isOpen = false">Huỷ</button>
-          <button type="submit" :disabled="saving" class="px-3 py-1.5 rounded-lg bg-[#153221] text-white text-xs font-bold cursor-pointer disabled:opacity-50">{{ saving ? "Đang lưu..." : "Lưu" }}</button>
+          <button type="submit" :disabled="saving" class="px-3 py-1.5 rounded-lg bg-content-strong text-white text-xs font-bold cursor-pointer disabled:opacity-50">{{ saving ? "Đang lưu..." : "Lưu" }}</button>
         </div>
       </form>
     </div>

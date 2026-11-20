@@ -86,7 +86,7 @@ async function run(action: () => Promise<void>) {
           :class="
             store.selectedSetId === set.id && store.selectedSlot === slot
               ? 'border-emerald-600 bg-emerald-50 ring-1 ring-emerald-600'
-              : 'border-[#cbd9c6] hover:border-teal-500'
+              : 'border-border-default hover:border-teal-500'
           "
         >
           <button
@@ -103,20 +103,20 @@ async function run(action: () => Promise<void>) {
           <div
             v-for="item in set[slot]"
             :key="item.inventory_id"
-            class="mt-1 flex min-w-0 items-center justify-between gap-1 rounded bg-[#f5f9f0] p-1 text-xs"
+            class="mt-1 flex min-w-0 items-center justify-between gap-1 rounded bg-surface p-1 text-xs"
           >
             <span class="truncate" :title="name(item.inventory_id)">{{ name(item.inventory_id) }}</span>
             <button
               type="button"
               :disabled="store.busy || store.loading"
-              class="shrink-0 rounded px-1 text-[#526650] hover:bg-rose-100 hover:text-rose-700 disabled:opacity-40"
+              class="shrink-0 rounded px-1 text-palette-526650 hover:bg-rose-100 hover:text-rose-700 disabled:opacity-40"
               :aria-label="tr('Health.unequipNamed', { item: name(item.inventory_id) })"
               @click="store.unequip(set, slot, item.inventory_id)"
             >
               ×
             </button>
           </div>
-          <div v-if="!set[slot].length" class="py-2 text-center text-xs text-[#526650]">{{ tr("FlipBook.trong") }}</div>
+          <div v-if="!set[slot].length" class="py-2 text-center text-xs text-palette-526650">{{ tr("FlipBook.trong") }}</div>
         </div>
       </div>
     </EquipmentSetCard>

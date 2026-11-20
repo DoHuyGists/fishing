@@ -48,10 +48,10 @@ async function submit() {
     class="fixed inset-0 z-[60] grid place-items-center bg-black/40 p-4"
     @click.self="store.closeForm()"
   >
-    <form class="w-full max-w-lg rounded-2xl border border-[#cbd9c6] bg-white shadow-xl" @submit.prevent="submit">
-      <header class="flex items-center justify-between border-b border-[#cbd9c6] px-5 py-4">
+    <form class="w-full max-w-lg rounded-2xl border border-border-default bg-white shadow-xl" @submit.prevent="submit">
+      <header class="flex items-center justify-between border-b border-border-default px-5 py-4">
         <div>
-          <div class="m-0 text-lg font-bold text-[#24352a]">
+          <div class="m-0 text-lg font-bold text-content">
             {{ store.editingId ? "Chỉnh sửa phạm vi" : "Thêm phạm vi độ sâu" }}
           </div>
           <div class="m-0 mt-1 text-xs text-gray-500">Thiết lập khoảng độ sâu và hình dạng đường cong.</div>
@@ -66,26 +66,26 @@ async function submit() {
         </button>
       </header>
       <div class="grid grid-cols-1 gap-4 p-5 sm:grid-cols-2">
-        <label class="flex flex-col gap-1 text-xs font-semibold text-[#24352a]"
+        <label class="flex flex-col gap-1 text-xs font-semibold text-content"
           >Mã
           <input
             v-model="draft.code"
             required
             maxlength="100"
-            class="rounded-lg border border-[#cbd9c6] px-3 py-2 font-normal"
+            class="rounded-lg border border-border-default px-3 py-2 font-normal"
             placeholder="Ví dụ: SHALLOW"
           />
         </label>
-        <label class="flex flex-col gap-1 text-xs font-semibold text-[#24352a]"
+        <label class="flex flex-col gap-1 text-xs font-semibold text-content"
           >Tên
           <input
             v-model="draft.name"
             required
-            class="rounded-lg border border-[#cbd9c6] px-3 py-2 font-normal"
+            class="rounded-lg border border-border-default px-3 py-2 font-normal"
             placeholder="Ví dụ: Vùng nước nông"
           />
         </label>
-        <label class="flex flex-col gap-1 text-xs font-semibold text-[#24352a]"
+        <label class="flex flex-col gap-1 text-xs font-semibold text-content"
           >Độ sâu tối thiểu
           <input
             v-model.number="draft.minDepth"
@@ -93,30 +93,30 @@ async function submit() {
             min="0"
             step="0.01"
             required
-            class="rounded-lg border border-[#cbd9c6] px-3 py-2 font-normal"
+            class="rounded-lg border border-border-default px-3 py-2 font-normal"
           />
         </label>
-        <label class="flex flex-col gap-1 text-xs font-semibold text-[#24352a]"
+        <label class="flex flex-col gap-1 text-xs font-semibold text-content"
           >Độ sâu tối đa
           <input
             v-model.number="draft.maxDepth"
             type="number"
             step="0.01"
             required
-            class="rounded-lg border border-[#cbd9c6] px-3 py-2 font-normal"
+            class="rounded-lg border border-border-default px-3 py-2 font-normal"
           />
         </label>
-        <label class="flex flex-col gap-1 text-xs font-semibold text-[#24352a]"
+        <label class="flex flex-col gap-1 text-xs font-semibold text-content"
           >Độ sâu đỉnh
           <input
             v-model.number="draft.peakDepth"
             type="number"
             step="0.01"
             required
-            class="rounded-lg border border-[#cbd9c6] px-3 py-2 font-normal"
+            class="rounded-lg border border-border-default px-3 py-2 font-normal"
           />
         </label>
-        <label class="flex flex-col gap-1 text-xs font-semibold text-[#24352a]"
+        <label class="flex flex-col gap-1 text-xs font-semibold text-content"
           >Độ cong (curve power)
           <input
             v-model.number="draft.curvePower"
@@ -124,7 +124,7 @@ async function submit() {
             min="0.01"
             step="0.01"
             required
-            class="rounded-lg border border-[#cbd9c6] px-3 py-2 font-normal"
+            class="rounded-lg border border-border-default px-3 py-2 font-normal"
           />
         </label>
         <div
@@ -134,10 +134,10 @@ async function submit() {
           {{ error }}
         </div>
       </div>
-      <footer class="flex justify-end gap-2 border-t border-[#cbd9c6] px-5 py-4">
+      <footer class="flex justify-end gap-2 border-t border-border-default px-5 py-4">
         <button
           type="button"
-          class="rounded-lg border border-[#cbd9c6] px-4 py-2 text-sm text-[#24352a] hover:bg-[#f5f9f0]"
+          class="rounded-lg border border-border-default px-4 py-2 text-sm text-content hover:bg-surface"
           @click="store.closeForm()"
         >
           Hủy
@@ -145,7 +145,7 @@ async function submit() {
         <button
           type="submit"
           :disabled="store.saving"
-          class="rounded-lg bg-[#24352a] px-4 py-2 text-sm font-semibold text-white hover:bg-[#314a39] disabled:opacity-50"
+          class="rounded-lg bg-content px-4 py-2 text-sm font-semibold text-white hover:bg-palette-314a39 disabled:opacity-50"
         >
           {{ store.saving ? "Đang lưu…" : "Lưu" }}
         </button>
