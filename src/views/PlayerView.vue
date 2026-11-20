@@ -167,6 +167,8 @@ watch(
 );
 
 onMounted(() => {
+  const cancelRestoration = modalStore.scheduleRestoration();
+  onUnmounted(cancelRestoration);
   void userTurnsStore.fetchStatus().then(() => userTurnsStore.startCountdown());
   if (authStore.userId) {
     caughtStore.loadCaughtFishes();
@@ -224,8 +226,8 @@ onUnmounted(() => {
       @finish="onboarding.finish()"
     />
     <Teleport to="body">
-      <Transition name="player-window" :duration="{ enter: 220, leave: 150 }">
-        <div v-if="modalStore.isModalOpening">
+      <Transition name="player-window" :css="!modalStore.restoredEntrance" :duration="{ enter: 220, leave: 220 }">
+        <div v-if="modalStore.isModalOpening && !modalStore.restorationPending">
           <AccountInfoModal v-if="modalStore.isOpening('account')" />
           <GuideModal v-if="modalStore.isOpening('guide')" />
           <RuleModal v-if="modalStore.isOpening('rule')" />

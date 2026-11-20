@@ -62,6 +62,14 @@
   animation-fill-mode: backwards;
 }
 
+.slide-fade-in.player-modal-restored {
+  --slide-distance: 100vh;
+  --duration: 0.4s;
+  opacity: 1;
+  /* Animate on insertion, including when the async modal chunk arrives late. */
+  animation-fill-mode: backwards;
+}
+
 .player-popup-in {
   animation: playerPopupIn 0.22s cubic-bezier(0.22, 1, 0.36, 1) backwards;
 }
@@ -85,9 +93,18 @@
 }
 
 .player-window-enter-active .player-window-panel { transition: transform 0.22s ease-out; }
-.player-window-leave-active .player-window-panel { transition: transform 0.15s ease-in; }
-.player-window-enter-from .player-window-panel,
-.player-window-leave-to .player-window-panel { transform: translateY(20px); }
+.player-window-enter-from .player-window-panel { transform: translateY(20px); }
+
+.player-window-leave-active .player-window-panel {
+  animation: playerWindowLeave 0.6s ease-in forwards;
+  pointer-events: none;
+}
+
+@keyframes playerWindowLeave {
+  0% { opacity: 1; transform: translateY(0); }
+  65% { opacity: 1; }
+  100% { opacity: 0; transform: translateY(30vh); }
+}
 
 @media (prefers-reduced-motion: reduce) {
   .shiny-sparkle {

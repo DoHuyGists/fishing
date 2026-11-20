@@ -126,7 +126,13 @@ const displayedGroups = computed(() =>
           <span class="font-normal text-content">({{ group.items.length }})</span>
         </div>
         <div :class="viewMode === 'list' ? 'flex flex-col gap-2' : 'grid grid-cols-2 gap-3 sm:grid-cols-3 xl:grid-cols-4'">
-          <InventoryItemCard v-for="item in group.items" :key="item.id" :item="item" :list="viewMode === 'list'" />
+          <InventoryItemCard
+            v-for="(item, index) in group.items"
+            :key="item.id"
+            :style="{ '--delay': `${index * 45}ms` }"
+            :item="item"
+            :list="viewMode === 'list'"
+          />
         </div>
       </div>
     </div>

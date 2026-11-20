@@ -100,8 +100,10 @@ async function refresh() {
               :class="store.viewMode === 'grid' ? 'lg:grid-cols-2 xl:grid-cols-3' : 'grid-cols-1'"
             >
               <FishingMapAreaCard
-                v-for="area in store.pagedAreas"
+                v-for="(area, index) in store.pagedAreas"
                 :key="area.id"
+                class="slide-fade-in from-bottom player-content-in"
+                :style="{ '--delay': `${index * 45}ms` }"
                 :area="area"
                 :view-mode="store.viewMode"
               />

@@ -181,14 +181,14 @@ function zoomTo(k: number) {
     :class="{ 'md:grid-cols-[auto_1fr]': isMapVisible }"
   >
     <FishingAnchor
-      class="slide-fade-in from-top-left"
+      class="slide-fade-in from-left"
       :collapsible="collapsible"
       :map-visible="isMapVisible"
       @toggle-map="worldStore.toggleMapVisibility()"
     />
-    <div v-if="isMapVisible" class="flex flex-col gap-1 bg-surface p-1 rounded-xl h-fit">
+    <div v-if="isMapVisible" class="slide-fade-in from-bottom flex flex-col gap-1 bg-surface p-1 rounded-xl h-fit">
       <div
-        class="slide-fade-in from-bottom w-full h-fit overflow-hidden grid place-items-center border border-content rounded-xl"
+        class="w-full h-fit overflow-hidden grid place-items-center border border-content rounded-xl"
       >
         <WorldMap
           ref="mapRef"

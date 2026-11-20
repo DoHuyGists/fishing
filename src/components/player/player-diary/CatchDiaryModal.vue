@@ -137,8 +137,10 @@ watch(
                 "
               >
                 <DiarySpeciesCard
-                  v-for="entry in filteredEntries"
+                  v-for="(entry, index) in filteredEntries"
                   :key="entry.species.id"
+                  class="slide-fade-in from-bottom player-content-in"
+                  :style="{ '--delay': `${index * 45}ms` }"
                   :entry="entry"
                   :list="mode.key === 'list'"
                 />

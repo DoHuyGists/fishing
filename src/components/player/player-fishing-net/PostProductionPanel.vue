@@ -148,8 +148,10 @@ function toggleSpecies(key: string) {
             v-if="expandedSpecies.has(group.key)"
             class="m-0 flex max-h-48 list-none flex-col gap-1 overflow-y-auto border-t border-accent/10 p-2"
           >
-            <div v-for="fish in group.fishes" :key="fish.id">
+            <div v-for="(fish, index) in group.fishes" :key="fish.id">
               <PostProductionFishItem
+                class="slide-fade-in from-bottom player-content-in"
+                :style="{ '--delay': `${index * 45}ms` }"
                 :fish="fish"
                 :selected="selected.has(fish.id)"
                 variant="species"
@@ -165,8 +167,10 @@ function toggleSpecies(key: string) {
         class="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-5 gap-2"
       >
         <PostProductionFishItem
-          v-for="fish in filteredFishes"
+          v-for="(fish, index) in filteredFishes"
           :key="fish.id"
+          class="slide-fade-in from-bottom player-content-in"
+          :style="{ '--delay': `${index * 45}ms` }"
           :fish="fish"
           :selected="selected.has(fish.id)"
           variant="grid"
@@ -175,8 +179,10 @@ function toggleSpecies(key: string) {
       </div>
 
       <div v-else class="m-0 flex list-none flex-col gap-1 p-0">
-        <div v-for="fish in filteredFishes" :key="fish.id">
+        <div v-for="(fish, index) in filteredFishes" :key="fish.id">
           <PostProductionFishItem
+            class="slide-fade-in from-bottom player-content-in"
+            :style="{ '--delay': `${index * 45}ms` }"
             :fish="fish"
             :selected="selected.has(fish.id)"
             variant="list"

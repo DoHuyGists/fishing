@@ -66,12 +66,15 @@ onUnmounted(() => {
     <div
       class="shared-modal__panel player-window-panel flex flex-col bg-white"
       :class="
-        compact
+        [
+          { 'slide-fade-in from-bottom player-modal-restored': modalStore.restoredEntrance },
+          compact
           ? [
               'max-h-[calc(100dvh-1.5rem)] w-full overflow-hidden rounded-2xl border border-border-default shadow-xl',
               contentWidthClass,
             ]
-          : 'h-[100vh] w-screen supports-[height:100dvh]:h-[100dvh]'
+          : 'h-[100vh] w-screen supports-[height:100dvh]:h-[100dvh]',
+        ]
       "
     >
       <header

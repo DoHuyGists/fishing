@@ -50,15 +50,30 @@ function restoreModal(): ModalName {
 }
 
 export const useModalStore = defineStore("Modal", {
-  state: () => ({
-    modalOpening: restoreModal(),
-    pointerPosition: { x: 0, y: 0 },
-    quickActions: { visible: false, x: 0, y: 0 },
-  }),
+  state: () => {
+    const modalOpening = restoreModal();
+    return {
+      modalOpening,
+      restorationPending: modalOpening !== null,
+      restoredEntrance: false,
+      pointerPosition: { x: 0, y: 0 },
+      quickActions: { visible: false, x: 0, y: 0 },
+    };
+  },
   getters: {
     isModalOpening: (state) => state.modalOpening != null,
   },
   actions: {
+    scheduleRestoration() {
+      if (!this.restorationPending) return () => {};
+      // Start the delay when the lobby mounts, after its loading gates finish.
+      const timer = window.setTimeout(() => {
+        if (!this.restorationPending) return;
+        this.restoredEntrance = true;
+        this.restorationPending = false;
+      }, 1000);
+      return () => window.clearTimeout(timer);
+    },
     trackPointer(x: number, y: number) {
       this.pointerPosition = { x, y };
     },
@@ -83,6 +98,8 @@ export const useModalStore = defineStore("Modal", {
         }
       }
       this.hideQuickActions();
+      this.restorationPending = false;
+      this.restoredEntrance = false;
       this.modalOpening = name;
       try {
         if (name === null) {

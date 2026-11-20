@@ -95,11 +95,12 @@ async function upgrade(skillId: string) {
 
       <div class="grid grid-cols-[repeat(auto-fit,minmax(min(100%,18rem),1fr))] gap-3">
         <SkillCard
-          v-for="skill in skillStore.skillCards"
+          v-for="(skill, index) in skillStore.skillCards"
           :key="skill.id"
           :skill="skill"
           :disabled="skillStore.loading || !!skillStore.upgradingId || !!skillStore.error"
           :upgrading="skillStore.upgradingId === skill.id"
+          :style="{ '--delay': `${index * 45}ms` }"
           @upgrade="upgrade"
         />
       </div>

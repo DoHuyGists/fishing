@@ -105,6 +105,7 @@ onMounted(() => {
       <div class="flex min-h-0 grow flex-col gap-2 md:flex-row">
         <template v-for="(panel, index) in panels" :key="panel.key">
           <PostProductionPanel
+            :style="{ '--delay': `${index * 45}ms` }"
             :title="panel.title"
             :fishes="panel.fishes"
             :capacity="panel.capacity"

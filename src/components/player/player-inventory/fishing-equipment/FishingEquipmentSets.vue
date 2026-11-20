@@ -51,8 +51,9 @@ const {
     @change-page="setPage = $event"
   >
       <EquipmentSetCard
-        v-for="{ set, index: setIndex } in pagedSets"
+        v-for="({ set, index: setIndex }, index) in pagedSets"
         :key="set.id"
+        :style="{ '--delay': `${index * 45}ms` }"
         :number="setIndex + 1"
         :dirty="isDirty(set)"
         :used="set.isUsed"

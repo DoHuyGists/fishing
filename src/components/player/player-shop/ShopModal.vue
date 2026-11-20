@@ -218,8 +218,9 @@ async function buyItem() {
               "
             >
               <ShopItemCard
-                v-for="item in group.items"
+                v-for="(item, index) in group.items"
                 :key="item.id"
+                :style="{ '--delay': `${index * 45}ms` }"
                 :item="item"
                 :selected="selectedItemId === item.id"
                 :owned-quantity="authStore.userId ? (inventoryStore.ownedQuantitiesByItemId.get(item.id) ?? 0) : 0"

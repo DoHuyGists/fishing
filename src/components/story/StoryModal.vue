@@ -7,7 +7,7 @@ import "../../styles/story.css";
 const modals = useModalStore();
 </script>
 <template>
-  <StoryDialog :title="t('Story.library')" wide @close="modals.close()"
+  <StoryDialog :title="t('Story.library')" wide :restored-entrance="modals.restoredEntrance" @close="modals.close()"
     ><StoryLibrary @select="modals.close()"
   /></StoryDialog>
 </template>

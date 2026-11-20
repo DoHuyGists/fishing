@@ -67,8 +67,9 @@ async function run(action: () => Promise<void>) {
     @change-page="page = $event"
   >
     <EquipmentSetCard
-      v-for="{ set, index } in visible"
+      v-for="({ set, index }, itemIndex) in visible"
       :key="set.id"
+      :style="{ '--delay': `${itemIndex * 45}ms` }"
       :number="index + 1"
       :dirty="store.isDirty(set)"
       :used="set.is_used"

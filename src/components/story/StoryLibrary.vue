@@ -29,7 +29,8 @@ onMounted(() => {
       v-for="(item, index) in stories.items"
       :key="item.id"
       :to="{ name: 'story', query: { id: item.id } }"
-      class="story-chapter-card"
+      class="story-chapter-card slide-fade-in from-bottom player-content-in"
+      :style="{ '--delay': `${index * 45}ms` }"
       @click="emit('select')"
       ><span class="story-chapter-number">{{ String(index + 1).padStart(2, "0") }}</span>
       <div>
