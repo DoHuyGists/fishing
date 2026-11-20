@@ -139,7 +139,7 @@ function handleKeydown(event: KeyboardEvent) {
 }
 
 .ocean-theme .shared-payment__title {
-  color: var(--color-ocean-gold);
+  color: var(--color-accent);
 }
 
 .ocean-theme .shared-payment__summary {
@@ -162,7 +162,7 @@ function handleKeydown(event: KeyboardEvent) {
 }
 
 .ocean-theme .shared-payment:not(.player-popup-in) .shared-payment__title {
-  color: var(--color-primary);
+  color: var(--color-accent);
 }
 
 .ocean-theme .shared-payment:not(.player-popup-in) .shared-payment__summary {

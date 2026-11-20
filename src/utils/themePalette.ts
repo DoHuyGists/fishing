@@ -1,15 +1,15 @@
 /** Keep in sync with the ten source colors in styles/theme.css (checked by check:palette). */
 export const THEME_COLORS = {
   white: '#ffffff',
-  surface: '#f5f9f0',
-  border: '#cbd9c6',
-  content: '#24352a',
+  surface: '#f5f7ef',
+  border: '#cbd3bd',
+  content: '#2f392b',
   primary: '#e7ecda',
-  sky: '#4fc3ff',
-  gold: '#ffd166',
-  accent: '#1abc9c',
-  danger: '#f75353',
-  special: '#a66bff',
+  sky: '#3f706b',
+  gold: '#d5b66f',
+  accent: '#526b45',
+  danger: '#a64138',
+  special: '#756184',
 } as const;
 
 const values = Object.values(THEME_COLORS);

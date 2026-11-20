@@ -22,8 +22,8 @@ const variantClasses: Record<ToastVariant, string> = {
 const variantTextClasses: Record<ToastVariant, string> = {
   success: "text-content",
   error: "text-danger",
-  warning: "text-gold",
-  info: "text-primary",
+  warning: "text-content",
+  info: "text-info",
   neutral: "text-content",
 };
 const variantIconClasses: Record<ToastVariant, string> = {

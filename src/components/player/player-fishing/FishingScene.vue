@@ -479,7 +479,7 @@ html.ocean-theme .weather,
 html.ocean-theme .scene-status {
   border-color: color-mix(in srgb, var(--color-gold) 45%, transparent);
   background: color-mix(in srgb, var(--color-content) 85%, transparent);
-  color: var(--color-ocean-pearl);
+  color: var(--color-white);
   box-shadow: inset 0 1px 0 color-mix(in srgb, var(--color-surface) 10%, transparent), 0 6px 18px color-mix(in srgb, var(--color-content) 20%, transparent);
 }
 

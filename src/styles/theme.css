@@ -5,15 +5,15 @@
 @theme static {
   --color-*: initial;
   --color-white: #ffffff;
-  --color-surface: #f5f9f0;
-  --color-border: #cbd9c6;
-  --color-content: #24352a;
+  --color-surface: #f5f7ef;
+  --color-border: #cbd3bd;
+  --color-content: #2f392b;
   --color-primary: #e7ecda;
-  --color-sky: #4fc3ff;
-  --color-gold: #ffd166;
-  --color-accent: #1abc9c;
-  --color-danger: #f75353;
-  --color-special: #a66bff;
+  --color-sky: #3f706b;
+  --color-gold: #d5b66f;
+  --color-accent: #526b45;
+  --color-danger: #a64138;
+  --color-special: #756184;
 
   /* Existing semantic roles share the ten source colors. */
   --color-ocean-deep: var(--color-primary);
@@ -21,7 +21,8 @@
   --color-ocean-cyan: var(--color-sky);
   --color-ocean-gold: var(--color-gold);
   --color-ocean-wood: var(--color-gold);
-  --color-ocean-pearl: var(--color-white);
+  /* Panel text follows the light primary background. */
+  --color-ocean-pearl: var(--color-content);
   --color-secondary: var(--color-gold);
   --color-secondary-hover: var(--color-gold);
   --color-success: var(--color-accent);
@@ -31,8 +32,8 @@
   --color-black: var(--color-content);
   --color-border-default: var(--color-border);
   --color-border-strong: var(--color-border);
-  --color-brand: var(--color-primary);
-  --color-brand-hover: var(--color-primary);
+  --color-brand: var(--color-accent);
+  --color-brand-hover: var(--color-content);
   --color-brand-secondary: var(--color-sky);
   --color-content-caption: var(--color-content);
   --color-content-disabled: var(--color-content);

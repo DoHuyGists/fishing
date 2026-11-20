@@ -103,7 +103,7 @@ withDefaults(
 }
 
 .ocean-theme .shared-confirmation__title {
-  color: var(--color-ocean-gold);
+  color: var(--color-accent);
 }
 
 .ocean-theme .shared-confirmation__message {
@@ -121,7 +121,7 @@ withDefaults(
 }
 
 .ocean-theme .shared-confirmation__danger {
-  color: var(--color-ocean-pearl);
+  color: var(--color-white);
   border: 1px solid color-mix(in srgb, var(--color-gold) 50.196%, transparent);
   background: var(--color-danger);
   box-shadow: inset 0 1px color-mix(in srgb, var(--color-surface) 14.902%, transparent), 0 3px 0 color-mix(in srgb, var(--color-content) 40%, transparent);

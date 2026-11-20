@@ -52,7 +52,7 @@ button {
     }
 
     a {
-        @apply text-primary underline hover:text-primary transition-colors;
+        @apply text-brand underline hover:text-brand-hover transition-colors;
     }
 }
 

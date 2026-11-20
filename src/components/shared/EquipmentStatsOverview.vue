@@ -21,7 +21,6 @@ defineProps<{ title: string; description: string; stats: EquipmentStatDisplay[] 
 
 <style scoped>
 .ocean-theme .shared-equipment-stats output {
-  color: var(--color-ocean-gold);
-  text-shadow: 0 1px 2px color-mix(in srgb, var(--color-content) 30.196%, transparent);
+  color: var(--color-accent);
 }
 </style>

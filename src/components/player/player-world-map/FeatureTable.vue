@@ -346,7 +346,7 @@ const supportActions: LobbyAction[] = [
             <span class="text-[11px] font-semibold leading-4">{{ action.label }}</span>
             <span
               v-if="!features.canOpen(action.modal)"
-              class="rounded bg-surface px-1 py-0.5 text-[9px] leading-3 text-gold underline underline-offset-2"
+              class="rounded bg-surface px-1 py-0.5 text-[9px] leading-3 text-accent underline underline-offset-2"
               >{{ tr("FeatureAvailability.maintenanceBadge") }}</span
             >
             <span
@@ -376,7 +376,7 @@ const supportActions: LobbyAction[] = [
         <span>{{ action.label }}</span>
         <span
           v-if="!features.canOpen(action.modal)"
-          class="w-full text-[9px] text-gold underline underline-offset-2"
+          class="w-full text-[9px] text-accent underline underline-offset-2"
           >{{ tr("FeatureAvailability.maintenanceBadge") }}</span
         >
         <span
@@ -404,8 +404,8 @@ html.ocean-theme .lobby-menu__footer {
 }
 
 html.ocean-theme .lobby-menu__button {
-  border-color: color-mix(in srgb, var(--color-ocean-gold) 42%, var(--color-ocean-panel));
-  background: linear-gradient(155deg, var(--color-ocean-panel), var(--color-ocean-deep));
+  border-color: var(--color-accent);
+  background: var(--color-surface);
   color: var(--color-ocean-pearl);
   box-shadow: inset 0 1px 0 color-mix(in srgb, var(--color-surface) 12%, transparent), 0 2px 0 color-mix(in srgb, var(--color-content) 20%, transparent);
 }

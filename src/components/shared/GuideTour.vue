@@ -541,7 +541,7 @@ onUnmounted(() => {
 }
 
 .ocean-theme .guide-tour__title {
-  color: var(--color-ocean-gold);
+  color: var(--color-accent);
 }
 
 .ocean-theme .guide-tour__description,

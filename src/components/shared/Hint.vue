@@ -62,7 +62,7 @@ const tooltipClasses = computed(() => ['w-max', props.maxWidthClass])
 
 .ocean-theme .shared-hint > button:hover,
 .ocean-theme .shared-hint > button:focus-visible {
-  color: var(--color-content);
+  color: var(--color-white);
   background: var(--color-ocean-cyan);
   --tw-ring-color: var(--color-ocean-cyan);
   --tw-ring-offset-color: var(--color-content);

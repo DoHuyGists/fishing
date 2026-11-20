@@ -13,11 +13,11 @@ html.ocean-theme {
 
   .ocean-theme ::selection {
     background: var(--color-sky);
-    color: var(--color-content);
+    color: var(--color-white);
   }
 
   .ocean-theme :where(input, select, textarea) {
-    accent-color: var(--color-primary);
+    accent-color: var(--color-accent);
   }
 
   .ocean-theme :where(input, textarea)::placeholder {
@@ -31,12 +31,12 @@ html.ocean-theme {
   }
 
   .ocean-theme :where(button, a, input, select, textarea, [tabindex]):focus-visible {
-    outline: 2px solid var(--color-primary);
+    outline: 2px solid var(--color-accent);
     outline-offset: 3px;
   }
 
   .ocean-theme :where(*) {
-    scrollbar-color: var(--color-primary) var(--color-surface);
+    scrollbar-color: var(--color-accent) var(--color-surface);
     scrollbar-width: thin;
   }
 }
@@ -63,7 +63,7 @@ html.ocean-theme {
 @media (hover: hover) {
   .ocean-theme .ocean-currency-chip:hover,
   .ocean-theme .ocean-primary-action:not(:disabled):hover {
-    outline: 2px solid var(--color-primary);
+    outline: 2px solid var(--color-accent);
     outline-offset: 2px;
   }
 }

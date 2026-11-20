@@ -190,7 +190,7 @@ onUnmounted(() => {
     <header
       class="slide-fade-in from-top flex flex-wrap items-center justify-between gap-3 rounded-2xl border border-[var(--color-ocean-gold)]/60 bg-[linear-gradient(115deg,var(--color-ocean-panel),var(--color-ocean-deep))] px-4 py-3 text-content shadow-[0_6px_20px_color-mix(in_srgb,_var(--color-content)_20%,_transparent),inset_0_1px_0_color-mix(in_srgb,_var(--color-surface)_8%,_transparent)]"
     >
-      <span class="font-bold tracking-wide text-[var(--color-ocean-gold)]">{{ tr("Lobby.tieu_de") }}</span>
+      <span class="font-bold tracking-wide text-accent">{{ tr("Lobby.tieu_de") }}</span>
       <div class="flex flex-wrap items-center justify-end gap-2">
         <Cash :amount="currencyStore.formattedCash" />
         <Shells :amount="currencyStore.formattedShells" />

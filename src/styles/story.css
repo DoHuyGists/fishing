@@ -1436,9 +1436,9 @@ html.ocean-theme .story-dialogue {
   border-color: color-mix(in srgb, var(--color-gold) 60%, transparent);
   border-left-color: var(--color-ocean-gold);
   border-radius: 14px;
-  background: linear-gradient(120deg, color-mix(in srgb, var(--color-content) 96%, transparent), color-mix(in srgb, var(--color-primary) 94%, transparent));
+  background: color-mix(in srgb, var(--color-content) 96%, transparent);
   box-shadow: inset 0 1px 0 color-mix(in srgb, var(--color-surface) 12%, transparent), 0 15px 60px color-mix(in srgb, var(--color-content) 35%, transparent);
-  color: var(--color-ocean-pearl);
+  color: var(--color-white);
 }
 
 html.ocean-theme .story-speaker {
@@ -1449,28 +1449,34 @@ html.ocean-theme :is(.story-speaker-title, .story-speed, .story-library-intro, .
   color: var(--story-muted);
 }
 
+html.ocean-theme :is(.story-dialogue .story-speaker-title, .story-speed) {
+  color: var(--color-white);
+}
+
 html.ocean-theme .story-choice {
   border-color: color-mix(in srgb, var(--color-gold) 50%, transparent);
   border-radius: 10px;
   background: color-mix(in srgb, var(--color-content) 94%, transparent);
-  color: var(--color-ocean-pearl);
+  color: var(--color-white);
 }
 
 html.ocean-theme .story-choice:hover {
   border-color: var(--color-ocean-cyan);
   background: var(--color-ocean-panel);
+  color: var(--color-content);
 }
 
 html.ocean-theme :is(.story-hud-button, .story-restore, .story-speed select) {
   border-color: color-mix(in srgb, var(--color-gold) 40%, transparent);
   border-radius: 8px;
   background: color-mix(in srgb, var(--color-content) 86%, transparent);
-  color: var(--color-ocean-pearl);
+  color: var(--color-white);
 }
 
 html.ocean-theme :is(.story-hud-button:hover, .story-hud-button[aria-pressed=true]) {
   border-color: var(--color-ocean-cyan);
   background: var(--color-ocean-panel);
+  color: var(--color-content);
 }
 
 html.ocean-theme .story-auto-track>span {

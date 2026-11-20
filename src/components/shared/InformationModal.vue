@@ -57,7 +57,7 @@ watch([content, dialog], () => {
 }
 
 .ocean-theme .shared-information #information-modal-title {
-  color: var(--color-ocean-gold);
+  color: var(--color-accent);
 }
 
 .ocean-theme .shared-information button:hover {

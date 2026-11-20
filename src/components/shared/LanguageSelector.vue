@@ -28,7 +28,7 @@ const localeStore = useLocaleStore();
 <style scoped>
 .ocean-theme .shared-language-select {
   color: var(--color-ocean-pearl);
-  color-scheme: dark;
+  color-scheme: light;
 }
 
 .ocean-theme .shared-language-select:focus-visible {

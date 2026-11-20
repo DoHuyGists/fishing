@@ -181,24 +181,24 @@ async function onKeydown(e: KeyboardEvent, index: number) {
 }
 
 .ocean-theme .shared-tabs__tab {
-  color: color-mix(in srgb, var(--color-ocean-pearl) 75%, transparent);
+  color: var(--color-content);
   border: 1px solid transparent;
   border-bottom-width: 2px;
   border-radius: 0.625rem 0.625rem 0 0;
 }
 
 .ocean-theme .shared-tabs__tab[aria-selected="true"] {
-  color: var(--color-ocean-gold);
-  border-color: color-mix(in srgb, var(--color-ocean-gold) 45%, transparent);
-  border-bottom-color: var(--color-ocean-gold);
-  background: linear-gradient(180deg, var(--color-ocean-panel), color-mix(in srgb, var(--color-primary) 30.196%, transparent));
+  color: var(--color-white);
+  border-color: var(--color-accent);
+  border-bottom-color: var(--color-accent);
+  background: var(--color-accent);
   box-shadow: inset 0 1px color-mix(in srgb, var(--color-surface) 10.196%, transparent);
 }
 
 .ocean-theme .shared-tabs__tab:hover:not(:disabled) {
-  color: var(--color-ocean-pearl);
+  color: var(--color-content);
   border-color: var(--color-ocean-cyan);
-  background-color: var(--color-ocean-panel);
+  background: var(--color-white);
 }
 
 .ocean-theme .shared-tabs__tab:focus-visible {
