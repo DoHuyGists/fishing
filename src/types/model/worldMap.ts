@@ -37,3 +37,26 @@ export interface AreaPoint {
   location?: { lon?: number; lat?: number } | null;
   [key: string]: any;
 }
+
+export interface WorldMapTileLevel {
+  zoom: number;
+  width: number;
+  height: number;
+  columns: number;
+  rows: number;
+}
+
+export interface WorldMapTileManifest {
+  projection: 'equirectangular';
+  tileSize: number;
+  template: string;
+  levels: WorldMapTileLevel[];
+}
+
+export interface WorldMapTileViewport {
+  bounds: [[number, number], [number, number]];
+  width: number;
+  height: number;
+  dpr: number;
+  transform: { x: number; y: number; k: number };
+}

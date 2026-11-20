@@ -7,6 +7,7 @@ import type { GeometryCollection, Topology } from "topojson-specification";
 import world from "world-atlas/countries-110m.json";
 import { createWorldMapCloudTexture } from "../../../utils/worldMapClouds";
 import { normalizeThemeColor } from '../../../utils/themePalette';
+import { useWorldMapTiles } from '../../../composables/useWorldMapTiles';
 
 const emit = defineEmits<{
   zoom: [state: ZoomState];
@@ -164,9 +165,7 @@ const zoomBehavior = d3
   });
 
 let projection: d3.GeoProjection | null = null;
-const relief = new Image();
-relief.src = "/HYP_HR_SR_OB_DR.jpg"; // đặt ảnh trong thư mục public/
-relief.onload = () => draw();
+const reliefTiles = useWorldMapTiles(draw);
 
 function updateCloudLayer() {
   if (!cloudLayerDirty || props.unlockedCountryIds === null) return;
@@ -297,12 +296,13 @@ function draw() {
   ctx.fillStyle = normalizeThemeColor(props.seaColor);
   ctx.fill();
 
-  if (projection && relief.complete && relief.naturalWidth > 0) {
-    const [x0, y0] = projection([-180, 90])!;
-    const [x1, y1] = projection([180, -90])!;
-    ctx.imageSmoothingQuality = "high";
-    ctx.drawImage(relief, x0, y0, x1 - x0, y1 - y0);
-  }
+  reliefTiles.draw(ctx, {
+    bounds: path.bounds({ type: "Sphere" }),
+    width,
+    height,
+    dpr,
+    transform,
+  });
 
   // Các quốc gia
   ctx.lineWidth = 0.5 / transform.k; // viền không dày lên khi zoom

@@ -4,6 +4,7 @@
   "version": "0.0.0",
   "type": "module",
   "scripts": {
+    "export:world-map-tiles": "node scripts/export-world-map-tiles.mjs",
     "test:jwt-clock-skew": "node --test scripts/test-jwt-clock-skew.mjs",
     "test:day-phase": "node --test --test-isolation=none scripts/test-day-phase.mjs",
     "test:single-session": "node --test --test-isolation=none scripts/test-single-session.mjs",
@@ -12,7 +13,7 @@
     "test:story": "node --test scripts/test-story.mjs",
     "test:story:browser": "node scripts/test-story-browser.mjs",
     "dev": "vite --host",
-    "build": "vue-tsc -b && vite build --dist",
+    "build": "vue-tsc -b && vite build",
     "test:leaderboard": "node --test --test-isolation=none scripts/test-leaderboard.mjs scripts/test-seasonal-fishing.mjs",
     "test:data-refresh": "node --test scripts/test-data-refresh.mjs scripts/test-refresh-stores.mjs",
     "test:dispatch": "node --test --test-isolation=none scripts/test-dispatch-sql.mjs scripts/test-dispatch-store.mjs",

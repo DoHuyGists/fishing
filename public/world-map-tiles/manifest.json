@@ -1,0 +1,50 @@
+{
+  "projection": "equirectangular",
+  "tileSize": 256,
+  "origin": "top-left",
+  "source": {
+    "height": 2048,
+    "width": 4096
+  },
+  "levels": [
+    {
+      "zoom": 0,
+      "rows": 1,
+      "width": 512,
+      "columns": 2,
+      "height": 256
+    },
+    {
+      "zoom": 1,
+      "rows": 2,
+      "width": 1024,
+      "columns": 4,
+      "height": 512
+    },
+    {
+      "zoom": 2,
+      "rows": 4,
+      "width": 2048,
+      "columns": 8,
+      "height": 1024
+    },
+    {
+      "zoom": 3,
+      "rows": 8,
+      "width": 4096,
+      "columns": 16,
+      "height": 2048
+    }
+  ],
+  "version": 1,
+  "minZoom": 0,
+  "format": "jpg",
+  "maxZoom": 3,
+  "template": "{z}/{x}/{y}.jpg",
+  "bounds": [
+    -180,
+    -90,
+    180,
+    90
+  ]
+}
