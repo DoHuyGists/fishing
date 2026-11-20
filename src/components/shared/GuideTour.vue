@@ -230,7 +230,7 @@ onUnmounted(() => {
             <rect
               width="100%"
               height="100%"
-              fill="white"
+              fill="var(--color-white)"
             />
 
             <rect
@@ -240,7 +240,7 @@ onUnmounted(() => {
               :width="spotlight.width"
               :height="spotlight.height"
               :rx="spotlight.radius"
-              fill="black"
+              fill="var(--color-content)"
             />
           </mask>
         </defs>
@@ -248,7 +248,7 @@ onUnmounted(() => {
         <rect
           width="100%"
           height="100%"
-          fill="rgba(0, 0, 0, 0.78)"
+          fill="rgba(36, 53, 42, 0.78)"
           :mask="`url(#${maskId})`"
         />
 
@@ -396,7 +396,7 @@ onUnmounted(() => {
   stroke: var(--color-white);
   stroke-width: 2;
   vector-effect: non-scaling-stroke;
-  filter: drop-shadow(0 0 5px rgba(255, 255, 255, 0.8));
+  filter: drop-shadow(0 0 5px color-mix(in srgb, var(--color-white) 80%, transparent));
 }
 
 /* Tooltip và các nút điều hướng luôn ở trên cùng */
@@ -407,18 +407,18 @@ onUnmounted(() => {
   overflow-y: auto;
   z-index: 10;
   padding: 18px;
-  color: var(--color-palette-f8fafc);
-  background: var(--color-palette-17191f);
-  border: 1px solid var(--color-palette-3b3f49);
+  color: var(--color-white);
+  background: var(--color-content);
+  border: 1px solid var(--color-content);
   border-radius: 14px;
-  box-shadow: 0 12px 40px rgba(0, 0, 0, 0.4);
+  box-shadow: 0 12px 40px color-mix(in srgb, var(--color-content) 40%, transparent);
   pointer-events: auto;
   user-select: none;
 }
 
 .guide-tour__progress {
   margin-bottom: 8px;
-  color: var(--color-palette-a5b4fc);
+  color: var(--color-primary);
   font-size: 11px;
   font-weight: 700;
   letter-spacing: 1px;
@@ -432,7 +432,7 @@ onUnmounted(() => {
 
 .guide-tour__description {
   margin: 0;
-  color: var(--color-palette-c4c8d1);
+  color: var(--color-surface);
   font-size: 13px;
   line-height: 1.6;
 }
@@ -498,12 +498,12 @@ onUnmounted(() => {
 
 .guide-tour__skip,
 .guide-tour__back {
-  color: var(--color-palette-c4c8d1);
+  color: var(--color-surface);
   background: transparent;
 }
 
 .guide-tour__next {
-  color: var(--color-palette-111827);
+  color: var(--color-content);
   background: var(--color-white);
 }
 
@@ -526,14 +526,14 @@ onUnmounted(() => {
 
 .ocean-theme .guide-tour__border {
   stroke: var(--color-ocean-cyan);
-  filter: drop-shadow(0 0 8px #35b9d5b3);
+  filter: drop-shadow(0 0 8px color-mix(in srgb, var(--color-sky) 70.196%, transparent));
 }
 
 .ocean-theme .guide-tour__tooltip {
   color: var(--color-ocean-pearl);
   border-color: var(--color-ocean-gold);
   background: linear-gradient(145deg, var(--color-ocean-panel), var(--color-ocean-deep));
-  box-shadow: 0 16px 40px #071a2d99, inset 0 1px #f5ebd426;
+  box-shadow: 0 16px 40px color-mix(in srgb, var(--color-content) 60%, transparent), inset 0 1px color-mix(in srgb, var(--color-surface) 14.902%, transparent);
 }
 
 .ocean-theme .guide-tour__progress {
@@ -551,7 +551,7 @@ onUnmounted(() => {
 }
 
 .ocean-theme .guide-tour__next {
-  color: var(--color-ocean-deep);
+  color: var(--color-content);
   background: var(--color-ocean-gold);
   box-shadow: 0 2px 0 var(--color-ocean-wood);
 }

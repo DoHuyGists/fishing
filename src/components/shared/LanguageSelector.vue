@@ -15,13 +15,13 @@ const localeStore = useLocaleStore();
         v-model="localeStore.locale"
         :disabled="localeStore.saving"
         :aria-busy="localeStore.saving"
-        class="shared-language-select cursor-pointer rounded bg-transparent focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-emerald-600 disabled:cursor-wait disabled:opacity-60"
+        class="shared-language-select cursor-pointer rounded bg-transparent focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-accent disabled:cursor-wait disabled:opacity-60"
       >
         <option value="vi" lang="vi">Tiếng Việt</option>
         <option value="en" lang="en">English</option>
       </select>
     </label>
-    <div v-if="localeStore.error" role="alert" class="text-xs text-red-700">{{ localeStore.error }}</div>
+    <div v-if="localeStore.error" role="alert" class="text-xs text-danger">{{ localeStore.error }}</div>
   </div>
 </template>
 

@@ -41,7 +41,7 @@ function attachmentUrl(path: string) {
     <div class="flex shrink-0 justify-end border-b border-border-default bg-white px-4 py-3 sm:px-6">
       <button
         type="button"
-        class="rounded-lg border border-slate-300 px-3 py-2 text-sm hover:bg-slate-50"
+        class="rounded-lg border border-content px-3 py-2 text-sm hover:bg-white"
         :disabled="store.loading"
         @click="store.fetchErrorFeedback()"
       >
@@ -49,43 +49,43 @@ function attachmentUrl(path: string) {
       </button>
     </div>
     <div class="min-h-0 flex-1 overflow-auto p-4 sm:p-6">
-      <div v-if="store.error" role="alert" class="mb-4 rounded-lg bg-red-50 px-4 py-3 text-sm text-red-700">
+      <div v-if="store.error" role="alert" class="mb-4 rounded-lg bg-surface px-4 py-3 text-sm text-danger">
         {{ store.error }}
       </div>
       <div
         v-if="store.attachmentError"
         role="alert"
-        class="mb-4 rounded-lg bg-amber-50 px-4 py-3 text-sm text-amber-800"
+        class="mb-4 rounded-lg bg-surface px-4 py-3 text-sm text-gold"
       >
         Không thể tạo signed URL cho tệp đính kèm. Kiểm tra quyền đọc Storage của tài khoản admin:
         {{ store.attachmentError }}
       </div>
-      <div v-else-if="store.loadingAttachments" class="mb-4 text-sm text-slate-500">
+      <div v-else-if="store.loadingAttachments" class="mb-4 text-sm text-content">
         Đang tạo liên kết an toàn cho tệp đính kèm…
       </div>
-      <div v-if="store.loading" class="py-10 text-center text-sm text-slate-500">Đang tải báo lỗi…</div>
-      <div v-else-if="!store.errorFeedback.length" class="py-10 text-center text-sm text-slate-500">
+      <div v-if="store.loading" class="py-10 text-center text-sm text-content">Đang tải báo lỗi…</div>
+      <div v-else-if="!store.errorFeedback.length" class="py-10 text-center text-sm text-content">
         Chưa có báo lỗi nào.
       </div>
       <div v-else class="space-y-4">
         <article
           v-for="item in store.errorFeedback"
           :key="item.id"
-          class="rounded-xl border border-slate-200 p-4 sm:p-5"
+          class="rounded-xl border border-border p-4 sm:p-5"
         >
           <div class="flex flex-col justify-between gap-3 sm:flex-row">
             <div class="min-w-0">
-              <div class="text-base font-bold text-slate-800">{{ item.title }}</div>
-              <div class="mt-1 text-xs text-slate-500">
+              <div class="text-base font-bold text-content">{{ item.title }}</div>
+              <div class="mt-1 text-xs text-content">
                 {{ formatDate(item.created_at) }} · Người dùng {{ item.user_id ?? "đã xóa tài khoản" }}
               </div>
             </div>
             <label class="flex shrink-0 items-center gap-2 text-sm"
-              ><span class="font-medium text-slate-600">Trạng thái</span
+              ><span class="font-medium text-content">Trạng thái</span
               ><select
                 :value="item.status"
                 :disabled="store.updatingIds.includes(item.id)"
-                class="rounded-lg border border-slate-300 bg-white px-3 py-2 text-sm focus:border-emerald-600 focus:outline-none disabled:opacity-60"
+                class="rounded-lg border border-content bg-white px-3 py-2 text-sm focus:border-accent focus:outline-none disabled:opacity-60"
                 @change="
                   store.updateErrorStatus(item.id, ($event.target as HTMLSelectElement).value as ErrorFeedbackStatus)
                 "
@@ -93,16 +93,16 @@ function attachmentUrl(path: string) {
                 <option v-for="status in statuses" :key="status.value" :value="status.value">
                   {{ status.label }}
                 </option></select
-              ><span v-if="store.updatingIds.includes(item.id)" class="text-xs text-slate-500">Đang lưu…</span></label
+              ><span v-if="store.updatingIds.includes(item.id)" class="text-xs text-content">Đang lưu…</span></label
             >
           </div>
-          <div v-if="item.description" class="mt-3 whitespace-pre-wrap text-sm leading-relaxed text-slate-700">
+          <div v-if="item.description" class="mt-3 whitespace-pre-wrap text-sm leading-relaxed text-content">
             {{ item.description }}
           </div>
-          <div v-if="item.attachments?.length" class="mt-4 rounded-lg border border-slate-200">
+          <div v-if="item.attachments?.length" class="mt-4 rounded-lg border border-border">
             <button
               type="button"
-              class="flex w-full items-center justify-between gap-3 px-4 py-3 text-left text-sm font-semibold text-slate-700 hover:bg-slate-50"
+              class="flex w-full items-center justify-between gap-3 px-4 py-3 text-left text-sm font-semibold text-content hover:bg-white"
               :aria-expanded="!!expandedAttachments[item.id]"
               :aria-controls="`attachments-${item.id}`"
               @click="expandedAttachments[item.id] = !expandedAttachments[item.id]"
@@ -125,7 +125,7 @@ function attachmentUrl(path: string) {
             <div
               v-if="expandedAttachments[item.id]"
               :id="`attachments-${item.id}`"
-              class="flex flex-wrap gap-3 border-t border-slate-200 p-3"
+              class="flex flex-wrap gap-3 border-t border-border p-3"
             >
               <a
                 v-for="file in item.attachments"
@@ -133,14 +133,14 @@ function attachmentUrl(path: string) {
                 :href="attachmentUrl(file.path) || undefined"
                 target="_blank"
                 rel="noopener noreferrer"
-                class="overflow-hidden rounded-lg border border-slate-200 bg-slate-50"
+                class="overflow-hidden rounded-lg border border-border bg-white"
                 :class="attachmentUrl(file.path) ? '' : 'pointer-events-none opacity-50'"
                 ><img
                   v-if="file.type === 'image' && attachmentUrl(file.path)"
                   :src="attachmentUrl(file.path)"
                   :alt="file.path.split('/').pop() ?? 'Ảnh đính kèm'"
                   class="h-32 w-40 object-cover"
-                /><span v-else class="flex h-32 w-48 flex-col justify-center px-4 text-center text-sm text-indigo-700"
+                /><span v-else class="flex h-32 w-48 flex-col justify-center px-4 text-center text-sm text-primary"
                   ><span aria-hidden="true" class="mb-1 text-2xl">▶</span
                   >{{
                     attachmentUrl(file.path)
@@ -153,7 +153,7 @@ function attachmentUrl(path: string) {
               >
             </div>
           </div>
-          <div class="mt-3 text-xs text-slate-400">Cập nhật lần cuối: {{ formatDate(item.updated_at) }}</div>
+          <div class="mt-3 text-xs text-content">Cập nhật lần cuối: {{ formatDate(item.updated_at) }}</div>
         </article>
       </div>
     </div>

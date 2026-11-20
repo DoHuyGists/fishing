@@ -541,10 +541,10 @@ const close = () => {
 </script>
 
 <template>
-  <div class="min-h-screen bg-slate-50 text-slate-800 lg:flex">
+  <div class="min-h-screen bg-white text-content lg:flex">
     <!-- Sidebar -->
     <aside
-      class="hidden lg:sticky lg:top-0 lg:flex lg:h-dvh lg:w-52 lg:shrink-0 lg:self-start flex-col overflow-hidden bg-content-strong text-emerald-50"
+      class="hidden lg:sticky lg:top-0 lg:flex lg:h-dvh lg:w-52 lg:shrink-0 lg:self-start flex-col overflow-hidden bg-content-strong text-white"
     >
       <div class="shrink-0 px-3 py-2 border-b border-white/10">
         <div class="text-sm font-bold leading-tight">{{ tr("AdminView.quan_tri") }}</div>
@@ -555,14 +555,14 @@ const close = () => {
         :aria-label="tr('AdminView.dieu_huong_quan_tri')"
       >
         <section v-for="group in groups" :key="group.title">
-          <div class="px-2 text-xs font-semibold text-emerald-200/60">{{ group.title }}</div>
+          <div class="px-2 text-xs font-semibold text-accent/60">{{ group.title }}</div>
           <div>
             <div v-for="m in group.modules" :key="m.key">
               <button
                 type="button"
-                class="w-full flex items-center gap-1.5 rounded px-2 py-1 text-left text-xs leading-4 font-medium transition-colors cursor-pointer focus-visible:outline-2 focus-visible:outline-emerald-300"
+                class="w-full flex items-center gap-1.5 rounded px-2 py-1 text-left text-xs leading-4 font-medium transition-colors cursor-pointer focus-visible:outline-2 focus-visible:outline-accent"
                 :class="
-                  active === m.key ? 'bg-white/15 text-white' : 'text-emerald-50/80 hover:bg-white/10 hover:text-white'
+                  active === m.key ? 'bg-white/15 text-white' : 'text-white/80 hover:bg-white/10 hover:text-white'
                 "
                 :aria-current="active === m.key ? 'true' : undefined"
                 @click="open(m.key)"
@@ -586,7 +586,7 @@ const close = () => {
         <div class="flex w-full flex-wrap items-center gap-1.5 sm:w-auto sm:justify-end">
           <button
             type="button"
-            class="rounded-md border border-border-default bg-surface px-2.5 py-1.5 text-xs font-semibold text-content hover:bg-emerald-100 focus-visible:outline-2 focus-visible:outline-emerald-600"
+            class="rounded-md border border-border-default bg-surface px-2.5 py-1.5 text-xs font-semibold text-content hover:bg-surface focus-visible:outline-2 focus-visible:outline-accent"
             aria-haspopup="dialog"
             :aria-expanded="monitorOpen"
             @click="monitorOpen = true"
@@ -595,7 +595,7 @@ const close = () => {
           </button>
           <button
             type="button"
-            class="rounded-md border border-border-default bg-surface px-2.5 py-1.5 text-xs font-semibold text-content hover:bg-emerald-100 focus-visible:outline-2 focus-visible:outline-emerald-600"
+            class="rounded-md border border-border-default bg-surface px-2.5 py-1.5 text-xs font-semibold text-content hover:bg-surface focus-visible:outline-2 focus-visible:outline-accent"
             aria-haspopup="dialog"
             :aria-expanded="guideStore.isOpen"
             @click="guideStore.open"
@@ -604,14 +604,14 @@ const close = () => {
           </button>
           <button
             type="button"
-            class="rounded-md bg-emerald-700 px-2.5 py-1.5 text-xs font-semibold text-white hover:bg-emerald-800 focus-visible:outline-2 focus-visible:outline-emerald-600"
+            class="rounded-md bg-accent px-2.5 py-1.5 text-xs font-semibold text-white hover:bg-accent focus-visible:outline-2 focus-visible:outline-accent"
             @click="feedbackModal = 'opinion'"
           >
             {{ tr("AdminView.xem_gop_y") }}
           </button>
           <button
             type="button"
-            class="rounded-md bg-amber-600 px-2.5 py-1.5 text-xs font-semibold text-white hover:bg-amber-700 focus-visible:outline-2 focus-visible:outline-amber-600"
+            class="rounded-md bg-gold px-2.5 py-1.5 text-xs font-semibold text-white hover:bg-gold focus-visible:outline-2 focus-visible:outline-gold"
             @click="feedbackModal = 'errors'"
           >
             {{ tr("AdminView.xu_ly_bao_loi") }}
@@ -622,9 +622,9 @@ const close = () => {
               v-model="keyword"
               type="search"
               :placeholder="tr('AdminView.tim_muc_quan_ly_2')"
-              class="w-full rounded-md border border-border-default bg-white py-1.5 pl-8 pr-2 text-xs placeholder:text-slate-400 focus:border-emerald-600 focus:outline-none focus:ring-2 focus:ring-emerald-600/25"
+              class="w-full rounded-md border border-border-default bg-white py-1.5 pl-8 pr-2 text-xs placeholder:text-content focus:border-accent focus:outline-none focus:ring-2 focus:ring-accent/25"
             />
-            <span class="pointer-events-none absolute left-3 top-1/2 -translate-y-1/2 text-slate-400" aria-hidden="true"
+            <span class="pointer-events-none absolute left-3 top-1/2 -translate-y-1/2 text-content" aria-hidden="true"
               >🔍</span
             >
           </label>
@@ -644,7 +644,7 @@ const close = () => {
               v-for="m in group.modules"
               :key="m.key"
               type="button"
-              class="flex min-h-8 items-center gap-2 rounded px-1.5 py-1 text-left transition-colors hover:bg-surface cursor-pointer focus-visible:outline-2 focus-visible:outline-emerald-600"
+              class="flex min-h-8 items-center gap-2 rounded px-1.5 py-1 text-left transition-colors hover:bg-surface cursor-pointer focus-visible:outline-2 focus-visible:outline-accent"
               :title="m.desc"
               @click="open(m.key)"
             >
@@ -658,7 +658,7 @@ const close = () => {
 
         <div
           v-if="filteredGroups.length === 0"
-          class="rounded-md border border-dashed border-border-default bg-white p-3 text-center text-xs text-slate-500"
+          class="rounded-md border border-dashed border-border-default bg-white p-3 text-center text-xs text-content"
         >
           {{ tr("AdminView.khong_co_muc_nao_khop_voi") }}{{ keyword }}{{ tr("AdminView.hay_thu_tu_khoa_khac") }}
         </div>

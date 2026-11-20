@@ -16,22 +16,22 @@ const filters = [
   { key: "fish" as const, label: "fish · 11" },
 ];
 const zones = {
-  slack: { label: "Dây chùng", color: "text-sky-700" },
-  safe: { label: "Trong vùng xanh", color: "text-emerald-700" },
-  danger: { label: "Dây căng nguy hiểm", color: "text-amber-700" },
-  broken: { label: "Chạm ngưỡng đứt dây", color: "text-red-700" },
+  slack: { label: "Dây chùng", color: "text-primary" },
+  safe: { label: "Trong vùng xanh", color: "text-content" },
+  danger: { label: "Dây căng nguy hiểm", color: "text-gold" },
+  broken: { label: "Chạm ngưỡng đứt dây", color: "text-danger" },
 };
 </script>
 
 <template>
   <article class="mx-auto w-full max-w-6xl px-4 py-5 text-sm leading-relaxed sm:px-6 sm:py-7">
     <div class="mb-5 rounded-2xl bg-content-strong p-5 text-white sm:p-7">
-      <div class="mb-2 flex flex-wrap gap-2 text-xs font-semibold text-emerald-100">
+      <div class="mb-2 flex flex-wrap gap-2 text-xs font-semibold text-white">
         <span class="rounded-full bg-white/10 px-3 py-1">🎣 Tension challenge</span>
         <span class="rounded-full bg-white/10 px-3 py-1">25 chỉ số · 2 nhóm</span>
       </div>
       <div class="m-0 text-xl font-extrabold sm:text-2xl">Hiểu sức cá, cân bằng cuộc đấu</div>
-      <div class="mb-0 mt-2 max-w-3xl text-emerald-100">
+      <div class="mb-0 mt-2 max-w-3xl text-white">
         Người chơi giữ nút để thu dây, thả nút để nhả dây. Bạn điều chỉnh luật trong
         <code
           class="rounded-[0.25rem] bg-surface-code px-[0.25rem] py-[0.0625rem] [overflow-wrap:anywhere] text-[0.85em]"
@@ -108,7 +108,7 @@ const zones = {
             <div class="mb-4 flex flex-wrap items-start justify-between gap-3">
               <div>
                 <div id="tension-preview-title" class="m-0 text-lg font-bold">Thử một khoảnh khắc trong ván đấu</div>
-                <div class="mb-0 mt-1 text-xs text-slate-600">
+                <div class="mb-0 mt-1 text-xs text-content">
                   Kéo các thanh và đổi thao tác để thấy chỉ số tác động ra sao.
                 </div>
               </div>
@@ -142,15 +142,15 @@ const zones = {
                   role="img"
                   :aria-label="`Lực căng ${guide.previewTension}; vùng an toàn từ ${guide.selectedPreset.config.safeMin} đến ${guide.selectedPreset.config.safeMax}`"
                 >
-                  <div class="relative mb-3 flex h-7 rounded-full bg-red-200">
+                  <div class="relative mb-3 flex h-7 rounded-full bg-danger">
                     <div
-                      class="rounded-l-full bg-sky-200"
+                      class="rounded-l-full bg-sky"
                       :style="{
                         width: `${(guide.selectedPreset.config.safeMin / guide.selectedPreset.config.maxTension) * 100}%`,
                       }"
                     />
                     <div
-                      class="bg-emerald-400"
+                      class="bg-accent"
                       :style="{
                         width: `${((guide.selectedPreset.config.safeMax - guide.selectedPreset.config.safeMin) / guide.selectedPreset.config.maxTension) * 100}%`,
                       }"
@@ -160,9 +160,9 @@ const zones = {
                       :style="{ left: `${(guide.previewTension / guide.selectedPreset.config.maxTension) * 100}%` }"
                     />
                   </div>
-                  <div class="flex justify-between gap-2 text-xs text-slate-600">
+                  <div class="flex justify-between gap-2 text-xs text-content">
                     <span>Chùng &lt; {{ number(guide.selectedPreset.config.safeMin) }}</span>
-                    <span class="font-semibold text-emerald-700"
+                    <span class="font-semibold text-content"
                       >Xanh {{ number(guide.selectedPreset.config.safeMin) }}–{{
                         number(guide.selectedPreset.config.safeMax)
                       }}</span
@@ -178,7 +178,7 @@ const zones = {
                     min="0"
                     :max="guide.selectedPreset.config.maxTension"
                     step="1"
-                    class="mt-2 block w-full accent-emerald-700"
+                    class="mt-2 block w-full accent-accent"
                   />
                 </label>
                 <label class="block font-semibold">
@@ -189,11 +189,11 @@ const zones = {
                     min="0"
                     max="100"
                     step="1"
-                    class="mt-2 block w-full accent-emerald-700"
+                    class="mt-2 block w-full accent-accent"
                   />
                 </label>
                 <label class="flex cursor-pointer items-center gap-2">
-                  <input v-model="guide.previewBurst" type="checkbox" class="size-4 accent-emerald-700" />
+                  <input v-model="guide.previewBurst" type="checkbox" class="size-4 accent-accent" />
                   Giả sử cá đang giật gần mức
                   <code
                     class="rounded-[0.25rem] bg-surface-code px-[0.25rem] py-[0.0625rem] [overflow-wrap:anywhere] text-[0.85em]"
@@ -223,7 +223,7 @@ const zones = {
                 </fieldset>
               </div>
               <div class="space-y-3 rounded-xl border border-border-default bg-surface p-4">
-                <div class="m-0 text-xs font-bold uppercase tracking-wide text-emerald-800">
+                <div class="m-0 text-xs font-bold uppercase tracking-wide text-content">
                   Lực căng sẽ thay đổi thế nào?
                 </div>
                 <div class="grid grid-cols-3 gap-2 text-center">
@@ -237,7 +237,7 @@ const zones = {
                     ><span class="text-xs">Thao tác/giây</span>
                   </div>
                   <div>
-                    <strong class="block text-lg" :class="guide.preview.delta > 0 ? 'text-amber-700' : 'text-sky-700'"
+                    <strong class="block text-lg" :class="guide.preview.delta > 0 ? 'text-gold' : 'text-primary'"
                       >{{ guide.preview.delta > 0 ? "+" : "" }}{{ number(guide.preview.delta) }}</strong
                     ><span class="text-xs">Tổng/giây</span>
                   </div>
@@ -280,7 +280,7 @@ const zones = {
                     }}
                   </div>
                 </div>
-                <details class="rounded-lg bg-white p-3 text-xs text-slate-600">
+                <details class="rounded-lg bg-white p-3 text-xs text-content">
                   <summary class="cursor-pointer font-semibold text-content">
                     Các con số này được tính ra sao?
                   </summary>
@@ -301,14 +301,14 @@ const zones = {
                 </details>
               </div>
             </div>
-            <div class="mb-0 mt-4 text-xs text-slate-600">
+            <div class="mb-0 mt-4 text-xs text-content">
               Đây là minh họa để đọc chỉ số. Các lựa chọn tại đây chỉ thay đổi bản xem hướng dẫn.
             </div>
           </section>
 
           <div class="grid gap-3 sm:grid-cols-3">
             <section class="guide-card border border-border-default rounded-[0.875rem] bg-white p-4">
-              <div class="guide-title m-0 text-[0.9375rem] font-bold! text-emerald-800">
+              <div class="guide-title m-0 text-[0.9375rem] font-bold! text-content">
                 🏁 Thắng khi khoảng cách ≤ 0
               </div>
               <div>
@@ -320,7 +320,7 @@ const zones = {
               </div>
             </section>
             <section class="guide-card border border-border-default rounded-[0.875rem] bg-white p-4">
-              <div class="guide-title m-0 text-[0.9375rem] font-bold! text-red-800">💥 Thua khi dây đứt</div>
+              <div class="guide-title m-0 text-[0.9375rem] font-bold! text-danger">💥 Thua khi dây đứt</div>
               <div>
                 Chạm
                 <code
@@ -336,7 +336,7 @@ const zones = {
               </div>
             </section>
             <section class="guide-card border border-border-default rounded-[0.875rem] bg-white p-4">
-              <div class="guide-title m-0 text-[0.9375rem] font-bold! text-sky-800">🐟 Thua khi cá thoát</div>
+              <div class="guide-title m-0 text-[0.9375rem] font-bold! text-primary">🐟 Thua khi cá thoát</div>
               <div>
                 Dưới
                 <code
@@ -352,7 +352,7 @@ const zones = {
               </div>
             </section>
           </div>
-          <aside class="rounded-xl border border-border-default bg-emerald-50 p-4">
+          <aside class="rounded-xl border border-border-default bg-surface p-4">
             <div class="guide-title m-0 text-[0.9375rem] font-bold!">Một ván, một bộ luật đã lưu</div>
             <div class="mb-0">
               Server lưu
@@ -381,13 +381,13 @@ const zones = {
           <div class="grid gap-3 sm:grid-cols-2">
             <div class="rounded-xl border border-border-default bg-white p-4">
               <strong>⚙️ config · Luật và trang bị</strong>
-              <div class="mb-0 mt-1 text-slate-600">
+              <div class="mb-0 mt-1 text-content">
                 Vùng lực căng, cách thu/nhả, tốc độ kéo cá và các điều kiện thoát.
               </div>
             </div>
             <div class="rounded-xl border border-border-default bg-white p-4">
               <strong>🐟 fish · Tính cách con cá</strong>
-              <div class="mb-0 mt-1 text-slate-600">Lực kéo nền, sức giật, thời lượng nhịp và tốc độ mệt.</div>
+              <div class="mb-0 mt-1 text-content">Lực kéo nền, sức giật, thời lượng nhịp và tốc độ mệt.</div>
             </div>
           </div>
           <label class="block font-semibold"
@@ -411,9 +411,9 @@ const zones = {
             >
               {{ filter.label }}
             </button>
-            <span class="ml-auto text-xs text-slate-600" role="status">{{ guide.filteredEntries.length }} chỉ số</span>
+            <span class="ml-auto text-xs text-content" role="status">{{ guide.filteredEntries.length }} chỉ số</span>
           </div>
-          <div class="text-xs text-slate-600">
+          <div class="text-xs text-content">
             Giá trị bên dưới minh họa rules v2: cá RARE có sức hiệu lực 40, dây chịu 100, máy có pull_strength = 80, hệ
             số giật 1,5. Session thật dùng chỉ số cá và bộ đồ lúc thả câu.
           </div>
@@ -426,33 +426,33 @@ const zones = {
           >
             <div class="flex flex-wrap items-center justify-between gap-2">
               <code
-                class="break-all font-bold text-emerald-800 rounded-[0.25rem] bg-surface-code px-[0.25rem] py-[0.0625rem] [overflow-wrap:anywhere] text-[0.85em]"
+                class="break-all font-bold text-content rounded-[0.25rem] bg-surface-code px-[0.25rem] py-[0.0625rem] [overflow-wrap:anywhere] text-[0.85em]"
                 >{{ entry.section }}.{{ entry.key }}</code
               >
               <span class="rounded-full bg-surface px-2 py-1 text-xs font-semibold">{{ number(entry.value) }}</span>
             </div>
             <div class="mb-1 mt-3 font-bold">
-              {{ entry.name }} <span class="font-normal text-slate-500">· {{ entry.unit }}</span>
+              {{ entry.name }} <span class="font-normal text-content">· {{ entry.unit }}</span>
             </div>
             <div class="mt-1">{{ entry.meaning }}</div>
             <dl class="m-0 space-y-3">
               <div>
-                <dt class="text-xs font-bold text-emerald-800">Cách hoạt động</dt>
-                <dd class="ml-0 mt-0.5 text-slate-600">{{ entry.mechanism }}</dd>
+                <dt class="text-xs font-bold text-content">Cách hoạt động</dt>
+                <dd class="ml-0 mt-0.5 text-content">{{ entry.mechanism }}</dd>
               </div>
               <div>
-                <dt class="text-xs font-bold text-emerald-800">Khi điều chỉnh</dt>
-                <dd class="ml-0 mt-0.5 text-slate-600">{{ entry.tuning }}</dd>
+                <dt class="text-xs font-bold text-content">Khi điều chỉnh</dt>
+                <dd class="ml-0 mt-0.5 text-content">{{ entry.tuning }}</dd>
               </div>
             </dl>
-            <div class="mb-0 mt-3 rounded-lg bg-amber-50 p-3 text-xs text-amber-950">
+            <div class="mb-0 mt-3 rounded-lg bg-surface p-3 text-xs text-gold">
               <strong>Ví dụ: </strong>{{ entry.example }}
             </div>
           </section>
         </div>
         <div
           v-if="!guide.filteredEntries.length"
-          class="rounded-xl border border-dashed border-border-default p-8 text-center text-slate-600"
+          class="rounded-xl border border-dashed border-border-default p-8 text-center text-content"
         >
           Không tìm thấy chỉ số. Thử key khác hoặc chọn “Tất cả”.
         </div>
@@ -462,7 +462,7 @@ const zones = {
         <div class="space-y-5">
           <div>
             <div class="m-0 text-lg font-bold">Bắt đầu từ một tình huống cụ thể</div>
-            <div class="mb-0 mt-1 text-slate-600">
+            <div class="mb-0 mt-1 text-content">
               Chọn một ví dụ để xem các thay đổi so với cấu hình RARE hiện tại. Các gợi ý cần được thử với nhiều seed và
               thao tác người chơi trước khi áp dụng.
             </div>
@@ -472,9 +472,9 @@ const zones = {
               v-for="preset in tensionGuidePresets"
               :key="preset.id"
               type="button"
-              class="guide-card border border-border-default rounded-[0.875rem] bg-white p-4 cursor-pointer text-left transition-colors hover:border-emerald-600 focus-visible:outline-2 focus-visible:outline-emerald-700"
+              class="guide-card border border-border-default rounded-[0.875rem] bg-white p-4 cursor-pointer text-left transition-colors hover:border-accent focus-visible:outline-2 focus-visible:outline-accent"
               :class="{
-                'selected-preset [&.selected-preset]:border-accent [&.selected-preset]:bg-palette-ecfdf5 [&.selected-preset]:shadow-[inset_0_0_0_1px_var(--color-accent)]':
+                'selected-preset [&.selected-preset]:border-accent [&.selected-preset]:bg-surface [&.selected-preset]:shadow-[inset_0_0_0_1px_var(--color-accent)]':
                   guide.selectedPresetId === preset.id,
               }"
               :aria-pressed="guide.selectedPresetId === preset.id"
@@ -482,7 +482,7 @@ const zones = {
             >
               <span class="text-2xl" aria-hidden="true">{{ preset.icon }}</span>
               <strong class="mb-1 mt-2 block">{{ preset.title }}</strong
-              ><span class="text-xs text-slate-600">{{ preset.audience }}</span>
+              ><span class="text-xs text-content">{{ preset.audience }}</span>
             </button>
           </div>
           <section class="guide-card border border-border-default rounded-[0.875rem] bg-white p-4">
@@ -504,12 +504,12 @@ const zones = {
                   <tr v-for="change in guide.presetChanges" :key="change.key" class="border-t border-border-default">
                     <th scope="row" class="p-3 font-normal">
                       <code
-                        class="break-all text-emerald-800 rounded-[0.25rem] bg-surface-code px-[0.25rem] py-[0.0625rem] [overflow-wrap:anywhere] text-[0.85em]"
+                        class="break-all text-content rounded-[0.25rem] bg-surface-code px-[0.25rem] py-[0.0625rem] [overflow-wrap:anywhere] text-[0.85em]"
                         >{{ change.key }}</code
-                      ><span class="mt-0.5 block text-xs text-slate-500">{{ change.name }} · {{ change.unit }}</span>
+                      ><span class="mt-0.5 block text-xs text-content">{{ change.name }} · {{ change.unit }}</span>
                     </th>
                     <td class="p-3 tabular-nums">{{ number(change.before) }}</td>
-                    <td class="p-3 font-bold text-emerald-800 tabular-nums">{{ number(change.after) }}</td>
+                    <td class="p-3 font-bold text-content tabular-nums">{{ number(change.after) }}</td>
                   </tr>
                 </tbody>
               </table>
@@ -517,34 +517,34 @@ const zones = {
             <div v-else class="rounded-lg bg-surface p-3">Giữ nguyên cả 25 key để làm mốc so sánh.</div>
             <div class="mt-4 grid gap-3 sm:grid-cols-3">
               <div class="rounded-lg bg-surface p-3">
-                <span class="block text-xs text-slate-600"
+                <span class="block text-xs text-content"
                   >Thu hiệu quả đủ {{ number(guide.selectedPreset.config.startDistance) }} m</span
                 ><strong class="text-xl">≈ {{ number(guide.preview.minimumReelSeconds) }} giây</strong>
-                <div class="mb-0 mt-1 text-xs text-slate-600">
+                <div class="mb-0 mt-1 text-xs text-content">
                   Ước tính khi luôn giữ nút và dây đủ căng. Ván thật còn thời gian nhả và cá lùi.
                 </div>
               </div>
               <div class="rounded-lg bg-surface p-3">
-                <span class="block text-xs text-slate-600">Một nhịp vùng vẫy</span
+                <span class="block text-xs text-content">Một nhịp vùng vẫy</span
                 ><strong class="text-xl"
                   >{{ number(guide.selectedPreset.fish.burstMinTicks / guide.selectedPreset.config.tickRate) }}–{{
                     number(guide.selectedPreset.fish.burstMaxTicks / guide.selectedPreset.config.tickRate)
                   }}
                   giây</strong
                 >
-                <div class="mb-0 mt-1 text-xs text-slate-600">
+                <div class="mb-0 mt-1 text-xs text-content">
                   Cả nhịp có giật và nhịp nghỉ đều dùng khoảng thời lượng này.
                 </div>
               </div>
               <div class="rounded-lg bg-surface p-3">
-                <span class="block text-xs text-slate-600">Ngưỡng dây quá chùng</span
+                <span class="block text-xs text-content">Ngưỡng dây quá chùng</span
                 ><strong class="text-xl">&lt; {{ number(guide.preview.slackThreshold) }}</strong>
-                <div class="mb-0 mt-1 text-xs text-slate-600">
+                <div class="mb-0 mt-1 text-xs text-content">
                   Liên tục quá {{ number(guide.selectedPreset.config.slackEscapeSeconds) }} giây thì cá thoát.
                 </div>
               </div>
             </div>
-            <div class="rounded-lg border border-amber-200 bg-amber-50 p-3 text-amber-950">
+            <div class="rounded-lg border border-gold bg-surface p-3 text-gold">
               <strong>Điểm cần theo dõi: </strong>{{ guide.selectedPreset.advice }}
             </div>
             <button
@@ -561,7 +561,7 @@ const zones = {
             <div class="mt-3 grid gap-4 md:grid-cols-2">
               <div>
                 <strong>💥 Hay đứt dù đã nhả</strong>
-                <div class="mb-0 mt-1 text-slate-600">
+                <div class="mb-0 mt-1 text-content">
                   Kiểm tra
                   <code
                     class="rounded-[0.25rem] bg-surface-code px-[0.25rem] py-[0.0625rem] [overflow-wrap:anywhere] text-[0.85em]"
@@ -585,7 +585,7 @@ const zones = {
               </div>
               <div>
                 <strong>🐟 Hay thoát ngay đầu ván</strong>
-                <div class="mb-0 mt-1 text-slate-600">
+                <div class="mb-0 mt-1 text-content">
                   Đưa
                   <code
                     class="rounded-[0.25rem] bg-surface-code px-[0.25rem] py-[0.0625rem] [overflow-wrap:anywhere] text-[0.85em]"
@@ -604,7 +604,7 @@ const zones = {
               </div>
               <div>
                 <strong>⏳ Ván quá dài, hay hết giờ</strong>
-                <div class="mb-0 mt-1 text-slate-600">
+                <div class="mb-0 mt-1 text-content">
                   Tăng
                   <code
                     class="rounded-[0.25rem] bg-surface-code px-[0.25rem] py-[0.0625rem] [overflow-wrap:anywhere] text-[0.85em]"
@@ -623,7 +623,7 @@ const zones = {
               </div>
               <div>
                 <strong>🔋 Cá không yếu đi rõ rệt</strong>
-                <div class="mb-0 mt-1 text-slate-600">
+                <div class="mb-0 mt-1 text-content">
                   Kiểm tra thời gian ở vùng xanh, tăng
                   <code
                     class="rounded-[0.25rem] bg-surface-code px-[0.25rem] py-[0.0625rem] [overflow-wrap:anywhere] text-[0.85em]"
@@ -646,7 +646,7 @@ const zones = {
                 text="Đây là các điều kiện chính của bộ kiểm tra hiện tại. Đổi giá trị không cần đổi công thức; thêm cơ chế hoặc đổi công thức cần cập nhật client, SQL và version cùng nhau."
               />
             </div>
-            <div class="mb-0 space-y-2 pl-5 text-slate-600">
+            <div class="mb-0 space-y-2 pl-5 text-content">
               <div>
                 <code
                   class="rounded-[0.25rem] bg-surface-code px-[0.25rem] py-[0.0625rem] [overflow-wrap:anywhere] text-[0.85em]"

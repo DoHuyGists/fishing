@@ -186,7 +186,7 @@ onUnmounted(() => {
 <template>
   <div
     v-if="adminFishingAreaStore.isFormOpen && adminFishingAreaStore.target"
-    class="w-full shrink-0 border-l border-gray-200 bg-white overflow-y-auto"
+    class="w-full shrink-0 border-l border-border bg-white overflow-y-auto"
   >
     <div class="p-5 flex flex-col gap-4">
       <div class="flex items-center justify-between">
@@ -196,13 +196,13 @@ onUnmounted(() => {
         <button
           type="button"
           @click="adminFishingAreaStore.closeForm"
-          class="text-gray-400 hover:text-gray-700 cursor-pointer text-lg leading-none"
+          class="text-content hover:text-content cursor-pointer text-lg leading-none"
         >
           &times;
         </button>
       </div>
 
-      <div v-if="formError" class="px-3 py-2 rounded-lg bg-red-50 border border-red-200 text-red-600 text-xs">
+      <div v-if="formError" class="px-3 py-2 rounded-lg bg-surface border border-danger text-danger text-xs">
         {{ formError }}
       </div>
 
@@ -214,21 +214,21 @@ onUnmounted(() => {
       </div>
 
       <div class="flex flex-col gap-1.5">
-        <label class="text-[11px] font-bold text-gray-500 uppercase">Tên bãi câu</label>
+        <label class="text-[11px] font-bold text-content uppercase">Tên bãi câu</label>
         <input
           v-model="adminFishingAreaStore.target.title"
           type="text"
           placeholder="Ví dụ: Hồ Xanh"
           :disabled="adminFishingAreaStore.isFormLock"
-          class="px-3 py-1.5 border border-gray-300 rounded-lg text-xs focus:outline-none focus:border-emerald-500"
+          class="px-3 py-1.5 border border-content rounded-lg text-xs focus:outline-none focus:border-accent"
         />
       </div>
 
       <div class="flex flex-col gap-1.5">
-        <label class="text-[11px] font-bold text-gray-500 uppercase">Quốc gia</label>
+        <label class="text-[11px] font-bold text-content uppercase">Quốc gia</label>
         <select
           v-model="adminFishingAreaStore.target.countryId"
-          class="px-3 py-1.5 border border-gray-300 rounded-lg text-xs bg-white focus:outline-none focus:border-emerald-500"
+          class="px-3 py-1.5 border border-content rounded-lg text-xs bg-white focus:outline-none focus:border-accent"
           :disabled="adminFishingAreaStore.isFormLock"
         >
           <option disabled value="">-- Chọn quốc gia --</option>
@@ -239,10 +239,10 @@ onUnmounted(() => {
       </div>
 
       <div class="flex flex-col gap-1.5">
-        <label class="text-[11px] font-bold text-gray-500 uppercase">Vùng</label>
+        <label class="text-[11px] font-bold text-content uppercase">Vùng</label>
         <select
           v-model="adminFishingAreaStore.target.zoneId"
-          class="px-3 py-1.5 border border-gray-300 rounded-lg text-xs bg-white focus:outline-none focus:border-emerald-500"
+          class="px-3 py-1.5 border border-content rounded-lg text-xs bg-white focus:outline-none focus:border-accent"
           :disabled="adminFishingAreaStore.isFormLock"
         >
           <option :value="null">-- Không chọn --</option>
@@ -253,7 +253,7 @@ onUnmounted(() => {
       </div>
 
       <div class="flex flex-col gap-1.5">
-        <label class="text-[11px] font-bold text-gray-500 uppercase">Độ sâu tối đa (max_depth)</label>
+        <label class="text-[11px] font-bold text-content uppercase">Độ sâu tối đa (max_depth)</label>
         <input
           v-model.number="adminFishingAreaStore.target.maxDepth"
           type="number"
@@ -261,19 +261,19 @@ onUnmounted(() => {
           step="any"
           placeholder="Ví dụ: 50"
           :disabled="adminFishingAreaStore.isFormLock"
-          class="px-3 py-1.5 border border-gray-300 rounded-lg text-xs focus:outline-none focus:border-emerald-500"
+          class="px-3 py-1.5 border border-content rounded-lg text-xs focus:outline-none focus:border-accent"
         />
       </div>
 
       <div class="flex flex-col gap-1.5">
-        <label for="fishing-area-timezone" class="text-[11px] font-bold text-gray-500 uppercase"
+        <label for="fishing-area-timezone" class="text-[11px] font-bold text-content uppercase"
           >Múi giờ (timezone)</label
         >
         <select
           id="fishing-area-timezone"
           v-model="adminFishingAreaStore.target.timezone"
           :disabled="adminFishingAreaStore.isFormLock"
-          class="px-3 py-1.5 border border-border-default rounded-lg text-xs bg-surface text-content focus:outline-none focus:border-emerald-500"
+          class="px-3 py-1.5 border border-border-default rounded-lg text-xs bg-surface text-content focus:outline-none focus:border-accent"
         >
           <option :value="null">-- Theo múi giờ quốc gia --</option>
           <option
@@ -292,17 +292,17 @@ onUnmounted(() => {
         <input
           v-model="adminFishingAreaStore.target.allowDepthTool"
           type="checkbox"
-          class="w-4 h-4 accent-emerald-700"
+          class="w-4 h-4 accent-accent"
           :disabled="adminFishingAreaStore.isFormLock"
         />
         Cho phép công cụ đo độ sâu (allow_depth_tool)
       </label>
 
-      <label class="flex items-center gap-2 text-xs font-medium text-gray-700 cursor-pointer select-none">
+      <label class="flex items-center gap-2 text-xs font-medium text-content cursor-pointer select-none">
         <input
           v-model="adminFishingAreaStore.target.isAvailable"
           type="checkbox"
-          class="w-4 h-4 accent-emerald-700"
+          class="w-4 h-4 accent-accent"
           :disabled="adminFishingAreaStore.isFormLock"
         />
         Kích hoạt (hiển thị trên bản đồ)
@@ -310,11 +310,11 @@ onUnmounted(() => {
 
       <div class="flex flex-col gap-1.5">
         <div class="flex items-center justify-between gap-2">
-          <label class="text-[11px] font-bold text-gray-500 uppercase">Location</label>
+          <label class="text-[11px] font-bold text-content uppercase">Location</label>
           <button
             type="button"
             @click="toggleAnchorMode"
-            class="shrink-0 rounded-lg border border-border-default bg-surface px-3 py-1.5 text-xs font-bold text-content transition-colors hover:bg-palette-eaf2e3"
+            class="shrink-0 rounded-lg border border-border-default bg-surface px-3 py-1.5 text-xs font-bold text-content transition-colors hover:bg-surface"
           >
             {{ worldStore.isAnchorMode ? "Tắt xác định vị trí" : "Bật xác định vị trí" }}
           </button>
@@ -323,31 +323,31 @@ onUnmounted(() => {
           :value="JSON.stringify(adminFishingAreaStore.target.location ?? [], null, 2)"
           rows="7"
           placeholder='{"k": 25, "lat": 10.82302, "lon": 106.62965}'
-          class="px-3 py-1.5 border border-gray-300 rounded-lg text-xs font-mono focus:outline-none focus:border-emerald-500 resize-none"
+          class="px-3 py-1.5 border border-content rounded-lg text-xs font-mono focus:outline-none focus:border-accent resize-none"
           disabled
         ></textarea>
       </div>
 
       <div class="flex flex-col gap-1.5">
-        <label class="text-[11px] font-bold text-gray-500 uppercase">Đường dẫn cảnh</label>
+        <label class="text-[11px] font-bold text-content uppercase">Đường dẫn cảnh</label>
         <input
           v-model="adminFishingAreaStore.target.scenePath"
           type="text"
           placeholder="area/VN/770.400"
-          class="px-3 py-1.5 border border-gray-300 rounded-lg text-xs focus:outline-none focus:border-emerald-500"
+          class="px-3 py-1.5 border border-content rounded-lg text-xs focus:outline-none focus:border-accent"
           :disabled="adminFishingAreaStore.isFormLock"
         />
       </div>
 
       <div class="flex flex-col gap-1.5">
         <div class="flex items-center justify-between gap-2">
-          <label class="text-[11px] font-bold text-gray-500 uppercase">Vùng câu</label>
+          <label class="text-[11px] font-bold text-content uppercase">Vùng câu</label>
           <button
             v-if="adminFishingAreaStore.target.scenePath?.trim()"
             type="button"
             @click="openBoundaryPicker"
             :disabled="adminFishingAreaStore.isFormLock"
-            class="self-start px-3 py-1.5 rounded-lg border border-border-default bg-surface text-content text-xs font-bold hover:bg-palette-eaf2e3 cursor-pointer transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+            class="self-start px-3 py-1.5 rounded-lg border border-border-default bg-surface text-content text-xs font-bold hover:bg-surface cursor-pointer transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
           >
             Thiết lập vùng câu
           </button>
@@ -356,24 +356,24 @@ onUnmounted(() => {
           :value="JSON.stringify(adminFishingAreaStore.target.fishingBoundary ?? [], null, 2)"
           rows="7"
           placeholder='[{"x": 0, "y": 0}, {"x": 10, "y": 0}]'
-          class="px-3 py-1.5 border border-gray-300 rounded-lg text-xs font-mono focus:outline-none focus:border-emerald-500 resize-none"
+          class="px-3 py-1.5 border border-content rounded-lg text-xs font-mono focus:outline-none focus:border-accent resize-none"
           disabled
         ></textarea>
       </div>
 
-      <div class="flex items-center gap-2 pt-2 border-t border-gray-100">
+      <div class="flex items-center gap-2 pt-2 border-t border-border">
         <button
           type="button"
           @click="handleSave"
           :disabled="isSaving"
-          class="flex-1 px-3 py-2 rounded-lg bg-content-strong hover:bg-emerald-800 text-white text-xs font-bold cursor-pointer transition-colors disabled:opacity-50"
+          class="flex-1 px-3 py-2 rounded-lg bg-content-strong hover:bg-accent text-white text-xs font-bold cursor-pointer transition-colors disabled:opacity-50"
         >
           {{ isSaving ? "Đang lưu..." : "Lưu" }}
         </button>
         <button
           type="button"
           @click="adminFishingAreaStore.closeForm"
-          class="px-3 py-2 rounded-lg border border-gray-300 hover:bg-gray-100 text-gray-700 text-xs font-bold cursor-pointer transition-colors"
+          class="px-3 py-2 rounded-lg border border-content hover:bg-surface text-content text-xs font-bold cursor-pointer transition-colors"
         >
           Huỷ
         </button>

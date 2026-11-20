@@ -28,7 +28,7 @@ const filteredCountries = computed(() => {
         type="search"
         :aria-label="tr('BookShelf.tim_quoc_gia')"
         :placeholder="tr('BookShelf.tim_quoc_gia')"
-        class="w-full min-w-0 rounded-lg border border-border-default bg-white px-2 py-2 text-xs outline-none focus:border-palette-698563 focus:ring-2 focus:ring-border-default sm:text-sm"
+        class="w-full min-w-0 rounded-lg border border-border-default bg-white px-2 py-2 text-xs outline-none focus:border-content focus:ring-2 focus:ring-border-default sm:text-sm"
       />
     </div>
     <div class="flex-1 space-y-1 overflow-y-auto p-1.5 sm:p-2">
@@ -37,7 +37,7 @@ const filteredCountries = computed(() => {
         :key="country.code"
         type="button"
         :aria-current="selectedCode === country.code ? 'true' : undefined"
-        class="w-full cursor-pointer rounded-lg border p-2 text-left transition-colors focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-palette-698563 sm:p-3"
+        class="w-full cursor-pointer rounded-lg border p-2 text-left transition-colors focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-content sm:p-3"
         :class="
           selectedCode === country.code
             ? 'border-border-default bg-surface-muted shadow-sm'
@@ -46,7 +46,7 @@ const filteredCountries = computed(() => {
         @click="emit('select', country.code)"
       >
         <div class="break-words text-xs font-bold sm:text-sm">{{ country.name }}</div>
-        <div class="mt-1 break-words text-[11px] text-palette-52664e sm:text-xs">
+        <div class="mt-1 break-words text-[11px] text-content sm:text-xs">
           {{
             tr("CatchDiaryModal.conqueredCount", {
               value0: diaryStore.caughtEntriesForCountry(country.code, country.name).length,

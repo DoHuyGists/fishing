@@ -49,7 +49,7 @@ function confirm() {
     @cancel="emit('cancel')"
     @confirm="confirm"
   >
-    <div class="text-sm text-emerald-900/70">
+    <div class="text-sm text-content/70">
       {{ tr("CaughtModal.dang_ban") }} <strong>{{ fish.species?.name }}</strong>
       {{ tr("FishSellConfirm.len_thi_truong") }}
     </div>
@@ -61,7 +61,7 @@ function confirm() {
       required
       :aria-label="tr('FishSellConfirm.nhap_gia_ban')"
       :placeholder="tr('FishSellConfirm.nhap_gia_ban')"
-      class="w-full rounded-lg border border-border-default px-3 py-2 text-sm focus-visible:outline-2 focus-visible:outline-emerald-700"
+      class="w-full rounded-lg border border-border-default px-3 py-2 text-sm focus-visible:outline-2 focus-visible:outline-accent"
       @keydown="
         (e: KeyboardEvent) => {
           if (['e', 'E', '+', '-', '.'].includes(e.key)) e.preventDefault();

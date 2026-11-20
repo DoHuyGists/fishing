@@ -37,11 +37,11 @@ function submit() {
       <label class="text-sm font-medium text-content">Bắt đầu <input v-model="form.startAt" type="datetime-local" required class="mt-1 w-full rounded-lg border border-border-default px-3 py-2" /></label>
       <label class="text-sm font-medium text-content">Kết thúc <input v-model="form.endAt" type="datetime-local" required class="mt-1 w-full rounded-lg border border-border-default px-3 py-2" /></label>
     </div>
-    <label class="flex items-center gap-2 text-sm text-content"><input v-model="form.isActive" type="checkbox" class="accent-emerald-700" /> Đang hoạt động</label>
-    <div v-if="error" class="text-sm text-red-600">{{ error }}</div>
+    <label class="flex items-center gap-2 text-sm text-content"><input v-model="form.isActive" type="checkbox" class="accent-accent" /> Đang hoạt động</label>
+    <div v-if="error" class="text-sm text-danger">{{ error }}</div>
     <div class="flex justify-end gap-2 border-t border-border-default pt-4">
       <button type="button" class="rounded-lg border border-border-default px-4 py-2 text-sm" @click="emit('cancel')">Huỷ</button>
-      <button type="submit" :disabled="saving || !!error" class="rounded-lg bg-emerald-800 px-4 py-2 text-sm font-semibold text-white disabled:opacity-50">{{ saving ? 'Đang lưu…' : pass ? 'Lưu thay đổi' : 'Tạo vé' }}</button>
+      <button type="submit" :disabled="saving || !!error" class="rounded-lg bg-accent px-4 py-2 text-sm font-semibold text-white disabled:opacity-50">{{ saving ? 'Đang lưu…' : pass ? 'Lưu thay đổi' : 'Tạo vé' }}</button>
     </div>
   </form>
 </template>

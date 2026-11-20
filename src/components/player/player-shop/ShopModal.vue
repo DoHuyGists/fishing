@@ -142,7 +142,7 @@ async function buyItem() {
             v-model="search"
             type="search"
             :placeholder="tr('ShopModal.tim_vat_pham')"
-            class="rounded-lg border border-border-default bg-white px-3 py-2 text-sm outline-none focus:ring-2 focus:ring-emerald-700/30"
+            class="rounded-lg border border-border-default bg-white px-3 py-2 text-sm outline-none focus:ring-2 focus:ring-accent/30"
           />
           <select
             v-model="selectedClassification"
@@ -194,12 +194,12 @@ async function buyItem() {
             </button>
           </div>
         </div>
-        <div v-if="inventoryStore.shopLoading" class="py-16 text-center text-sm text-emerald-900/60">
+        <div v-if="inventoryStore.shopLoading" class="py-16 text-center text-sm text-content/60">
           {{ tr("ShopModal.dang_tai_vat_pham") }}
         </div>
         <div
           v-else-if="!filteredItems.length"
-          class="rounded-xl border border-dashed border-border-default py-16 text-center text-sm text-emerald-900/60"
+          class="rounded-xl border border-dashed border-border-default py-16 text-center text-sm text-content/60"
         >
           {{ tr("ShopModal.khong_tim_thay_vat_pham_phu_hop") }}
         </div>
@@ -207,10 +207,10 @@ async function buyItem() {
           <section v-for="group in displayGroups" :key="group.category || 'all-items'">
             <div
               v-if="viewMode === 'group'"
-              class="mb-2 mt-0 flex items-center gap-2 border-b border-border-default pb-2 text-sm font-extrabold uppercase tracking-wide text-emerald-900"
+              class="mb-2 mt-0 flex items-center gap-2 border-b border-border-default pb-2 text-sm font-extrabold uppercase tracking-wide text-content"
             >
               {{ group.category }}
-              <span class="rounded-full bg-emerald-100 px-2 py-0.5 text-[10px]">{{ group.items.length }}</span>
+              <span class="rounded-full bg-surface px-2 py-0.5 text-[10px]">{{ group.items.length }}</span>
             </div>
             <div
               :class="
@@ -245,7 +245,7 @@ async function buyItem() {
   <Teleport to="body">
     <div
       v-if="previewImage"
-      class="fixed inset-0 z-[10001] flex items-center justify-center bg-black/85 p-4"
+      class="fixed inset-0 z-[10001] flex items-center justify-center bg-content/85 p-4"
       role="dialog"
       aria-modal="true"
       :aria-label="tr('ShopModal.xem_anh_value0', { value0: previewImage.alt })"
@@ -266,7 +266,7 @@ async function buyItem() {
         class="player-popup-in max-h-[calc(100vh-2rem)] max-w-[calc(100vw-2rem)] object-contain"
       />
       <div
-        class="absolute bottom-3 left-1/2 max-w-[90vw] -translate-x-1/2 truncate rounded-full bg-black/50 px-4 py-1.5 text-sm text-white"
+        class="absolute bottom-3 left-1/2 max-w-[90vw] -translate-x-1/2 truncate rounded-full bg-content/50 px-4 py-1.5 text-sm text-white"
       >
         {{ previewImage.alt }}
       </div>

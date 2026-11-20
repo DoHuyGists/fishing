@@ -13,7 +13,7 @@ defineProps<{ area: FishingMapArea; viewMode: "list" | "grid" }>();
     :class="viewMode === 'list' ? 'sm:flex' : ''"
   >
     <div
-      class="flex shrink-0 items-center justify-center overflow-hidden bg-palette-e5eddf"
+      class="flex shrink-0 items-center justify-center overflow-hidden bg-surface"
       :class="viewMode === 'list' ? 'h-36 sm:h-auto sm:w-1/3' : 'h-40'"
     >
       <img
@@ -29,7 +29,7 @@ defineProps<{ area: FishingMapArea; viewMode: "list" | "grid" }>();
       <div class="break-words font-bold">{{ area.title || tr("FishingAnchor.bai_cau_chua_dat_ten") }}</div>
       <div
         class="mt-2 inline-flex items-center gap-1.5 rounded-full px-2 py-1 text-xs font-semibold"
-        :class="area.isAvailable ? 'bg-emerald-100 text-emerald-800' : 'bg-rose-100 text-rose-800'"
+        :class="area.isAvailable ? 'bg-surface text-content' : 'bg-surface text-danger'"
       >
         <span aria-hidden="true">●</span>{{ tr(area.isAvailable ? "FishingMapModal.open" : "FishingMapModal.closed") }}
       </div>
@@ -43,7 +43,7 @@ defineProps<{ area: FishingMapArea; viewMode: "list" | "grid" }>();
             v-for="species in area.species"
             :key="species.speciesId"
             type="button"
-            class="flex items-center gap-2 rounded-lg border border-border-default bg-surface px-2 py-1 text-left text-xs transition-colors hover:bg-palette-e5eddf focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-emerald-700"
+            class="flex items-center gap-2 rounded-lg border border-border-default bg-surface px-2 py-1 text-left text-xs transition-colors hover:bg-surface focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-accent"
             aria-haspopup="dialog"
             @click="store.selectedSpecies = species"
           >
@@ -58,7 +58,7 @@ defineProps<{ area: FishingMapArea; viewMode: "list" | "grid" }>();
           </button>
         </div>
       </details>
-      <div v-else class="mt-3 text-sm text-palette-607176">{{ tr("FishingMapModal.noSpecies") }}</div>
+      <div v-else class="mt-3 text-sm text-content">{{ tr("FishingMapModal.noSpecies") }}</div>
     </div>
   </article>
 </template>

@@ -17,18 +17,18 @@ const emit = defineEmits<{
 
 <template>
 <div class="space-y-3">
-        <div class="flex flex-wrap items-center justify-between gap-x-2 gap-y-1 text-xs text-gray-600 px-1">
+        <div class="flex flex-wrap items-center justify-between gap-x-2 gap-y-1 text-xs text-content px-1">
           <span>{{ tr("FriendModal.danh_sach_nguoi_choi_tu_he_thong") }}{{ filteredPlayers.length }})</span>
-          <span class="text-[11px] text-gray-400">{{ tr("FriendModal.sap_xep_theo_cap_do_cao_xuong_thap") }}</span>
+          <span class="text-[11px] text-content">{{ tr("FriendModal.sap_xep_theo_cap_do_cao_xuong_thap") }}</span>
         </div>
 
         <div
           v-if="filteredPlayers.length === 0"
-          class="py-14 text-center bg-white/60 rounded-2xl border border-emerald-900/10 p-6"
+          class="py-14 text-center bg-white/60 rounded-2xl border border-accent/10 p-6"
         >
           <div class="text-4xl mb-2">🔍</div>
-          <div class="m-0 text-sm font-bold text-gray-800">{{ tr("FriendModal.khong_tim_thay_nguoi_choi") }}</div>
-          <div class="m-0 text-xs text-gray-500 mt-1">
+          <div class="m-0 text-sm font-bold text-content">{{ tr("FriendModal.khong_tim_thay_nguoi_choi") }}</div>
+          <div class="m-0 text-xs text-content mt-1">
             {{ tr("FriendModal.khong_co_nguoi_choi_nao_khop_voi_tu_khoa_tim_kiem") }}
           </div>
         </div>
@@ -37,7 +37,7 @@ const emit = defineEmits<{
           <div
             v-for="player in filteredPlayers"
             :key="player.id"
-            class="slide-fade-in from-bottom player-content-in p-4 rounded-2xl border border-emerald-900/10 bg-white/95 shadow-sm hover:shadow-md transition-shadow flex flex-col justify-between gap-3"
+            class="slide-fade-in from-bottom player-content-in p-4 rounded-2xl border border-accent/10 bg-white/95 shadow-sm hover:shadow-md transition-shadow flex flex-col justify-between gap-3"
           >
             <div class="flex items-start justify-between gap-3">
               <div class="flex items-center gap-3 min-w-0">
@@ -58,12 +58,12 @@ const emit = defineEmits<{
 
                 <div class="min-w-0">
                   <div class="flex items-center gap-1.5">
-                    <span class="text-xs font-bold text-gray-900 font-mono">
+                    <span class="text-xs font-bold text-content font-mono">
                       {{ player.display_name || formatUuid(player.id) }}
                     </span>
                     <button
                       type="button"
-                      class="text-gray-400 hover:text-emerald-700 text-xs cursor-pointer"
+                      class="text-content hover:text-content text-xs cursor-pointer"
                       :title="tr('FriendModal.sao_chep_toan_bo_id')"
                       @click="emit('copy', player.id)"
                     >
@@ -77,11 +77,11 @@ const emit = defineEmits<{
                   <!-- Thông số: Cấp & EXP -->
                   <div class="flex items-center gap-2 mt-1 flex-wrap text-[11px]">
                     <span
-                      class="px-2 py-0.5 rounded-full bg-amber-100 text-amber-800 font-bold border border-amber-200"
+                      class="px-2 py-0.5 rounded-full bg-surface text-gold font-bold border border-gold"
                     >
                       {{ tr("UserProfile.cap") }} {{ player.level }}
                     </span>
-                    <span class="px-2 py-0.5 rounded-full bg-emerald-100 text-emerald-800 font-medium">
+                    <span class="px-2 py-0.5 rounded-full bg-surface text-content font-medium">
                       ✨ {{ Number(player.experience_point).toLocaleString(getFormattingLocale()) }} EXP
                     </span>
                   </div>
@@ -93,7 +93,7 @@ const emit = defineEmits<{
                 <!-- Đã là bạn bè -->
                 <span
                   v-if="getRelation(player.id).type === 'ACCEPTED'"
-                  class="px-2.5 py-1.5 rounded-lg bg-emerald-50 text-emerald-800 border border-emerald-200 text-xs font-bold"
+                  class="px-2.5 py-1.5 rounded-lg bg-surface text-content border border-accent text-xs font-bold"
                 >
                   {{ tr("FriendModal.ban_be_3") }}
                 </span>
@@ -101,13 +101,13 @@ const emit = defineEmits<{
                 <!-- Đã gửi lời mời đang chờ -->
                 <div v-else-if="getRelation(player.id).type === 'SENT_PENDING'" class="flex items-center gap-1.5">
                   <span
-                    class="px-2.5 py-1.5 rounded-lg bg-gray-100 text-gray-700 border border-gray-200 text-xs font-semibold"
+                    class="px-2.5 py-1.5 rounded-lg bg-surface text-content border border-border text-xs font-semibold"
                   >
                     {{ tr("FriendModal.da_gui") }}
                   </span>
                   <button
                     type="button"
-                    class="px-2 py-1.5 rounded-lg border border-red-200 bg-red-50 hover:bg-red-100 text-red-600 text-xs font-bold cursor-pointer"
+                    class="px-2 py-1.5 rounded-lg border border-danger bg-surface hover:bg-surface text-danger text-xs font-bold cursor-pointer"
                     :title="tr('FriendModal.huy_loi_moi')"
                     @click="
                       emit('delete',
@@ -124,7 +124,7 @@ const emit = defineEmits<{
                 <div v-else-if="getRelation(player.id).type === 'RECEIVED_PENDING'" class="flex items-center gap-1.5">
                   <button
                     type="button"
-                    class="px-2.5 py-1.5 rounded-lg bg-emerald-700 hover:bg-emerald-800 text-white text-xs font-bold cursor-pointer"
+                    class="px-2.5 py-1.5 rounded-lg bg-accent hover:bg-accent text-white text-xs font-bold cursor-pointer"
                     @click="
                       emit('respond',
                         (getRelation(player.id) as { type: 'RECEIVED_PENDING'; record: UserFriend }).record.id,
@@ -136,7 +136,7 @@ const emit = defineEmits<{
                   </button>
                   <button
                     type="button"
-                    class="px-2 py-1.5 rounded-lg bg-gray-200 hover:bg-gray-300 text-gray-800 text-xs font-bold cursor-pointer"
+                    class="px-2 py-1.5 rounded-lg bg-surface hover:bg-content text-content text-xs font-bold cursor-pointer"
                     @click="
                       emit('respond',
                         (getRelation(player.id) as { type: 'RECEIVED_PENDING'; record: UserFriend }).record.id,
@@ -152,7 +152,7 @@ const emit = defineEmits<{
                 <button
                   v-else
                   type="button"
-                  class="px-3 py-1.5 rounded-lg bg-content-strong hover:bg-palette-1c432d text-white text-xs font-bold transition shadow-sm cursor-pointer disabled:opacity-50 flex items-center gap-1"
+                  class="px-3 py-1.5 rounded-lg bg-content-strong hover:bg-content text-white text-xs font-bold transition shadow-sm cursor-pointer disabled:opacity-50 flex items-center gap-1"
                   :disabled="friendStore.actionLoadingId === player.id"
                   @click="emit('send', player.id)"
                 >
@@ -167,7 +167,7 @@ const emit = defineEmits<{
 
             <!-- Dung lượng túi & Kho cá -->
             <div
-              class="pt-2 border-t border-gray-100 flex flex-wrap items-center justify-between gap-x-2 gap-y-1 text-[10px] text-gray-500"
+              class="pt-2 border-t border-border flex flex-wrap items-center justify-between gap-x-2 gap-y-1 text-[10px] text-content"
             >
               <div class="flex flex-wrap items-center gap-x-3 gap-y-1">
                 <span>{{ tr("FriendModal.tui") }} {{ player.inventory_capacity }} {{ tr("UserProfile.o") }}</span>

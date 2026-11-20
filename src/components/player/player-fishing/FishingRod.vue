@@ -81,7 +81,7 @@ function draw(bendDeg: number, t: number) {
     ctx.beginPath();
     ctx.moveTo(tip.x, tip.y);
     ctx.quadraticCurveTo(tip.x - 4 + sway, (tip.y + endY) / 2, tip.x + sway, endY);
-    ctx.strokeStyle = "rgba(80,80,80,0.85)";
+    ctx.strokeStyle = "rgba(36, 53, 42, 0.85)";
     ctx.lineWidth = 1;
     ctx.stroke();
   }
@@ -154,7 +154,7 @@ onBeforeUnmount(() => {
   height: 100%;
   pointer-events: none;
   mix-blend-mode: multiply;
-  filter: drop-shadow(-5px 7px 5px rgba(0, 0, 0, 0.25));
+  filter: drop-shadow(-5px 7px 5px color-mix(in srgb, var(--color-content) 25%, transparent));
 }
 
 .rod-canvas {

@@ -32,7 +32,7 @@ onMounted(() => {
       <button
         v-if="collapsible"
         type="button"
-        class="flex size-9 shrink-0 cursor-pointer items-center justify-center rounded-lg border border-border-default hover:bg-palette-e5eddf focus-visible:outline-2 focus-visible:outline-content"
+        class="flex size-9 shrink-0 cursor-pointer items-center justify-center rounded-lg border border-border-default hover:bg-surface focus-visible:outline-2 focus-visible:outline-content"
         :aria-label="mapVisible ? tr('FishingAnchor.an_ban_do') : tr('FishingAnchor.hien_ban_do')"
         :title="mapVisible ? tr('FishingAnchor.an_ban_do') : tr('FishingAnchor.hien_ban_do')"
         :aria-expanded="mapVisible"
@@ -47,7 +47,7 @@ onMounted(() => {
         type="search"
         :aria-label="tr('FishingAnchor.tim_quoc_gia_hoac_bai_cau')"
         :placeholder="tr('FishingAnchor.tim_quoc_gia_bai_cau')"
-        class="w-full rounded-lg border border-border-default bg-white px-3 py-2 text-xs text-content placeholder:text-palette-607176 focus-visible:outline-2 focus-visible:outline-content"
+        class="w-full rounded-lg border border-border-default bg-white px-3 py-2 text-xs text-content placeholder:text-content focus-visible:outline-2 focus-visible:outline-content"
       />
     </div>
     <div v-if="mapVisible" class="mt-5 flex-1 overflow-y-auto">
@@ -70,7 +70,7 @@ onMounted(() => {
           >
             <summary
               @click="worldStore.handleMoveToCountry(group.id)"
-              class="flex cursor-pointer list-none items-center gap-2 rounded-lg px-2 py-2 text-xs font-bold hover:bg-palette-e5eddf focus-visible:outline-2 focus-visible:outline-content [&::-webkit-details-marker]:hidden"
+              class="flex cursor-pointer list-none items-center gap-2 rounded-lg px-2 py-2 text-xs font-bold hover:bg-surface focus-visible:outline-2 focus-visible:outline-content [&::-webkit-details-marker]:hidden"
             >
               <svg
                 aria-hidden="true"
@@ -83,7 +83,7 @@ onMounted(() => {
                 <path d="m6 3 5 5-5 5" />
               </svg>
               <span class="min-w-0 flex-1 wrap-break-word">{{ group.name }}</span>
-              <span class="shrink-0 rounded-full bg-white px-2 py-0.5 text-[11px] text-palette-607176">
+              <span class="shrink-0 rounded-full bg-white px-2 py-0.5 text-[11px] text-content">
                 {{ group.areas.length }}
               </span>
             </summary>
@@ -92,11 +92,11 @@ onMounted(() => {
                 <button
                   type="button"
                   :aria-current="worldStore.selectedArea?.id === area.id ? 'true' : undefined"
-                  :class="worldStore.selectedArea?.id === area.id ? 'bg-palette-e5eddf font-bold' : 'hover:bg-white'"
+                  :class="worldStore.selectedArea?.id === area.id ? 'bg-surface font-bold' : 'hover:bg-white'"
                   class="flex w-full cursor-pointer items-start gap-2 rounded-lg px-2 py-2 text-left text-xs focus-visible:outline-2 focus-visible:outline-content"
                   @click="worldStore.handleMoveToArea(area)"
                 >
-                  <span aria-hidden="true" class="mt-1 h-2 w-2 shrink-0 rounded-full bg-palette-d84315"></span>
+                  <span aria-hidden="true" class="mt-1 h-2 w-2 shrink-0 rounded-full bg-danger"></span>
                   <span class="min-w-0 wrap-break-word">{{
                     area.title || tr("FishingAnchor.bai_cau_chua_dat_ten")
                   }}</span>
@@ -106,21 +106,21 @@ onMounted(() => {
           </details>
         </div>
       </div>
-      <div v-if="fishingAreaStore.loading" class="mt-2 mb-0 text-palette-607176 text-xs" role="status">
+      <div v-if="fishingAreaStore.loading" class="mt-2 mb-0 text-content text-xs" role="status">
         {{ tr("FishingAnchor.dang_tai_bai_cau") }}
       </div>
-      <div v-else-if="fishingAreaStore.error" class="mt-2 mb-0 text-red-700 text-xs" role="alert">
+      <div v-else-if="fishingAreaStore.error" class="mt-2 mb-0 text-danger text-xs" role="alert">
         {{ fishingAreaStore.error }}
         <button type="button" class="cursor-pointer underline" @click="fishingAreaStore.fetchArea()">
           {{ tr("Maintenance.thu_lai") }}
         </button>
       </div>
-      <div v-else-if="!fishingAreaStore.fishingAreas.length" class="mt-2 mb-0 text-palette-607176 text-xs">
+      <div v-else-if="!fishingAreaStore.fishingAreas.length" class="mt-2 mb-0 text-content text-xs">
         {{ tr("FishingAnchor.chua_co_bai_cau") }}
       </div>
       <div
         v-else-if="!fishingAreaStore.filteredAreasByCountry.length"
-        class="mt-2 text-xs text-palette-607176"
+        class="mt-2 text-xs text-content"
         role="status"
       >
         {{ tr("FishingAnchor.khong_tim_thay_quoc_gia_hoac_bai_cau_phu_hop") }}

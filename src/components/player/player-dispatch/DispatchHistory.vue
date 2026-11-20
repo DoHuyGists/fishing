@@ -10,7 +10,7 @@ const store = useDispatchStore();
 </script>
 
 <template>
-  <div v-if="store.historyError" role="alert" class="mb-3 text-sm text-red-700">
+  <div v-if="store.historyError" role="alert" class="mb-3 text-sm text-danger">
     {{ store.historyError }}
     <button type="button" class="underline" @click="store.fetchHistory(store.historyPage)">
       {{ tr("Dispatch.retry") }}
@@ -25,7 +25,7 @@ const store = useDispatchStore();
       <div class="font-bold">
         {{ dispatchText(record.npc_snapshot.name) }} · {{ dispatchText(record.job_snapshot.name) }}
       </div>
-      <div :class="record.outcome === 'cancelled' ? 'text-red-700' : 'text-emerald-800'">
+      <div :class="record.outcome === 'cancelled' ? 'text-danger' : 'text-content'">
         {{ record.outcome === "cancelled" ? tr("Dispatch.cancelled") : tr("Dispatch.claimed") }}
       </div>
       <div>{{ tr("Dispatch.startedAt") }}: {{ formatDateTime(record.started_at) }}</div>

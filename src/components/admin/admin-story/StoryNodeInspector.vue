@@ -34,7 +34,7 @@ function title(locale: 'vi' | 'en', event: Event) {
       <div class="story-field-pair"><label class="story-field">Chức danh · VI<input :value="editor.node.speaker.title?.vi ?? ''" @input="title('vi', $event)" /></label><label class="story-field">Chức danh · EN<input :value="editor.node.speaker.title?.en ?? ''" @input="title('en', $event)" /></label></div>
     </template>
     <label class="story-field">Thoại · VI<textarea v-model="editor.node.dialogue.vi" rows="4" /></label><label class="story-field">Thoại · EN<textarea v-model="editor.node.dialogue.en" rows="4" /></label>
-    <div class="story-muted">Định dạng: &lt;strong&gt;, &lt;em&gt;, &lt;br&gt;, &lt;span style="color:#7dd3fc"&gt;.</div>
+    <div class="story-muted">Định dạng: &lt;strong&gt;, &lt;em&gt;, &lt;br&gt;, &lt;span style="color:#4fc3ff"&gt;.</div>
     <label class="story-field">Phông nền<input v-model="editor.node.background.url" list="story-backgrounds" placeholder="/images/background.webp hoặc https://…" /></label><datalist id="story-backgrounds"><option value="builtin:dawn" /><option value="builtin:night" /><option value="builtin:storm" /></datalist>
     <div class="story-field-pair"><label class="story-field">Chuyển cảnh<select v-model="editor.node.background.transition"><option>none</option><option>fade</option><option>flash</option></select></label><label class="story-field">VFX<select v-model="editor.node.vfx"><option v-for="effect in storyEffects" :key="effect">{{ effect }}</option></select></label></div>
     <div class="story-panel-heading">NHÂN VẬT / TỐI ĐA 3</div>

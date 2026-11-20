@@ -188,7 +188,7 @@ function zoomTo(k: number) {
     />
     <div v-if="isMapVisible" class="flex flex-col gap-2">
       <div
-        class="slide-fade-in from-bottom w-full h-fit overflow-hidden grid place-items-center border border-gray-300 rounded-xl"
+        class="slide-fade-in from-bottom w-full h-fit overflow-hidden grid place-items-center border border-content rounded-xl"
       >
         <WorldMap
           ref="mapRef"
@@ -202,10 +202,10 @@ function zoomTo(k: number) {
           @select-area="onSelectArea"
         >
           <template #popup="{ area }">
-            <div class="player-popup-in flex flex-col gap-1.5 rounded-lg bg-white p-2 text-xs text-gray-800 shadow-lg">
+            <div class="player-popup-in flex flex-col gap-1.5 rounded-lg bg-white p-2 text-xs text-content shadow-lg">
               <div class="flex items-center justify-between gap-2 font-bold">
                 <span class="whitespace-nowrap">{{ area.title }}</span>
-                <button type="button" class="text-base leading-none text-gray-500" @click="worldStore.targetArea({})">
+                <button type="button" class="text-base leading-none text-content" @click="worldStore.targetArea({})">
                   ×
                 </button>
               </div>
@@ -220,7 +220,7 @@ function zoomTo(k: number) {
               <FishingFatigue variant="compact" :area-id="area.id" />
               <button
                 type="button"
-                class="w-full rounded-lg bg-green-500 px-2 py-1.5 font-bold text-white hover:bg-green-600 disabled:opacity-70"
+                class="w-full rounded-lg bg-accent px-2 py-1.5 font-bold text-white hover:bg-accent disabled:opacity-70"
                 :disabled="isEntering"
                 aria-haspopup="dialog"
                 :class="{ 'underline underline-offset-2': !features.isAvailable('enter-area') }"
@@ -238,7 +238,7 @@ function zoomTo(k: number) {
           </template>
         </WorldMap>
       </div>
-      <div v-if="fogEnabled && countryStore.unlockedError" class="text-xs text-red-700" role="alert">
+      <div v-if="fogEnabled && countryStore.unlockedError" class="text-xs text-danger" role="alert">
         {{ countryStore.unlockedError }}
         <button type="button" class="ml-1 underline cursor-pointer" @click="countryStore.fetchMyUnlockedCountries()">
           {{ tr("Maintenance.thu_lai") }}
@@ -248,10 +248,10 @@ function zoomTo(k: number) {
         {{ tr("InteractWorldMap.dang_tai_quoc_gia_da_mo_khoa") }}
       </div>
       <div class="slide-fade-in from-bottom-right flex gap-2">
-        <button @click="zoomTo(3)" class="border border-gray-300 rounded-md px-3">3x</button>
-        <button @click="zoomTo(6)" class="border border-gray-300 rounded-md px-3">6x</button>
-        <button @click="zoomTo(12)" class="border border-gray-300 rounded-md px-3">12x</button>
-        <button @click="zoomTo(24)" class="border border-gray-300 rounded-md px-3">24x</button>
+        <button @click="zoomTo(3)" class="border border-content rounded-md px-3">3x</button>
+        <button @click="zoomTo(6)" class="border border-content rounded-md px-3">6x</button>
+        <button @click="zoomTo(12)" class="border border-content rounded-md px-3">12x</button>
+        <button @click="zoomTo(24)" class="border border-content rounded-md px-3">24x</button>
       </div>
     </div>
   </div>

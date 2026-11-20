@@ -106,7 +106,7 @@ async function onKeydown(e: KeyboardEvent, index: number) {
     <div
       role="tablist"
       :aria-label="ariaLabel"
-      class="shared-tabs flex shrink-0 gap-1 border-b border-green-200"
+      class="shared-tabs flex shrink-0 gap-1 border-b border-accent"
       :class="wrap ? 'flex-wrap' : 'overflow-x-auto'"
     >
       <button
@@ -120,11 +120,11 @@ async function onKeydown(e: KeyboardEvent, index: number) {
         :aria-controls="panelId(tab.key)"
         :tabindex="tab.key === activeKey ? 0 : -1"
         :disabled="tab.disabled"
-        class="shared-tabs__tab inline-flex shrink-0 items-center gap-2 whitespace-nowrap border-b-2 px-4 py-2.5 text-sm font-medium transition-colors duration-150 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-green-500 disabled:cursor-not-allowed disabled:opacity-40"
+        class="shared-tabs__tab inline-flex shrink-0 items-center gap-2 whitespace-nowrap border-b-2 px-4 py-2.5 text-sm font-medium transition-colors duration-150 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-accent disabled:cursor-not-allowed disabled:opacity-40"
         :class="
           tab.key === activeKey
-            ? 'border-green-600 text-green-700'
-            : 'border-transparent text-gray-500 hover:border-green-300 hover:text-green-700'
+            ? 'border-accent text-content'
+            : 'border-transparent text-content hover:border-accent hover:text-content'
         "
         @click="select(tab)"
         @keydown="onKeydown($event, index)"
@@ -144,8 +144,8 @@ async function onKeydown(e: KeyboardEvent, index: number) {
             class="shared-tabs__badge rounded-full px-1.5 py-0.5 text-[11px] font-semibold leading-none"
             :class="
               tab.key === activeKey
-                ? 'bg-green-600 text-white'
-                : 'bg-green-100 text-green-700'
+                ? 'bg-accent text-white'
+                : 'bg-surface text-content'
             "
           >
             {{ tab.badge }}
@@ -163,7 +163,7 @@ async function onKeydown(e: KeyboardEvent, index: number) {
         role="tabpanel"
         :aria-labelledby="tabId(tab.key)"
         tabindex="0"
-        class="focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-green-500"
+        class="focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent"
         :class="contained ? 'min-h-0 flex-1 overflow-hidden' : 'h-full'"
       >
         <slot :name="tab.key" :active="tab.key === activeKey" />
@@ -191,8 +191,8 @@ async function onKeydown(e: KeyboardEvent, index: number) {
   color: var(--color-ocean-gold);
   border-color: color-mix(in srgb, var(--color-ocean-gold) 45%, transparent);
   border-bottom-color: var(--color-ocean-gold);
-  background: linear-gradient(180deg, var(--color-ocean-panel), #1d54754d);
-  box-shadow: inset 0 1px #f5ebd41a;
+  background: linear-gradient(180deg, var(--color-ocean-panel), color-mix(in srgb, var(--color-primary) 30.196%, transparent));
+  box-shadow: inset 0 1px color-mix(in srgb, var(--color-surface) 10.196%, transparent);
 }
 
 .ocean-theme .shared-tabs__tab:hover:not(:disabled) {
@@ -210,11 +210,11 @@ async function onKeydown(e: KeyboardEvent, index: number) {
 .ocean-theme .shared-tabs__badge {
   color: var(--color-ocean-pearl);
   background: var(--color-ocean-panel);
-  border: 1px solid #35b9d566;
+  border: 1px solid color-mix(in srgb, var(--color-sky) 40%, transparent);
 }
 
 .ocean-theme .shared-tabs__tab[aria-selected="true"] .shared-tabs__badge {
-  color: var(--color-ocean-deep);
+  color: var(--color-content);
   background: var(--color-ocean-gold);
   border-color: var(--color-ocean-gold);
 }

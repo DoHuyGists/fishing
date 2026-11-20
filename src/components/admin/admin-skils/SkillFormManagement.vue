@@ -72,7 +72,7 @@ const store = useAdminSkillStore();
             spellcheck="false"
             class="rounded-lg border border-border-default px-3 py-2 font-mono font-normal"
           ></textarea>
-          <span class="text-xs font-normal text-gray-500"
+          <span class="text-xs font-normal text-content"
             >Nhập đối tượng JSON theo cấu hình hiệu ứng của trò chơi. Dùng {} nếu không có hiệu ứng.</span
           >
         </label>
@@ -82,7 +82,7 @@ const store = useAdminSkillStore();
         <div
           v-if="store.formError"
           role="alert"
-          class="m-0 rounded-lg border border-red-200 bg-red-50 p-3 text-sm text-red-700 sm:col-span-2"
+          class="m-0 rounded-lg border border-danger bg-surface p-3 text-sm text-danger sm:col-span-2"
         >
           {{ store.formError }}
         </div>

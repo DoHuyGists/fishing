@@ -55,10 +55,10 @@ function toggleSpecies(key: string) {
 
 <template>
   <section
-    class="slide-fade-in from-bottom player-content-in flex min-w-0 flex-1 flex-col rounded-lg border border-emerald-900/15 bg-white"
+    class="slide-fade-in from-bottom player-content-in flex min-w-0 flex-1 flex-col rounded-lg border border-accent/15 bg-white"
   >
-    <div class="flex flex-wrap items-center gap-2 border-b border-emerald-900/10 p-2">
-      <div class="m-0 text-sm font-bold text-emerald-950">
+    <div class="flex flex-wrap items-center gap-2 border-b border-accent/10 p-2">
+      <div class="m-0 text-sm font-bold text-content">
         {{ title }} ({{ fishes.length
         }}<template v-if="capacity !== undefined">/{{ capacity }}</template
         >)
@@ -67,24 +67,24 @@ function toggleSpecies(key: string) {
         v-model="search"
         type="search"
         :placeholder="tr('PostProduction.tim_ca')"
-        class="min-w-0 grow rounded-md border border-gray-300 px-2 py-1 text-sm focus:border-emerald-600 focus:outline-none"
+        class="min-w-0 grow rounded-md border border-content px-2 py-1 text-sm focus:border-accent focus:outline-none"
       />
       <button
         type="button"
-        class="rounded-md border border-emerald-900/15 px-2 py-1 text-xs font-bold hover:bg-emerald-50"
+        class="rounded-md border border-accent/15 px-2 py-1 text-xs font-bold hover:bg-surface"
         @click="emit('selectAll', filteredFishes)"
       >
         {{ tr("PostProduction.chon_tat_ca") }}
       </button>
       <div
-        class="flex rounded-md border border-emerald-900/15 p-0.5 text-xs font-bold"
+        class="flex rounded-md border border-accent/15 p-0.5 text-xs font-bold"
         role="group"
         :aria-label="tr('PostProduction.che_do_xem')"
       >
         <button
           type="button"
           class="rounded px-2 py-1"
-          :class="viewMode === 'list' ? 'bg-emerald-800 text-white' : 'hover:bg-emerald-50'"
+          :class="viewMode === 'list' ? 'bg-accent text-white' : 'hover:bg-surface'"
           :aria-pressed="viewMode === 'list'"
           @click="viewMode = 'list'"
         >
@@ -93,7 +93,7 @@ function toggleSpecies(key: string) {
         <button
           type="button"
           class="rounded px-2 py-1"
-          :class="viewMode === 'grid' ? 'bg-emerald-800 text-white' : 'hover:bg-emerald-50'"
+          :class="viewMode === 'grid' ? 'bg-accent text-white' : 'hover:bg-surface'"
           :aria-pressed="viewMode === 'grid'"
           @click="viewMode = 'grid'"
         >
@@ -102,7 +102,7 @@ function toggleSpecies(key: string) {
         <button
           type="button"
           class="rounded px-2 py-1"
-          :class="viewMode === 'species' ? 'bg-emerald-800 text-white' : 'hover:bg-emerald-50'"
+          :class="viewMode === 'species' ? 'bg-accent text-white' : 'hover:bg-surface'"
           :aria-pressed="viewMode === 'species'"
           @click="viewMode = 'species'"
         >
@@ -112,10 +112,10 @@ function toggleSpecies(key: string) {
     </div>
 
     <div class="grow h-0 overflow-y-auto p-2">
-      <div v-if="isLoading" class="text-center text-sm text-gray-500">
+      <div v-if="isLoading" class="text-center text-sm text-content">
         {{ tr("WeatherSection.dang_tai") }}
       </div>
-      <div v-else-if="filteredFishes.length === 0" class="text-center text-sm text-gray-500">
+      <div v-else-if="filteredFishes.length === 0" class="text-center text-sm text-content">
         {{ tr("PostProduction.khong_co_ca") }}
       </div>
 
@@ -123,11 +123,11 @@ function toggleSpecies(key: string) {
         <section
           v-for="group in speciesGroups"
           :key="group.key"
-          class="overflow-hidden rounded-md border border-emerald-900/15 bg-surface"
+          class="overflow-hidden rounded-md border border-accent/15 bg-surface"
         >
           <button
             type="button"
-            class="flex w-full items-center gap-2 p-2 text-left hover:bg-emerald-50"
+            class="flex w-full items-center gap-2 p-2 text-left hover:bg-surface"
             :aria-expanded="expandedSpecies.has(group.key)"
             @click="toggleSpecies(group.key)"
           >
@@ -146,7 +146,7 @@ function toggleSpecies(key: string) {
           </button>
           <div
             v-if="expandedSpecies.has(group.key)"
-            class="m-0 flex max-h-48 list-none flex-col gap-1 overflow-y-auto border-t border-emerald-900/10 p-2"
+            class="m-0 flex max-h-48 list-none flex-col gap-1 overflow-y-auto border-t border-accent/10 p-2"
           >
             <div v-for="fish in group.fishes" :key="fish.id">
               <PostProductionFishItem

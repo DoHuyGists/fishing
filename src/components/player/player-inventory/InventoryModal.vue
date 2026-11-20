@@ -77,8 +77,8 @@ const guildeSteps = [
     @click.self="modalStore.close"
     @keydown.esc="modal ? (modal = null) : modalStore.close()"
   >
-    <section class="h-full w-full text-slate-800">
-      <div v-if="loading" class="py-24 text-center text-sm text-slate-500">
+    <section class="h-full w-full text-content">
+      <div v-if="loading" class="py-24 text-center text-sm text-content">
         {{ tr("InventoryModal.dang_tai_kho_do") }}
       </div>
 
@@ -109,7 +109,7 @@ const guildeSteps = [
       />
       <div
         v-if="modal === 'delete'"
-        class="fixed inset-0 z-40 flex items-center justify-center bg-slate-900/50 p-4"
+        class="fixed inset-0 z-40 flex items-center justify-center bg-content/50 p-4"
         role="dialog"
         aria-modal="true"
         @click.self="modal = null"
@@ -119,14 +119,14 @@ const guildeSteps = [
           <div class="text-base font-semibold">
             {{ tr("InventoryModal.xoa") }} {{ selected.size }} {{ tr("InventoryModal.vat_pham") }}
           </div>
-          <div class="mt-2 text-sm text-slate-600">
+          <div class="mt-2 text-sm text-content">
             {{ tr("InventoryModal.khong_the_xoa_vat_pham_dang_co_trong_set_hay_go_vat_pham_va_luu_") }}
           </div>
 
           <div class="mt-5 flex justify-end gap-2">
             <button
               type="button"
-              class="rounded-md border border-slate-300 px-3 py-1.5 text-sm hover:bg-slate-100"
+              class="rounded-md border border-content px-3 py-1.5 text-sm hover:bg-surface"
               :disabled="busy"
               @click="modal = null"
             >
@@ -134,7 +134,7 @@ const guildeSteps = [
             </button>
             <button
               type="button"
-              class="rounded-md bg-red-600 px-3 py-1.5 text-sm text-white hover:bg-red-700 disabled:opacity-50"
+              class="rounded-md bg-danger px-3 py-1.5 text-sm text-white hover:bg-danger disabled:opacity-50"
               :disabled="busy"
               @click="deleteSelected"
             >

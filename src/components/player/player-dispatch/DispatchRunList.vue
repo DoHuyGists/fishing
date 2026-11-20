@@ -12,7 +12,7 @@ const store = useDispatchStore();
   <div class="grid gap-2 lg:grid-cols-2 2xl:grid-cols-3">
     <article v-for="run in store.runs" :key="run.id" class="dispatch-card slide-fade-in player-content-in">
       <div class="font-bold">{{ dispatchText(run.npc_snapshot.name) }} · {{ dispatchText(run.job_snapshot.name) }}</div>
-      <div class="space-y-1 text-xs text-palette-61745d">
+      <div class="space-y-1 text-xs text-content">
         <div>{{ tr("Dispatch.startedAt") }}: {{ formatDateTime(run.started_at) }}</div>
         <div>{{ tr("Dispatch.endsAt") }}: {{ formatDateTime(run.ends_at) }}</div>
       </div>
@@ -25,7 +25,7 @@ const store = useDispatchStore();
         class="h-3 overflow-hidden rounded-full bg-surface-muted"
       >
         <div
-          class="h-full rounded-full bg-palette-527547 transition-[width] duration-700 motion-reduce:transition-none"
+          class="h-full rounded-full bg-accent transition-[width] duration-700 motion-reduce:transition-none"
           :style="{ width: dispatchProgress(run, store.now) + '%' }"
         ></div>
       </div>
@@ -49,7 +49,7 @@ const store = useDispatchStore();
         <button
           v-else
           type="button"
-          class="min-h-8 rounded-md border border-red-200 px-2.5 py-1.5 text-xs font-semibold text-red-700 disabled:opacity-50"
+          class="min-h-8 rounded-md border border-danger px-2.5 py-1.5 text-xs font-semibold text-danger disabled:opacity-50"
           :disabled="store.locked"
           @click="store.ask('cancel', run.id)"
         >

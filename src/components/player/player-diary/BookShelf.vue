@@ -50,7 +50,7 @@ function getBookVariant(countryCode: string, speciesCount: number): BookVariant 
           v-model="searchQuery"
           type="text"
           :placeholder="tr('BookShelf.tim_quoc_gia')"
-          class="w-full border border-amber-700/60 rounded-xl px-3 py-1.5 text-xs focus:outline-none focus:border-amber-400 shadow-inner"
+          class="w-full border border-gold/60 rounded-xl px-3 py-1.5 text-xs focus:outline-none focus:border-gold inset-shadow-sm"
         />
         <button
           v-if="searchQuery"
@@ -102,14 +102,14 @@ function getBookVariant(countryCode: string, speciesCount: number): BookVariant 
               </template>
             </TheBook>
           </div>
-          <div class="w-full text-center mt-2 pt-2 border-amber-800/40">
+          <div class="w-full text-center mt-2 pt-2 border-gold/40">
             <div class="m-0 text-xs md:text-sm font-serif font-bold truncate px-1">{{ country.name }}</div>
             <span
               class="inline-block mt-1 text-[10px] font-bold px-2 py-0.5 rounded-full"
               :class="
                 getSpeciesCount(country) > 0
-                  ? 'bg-emerald-900/80 text-white border border-emerald-600/40'
-                  : 'bg-amber-950/60 text-amber-400/70 border border-amber-900/40'
+                  ? 'bg-accent/80 text-white border border-accent/40'
+                  : 'bg-gold/60 text-gold/70 border border-gold/40'
               "
               >{{ getSpeciesCount(country) }} {{ tr("BookShelf.loai_ca") }}</span
             >
@@ -118,7 +118,7 @@ function getBookVariant(countryCode: string, speciesCount: number): BookVariant 
       </div>
       <div
         v-if="paginatedCountries.length === 0"
-        class="flex flex-col items-center justify-center p-12 text-amber-300/70"
+        class="flex flex-col items-center justify-center p-12 text-gold/70"
       >
         <span class="text-4xl mb-2">🔍</span>
         <div class="font-serif text-base">
@@ -127,19 +127,19 @@ function getBookVariant(countryCode: string, speciesCount: number): BookVariant 
       </div>
     </div>
 
-    <div class="mt-4 pt-2 border-t border-amber-900/40 flex items-center justify-between text-xs font-serif">
+    <div class="mt-4 pt-2 border-t border-gold/40 flex items-center justify-between text-xs font-serif">
       <button
         type="button"
-        class="px-3.5 py-1.5 rounded-lg bg-amber-900/80 hover:bg-amber-800 disabled:opacity-40 text-amber-100 font-bold transition-all cursor-pointer border border-amber-700/40"
+        class="px-3.5 py-1.5 rounded-lg bg-gold/80 hover:bg-gold disabled:opacity-40 text-white font-bold transition-all cursor-pointer border border-gold/40"
         :disabled="shelfPage === 0"
         @click="shelfPage--"
       >
         {{ tr("BookShelf.trang_truoc") }}
       </button>
-      <span class="text-amber-300 font-bold">{{ shelfPage + 1 }} / {{ totalShelfPages }}</span>
+      <span class="text-gold font-bold">{{ shelfPage + 1 }} / {{ totalShelfPages }}</span>
       <button
         type="button"
-        class="px-3.5 py-1.5 rounded-lg bg-amber-900/80 hover:bg-amber-800 disabled:opacity-40 text-amber-100 font-bold transition-all cursor-pointer border border-amber-700/40"
+        class="px-3.5 py-1.5 rounded-lg bg-gold/80 hover:bg-gold disabled:opacity-40 text-white font-bold transition-all cursor-pointer border border-gold/40"
         :disabled="shelfPage === totalShelfPages - 1"
         @click="shelfPage++"
       >

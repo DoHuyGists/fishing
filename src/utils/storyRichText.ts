@@ -1,5 +1,6 @@
 import DOMPurify from 'dompurify';
 import type { StoryRichToken } from '../types/model/story';
+import { normalizeThemeColor } from './themePalette';
 
 /** Parse once, animate text tokens only. Never render partial HTML or arbitrary styles. */
 export function storyTokens(content: string): StoryRichToken[] {
@@ -17,7 +18,7 @@ export function storyTokens(content: string): StoryRichToken[] {
       bold ||= ['B', 'STRONG'].includes(node.tagName);
       italic ||= ['I', 'EM'].includes(node.tagName);
       const candidate = node.style.color;
-      if (/^(#[a-f\d]{3,8}|rgba?\([\d\s.,%]+\)|[a-z]+)$/i.test(candidate)) color = candidate;
+      if (/^(#[a-f\d]{3,8}|rgba?\([\d\s.,%]+\)|[a-z]+)$/i.test(candidate)) color = normalizeThemeColor(candidate);
     }
     node.childNodes.forEach(child => walk(child, bold, italic, color));
   }

@@ -29,13 +29,13 @@ async function redeemCode() {
       required
       :disabled="isSubmitting"
       :placeholder="tr('RedeemCodeForm.nhap_ma_cua_ban')"
-      class="w-full rounded-lg border border-border-default px-3 py-3 text-sm outline-none transition focus:border-emerald-700 focus:ring-2 focus:ring-emerald-700/15 disabled:bg-gray-100"
+      class="w-full rounded-lg border border-border-default px-3 py-3 text-sm outline-none transition focus:border-accent focus:ring-2 focus:ring-accent/15 disabled:bg-surface"
     />
 
     <div class="mt-5 flex justify-center">
       <button
         type="submit"
-        class="min-h-11 rounded-lg bg-emerald-800 px-4 py-2 text-sm font-bold text-white transition hover:bg-emerald-900 disabled:cursor-not-allowed disabled:opacity-50"
+        class="min-h-11 rounded-lg bg-accent px-4 py-2 text-sm font-bold text-white transition hover:bg-accent disabled:cursor-not-allowed disabled:opacity-50"
         :disabled="isSubmitting || !code.trim()"
       >
         {{ isSubmitting ? tr('RedeemCodeForm.dang_doi_ma') : tr('RedeemCodeForm.doi_ma') }}

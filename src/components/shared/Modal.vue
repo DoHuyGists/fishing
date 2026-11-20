@@ -61,7 +61,7 @@ onUnmounted(() => {
   <div
     v-bind="$attrs"
     class="shared-modal fixed inset-0 z-9999"
-    :class="compact ? 'flex items-center justify-center bg-black/40 p-3 backdrop-blur-xs' : ''"
+    :class="compact ? 'flex items-center justify-center bg-content/40 p-3 backdrop-blur-xs' : ''"
   >
     <div
       class="shared-modal__panel player-window-panel flex flex-col bg-white"
@@ -75,7 +75,7 @@ onUnmounted(() => {
       "
     >
       <header
-        class="shared-modal__header grid grid-cols-2 md:grid-cols-[auto_1fr_auto] gap-x-3 gap-y-2 p-2 border-b border-emerald-950/10 bg-surface-muted sm:flex-nowrap sm:gap-4"
+        class="shared-modal__header grid grid-cols-2 md:grid-cols-[auto_1fr_auto] gap-x-3 gap-y-2 p-2 border-b border-accent/10 bg-surface-muted sm:flex-nowrap sm:gap-4"
       >
         <div class="min-w-0 flex-1 sm:flex-none order-1 md:order-1">
           <div class="shared-modal__title m-0 mt-1 break-words text-lg font-bold sm:text-xl">{{ title }}</div>
@@ -94,7 +94,7 @@ onUnmounted(() => {
           <button
             v-if="hasGuideSteps"
             type="button"
-            class="px-2 py-2 rounded-md border border-emerald-900/15 bg-white/70 text-xs font-bold text-emerald-950 hover:bg-white disabled:opacity-50 disabled:cursor-not-allowed sm:px-3 sm:text-sm"
+            class="px-2 py-2 rounded-md border border-accent/15 bg-white/70 text-xs font-bold text-content hover:bg-white disabled:opacity-50 disabled:cursor-not-allowed sm:px-3 sm:text-sm"
             :disabled="isRefreshing"
             @click="handleGuide"
           >
@@ -103,7 +103,7 @@ onUnmounted(() => {
           <button
             v-if="hasRefreshListener"
             type="button"
-            class="px-2 py-2 rounded-md border border-emerald-900/15 bg-white/70 text-xs font-bold text-emerald-950 hover:bg-white disabled:opacity-50 disabled:cursor-not-allowed sm:px-3 sm:text-sm"
+            class="px-2 py-2 rounded-md border border-accent/15 bg-white/70 text-xs font-bold text-content hover:bg-white disabled:opacity-50 disabled:cursor-not-allowed sm:px-3 sm:text-sm"
             :disabled="refreshDisabled"
             :aria-busy="isRefreshing"
             @click="handleRefresh"
@@ -113,7 +113,7 @@ onUnmounted(() => {
           </button>
           <button
             type="button"
-            class="w-9 h-9 rounded-full border border-emerald-900/15 bg-white/70 text-emerald-950 hover:bg-white text-2xl leading-none cursor-pointer"
+            class="w-9 h-9 rounded-full border border-accent/15 bg-white/70 text-content hover:bg-white text-2xl leading-none cursor-pointer"
             :aria-label="tr('ChangePasswordModal.dong')"
             @click="modalStore.close"
           >
@@ -121,7 +121,7 @@ onUnmounted(() => {
           </button>
         </div>
       </header>
-      <div v-if="refreshError" role="alert" class="border-b border-red-200 bg-red-50 px-3 py-2 text-sm text-red-800">
+      <div v-if="refreshError" role="alert" class="border-b border-danger bg-surface px-3 py-2 text-sm text-danger">
         {{ refreshError }}
       </div>
       <div class="shared-modal__content min-h-0 flex-1 overflow-y-auto overflow-x-hidden p-2">
@@ -134,36 +134,36 @@ onUnmounted(() => {
 
 <style scoped>
 .ocean-theme .shared-modal__panel {
-  color: var(--color-ocean-pearl);
-  background: var(--color-ocean-deep);
+  color: var(--color-content);
+  background: var(--color-surface);
   border-color: color-mix(in srgb, var(--color-ocean-gold) 70%, transparent);
-  box-shadow: 0 24px 80px #071a2d80, inset 0 0 0 1px #f2c66d1a;
+  box-shadow: 0 24px 80px color-mix(in srgb, var(--color-content) 50.196%, transparent), inset 0 0 0 1px color-mix(in srgb, var(--color-gold) 10.196%, transparent);
 }
 
 .ocean-theme .shared-modal__header {
   padding: 0.75rem;
   border-bottom-color: color-mix(in srgb, var(--color-ocean-gold) 65%, transparent);
   background: linear-gradient(135deg, var(--color-ocean-panel), var(--color-ocean-deep));
-  box-shadow: 0 3px 16px #071a2d40, inset 0 1px #f5ebd41a;
+  box-shadow: 0 3px 16px color-mix(in srgb, var(--color-content) 25.098%, transparent), inset 0 1px color-mix(in srgb, var(--color-surface) 10.196%, transparent);
 }
 
 .ocean-theme .shared-modal__title {
   color: var(--color-ocean-pearl);
-  text-shadow: 0 2px 3px #071a2d66;
+  text-shadow: 0 2px 3px color-mix(in srgb, var(--color-content) 40%, transparent);
 }
 
 .ocean-theme .shared-modal__header button {
   color: var(--color-ocean-pearl);
   border-color: color-mix(in srgb, var(--color-ocean-gold) 55%, transparent);
   background: var(--color-ocean-deep);
-  box-shadow: inset 0 1px #f5ebd414;
+  box-shadow: inset 0 1px color-mix(in srgb, var(--color-surface) 7.843%, transparent);
   transition: border-color 150ms ease, background-color 150ms ease, box-shadow 150ms ease;
 }
 
 .ocean-theme .shared-modal__header button:hover:not(:disabled) {
   background: var(--color-ocean-panel);
   border-color: var(--color-ocean-cyan);
-  box-shadow: 0 0 12px #35b9d526;
+  box-shadow: 0 0 12px color-mix(in srgb, var(--color-sky) 14.902%, transparent);
 }
 
 .ocean-theme .shared-modal__header button:focus-visible {
@@ -172,6 +172,6 @@ onUnmounted(() => {
 }
 
 .ocean-theme .shared-modal__content {
-  background: radial-gradient(ellipse at 90% 0%, #35b9d50a, transparent 65%);
+  background: radial-gradient(ellipse at 90% 0%, color-mix(in srgb, var(--color-sky) 3.922%, transparent), transparent 65%);
 }
 </style>

@@ -67,7 +67,7 @@ const {
           <template #summary>
             <span
               class="ml-2 font-normal"
-              :class="equipmentStore.countSetItems(set) >= equipmentCapacity ? 'text-amber-700' : 'text-palette-526650'"
+              :class="equipmentStore.countSetItems(set) >= equipmentCapacity ? 'text-gold' : 'text-content'"
             >
               {{
                 tr("EquipmentSets.capacity_usage", {
@@ -80,7 +80,7 @@ const {
 
         <div
           v-if="equipmentStore.countSetItems(set) > equipmentCapacity"
-          class="mb-2 text-xs text-amber-700"
+          class="mb-2 text-xs text-gold"
           role="status"
         >
           {{ tr("EquipmentSets.capacity_reached", { capacity: equipmentCapacity }) }}
@@ -93,8 +93,8 @@ const {
             :class="[
               'min-w-0 cursor-pointer rounded-md border p-1.5 transition',
               isActiveSlot(set.id, slot)
-                ? 'border-emerald-600 bg-emerald-50 ring-1 ring-emerald-600'
-                : 'border-border-default hover:border-teal-500',
+                ? 'border-accent bg-surface ring-1 ring-accent'
+                : 'border-border-default hover:border-accent',
             ]"
             @click="toggleActive(set.id, slot)"
           >
@@ -118,14 +118,14 @@ const {
                 <span class="truncate" :title="itemName(eq, eq.id)">{{ itemName(eq, eq.id) }}</span>
                 <button
                   type="button"
-                  class="shrink-0 rounded px-1 text-palette-526650 hover:bg-rose-100 hover:text-rose-700 disabled:opacity-40"
+                  class="shrink-0 rounded px-1 text-content hover:bg-surface hover:text-danger disabled:opacity-40"
                   :aria-label="tr('EquipmentSets.go_value0_khoi_set', { value0: itemName(eq, eq.id) })"
                   @click.stop="removeFromSet(set, slot, eq)"
                 >
                   ×
                 </button>
               </div>
-            <div v-if="set[slot].length === 0" class="py-2 text-center text-xs text-palette-526650">
+            <div v-if="set[slot].length === 0" class="py-2 text-center text-xs text-content">
               {{ tr("FlipBook.trong") }}
             </div>
           </div>

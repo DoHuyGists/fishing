@@ -91,43 +91,43 @@ onBeforeUnmount(stopAnimation);
 </script>
 
 <template>
-  <section class="power-meter p-3 px-3.5 rounded-[15px] border border-palette-e3e0d8 bg-palette-fffefa">
-    <div class="power-title flex items-center gap-2 text-palette-385645">
+  <section class="power-meter p-3 px-3.5 rounded-[15px] border border-border bg-white">
+    <div class="power-title flex items-center gap-2 text-content">
       <div class="flex-1">
-        <small class="block mt-0.5 text-palette-879188 text-[9px]">{{
+        <small class="block mt-0.5 text-content text-[9px]">{{
           canPull
             ? tr('CatchChallenge.bam_khi_vach_nam_trong_vung_sang')
             : tr('CatchChallenge.cho_bat_dau')
         }}</small>
       </div>
-      <b class="text-[13px] text-palette-e29a31">{{ canPull ? `${Math.ceil(timeRemaining / 1000)}s` : "" }}</b>
+      <b class="text-[13px] text-gold">{{ canPull ? `${Math.ceil(timeRemaining / 1000)}s` : "" }}</b>
     </div>
-    <div class="power-track relative h-2 my-2.5 overflow-hidden rounded-full bg-palette-e6e9df">
+    <div class="power-track relative h-2 my-2.5 overflow-hidden rounded-full bg-surface">
       <span
         v-if="challenge && canPull"
-        class="absolute z-[1] top-0 bottom-0 bg-[rgba(118,175,83,0.55)]"
+        class="absolute z-[1] top-0 bottom-0 bg-[color-mix(in_srgb,_var(--color-accent)_55%,_transparent)]"
         :style="{ left: `${challenge.target_zone_start * 100}%`, width: `${challenge.target_zone_width * 100}%` }"
       ></span>
       <i
         v-if="canPull"
-        class="absolute z-[2] top-[-2px] w-1.5 h-3 rounded-[3px] bg-palette-e66f44 not-italic"
+        class="absolute z-[2] top-[-2px] w-1.5 h-3 rounded-[3px] bg-danger not-italic"
         :style="{ left: `calc(${markerPosition * 100}% - 3px)` }"
       ></i>
     </div>
-    <div class="flex justify-between text-palette-617363 text-[9px] font-bold">
+    <div class="flex justify-between text-content text-[9px] font-bold">
       <span>{{ tr('CatchChallenge.thoi_gian_thu_thach') }}</span
-      ><b class="text-palette-e29a31 text-[13px]">{{ canPull ? tr('CatchChallenge.value0_giay', { value0: Math.ceil(timeRemaining / 1000) }) : "--" }}</b>
+      ><b class="text-gold text-[13px]">{{ canPull ? tr('CatchChallenge.value0_giay', { value0: Math.ceil(timeRemaining / 1000) }) : "--" }}</b>
     </div>
-    <div class="relative h-[5px] my-[5px] mb-2.5 overflow-hidden rounded-full bg-palette-e6e9df">
+    <div class="relative h-[5px] my-[5px] mb-2.5 overflow-hidden rounded-full bg-surface">
       <i
-        class="block h-full rounded-[inherit] bg-palette-75b865 transition-[width] duration-100 ease-linear not-italic"
+        class="block h-full rounded-[inherit] bg-accent transition-[width] duration-100 ease-linear not-italic"
         :style="{ width: challenge && canPull ? `${(timeRemaining / challenge.max_duration_ms) * 100}%` : '0%' }"
       ></i>
     </div>
     <div class="mt-3 flex gap-2">
       <button
         type="button"
-        class="cast-button flex-1 rounded-[10px] border-0 bg-palette-3f7652 shadow-[0_4px_0_var(--color-palette-2d593c)] text-white cursor-pointer px-2.5 py-2 text-[11px] font-extrabold tracking-[0.01em] touch-none enabled:active:translate-y-[3px] enabled:active:shadow-[0_1px_0_var(--color-palette-2d593c)] disabled:cursor-not-allowed disabled:opacity-45"
+        class="cast-button flex-1 rounded-[10px] border-0 bg-accent shadow-[0_4px_0_var(--color-content)] text-white cursor-pointer px-2.5 py-2 text-[11px] font-extrabold tracking-[0.01em] touch-none enabled:active:translate-y-[3px] enabled:active:shadow-[0_1px_0_var(--color-content)] disabled:cursor-not-allowed disabled:opacity-45"
         :disabled="!canPull"
         @click="finishChallenge"
       >

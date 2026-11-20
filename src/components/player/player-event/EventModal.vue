@@ -20,13 +20,13 @@ onMounted(loadSchedules);
 <template>
   <Modal :title="tr('EventModal.bang_su_kien')" :on-refresh="loadSchedules">
     <section
-      class="relative flex max-w-none h-full flex-col overflow-hidden border-0 bg-palette-f4f5e9 text-palette-20372a"
+      class="relative flex max-w-none h-full flex-col overflow-hidden border-0 bg-surface text-content"
       role="dialog"
       aria-modal="true"
       aria-labelledby="event-title"
     >
-      <div v-if="isLoading" class="grid flex-1 place-items-center text-sm text-emerald-900/70">{{ tr('EventModal.dang_tai_su_kien') }}</div>
-      <div v-else-if="loadError" class="grid flex-1 place-items-center text-center text-sm text-red-700">
+      <div v-if="isLoading" class="grid flex-1 place-items-center text-sm text-content/70">{{ tr('EventModal.dang_tai_su_kien') }}</div>
+      <div v-else-if="loadError" class="grid flex-1 place-items-center text-center text-sm text-danger">
         <div>
           <div>{{ loadError }}</div>
           <button type="button" class="mt-2 font-bold underline" @click="loadSchedules">{{ tr('Maintenance.thu_lai') }}</button>
@@ -37,13 +37,13 @@ onMounted(loadSchedules);
         class="grid min-h-0 flex-1 grid-rows-[minmax(0,1fr)_minmax(0,1fr)] md:grid-cols-[26rem_minmax(0,1fr)] md:grid-rows-1"
       >
         <!-- Danh sách sự kiện -->
-        <section class="flex min-h-0 flex-col border-b border-emerald-950/10 md:border-b-0 md:border-r">
-          <div class="flex items-center justify-between border-b border-emerald-950/10 px-5 py-3 sm:px-6">
+        <section class="flex min-h-0 flex-col border-b border-accent/10 md:border-b-0 md:border-r">
+          <div class="flex items-center justify-between border-b border-accent/10 px-5 py-3 sm:px-6">
             <div class="m-0 text-sm font-bold">{{ tr('EventModal.danh_sach_su_kien') }}</div>
-            <span class="text-xs text-emerald-900/60">{{ activeSchedules.length }} {{ tr('EventModal.su_kien') }}</span>
+            <span class="text-xs text-content/60">{{ activeSchedules.length }} {{ tr('EventModal.su_kien') }}</span>
           </div>
           <div class="grow h-0 space-y-2 overflow-y-scroll p-3 sm:p-4">
-            <div v-if="!activeSchedules.length" class="py-8 text-center text-sm text-emerald-900/55">
+            <div v-if="!activeSchedules.length" class="py-8 text-center text-sm text-content/55">
               {{ tr('EventModal.hien_khong_co_su_kien_nao') }}
             </div>
             <button
@@ -51,7 +51,7 @@ onMounted(loadSchedules);
               :key="item.id"
               type="button"
               class="slide-fade-in from-bottom player-content-in w-full cursor-pointer rounded-lg p-3 text-left transition-colors"
-              :class="selectedId === item.id ? 'bg-gray-50' : ''"
+              :class="selectedId === item.id ? 'bg-white' : ''"
               @click="selectSchedule(item)"
             >
               <span class="flex items-start gap-3">
@@ -64,9 +64,9 @@ onMounted(loadSchedules);
                     <span
                       class="shrink-0 rounded-full w-fit px-2 py-0.5 text-[10px] font-bold"
                       :class="{
-                        'bg-emerald-200 text-emerald-900': scheduleStatus(item) === 'ongoing',
-                        'bg-amber-200 text-amber-900': scheduleStatus(item) === 'upcoming',
-                        'bg-gray-200 text-gray-700': scheduleStatus(item) === 'ended',
+                        'bg-accent text-content': scheduleStatus(item) === 'ongoing',
+                        'bg-gold text-gold': scheduleStatus(item) === 'upcoming',
+                        'bg-surface text-content': scheduleStatus(item) === 'ended',
                       }"
                     >
                       {{
@@ -78,7 +78,7 @@ onMounted(loadSchedules);
                       }}
                     </span>
                   </span>
-                  <span class="mt-1 block text-xs text-emerald-900/60"
+                  <span class="mt-1 block text-xs text-content/60"
                     >{{ formatDate(item.start) }} - {{ formatDate(item.end) }}</span
                   >
                 </span>
@@ -94,10 +94,10 @@ onMounted(loadSchedules);
               v-if="selectedSchedule.eventImage"
               :src="selectedSchedule.eventImage"
               :alt="selectedSchedule.eventName || ''"
-              class="mb-5 h-56 w-full rounded-xl border border-emerald-950/10 object-cover sm:h-72"
+              class="mb-5 h-56 w-full rounded-xl border border-accent/10 object-cover sm:h-72"
               draggable="false"
             />
-            <div class="m-0 text-[10px] font-extrabold uppercase tracking-[0.14em] text-emerald-800">
+            <div class="m-0 text-[10px] font-extrabold uppercase tracking-[0.14em] text-content">
               {{
                 scheduleStatus(selectedSchedule) === "ongoing"
                   ? tr('EventModal.dang_dien_ra')
@@ -110,16 +110,16 @@ onMounted(loadSchedules);
               <span>{{ "🎉" }}</span>
               <span>{{ selectedSchedule.eventName || tr('EventModal.su_kien_2') }}</span>
             </div>
-            <div class="mt-3 flex flex-wrap items-center gap-x-4 gap-y-1 text-xs text-emerald-900/60">
+            <div class="mt-3 flex flex-wrap items-center gap-x-4 gap-y-1 text-xs text-content/60">
               <span>🗓️ {{ formatDate(selectedSchedule.start) }} — {{ formatDate(selectedSchedule.end) }}</span>
               <span>👁️ {{ selectedSchedule.viewCount }} {{ tr('EventModal.luot_xem') }}</span>
             </div>
-            <hr class="my-5 border-emerald-950/10" />
-            <div class="prose prose-sm max-w-none whitespace-pre-line text-[15px] leading-relaxed text-palette-20372a">
+            <hr class="my-5 border-accent/10" />
+            <div class="prose prose-sm max-w-none whitespace-pre-line text-[15px] leading-relaxed text-content">
               {{ selectedSchedule.eventDescription || tr('EventModal.su_kien_chua_co_mo_ta_chi_tiet') }}
             </div>
           </article>
-          <div v-else class="grid h-full place-items-center p-8 text-center text-sm text-emerald-900/55">
+          <div v-else class="grid h-full place-items-center p-8 text-center text-sm text-content/55">
             {{ tr('EventModal.chon_mot_su_kien_o_danh_sach_ben_trai_de_xem_chi_tiet') }}
           </div>
         </section>

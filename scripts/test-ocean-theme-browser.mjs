@@ -17,8 +17,8 @@ if (!executablePath) throw new Error('Set OCEAN_THEME_TEST_BROWSER to an install
 
 const screenshotDirectory = resolve('node_modules/.cache/ocean-theme-browser');
 const palette = {
-  deep: '#102d46', panel: '#1d5475', cyan: '#35b9d5',
-  gold: '#f2c66d', wood: '#93643f', pearl: '#f5ebd4',
+  deep: '#1e5fbf', panel: '#1e5fbf', cyan: '#4fc3ff',
+  gold: '#ffd166', wood: '#ffd166', pearl: '#ffffff',
 };
 const rgb = hex => hex.match(/[a-f\d]{2}/gi).map(channel => parseInt(channel, 16));
 const fixture = `
@@ -79,7 +79,7 @@ const fixture = `
   const SemanticProbe = defineComponent({
     setup: () => () => h('div', { 'data-testid': 'semantic', class: 'rounded-xl bg-surface p-4 text-content' }, [
       h('div', { 'data-testid': 'muted', class: 'bg-surface-muted p-2 text-content' }, 'Ocean information'),
-      h('div', { 'data-testid': 'alpha', class: 'bg-white/70 p-2 text-emerald-950/65' }, 'Translucent surface'),
+      h('div', { 'data-testid': 'alpha', class: 'bg-white/70 p-2 text-content/65' }, 'Translucent surface'),
     ]),
   });
   const Playground = defineComponent({
@@ -209,7 +209,7 @@ try {
   assert.equal(await page.locator('html').evaluate(element => element.classList.contains('ocean-theme')), true);
   assert.deepEqual(await page.evaluate(keys => Object.fromEntries(keys.map(key => [key,
     getComputedStyle(document.documentElement).getPropertyValue('--color-ocean-' + key).trim().toLowerCase(),
-  ])), Object.keys(palette)), palette, 'All six public palette values match the requested colors');
+  ])), Object.keys(palette)), palette, 'Ocean aliases resolve to the shared palette');
 
   for (const viewport of [{ width: 1440, height: 1000 }, { width: 390, height: 844 }]) {
     await page.setViewportSize(viewport);
@@ -220,7 +220,7 @@ try {
       await assertColor('input[type="email"]', 'backgroundColor', palette.deep);
       await assertColor('input[type="email"]', 'color', palette.pearl);
       await assertColor('button[type="submit"]', 'backgroundColor', palette.gold);
-      await assertColor('button[type="submit"]', 'color', palette.deep);
+      await assertColor('button[type="submit"]', 'color', '#24352a');
       await assertReadable('input[type="email"]');
       await assertReadable('button[type="submit"]');
       await assertNoOverflow(`${path} at ${viewport.width}px`);
@@ -237,14 +237,14 @@ try {
   await page.getByRole('alert').filter({ hasText: 'Fixture sign-in error' }).waitFor();
 
   await navigate('/');
-  await assertColor('[data-testid="semantic"]', 'backgroundColor', palette.panel);
-  await assertColor('[data-testid="semantic"]', 'color', palette.pearl);
-  await assertColor('[data-testid="muted"]', 'backgroundColor', palette.deep);
+  await assertColor('[data-testid="semantic"]', 'backgroundColor', '#f5f9f0');
+  await assertColor('[data-testid="semantic"]', 'color', '#24352a');
+  await assertColor('[data-testid="muted"]', 'backgroundColor', '#f5f9f0');
   await assertReadable('[data-testid="semantic"]');
   const alpha = await color('[data-testid="alpha"]');
-  assert.ok(alpha[0] < 60 && alpha[1] < 115 && alpha[2] < 150 && alpha[3] > 0, 'bg-white/70 must become a dark ocean surface');
+  assert.deepEqual(alpha.slice(0, 3), [255, 255, 255], 'Translucent surfaces use palette white');
   const alphaInk = await color('[data-testid="alpha"]', 'color');
-  assert.ok(alphaInk[0] > 160 && alphaInk[1] > 160 && alphaInk[2] > 160 && alphaInk[3] > 0, 'Legacy alpha text must become light enough to read: ' + JSON.stringify(alphaInk));
+  assert.ok(alphaInk[0] < 60 && alphaInk[1] < 70 && alphaInk[2] < 60 && alphaInk[3] > 0, 'Secondary text uses content with transparency');
   await assertColor('[role="tab"][aria-selected="true"]', 'color', palette.gold);
   await page.getByRole('tab', { name: 'Rewards', exact: true }).click();
   await page.getByRole('tabpanel').filter({ hasText: 'Rewards panel' }).waitFor();
@@ -258,9 +258,9 @@ try {
   await page.evaluate(() => window.oceanThemeTest.show('modal'));
   await page.locator('.shared-modal').waitFor();
   assert.equal(await page.locator('.shared-modal').evaluate(element => !document.querySelector('#app').contains(element)), true, 'Modal fixture must be teleported outside #app');
-  await assertColor('.shared-modal__panel', 'backgroundColor', palette.deep);
+  await assertColor('.shared-modal__panel', 'backgroundColor', '#f5f9f0');
   await assertColor('.shared-modal__title', 'color', palette.pearl);
-  await assertColor('.shared-modal [data-testid="semantic"]', 'backgroundColor', palette.panel);
+  await assertColor('.shared-modal [data-testid="semantic"]', 'backgroundColor', '#f5f9f0');
   await screenshot('shared-modal-desktop');
   await page.setViewportSize({ width: 390, height: 844 });
   await assertNoOverflow('Shared modal mobile');
@@ -272,8 +272,8 @@ try {
   await assertColor('.shared-payment__title', 'color', palette.gold);
   await assertColor('.shared-payment__summary', 'backgroundColor', palette.deep);
   await assertColor('.shared-payment button[type="submit"]', 'borderTopColor', palette.gold);
-  await assertColor('.shared-payment button[type="submit"]', 'color', palette.deep);
-  assert.match(await page.locator('.shared-payment button[type="submit"]').evaluate(element => getComputedStyle(element).backgroundImage), /rgb\(242, 198, 109\)/, 'Payment primary action uses a gold gradient');
+  await assertColor('.shared-payment button[type="submit"]', 'color', '#24352a');
+  await assertColor('.shared-payment button[type="submit"]', 'backgroundColor', palette.gold);
   await assertReadable('.shared-payment button[type="submit"]', palette.gold);
   await screenshot('payment-desktop');
   await page.getByRole('button', { name: 'Pay fixture', exact: true }).click();
@@ -287,7 +287,7 @@ try {
 
   await page.evaluate(() => window.oceanThemeTest.show('shop'));
   await page.locator('.shop-item-card').waitFor();
-  await assertColor('.shared-modal__panel', 'backgroundColor', palette.deep);
+  await assertColor('.shared-modal__panel', 'backgroundColor', '#f5f9f0');
   await page.locator('.shop-item-card').click();
   await page.locator('.shop-order .shared-payment').waitFor();
   await assertNoOverflow('Shop desktop');
@@ -307,20 +307,20 @@ try {
   await screenshot('workbench-mobile');
   await page.setViewportSize({ width: 1440, height: 1000 });
 
-  // App.vue owns the document class; shared semantic utilities must revert on admin.
+  // App.vue owns the document class; admin and player share the same ten colors.
   await navigate('/admin');
   assert.equal(await page.locator('html').evaluate(element => element.classList.contains('ocean-theme')), false);
   await assertColor('[data-testid="semantic"]', 'backgroundColor', '#f5f9f0');
   await assertColor('[data-testid="semantic"]', 'color', '#24352a');
   assert.ok((await color('[data-testid="alpha"]'))[0] > 245, 'Admin bg-white/70 must retain its original white');
-  await screenshot('admin-original-palette');
+  await screenshot('admin-shared-palette');
   await navigate('/');
   assert.equal(await page.locator('html').evaluate(element => element.classList.contains('ocean-theme')), true);
-  await assertColor('[data-testid="semantic"]', 'backgroundColor', palette.panel);
-  await assertColor('[data-testid="semantic"]', 'color', palette.pearl);
+  await assertColor('[data-testid="semantic"]', 'backgroundColor', '#f5f9f0');
+  await assertColor('[data-testid="semantic"]', 'color', '#24352a');
   assert.deepEqual(externalRequests, [], 'The fixture must make zero requests to external/production services');
   assert.deepEqual(runtimeErrors, [], 'No browser runtime errors');
-  console.log('Ocean theme browser checks passed: exact palette, auth desktop/mobile, text contrast, alpha compatibility, shared controls, Teleport, shop, workbench, admin isolation and public roundtrip.');
+  console.log('Ocean theme browser checks passed: shared palette, auth desktop/mobile, text contrast, alpha effects, shared controls, Teleport, shop, workbench, admin and public roundtrip.');
   console.log('Screenshots: ' + screenshotDirectory);
 } catch (error) {
   console.error('Browser runtime errors:', runtimeErrors);

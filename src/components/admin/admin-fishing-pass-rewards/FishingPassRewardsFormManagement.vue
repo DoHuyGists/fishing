@@ -44,11 +44,11 @@ function submit() {
         <input v-model.number="form.quantity" type="number" min="1" step="1" required class="mt-1 w-full rounded-lg border border-border-default px-3 py-2" />
       </label>
     </div>
-    <div v-if="error" class="text-sm text-red-600">{{ error }}</div>
+    <div v-if="error" class="text-sm text-danger">{{ error }}</div>
     <div class="text-xs text-content/65">Mỗi vé chỉ có một phần thưởng cho cùng ngày và loại (FREE/PREMIUM).</div>
     <div class="flex justify-end gap-2 border-t border-border-default pt-4">
       <button type="button" class="rounded-lg border border-border-default px-4 py-2 text-sm" @click="emit('cancel')">Huỷ</button>
-      <button type="submit" :disabled="saving || !!error" class="rounded-lg bg-emerald-800 px-4 py-2 text-sm font-semibold text-white disabled:opacity-50">{{ saving ? 'Đang lưu…' : reward ? 'Lưu thay đổi' : 'Tạo phần thưởng' }}</button>
+      <button type="submit" :disabled="saving || !!error" class="rounded-lg bg-accent px-4 py-2 text-sm font-semibold text-white disabled:opacity-50">{{ saving ? 'Đang lưu…' : reward ? 'Lưu thay đổi' : 'Tạo phần thưởng' }}</button>
     </div>
   </form>
 </template>

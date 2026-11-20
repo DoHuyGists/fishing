@@ -28,23 +28,23 @@ function onPick(selected: SpeciesRow[]) {
   isPickerOpen.value = false;
 }
 const inputClass =
-  "rounded-md border border-gray-300 px-3 py-2 text-sm font-normal text-gray-800 focus:border-emerald-600 focus:outline-none";
+  "rounded-md border border-content px-3 py-2 text-sm font-normal text-content focus:border-accent focus:outline-none";
 </script>
 
 <template>
-  <div v-if="store.isFormOpen" class="fixed inset-0 z-30 bg-black/25" @click.self="store.closeForm()">
-    <aside class="ml-auto flex h-full w-full max-w-xl flex-col border-l border-gray-200 bg-white shadow-xl">
-      <div class="flex shrink-0 items-center justify-between border-b border-gray-200 px-5 py-4">
+  <div v-if="store.isFormOpen" class="fixed inset-0 z-30 bg-content/25" @click.self="store.closeForm()">
+    <aside class="ml-auto flex h-full w-full max-w-xl flex-col border-l border-border bg-white shadow-xl">
+      <div class="flex shrink-0 items-center justify-between border-b border-border px-5 py-4">
         <div>
           <div class="m-0 text-base font-extrabold text-content-strong">
             {{ store.form.id ? "Chỉnh sửa nhiệm vụ giờ" : "Thêm nhiệm vụ giờ" }}
           </div>
-          <div class="m-0 mt-1 text-xs text-gray-500">Giờ lưu theo múi giờ UTC</div>
+          <div class="m-0 mt-1 text-xs text-content">Giờ lưu theo múi giờ UTC</div>
         </div>
         <button
           type="button"
           aria-label="Đóng biểu mẫu"
-          class="grid size-8 place-items-center rounded-md text-xl text-gray-500 hover:bg-gray-100"
+          class="grid size-8 place-items-center rounded-md text-xl text-content hover:bg-surface"
           @click="store.closeForm()"
         >
           &times;
@@ -52,48 +52,48 @@ const inputClass =
       </div>
 
       <form class="flex-1 space-y-4 overflow-y-auto p-5" @submit.prevent="store.save()">
-        <div v-if="store.formError" class="rounded-lg border border-red-200 bg-red-50 px-3 py-2 text-sm text-red-700">
+        <div v-if="store.formError" class="rounded-lg border border-danger bg-surface px-3 py-2 text-sm text-danger">
           {{ store.formError }}
         </div>
 
         <div class="grid grid-cols-2 gap-4">
-          <label class="flex flex-col gap-1.5 text-xs font-bold text-gray-600"
+          <label class="flex flex-col gap-1.5 text-xs font-bold text-content"
             >Bắt đầu<input v-model="store.form.start" type="time" step="1" :class="inputClass"
           /></label>
-          <label class="flex flex-col gap-1.5 text-xs font-bold text-gray-600"
+          <label class="flex flex-col gap-1.5 text-xs font-bold text-content"
             >Kết thúc<input v-model="store.form.end" type="time" step="1" :class="inputClass"
           /></label>
         </div>
-        <div class="m-0 -mt-2 text-xs leading-relaxed text-gray-500">
+        <div class="m-0 -mt-2 text-xs leading-relaxed text-content">
           Giờ hiện tại trên thiết bị của bạn là {{ localCurrentTime() }} (giờ địa phương), tương ứng
           {{ utcCurrentTime() }} UTC. Nếu muốn chọn giờ hiện tại, hãy nhập {{ utcCurrentTime() }} vào trường thời gian.
         </div>
         <br />
 
-        <label class="flex flex-col gap-1.5 text-xs font-bold text-gray-600"
+        <label class="flex flex-col gap-1.5 text-xs font-bold text-content"
           >Tiền thưởng (xu)<input v-model="store.form.cash" type="number" min="0" step="1" :class="inputClass"
         /></label>
 
         <label
-          class="flex items-center gap-3 rounded-md border border-gray-200 px-3 py-3 text-sm font-semibold text-gray-700"
-          ><input v-model="store.form.isDisabled" type="checkbox" class="size-4 accent-emerald-800" /><span
+          class="flex items-center gap-3 rounded-md border border-border px-3 py-3 text-sm font-semibold text-content"
+          ><input v-model="store.form.isDisabled" type="checkbox" class="size-4 accent-accent" /><span
             >Tắt nhiệm vụ</span
           ></label
         >
 
         <section class="space-y-3">
           <div class="flex items-center justify-between">
-            <div class="m-0 text-xs font-bold text-gray-600">Cá cần câu ({{ store.form.content.length }})</div>
+            <div class="m-0 text-xs font-bold text-content">Cá cần câu ({{ store.form.content.length }})</div>
             <button
               type="button"
-              class="rounded-md border border-emerald-200 px-2.5 py-1.5 text-xs font-bold text-emerald-800 hover:bg-emerald-50"
+              class="rounded-md border border-accent px-2.5 py-1.5 text-xs font-bold text-content hover:bg-surface"
               @click="isPickerOpen = true"
             >
               + Thêm cá
             </button>
           </div>
 
-          <div v-if="!store.form.content.length" class="m-0 text-xs text-gray-500">Chưa chọn cá nào</div>
+          <div v-if="!store.form.content.length" class="m-0 text-xs text-content">Chưa chọn cá nào</div>
           <div class="grid grid-cols-2 gap-3 sm:grid-cols-3">
             <div
               v-for="(fish, index) in store.form.content"
@@ -103,7 +103,7 @@ const inputClass =
               <button
                 type="button"
                 aria-label="Bỏ cá này"
-                class="absolute right-1 top-1 grid size-6 place-items-center rounded-full text-base text-red-700 hover:bg-red-50"
+                class="absolute right-1 top-1 grid size-6 place-items-center rounded-full text-base text-danger hover:bg-surface"
                 @click="store.removeFish(index)"
               >
                 &times;
@@ -111,8 +111,8 @@ const inputClass =
               <img v-if="fish.image" :src="fish.image" :alt="fish.name" class="h-16 w-full object-contain" />
               <div v-else class="h-16" />
               <span class="text-sm font-bold text-content">{{ fish.name }}</span>
-              <span class="text-xs text-gray-500">{{ fish.rarity }}</span>
-              <span v-if="fish.length" class="text-xs text-gray-500">{{ fish.length }}</span>
+              <span class="text-xs text-content">{{ fish.rarity }}</span>
+              <span v-if="fish.length" class="text-xs text-content">{{ fish.length }}</span>
             </div>
           </div>
         </section>
@@ -125,10 +125,10 @@ const inputClass =
         />
       </form>
 
-      <div class="flex shrink-0 items-center justify-end gap-2 border-t border-gray-200 px-5 py-4">
+      <div class="flex shrink-0 items-center justify-end gap-2 border-t border-border px-5 py-4">
         <button
           type="button"
-          class="rounded-lg border border-gray-300 px-4 py-2 text-sm font-bold text-gray-700 hover:bg-gray-100"
+          class="rounded-lg border border-content px-4 py-2 text-sm font-bold text-content hover:bg-surface"
           @click="store.closeForm()"
         >
           Huỷ
@@ -136,7 +136,7 @@ const inputClass =
         <button
           type="button"
           :disabled="store.isSaving"
-          class="rounded-lg bg-content-strong px-4 py-2 text-sm font-bold text-white hover:bg-emerald-800 disabled:opacity-50"
+          class="rounded-lg bg-content-strong px-4 py-2 text-sm font-bold text-white hover:bg-accent disabled:opacity-50"
           @click="store.save()"
         >
           {{ store.isSaving ? "Đang lưu..." : "Lưu nhiệm vụ" }}

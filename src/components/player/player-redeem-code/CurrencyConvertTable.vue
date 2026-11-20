@@ -68,7 +68,7 @@ onMounted(() => {
     <div v-if="currencyStore.conversionRatesLoading" role="status" class="mt-4 text-sm">
       {{ tr("CurrencyConvertTable.dang_tai_ty_gia") }}
     </div>
-    <div v-else-if="currencyStore.conversionRatesError" role="alert" class="mt-4 text-sm text-red-700">
+    <div v-else-if="currencyStore.conversionRatesError" role="alert" class="mt-4 text-sm text-danger">
       {{ currencyStore.conversionRatesError }}
       <button type="button" class="ml-2 underline" @click="currencyStore.fetchConversionRates()">
         {{ tr("Maintenance.thu_lai") }}
@@ -122,7 +122,7 @@ onMounted(() => {
                     !!pendingConversion ||
                     currencyStore.conversionAmounts(rate).batches <= 1
                   "
-                  class="flex size-11 shrink-0 items-center justify-center rounded-lg border border-border-default bg-white text-lg font-bold hover:bg-palette-e7efdf focus-visible:outline-2 focus-visible:outline-emerald-700 disabled:cursor-not-allowed disabled:opacity-50"
+                  class="flex size-11 shrink-0 items-center justify-center rounded-lg border border-border-default bg-white text-lg font-bold hover:bg-surface focus-visible:outline-2 focus-visible:outline-accent disabled:cursor-not-allowed disabled:opacity-50"
                   @click="currencyStore.adjustConversionBatches(rate, -1)"
                 >
                   −
@@ -140,7 +140,7 @@ onMounted(() => {
                     })
                   "
                   :disabled="currencyStore.converting || !!pendingConversion"
-                  class="min-h-11 w-20 rounded-lg border border-border-default bg-white px-2 py-2 text-center outline-none focus:border-emerald-700 focus:ring-2 focus:ring-emerald-700/15 disabled:opacity-50"
+                  class="min-h-11 w-20 rounded-lg border border-border-default bg-white px-2 py-2 text-center outline-none focus:border-accent focus:ring-2 focus:ring-accent/15 disabled:opacity-50"
                 />
                 <button
                   type="button"
@@ -151,7 +151,7 @@ onMounted(() => {
                     !!pendingConversion ||
                     currencyStore.conversionAmounts(rate).batches >= Number.MAX_SAFE_INTEGER
                   "
-                  class="flex size-11 shrink-0 items-center justify-center rounded-lg border border-border-default bg-white text-lg font-bold hover:bg-palette-e7efdf focus-visible:outline-2 focus-visible:outline-emerald-700 disabled:cursor-not-allowed disabled:opacity-50"
+                  class="flex size-11 shrink-0 items-center justify-center rounded-lg border border-border-default bg-white text-lg font-bold hover:bg-surface focus-visible:outline-2 focus-visible:outline-accent disabled:cursor-not-allowed disabled:opacity-50"
                   @click="currencyStore.adjustConversionBatches(rate, 1)"
                 >
                   +
@@ -175,7 +175,7 @@ onMounted(() => {
                   :size="20"
                 />
               </div>
-              <span v-else class="text-xs text-red-700">{{
+              <span v-else class="text-xs text-danger">{{
                 tr("CurrencyConvertTable.so_goi_phai_la_so_nguyen_duong_va_tong_quy_doi_trong_gioi_han_ch")
               }}</span>
             </td>
@@ -183,7 +183,7 @@ onMounted(() => {
               <button
                 type="button"
                 :disabled="!currencyStore.canConvert(rate) || !!pendingConversion"
-                class="min-h-11 whitespace-nowrap rounded-lg bg-emerald-800 px-3 py-2 font-bold text-white hover:bg-emerald-900 disabled:cursor-not-allowed disabled:opacity-50"
+                class="min-h-11 whitespace-nowrap rounded-lg bg-accent px-3 py-2 font-bold text-white hover:bg-accent disabled:cursor-not-allowed disabled:opacity-50"
                 @click="requestConversion(rate)"
               >
                 {{
@@ -195,7 +195,7 @@ onMounted(() => {
         </tbody>
       </table>
     </div>
-    <div v-if="currencyStore.error" role="alert" class="mt-4 text-sm text-red-700">
+    <div v-if="currencyStore.error" role="alert" class="mt-4 text-sm text-danger">
       {{ currencyStore.error }}
       <button
         type="button"

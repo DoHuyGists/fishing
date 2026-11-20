@@ -161,70 +161,70 @@ async function confirmDelete() {
     @close="emit('close')"
   >
 
-    <div class="px-6 py-3 bg-gray-50 border-b border-gray-200 flex items-center gap-3 shrink-0">
-      <input v-model="search" type="text" placeholder="Tìm kiếm..." class="flex-1 px-3 py-1.5 text-xs border border-gray-300 rounded-lg bg-white focus:outline-none" />
-      <button type="button" :disabled="isOpen || loading" class="px-3 py-1.5 border border-gray-300 rounded-lg bg-white hover:bg-gray-100 text-xs font-bold cursor-pointer disabled:opacity-50" @click="emit('refresh')">Làm mới</button>
-      <button v-if="allowCreate !== false" type="button" class="px-3 py-1.5 rounded-lg bg-content-strong hover:bg-emerald-800 text-white text-xs font-bold cursor-pointer" @click="openForm()">+ Thêm mới</button>
+    <div class="px-6 py-3 bg-white border-b border-border flex items-center gap-3 shrink-0">
+      <input v-model="search" type="text" placeholder="Tìm kiếm..." class="flex-1 px-3 py-1.5 text-xs border border-content rounded-lg bg-white focus:outline-none" />
+      <button type="button" :disabled="isOpen || loading" class="px-3 py-1.5 border border-content rounded-lg bg-white hover:bg-surface text-xs font-bold cursor-pointer disabled:opacity-50" @click="emit('refresh')">Làm mới</button>
+      <button v-if="allowCreate !== false" type="button" class="px-3 py-1.5 rounded-lg bg-content-strong hover:bg-accent text-white text-xs font-bold cursor-pointer" @click="openForm()">+ Thêm mới</button>
     </div>
 
-    <div v-if="error || actionError" class="mx-6 mt-3 shrink-0 px-3 py-2 text-xs rounded-lg bg-red-50 border border-red-200 text-red-700">{{ error || actionError }}</div>
+    <div v-if="error || actionError" class="mx-6 mt-3 shrink-0 px-3 py-2 text-xs rounded-lg bg-surface border border-danger text-danger">{{ error || actionError }}</div>
 
     <div class="flex min-h-0 min-w-0 flex-1 flex-col overflow-hidden px-6 py-4">
-      <div v-if="loading" class="text-sm text-gray-500">Đang tải...</div>
+      <div v-if="loading" class="text-sm text-content">Đang tải...</div>
       <div v-else class="min-h-0 flex-1 overflow-auto">
         <table class="w-full text-xs border-collapse">
           <thead>
-            <tr class="bg-gray-100 text-left text-gray-600">
-              <th v-for="c in columns" :key="c.key" class="sticky top-0 z-10 bg-gray-100 px-3 py-2 font-bold border-b border-gray-200">{{ c.label }}</th>
-              <th class="sticky top-0 z-10 bg-gray-100 px-3 py-2 border-b border-gray-200 w-40"></th>
+            <tr class="bg-surface text-left text-content">
+              <th v-for="c in columns" :key="c.key" class="sticky top-0 z-10 bg-surface px-3 py-2 font-bold border-b border-border">{{ c.label }}</th>
+              <th class="sticky top-0 z-10 bg-surface px-3 py-2 border-b border-border w-40"></th>
             </tr>
           </thead>
           <tbody>
-            <tr v-for="r in filtered" :key="r.item.id" class="hover:bg-gray-50 border-b border-gray-100">
-              <td v-for="(cell, i) in r.cells" :key="i" class="px-3 py-2 text-gray-700">
+            <tr v-for="r in filtered" :key="r.item.id" class="hover:bg-white border-b border-border">
+              <td v-for="(cell, i) in r.cells" :key="i" class="px-3 py-2 text-content">
                 <slot :name="`cell-${columns[i]!.key}`" :item="r.item" :value="cell">{{ cell }}</slot>
               </td>
               <td class="px-3 py-2 text-right whitespace-nowrap">
                 <template v-if="confirmDeleteId === r.item.id">
-                  <button type="button" class="px-2 py-1 rounded bg-red-600 text-white font-bold cursor-pointer" @click="confirmDelete">Xác nhận</button>
-                  <button type="button" class="ml-1 px-2 py-1 rounded border border-gray-300 cursor-pointer" @click="confirmDeleteId = null">Huỷ</button>
+                  <button type="button" class="px-2 py-1 rounded bg-danger text-white font-bold cursor-pointer" @click="confirmDelete">Xác nhận</button>
+                  <button type="button" class="ml-1 px-2 py-1 rounded border border-content cursor-pointer" @click="confirmDeleteId = null">Huỷ</button>
                 </template>
                 <template v-else>
-                  <button type="button" class="px-2 py-1 rounded border border-gray-300 hover:bg-gray-100 font-bold cursor-pointer" @click="openForm(r.item)">Sửa</button>
-                  <button v-if="allowDelete !== false" type="button" class="ml-1 px-2 py-1 rounded border border-red-300 text-red-600 hover:bg-red-50 font-bold cursor-pointer" @click="confirmDeleteId = r.item.id">Xoá</button>
+                  <button type="button" class="px-2 py-1 rounded border border-content hover:bg-surface font-bold cursor-pointer" @click="openForm(r.item)">Sửa</button>
+                  <button v-if="allowDelete !== false" type="button" class="ml-1 px-2 py-1 rounded border border-danger text-danger hover:bg-surface font-bold cursor-pointer" @click="confirmDeleteId = r.item.id">Xoá</button>
                 </template>
               </td>
             </tr>
             <tr v-if="!filtered.length">
-              <td :colspan="columns.length + 1" class="px-3 py-6 text-center text-gray-400">Không có dữ liệu</td>
+              <td :colspan="columns.length + 1" class="px-3 py-6 text-center text-content">Không có dữ liệu</td>
             </tr>
           </tbody>
         </table>
       </div>
     </div>
 
-    <div v-if="isOpen" class="fixed inset-0 z-60 bg-black/40 grid place-items-center p-4">
+    <div v-if="isOpen" class="fixed inset-0 z-60 bg-content/40 grid place-items-center p-4">
       <form class="bg-white rounded-xl w-full max-w-lg max-h-[90vh] flex flex-col shadow-xl" @submit.prevent="submit">
-        <div class="px-5 py-3 border-b border-gray-200 font-extrabold text-sm">{{ editingId ? "Cập nhật" : "Thêm mới" }} - {{ title }}</div>
+        <div class="px-5 py-3 border-b border-border font-extrabold text-sm">{{ editingId ? "Cập nhật" : "Thêm mới" }} - {{ title }}</div>
         <fieldset :disabled="saving" class="m-0 min-w-0 border-0 p-5 overflow-auto flex flex-col gap-3">
           <slot name="form-fields" :form="form" :editing="editingId !== null">
-          <label v-for="f in fields" :key="f.key" class="flex flex-col gap-1 text-xs font-bold text-gray-600">
-            <span>{{ f.label }}<span v-if="f.required && !isReadonly(f)" class="text-red-500"> *</span></span>
-            <input v-if="isReadonly(f)" :value="readonlyDisplay(f)" disabled class="px-2 py-1.5 border border-gray-200 rounded-lg bg-gray-100 text-gray-500 font-normal" />
-            <select v-else-if="f.type === 'select'" v-model="form[f.key]" class="px-2 py-1.5 border border-gray-300 rounded-lg font-normal bg-white">
+          <label v-for="f in fields" :key="f.key" class="flex flex-col gap-1 text-xs font-bold text-content">
+            <span>{{ f.label }}<span v-if="f.required && !isReadonly(f)" class="text-danger"> *</span></span>
+            <input v-if="isReadonly(f)" :value="readonlyDisplay(f)" disabled class="px-2 py-1.5 border border-border rounded-lg bg-surface text-content font-normal" />
+            <select v-else-if="f.type === 'select'" v-model="form[f.key]" class="px-2 py-1.5 border border-content rounded-lg font-normal bg-white">
               <option value="">-- Chọn --</option>
               <option v-for="o in f.options" :key="o.value" :value="o.value">{{ o.label }}</option>
             </select>
-            <textarea v-else-if="f.type === 'json'" v-model="form[f.key]" rows="5" class="px-2 py-1.5 border border-gray-300 rounded-lg font-mono font-normal"></textarea>
-            <input v-else-if="f.type === 'number'" v-model.number="form[f.key]" type="number" :min="f.min" :max="f.max" :step="f.step ?? 'any'" class="px-2 py-1.5 border border-gray-300 rounded-lg font-normal" />
-            <input v-else-if="f.type === 'datetime'" v-model="form[f.key]" type="datetime-local" class="px-2 py-1.5 border border-gray-300 rounded-lg font-normal" />
-            <input v-else v-model="form[f.key]" type="text" class="px-2 py-1.5 border border-gray-300 rounded-lg font-normal" />
+            <textarea v-else-if="f.type === 'json'" v-model="form[f.key]" rows="5" class="px-2 py-1.5 border border-content rounded-lg font-mono font-normal"></textarea>
+            <input v-else-if="f.type === 'number'" v-model.number="form[f.key]" type="number" :min="f.min" :max="f.max" :step="f.step ?? 'any'" class="px-2 py-1.5 border border-content rounded-lg font-normal" />
+            <input v-else-if="f.type === 'datetime'" v-model="form[f.key]" type="datetime-local" class="px-2 py-1.5 border border-content rounded-lg font-normal" />
+            <input v-else v-model="form[f.key]" type="text" class="px-2 py-1.5 border border-content rounded-lg font-normal" />
           </label>
           </slot>
-          <div v-if="formError" class="px-3 py-2 text-xs rounded-lg bg-red-50 border border-red-200 text-red-700">{{ formError }}</div>
+          <div v-if="formError" class="px-3 py-2 text-xs rounded-lg bg-surface border border-danger text-danger">{{ formError }}</div>
         </fieldset>
-        <div class="px-5 py-3 border-t border-gray-200 flex justify-end gap-2">
-          <button type="button" :disabled="saving" class="px-3 py-1.5 border border-gray-300 rounded-lg text-xs font-bold cursor-pointer" @click="isOpen = false">Huỷ</button>
+        <div class="px-5 py-3 border-t border-border flex justify-end gap-2">
+          <button type="button" :disabled="saving" class="px-3 py-1.5 border border-content rounded-lg text-xs font-bold cursor-pointer" @click="isOpen = false">Huỷ</button>
           <button type="submit" :disabled="saving" class="px-3 py-1.5 rounded-lg bg-content-strong text-white text-xs font-bold cursor-pointer disabled:opacity-50">{{ saving ? "Đang lưu..." : "Lưu" }}</button>
         </div>
       </form>

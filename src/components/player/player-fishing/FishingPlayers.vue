@@ -15,7 +15,7 @@ const store = useFishingStore();
         @click.self="store.closePlayers"
       >
         <section
-          class="player-popup-panel w-[min(440px,100%)] overflow-hidden border border-ocean-gold/70 rounded-[20px] bg-linear-to-br from-ocean-panel to-ocean-deep shadow-[0_24px_70px_rgba(0,0,0,0.48)] text-ocean-pearl"
+          class="player-popup-panel w-[min(440px,100%)] overflow-hidden border border-ocean-gold/70 rounded-[20px] bg-linear-to-br from-ocean-panel to-ocean-deep shadow-[0_24px_70px_color-mix(in_srgb,_var(--color-content)_48%,_transparent)] text-ocean-pearl"
           role="dialog"
           aria-modal="true"
           aria-labelledby="players-title"
@@ -59,7 +59,7 @@ const store = useFishingStore();
                 @click="store.selectPlayer(player)"
               >
                 <span
-                  class="grid flex-none place-items-center w-[39px] h-[39px] border-1 border-[rgba(255,255,255,0.35)] rounded-full text-white text-[11px] font-black"
+                  class="grid flex-none place-items-center w-[39px] h-[39px] border-1 border-[color-mix(in_srgb,_var(--color-white)_35%,_transparent)] rounded-full text-white text-[11px] font-black"
                   :style="{ background: player.color }"
                   >{{ player.avatar }}</span
                 >
@@ -84,7 +84,7 @@ const store = useFishingStore();
               {{ tr("FishingPlayers.danh_sach") }}
             </button>
             <span
-              class="grid place-items-center w-[66px] h-[66px] my-2.5 border-1 border-[rgba(255,255,255,0.35)] rounded-full text-white text-lg font-black"
+              class="grid place-items-center w-[66px] h-[66px] my-2.5 border-1 border-[color-mix(in_srgb,_var(--color-white)_35%,_transparent)] rounded-full text-white text-lg font-black"
               :style="{ background: store.selectedPlayer.color }"
               >{{ store.selectedPlayer.avatar }}</span
             >

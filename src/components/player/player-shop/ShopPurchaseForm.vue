@@ -44,7 +44,7 @@ const emit = defineEmits<{ buy: [] }>();
         </div>
         <div class="min-w-0">
           <div class="m-0 truncate font-bold">{{ selectedItem.name }}</div>
-          <div class="m-0 text-xs text-emerald-950/60">{{ selectedItem.category || tr('ShopModal.vat_pham') }}</div>
+          <div class="m-0 text-xs text-content/60">{{ selectedItem.category || tr('ShopModal.vat_pham') }}</div>
         </div>
       </div>
       <label class="my-5 block text-xs font-bold"
@@ -71,7 +71,7 @@ const emit = defineEmits<{ buy: [] }>();
     </PaymentConfirmation>
     <template v-else>
       <div class="text-base font-extrabold">{{ tr('ShopModal.don_hang') }}</div>
-      <div class="mt-4 text-sm text-emerald-950/60">{{ tr('ShopModal.chon_mot_vat_pham_de_xem_gia_va_mua') }}</div>
+      <div class="mt-4 text-sm text-content/60">{{ tr('ShopModal.chon_mot_vat_pham_de_xem_gia_va_mua') }}</div>
     </template>
   </aside>
 </template>
@@ -79,7 +79,7 @@ const emit = defineEmits<{ buy: [] }>();
 <style scoped>
 html.ocean-theme .shop-order {
   border: 2px solid var(--color-ocean-wood);
-  background: linear-gradient(160deg, var(--color-ocean-panel), var(--color-ocean-deep));
-  box-shadow: inset 0 0 0 1px color-mix(in srgb, var(--color-ocean-gold) 45%, transparent), 0 4px 12px rgb(0 0 0 / 18%);
+  background: var(--color-white);
+  box-shadow: inset 0 0 0 1px color-mix(in srgb, var(--color-ocean-gold) 45%, transparent), 0 4px 12px color-mix(in srgb, var(--color-content) 18%, transparent);
 }
 </style>

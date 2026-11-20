@@ -65,10 +65,10 @@ onMounted(() => store.fetchAll());
   <AdminModal title="Quản lý phần thưởng vé câu" @close="emit('close')" @keydown.esc="emit('close')">
     <div v-if="formOpen" class="overflow-y-auto p-5 sm:p-7">
       <div class="mb-4 text-base font-bold">{{ editing ? "Sửa phần thưởng" : "Tạo phần thưởng" }}</div>
-      <div v-if="store.error" class="mb-3 rounded-lg bg-red-50 p-3 text-sm text-red-700">{{ store.error }}</div>
+      <div v-if="store.error" class="mb-3 rounded-lg bg-surface p-3 text-sm text-danger">{{ store.error }}</div>
       <div
         v-if="!store.passes.length || !store.items.length"
-        class="mb-3 rounded-lg bg-amber-50 p-3 text-sm text-amber-800"
+        class="mb-3 rounded-lg bg-surface p-3 text-sm text-gold"
       >
         Cần có ít nhất một vé câu và một vật phẩm trước khi tạo phần thưởng.
       </div>
@@ -105,13 +105,13 @@ onMounted(() => store.fetchAll());
         ><button
           type="button"
           :disabled="!store.passes.length || !store.items.length"
-          class="rounded-lg bg-emerald-800 px-4 py-2 text-sm font-semibold text-white disabled:opacity-50"
+          class="rounded-lg bg-accent px-4 py-2 text-sm font-semibold text-white disabled:opacity-50"
           @click="create"
         >
           + Tạo phần thưởng
         </button>
       </div>
-      <div v-if="store.error" class="mx-5 mt-4 rounded-lg bg-red-50 p-3 text-sm text-red-700 sm:mx-6">
+      <div v-if="store.error" class="mx-5 mt-4 rounded-lg bg-surface p-3 text-sm text-danger sm:mx-6">
         {{ store.error }}
       </div>
       <div class="min-h-0 flex-1 overflow-auto p-4 sm:p-6">
@@ -126,7 +126,7 @@ onMounted(() => store.fetchAll());
         </div>
         <div v-else class="overflow-x-auto rounded-xl border border-border-default bg-white">
           <table class="w-full min-w-[760px] text-left text-sm">
-            <thead class="bg-palette-eaf1e5 text-xs uppercase text-content/70">
+            <thead class="bg-surface text-xs uppercase text-content/70">
               <tr>
                 <th class="px-4 py-3">Vé câu</th>
                 <th class="px-4 py-3">Ngày</th>
@@ -137,13 +137,13 @@ onMounted(() => store.fetchAll());
               </tr>
             </thead>
             <tbody>
-              <tr v-for="reward in filtered" :key="reward.id" class="border-t border-palette-e5ece1">
+              <tr v-for="reward in filtered" :key="reward.id" class="border-t border-border">
                 <td class="px-4 py-3 font-medium">{{ reward.passName }}</td>
                 <td class="px-4 py-3">Ngày {{ reward.dayNumber }}</td>
                 <td class="px-4 py-3">
                   <span
                     class="rounded-full px-2.5 py-1 text-xs font-semibold"
-                    :class="reward.rewardType === 'FREE' ? 'bg-sky-100 text-sky-800' : 'bg-amber-100 text-amber-800'"
+                    :class="reward.rewardType === 'FREE' ? 'bg-surface text-primary' : 'bg-surface text-gold'"
                     >{{ reward.rewardType }}</span
                   >
                 </td>
@@ -158,7 +158,7 @@ onMounted(() => store.fetchAll());
                     Sửa</button
                   ><button
                     type="button"
-                    class="ml-2 rounded-lg border border-red-200 px-3 py-1.5 text-xs font-semibold text-red-700 hover:bg-red-50"
+                    class="ml-2 rounded-lg border border-danger px-3 py-1.5 text-xs font-semibold text-danger hover:bg-surface"
                     @click="deleting = reward"
                   >
                     Xoá
@@ -170,17 +170,17 @@ onMounted(() => store.fetchAll());
         </div>
       </div>
     </template>
-    <div v-if="deleting" class="fixed inset-0 z-[60] grid place-items-center bg-black/45 p-4">
+    <div v-if="deleting" class="fixed inset-0 z-[60] grid place-items-center bg-content/45 p-4">
       <div class="w-full max-w-sm rounded-xl bg-white p-5 shadow-xl">
         <div class="font-bold">Xác nhận xoá phần thưởng</div>
-        <div class="my-3 text-sm text-slate-600">
+        <div class="my-3 text-sm text-content">
           Xoá vật phẩm “{{ deleting.itemName }}” khỏi {{ deleting.passName }}, ngày {{ deleting.dayNumber }}?
         </div>
         <div class="flex justify-end gap-2">
           <button type="button" class="rounded-lg border px-3 py-2 text-sm" @click="deleting = null">Huỷ</button
           ><button
             type="button"
-            class="rounded-lg bg-red-700 px-3 py-2 text-sm font-semibold text-white"
+            class="rounded-lg bg-danger px-3 py-2 text-sm font-semibold text-white"
             @click="confirmDelete"
           >
             Xoá

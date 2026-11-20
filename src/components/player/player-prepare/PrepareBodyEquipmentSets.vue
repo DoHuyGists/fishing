@@ -44,13 +44,13 @@ async function switchSet(set: BodyEquipmentSet) {
       <div class="flex flex-wrap items-center gap-2">
         <span
           v-if="usedSet"
-          class="inline-flex items-center gap-1 rounded-lg border border-palette-b7cbb4 bg-surface-selected px-3 py-1 text-xs font-semibold text-content-secondary"
+          class="inline-flex items-center gap-1 rounded-lg border border-border bg-surface-selected px-3 py-1 text-xs font-semibold text-content-secondary"
         >
           {{ tr("PrepareModal.dang_dung_set") }} {{ usedSetIndex + 1 }}
         </span>
         <button
           type="button"
-          class="inline-flex items-center justify-center gap-2 rounded-lg border border-border-default bg-surface px-3 py-1.5 text-xs font-semibold text-content cursor-pointer transition-all duration-150 hover:bg-palette-dce8d5 active:scale-95"
+          class="inline-flex items-center justify-center gap-2 rounded-lg border border-border-default bg-surface px-3 py-1.5 text-xs font-semibold text-content cursor-pointer transition-all duration-150 hover:bg-surface active:scale-95"
           @click="modalStore.open('body')"
         >
           <span aria-hidden="true">🎒</span>
@@ -60,11 +60,11 @@ async function switchSet(set: BodyEquipmentSet) {
     </header>
 
     <div v-if="store.loading" class="flex items-center justify-center gap-2 p-4 text-sm text-content-subtle" role="status">
-      <span class="h-5 w-5 animate-spin rounded-full border-2 border-border-default border-t-palette-526a58"></span>
+      <span class="h-5 w-5 animate-spin rounded-full border-2 border-border-default border-t-content"></span>
       {{ tr("PrepareModal.dang_tai_trang_bi") }}
     </div>
     <div v-else-if="store.error" class="p-4 text-center text-sm" role="alert">
-      <div class="text-red-600">{{ store.error }}</div>
+      <div class="text-danger">{{ store.error }}</div>
       <button
         type="button"
         class="mt-2 rounded-lg border border-border-default bg-surface px-3 py-1.5 text-xs font-semibold hover:bg-white"
@@ -84,7 +84,7 @@ async function switchSet(set: BodyEquipmentSet) {
           :class="
             set.is_used
               ? 'cursor-default border-content-disabled bg-surface-selected shadow-sm'
-              : 'border-border-default bg-surface text-palette-405446 hover:border-content-disabled hover:bg-white'
+              : 'border-border-default bg-surface text-content hover:border-content-disabled hover:bg-white'
           "
           :disabled="store.busy"
           :aria-pressed="set.is_used"
@@ -92,7 +92,7 @@ async function switchSet(set: BodyEquipmentSet) {
         >
           <span class="flex items-center gap-1.5">
             <span class="text-[13px] font-bold">{{ tr("EquipmentSets.setNumber", { number: index + 1 }) }}</span>
-            <span class="rounded-full bg-surface-hover px-1.5 py-px text-[10px] font-semibold text-palette-526a58">
+            <span class="rounded-full bg-surface-hover px-1.5 py-px text-[10px] font-semibold text-content">
               {{ set.is_used ? tr("EquipmentPickerModal.dang_dung") : tr("PrepareModal.doi_sang_set_nay") }}
             </span>
           </span>

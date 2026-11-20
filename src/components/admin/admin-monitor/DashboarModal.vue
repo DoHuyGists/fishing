@@ -22,11 +22,11 @@ onUnmounted(store.stop);
     <div
       class="flex shrink-0 flex-wrap items-center justify-between gap-3 border-b border-border-default bg-white px-4 py-3 sm:px-6"
     >
-      <div class="text-xs text-slate-600" aria-live="polite">
+      <div class="text-xs text-content" aria-live="polite">
         <div class="mb-1 flex items-center gap-2">
           <span
             class="size-2 shrink-0 rounded-full"
-            :class="store.error || store.currencyError ? 'bg-amber-500' : 'bg-emerald-600'"
+            :class="store.error || store.currencyError ? 'bg-gold' : 'bg-accent'"
             aria-hidden="true"
           />
           Tự động tải báo cáo đang xem mỗi 30 giây
@@ -38,7 +38,7 @@ onUnmounted(store.stop);
       </div>
       <button
         type="button"
-        class="rounded-lg border border-border-default bg-surface px-4 py-2 text-sm font-semibold text-content hover:bg-emerald-100 focus-visible:outline-2 focus-visible:outline-emerald-600 disabled:cursor-wait disabled:opacity-50"
+        class="rounded-lg border border-border-default bg-surface px-4 py-2 text-sm font-semibold text-content hover:bg-surface focus-visible:outline-2 focus-visible:outline-accent disabled:cursor-wait disabled:opacity-50"
         :disabled="store.reportLoading"
         @click="store.refresh()"
       >
@@ -52,7 +52,7 @@ onUnmounted(store.stop);
             <div
               v-if="store.error"
               role="alert"
-              class="mb-4 rounded-lg border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-700"
+              class="mb-4 rounded-lg border border-danger bg-surface px-4 py-3 text-sm text-danger"
             >
               Không thể cập nhật báo cáo: {{ store.error }}
               <span v-if="store.lastUpdatedAt">Dữ liệu bên dưới là lần tải thành công gần nhất.</span>
@@ -60,7 +60,7 @@ onUnmounted(store.stop);
             <div
               v-if="store.loading && !store.lastUpdatedAt"
               role="status"
-              class="py-12 text-center text-sm text-slate-600"
+              class="py-12 text-center text-sm text-content"
             >
               Đang tải báo cáo người chơi…
             </div>
@@ -72,7 +72,7 @@ onUnmounted(store.stop);
             <div
               v-if="store.currencyError"
               role="alert"
-              class="mb-4 rounded-lg border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-700"
+              class="mb-4 rounded-lg border border-danger bg-surface px-4 py-3 text-sm text-danger"
             >
               Không thể cập nhật báo cáo tiền tệ: {{ store.currencyError }}
               <span v-if="store.currencyUpdatedAt">Dữ liệu bên dưới là lần tải thành công gần nhất.</span>
@@ -80,7 +80,7 @@ onUnmounted(store.stop);
             <div
               v-if="store.currencyLoading && !store.currencyUpdatedAt"
               role="status"
-              class="py-12 text-center text-sm text-slate-600"
+              class="py-12 text-center text-sm text-content"
             >
               Đang tải báo cáo tiền tệ…
             </div>

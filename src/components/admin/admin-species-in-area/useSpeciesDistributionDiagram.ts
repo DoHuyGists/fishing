@@ -16,7 +16,7 @@ export function useSpeciesDistributionDiagram(
   const powerBaseline = ref(0);
   const drag = ref<{ id: string; kind: 'seed' | 'size'; pointerId: number; start: DistributionPoint; seed: DistributionPoint; power: number; radius: number; total: number } | null>(null);
   const svgRef = ref<SVGSVGElement | null>(null);
-  const colors = ['#679e52', '#d38d40', '#438bb0', '#9c6fb0', '#ce737f', '#429b91', '#a29839', '#6579b5'];
+  const colors = ['#1abc9c', '#ffd166', '#1e5fbf', '#a66bff', '#f75353', '#4fc3ff', '#cbd9c6', '#24352a'];
   const signature = (weights: Record<string, number | null>) => getRows().map(row => `${row.speciesId}:${weights[row.speciesId]}`).join('|');
   let emittedSignature = '';
   const total = computed(() => Object.values(getWeights()).reduce<number>((sum, value) => sum + (Number.isFinite(value) && value! > 0 ? value! : 0), 0));

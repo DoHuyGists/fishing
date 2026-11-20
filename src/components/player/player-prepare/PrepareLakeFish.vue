@@ -23,7 +23,7 @@ const worldStore = useWorldStore();
       </div>
       <span
         v-if="!diaryStore.isLoadingAreaSpecies && !diaryStore.areaSpeciesError"
-        class="text-xs font-semibold text-palette-526a58"
+        class="text-xs font-semibold text-content"
       >
         {{ diaryStore.discoveredAreaSpecies.length }} {{ tr("PrepareModal.loai_da_kham_pha") }}
       </span>
@@ -32,7 +32,7 @@ const worldStore = useWorldStore();
       {{ tr("PrepareModal.dang_tai_danh_sach_ca") }}
     </div>
     <div v-else-if="diaryStore.areaSpeciesError" class="p-4 text-center" role="alert">
-      <div class="m-0 text-sm text-red-600">{{ tr("PrepareModal.khong_the_tai_danh_sach_ca_trong_ho") }}</div>
+      <div class="m-0 text-sm text-danger">{{ tr("PrepareModal.khong_the_tai_danh_sach_ca_trong_ho") }}</div>
       <button
         type="button"
         class="mt-2 rounded-lg border border-border-default bg-surface-hover px-3 py-1.5 text-xs font-semibold text-content hover:bg-white"
@@ -59,7 +59,7 @@ const worldStore = useWorldStore();
         />
         <div class="min-w-0 flex-1">
           <div class="m-0 break-words text-sm font-semibold text-content">{{ fish.name }}</div>
-          <div v-if="fish.rarity" class="m-0 mt-0.5 text-xs text-palette-526a58">{{ fish.rarity }}</div>
+          <div v-if="fish.rarity" class="m-0 mt-0.5 text-xs text-content">{{ fish.rarity }}</div>
           <div v-if="fish.information" class="m-0 mt-1 text-xs leading-relaxed text-content-subtle">
             {{ fish.information }}
           </div>

@@ -49,11 +49,11 @@ withDefaults(
 }
 
 html.ocean-theme .loading-screen {
-  background: radial-gradient(ellipse at 50% 0%, rgba(53, 185, 213, 0.14), transparent 60%), var(--color-ocean-deep);
+  background: radial-gradient(ellipse at 50% 0%, color-mix(in srgb, var(--color-sky) 14%, transparent), transparent 60%), var(--color-ocean-deep);
 }
 
 html.ocean-theme .loading-ring {
-  border-color: rgba(53, 185, 213, 0.2);
+  border-color: color-mix(in srgb, var(--color-sky) 20%, transparent);
   border-top-color: var(--color-ocean-gold);
 }
 

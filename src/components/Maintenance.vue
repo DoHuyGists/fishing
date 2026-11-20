@@ -17,7 +17,7 @@ const retry = () => {
     <section class="w-full max-w-xl" aria-labelledby="error-title">
       <!-- Khung có thanh trạng thái đang bảo trì -->
       <div
-        class="relative flex aspect-[16/7] w-full items-center justify-center overflow-hidden rounded-3xl border-2 border-[var(--color-ocean-gold)]/60 bg-surface text-[var(--color-ocean-gold)] shadow-[inset_0_1px_0_rgba(245,235,212,0.12),0_16px_40px_rgba(0,0,0,0.15)]"
+        class="relative flex aspect-[16/7] w-full items-center justify-center overflow-hidden rounded-3xl border-2 border-[var(--color-ocean-gold)]/60 bg-surface text-[var(--color-ocean-gold)] shadow-[inset_0_1px_0_color-mix(in_srgb,_var(--color-surface)_12%,_transparent),0_16px_40px_color-mix(in_srgb,_var(--color-content)_15%,_transparent)]"
         aria-hidden="true"
       >
         <span class="select-none text-7xl font-semibold tracking-tight sm:text-8xl">503</span>
@@ -38,7 +38,7 @@ const retry = () => {
         <button
           type="button"
           :disabled="retrying"
-          class="inline-flex items-center gap-2 rounded-xl border border-[var(--color-ocean-gold)] bg-[var(--color-ocean-gold)] px-5 py-2.5 text-sm font-bold text-[var(--color-ocean-deep)] transition hover:brightness-110 disabled:cursor-wait disabled:opacity-70 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-[var(--color-ocean-cyan)]"
+          class="inline-flex items-center gap-2 rounded-xl border border-[var(--color-ocean-gold)] bg-[var(--color-ocean-gold)] px-5 py-2.5 text-sm font-bold text-content transition hover:brightness-110 disabled:cursor-wait disabled:opacity-70 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-[var(--color-ocean-cyan)]"
           @click="retry"
         >
           <svg

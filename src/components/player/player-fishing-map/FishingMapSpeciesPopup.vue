@@ -44,7 +44,7 @@ watch(
     <dialog
       ref="dialog"
       aria-labelledby="map-species-title"
-      class="m-auto max-h-[85dvh] w-[calc(100%-2rem)] max-w-xl overflow-y-auto rounded-2xl border border-border-default bg-surface p-0 text-content shadow-xl backdrop:bg-black/40"
+      class="m-auto max-h-[85dvh] w-[calc(100%-2rem)] max-w-xl overflow-y-auto rounded-2xl border border-border-default bg-surface p-0 text-content shadow-xl backdrop:bg-content/40"
       @cancel.prevent="close"
       @close="close"
       @click.self="close"
@@ -77,7 +77,7 @@ watch(
             class="flex flex-col items-center justify-center gap-1 rounded-xl border border-border-default bg-white p-3 text-center"
           >
             <span aria-hidden="true" class="text-xl">{{ stat.icon }}</span>
-            <span class="text-xs text-palette-607176">{{ tr(`FishingMapModal.${stat.key}`) }}</span>
+            <span class="text-xs text-content">{{ tr(`FishingMapModal.${stat.key}`) }}</span>
             <span class="text-sm font-bold">{{ stat.value }}</span>
           </div>
         </div>
@@ -92,7 +92,7 @@ watch(
             :key="detail.key"
             class="min-w-0 rounded-lg border border-border-default p-3"
           >
-            <div class="text-xs text-palette-607176">{{ tr(`FishingMapModal.${detail.key}`) }}</div>
+            <div class="text-xs text-content">{{ tr(`FishingMapModal.${detail.key}`) }}</div>
             <div class="mt-1 break-words font-semibold">{{ detail.value || tr("FishingMapModal.unknown") }}</div>
           </div>
         </div>

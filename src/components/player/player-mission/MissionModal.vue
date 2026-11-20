@@ -148,7 +148,7 @@ onMounted(() => void loadMissionData(true));
     <div class="h-full">
       <Tab v-model="activeTab" :tabs="tabs" :aria-label="tr('MissionModal.loai_nhiem_vu')" lazy contained>
         <template #hourly>
-          <div v-if="isLoading || isRefreshing" class="grid h-full place-items-center text-sm text-emerald-900/70">
+          <div v-if="isLoading || isRefreshing" class="grid h-full place-items-center text-sm text-content/70">
             {{ tr("MissionModal.dang_tai_ca_va_nhiem_vu") }}
           </div>
           <div

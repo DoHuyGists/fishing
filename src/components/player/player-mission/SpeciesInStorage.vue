@@ -59,20 +59,20 @@ function isSelected(caught: CaughtFish) {
 
 function selectionClass(caught: CaughtFish) {
   return isSelected(caught)
-    ? "border-emerald-700 bg-emerald-100 ring-2 ring-emerald-700/20"
+    ? "border-accent bg-surface ring-2 ring-accent/20"
     : isFishRequired(caught.species?.id)
-      ? "border-amber-500 bg-amber-50 hover:bg-amber-100 cursor-pointer"
-      : "border-emerald-950/10 bg-white/50 opacity-55";
+      ? "border-gold bg-surface hover:bg-surface cursor-pointer"
+      : "border-accent/10 bg-white/50 opacity-55";
 }
 </script>
 
 <template>
-  <section class="flex h-full min-h-0 flex-col border-b border-emerald-950/10 md:border-b-0 md:border-r">
+  <section class="flex h-full min-h-0 flex-col border-b border-accent/10 md:border-b-0 md:border-r">
     <div
-      class="flex shrink-0 flex-wrap items-center justify-between gap-2 border-b border-emerald-950/10 px-5 py-3 sm:px-6"
+      class="flex shrink-0 flex-wrap items-center justify-between gap-2 border-b border-accent/10 px-5 py-3 sm:px-6"
     >
       <div class="m-0 text-sm font-bold">{{ tr("FishingPlayers.ca_da_cau") }}</div>
-      <span class="text-xs text-emerald-900/60">{{ caughtFishes.length }} {{ tr("UserProfile.con") }}</span>
+      <span class="text-xs text-content/60">{{ caughtFishes.length }} {{ tr("UserProfile.con") }}</span>
       <div
         class="flex rounded-md border border-border-default p-0.5 text-xs font-bold"
         role="group"
@@ -81,7 +81,7 @@ function selectionClass(caught: CaughtFish) {
         <button
           type="button"
           class="rounded px-2 py-1"
-          :class="viewMode === 'list' ? 'bg-emerald-800 text-white' : 'hover:bg-emerald-50'"
+          :class="viewMode === 'list' ? 'bg-accent text-white' : 'hover:bg-surface'"
           :aria-pressed="viewMode === 'list'"
           @click="viewMode = 'list'"
         >
@@ -90,7 +90,7 @@ function selectionClass(caught: CaughtFish) {
         <button
           type="button"
           class="rounded px-2 py-1"
-          :class="viewMode === 'grid' ? 'bg-emerald-800 text-white' : 'hover:bg-emerald-50'"
+          :class="viewMode === 'grid' ? 'bg-accent text-white' : 'hover:bg-surface'"
           :aria-pressed="viewMode === 'grid'"
           @click="viewMode = 'grid'"
         >
@@ -99,7 +99,7 @@ function selectionClass(caught: CaughtFish) {
         <button
           type="button"
           class="rounded px-2 py-1"
-          :class="viewMode === 'group' ? 'bg-emerald-800 text-white' : 'hover:bg-emerald-50'"
+          :class="viewMode === 'group' ? 'bg-accent text-white' : 'hover:bg-surface'"
           :aria-pressed="viewMode === 'group'"
           @click="viewMode = 'group'"
         >
@@ -108,7 +108,7 @@ function selectionClass(caught: CaughtFish) {
       </div>
     </div>
 
-    <div v-if="!caughtFishes.length" class="py-8 text-center text-sm text-emerald-900/55">
+    <div v-if="!caughtFishes.length" class="py-8 text-center text-sm text-content/55">
       {{ tr("CaughtFishList.ban_chua_co_ca_trong_bo_suu_tap") }}
     </div>
     <div v-else class="h-0 grow overflow-y-auto p-3 sm:p-4">
@@ -120,14 +120,14 @@ function selectionClass(caught: CaughtFish) {
         >
           <button
             type="button"
-            class="flex w-full items-center gap-3 p-2.5 text-left hover:bg-emerald-50"
+            class="flex w-full items-center gap-3 p-2.5 text-left hover:bg-surface"
             :aria-expanded="expandedSpecies.has(group.key)"
             @click="toggleSpecies(group.key)"
           >
             <img
               :src="group.image || '/fish/VN/fish.jpg'"
               :alt="group.name"
-              class="h-12 shrink-0 rounded-md bg-emerald-950/5 object-cover"
+              class="h-12 shrink-0 rounded-md bg-accent/5 object-cover"
             />
             <span class="min-w-0 flex-1 truncate text-sm font-bold text-content">{{ group.name }}</span>
             <span class="shrink-0 rounded-full bg-white px-2 py-1 text-xs font-bold"
@@ -156,15 +156,15 @@ function selectionClass(caught: CaughtFish) {
                   <span class="block truncate text-sm font-bold">{{
                     caught.species?.name || tr("CaughtModal.ca_chua_ro_ten")
                   }}</span>
-                  <span class="block text-xs text-emerald-900/60"
+                  <span class="block text-xs text-content/60"
                     >{{ caught.species?.rarity || tr("CaughtFishList.khong_ro_do_hiem") }} ·
                     {{ caught.weight }} kg</span
                   >
                 </span>
-                <span v-if="isSelected(caught)" class="text-xs font-bold text-emerald-800">{{
+                <span v-if="isSelected(caught)" class="text-xs font-bold text-content">{{
                   tr("Fishfarm.da_chon")
                 }}</span>
-                <span v-else-if="isFishRequired(caught.species?.id)" class="text-xs font-bold text-amber-800">{{
+                <span v-else-if="isFishRequired(caught.species?.id)" class="text-xs font-bold text-gold">{{
                   tr("CaughtFishList.phu_hop")
                 }}</span>
               </button>
@@ -193,22 +193,22 @@ function selectionClass(caught: CaughtFish) {
             :alt="caught.species?.name || tr('CaughtModal.ca')"
             :class="
               viewMode === 'grid'
-                ? 'w-full rounded-md object-cover bg-emerald-950/5'
-                : 'w-14 shrink-0 rounded-md object-cover bg-emerald-950/5'
+                ? 'w-full rounded-md object-cover bg-accent/5'
+                : 'w-14 shrink-0 rounded-md object-cover bg-accent/5'
             "
           />
           <span :class="viewMode === 'grid' ? 'w-full min-w-0' : 'min-w-0 flex-1'">
             <span class="block truncate text-sm font-bold">{{
               caught.species?.name || tr("CaughtModal.ca_chua_ro_ten")
             }}</span>
-            <span class="block truncate text-xs text-emerald-900/60"
+            <span class="block truncate text-xs text-content/60"
               >{{ caught.species?.rarity || tr("CaughtFishList.khong_ro_do_hiem") }} · {{ caught.weight }} kg</span
             >
           </span>
-          <span v-if="isSelected(caught)" class="shrink-0 text-xs font-bold text-emerald-800">{{
+          <span v-if="isSelected(caught)" class="shrink-0 text-xs font-bold text-content">{{
             tr("Fishfarm.da_chon")
           }}</span>
-          <span v-else-if="isFishRequired(caught.species?.id)" class="shrink-0 text-xs font-bold text-amber-800">{{
+          <span v-else-if="isFishRequired(caught.species?.id)" class="shrink-0 text-xs font-bold text-gold">{{
             tr("CaughtFishList.phu_hop")
           }}</span>
         </button>

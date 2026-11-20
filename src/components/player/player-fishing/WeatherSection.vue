@@ -145,12 +145,12 @@ onBeforeUnmount(() => {
   <button
     v-if="!inline"
     type="button"
-    class="inline-flex w-fit items-center gap-1.5 rounded-full border border-emerald-700/30 bg-emerald-50 px-2.5 py-1 text-xs font-semibold text-emerald-900 hover:bg-emerald-100"
+    class="inline-flex w-fit items-center gap-1.5 rounded-full border border-accent/30 bg-surface px-2.5 py-1 text-xs font-semibold text-content hover:bg-surface"
     @click.stop="open = true"
   >
     <span class="text-sm leading-none">{{ hasWeather ? weatherIcon : "🌤️" }}</span>
     <span>{{ hasWeather ? weather?.name : tr('WeatherSection.thoi_tiet') }}</span>
-    <span v-if="hasWeather && weatherStore.zone?.weather_expires_at" class="tabular-nums text-emerald-700">{{
+    <span v-if="hasWeather && weatherStore.zone?.weather_expires_at" class="tabular-nums text-content">{{
       countdown
     }}</span>
   </button>
@@ -159,7 +159,7 @@ onBeforeUnmount(() => {
     <Transition :name="inline ? undefined : 'player-popup'" :duration="inline ? 0 : { enter: 220, leave: 150 }">
       <div
         v-if="inline || open"
-        :class="inline ? 'w-full shrink-0' : 'fixed inset-0 z-1000 grid place-items-center bg-emerald-950/60 p-4'"
+        :class="inline ? 'w-full shrink-0' : 'fixed inset-0 z-1000 grid place-items-center bg-accent/60 p-4'"
         @click.self="open = false"
         @contextmenu.prevent
       >
@@ -167,7 +167,7 @@ onBeforeUnmount(() => {
           class="player-popup-panel relative flex flex-col overflow-hidden rounded-xl border"
           :class="inline
             ? 'slide-fade-in from-top player-content-in w-full border-border-default bg-surface text-content shadow-sm'
-            : 'max-h-[90vh] w-[min(720px,100%)] border-emerald-900/15 bg-white text-emerald-950'"
+            : 'max-h-[90vh] w-[min(720px,100%)] border-accent/15 bg-white text-content'"
           :role="inline ? 'region' : 'dialog'"
           :aria-modal="inline ? undefined : true"
           :aria-label="tr('WeatherSection.thoi_tiet_khu_vuc')"
@@ -184,14 +184,14 @@ onBeforeUnmount(() => {
               muted
               playsinline
             ></video>
-            <div v-else class="h-full w-full bg-emerald-50"></div>
+            <div v-else class="h-full w-full bg-surface"></div>
             <div class="absolute inset-0 bg-white/75"></div>
           </div>
 
           <button
             v-if="!inline"
             type="button"
-            class="absolute right-3 top-3 z-10 h-8 w-8 rounded-full border border-emerald-900/15 bg-white/80 leading-none text-emerald-950 hover:bg-white"
+            class="absolute right-3 top-3 z-10 h-8 w-8 rounded-full border border-accent/15 bg-white/80 leading-none text-content hover:bg-white"
             :aria-label="tr('ChangePasswordModal.dong')"
             @click="open = false"
           >
@@ -201,11 +201,11 @@ onBeforeUnmount(() => {
           <div class="relative flex min-h-0 flex-1 flex-col">
             <div
               v-if="!inline || (weatherStore.zone && !weatherStore.error)"
-              class="flex items-center gap-4 border-b border-emerald-900/10"
+              class="flex items-center gap-4 border-b border-accent/10"
               :class="inline ? 'flex-wrap bg-surface-hover px-3 py-3 sm:flex-nowrap' : 'px-5 py-4 pr-14'"
             >
               <div
-                class="grid h-16 w-16 shrink-0 place-items-center rounded-full border border-emerald-700/30 bg-emerald-100 text-3xl"
+                class="grid h-16 w-16 shrink-0 place-items-center rounded-full border border-accent/30 bg-surface text-3xl"
               >
                 <img
                   v-if="weather?.image"
@@ -217,7 +217,7 @@ onBeforeUnmount(() => {
                 <span v-else>{{ weatherIcon }}</span>
               </div>
               <div class="min-w-0">
-                <div class="text-[10px] font-bold uppercase tracking-widest text-emerald-800">
+                <div class="text-[10px] font-bold uppercase tracking-widest text-content">
                   {{ weatherStore.zone?.name ?? "—" }}
                 </div>
                 <div class="truncate text-xl font-bold leading-tight">
@@ -225,7 +225,7 @@ onBeforeUnmount(() => {
                 </div>
                 <span
                   v-if="hasWeather"
-                  class="mt-1 inline-block rounded-full bg-emerald-700 px-2 py-0.5 text-[11px] font-semibold text-white"
+                  class="mt-1 inline-block rounded-full bg-accent px-2 py-0.5 text-[11px] font-semibold text-white"
                   >{{ rarityLabel }}</span
                 >
               </div>
@@ -233,38 +233,38 @@ onBeforeUnmount(() => {
                 v-if="hasWeather && weatherStore.zone?.weather_expires_at"
                 class="ml-auto hidden w-fit min-w-0 sm:block"
               >
-                <div class="flex items-baseline justify-between text-xs gap-2 text-emerald-800">
+                <div class="flex items-baseline justify-between text-xs gap-2 text-content">
                   <span>{{ tr('WeatherSection.thoi_tiet') }} {{ weather?.name }} {{ tr('WeatherSection.ket_thuc_sau') }} </span>
-                  <b class="text-base tabular-nums text-emerald-900">{{ countdown }}</b>
+                  <b class="text-base tabular-nums text-content">{{ countdown }}</b>
                 </div>
-                <div class="mt-1 h-1.5 overflow-hidden rounded-full bg-emerald-900/10">
+                <div class="mt-1 h-1.5 overflow-hidden rounded-full bg-accent/10">
                   <div
-                    class="h-full rounded-full bg-emerald-600 transition-[width] duration-700"
+                    class="h-full rounded-full bg-accent transition-[width] duration-700"
                     :style="{ width: `${progress}%` }"
                   ></div>
                 </div>
               </div>
             </div>
 
-            <div v-if="weatherStore.loading && !weatherStore.zone" class="px-5 py-8 text-center text-sm text-emerald-800">
+            <div v-if="weatherStore.loading && !weatherStore.zone" class="px-5 py-8 text-center text-sm text-content">
               {{ tr('WeatherSection.dang_tai') }}
             </div>
-            <div v-else-if="weatherStore.error" class="px-5 py-8 text-center text-sm text-red-600">
+            <div v-else-if="weatherStore.error" class="px-5 py-8 text-center text-sm text-danger">
               {{ weatherStore.error }}
             </div>
-            <div v-else-if="!weatherStore.zone" class="px-5 py-8 text-center text-sm text-emerald-800">
+            <div v-else-if="!weatherStore.zone" class="px-5 py-8 text-center text-sm text-content">
               {{ tr('WeatherSection.khu_vuc_nay_chua_co_du_lieu_moi_truong') }}
             </div>
 
             <template v-else>
               <div v-if="hasWeather && weatherStore.zone?.weather_expires_at" class="px-5 pt-3 sm:hidden">
-                <div class="flex items-baseline justify-between text-xs text-emerald-800">
+                <div class="flex items-baseline justify-between text-xs text-content">
                   <span>{{ tr('WeatherSection.con_lai') }}</span>
-                  <b class="tabular-nums text-emerald-900">{{ countdown }}</b>
+                  <b class="tabular-nums text-content">{{ countdown }}</b>
                 </div>
-                <div class="mt-1 h-1.5 overflow-hidden rounded-full bg-emerald-900/10">
+                <div class="mt-1 h-1.5 overflow-hidden rounded-full bg-accent/10">
                   <div
-                    class="h-full rounded-full bg-emerald-600 transition-[width] duration-700"
+                    class="h-full rounded-full bg-accent transition-[width] duration-700"
                     :style="{ width: `${progress}%` }"
                   ></div>
                 </div>
@@ -272,7 +272,7 @@ onBeforeUnmount(() => {
 
               <div :class="inline ? 'px-3 py-3' : 'min-h-0 flex-1 overflow-y-auto px-5 py-4'">
                 <div
-                  class="mb-2 flex items-baseline justify-between text-[11px] font-bold uppercase tracking-widest text-emerald-800"
+                  class="mb-2 flex items-baseline justify-between text-[11px] font-bold uppercase tracking-widest text-content"
                 >
                   <span>{{ tr('WeatherSection.hieu_qua_dang_kich_hoat') }}</span>
                   <span v-if="hasWeather && modifiers.length" class="tabular-nums">{{ modifiers.length }}</span>
@@ -288,32 +288,32 @@ onBeforeUnmount(() => {
                   <div
                     v-for="m in modifiers"
                     :key="m.code"
-                    class="flex items-center gap-2 rounded-lg border border-emerald-900/10 bg-white/80 px-2.5 py-2"
+                    class="flex items-center gap-2 rounded-lg border border-accent/10 bg-white/80 px-2.5 py-2"
                   >
                     <span class="text-base leading-none">{{ m.icon }}</span>
                     <div class="min-w-0 flex-1">
                       <div class="flex items-baseline justify-between gap-2 text-xs">
                         <span :class="inline ? 'break-words' : 'truncate'">{{ m.label }}</span>
-                        <b :class="m.positive ? 'text-emerald-700' : 'text-red-600'" class="shrink-0 tabular-nums">{{
+                        <b :class="m.positive ? 'text-content' : 'text-danger'" class="shrink-0 tabular-nums">{{
                           m.text
                         }}</b>
                       </div>
-                      <div class="mt-1 h-1 overflow-hidden rounded-full bg-emerald-900/10">
+                      <div class="mt-1 h-1 overflow-hidden rounded-full bg-accent/10">
                         <div
                           class="h-full rounded-full transition-[width] duration-700"
-                          :class="m.positive ? 'bg-emerald-600' : 'bg-red-500'"
+                          :class="m.positive ? 'bg-accent' : 'bg-danger'"
                           :style="{ width: `${m.width}%` }"
                         ></div>
                       </div>
                     </div>
                   </div>
                 </TransitionGroup>
-                <div v-else class="py-4 text-center text-sm text-emerald-800">{{ tr('WeatherSection.chua_co_hieu_ung_nao') }}</div>
+                <div v-else class="py-4 text-center text-sm text-content">{{ tr('WeatherSection.chua_co_hieu_ung_nao') }}</div>
               </div>
 
               <div
                 v-if="weather"
-                class="border-t border-emerald-900/10 px-5 py-2 text-center text-[11px] text-emerald-800"
+                class="border-t border-accent/10 px-5 py-2 text-center text-[11px] text-content"
               >
                 {{ tr('WeatherSection.thoi_tiet_keo_dai') }} {{ weather.duration_min }}–{{ weather.duration_max }} {{ tr('WeatherSection.phut') }}
               </div>

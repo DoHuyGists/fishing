@@ -94,7 +94,7 @@ async function saveIdentity() {
 
 <template>
   <div
-    class="fixed inset-0 z-[10000] flex items-center justify-center bg-black/60 p-4 backdrop-blur-sm"
+    class="fixed inset-0 z-[10000] flex items-center justify-center bg-content/60 p-4 backdrop-blur-sm"
     @click.self="close"
     @keydown.esc.stop="close"
   >
@@ -168,7 +168,7 @@ async function saveIdentity() {
                 </div>
               </div>
             </div>
-            <div v-if="previewFailed" role="status" class="mt-2 text-xs text-amber-800">
+            <div v-if="previewFailed" role="status" class="mt-2 text-xs text-gold">
               {{ tr("UpdateIdentityModal.khong_the_xem_truoc_anh_vui_long_chon_anh_khac_hoac_kiem_tra_duo") }}
             </div>
             <div v-if="previewUrl || removedAvatar" class="mt-2 flex flex-wrap gap-x-4 gap-y-2">
@@ -243,7 +243,7 @@ async function saveIdentity() {
         <div
           v-if="identityError"
           role="alert"
-          class="mx-5 mb-4 rounded-lg border border-red-200 bg-red-50 px-3 py-2 text-red-700"
+          class="mx-5 mb-4 rounded-lg border border-danger bg-surface px-3 py-2 text-danger"
         >
           {{ identityError }}
         </div>
@@ -259,7 +259,7 @@ async function saveIdentity() {
           <button
             type="submit"
             :disabled="identityBusy"
-            class="rounded-lg bg-content px-4 py-2.5 font-semibold text-white transition hover:bg-palette-364c3d focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-content disabled:opacity-50"
+            class="rounded-lg bg-content px-4 py-2.5 font-semibold text-white transition hover:bg-content focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-content disabled:opacity-50"
           >
             {{ identityBusy ? tr("ChangePasswordModal.dang_luu") : tr("UpdateIdentityModal.luu_ho_so") }}
           </button>

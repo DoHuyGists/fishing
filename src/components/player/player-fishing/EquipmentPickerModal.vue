@@ -119,11 +119,11 @@ onBeforeUnmount(() => window.removeEventListener("keydown", onKeydown));
   <Teleport to="body">
     <div
       v-if="open"
-      class="fixed inset-0 z-[45] grid place-items-center overflow-y-auto bg-black/60 p-2 backdrop-blur-[3px] sm:p-5"
+      class="fixed inset-0 z-[45] grid place-items-center overflow-y-auto bg-content/60 p-2 backdrop-blur-[3px] sm:p-5"
       @click.self="emit('close')"
     >
       <section
-        class="player-popup-in flex max-h-[92dvh] w-[min(920px,100%)] flex-col overflow-hidden rounded-2xl border border-border-default bg-surface text-content shadow-[0_24px_70px_rgba(0,0,0,0.4)]"
+        class="player-popup-in flex max-h-[92dvh] w-[min(920px,100%)] flex-col overflow-hidden rounded-2xl border border-border-default bg-surface text-content shadow-[0_24px_70px_color-mix(in_srgb,_var(--color-content)_40%,_transparent)]"
         role="dialog"
         aria-modal="true"
         :aria-label="tr('EquipmentMenu.chon_trang_bi')"
@@ -132,7 +132,7 @@ onBeforeUnmount(() => window.removeEventListener("keydown", onKeydown));
           <div class="m-0 text-base font-bold">{{ tr("EquipmentMenu.chon_trang_bi") }}</div>
           <button
             type="button"
-            class="grid h-8 w-8 place-items-center rounded-full text-2xl leading-none hover:bg-black/5"
+            class="grid h-8 w-8 place-items-center rounded-full text-2xl leading-none hover:bg-content/5"
             :aria-label="tr('ChangePasswordModal.dong')"
             @click="emit('close')"
           >
@@ -150,7 +150,7 @@ onBeforeUnmount(() => window.removeEventListener("keydown", onKeydown));
               >
                 <div v-if="bodySlot" class="shrink-0 space-y-2 text-xs">
                   <div v-if="healthStore.loading" role="status">{{ tr("PrepareModal.dang_tai_trang_bi") }}</div>
-                  <div v-else-if="healthStore.error" role="alert" class="flex items-center gap-2 text-red-700">
+                  <div v-else-if="healthStore.error" role="alert" class="flex items-center gap-2 text-danger">
                     <span>{{ healthStore.error }}</span>
                     <button
                       type="button"
@@ -164,7 +164,7 @@ onBeforeUnmount(() => window.removeEventListener("keydown", onKeydown));
                 <input
                   v-model="search"
                   type="text"
-                  class="mb-3 w-full shrink-0 rounded-lg border border-border-default bg-white px-3 py-2 text-xs outline-none focus:border-palette-70a77e"
+                  class="mb-3 w-full shrink-0 rounded-lg border border-border-default bg-white px-3 py-2 text-xs outline-none focus:border-accent"
                   :placeholder="tr('EquipmentPickerModal.tim_kiem')"
                 />
                 <div class="m-0 grid min-h-0 grid-cols-1 gap-3 overflow-y-auto p-1 sm:grid-cols-2 lg:grid-cols-3">
@@ -182,9 +182,9 @@ onBeforeUnmount(() => window.removeEventListener("keydown", onKeydown));
                     <button
                       type="button"
                       :disabled="!!bodySlot"
-                      class="relative flex min-h-[150px] w-full items-center gap-3 overflow-hidden rounded-xl border border-border-default bg-white p-3 text-left transition hover:bg-palette-eef8e9"
+                      class="relative flex min-h-[150px] w-full items-center gap-3 overflow-hidden rounded-xl border border-border-default bg-white p-3 text-left transition hover:bg-surface"
                       :class="{
-                        'border-2 border-palette-2f8f4e bg-palette-eef8e9 shadow-[0_0_0_2px_var(--color-palette-b9dba7)]': isSelected(variant),
+                        'border-2 border-accent bg-surface shadow-[0_0_0_2px_var(--color-surface)]': isSelected(variant),
                       }"
                       :aria-pressed="isSelected(variant)"
                       @click="pick(variant)"
@@ -201,20 +201,20 @@ onBeforeUnmount(() => window.removeEventListener("keydown", onKeydown));
                       <span class="flex min-w-0 flex-1 flex-col leading-tight">
                         <span
                           v-if="isSelected(variant)"
-                          class="mb-1 flex items-center gap-1 text-[10px] font-extrabold uppercase tracking-wide text-palette-24733d"
+                          class="mb-1 flex items-center gap-1 text-[10px] font-extrabold uppercase tracking-wide text-content"
                         >
-                          <span class="grid h-4 w-4 place-items-center rounded-full bg-palette-2f8f4e text-white">✓</span>
+                          <span class="grid h-4 w-4 place-items-center rounded-full bg-accent text-white">✓</span>
                           {{ tr("EquipmentPickerModal.dang_dung") }}
                         </span>
                         <strong class="text-xs font-bold">{{ variant.name }}</strong>
-                        <small class="text-[10px] text-palette-4b5f50">{{ variant.detail }}</small>
-                        <small v-if="activeTab === 'bait'" class="mt-1 text-[10px] font-semibold text-palette-24733d">
+                        <small class="text-[10px] text-content">{{ variant.detail }}</small>
+                        <small v-if="activeTab === 'bait'" class="mt-1 text-[10px] font-semibold text-content">
                           {{ tr("EquipmentPickerModal.so_luong") }} {{ variant.quantity ?? 0 }}
                         </small>
                       </span>
                       <span
                         v-if="isSelected(variant)"
-                        class="absolute right-2 top-2 rounded-full bg-palette-2f8f4e px-2 py-1 text-[9px] font-extrabold text-white"
+                        class="absolute right-2 top-2 rounded-full bg-accent px-2 py-1 text-[9px] font-extrabold text-white"
                       >
                         {{ tr("EquipmentPickerModal.da_chon") }}
                       </span>
@@ -229,7 +229,7 @@ onBeforeUnmount(() => window.removeEventListener("keydown", onKeydown));
         <footer class="flex justify-end border-t border-border-default px-4 py-3">
           <button
             type="button"
-            class="rounded-xl border border-border-default bg-white px-4 py-2 text-xs font-bold hover:bg-palette-eaf5e8"
+            class="rounded-xl border border-border-default bg-white px-4 py-2 text-xs font-bold hover:bg-surface"
             @click="emit('close')"
           >
             {{ tr("EquipmentPickerModal.xong") }}

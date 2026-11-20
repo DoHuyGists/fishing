@@ -189,7 +189,7 @@ function drawFishShadow(h: { x: number; y: number }) {
   ctx.save();
   ctx.translate(fx, fy);
   ctx.rotate(Math.sin(time * 11) * 0.25 * tension);
-  ctx.fillStyle = `rgba(2, 20, 28, ${0.16 + tension * 0.14})`;
+  ctx.fillStyle = `rgba(36, 53, 42, ${0.16 + tension * 0.14})`;
   ctx.filter = "blur(5px)";
   ctx.beginPath();
   ctx.ellipse(0, 0, 30, 9, 0, 0, Math.PI * 2);
@@ -209,13 +209,13 @@ function drawRipples() {
   for (const rp of ripples) {
     const life = 1 - rp.r / rp.max;
     ctx.lineWidth = rp.width;
-    ctx.strokeStyle = `rgba(235, 252, 255, ${life * 0.6})`;
+    ctx.strokeStyle = `rgba(245, 249, 240, ${life * 0.6})`;
     ctx.beginPath();
     ctx.ellipse(rp.x, rp.y, rp.r, rp.r * PERSPECTIVE, 0, 0, Math.PI * 2);
     ctx.stroke();
     // vòng trong mờ hơn tạo cảm giác gợn
     ctx.lineWidth = rp.width * 0.6;
-    ctx.strokeStyle = `rgba(120, 220, 235, ${life * 0.35})`;
+    ctx.strokeStyle = `rgba(79, 195, 255, ${life * 0.35})`;
     ctx.beginPath();
     ctx.ellipse(rp.x, rp.y, rp.r * 0.82, rp.r * 0.82 * PERSPECTIVE, 0, 0, Math.PI * 2);
     ctx.stroke();
@@ -231,8 +231,8 @@ function drawFoam() {
     ctx.translate(f.x, f.y);
     ctx.scale(1, PERSPECTIVE + 0.1);
     const g = ctx.createRadialGradient(0, 0, 0, 0, 0, r);
-    g.addColorStop(0, `rgba(255,255,255,${0.75 * (1 - k)})`);
-    g.addColorStop(1, "rgba(255,255,255,0)");
+    g.addColorStop(0, `rgba(255, 255, 255, ${0.75 * (1 - k)})`);
+    g.addColorStop(1, "rgba(255, 255, 255, 0)");
     ctx.fillStyle = g;
     ctx.beginPath();
     ctx.arc(0, 0, r, 0, Math.PI * 2);
@@ -258,7 +258,7 @@ function drawLine(h: { x: number; y: number }) {
   const fx = h.x - 34 + Math.sin(time * 9) * tension * 10;
   const fy = h.y + 30;
   ctx.lineCap = "round";
-  ctx.strokeStyle = "rgba(255,255,255,0.22)";
+  ctx.strokeStyle = "rgba(255, 255, 255, 0.22)";
   ctx.lineWidth = 1;
   ctx.beginPath();
   ctx.moveTo(h.x, h.y);
@@ -266,7 +266,7 @@ function drawLine(h: { x: number; y: number }) {
   ctx.stroke();
 
   // phần dây trên không
-  ctx.strokeStyle = "rgba(255,255,255,0.8)";
+  ctx.strokeStyle = "rgba(255, 255, 255, 0.8)";
   ctx.lineWidth = 1.2;
   ctx.beginPath();
   ctx.moveTo(tipX, tipY);
@@ -274,7 +274,7 @@ function drawLine(h: { x: number; y: number }) {
   ctx.stroke();
 
   // vệt nước kéo theo dây tại điểm chạm
-  ctx.strokeStyle = `rgba(255,255,255,${0.25 + tension * 0.4})`;
+  ctx.strokeStyle = `rgba(255, 255, 255, ${0.25 + tension * 0.4})`;
   ctx.lineWidth = 1;
   const w = 10 + tension * 18;
   ctx.beginPath();
@@ -289,7 +289,7 @@ function drawDrops() {
   if (!ctx) return;
   ctx.lineCap = "round";
   for (const d of drops) {
-    ctx.strokeStyle = "rgba(255,255,255,0.88)";
+    ctx.strokeStyle = "rgba(255, 255, 255, 0.88)";
     ctx.lineWidth = d.r;
     ctx.beginPath();
     ctx.moveTo(d.x, d.y);
@@ -364,10 +364,10 @@ defineExpose({ thrash });
   >
     <!-- ánh sáng phản chiếu trên mặt hồ -->
     <div
-      class="pointer-events-none absolute inset-0 bg-[radial-gradient(ellipse_at_70%_0%,rgba(53,185,213,0.3),transparent_60%)]"
+      class="pointer-events-none absolute inset-0 bg-[radial-gradient(ellipse_at_70%_0%,color-mix(in_srgb,_var(--color-sky)_30%,_transparent),transparent_60%)]"
     />
     <div
-      class="pointer-events-none absolute inset-0 opacity-30 mix-blend-soft-light bg-[repeating-linear-gradient(180deg,transparent_0_9px,rgba(255,255,255,0.18)_9px_10px)]"
+      class="pointer-events-none absolute inset-0 opacity-30 mix-blend-soft-light bg-[repeating-linear-gradient(180deg,transparent_0_9px,color-mix(in_srgb,_var(--color-white)_18%,_transparent)_9px_10px)]"
     />
 
     <canvas

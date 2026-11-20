@@ -6,6 +6,7 @@ import * as topojson from "topojson-client";
 import type { GeometryCollection, Topology } from "topojson-specification";
 import world from "world-atlas/countries-110m.json";
 import { createWorldMapCloudTexture } from "../../../utils/worldMapClouds";
+import { normalizeThemeColor } from '../../../utils/themePalette';
 
 const emit = defineEmits<{
   zoom: [state: ZoomState];
@@ -25,8 +26,8 @@ const props = withDefaults(
     unlockedCountryIds?: string[] | null; // null = xem toàn bộ bản đồ
   }>(),
   {
-    seaColor: "#cfe8f3",
-    landColor: "#e8e4d8",
+    seaColor: "#4fc3ff",
+    landColor: "#f5f9f0",
     borderColor: "#ffffff",
     anchor: null,
     areas: () => [],
@@ -215,7 +216,7 @@ function updateCloudLayer() {
   cloudCanvas.height = size / 2;
   const clouds = cloudCanvas.getContext("2d");
   if (!clouds) return;
-  clouds.fillStyle = (cloudTexture && clouds.createPattern(cloudTexture, "repeat")) ?? "#f4f7f9";
+  clouds.fillStyle = (cloudTexture && clouds.createPattern(cloudTexture, "repeat")) ?? "#f5f9f0";
   clouds.fillRect(0, 0, size, size / 2);
   clouds.globalCompositeOperation = "destination-in";
   clouds.drawImage(mask, 0, 0);
@@ -225,8 +226,8 @@ function updateCloudLayer() {
   cloudLayer.height = size / 2;
   const layer = cloudLayer.getContext("2d");
   if (!layer) return;
-  // A low, diffuse shadow lifts the clouds above the terrain without a dark outline.
-  layer.shadowColor = "rgba(37, 58, 74, 0.20)";
+  // A low, diffuse shadow-sm lifts the clouds above the terrain without a dark outline.
+  layer.shadowColor = "rgba(36, 53, 42, 0.2)";
   layer.shadowBlur = 9;
   layer.shadowOffsetX = 2;
   layer.shadowOffsetY = 4;
@@ -293,7 +294,7 @@ function draw() {
   // Biển
   ctx.beginPath();
   path({ type: "Sphere" });
-  ctx.fillStyle = props.seaColor;
+  ctx.fillStyle = normalizeThemeColor(props.seaColor);
   ctx.fill();
 
   if (projection && relief.complete && relief.naturalWidth > 0) {
@@ -305,7 +306,7 @@ function draw() {
 
   // Các quốc gia
   ctx.lineWidth = 0.5 / transform.k; // viền không dày lên khi zoom
-  ctx.strokeStyle = props.borderColor;
+  ctx.strokeStyle = normalizeThemeColor(props.borderColor);
   for (const feature of countries) {
     ctx.beginPath();
     path(feature);
@@ -519,7 +520,7 @@ defineExpose({ setView, resetView });
   inset: -10px;
 }
 .world-map-marker__dot.is-selected {
-  background: var(--color-palette-22c55e);
+  background: var(--color-accent);
 }
 .world-map-marker__pulse {
   position: absolute;
@@ -560,10 +561,10 @@ defineExpose({ setView, resetView });
 }
 .world-map-tip__dot {
   border: 2px solid var(--color-white);
-  background: var(--color-palette-2563eb);
+  background: var(--color-primary);
 }
 .world-map-tip__pulse {
-  background: var(--color-palette-2563eb);
+  background: var(--color-primary);
   animation: world-map-pulse 1.5s ease-out infinite;
 }
 </style>

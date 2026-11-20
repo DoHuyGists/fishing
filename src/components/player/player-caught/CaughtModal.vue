@@ -125,13 +125,13 @@ async function handleSell(priceNum: number) {
 function getRarityBadgeClass(rarity: string | null | undefined) {
   switch (rarity) {
     case "Sách đỏ":
-      return "bg-amber-100 text-amber-800 border-amber-300";
+      return "bg-surface text-gold border-gold";
     case "Quý hiếm":
-      return "bg-purple-100 text-purple-800 border-purple-300";
+      return "bg-surface text-special border-special";
     case "Khó tìm":
-      return "bg-blue-100 text-blue-800 border-blue-300";
+      return "bg-surface text-primary border-primary";
     default:
-      return "bg-gray-100 text-gray-700 border-gray-300";
+      return "bg-surface text-content border-content";
   }
 }
 
@@ -167,25 +167,25 @@ async function handleRelease() {
 </script>
 <template>
   <Modal class="caught-list-modal" :title="tr('CaughtModal.tui_ca')" :on-refresh="caughtStore.loadCaughtFishes">
-    <section class="h-full min-h-0 text-palette-263238 flex flex-col overflow-hidden">
+    <section class="h-full min-h-0 text-content flex flex-col overflow-hidden">
       <!-- Header  -->
       <div class="flex items-center justify-between gap-2 pb-3">
         <div class="flex items-center gap-2">
-          <div class="m-0 text-base font-bold text-palette-263238">{{ tr("CaughtModal.tong_so_ca") }}</div>
+          <div class="m-0 text-base font-bold text-content">{{ tr("CaughtModal.tong_so_ca") }}</div>
           <span class="px-2 py-0.5 rounded-full bg-content-strong text-white text-[11px] font-extrabold shadow-xs">
             {{ caughtStore.caughtFishes.length }}
           </span>
         </div>
         <div class="flex items-center gap-2">
           <div
-            class="flex rounded-lg border border-gray-200 bg-white p-0.5"
+            class="flex rounded-lg border border-border bg-white p-0.5"
             role="group"
             :aria-label="tr('CaughtModal.che_do_hien_thi')"
           >
             <button
               type="button"
               class="rounded-md px-2 py-1.5 text-xs font-bold transition-colors cursor-pointer"
-              :class="viewMode === 'grid' ? 'bg-content-strong text-white' : 'text-gray-600 hover:bg-gray-100'"
+              :class="viewMode === 'grid' ? 'bg-content-strong text-white' : 'text-content hover:bg-surface'"
               :aria-pressed="viewMode === 'grid'"
               :aria-label="tr('CaughtModal.hien_thi_dang_luoi')"
               @click="viewMode = 'grid'"
@@ -195,7 +195,7 @@ async function handleRelease() {
             <button
               type="button"
               class="rounded-md px-2 py-1.5 text-xs font-bold transition-colors cursor-pointer"
-              :class="viewMode === 'list' ? 'bg-content-strong text-white' : 'text-gray-600 hover:bg-gray-100'"
+              :class="viewMode === 'list' ? 'bg-content-strong text-white' : 'text-content hover:bg-surface'"
               :aria-pressed="viewMode === 'list'"
               :aria-label="tr('CaughtModal.hien_thi_dang_danh_sach')"
               @click="viewMode = 'list'"
@@ -205,7 +205,7 @@ async function handleRelease() {
             <button
               type="button"
               class="rounded-md px-2 py-1.5 text-xs font-bold transition-colors cursor-pointer"
-              :class="viewMode === 'species' ? 'bg-content-strong text-white' : 'text-gray-600 hover:bg-gray-100'"
+              :class="viewMode === 'species' ? 'bg-content-strong text-white' : 'text-content hover:bg-surface'"
               :aria-pressed="viewMode === 'species'"
               :aria-label="tr('CaughtModal.gom_theo_loai')"
               @click="viewMode = 'species'"
@@ -223,10 +223,10 @@ async function handleRelease() {
             v-model="searchQuery"
             type="text"
             :placeholder="tr('CaughtModal.tim_theo_ten_ca')"
-            class="w-full pl-8 pr-3 py-1.5 text-xs border border-gray-300 rounded-lg focus:outline-none focus:border-gray-300 bg-gray-50/80"
+            class="w-full pl-8 pr-3 py-1.5 text-xs border border-content rounded-lg focus:outline-none focus:border-content bg-white/80"
           />
           <svg
-            class="w-3.5 h-3.5 absolute left-2.5 top-2.5 text-gray-400"
+            class="w-3.5 h-3.5 absolute left-2.5 top-2.5 text-content"
             fill="none"
             stroke="currentColor"
             viewBox="0 0 24 24"
@@ -249,8 +249,8 @@ async function handleRelease() {
             class="px-2 py-0.5 rounded-md border text-[11px] transition-colors cursor-pointer whitespace-nowrap"
             :class="
               selectedRarity === 'ALL'
-                ? 'bg-content-strong text-white border-gray-300 font-bold'
-                : 'bg-gray-100 text-gray-700 border-gray-200 hover:bg-gray-200'
+                ? 'bg-content-strong text-white border-content font-bold'
+                : 'bg-surface text-content border-border hover:bg-surface'
             "
             @click="selectedRarity = 'ALL'"
           >
@@ -263,8 +263,8 @@ async function handleRelease() {
             class="px-2 py-0.5 rounded-md border text-[11px] transition-colors cursor-pointer whitespace-nowrap"
             :class="
               selectedRarity === rarity
-                ? 'bg-content-strong text-white border-gray-300 font-bold'
-                : 'bg-gray-100 text-gray-700 border-gray-200 hover:bg-gray-200'
+                ? 'bg-content-strong text-white border-content font-bold'
+                : 'bg-surface text-content border-border hover:bg-surface'
             "
             @click="selectedRarity = rarity"
           >
@@ -278,10 +278,10 @@ async function handleRelease() {
         class="h-0 grow overflow-y-auto pr-1 gap-3 content-start"
         :class="viewMode !== 'list' ? 'grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 xl:grid-cols-6' : 'flex flex-col'"
       >
-        <div v-if="caughtStore.isLoadingCaught" class="col-span-full text-center text-xs text-gray-500">
+        <div v-if="caughtStore.isLoadingCaught" class="col-span-full text-center text-xs text-content">
           {{ tr("CaughtModal.dang_tai_danh_sach_ca") }}
         </div>
-        <div v-else-if="!filteredCaughtFishes.length" class="col-span-full py-12 text-center text-xs text-gray-400">
+        <div v-else-if="!filteredCaughtFishes.length" class="col-span-full py-12 text-center text-xs text-content">
           {{
             searchQuery || selectedRarity !== "ALL"
               ? tr("CaughtModal.khong_tim_thay_ca_phu_hop")
@@ -292,20 +292,20 @@ async function handleRelease() {
           <article
             v-for="group in paginatedFishGroups"
             :key="group.id"
-            class="slide-fade-in from-bottom player-content-in min-w-0 overflow-hidden h-fit border border-gray-200 hover:border-emerald-300 rounded-xl bg-gray-50/70 transition-all shadow-sm"
+            class="slide-fade-in from-bottom player-content-in min-w-0 overflow-hidden h-fit border border-border hover:border-accent rounded-xl bg-white/70 transition-all shadow-sm"
           >
             <div class="relative">
               <img
                 :src="group.fishes[0].species?.image || '/fish/VN/fish.jpg'"
                 :alt="group.fishes[0].species?.name || tr('CaughtModal.ca')"
-                class="object-cover bg-gray-200 w-full h-36 border-b border-gray-200"
+                class="object-cover bg-surface w-full h-36 border-b border-border"
               />
               <ShinySparkles v-if="group.fishes.some((fish) => fish.is_shiny)" />
             </div>
             <div class="min-w-0 flex-1 p-2">
               <div class="flex items-start justify-between gap-2">
                 <div class="min-w-0">
-                  <div class="m-0 truncate font-bold text-xs text-palette-263238">
+                  <div class="m-0 truncate font-bold text-xs text-content">
                     {{ group.fishes[0].species?.name || tr("CaughtModal.ca_chua_ro_ten") }}
                   </div>
                   <span
@@ -322,7 +322,7 @@ async function handleRelease() {
               </div>
               <button
                 type="button"
-                class="mt-2 w-full px-2 py-1.5 rounded-lg border border-emerald-200 bg-emerald-50 hover:bg-emerald-100 text-emerald-800 font-bold text-xs transition-colors cursor-pointer"
+                class="mt-2 w-full px-2 py-1.5 rounded-lg border border-accent bg-surface hover:bg-surface text-content font-bold text-xs transition-colors cursor-pointer"
                 :aria-expanded="expandedSpecies === group.id"
                 @click="expandedSpecies = expandedSpecies === group.id ? null : group.id"
               >
@@ -330,16 +330,16 @@ async function handleRelease() {
               </button>
               <div
                 v-if="expandedSpecies === group.id"
-                class="mt-2 space-y-2 border-t border-gray-200 pt-2 overflow-y-scroll h-60"
+                class="mt-2 space-y-2 border-t border-border pt-2 overflow-y-scroll h-60"
               >
                 <div
                   v-for="fish in group.fishes"
                   :key="fish.id"
-                  class="relative rounded-lg bg-white p-2 text-[10px] text-gray-600"
+                  class="relative rounded-lg bg-white p-2 text-[10px] text-content"
                 >
                   <ShinySparkles v-if="fish.is_shiny" />
                   <div class="flex items-center justify-between gap-2">
-                    <span class="font-semibold text-gray-800">{{ fish.weight }} kg</span>
+                    <span class="font-semibold text-content">{{ fish.weight }} kg</span>
                     <span class="shrink-0">{{ formatDateTime(fish.created_at) }}</span>
                   </div>
                   <CaughtFishTraits :fish="fish" class="mt-1" />
@@ -351,11 +351,11 @@ async function handleRelease() {
                   >
                     {{ fish.origin.country }} - {{ fish.origin.name }}
                   </button>
-                  <span v-else class="mt-1 block text-emerald-700">{{ tr("CaughtModal.nguon_nuoi_tai_ao") }}</span>
+                  <span v-else class="mt-1 block text-content">{{ tr("CaughtModal.nguon_nuoi_tai_ao") }}</span>
                   <div class="mt-2 flex gap-2">
                     <button
                       type="button"
-                      class="px-2 py-1 border border-emerald-200 rounded-lg bg-emerald-50 hover:bg-emerald-100 text-emerald-700 font-bold transition-colors cursor-pointer"
+                      class="px-2 py-1 border border-accent rounded-lg bg-surface hover:bg-surface text-content font-bold transition-colors cursor-pointer"
                       :title="tr('CaughtModal.dang_ban')"
                       @click="openSellConfirm(fish)"
                     >
@@ -363,7 +363,7 @@ async function handleRelease() {
                     </button>
                     <button
                       type="button"
-                      class="px-2 py-1 border border-red-200 rounded-lg bg-red-50 hover:bg-red-100 text-red-600 font-bold transition-colors cursor-pointer"
+                      class="px-2 py-1 border border-danger rounded-lg bg-surface hover:bg-surface text-danger font-bold transition-colors cursor-pointer"
                       :title="tr('CaughtModal.tha_ca_ve_lai_tu_nhien')"
                       @click="openReleaseConfirm(fish)"
                     >
@@ -379,14 +379,14 @@ async function handleRelease() {
           v-else
           v-for="item in paginatedCaughtFishes"
           :key="item.id"
-          class="slide-fade-in from-bottom player-content-in relative min-w-0 p-2 border border-gray-200 hover:border-emerald-300 rounded-xl bg-gray-50/70 hover:bg-emerald-50/30 transition-all shadow-sm"
+          class="slide-fade-in from-bottom player-content-in relative min-w-0 p-2 border border-border hover:border-accent rounded-xl bg-white/70 hover:bg-surface/30 transition-all shadow-sm"
           :class="viewMode === 'grid' ? 'flex flex-col gap-2' : 'flex items-center gap-3'"
         >
           <ShinySparkles v-if="item.is_shiny" />
           <img
             :src="item.species?.image || '/fish/VN/fish.jpg'"
             :alt="item.species?.name"
-            class="rounded-lg object-cover border border-gray-200 bg-gray-200"
+            class="rounded-lg object-cover border border-border bg-surface"
             :class="viewMode === 'grid' ? 'w-full h-36' : 'w-fit h-20 shrink-0'"
           />
           <div
@@ -395,14 +395,14 @@ async function handleRelease() {
           >
             <div class="flex-1 min-w-0 flex flex-col gap-0.5">
               <div class="flex items-center justify-between gap-1">
-                <span class="font-bold text-xs truncate text-palette-263238">{{ item.species?.name }}</span>
+                <span class="font-bold text-xs truncate text-content">{{ item.species?.name }}</span>
               </div>
-              <div class="flex items-center gap-2 text-[11px] text-gray-600">
+              <div class="flex items-center gap-2 text-[11px] text-content">
                 <span>{{
                   typeof item.species?.weight === "number" ? item.species.weight + " kg" : item.species?.weight
                 }}</span>
               </div>
-              <div class="flex items-center justify-between text-[10px] text-gray-400">
+              <div class="flex items-center justify-between text-[10px] text-content">
                 <span class="shrink-0 ml-1">{{ formatDateTime(item.created_at!) }}</span>
               </div>
               <div>
@@ -420,13 +420,13 @@ async function handleRelease() {
                 >
                   {{ item.origin.country }} - {{ item.origin.name }}
                 </div>
-                <div v-else class="mt-1 text-xs text-emerald-700">{{ tr("CaughtModal.nguon_nuoi_tai_ao") }}</div>
+                <div v-else class="mt-1 text-xs text-content">{{ tr("CaughtModal.nguon_nuoi_tai_ao") }}</div>
               </div>
             </div>
             <div class="flex gap-2 shrink-0">
               <button
                 type="button"
-                class="px-2 py-1.5 border border-emerald-200 rounded-lg bg-emerald-50 hover:bg-emerald-100 text-emerald-700 font-bold text-xs transition-colors cursor-pointer"
+                class="px-2 py-1.5 border border-accent rounded-lg bg-surface hover:bg-surface text-content font-bold text-xs transition-colors cursor-pointer"
                 :title="tr('CaughtModal.dang_ban')"
                 @click="openSellConfirm(item)"
               >
@@ -434,7 +434,7 @@ async function handleRelease() {
               </button>
               <button
                 type="button"
-                class="px-2 py-1.5 border border-red-200 rounded-lg bg-red-50 hover:bg-red-100 text-red-600 font-bold text-xs transition-colors cursor-pointer"
+                class="px-2 py-1.5 border border-danger rounded-lg bg-surface hover:bg-surface text-danger font-bold text-xs transition-colors cursor-pointer"
                 :title="tr('CaughtModal.tha_ca_ve_lai_tu_nhien')"
                 @click="openReleaseConfirm(item)"
               >
@@ -446,9 +446,9 @@ async function handleRelease() {
       </div>
       <div
         v-if="(viewMode === 'species' ? groupedCaughtFishes.length : filteredCaughtFishes.length) > pageSize"
-        class="flex items-center justify-between gap-3 border-t border-gray-200 pt-3 mt-3 text-xs"
+        class="flex items-center justify-between gap-3 border-t border-border pt-3 mt-3 text-xs"
       >
-        <span class="text-gray-500"
+        <span class="text-content"
           >{{ tr("CaughtModal.trang") }} {{ currentPage }} / {{ pageCount }} ({{
             viewMode === "species"
               ? tr("CaughtModal.value0_loai", { value0: groupedCaughtFishes.length })
@@ -458,7 +458,7 @@ async function handleRelease() {
         <div class="flex gap-2">
           <button
             type="button"
-            class="px-3 py-1.5 rounded-lg border border-gray-300 disabled:opacity-40"
+            class="px-3 py-1.5 rounded-lg border border-content disabled:opacity-40"
             :disabled="currentPage === 1"
             @click="currentPage--"
           >
@@ -466,7 +466,7 @@ async function handleRelease() {
           </button>
           <button
             type="button"
-            class="px-3 py-1.5 rounded-lg border border-gray-300 disabled:opacity-40"
+            class="px-3 py-1.5 rounded-lg border border-content disabled:opacity-40"
             :disabled="currentPage === pageCount"
             @click="currentPage++"
           >

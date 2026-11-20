@@ -70,7 +70,7 @@ onMounted(() => store.fetchAll());
       </button>
       <button
         type="button"
-        class="rounded-lg bg-content px-4 py-2 text-sm font-semibold text-white hover:bg-palette-314a39"
+        class="rounded-lg bg-content px-4 py-2 text-sm font-semibold text-white hover:bg-content"
         @click="store.openCreate()"
       >
         + Thêm phạm vi
@@ -78,24 +78,24 @@ onMounted(() => store.fetchAll());
     </div>
 
     <main class="min-h-0 flex-1 overflow-auto p-4 sm:p-8">
-      <div v-if="store.error" class="mb-4 rounded-lg border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-700">
+      <div v-if="store.error" class="mb-4 rounded-lg border border-danger bg-surface px-4 py-3 text-sm text-danger">
         {{ store.error }}
       </div>
-      <div v-if="actionError" class="mb-4 rounded-lg border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-700">
+      <div v-if="actionError" class="mb-4 rounded-lg border border-danger bg-surface px-4 py-3 text-sm text-danger">
         {{ actionError }}
       </div>
-      <div v-if="store.loading && !store.items.length" class="py-16 text-center text-sm text-gray-500">
+      <div v-if="store.loading && !store.items.length" class="py-16 text-center text-sm text-content">
         Đang tải danh sách…
       </div>
       <div
         v-else-if="!filteredItems.length"
-        class="rounded-xl border border-dashed border-border-default bg-white py-16 text-center text-sm text-gray-500"
+        class="rounded-xl border border-dashed border-border-default bg-white py-16 text-center text-sm text-content"
       >
         {{ search ? "Không tìm thấy phạm vi phù hợp." : "Chưa có phạm vi độ sâu nào." }}
       </div>
       <div v-else class="overflow-x-auto rounded-xl border border-border-default bg-white shadow-sm">
         <table class="w-full min-w-[1070px] border-collapse text-left text-sm">
-          <thead class="bg-surface text-xs uppercase tracking-wide text-gray-600">
+          <thead class="bg-surface text-xs uppercase tracking-wide text-content">
             <tr>
               <th class="px-4 py-3">Mã</th>
               <th class="px-4 py-3">Tên</th>
@@ -109,7 +109,7 @@ onMounted(() => store.fetchAll());
             </tr>
           </thead>
           <tbody>
-            <tr v-for="item in filteredItems" :key="item.id" class="border-t border-palette-e5ece2 hover:bg-surface/70">
+            <tr v-for="item in filteredItems" :key="item.id" class="border-t border-border hover:bg-surface/70">
               <td class="px-4 py-3 font-mono font-semibold">{{ item.code }}</td>
               <td class="px-4 py-3 font-medium">{{ item.name }}</td>
               <td class="px-4 py-3">{{ item.minDepth.toFixed(2) }}</td>
@@ -152,9 +152,9 @@ onMounted(() => store.fetchAll());
                     <text x="104" y="90" text-anchor="middle">Độ sâu (m)</text>
                   </g>
                 </svg>
-                <span v-else class="text-xs text-gray-500">Thông số không hợp lệ</span>
+                <span v-else class="text-xs text-content">Thông số không hợp lệ</span>
               </td>
-              <td class="px-4 py-3 text-gray-500">{{ formatDate(item.updatedAt) }}</td>
+              <td class="px-4 py-3 text-content">{{ formatDate(item.updatedAt) }}</td>
               <td class="px-4 py-3">
                 <div class="flex justify-end gap-2">
                   <button
@@ -165,7 +165,7 @@ onMounted(() => store.fetchAll());
                     Sửa</button
                   ><button
                     type="button"
-                    class="rounded-lg border border-red-200 px-3 py-1.5 text-xs font-semibold text-red-700 hover:bg-red-50"
+                    class="rounded-lg border border-danger px-3 py-1.5 text-xs font-semibold text-danger hover:bg-surface"
                     @click="deleteTarget = { id: item.id, name: item.name }"
                   >
                     Xóa
@@ -181,12 +181,12 @@ onMounted(() => store.fetchAll());
     <DepthScopeForm />
     <div
       v-if="deleteTarget"
-      class="fixed inset-0 z-[70] grid place-items-center bg-black/40 p-4"
+      class="fixed inset-0 z-[70] grid place-items-center bg-content/40 p-4"
       @click.self="deleteTarget = null"
     >
       <div class="w-full max-w-sm rounded-2xl border border-border-default bg-white p-5 shadow-xl">
         <div class="m-0 text-lg font-bold">Xác nhận xóa</div>
-        <div class="my-3 text-sm text-gray-600">
+        <div class="my-3 text-sm text-content">
           Xóa phạm vi “{{ deleteTarget.name }}”? Thao tác này không thể hoàn tác.
         </div>
         <div class="flex justify-end gap-2">
@@ -199,7 +199,7 @@ onMounted(() => store.fetchAll());
           ><button
             type="button"
             :disabled="deleting"
-            class="rounded-lg bg-red-600 px-4 py-2 text-sm font-semibold text-white disabled:opacity-50"
+            class="rounded-lg bg-danger px-4 py-2 text-sm font-semibold text-white disabled:opacity-50"
             @click="remove"
           >
             {{ deleting ? "Đang xóa…" : "Xóa" }}

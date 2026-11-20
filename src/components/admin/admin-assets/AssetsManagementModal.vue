@@ -86,7 +86,7 @@ onMounted(() => {
           type="search"
           aria-label="Tìm tên tệp"
           placeholder="Tìm tên tệp…"
-          class="min-w-48 flex-1 rounded-lg border border-border-default bg-white px-3 py-2 text-sm focus:outline-emerald-700"
+          class="min-w-48 flex-1 rounded-lg border border-border-default bg-white px-3 py-2 text-sm focus:outline-accent"
         />
         <select
           v-if="selectionKind !== 'image'"
@@ -107,7 +107,7 @@ onMounted(() => {
             :aria-pressed="store.viewMode === mode.value"
             :disabled="store.busy"
             class="rounded-md px-3 py-1 text-sm font-semibold disabled:opacity-50"
-            :class="store.viewMode === mode.value ? 'bg-emerald-800 text-white' : 'hover:bg-surface'"
+            :class="store.viewMode === mode.value ? 'bg-accent text-white' : 'hover:bg-surface'"
             @click="store.viewMode = mode.value"
           >
             {{ mode.label }}
@@ -135,7 +135,7 @@ onMounted(() => {
         <button
           type="button"
           :disabled="store.loading || store.busy"
-          class="rounded-lg bg-emerald-800 px-4 py-2 text-sm font-bold text-white hover:bg-emerald-900 disabled:opacity-50"
+          class="rounded-lg bg-accent px-4 py-2 text-sm font-bold text-white hover:bg-accent disabled:opacity-50"
           @click="fileInput?.click()"
         >
           {{ store.uploading ? "Đang tải lên…" : selectionKind === "image" ? "+ Tải ảnh" : "+ Tải ảnh / video" }}
@@ -149,7 +149,7 @@ onMounted(() => {
               type="button"
               :disabled="store.loading || store.busy"
               :aria-current="crumb.folder === store.currentFolder ? 'location' : undefined"
-              class="break-all rounded px-2 py-1 hover:bg-emerald-100 disabled:opacity-50"
+              class="break-all rounded px-2 py-1 hover:bg-surface disabled:opacity-50"
               :class="{ 'font-bold': crumb.folder === store.currentFolder }"
               @click="store.navigate(crumb.folder)"
             >
@@ -188,10 +188,10 @@ onMounted(() => {
           <input v-model="store.includeDescendants" type="checkbox" /> Bao gồm thư mục con
         </label>
         <div v-else class="flex items-center gap-2 text-xs">
-          <button type="button" class="rounded px-2 py-1 hover:bg-emerald-100" @click="store.expandAll()">
+          <button type="button" class="rounded px-2 py-1 hover:bg-surface" @click="store.expandAll()">
             Mở tất cả
           </button>
-          <button type="button" class="rounded px-2 py-1 hover:bg-emerald-100" @click="store.collapseAll()">
+          <button type="button" class="rounded px-2 py-1 hover:bg-surface" @click="store.collapseAll()">
             Thu gọn
           </button>
         </div>
@@ -215,14 +215,14 @@ onMounted(() => {
       <div
         v-if="store.error"
         role="alert"
-        class="mb-4 rounded-lg border border-red-200 bg-red-50 p-3 text-sm text-red-700"
+        class="mb-4 rounded-lg border border-danger bg-surface p-3 text-sm text-danger"
       >
         {{ store.error }}
       </div>
       <div
         v-if="store.uploadErrors.length"
         role="alert"
-        class="mb-4 max-h-48 overflow-auto rounded-lg border border-red-200 bg-red-50 p-3 text-sm text-red-700"
+        class="mb-4 max-h-48 overflow-auto rounded-lg border border-danger bg-surface p-3 text-sm text-danger"
       >
         <div class="font-semibold">Các tệp chưa tải lên được:</div>
         <div class="mt-2 space-y-1 break-words">
@@ -265,14 +265,14 @@ onMounted(() => {
         >
           <div
             v-if="entry.type === 'folder'"
-            class="flex h-full min-w-0 items-center gap-2 rounded-xl border border-border-default bg-palette-eaf1e5 p-3"
+            class="flex h-full min-w-0 items-center gap-2 rounded-xl border border-border-default bg-surface p-3"
           >
             <button
               v-if="store.viewMode === 'tree'"
               type="button"
               :aria-label="`${entry.expanded ? 'Thu gọn' : 'Mở rộng'} ${entry.folder}`"
               :aria-expanded="entry.expanded"
-              class="size-8 shrink-0 rounded border border-border-default bg-white font-bold hover:bg-emerald-100"
+              class="size-8 shrink-0 rounded border border-border-default bg-white font-bold hover:bg-surface"
               @click="store.toggleFolder(entry.folder)"
             >
               {{ entry.expanded ? "−" : "+" }}
@@ -303,7 +303,7 @@ onMounted(() => {
             :class="{ 'sm:flex sm:items-center': store.viewMode !== 'grid' }"
           >
             <div
-              class="flex shrink-0 items-center justify-center bg-palette-eaf1e5"
+              class="flex shrink-0 items-center justify-center bg-surface"
               :class="store.viewMode === 'grid' ? 'aspect-video' : 'h-32 sm:h-24 sm:w-32'"
             >
               <img
@@ -336,7 +336,7 @@ onMounted(() => {
                 <button
                   type="button"
                   :disabled="store.loading || store.busy"
-                  class="max-w-full break-all text-left text-xs text-emerald-800 underline disabled:opacity-50"
+                  class="max-w-full break-all text-left text-xs text-content underline disabled:opacity-50"
                   @click="store.navigate(entry.row.folder)"
                 >
                   {{ entry.row.folder || "Thư mục gốc" }}
@@ -356,7 +356,7 @@ onMounted(() => {
                   type="button"
                   :disabled="store.loading || store.busy"
                   :aria-label="`Dùng link ${entry.row.name}`"
-                  class="rounded-lg bg-emerald-800 px-3 py-2 text-xs font-bold text-white hover:bg-emerald-900 disabled:opacity-50"
+                  class="rounded-lg bg-accent px-3 py-2 text-xs font-bold text-white hover:bg-accent disabled:opacity-50"
                   @click="selectAsset(entry.row)"
                 >
                   Dùng link
@@ -364,7 +364,7 @@ onMounted(() => {
                 <button
                   type="button"
                   :aria-label="`Sao chép link ${entry.row.name}`"
-                  class="rounded-lg border border-border-default px-3 py-1.5 text-xs font-semibold hover:bg-emerald-100"
+                  class="rounded-lg border border-border-default px-3 py-1.5 text-xs font-semibold hover:bg-surface"
                   @click="store.copyLink(entry.row)"
                 >
                   Copy link
@@ -373,7 +373,7 @@ onMounted(() => {
                   type="button"
                   :disabled="store.loading || store.busy"
                   :aria-label="`Chuyển thư mục cho ${entry.row.name}`"
-                  class="rounded-lg border border-border-default px-3 py-1.5 text-xs font-semibold hover:bg-emerald-100 disabled:opacity-50"
+                  class="rounded-lg border border-border-default px-3 py-1.5 text-xs font-semibold hover:bg-surface disabled:opacity-50"
                   @click="store.requestMove(entry.row)"
                 >
                   Chuyển
@@ -382,7 +382,7 @@ onMounted(() => {
                   type="button"
                   :disabled="store.loading || store.busy"
                   :aria-label="`Xóa ${entry.row.name}`"
-                  class="rounded-lg border border-red-200 px-3 py-1.5 text-xs font-semibold text-red-700 hover:bg-red-50 disabled:opacity-50"
+                  class="rounded-lg border border-danger px-3 py-1.5 text-xs font-semibold text-danger hover:bg-surface disabled:opacity-50"
                   @click="store.requestDelete(entry.row)"
                 >
                   Xóa
@@ -445,7 +445,7 @@ onMounted(() => {
             : "Link ảnh/video đang sử dụng sẽ được giữ nguyên."
         }}
       </div>
-      <div v-if="store.folderError" role="alert" class="mt-3 break-words text-sm text-red-700">
+      <div v-if="store.folderError" role="alert" class="mt-3 break-words text-sm text-danger">
         {{ store.folderError }}
       </div>
     </TwoOptionsModal>
@@ -464,7 +464,7 @@ onMounted(() => {
         Xóa “{{ store.deleting.name }}”? Các nội dung đang sử dụng link này sẽ không còn hiển thị tệp. Thao tác không
         thể hoàn tác.
       </div>
-      <div v-if="store.deleteError" role="alert" class="mt-3 text-sm text-red-700">{{ store.deleteError }}</div>
+      <div v-if="store.deleteError" role="alert" class="mt-3 text-sm text-danger">{{ store.deleteError }}</div>
     </TwoOptionsModal>
   </AdminModal>
 </template>

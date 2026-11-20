@@ -45,7 +45,7 @@ async function submit() {
 <template>
   <div
     v-if="store.formOpen && draft"
-    class="fixed inset-0 z-[60] grid place-items-center bg-black/40 p-4"
+    class="fixed inset-0 z-[60] grid place-items-center bg-content/40 p-4"
     @click.self="store.closeForm()"
   >
     <form class="w-full max-w-lg rounded-2xl border border-border-default bg-white shadow-xl" @submit.prevent="submit">
@@ -54,12 +54,12 @@ async function submit() {
           <div class="m-0 text-lg font-bold text-content">
             {{ store.editingId ? "Chỉnh sửa phạm vi" : "Thêm phạm vi độ sâu" }}
           </div>
-          <div class="m-0 mt-1 text-xs text-gray-500">Thiết lập khoảng độ sâu và hình dạng đường cong.</div>
+          <div class="m-0 mt-1 text-xs text-content">Thiết lập khoảng độ sâu và hình dạng đường cong.</div>
         </div>
         <button
           type="button"
           aria-label="Đóng"
-          class="rounded-lg px-2 py-1 text-xl text-gray-500 hover:bg-gray-100"
+          class="rounded-lg px-2 py-1 text-xl text-content hover:bg-surface"
           @click="store.closeForm()"
         >
           &times;
@@ -129,7 +129,7 @@ async function submit() {
         </label>
         <div
           v-if="error"
-          class="m-0 rounded-lg border border-red-200 bg-red-50 px-3 py-2 text-xs text-red-700 sm:col-span-2"
+          class="m-0 rounded-lg border border-danger bg-surface px-3 py-2 text-xs text-danger sm:col-span-2"
         >
           {{ error }}
         </div>
@@ -145,7 +145,7 @@ async function submit() {
         <button
           type="submit"
           :disabled="store.saving"
-          class="rounded-lg bg-content px-4 py-2 text-sm font-semibold text-white hover:bg-palette-314a39 disabled:opacity-50"
+          class="rounded-lg bg-content px-4 py-2 text-sm font-semibold text-white hover:bg-content disabled:opacity-50"
         >
           {{ store.saving ? "Đang lưu…" : "Lưu" }}
         </button>

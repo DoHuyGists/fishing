@@ -388,16 +388,16 @@ export const useFishingStore = defineStore("fishing", {
         }
 
         const colors = [
-          "#d99157",
-          "#a783cf",
-          "#59a9a0",
-          "#3b82f6",
-          "#ef4444",
-          "#f59e0b",
-          "#10b981",
-          "#8b5cf6",
-          "#ec4899",
-          "#14b8a6",
+          "#ffd166",
+          "#a66bff",
+          "#1abc9c",
+          "#1e5fbf",
+          "#f75353",
+          "#ffd166",
+          "#1abc9c",
+          "#a66bff",
+          "#a66bff",
+          "#1abc9c",
         ];
 
         this.nearbyPlayers = rows.map((row) => {

@@ -31,7 +31,7 @@ const titleId = useId();
       <div class="flex min-w-0 items-center gap-3">
         <span
           v-if="icon"
-          class="grid size-10 shrink-0 place-items-center rounded-lg border border-emerald-400/30 bg-emerald-800 text-xl"
+          class="grid size-10 shrink-0 place-items-center rounded-lg border border-accent/30 bg-accent text-xl"
           aria-hidden="true"
         >{{ icon }}</span>
         <div :id="titleId" class="m-0 min-w-0 break-words text-lg font-extrabold">{{ title }}</div>
@@ -41,7 +41,7 @@ const titleId = useId();
         title="Đóng"
         aria-label="Đóng"
         :disabled="closeDisabled"
-        class="grid size-9 shrink-0 cursor-pointer place-items-center rounded-lg border border-emerald-600 bg-emerald-900/50 text-xl hover:bg-emerald-800 focus-visible:outline-2 focus-visible:outline-emerald-300 disabled:cursor-not-allowed disabled:opacity-50"
+        class="grid size-9 shrink-0 cursor-pointer place-items-center rounded-lg border border-accent bg-accent/50 text-xl hover:bg-accent focus-visible:outline-2 focus-visible:outline-accent disabled:cursor-not-allowed disabled:opacity-50"
         @click="emit('close')"
       >&times;</button>
     </header>

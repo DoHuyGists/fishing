@@ -18,7 +18,7 @@ function formatDate(value: string) {
     <div class="flex shrink-0 justify-end border-b border-border-default bg-white px-4 py-3 sm:px-6">
       <button
         type="button"
-        class="rounded-lg border border-slate-300 px-3 py-2 text-sm hover:bg-slate-50"
+        class="rounded-lg border border-content px-3 py-2 text-sm hover:bg-white"
         :disabled="store.loading"
         @click="store.fetchOpinionFeedback()"
       >
@@ -26,33 +26,33 @@ function formatDate(value: string) {
       </button>
     </div>
     <div class="min-h-0 flex-1 overflow-auto p-4 sm:p-6">
-      <div v-if="store.error" role="alert" class="mb-4 rounded-lg bg-red-50 px-4 py-3 text-sm text-red-700">
+      <div v-if="store.error" role="alert" class="mb-4 rounded-lg bg-surface px-4 py-3 text-sm text-danger">
         {{ store.error }}
       </div>
-      <div v-if="store.loading" class="py-10 text-center text-sm text-slate-500">Đang tải góp ý…</div>
-      <div v-else-if="!store.opinionFeedback.length" class="py-10 text-center text-sm text-slate-500">
+      <div v-if="store.loading" class="py-10 text-center text-sm text-content">Đang tải góp ý…</div>
+      <div v-else-if="!store.opinionFeedback.length" class="py-10 text-center text-sm text-content">
         Chưa có góp ý nào.
       </div>
       <div v-else class="space-y-4">
-        <article v-for="item in store.opinionFeedback" :key="item.id" class="rounded-xl border border-slate-200 p-4">
+        <article v-for="item in store.opinionFeedback" :key="item.id" class="rounded-xl border border-border p-4">
           <div class="mb-3 flex flex-wrap items-center justify-between gap-2">
-            <span class="text-xs text-slate-500"
+            <span class="text-xs text-content"
               >{{ formatDate(item.created_at) }} · Người dùng {{ item.user_id ?? "đã xóa tài khoản" }}</span
-            ><span class="font-mono text-xs text-slate-400">{{ item.id }}</span>
+            ><span class="font-mono text-xs text-content">{{ item.id }}</span>
           </div>
           <div class="grid gap-3 md:grid-cols-2">
             <div>
-              <div class="text-xs font-semibold uppercase tracking-wide text-emerald-800">Điều người chơi thích</div>
-              <div class="mt-1 whitespace-pre-wrap text-sm text-slate-700">{{ item.like }}</div>
+              <div class="text-xs font-semibold uppercase tracking-wide text-content">Điều người chơi thích</div>
+              <div class="mt-1 whitespace-pre-wrap text-sm text-content">{{ item.like }}</div>
             </div>
             <div>
-              <div class="text-xs font-semibold uppercase tracking-wide text-amber-800">Điều chưa hài lòng</div>
-              <div class="mt-1 whitespace-pre-wrap text-sm text-slate-700">{{ item.dislike }}</div>
+              <div class="text-xs font-semibold uppercase tracking-wide text-gold">Điều chưa hài lòng</div>
+              <div class="mt-1 whitespace-pre-wrap text-sm text-content">{{ item.dislike }}</div>
             </div>
           </div>
-          <div v-if="item.contribute" class="mt-3 border-t border-slate-100 pt-3">
-            <div class="text-xs font-semibold uppercase tracking-wide text-indigo-800">Ý tưởng</div>
-            <div class="mt-1 whitespace-pre-wrap text-sm text-slate-700">{{ item.contribute }}</div>
+          <div v-if="item.contribute" class="mt-3 border-t border-border pt-3">
+            <div class="text-xs font-semibold uppercase tracking-wide text-primary">Ý tưởng</div>
+            <div class="mt-1 whitespace-pre-wrap text-sm text-content">{{ item.contribute }}</div>
           </div>
         </article>
       </div>

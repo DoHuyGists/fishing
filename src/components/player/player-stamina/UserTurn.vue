@@ -38,6 +38,6 @@ const userTurnsStore = useUserTurnsStore();
     >
       {{ tr("UserTurn.1_sau") }} {{ userTurnsStore.countdown }}
     </span>
-    <span v-else-if="userTurnsStore.error" class="text-xs text-red-700">{{ tr("UserTurn.khong_tai_duoc") }}</span>
+    <span v-else-if="userTurnsStore.error" class="text-xs text-danger">{{ tr("UserTurn.khong_tai_duoc") }}</span>
   </button>
 </template>

@@ -51,13 +51,13 @@ onUnmounted(() => {
               >{{ section.icon }}</span
             >
             <div :id="`rule-${section.key}`" class="text-sm font-bold leading-5">
-              <span class="mr-1 text-palette-61745d">{{ String(index + 1).padStart(2, "0") }}.</span>
+              <span class="mr-1 text-content">{{ String(index + 1).padStart(2, "0") }}.</span>
               {{ tr(`RuleModal.${section.key}Title`) }}
             </div>
           </div>
           <div class="space-y-2 text-sm leading-6">
             <div v-for="item in ['first', 'second']" :key="item" class="flex items-start gap-2">
-              <span aria-hidden="true" class="mt-2.5 size-1.5 shrink-0 rounded-full bg-palette-61745d"></span>
+              <span aria-hidden="true" class="mt-2.5 size-1.5 shrink-0 rounded-full bg-content"></span>
               <div>{{ tr(`RuleModal.${section.key}_${item}`) }}</div>
             </div>
           </div>
@@ -70,14 +70,14 @@ onUnmounted(() => {
         <div class="mt-4 flex flex-wrap gap-2">
           <button
             type="button"
-            class="rounded-lg border border-palette-527547 bg-palette-527547 px-4 py-2 text-sm font-semibold text-white transition-colors hover:bg-palette-405e37 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-palette-527547"
+            class="rounded-lg border border-accent bg-accent px-4 py-2 text-sm font-semibold text-white transition-colors hover:bg-content focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-accent"
             @click="modalStore.open('feedback')"
           >
             {{ tr("RuleModal.reportAction") }}
           </button>
           <button
             type="button"
-            class="rounded-lg border border-border-default bg-white px-4 py-2 text-sm font-semibold transition-colors hover:bg-palette-edf5e5 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-palette-527547"
+            class="rounded-lg border border-border-default bg-white px-4 py-2 text-sm font-semibold transition-colors hover:bg-surface focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-accent"
             @click="modalStore.close()"
           >
             {{ tr("RuleModal.close") }}

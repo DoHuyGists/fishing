@@ -32,20 +32,20 @@ onMounted(() => store.loadCodes());
 
 <template>
   <AdminModal title="Quản lý mã đổi thưởng" icon="🎟️" @close="emit('close')">
-    <div class="flex shrink-0 flex-wrap items-center gap-3 border-b border-gray-200 bg-white px-5 py-3 md:px-7">
+    <div class="flex shrink-0 flex-wrap items-center gap-3 border-b border-border bg-white px-5 py-3 md:px-7">
       <div class="min-w-55 flex-1">
         <input
           v-model="store.search"
           type="search"
           placeholder="Tìm mã đổi thưởng..."
-          class="w-full rounded-lg border border-gray-300 bg-gray-50 px-3 py-2 text-sm focus:border-emerald-600 focus:outline-none"
+          class="w-full rounded-lg border border-content bg-white px-3 py-2 text-sm focus:border-accent focus:outline-none"
         />
       </div>
-      <label class="flex items-center gap-2 text-xs font-semibold text-gray-600"
+      <label class="flex items-center gap-2 text-xs font-semibold text-content"
         >Trạng thái
         <select
           v-model="store.statusFilter"
-          class="rounded-lg border border-gray-300 bg-white px-2.5 py-2 text-sm text-gray-700"
+          class="rounded-lg border border-content bg-white px-2.5 py-2 text-sm text-content"
         >
           <option value="ALL">Tất cả</option>
           <option value="ACTIVE">Đang bật</option>
@@ -54,11 +54,11 @@ onMounted(() => store.loadCodes());
         </select>
       </label>
       <div class="ml-auto flex items-center gap-2">
-        <span class="hidden text-xs text-gray-500 sm:inline">{{ store.filteredCodes.length }} kết quả</span>
+        <span class="hidden text-xs text-content sm:inline">{{ store.filteredCodes.length }} kết quả</span>
         <button
           type="button"
           title="Làm mới danh sách"
-          class="grid size-9 place-items-center rounded-lg border border-gray-300 bg-white text-gray-700 hover:bg-gray-100 disabled:opacity-50"
+          class="grid size-9 place-items-center rounded-lg border border-content bg-white text-content hover:bg-surface disabled:opacity-50"
           :disabled="store.isLoading"
           @click="store.loadCodes()"
         >
@@ -79,7 +79,7 @@ onMounted(() => store.loadCodes());
         </button>
         <button
           type="button"
-          class="rounded-lg bg-content-strong px-3.5 py-2 text-sm font-bold text-white hover:bg-emerald-800"
+          class="rounded-lg bg-content-strong px-3.5 py-2 text-sm font-bold text-white hover:bg-accent"
           @click="store.openCreateForm()"
         >
           + Thêm mã
@@ -91,45 +91,45 @@ onMounted(() => store.loadCodes());
       <section class="flex min-h-0 min-w-0 flex-1 flex-col overflow-hidden p-4 md:p-6">
         <div
           v-if="store.loadError"
-          class="mb-4 flex items-center justify-between gap-3 rounded-lg border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-700"
+          class="mb-4 flex items-center justify-between gap-3 rounded-lg border border-danger bg-surface px-4 py-3 text-sm text-danger"
         >
           <span>{{ store.loadError }}</span
           ><button type="button" class="font-bold underline" @click="store.loadCodes()">Thử lại</button>
         </div>
-        <div v-if="store.isLoading" class="grid min-h-64 place-items-center text-sm text-gray-500">
+        <div v-if="store.isLoading" class="grid min-h-64 place-items-center text-sm text-content">
           Đang tải danh sách mã...
         </div>
         <div
           v-else-if="!store.filteredCodes.length"
-          class="grid min-h-64 place-items-center text-center text-sm text-gray-500"
+          class="grid min-h-64 place-items-center text-center text-sm text-content"
         >
           <div>
             <span class="mb-2 block text-3xl">🎟️</span
             >{{ store.codes.length ? "Không tìm thấy mã phù hợp." : "Chưa có mã đổi thưởng nào." }}
           </div>
         </div>
-        <div v-else class="min-h-0 flex-1 overflow-auto rounded-lg border border-gray-200 bg-white shadow-sm">
+        <div v-else class="min-h-0 flex-1 overflow-auto rounded-lg border border-border bg-white shadow-sm">
           <table class="w-full min-w-220 border-separate border-spacing-0 text-left text-sm">
-            <thead class="text-[11px] uppercase text-gray-600">
+            <thead class="text-[11px] uppercase text-content">
               <tr>
-                <th class="sticky top-0 z-10 bg-gray-100 px-4 py-3">Mã</th>
-                <th class="sticky top-0 z-10 bg-gray-100 px-4 py-3">Phần thưởng</th>
-                <th class="sticky top-0 z-10 bg-gray-100 px-4 py-3">Trạng thái</th>
-                <th class="sticky top-0 z-10 bg-gray-100 px-4 py-3">Hạn dùng</th>
-                <th class="sticky top-0 z-10 bg-gray-100 px-4 py-3">Ngày tạo</th>
-                <th class="sticky top-0 z-10 bg-gray-100 px-4 py-3 text-right">Thao tác</th>
+                <th class="sticky top-0 z-10 bg-surface px-4 py-3">Mã</th>
+                <th class="sticky top-0 z-10 bg-surface px-4 py-3">Phần thưởng</th>
+                <th class="sticky top-0 z-10 bg-surface px-4 py-3">Trạng thái</th>
+                <th class="sticky top-0 z-10 bg-surface px-4 py-3">Hạn dùng</th>
+                <th class="sticky top-0 z-10 bg-surface px-4 py-3">Ngày tạo</th>
+                <th class="sticky top-0 z-10 bg-surface px-4 py-3 text-right">Thao tác</th>
               </tr>
             </thead>
             <tbody>
               <tr
                 v-for="item in store.filteredCodes"
                 :key="item.id"
-                class="border-t border-gray-100 hover:bg-emerald-50/40"
+                class="border-t border-border hover:bg-surface/40"
               >
                 <td class="px-4 py-3">
-                  <span class="rounded bg-gray-100 px-2 py-1 font-mono font-bold text-gray-800">{{ item.code }}</span>
+                  <span class="rounded bg-surface px-2 py-1 font-mono font-bold text-content">{{ item.code }}</span>
                 </td>
-                <td class="whitespace-nowrap px-4 py-3 font-semibold text-emerald-800">
+                <td class="whitespace-nowrap px-4 py-3 font-semibold text-content">
                   {{ item.cash.toLocaleString("vi-VN") }} xu
                 </td>
                 <td class="px-4 py-3">
@@ -137,36 +137,36 @@ onMounted(() => store.loadCodes());
                     class="rounded-full border px-2.5 py-1 text-xs font-semibold"
                     :class="
                       item.isDisabled
-                        ? 'border-gray-200 bg-gray-100 text-gray-600'
+                        ? 'border-border bg-surface text-content'
                         : isExpired(item)
-                          ? 'border-amber-200 bg-amber-50 text-amber-800'
-                          : 'border-emerald-200 bg-emerald-50 text-emerald-800'
+                          ? 'border-gold bg-surface text-gold'
+                          : 'border-accent bg-surface text-content'
                     "
                     >{{ item.isDisabled ? "Đang tắt" : isExpired(item) ? "Đã hết hạn" : "Đang bật" }}</span
                   >
                 </td>
-                <td class="whitespace-nowrap px-4 py-3 text-xs text-gray-500">{{ formatDate(item.expiresAt) }}</td>
-                <td class="whitespace-nowrap px-4 py-3 text-xs text-gray-500">
+                <td class="whitespace-nowrap px-4 py-3 text-xs text-content">{{ formatDate(item.expiresAt) }}</td>
+                <td class="whitespace-nowrap px-4 py-3 text-xs text-content">
                   {{ new Date(item.createdAt).toLocaleString("vi-VN") }}
                 </td>
                 <td class="px-4 py-3">
                   <div class="flex justify-end gap-2">
                     <button
                       type="button"
-                      class="rounded-md border border-emerald-200 px-2.5 py-1.5 text-xs font-bold text-emerald-800 hover:bg-emerald-50 disabled:opacity-50"
+                      class="rounded-md border border-accent px-2.5 py-1.5 text-xs font-bold text-content hover:bg-surface disabled:opacity-50"
                       :disabled="store.updatingId === item.id"
                       @click="store.toggleEnabled(item)"
                     >
                       {{ store.updatingId === item.id ? "..." : item.isDisabled ? "Bật" : "Tắt" }}</button
                     ><button
                       type="button"
-                      class="rounded-md border border-gray-300 px-2.5 py-1.5 text-xs font-bold text-gray-700 hover:bg-gray-100"
+                      class="rounded-md border border-content px-2.5 py-1.5 text-xs font-bold text-content hover:bg-surface"
                       @click="store.openEditForm(item)"
                     >
                       Sửa</button
                     ><button
                       type="button"
-                      class="rounded-md border border-red-200 px-2.5 py-1.5 text-xs font-bold text-red-700 hover:bg-red-50"
+                      class="rounded-md border border-danger px-2.5 py-1.5 text-xs font-bold text-danger hover:bg-surface"
                       @click="store.confirmDeleteId = item.id"
                     >
                       Xoá

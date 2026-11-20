@@ -10,11 +10,11 @@ const store = useLeaderboardStore();
     <div class="flex flex-wrap items-center gap-2">
       <span aria-hidden="true" class="text-xl">🎁</span>
       <div class="text-lg font-bold">{{ tr("LeaderboardRules.rewards") }}</div>
-      <span class="rounded-full bg-amber-100 px-2 py-0.5 text-[10px] font-semibold text-amber-900">{{
+      <span class="rounded-full bg-surface px-2 py-0.5 text-[10px] font-semibold text-gold">{{
         tr("LeaderboardRules.planned")
       }}</span>
     </div>
-    <div class="rounded-xl border border-amber-200 bg-amber-50 px-4 py-3 text-xs text-amber-900">
+    <div class="rounded-xl border border-gold bg-surface px-4 py-3 text-xs text-gold">
       {{ tr("LeaderboardRules.reward_status") }}
     </div>
     <div class="grid gap-3 text-xs text-content-muted md:grid-cols-2">
@@ -59,7 +59,7 @@ const store = useLeaderboardStore();
             <tr
               v-for="reward in tier.rewards"
               :key="reward.fromRank"
-              :class="reward.fromRank === 1 ? 'bg-amber-50 text-amber-950' : 'bg-white/70'"
+              :class="reward.fromRank === 1 ? 'bg-surface text-gold' : 'bg-white/70'"
             >
               <th scope="row" class="px-2 py-2 font-semibold tabular-nums">
                 <span v-if="reward.fromRank === 1" aria-hidden="true">🥇 </span
@@ -81,11 +81,11 @@ const store = useLeaderboardStore();
       </div>
     </div>
     <div class="text-xs text-content-muted">{{ tr("LeaderboardRules.per_player") }}</div>
-    <div class="flex items-start gap-3 rounded-2xl border border-amber-200 bg-amber-50 p-4">
+    <div class="flex items-start gap-3 rounded-2xl border border-gold bg-surface p-4">
       <span aria-hidden="true" class="text-2xl">🏅</span>
       <div>
-        <div class="font-bold text-amber-950">{{ tr("LeaderboardRules.titles_heading") }}</div>
-        <div class="mt-1 text-xs text-amber-900">{{ tr("LeaderboardRules.titles") }}</div>
+        <div class="font-bold text-gold">{{ tr("LeaderboardRules.titles_heading") }}</div>
+        <div class="mt-1 text-xs text-gold">{{ tr("LeaderboardRules.titles") }}</div>
       </div>
     </div>
     <div class="grid gap-3 md:grid-cols-2">

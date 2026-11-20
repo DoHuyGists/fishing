@@ -50,9 +50,9 @@ const fishStats = [
 <template>
   <article class="mx-auto w-full max-w-6xl space-y-5 px-4 py-5 text-sm leading-relaxed text-content sm:px-6 sm:py-7">
     <header class="rounded-2xl bg-content-strong p-5 text-white sm:p-7">
-      <div class="mb-2 mt-0 text-xs font-semibold text-emerald-100">Trang bị · 5 nhóm chỉ số</div>
+      <div class="mb-2 mt-0 text-xs font-semibold text-white">Trang bị · 5 nhóm chỉ số</div>
       <div class="m-0 text-xl font-extrabold sm:text-2xl">Thiết lập trang bị theo sức cá</div>
-      <div class="mb-0 mt-2 text-emerald-100">Chọn mồi và lưỡi để tăng cơ hội móc cá; cân bằng cần, máy và dây để đưa cá về bờ.</div>
+      <div class="mb-0 mt-2 text-white">Chọn mồi và lưỡi để tăng cơ hội móc cá; cân bằng cần, máy và dây để đưa cá về bờ.</div>
     </header>
 
     <section aria-labelledby="equipment-guide-table-title">
@@ -87,7 +87,7 @@ const fishStats = [
       <dl class="m-0 grid gap-4 sm:grid-cols-2">
         <div v-for="stat in fishStats" :key="stat.key">
           <dt class="font-semibold"><code class="rounded-[0.25rem] bg-surface-code px-[0.25rem] py-[0.0625rem] [overflow-wrap:anywhere] text-[0.85em]">{{ stat.key }}</code></dt>
-          <dd class="mb-0 ml-0 mt-1 text-slate-600">{{ stat.meaning }}</dd>
+          <dd class="mb-0 ml-0 mt-1 text-content">{{ stat.meaning }}</dd>
         </div>
       </dl>
     </section>
@@ -100,7 +100,7 @@ const fishStats = [
         <div>Máy có <code class="rounded-[0.25rem] bg-surface-code px-[0.25rem] py-[0.0625rem] [overflow-wrap:anywhere] text-[0.85em]">pull_strength = 20</code>: tốc độ là 2 × (1 + 20 / 40) = 3 m/giây; thu hiệu quả 30 m mất khoảng 10 giây, chưa tính nhả dây.</div>
         <div>Cá có <code class="rounded-[0.25rem] bg-surface-code px-[0.25rem] py-[0.0625rem] [overflow-wrap:anywhere] text-[0.85em]">base_catch_rate = 0,5</code>, cảnh giác 0,2; lưỡi cộng 0,1: đúng mồi đạt (0,5 + 0,1) × 1 × 0,8 = 48%; sai mồi với hệ số 0,5 còn 24%.</div>
       </div>
-      <div class="mb-0 mt-3 text-xs text-slate-600">Móc cá thành công là một bước; vẫn cần vượt qua giới hạn tải cần, sức chịu dây và thử thách kéo cá để bắt được cá.</div>
+      <div class="mb-0 mt-3 text-xs text-content">Móc cá thành công là một bước; vẫn cần vượt qua giới hạn tải cần, sức chịu dây và thử thách kéo cá để bắt được cá.</div>
     </section>
 
     <aside class="rounded-xl border border-border-default bg-surface p-4">

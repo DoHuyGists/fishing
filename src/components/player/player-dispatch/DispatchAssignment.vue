@@ -56,7 +56,7 @@ const store = useDispatchStore();
       <span>{{ tr("Dispatch.operatingCost") }}</span
       ><Cash :amount="store.selectedNpc.operating_cash" :size="20" :interactive="false" />
     </div>
-    <div v-if="store.selectedNpc && store.selectedJob && !store.canAssign" class="text-xs text-amber-800">
+    <div v-if="store.selectedNpc && store.selectedJob && !store.canAssign" class="text-xs text-gold">
       {{ tr("Dispatch.assignmentHint") }}
     </div>
   </form>

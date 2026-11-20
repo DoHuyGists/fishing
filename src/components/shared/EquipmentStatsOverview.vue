@@ -15,13 +15,13 @@ defineProps<{ title: string; description: string; stats: EquipmentStatDisplay[] 
         </div>
       </div>
     </div>
-    <div class="mt-1 text-[10px] text-palette-526650">{{ description }}</div>
+    <div class="mt-1 text-[10px] text-content">{{ description }}</div>
   </section>
 </template>
 
 <style scoped>
 .ocean-theme .shared-equipment-stats output {
   color: var(--color-ocean-gold);
-  text-shadow: 0 1px 2px #071a2d4d;
+  text-shadow: 0 1px 2px color-mix(in srgb, var(--color-content) 30.196%, transparent);
 }
 </style>

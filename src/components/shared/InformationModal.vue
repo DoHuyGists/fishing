@@ -22,7 +22,7 @@ watch([content, dialog], () => {
       ref="dialog"
       aria-labelledby="information-modal-title"
       aria-describedby="information-modal-description"
-      class="shared-information fixed inset-0 m-auto max-h-[85dvh] w-[calc(100%-2rem)] max-w-sm overflow-y-auto rounded-2xl border border-border-default bg-surface p-0 text-content shadow-xl backdrop:bg-black/40"
+      class="shared-information fixed inset-0 m-auto max-h-[85dvh] w-[calc(100%-2rem)] max-w-sm overflow-y-auto rounded-2xl border border-border-default bg-surface p-0 text-content shadow-xl backdrop:bg-content/40"
       @cancel.prevent="close"
       @close="close"
       @click.self="close"
@@ -48,11 +48,11 @@ watch([content, dialog], () => {
   color: var(--color-ocean-pearl);
   border-color: var(--color-ocean-gold);
   background: linear-gradient(150deg, var(--color-ocean-panel), var(--color-ocean-deep));
-  box-shadow: 0 24px 64px #071a2d99, inset 0 1px #f5ebd426;
+  box-shadow: 0 24px 64px color-mix(in srgb, var(--color-content) 60%, transparent), inset 0 1px color-mix(in srgb, var(--color-surface) 14.902%, transparent);
 }
 
 .ocean-theme .shared-information::backdrop {
-  background: #071a2db3;
+  background: color-mix(in srgb, var(--color-content) 70.196%, transparent);
   backdrop-filter: blur(4px);
 }
 
@@ -62,7 +62,7 @@ watch([content, dialog], () => {
 
 .ocean-theme .shared-information button:hover {
   color: var(--color-ocean-cyan);
-  background: #35b9d51a;
+  background: color-mix(in srgb, var(--color-sky) 10.196%, transparent);
 }
 
 .ocean-theme .shared-information button:focus-visible {

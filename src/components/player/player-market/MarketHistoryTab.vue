@@ -18,7 +18,7 @@ const marketStore = useMarketStore();
     <div
       v-if="marketStore.historyError"
       role="alert"
-      class="flex items-center justify-between gap-3 rounded-lg border border-red-200 bg-red-50 px-3 py-2 text-xs text-red-700"
+      class="flex items-center justify-between gap-3 rounded-lg border border-danger bg-surface px-3 py-2 text-xs text-danger"
     >
       <span>{{ marketStore.historyError }}</span>
       <button
@@ -30,7 +30,7 @@ const marketStore = useMarketStore();
         {{ tr("Maintenance.thu_lai") }}
       </button>
     </div>
-    <div v-if="marketStore.historyLoading" role="status" class="py-2 text-center text-xs text-gray-500">
+    <div v-if="marketStore.historyLoading" role="status" class="py-2 text-center text-xs text-content">
       {{ tr("MarketWindow.dang_tai_lich_su") }}
     </div>
     <div
@@ -38,7 +38,7 @@ const marketStore = useMarketStore();
       class="rounded-xl border border-dashed border-border-default bg-surface px-4 py-8 text-center"
     >
       <div class="font-semibold">{{ tr("MarketWindow.chua_co_giao_dich_mua_ban") }}</div>
-      <div class="mt-1 text-xs text-gray-500">
+      <div class="mt-1 text-xs text-content">
         {{ tr("MarketWindow.cac_giao_dich_da_hoan_tat_se_xuat_hien_tai_day") }}
       </div>
     </div>
@@ -56,7 +56,7 @@ const marketStore = useMarketStore();
           <span
             class="shrink-0 rounded-md px-2 py-1 text-[11px] font-semibold"
             :class="
-              entry.buyer_id === authStore.userId ? 'bg-blue-50 text-blue-700' : 'bg-emerald-100 text-emerald-800'
+              entry.buyer_id === authStore.userId ? 'bg-surface text-primary' : 'bg-surface text-content'
             "
           >
             {{ entry.buyer_id === authStore.userId ? tr("MarketWindow.da_mua") : tr("MarketWindow.da_ban") }}
@@ -70,7 +70,7 @@ const marketStore = useMarketStore();
                 tr("CaughtModal.ca")
               }}
             </div>
-            <div class="mt-0.5 text-[11px] text-gray-500">
+            <div class="mt-0.5 text-[11px] text-content">
               <time :datetime="entry.created_at">{{ formatDate(entry.created_at) }}</time> · #{{ entry.id.slice(0, 8) }}
             </div>
           </div>
@@ -91,7 +91,7 @@ const marketStore = useMarketStore();
       >
         {{ tr("Fishfarm.truoc") }}
       </button>
-      <span class="text-gray-500">{{ tr("CaughtModal.trang") }} {{ marketStore.historyPage }}</span>
+      <span class="text-content">{{ tr("CaughtModal.trang") }} {{ marketStore.historyPage }}</span>
       <button
         type="button"
         :disabled="marketStore.historyLoading || !marketStore.historyHasNext"

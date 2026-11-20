@@ -19,11 +19,11 @@ const emit = defineEmits<{
 <div class="space-y-3">
         <div
           v-if="receivedRequests.length === 0"
-          class="py-14 text-center bg-white/60 rounded-2xl border border-emerald-900/10 p-6"
+          class="py-14 text-center bg-white/60 rounded-2xl border border-accent/10 p-6"
         >
           <div class="text-4xl mb-2">📬</div>
-          <div class="m-0 text-sm font-bold text-gray-800">{{ tr("FriendModal.khong_co_loi_moi_nao") }}</div>
-          <div class="m-0 text-xs text-gray-500 mt-1">
+          <div class="m-0 text-sm font-bold text-content">{{ tr("FriendModal.khong_co_loi_moi_nao") }}</div>
+          <div class="m-0 text-xs text-content mt-1">
             {{ tr("FriendModal.hien_tai_ban_chua_nhan_duoc_yeu_cau_ket_ban_nao_tu_nguoi_choi_kh") }}
           </div>
         </div>
@@ -32,7 +32,7 @@ const emit = defineEmits<{
           <div
             v-for="record in receivedRequests"
             :key="record.id"
-            class="slide-fade-in from-bottom player-content-in p-4 rounded-2xl border border-amber-200/60 bg-amber-50/40 shadow-sm flex flex-col sm:flex-row sm:items-center justify-between gap-3"
+            class="slide-fade-in from-bottom player-content-in p-4 rounded-2xl border border-gold/60 bg-surface/40 shadow-sm flex flex-col sm:flex-row sm:items-center justify-between gap-3"
           >
             <div class="flex items-center gap-3 min-w-0">
               <div
@@ -53,18 +53,18 @@ const emit = defineEmits<{
 
               <div class="min-w-0">
                 <div class="flex items-center gap-1.5">
-                  <span class="text-xs font-bold text-gray-900 font-mono">
+                  <span class="text-xs font-bold text-content font-mono">
                     {{ getSenderProfile(record)?.display_name || formatUuid(record.user_id) }}
                   </span>
                   <button
                     type="button"
-                    class="text-gray-400 hover:text-emerald-700 text-xs cursor-pointer"
+                    class="text-content hover:text-content text-xs cursor-pointer"
                     :title="tr('FriendModal.sao_chep_toan_bo_id')"
                     @click="emit('copy', record.user_id)"
                   >
                     📋
                   </button>
-                  <span class="px-2 py-0.5 rounded text-[10px] font-bold bg-amber-200 text-amber-900">
+                  <span class="px-2 py-0.5 rounded text-[10px] font-bold bg-gold text-gold">
                     {{ tr("FriendModal.muon_ket_ban") }}
                   </span>
                 </div>
@@ -73,18 +73,18 @@ const emit = defineEmits<{
                   {{ countryStore.getCountryName(getSenderProfile(record)?.country_id) }}
                 </div>
                 <div v-if="getSenderProfile(record)" class="flex flex-wrap items-center gap-2 mt-1 text-[11px]">
-                  <span class="font-bold text-amber-800">
+                  <span class="font-bold text-gold">
                     {{ tr("UserProfile.cap") }} {{ getSenderProfile(record)?.level }}
                   </span>
-                  <span class="text-gray-500">·</span>
-                  <span class="text-emerald-800 font-medium">
+                  <span class="text-content">·</span>
+                  <span class="text-content font-medium">
                     {{
                       Number(getSenderProfile(record)?.experience_point ?? 0).toLocaleString(getFormattingLocale())
                     }}
                     EXP
                   </span>
-                  <span class="text-gray-500">·</span>
-                  <span class="text-gray-400 text-[10px]">
+                  <span class="text-content">·</span>
+                  <span class="text-content text-[10px]">
                     {{ new Date(record.created_at).toLocaleDateString(getFormattingLocale()) }}
                   </span>
                 </div>
@@ -95,7 +95,7 @@ const emit = defineEmits<{
             <div class="flex flex-wrap items-center gap-2 sm:shrink-0">
               <button
                 type="button"
-                class="px-3 py-1.5 rounded-xl bg-emerald-700 hover:bg-emerald-800 text-white text-xs font-bold transition shadow-sm cursor-pointer disabled:opacity-50 flex items-center gap-1"
+                class="px-3 py-1.5 rounded-xl bg-accent hover:bg-accent text-white text-xs font-bold transition shadow-sm cursor-pointer disabled:opacity-50 flex items-center gap-1"
                 :disabled="friendStore.actionLoadingId === record.id"
                 @click="emit('respond', record.id, true)"
               >
@@ -108,7 +108,7 @@ const emit = defineEmits<{
 
               <button
                 type="button"
-                class="px-3 py-1.5 rounded-xl border border-gray-300 bg-white hover:bg-gray-100 text-gray-700 text-xs font-bold transition cursor-pointer disabled:opacity-50"
+                class="px-3 py-1.5 rounded-xl border border-content bg-white hover:bg-surface text-content text-xs font-bold transition cursor-pointer disabled:opacity-50"
                 :disabled="friendStore.actionLoadingId === record.id"
                 @click="emit('respond', record.id, false)"
               >
@@ -117,7 +117,7 @@ const emit = defineEmits<{
 
               <button
                 type="button"
-                class="px-2.5 py-1.5 rounded-xl border border-red-200 bg-red-50 hover:bg-red-100 text-red-700 text-xs font-semibold transition cursor-pointer disabled:opacity-50"
+                class="px-2.5 py-1.5 rounded-xl border border-danger bg-surface hover:bg-surface text-danger text-xs font-semibold transition cursor-pointer disabled:opacity-50"
                 :disabled="friendStore.actionLoadingId === record.id"
                 :title="tr('FriendModal.xoa_yeu_cau_nay')"
                 @click="emit('delete', record, 'received_request')"

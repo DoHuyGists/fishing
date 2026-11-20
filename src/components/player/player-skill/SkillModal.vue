@@ -56,13 +56,13 @@ async function upgrade(skillId: string) {
 <template>
   <Modal :title="tr('SkillModal.ky_nang')" :on-refresh="() => refresh(true)">
     <section
-      class="skill-board bg-palette-edf2e6 bg-[radial-gradient(var(--color-border-default)_0.7px,transparent_0.7px)] bg-size-[12px_12px] min-h-full w-full space-y-4 rounded-2xl p-3 text-content sm:p-4"
+      class="skill-board bg-surface bg-[radial-gradient(var(--color-border-default)_0.7px,transparent_0.7px)] bg-size-[12px_12px] min-h-full w-full space-y-4 rounded-2xl p-3 text-content sm:p-4"
       :aria-busy="skillStore.loading"
     >
       <button
         v-if="skillStore.error"
         type="button"
-        class="cursor-pointer text-sm font-bold text-emerald-800 underline disabled:opacity-50"
+        class="cursor-pointer text-sm font-bold text-content underline disabled:opacity-50"
         :disabled="skillStore.loading || !!skillStore.upgradingId"
         @click="refresh(true)"
       >
@@ -79,17 +79,17 @@ async function upgrade(skillId: string) {
       </div>
 
       <div class="flex flex-wrap items-center gap-3">
-        <div class="m-0 text-[11px] font-extrabold uppercase tracking-[0.18em] text-palette-60745d">
+        <div class="m-0 text-[11px] font-extrabold uppercase tracking-[0.18em] text-content">
           {{ tr("SkillModal.chon_ky_nang_de_ren_luyen") }}
         </div>
         <span aria-hidden="true" class="h-px flex-1 bg-border-default"></span>
         <div
           v-if="skillStore.remainingSkillPoints !== null"
           role="status"
-          class="m-0 rounded-lg border border-border-default bg-surface px-3 py-1.5 text-xs text-palette-52634c"
+          class="m-0 rounded-lg border border-border-default bg-surface px-3 py-1.5 text-xs text-content"
         >
-          <span aria-hidden="true" class="mr-1 text-palette-8b651b">✦</span> {{ tr("SkillModal.diem_ky_nang") }}
-          <strong class="tabular-nums text-emerald-800">{{ skillStore.remainingSkillPoints }}</strong>
+          <span aria-hidden="true" class="mr-1 text-gold">✦</span> {{ tr("SkillModal.diem_ky_nang") }}
+          <strong class="tabular-nums text-content">{{ skillStore.remainingSkillPoints }}</strong>
         </div>
       </div>
 

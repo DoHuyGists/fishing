@@ -78,19 +78,19 @@ function countSetItems(s: EquipmentSet): number {
       <div class="flex flex-wrap items-center gap-2">
         <span
           v-if="usedSet && !isUsedSetComplete"
-          class="inline-flex items-center gap-1 px-3 py-1 bg-amber-100 border border-amber-300 text-amber-800 text-xs font-semibold rounded-lg"
+          class="inline-flex items-center gap-1 px-3 py-1 bg-surface border border-gold text-gold text-xs font-semibold rounded-lg"
         >
           {{ tr("PrepareModal.set_chua_du_5_loai") }}
         </span>
         <span
           v-if="usedSet"
-          class="inline-flex items-center gap-1 px-3 py-1 bg-surface-selected border border-palette-b7cbb4 text-content-secondary text-xs font-semibold rounded-lg"
+          class="inline-flex items-center gap-1 px-3 py-1 bg-surface-selected border border-border text-content-secondary text-xs font-semibold rounded-lg"
         >
           {{ tr("PrepareModal.dang_dung_set") }} {{ usedSetIndex + 1 }}
         </span>
         <button
           type="button"
-          class="inline-flex items-center justify-center gap-2 rounded-lg border border-border-default bg-surface px-3 py-1.5 text-xs font-semibold text-content cursor-pointer transition-all duration-150 hover:bg-palette-dce8d5 active:scale-95"
+          class="inline-flex items-center justify-center gap-2 rounded-lg border border-border-default bg-surface px-3 py-1.5 text-xs font-semibold text-content cursor-pointer transition-all duration-150 hover:bg-surface active:scale-95"
           @click="modalStore.open('inventory')"
         >
           <span aria-hidden="true">🎒</span>
@@ -105,7 +105,7 @@ function countSetItems(s: EquipmentSet): number {
         v-for="(s, idx) in inventoryStore.equipmentSets"
         :key="s.id"
         type="button"
-        class="group flex flex-col items-start gap-0.5 px-2.5 py-1 rounded-lg cursor-pointer text-palette-405446 transition-all duration-150 border disabled:cursor-not-allowed"
+        class="group flex flex-col items-start gap-0.5 px-2.5 py-1 rounded-lg cursor-pointer text-content transition-all duration-150 border disabled:cursor-not-allowed"
         :class="[
           s.isUsed
             ? '!bg-surface-selected !border-content-disabled !text-content shadow-sm cursor-default'
@@ -124,12 +124,12 @@ function countSetItems(s: EquipmentSet): number {
           >
           <span
             v-else
-            class="text-[10px] font-medium px-1.5 py-px rounded-full bg-surface-hover text-palette-526a58 transition-colors group-hover:bg-border-default group-hover:text-content group-hover:font-semibold"
+            class="text-[10px] font-medium px-1.5 py-px rounded-full bg-surface-hover text-content transition-colors group-hover:bg-border-default group-hover:text-content group-hover:font-semibold"
             >{{ tr("PrepareModal.doi_sang_set_nay") }}</span
           >
           <span
             v-if="!isSetComplete(s)"
-            class="text-[10px] font-semibold px-1.5 py-px rounded-md bg-amber-100 border border-amber-300 text-amber-800"
+            class="text-[10px] font-semibold px-1.5 py-px rounded-md bg-surface border border-gold text-gold"
             >{{ tr("PrepareModal.thieu_loai") }}</span
           >
         </div>
@@ -165,7 +165,7 @@ function countSetItems(s: EquipmentSet): number {
 
           <!-- Items list in this category -->
           <div
-            class="flex flex-col gap-1 p-1 max-h-[120px] overflow-y-auto [&::-webkit-scrollbar]:w-1.5 [&::-webkit-scrollbar-thumb]:bg-palette-b7cbb4 [&::-webkit-scrollbar-thumb]:rounded-full [&::-webkit-scrollbar-track]:bg-transparent"
+            class="flex flex-col gap-1 p-1 max-h-[120px] overflow-y-auto [&::-webkit-scrollbar]:w-1.5 [&::-webkit-scrollbar-thumb]:bg-surface [&::-webkit-scrollbar-thumb]:rounded-full [&::-webkit-scrollbar-track]:bg-transparent"
           >
             <template v-if="(usedSet[cat.id] || []).length > 0">
               <div
@@ -213,7 +213,7 @@ function countSetItems(s: EquipmentSet): number {
                 <div class="shrink-0">
                   <span
                     v-if="selectingItemId === String(item.id)"
-                    class="inline-block w-3.5 h-3.5 border-2 border-border-default border-t-palette-526a58 rounded-full animate-spin"
+                    class="inline-block w-3.5 h-3.5 border-2 border-border-default border-t-content rounded-full animate-spin"
                   ></span>
                   <span
                     v-else
@@ -221,7 +221,7 @@ function countSetItems(s: EquipmentSet): number {
                     :class="
                       isItemSelected(cat.id, item.id)
                         ? 'bg-border-default text-content-secondary'
-                        : 'bg-surface-hover text-palette-526a58 group-hover:bg-border-default group-hover:text-content group-hover:font-bold'
+                        : 'bg-surface-hover text-content group-hover:bg-border-default group-hover:text-content group-hover:font-bold'
                     "
                   >
                     {{ isItemSelected(cat.id, item.id) ? tr("PrepareModal.dang_dung") : tr("NewPlayerFishing.chon") }}
@@ -231,7 +231,7 @@ function countSetItems(s: EquipmentSet): number {
             </template>
             <template v-else>
               <div class="flex items-center justify-center py-6 px-2 text-[11px] text-content-subtle italic">
-                <span class="text-amber-700 font-medium">{{ tr("PrepareModal.chua_co_do") }}</span>
+                <span class="text-gold font-medium">{{ tr("PrepareModal.chua_co_do") }}</span>
               </div>
             </template>
           </div>

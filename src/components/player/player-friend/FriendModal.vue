@@ -181,11 +181,11 @@ async function executeDelete() {
     <div class="w-full min-w-0 space-y-3 pb-6 sm:space-y-4 sm:pb-10">
       <!-- ID Người chơi hiện tại & Banner -->
       <div
-        class="slide-fade-in from-top player-content-in bg-linear-to-r from-palette-173223 via-palette-1c3f2d to-palette-122b1e rounded-2xl p-3 sm:p-5 border border-emerald-800/40 shadow-md text-emerald-50 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 sm:gap-4"
+        class="slide-fade-in from-top player-content-in bg-linear-to-r from-content via-content to-content rounded-2xl p-3 sm:p-5 border border-accent/40 shadow-md text-white flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 sm:gap-4"
       >
         <div class="flex items-center gap-3.5 min-w-0">
           <div
-            class="size-12 rounded-xl bg-emerald-500/20 border border-emerald-400/30 flex items-center justify-center text-2xl shrink-0"
+            class="size-12 rounded-xl bg-accent/20 border border-accent/30 flex items-center justify-center text-2xl shrink-0"
           >
             🎣
           </div>
@@ -193,7 +193,7 @@ async function executeDelete() {
             <div class="m-0 text-base sm:text-lg font-bold text-white tracking-wide">
               {{ tr("FriendModal.ma_nguoi_choi_cua_ban") }}
             </div>
-            <div class="m-0 text-xs text-emerald-200/70 font-mono truncate" :title="currentUserId">
+            <div class="m-0 text-xs text-accent/70 font-mono truncate" :title="currentUserId">
               {{ currentUserId || tr("FriendModal.chua_dang_nhap") }}
             </div>
           </div>
@@ -202,7 +202,7 @@ async function executeDelete() {
         <button
           v-if="currentUserId"
           type="button"
-          class="shrink-0 flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-emerald-600/30 hover:bg-emerald-600/50 border border-emerald-400/40 text-emerald-100 text-xs font-semibold transition cursor-pointer"
+          class="shrink-0 flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-accent/30 hover:bg-accent/50 border border-accent/40 text-white text-xs font-semibold transition cursor-pointer"
           @click="copyToClipboard(currentUserId)"
         >
           <span>{{ copiedId === currentUserId ? tr("UserProfile.da_chep") : tr("FriendModal.sao_chep_id") }}</span>
@@ -211,22 +211,22 @@ async function executeDelete() {
 
       <!-- Thanh điều hướng Tab -->
       <div
-        class="flex items-center gap-2 border-b border-emerald-900/10 pb-2 overflow-x-auto snap-x snap-mandatory scrollbar-thin -mx-2 px-2 sm:mx-0 sm:px-0"
+        class="flex items-center gap-2 border-b border-accent/10 pb-2 overflow-x-auto snap-x snap-mandatory scrollbar-thin -mx-2 px-2 sm:mx-0 sm:px-0"
       >
         <button
           type="button"
           class="flex shrink-0 snap-start items-center gap-2 px-3 sm:px-4 py-2 rounded-xl text-xs font-bold transition-all cursor-pointer border"
           :class="
             activeTab === 'friends'
-              ? 'bg-content-strong text-white border-emerald-800 shadow-sm'
-              : 'bg-white/80 text-emerald-950/80 border-emerald-900/10 hover:bg-emerald-50'
+              ? 'bg-content-strong text-white border-accent shadow-sm'
+              : 'bg-white/80 text-content/80 border-accent/10 hover:bg-surface'
           "
           @click="activeTab = 'friends'"
         >
           <span>{{ tr("FriendModal.ban_be") }}</span>
           <span
             class="px-1.5 py-0.5 rounded-full text-[10px] font-black"
-            :class="activeTab === 'friends' ? 'bg-emerald-800 text-emerald-200' : 'bg-gray-200 text-gray-700'"
+            :class="activeTab === 'friends' ? 'bg-accent text-accent' : 'bg-surface text-content'"
           >
             {{ friendStore.counts.friends }}
           </span>
@@ -237,22 +237,22 @@ async function executeDelete() {
           class="flex shrink-0 snap-start items-center gap-2 px-3 sm:px-4 py-2 rounded-xl text-xs font-bold transition-all cursor-pointer border relative"
           :class="
             activeTab === 'received'
-              ? 'bg-content-strong text-white border-emerald-800 shadow-sm'
-              : 'bg-white/80 text-emerald-950/80 border-emerald-900/10 hover:bg-emerald-50'
+              ? 'bg-content-strong text-white border-accent shadow-sm'
+              : 'bg-white/80 text-content/80 border-accent/10 hover:bg-surface'
           "
           @click="activeTab = 'received'"
         >
           <span>{{ tr("FriendModal.loi_moi_da_nhan") }}</span>
           <span
             v-if="friendStore.counts.received > 0"
-            class="px-1.5 py-0.5 rounded-full text-[10px] font-black bg-rose-500 text-white animate-pulse"
+            class="px-1.5 py-0.5 rounded-full text-[10px] font-black bg-danger text-white animate-pulse"
           >
             {{ friendStore.counts.received }}
           </span>
           <span
             v-else
             class="px-1.5 py-0.5 rounded-full text-[10px] font-black"
-            :class="activeTab === 'received' ? 'bg-emerald-800 text-emerald-200' : 'bg-gray-200 text-gray-700'"
+            :class="activeTab === 'received' ? 'bg-accent text-accent' : 'bg-surface text-content'"
           >
             0
           </span>
@@ -263,15 +263,15 @@ async function executeDelete() {
           class="flex shrink-0 snap-start items-center gap-2 px-3 sm:px-4 py-2 rounded-xl text-xs font-bold transition-all cursor-pointer border"
           :class="
             activeTab === 'sent'
-              ? 'bg-content-strong text-white border-emerald-800 shadow-sm'
-              : 'bg-white/80 text-emerald-950/80 border-emerald-900/10 hover:bg-emerald-50'
+              ? 'bg-content-strong text-white border-accent shadow-sm'
+              : 'bg-white/80 text-content/80 border-accent/10 hover:bg-surface'
           "
           @click="activeTab = 'sent'"
         >
           <span>{{ tr("FriendModal.loi_moi_da_gui") }}</span>
           <span
             class="px-1.5 py-0.5 rounded-full text-[10px] font-black"
-            :class="activeTab === 'sent' ? 'bg-emerald-800 text-emerald-200' : 'bg-gray-200 text-gray-700'"
+            :class="activeTab === 'sent' ? 'bg-accent text-accent' : 'bg-surface text-content'"
           >
             {{ friendStore.counts.sent }}
           </span>
@@ -282,15 +282,15 @@ async function executeDelete() {
           class="flex shrink-0 snap-start items-center gap-2 px-3 sm:px-4 py-2 rounded-xl text-xs font-bold transition-all cursor-pointer border"
           :class="
             activeTab === 'discover'
-              ? 'bg-content-strong text-white border-emerald-800 shadow-sm'
-              : 'bg-white/80 text-emerald-950/80 border-emerald-900/10 hover:bg-emerald-50'
+              ? 'bg-content-strong text-white border-accent shadow-sm'
+              : 'bg-white/80 text-content/80 border-accent/10 hover:bg-surface'
           "
           @click="activeTab = 'discover'"
         >
           <span>{{ tr("FriendModal.them_ban_be") }}</span>
           <span
             class="px-1.5 py-0.5 rounded-full text-[10px] font-black"
-            :class="activeTab === 'discover' ? 'bg-emerald-800 text-emerald-200' : 'bg-gray-200 text-gray-700'"
+            :class="activeTab === 'discover' ? 'bg-accent text-accent' : 'bg-surface text-content'"
           >
             {{ friendStore.counts.discover }}
           </span>
@@ -305,13 +305,13 @@ async function executeDelete() {
             v-model="searchQuery"
             type="text"
             :placeholder="tr('FriendModal.tim_theo_ten_hoac_ma_nguoi_choi_id')"
-            class="w-full px-3.5 py-2 pl-9 rounded-xl border border-emerald-900/20 bg-white/90 text-xs text-gray-800 placeholder-gray-400 focus:outline-none focus:border-emerald-600 focus:ring-1 focus:ring-emerald-600"
+            class="w-full px-3.5 py-2 pl-9 rounded-xl border border-accent/20 bg-white/90 text-xs text-content placeholder-content focus:outline-none focus:border-accent focus:ring-1 focus:ring-accent"
           />
-          <span class="absolute left-3 top-2.5 text-xs text-gray-400">🔍</span>
+          <span class="absolute left-3 top-2.5 text-xs text-content">🔍</span>
           <button
             v-if="searchQuery"
             type="button"
-            class="absolute right-3 top-2 text-xs text-gray-400 hover:text-gray-600 cursor-pointer"
+            class="absolute right-3 top-2 text-xs text-content hover:text-content cursor-pointer"
             @click="searchQuery = ''"
           >
             ✕
@@ -324,12 +324,12 @@ async function executeDelete() {
             v-model="directFriendIdInput"
             type="text"
             :placeholder="tr('FriendModal.nhap_uuid_de_ket_ban_ngay')"
-            class="min-w-0 flex-1 px-3 py-2 sm:px-3.5 rounded-xl border border-emerald-900/20 bg-white/90 text-xs text-gray-800 placeholder-gray-400 focus:outline-none focus:border-emerald-600 focus:ring-1 focus:ring-emerald-600 font-mono"
+            class="min-w-0 flex-1 px-3 py-2 sm:px-3.5 rounded-xl border border-accent/20 bg-white/90 text-xs text-content placeholder-content focus:outline-none focus:border-accent focus:ring-1 focus:ring-accent font-mono"
             @keydown.enter="handleSendDirectId"
           />
           <button
             type="button"
-            class="shrink-0 px-2.5 sm:px-3.5 py-2 rounded-xl bg-emerald-700 hover:bg-emerald-800 text-white text-xs font-bold transition shadow-sm cursor-pointer whitespace-nowrap disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-1"
+            class="shrink-0 px-2.5 sm:px-3.5 py-2 rounded-xl bg-accent hover:bg-accent text-white text-xs font-bold transition shadow-sm cursor-pointer whitespace-nowrap disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-1"
             :disabled="!directFriendIdInput.trim() || friendStore.actionLoadingId === directFriendIdInput.trim()"
             @click="handleSendDirectId"
           >
@@ -345,16 +345,16 @@ async function executeDelete() {
       <!-- Trạng thái Loading -->
       <div
         v-if="friendStore.loading && !friendStore.friends.length && !friendStore.profiles.length"
-        class="py-16 flex flex-col items-center justify-center gap-3 text-emerald-800"
+        class="py-16 flex flex-col items-center justify-center gap-3 text-content"
       >
-        <div class="size-8 border-3 border-emerald-600 border-t-transparent rounded-full animate-spin"></div>
+        <div class="size-8 border-3 border-accent border-t-transparent rounded-full animate-spin"></div>
         <span class="text-xs font-semibold">{{ tr("FriendModal.dang_tai_danh_sach_ban_be") }}</span>
       </div>
 
       <!-- Trạng thái lỗi -->
       <div
         v-else-if="friendStore.error && !friendStore.friends.length"
-        class="p-4 rounded-xl bg-red-50 border border-red-200 text-red-700 text-xs flex items-center justify-between"
+        class="p-4 rounded-xl bg-surface border border-danger text-danger text-xs flex items-center justify-between"
       >
         <span>{{ friendStore.error }}</span>
         <button type="button" class="font-bold underline hover:no-underline cursor-pointer" @click="handleRefresh">
@@ -376,11 +376,11 @@ async function executeDelete() {
     </div>
 
     <!-- Hộp thoại xác nhận xóa (Modal xác nhận bên trong) -->
-    <div v-if="deleteConfirmTarget" class="fixed inset-0 z-50 bg-black/50 flex items-center justify-center p-4">
-      <div class="bg-white rounded-2xl max-w-sm w-full p-5 shadow-2xl border border-gray-200 space-y-4 player-popup-in">
-        <div class="flex items-center gap-3 text-red-600">
-          <div class="size-10 rounded-full bg-red-100 flex items-center justify-center text-lg shrink-0">⚠️</div>
-          <div class="m-0 text-base font-bold text-gray-900">
+    <div v-if="deleteConfirmTarget" class="fixed inset-0 z-50 bg-content/50 flex items-center justify-center p-4">
+      <div class="bg-white rounded-2xl max-w-sm w-full p-5 shadow-2xl border border-border space-y-4 player-popup-in">
+        <div class="flex items-center gap-3 text-danger">
+          <div class="size-10 rounded-full bg-surface flex items-center justify-center text-lg shrink-0">⚠️</div>
+          <div class="m-0 text-base font-bold text-content">
             {{
               deleteConfirmTarget.type === "friend"
                 ? tr("FriendModal.xac_nhan_huy_ket_ban")
@@ -391,7 +391,7 @@ async function executeDelete() {
           </div>
         </div>
 
-        <div class="m-0 text-xs text-gray-600 leading-relaxed">
+        <div class="m-0 text-xs text-content leading-relaxed">
           {{
             deleteConfirmTarget.type === "friend"
               ? tr("FriendModal.ban_co_chac_chan_muon_xoa_nguoi_nay_khoi_danh_sach_ban_be_hai_ng")
@@ -401,21 +401,21 @@ async function executeDelete() {
           }}
         </div>
 
-        <div class="p-2.5 rounded-lg bg-gray-50 border border-gray-200 text-xs font-mono text-gray-700 truncate">
+        <div class="p-2.5 rounded-lg bg-white border border-border text-xs font-mono text-content truncate">
           {{ tr("FriendModal.ma_nguoi_choi") }} {{ deleteConfirmTarget.targetUserId }}
         </div>
 
         <div class="flex items-center justify-end gap-2 pt-2">
           <button
             type="button"
-            class="px-4 py-2 rounded-xl border border-gray-300 bg-white hover:bg-gray-100 text-gray-700 text-xs font-bold transition cursor-pointer"
+            class="px-4 py-2 rounded-xl border border-content bg-white hover:bg-surface text-content text-xs font-bold transition cursor-pointer"
             @click="deleteConfirmTarget = null"
           >
             {{ tr("FactionSelectModal.huy_bo") }}
           </button>
           <button
             type="button"
-            class="px-4 py-2 rounded-xl bg-red-600 hover:bg-red-700 text-white text-xs font-bold transition shadow-sm cursor-pointer disabled:opacity-50 flex items-center gap-1.5"
+            class="px-4 py-2 rounded-xl bg-danger hover:bg-danger text-white text-xs font-bold transition shadow-sm cursor-pointer disabled:opacity-50 flex items-center gap-1.5"
             :disabled="
               friendStore.actionLoadingId === deleteConfirmTarget.id ||
               friendStore.actionLoadingId === deleteConfirmTarget.targetUserId

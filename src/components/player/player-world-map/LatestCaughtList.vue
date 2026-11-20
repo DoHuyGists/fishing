@@ -17,7 +17,7 @@ const viewModes = computed(() => [
   <section class="w-full max-w-sm rounded-xl border border-border-default bg-white/95 p-3 text-content shadow-sm">
     <div class="mb-2 flex items-center justify-between">
       <div class="m-0 text-sm font-bold text-content-strong">{{ tr("CaughtModal.luoi") }}</div>
-      <span class="text-[11px] text-gray-500">{{ recentCaughtFishes.length }} {{ tr("UserProfile.con") }}</span>
+      <span class="text-[11px] text-content">{{ recentCaughtFishes.length }} {{ tr("UserProfile.con") }}</span>
     </div>
     <Tab
       v-model="caughtStore.latestCaughtViewMode"
@@ -29,11 +29,11 @@ const viewModes = computed(() => [
       <template v-for="mode in viewModes" :key="mode.key" #[mode.key]>
         <div
           v-if="caughtStore.isLoadingCaught && !recentCaughtFishes.length"
-          class="m-0 py-3 text-center text-xs text-gray-500"
+          class="m-0 py-3 text-center text-xs text-content"
         >
           {{ tr("LatestCaughtList.dang_tai_danh_sach_loai_vua_cau") }}
         </div>
-        <div v-else-if="!recentCaughtFishes.length" class="m-0 py-3 text-center text-xs text-gray-500">
+        <div v-else-if="!recentCaughtFishes.length" class="m-0 py-3 text-center text-xs text-content">
           {{ tr("LatestCaughtList.chua_cau_duoc_con_nao") }}
         </div>
         <div
@@ -60,7 +60,7 @@ const viewModes = computed(() => [
                 >
                   {{ group.fish.species?.name || tr("CaughtModal.ca_chua_ro_ten") }}
                 </div>
-                <div class="text-[10px] text-gray-500">
+                <div class="text-[10px] text-content">
                   {{ group.fish.species?.rarity || tr("LatestCaughtList.thuong") }}
                 </div>
               </div>
@@ -84,10 +84,10 @@ const viewModes = computed(() => [
                 draggable="false"
               />
               <div class="min-w-0 flex-1">
-                <div class="m-0 truncate text-xs font-bold text-gray-800">
+                <div class="m-0 truncate text-xs font-bold text-content">
                   {{ fish.species?.name || tr("CaughtModal.ca_chua_ro_ten") }}
                 </div>
-                <div class="m-0 text-[10px] text-gray-500">
+                <div class="m-0 text-[10px] text-content">
                   {{ fish.species?.rarity || tr("LatestCaughtList.thuong") }} ·
                   {{ fish.created_at ? new Date(fish.created_at).toLocaleDateString(getFormattingLocale()) : "" }}
                 </div>

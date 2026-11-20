@@ -13,12 +13,12 @@ export function formatDate(dateStr: string) {
 export function getRarityBadgeClass(rarity: string | null | undefined) {
   switch (rarity?.toUpperCase()) {
     case "HUYỀN THOẠI":
-      return "bg-amber-100 text-amber-800 border-amber-300";
+      return "bg-surface text-gold border-gold";
     case "SỬ THI":
-      return "bg-purple-100 text-purple-800 border-purple-300";
+      return "bg-surface text-special border-special";
     case "HIẾM":
-      return "bg-blue-100 text-blue-800 border-blue-300";
+      return "bg-surface text-primary border-primary";
     default:
-      return "bg-gray-100 text-gray-700 border-gray-300";
+      return "bg-surface text-content border-content";
   }
 }

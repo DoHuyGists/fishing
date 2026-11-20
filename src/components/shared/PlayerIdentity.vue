@@ -49,6 +49,6 @@ watch(
   color: var(--color-ocean-pearl);
   border: 2px solid var(--color-ocean-gold);
   background: linear-gradient(145deg, var(--color-ocean-panel), var(--color-ocean-deep));
-  box-shadow: 0 2px 6px #071a2d40, inset 0 1px #f5ebd426;
+  box-shadow: 0 2px 6px color-mix(in srgb, var(--color-content) 25.098%, transparent), inset 0 1px color-mix(in srgb, var(--color-surface) 14.902%, transparent);
 }
 </style>

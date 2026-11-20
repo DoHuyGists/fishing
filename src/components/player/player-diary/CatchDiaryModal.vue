@@ -68,7 +68,7 @@ watch(
       <div
         v-if="diaryStore.error || countryStore.unlockedError"
         role="alert"
-        class="rounded-xl border border-red-200 bg-red-50 p-4 text-sm text-red-800"
+        class="rounded-xl border border-danger bg-surface p-4 text-sm text-danger"
       >
         <div>{{ diaryStore.error || countryStore.unlockedError }}</div>
         <button type="button" class="mt-2 cursor-pointer underline" @click="retry">
@@ -114,7 +114,7 @@ watch(
             type="search"
             :aria-label="tr('CatchDiaryModal.searchSpecies')"
             :placeholder="tr('CatchDiaryModal.searchSpecies')"
-            class="mb-3 w-full rounded-lg border border-border-default bg-white px-3 py-2 text-sm outline-none focus:border-palette-698563 focus:ring-2 focus:ring-border-default"
+            class="mb-3 w-full rounded-lg border border-border-default bg-white px-3 py-2 text-sm outline-none focus:border-content focus:ring-2 focus:ring-border-default"
           />
           <div v-if="!diaryStore.error && !entries.length" role="status" class="py-12 text-center text-sm leading-6">
             {{ tr("CatchDiaryModal.noSpecies") }}

@@ -70,20 +70,20 @@ onMounted(() => speciesStore.fetchAll());
 
 <template>
   <AdminModal title="Quản lý loài cá" icon="🐟" @close="emit('close')">
-    <div class="flex shrink-0 flex-wrap items-center gap-3 border-b border-gray-200 bg-white px-5 py-3 md:px-7">
+    <div class="flex shrink-0 flex-wrap items-center gap-3 border-b border-border bg-white px-5 py-3 md:px-7">
       <div class="relative min-w-55 flex-1">
         <input
           v-model="search"
           type="search"
           placeholder="Tìm tên, khu vực, độ hiếm, mô tả..."
-          class="w-full rounded-lg border border-gray-300 bg-gray-50 px-3 py-2 text-sm focus:border-emerald-600 focus:outline-none"
+          class="w-full rounded-lg border border-content bg-white px-3 py-2 text-sm focus:border-accent focus:outline-none"
         />
       </div>
-      <label class="flex items-center gap-2 text-xs font-semibold text-gray-600">
+      <label class="flex items-center gap-2 text-xs font-semibold text-content">
         Độ hiếm
         <select
           v-model="rarityFilter"
-          class="rounded-lg border border-gray-300 bg-white px-2.5 py-2 text-sm text-gray-700"
+          class="rounded-lg border border-content bg-white px-2.5 py-2 text-sm text-content"
         >
           <option value="ALL">Tất cả</option>
           <option v-for="rarity in rarityOptions" :key="rarity" :value="rarity">{{ rarity }}</option>
@@ -95,19 +95,19 @@ onMounted(() => speciesStore.fetchAll());
           :key="mode.value"
           type="button"
           :aria-pressed="viewMode === mode.value"
-          class="rounded-md px-3 py-1.5 text-xs font-semibold transition-colors focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-emerald-700"
-          :class="viewMode === mode.value ? 'bg-white text-content shadow-sm' : 'text-gray-600 hover:bg-white/60'"
+          class="rounded-md px-3 py-1.5 text-xs font-semibold transition-colors focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-accent"
+          :class="viewMode === mode.value ? 'bg-white text-content shadow-sm' : 'text-content hover:bg-white/60'"
           @click="viewMode = mode.value"
         >
           {{ mode.label }}
         </button>
       </div>
       <div class="ml-auto flex items-center gap-2">
-        <span class="hidden text-xs text-gray-500 sm:inline">{{ filteredSpecies.length }} kết quả</span>
+        <span class="hidden text-xs text-content sm:inline">{{ filteredSpecies.length }} kết quả</span>
         <button
           type="button"
           title="Làm mới danh sách"
-          class="grid size-9 place-items-center rounded-lg border border-gray-300 bg-white text-gray-700 hover:bg-gray-100 disabled:opacity-50"
+          class="grid size-9 place-items-center rounded-lg border border-content bg-white text-content hover:bg-surface disabled:opacity-50"
           :disabled="speciesStore.isLoading"
           @click="speciesStore.fetchAll()"
         >
@@ -128,7 +128,7 @@ onMounted(() => speciesStore.fetchAll());
         </button>
         <button
           type="button"
-          class="rounded-lg bg-content-strong px-3.5 py-2 text-sm font-bold text-white hover:bg-emerald-800"
+          class="rounded-lg bg-content-strong px-3.5 py-2 text-sm font-bold text-white hover:bg-accent"
           @click="openCreateForm"
         >
           + Thêm loài
@@ -140,17 +140,17 @@ onMounted(() => speciesStore.fetchAll());
       <section class="flex min-h-0 min-w-0 flex-1 flex-col overflow-hidden p-4 md:p-6">
         <div
           v-if="speciesStore.error"
-          class="mb-4 flex shrink-0 items-center justify-between gap-3 rounded-lg border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-700"
+          class="mb-4 flex shrink-0 items-center justify-between gap-3 rounded-lg border border-danger bg-surface px-4 py-3 text-sm text-danger"
         >
           <span>{{ speciesStore.error }}</span>
           <button type="button" class="font-bold underline" @click="speciesStore.fetchAll()">Thử lại</button>
         </div>
-        <div v-if="speciesStore.isLoading" class="grid min-h-64 place-items-center text-sm text-gray-500">
+        <div v-if="speciesStore.isLoading" class="grid min-h-64 place-items-center text-sm text-content">
           Đang tải danh sách loài cá...
         </div>
         <div
           v-else-if="!filteredSpecies.length"
-          class="grid min-h-64 place-items-center text-center text-sm text-gray-500"
+          class="grid min-h-64 place-items-center text-center text-sm text-content"
         >
           <div>
             <span class="mb-2 block text-3xl">🎣</span>
@@ -159,26 +159,26 @@ onMounted(() => speciesStore.fetchAll());
         </div>
         <div
           v-else-if="viewMode === 'list'"
-          class="min-h-0 flex-1 overflow-auto rounded-lg border border-gray-200 bg-white shadow-sm"
+          class="min-h-0 flex-1 overflow-auto rounded-lg border border-border bg-white shadow-sm"
         >
           <table class="w-full min-w-[1400px] border-collapse text-left text-sm">
-            <thead class="text-[11px] uppercase text-gray-600">
+            <thead class="text-[11px] uppercase text-content">
               <tr>
-                <th class="sticky top-0 z-10 bg-gray-100 px-4 py-3">Loài cá</th>
-                <th class="sticky top-0 z-10 bg-gray-100 px-4 py-3">Khu vực</th>
-                <th class="sticky top-0 z-10 bg-gray-100 px-4 py-3">Độ hiếm</th>
-                <th class="sticky top-0 z-10 bg-gray-100 px-4 py-3">Khối lượng</th>
-                <th class="sticky top-0 z-10 bg-gray-100 px-4 py-3">Tỉ lệ bắt</th>
-                <th class="sticky top-0 z-10 bg-gray-100 px-4 py-3">Chỉ số loài cá</th>
-                <th class="sticky top-0 z-10 bg-gray-100 px-4 py-3">Ngày tạo</th>
-                <th class="sticky top-0 z-10 bg-gray-100 px-4 py-3 text-right">Thao tác</th>
+                <th class="sticky top-0 z-10 bg-surface px-4 py-3">Loài cá</th>
+                <th class="sticky top-0 z-10 bg-surface px-4 py-3">Khu vực</th>
+                <th class="sticky top-0 z-10 bg-surface px-4 py-3">Độ hiếm</th>
+                <th class="sticky top-0 z-10 bg-surface px-4 py-3">Khối lượng</th>
+                <th class="sticky top-0 z-10 bg-surface px-4 py-3">Tỉ lệ bắt</th>
+                <th class="sticky top-0 z-10 bg-surface px-4 py-3">Chỉ số loài cá</th>
+                <th class="sticky top-0 z-10 bg-surface px-4 py-3">Ngày tạo</th>
+                <th class="sticky top-0 z-10 bg-surface px-4 py-3 text-right">Thao tác</th>
               </tr>
             </thead>
             <tbody>
               <tr
                 v-for="item in filteredSpecies"
                 :key="item.id"
-                class="border-t border-gray-100 hover:bg-emerald-50/40"
+                class="border-t border-border hover:bg-surface/40"
               >
                 <td class="max-w-[25rem] px-4 py-3">
                   <div class="flex items-center gap-3">
@@ -186,44 +186,44 @@ onMounted(() => speciesStore.fetchAll());
                       v-if="item.image"
                       :src="item.image"
                       :alt="item.name"
-                      class="w-30 shrink-0 rounded-md border border-gray-200 bg-gray-50 object-cover"
+                      class="w-30 shrink-0 rounded-md border border-border bg-white object-cover"
                       loading="lazy"
                     />
                     <div
                       v-else
-                      class="grid size-12 shrink-0 place-items-center rounded-md border border-gray-200 bg-gray-50 text-xl"
+                      class="grid size-12 shrink-0 place-items-center rounded-md border border-border bg-white text-xl"
                     >
                       🐟
                     </div>
                     <div class="min-w-0">
-                      <div class="truncate font-bold text-gray-800" :title="item.name">{{ item.name }}</div>
-                      <div class="mt-1 break-all text-xs text-gray-500">ID: {{ item.id }}</div>
-                      <div class="mt-1 max-w-[22rem] truncate text-xs text-gray-500" :title="item.information || ''">
+                      <div class="truncate font-bold text-content" :title="item.name">{{ item.name }}</div>
+                      <div class="mt-1 break-all text-xs text-content">ID: {{ item.id }}</div>
+                      <div class="mt-1 max-w-[22rem] truncate text-xs text-content" :title="item.information || ''">
                         {{ item.information || "Chưa có mô tả" }}
                       </div>
                     </div>
                   </div>
                 </td>
-                <td class="px-4 py-3 text-gray-700">{{ item.location || "—" }}</td>
-                <td class="px-4 py-3 text-gray-700">{{ item.rarity || "—" }}</td>
-                <td class="whitespace-nowrap px-4 py-3 text-gray-700">
+                <td class="px-4 py-3 text-content">{{ item.location || "—" }}</td>
+                <td class="px-4 py-3 text-content">{{ item.rarity || "—" }}</td>
+                <td class="whitespace-nowrap px-4 py-3 text-content">
                   {{ item.weight_min ?? "—" }} – {{ item.weight_max ?? "—" }}
                 </td>
-                <td class="px-4 py-3 text-gray-700">{{ item.base_catch_rate ?? "—" }}</td>
+                <td class="px-4 py-3 text-content">{{ item.base_catch_rate ?? "—" }}</td>
                 <td class="min-w-72 px-4 py-3"><SpeciesManagementStats :species="item" /></td>
-                <td class="whitespace-nowrap px-4 py-3 text-xs text-gray-500">{{ formatDate(item.created_at) }}</td>
+                <td class="whitespace-nowrap px-4 py-3 text-xs text-content">{{ formatDate(item.created_at) }}</td>
                 <td class="px-4 py-3">
                   <div class="flex justify-end gap-2">
                     <button
                       type="button"
-                      class="rounded-md border border-gray-300 px-2.5 py-1.5 text-xs font-bold text-gray-700 hover:bg-gray-100"
+                      class="rounded-md border border-content px-2.5 py-1.5 text-xs font-bold text-content hover:bg-surface"
                       @click="openEditForm(item)"
                     >
                       Sửa
                     </button>
                     <button
                       type="button"
-                      class="rounded-md border border-red-200 px-2.5 py-1.5 text-xs font-bold text-red-700 hover:bg-red-50"
+                      class="rounded-md border border-danger px-2.5 py-1.5 text-xs font-bold text-danger hover:bg-surface"
                       @click="confirmDeleteId = item.id"
                     >
                       Xoá
@@ -262,32 +262,32 @@ onMounted(() => speciesStore.fetchAll());
                 <div class="flex flex-1 flex-col gap-3 p-4">
                   <div>
                     <div class="m-0 break-words text-sm font-bold text-content">{{ item.name }}</div>
-                    <div class="mt-2 break-all text-xs text-gray-500">ID: {{ item.id }}</div>
-                    <div class="m-0 mt-1 line-clamp-2 text-xs text-gray-500" :title="item.information || ''">
+                    <div class="mt-2 break-all text-xs text-content">ID: {{ item.id }}</div>
+                    <div class="m-0 mt-1 line-clamp-2 text-xs text-content" :title="item.information || ''">
                       {{ item.information || "Chưa có mô tả" }}
                     </div>
                   </div>
                   <dl class="m-0 grid grid-cols-2 gap-3 text-xs">
                     <div class="min-w-0">
-                      <dt class="text-gray-500">Khu vực</dt>
+                      <dt class="text-content">Khu vực</dt>
                       <dd class="m-0 mt-1 break-words text-content">{{ item.location || "—" }}</dd>
                     </div>
                     <div class="min-w-0">
-                      <dt class="text-gray-500">Độ hiếm</dt>
+                      <dt class="text-content">Độ hiếm</dt>
                       <dd class="m-0 mt-1 break-words text-content">{{ item.rarity || "—" }}</dd>
                     </div>
                     <div>
-                      <dt class="text-gray-500">Khối lượng</dt>
+                      <dt class="text-content">Khối lượng</dt>
                       <dd class="m-0 mt-1 text-content">
                         {{ item.weight_min ?? "—" }} – {{ item.weight_max ?? "—" }}
                       </dd>
                     </div>
                     <div>
-                      <dt class="text-gray-500">Tỉ lệ bắt</dt>
+                      <dt class="text-content">Tỉ lệ bắt</dt>
                       <dd class="m-0 mt-1 text-content">{{ item.base_catch_rate ?? "—" }}</dd>
                     </div>
                     <div>
-                      <dt class="text-gray-500">Ngày tạo</dt>
+                      <dt class="text-content">Ngày tạo</dt>
                       <dd class="m-0 mt-1 text-content">{{ formatDate(item.created_at) }}</dd>
                     </div>
                   </dl>
@@ -304,7 +304,7 @@ onMounted(() => speciesStore.fetchAll());
                     <button
                       type="button"
                       :aria-label="`Xoá ${item.name}`"
-                      class="rounded-md border border-red-200 px-2.5 py-1.5 text-xs font-bold text-red-700 hover:bg-red-50"
+                      class="rounded-md border border-danger px-2.5 py-1.5 text-xs font-bold text-danger hover:bg-surface"
                       @click="confirmDeleteId = item.id"
                     >
                       Xoá
@@ -319,23 +319,23 @@ onMounted(() => speciesStore.fetchAll());
 
       <div
         v-if="isFormOpen"
-        class="absolute inset-0 z-20 bg-black/25 lg:static lg:inset-auto lg:z-auto lg:bg-transparent"
+        class="absolute inset-0 z-20 bg-content/25 lg:static lg:inset-auto lg:z-auto lg:bg-transparent"
         @click.self="closeForm"
       >
         <SpeciesManagementForm :species="selectedSpecies" @close="closeForm" @saved="closeForm" />
       </div>
     </main>
 
-    <div v-if="confirmDeleteId" class="fixed inset-0 z-40 grid place-items-center bg-black/45 p-4">
+    <div v-if="confirmDeleteId" class="fixed inset-0 z-40 grid place-items-center bg-content/45 p-4">
       <div class="w-full max-w-sm rounded-xl bg-white p-5 shadow-xl">
-        <div class="m-0 text-base font-extrabold text-gray-800">Xác nhận xoá loài cá?</div>
-        <div class="my-3 text-sm text-gray-600">
+        <div class="m-0 text-base font-extrabold text-content">Xác nhận xoá loài cá?</div>
+        <div class="my-3 text-sm text-content">
           Thao tác này không thể hoàn tác. Các dữ liệu liên quan có thể bị ràng buộc bởi cơ sở dữ liệu.
         </div>
         <div class="flex justify-end gap-2">
           <button
             type="button"
-            class="rounded-lg border border-gray-300 px-3 py-2 text-sm font-bold text-gray-700"
+            class="rounded-lg border border-content px-3 py-2 text-sm font-bold text-content"
             @click="confirmDeleteId = null"
           >
             Huỷ
@@ -343,7 +343,7 @@ onMounted(() => speciesStore.fetchAll());
           <button
             type="button"
             :disabled="deletingId === confirmDeleteId"
-            class="rounded-lg bg-red-600 px-3 py-2 text-sm font-bold text-white disabled:opacity-50"
+            class="rounded-lg bg-danger px-3 py-2 text-sm font-bold text-white disabled:opacity-50"
             @click="handleDelete"
           >
             {{ deletingId ? "Đang xoá..." : "Xoá loài" }}

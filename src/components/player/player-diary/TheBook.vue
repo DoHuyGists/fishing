@@ -23,29 +23,29 @@ const emit = defineEmits<{
 
 const VARIANT_PRESETS: Record<BookVariant, { coverBg: string; spineBg: string; textColor: string }> = {
   default: {
-    coverBg: 'linear-gradient(45deg, #102D46 0%, #1D5475 100%)',
-    spineBg: '#93643F',
-    textColor: '#F5EBD4',
+    coverBg: 'linear-gradient(45deg, #24352a 0%, #1e5fbf 100%)',
+    spineBg: '#ffd166',
+    textColor: '#f5f9f0',
   },
   ocean: {
-    coverBg: 'linear-gradient(45deg, #102D46 0%, #1D5475 65%, #35B9D5 100%)',
-    spineBg: '#102D46',
-    textColor: '#F2C66D',
+    coverBg: 'linear-gradient(45deg, #24352a 0%, #1e5fbf 65%, #4fc3ff 100%)',
+    spineBg: '#24352a',
+    textColor: '#ffd166',
   },
   gold: {
-    coverBg: 'linear-gradient(45deg, #93643F 0%, #F2C66D 100%)',
-    spineBg: '#93643F',
-    textColor: '#102D46',
+    coverBg: 'linear-gradient(45deg, #ffd166 0%, #ffd166 100%)',
+    spineBg: '#ffd166',
+    textColor: '#24352a',
   },
   dark: {
-    coverBg: 'linear-gradient(45deg, #18181b 0%, #3f3f46 100%)',
-    spineBg: '#09090b',
-    textColor: '#f4f4f5',
+    coverBg: 'linear-gradient(45deg, #24352a 0%, #24352a 100%)',
+    spineBg: '#24352a',
+    textColor: '#f5f9f0',
   },
   emerald: {
-    coverBg: 'linear-gradient(45deg, #064e3b 0%, #10b981 100%)',
-    spineBg: '#022c22',
-    textColor: '#ecfdf5',
+    coverBg: 'linear-gradient(45deg, #24352a 0%, #1abc9c 100%)',
+    spineBg: '#24352a',
+    textColor: '#f5f9f0',
   },
 }
 

@@ -105,7 +105,7 @@ onBeforeUnmount(() => {
             >
               {{ tr("Fishfarm.tai_lai") }}
             </button>
-            <div v-if="feedbackStore.historyError" role="alert" class="text-red-700">
+            <div v-if="feedbackStore.historyError" role="alert" class="text-danger">
               {{ feedbackStore.historyError }}
             </div>
             <div v-if="feedbackStore.historyLoading">{{ tr("Feedbackmodal.dang_tai_bao_loi") }}</div>
@@ -122,7 +122,7 @@ onBeforeUnmount(() => {
                 <span>{{ statusLabels[item.status] || item.status }}</span>
               </div>
               <div class="mt-2 whitespace-pre-wrap">{{ item.description }}</div>
-              <div class="mt-2 text-xs text-gray-600">
+              <div class="mt-2 text-xs text-content">
                 {{ tr("Feedbackmodal.gui") }} {{ new Date(item.created_at).toLocaleString(getFormattingLocale()) }}
                 {{ tr("Feedbackmodal.cap_nhat") }} {{ new Date(item.updated_at).toLocaleString(getFormattingLocale()) }}
               </div>
@@ -153,9 +153,9 @@ onBeforeUnmount(() => {
     v-if="toastVisible"
     role="status"
     aria-live="polite"
-    class="fixed inset-x-4 bottom-4 z-[60] mx-auto flex max-w-md items-start gap-3 rounded-xl bg-gray-900 px-4 py-3 text-sm text-white shadow-lg sm:inset-x-auto sm:right-6 sm:bottom-6 sm:mx-0"
+    class="fixed inset-x-4 bottom-4 z-[60] mx-auto flex max-w-md items-start gap-3 rounded-xl bg-content px-4 py-3 text-sm text-white shadow-lg sm:inset-x-auto sm:right-6 sm:bottom-6 sm:mx-0"
   >
-    <svg class="mt-0.5 h-5 w-5 shrink-0 text-emerald-400" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true">
+    <svg class="mt-0.5 h-5 w-5 shrink-0 text-accent" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true">
       <path
         fill-rule="evenodd"
         d="M10 18a8 8 0 1 0 0-16 8 8 0 0 0 0 16Zm3.86-9.64a.75.75 0 0 0-1.22-.87l-3.24 4.53-1.8-1.8a.75.75 0 0 0-1.06 1.06l2.4 2.4a.75.75 0 0 0 1.14-.09l3.78-5.23Z"
@@ -165,7 +165,7 @@ onBeforeUnmount(() => {
     <div class="flex-1 leading-relaxed">{{ SUCCESS_MESSAGE }}</div>
     <button
       type="button"
-      class="-mr-1 rounded p-1 text-gray-400 hover:text-white focus:outline-none focus-visible:ring-2 focus-visible:ring-white"
+      class="-mr-1 rounded p-1 text-content hover:text-white focus:outline-none focus-visible:ring-2 focus-visible:ring-white"
       :aria-label="tr('Feedbackmodal.dong_thong_bao')"
       @click="toastVisible = false"
     >

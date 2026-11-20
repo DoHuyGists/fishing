@@ -8,7 +8,7 @@ const store = useLeaderboardStore();
 
 <template>
   <div class="slide-fade-in from-bottom player-content-in space-y-6 text-sm leading-relaxed text-content">
-    <div class="relative overflow-hidden rounded-2xl bg-palette-243f32 px-5 py-6 text-white sm:px-8 sm:py-8">
+    <div class="relative overflow-hidden rounded-2xl bg-content px-5 py-6 text-white sm:px-8 sm:py-8">
       <div
         aria-hidden="true"
         class="pointer-events-none absolute -right-6 -top-10 text-[160px] leading-none opacity-10"
@@ -20,7 +20,7 @@ const store = useLeaderboardStore();
           {{ tr("LeaderboardRules.tab") }}
         </div>
         <div class="mt-2 text-2xl font-bold sm:text-3xl">{{ tr("LeaderboardRules.intro_title") }}</div>
-        <div class="mt-2 text-sm text-palette-dbe7d6">{{ tr("LeaderboardRules.intro") }}</div>
+        <div class="mt-2 text-sm text-content">{{ tr("LeaderboardRules.intro") }}</div>
       </div>
       <div class="relative mt-5 flex flex-wrap gap-2 text-xs font-semibold">
         <span class="rounded-full border border-white/20 bg-white/10 px-3 py-1.5">{{
@@ -59,7 +59,7 @@ const store = useLeaderboardStore();
           </div>
         </div>
       </div>
-      <div class="mt-3 rounded-xl border-l-4 border-palette-94ac83 bg-surface px-4 py-3 text-xs text-content-muted">
+      <div class="mt-3 rounded-xl border-l-4 border-content bg-surface px-4 py-3 text-xs text-content-muted">
         {{ tr("LeaderboardRules.lifetime_ties") }}
       </div>
     </section>

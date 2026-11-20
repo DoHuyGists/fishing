@@ -16,7 +16,7 @@ const undiscoveredFishes = computed(() => store.areaSpeciesDiary?.fishes.filter(
         @click.self="store.closeLakeGuide"
       >
         <section
-          class="player-popup-panel w-[min(500px,100%)] overflow-hidden border border-ocean-gold/70 rounded-[20px] bg-linear-to-br from-ocean-panel to-ocean-deep shadow-[0_24px_70px_rgba(0,0,0,0.48)] text-ocean-pearl"
+          class="player-popup-panel w-[min(500px,100%)] overflow-hidden border border-ocean-gold/70 rounded-[20px] bg-linear-to-br from-ocean-panel to-ocean-deep shadow-[0_24px_70px_color-mix(in_srgb,_var(--color-content)_48%,_transparent)] text-ocean-pearl"
           role="dialog"
           aria-modal="true"
         >
@@ -36,7 +36,7 @@ const undiscoveredFishes = computed(() => store.areaSpeciesDiary?.fishes.filter(
             <div v-if="store.isLoadingAreaSpeciesDiary" class="py-8 text-center text-sm text-border-strong" role="status">
               {{ tr("CaughtModal.dang_tai_danh_sach_ca") }}
             </div>
-            <div v-else-if="store.areaSpeciesDiaryError" class="py-6 text-center text-sm text-palette-f3b8a8" role="alert">
+            <div v-else-if="store.areaSpeciesDiaryError" class="py-6 text-center text-sm text-danger" role="alert">
               <div class="mb-3">{{ tr("LakeFishGuide.khong_the_tai_so_tay_ca_trong_ho") }}</div>
               <button
                 type="button"
@@ -78,7 +78,7 @@ const undiscoveredFishes = computed(() => store.areaSpeciesDiary?.fishes.filter(
                       <img
                         :src="fish.image || '/fish/VN/fish.jpg'"
                         :alt="fish.display_name"
-                        class="h-14 shrink-0 rounded-lg bg-black/20 object-cover"
+                        class="h-14 shrink-0 rounded-lg bg-content/20 object-cover"
                         draggable="false"
                       />
                       <div class="min-w-0 flex-1">
@@ -111,7 +111,7 @@ const undiscoveredFishes = computed(() => store.areaSpeciesDiary?.fishes.filter(
                     <div
                       v-for="fish in undiscoveredFishes"
                       :key="fish.species_id"
-                      class="flex min-h-16 items-center gap-2 rounded-xl border border-dashed border-white/15 bg-black/10 p-2.5"
+                      class="flex min-h-16 items-center gap-2 rounded-xl border border-dashed border-white/15 bg-content/10 p-2.5"
                     >
                       <span
                         class="grid h-9 w-9 shrink-0 place-items-center rounded-full bg-white/[0.08] text-lg text-border-strong"

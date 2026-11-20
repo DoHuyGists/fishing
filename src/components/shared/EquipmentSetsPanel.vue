@@ -24,16 +24,16 @@ defineEmits<{ action: []; "change-page": [page: number] }>();
     <header class="space-y-2 border-b border-border-default p-3">
       <div class="flex flex-wrap items-center justify-between gap-2">
         <div class="text-sm font-bold">
-          {{ title }} <span class="font-normal text-palette-526650">({{ count }})</span>
+          {{ title }} <span class="font-normal text-content">({{ count }})</span>
         </div>
-        <button :id="actionId" type="button" :disabled="actionDisabled" class="ocean-primary-action rounded-md bg-teal-700 px-3 py-1.5 text-xs text-white hover:bg-teal-800 disabled:cursor-not-allowed disabled:opacity-40" @click="$emit('action')">
+        <button :id="actionId" type="button" :disabled="actionDisabled" class="ocean-primary-action rounded-md bg-accent px-3 py-1.5 text-xs text-white hover:bg-accent disabled:cursor-not-allowed disabled:opacity-40" @click="$emit('action')">
           {{ actionLabel }}
         </button>
       </div>
-      <input v-model="search" type="search" :aria-label="tr('EquipmentSets.tim_theo_so_set_hoac_ten_vat_pham')" :placeholder="tr('EquipmentSets.tim_theo_so_set_hoac_ten_vat_pham')" class="w-full rounded-md border border-border-default bg-white px-3 py-2 text-xs outline-none focus:border-teal-600 focus:ring-2 focus:ring-teal-100" />
+      <input v-model="search" type="search" :aria-label="tr('EquipmentSets.tim_theo_so_set_hoac_ten_vat_pham')" :placeholder="tr('EquipmentSets.tim_theo_so_set_hoac_ten_vat_pham')" class="w-full rounded-md border border-border-default bg-white px-3 py-2 text-xs outline-none focus:border-accent focus:ring-2 focus:ring-surface" />
     </header>
     <div class="min-w-0 flex-1 space-y-3 p-3">
-      <div v-if="empty" class="py-6 text-center text-xs text-palette-526650">{{ emptyText }}</div>
+      <div v-if="empty" class="py-6 text-center text-xs text-content">{{ emptyText }}</div>
       <slot />
     </div>
     <Pagination :page="page" :total="total" :page-size="pageSize" :loading="loading" @change="$emit('change-page', $event)" />

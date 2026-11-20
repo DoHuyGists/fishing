@@ -421,7 +421,7 @@ function applyMedia() {
 
 <template>
   <div
-    class="overflow-hidden rounded-xl border border-border-default bg-white text-content focus-within:ring-2 focus-within:ring-emerald-700/20"
+    class="overflow-hidden rounded-xl border border-border-default bg-white text-content focus-within:ring-2 focus-within:ring-accent/20"
     :class="{ 'opacity-60': disabled }"
   >
     <div
@@ -437,10 +437,10 @@ function applyMedia() {
         :aria-label="tool.label"
         :aria-pressed="tool.active ? editor?.isActive(tool.active) : undefined"
         :disabled="disabled || !editor || (tool.enabled ? !tool.enabled(editor) : false)"
-        class="rounded-md border px-2.5 py-1.5 text-xs font-semibold hover:bg-emerald-100 focus-visible:outline-2 focus-visible:outline-emerald-700 disabled:cursor-not-allowed disabled:opacity-40"
+        class="rounded-md border px-2.5 py-1.5 text-xs font-semibold hover:bg-surface focus-visible:outline-2 focus-visible:outline-accent disabled:cursor-not-allowed disabled:opacity-40"
         :class="
           tool.active && editor?.isActive(tool.active)
-            ? 'border-emerald-700 bg-emerald-100 text-emerald-900'
+            ? 'border-accent bg-surface text-content'
             : 'border-transparent'
         "
         @mousedown.prevent
@@ -453,7 +453,7 @@ function applyMedia() {
         :disabled="disabled || !editor"
         :aria-expanded="linkOpen"
         :aria-pressed="editor?.isActive('link')"
-        class="rounded-md border border-border-default px-2.5 py-1.5 text-xs font-semibold hover:bg-emerald-100 disabled:opacity-40"
+        class="rounded-md border border-border-default px-2.5 py-1.5 text-xs font-semibold hover:bg-surface disabled:opacity-40"
         @mousedown.prevent
         @click="openLink"
       >
@@ -464,7 +464,7 @@ function applyMedia() {
         :disabled="disabled || !editor"
         :aria-expanded="mediaOpen"
         :aria-controls="mediaPanelId"
-        class="rounded-md border border-border-default px-2.5 py-1.5 text-xs font-semibold hover:bg-emerald-100 disabled:opacity-40"
+        class="rounded-md border border-border-default px-2.5 py-1.5 text-xs font-semibold hover:bg-surface disabled:opacity-40"
         @mousedown.prevent
         @click="openMedia"
       >
@@ -495,12 +495,12 @@ function applyMedia() {
           @keydown.enter.prevent="applyLink"
         />
       </label>
-      <div v-if="linkError" role="alert" class="text-xs text-red-700">{{ linkError }}</div>
+      <div v-if="linkError" role="alert" class="text-xs text-danger">{{ linkError }}</div>
       <div class="flex flex-wrap gap-2">
         <button
           type="button"
           :disabled="disabled || !editor"
-          class="rounded-lg border border-border-default bg-white px-3 py-1.5 text-xs font-semibold hover:bg-emerald-100 disabled:opacity-40"
+          class="rounded-lg border border-border-default bg-white px-3 py-1.5 text-xs font-semibold hover:bg-surface disabled:opacity-40"
           @click="openAssets('link')"
         >
           {{ tr("RichEditor.chon_tu_kho_anh_video") }}
@@ -508,7 +508,7 @@ function applyMedia() {
         <button
           type="button"
           :disabled="disabled"
-          class="rounded-lg bg-emerald-800 px-3 py-1.5 text-xs font-bold text-white disabled:opacity-40"
+          class="rounded-lg bg-accent px-3 py-1.5 text-xs font-bold text-white disabled:opacity-40"
           @click="applyLink"
         >
           {{ tr("RichEditor.ap_dung") }}
@@ -571,12 +571,12 @@ function applyMedia() {
           @keydown.enter.prevent="applyMedia"
         />
       </label>
-      <div v-if="mediaError" role="alert" class="text-xs text-red-700">{{ mediaError }}</div>
+      <div v-if="mediaError" role="alert" class="text-xs text-danger">{{ mediaError }}</div>
       <div class="flex flex-wrap gap-2">
         <button
           type="button"
           :disabled="disabled || !editor"
-          class="rounded-lg border border-border-default bg-white px-3 py-1.5 text-xs font-semibold hover:bg-emerald-100 disabled:opacity-40"
+          class="rounded-lg border border-border-default bg-white px-3 py-1.5 text-xs font-semibold hover:bg-surface disabled:opacity-40"
           @click="openAssets('media')"
         >
           {{ tr("RichEditor.chon_anh_video_tu_kho") }}
@@ -584,7 +584,7 @@ function applyMedia() {
         <button
           type="button"
           :disabled="disabled"
-          class="rounded-lg bg-emerald-800 px-3 py-1.5 text-xs font-bold text-white disabled:opacity-40"
+          class="rounded-lg bg-accent px-3 py-1.5 text-xs font-bold text-white disabled:opacity-40"
           @click="applyMedia"
         >
           {{
@@ -627,7 +627,7 @@ function applyMedia() {
 .guide-editor :deep(pre) {
   overflow-x: auto;
   border-radius: 0.5rem;
-  background: var(--color-palette-eef2e9);
+  background: var(--color-surface);
   padding: 0.75rem;
 }
 .guide-editor :deep(img) {

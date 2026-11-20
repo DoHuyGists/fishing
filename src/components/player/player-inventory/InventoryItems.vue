@@ -56,26 +56,26 @@ const displayedGroups = computed(() =>
 </script>
 
 <template>
-  <div id="user-inventory" class="flex min-w-0 flex-col rounded-lg border border-slate-200 bg-white">
-    <header class="space-y-3 border-b border-slate-200 p-4">
+  <div id="user-inventory" class="flex min-w-0 flex-col rounded-lg border border-border bg-white">
+    <header class="space-y-3 border-b border-border p-4">
       <div class="flex flex-wrap items-center justify-between gap-2">
         <div class="text-lg font-semibold">
-          {{ tr('InventoryItems.kho_do') }} <span class="text-sm font-normal text-slate-500">({{ inventoryStore.ownedTotal }})</span>
+          {{ tr('InventoryItems.kho_do') }} <span class="text-sm font-normal text-content">({{ inventoryStore.ownedTotal }})</span>
         </div>
-        <div class="inline-flex overflow-hidden rounded-md border border-slate-300 text-sm" role="group"
+        <div class="inline-flex overflow-hidden rounded-md border border-content text-sm" role="group"
           :aria-label="tr('InventoryItems.kieu_hien_thi')">
           <button type="button" :aria-pressed="viewMode === 'grid'"
-            :class="['px-3 py-1', viewMode === 'grid' ? 'bg-slate-800 text-white' : 'bg-white hover:bg-slate-100']"
+            :class="['px-3 py-1', viewMode === 'grid' ? 'bg-content text-white' : 'bg-white hover:bg-surface']"
             @click="viewMode = 'grid'">
             {{ tr('CaughtModal.luoi') }}
           </button>
           <button type="button" :aria-pressed="viewMode === 'list'"
-            :class="['px-3 py-1', viewMode === 'list' ? 'bg-slate-800 text-white' : 'bg-white hover:bg-slate-100']"
+            :class="['px-3 py-1', viewMode === 'list' ? 'bg-content text-white' : 'bg-white hover:bg-surface']"
             @click="viewMode = 'list'">
             {{ tr('CaughtModal.danh_sach') }}
           </button>
           <button type="button" :aria-pressed="viewMode === 'grouped'"
-            :class="['px-3 py-1', viewMode === 'grouped' ? 'bg-slate-800 text-white' : 'bg-white hover:bg-slate-100']"
+            :class="['px-3 py-1', viewMode === 'grouped' ? 'bg-content text-white' : 'bg-white hover:bg-surface']"
             @click="viewMode = 'grouped'">
             {{ tr('InventoryItems.nhom_loai') }}
           </button>
@@ -83,21 +83,21 @@ const displayedGroups = computed(() =>
       </div>
 
       <input v-model="itemSearch" type="search" :placeholder="tr('InventoryItems.tim_theo_ten_hoac_loai_vat_pham')"
-        class="w-full rounded-md border border-slate-300 px-3 py-2 text-sm outline-none focus:border-teal-600 focus:ring-2 focus:ring-teal-100" />
+        class="w-full rounded-md border border-content px-3 py-2 text-sm outline-none focus:border-accent focus:ring-2 focus:ring-surface" />
 
       <div class="flex flex-wrap items-center justify-between gap-2 text-sm">
         <label class="inline-flex cursor-pointer items-center gap-2">
-          <input type="checkbox" class="h-4 w-4 accent-teal-700" :checked="allOnPageSelected"
+          <input type="checkbox" class="h-4 w-4 accent-accent" :checked="allOnPageSelected"
             @change="toggleSelectPage" />
           {{ tr('InventoryItems.chon_ca_trang') }}
         </label>
         <button type="button" :disabled="selected.size === 0"
-          class="rounded-md bg-red-600 px-3 py-1 text-white hover:bg-red-700 disabled:cursor-not-allowed disabled:bg-slate-200 disabled:text-slate-400"
+          class="rounded-md bg-danger px-3 py-1 text-white hover:bg-danger disabled:cursor-not-allowed disabled:bg-surface disabled:text-content"
           @click="$emit('request-delete')">
           {{ tr('InventoryItems.xoa_da_chon') }}<span v-if="selected.size"> ({{ selected.size }})</span>
         </button>
         <button v-if="selected.size === 1 && hasRpc()" type="button" :disabled="!!usingItemId"
-          class="rounded-md bg-teal-700 px-3 py-1 text-white hover:bg-teal-800 disabled:cursor-not-allowed disabled:opacity-50"
+          class="rounded-md bg-accent px-3 py-1 text-white hover:bg-accent disabled:cursor-not-allowed disabled:opacity-50"
           @click="useSelectedItem">
           {{ usingItemId ? tr('InventoryItems.dang_su_dung') : tr('EquipmentSets.su_dung') }}
         </button>
@@ -107,7 +107,7 @@ const displayedGroups = computed(() =>
         <span>{{ tr('Health.filterSlot', { slot: tr(`Health.slot_${healthStore.selectedSlot}`) }) }} · {{ tr('Health.pickInventoryItem') }}</span>
         <button type="button" class="min-h-8 underline" @click="healthStore.selectedSlot = null">{{ tr('AccountInfoModal.huy') }}</button>
       </div>
-      <div v-else-if="activeTab === 'fishing' && active" class="flex items-center justify-between rounded-md bg-teal-50 px-3 py-2 text-sm text-teal-900">
+      <div v-else-if="activeTab === 'fishing' && active" class="flex items-center justify-between rounded-md bg-surface px-3 py-2 text-sm text-content">
         <span>
           {{ tr('InventoryItems.dang_chon_o') }} <b>{{ LABELS[active.slot] }}</b> {{ tr('InventoryItems.cua_set') }} {{ activeSetNumber }}{{ tr('InventoryItems.bam_vat_pham_de_them') }}
         </span>
@@ -116,14 +116,14 @@ const displayedGroups = computed(() =>
     </header>
 
     <div class="min-h-0 max-h-[60dvh] flex-1 overflow-y-scroll p-4">
-      <div v-if="pagedItems.length === 0" class="py-12 text-center text-sm text-slate-500">
+      <div v-if="pagedItems.length === 0" class="py-12 text-center text-sm text-content">
         {{ inventoryStore.ownedTotal === 0 ? tr('InventoryItems.kho_do_dang_trong') : tr('InventoryItems.khong_co_vat_pham_nao_khop_voi_tim_kiem') }}
       </div>
 
       <div v-for="group in displayedGroups" :key="group.category" class="mb-4 last:mb-0">
-        <div v-if="viewMode === 'grouped'" class="mb-2 text-sm font-semibold text-slate-700">
+        <div v-if="viewMode === 'grouped'" class="mb-2 text-sm font-semibold text-content">
           {{ categoryName(group.category) || tr('InventoryItems.khac') }}
-          <span class="font-normal text-slate-500">({{ group.items.length }})</span>
+          <span class="font-normal text-content">({{ group.items.length }})</span>
         </div>
         <div :class="viewMode === 'list' ? 'flex flex-col gap-2' : 'grid grid-cols-2 gap-3 sm:grid-cols-3 xl:grid-cols-4'">
           <InventoryItemCard v-for="item in group.items" :key="item.id" :item="item" :list="viewMode === 'list'" />
@@ -131,15 +131,15 @@ const displayedGroups = computed(() =>
       </div>
     </div>
 
-    <footer v-if="itemPages > 1" class="flex items-center justify-between border-t border-slate-200 px-4 py-3 text-sm">
+    <footer v-if="itemPages > 1" class="flex items-center justify-between border-t border-border px-4 py-3 text-sm">
       <button type="button" :disabled="itemPage <= 1 || inventoryStore.viewLoading"
-        class="rounded border border-slate-300 px-3 py-1 hover:bg-slate-100 disabled:opacity-40"
+        class="rounded border border-content px-3 py-1 hover:bg-surface disabled:opacity-40"
         @click="itemPage--">
         {{ tr('Fishfarm.truoc') }}
       </button>
-      <span class="text-slate-600">{{ tr('CaughtModal.trang') }} {{ itemPage }} / {{ itemPages }}</span>
+      <span class="text-content">{{ tr('CaughtModal.trang') }} {{ itemPage }} / {{ itemPages }}</span>
       <button type="button" :disabled="itemPage >= itemPages || inventoryStore.viewLoading"
-        class="rounded border border-slate-300 px-3 py-1 hover:bg-slate-100 disabled:opacity-40"
+        class="rounded border border-content px-3 py-1 hover:bg-surface disabled:opacity-40"
         @click="itemPage++">
         {{ tr('Fishfarm.sau') }}
       </button>

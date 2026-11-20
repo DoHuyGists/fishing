@@ -38,7 +38,7 @@ async function submit() {
       {{ tr("AquacultureStockForm.tha_mot_lua_moi") }}
     </summary>
     <form class="space-y-3 border-t border-border-default p-4 text-xs" @submit.prevent="submit">
-      <div class="m-0 leading-relaxed text-stone-600">
+      <div class="m-0 leading-relaxed text-content">
         {{ tr("AquacultureStockForm.moi_lua_mot_loai_ban_co_the_tha_nhieu_loai_chung_ao_neu_con_suc_") }}
       </div>
       <label class="block"
@@ -61,7 +61,7 @@ async function submit() {
           </option>
         </select>
       </label>
-      <div v-if="!farm.farm?.species.length" class="text-stone-500">
+      <div v-if="!farm.farm?.species.length" class="text-content">
         {{ tr("AquacultureStockForm.chua_co_loai_nao_duoc_mo_nuoi") }}
       </div>
       <template v-if="rule">
@@ -92,7 +92,7 @@ async function submit() {
             <input v-model="mode" type="radio" value="simple" name="care-mode" class="mt-0.5" />
             <span
               ><b>{{ tr("AquacultureStockForm.thong_tha") }}</b
-              ><span class="mt-1 block text-stone-500">{{
+              ><span class="mt-1 block text-content">{{
                 tr("AquacultureStockForm.tha_roi_cho_ca_lon_khong_can_cho_an_hay_cham_soc")
               }}</span></span
             >
@@ -101,7 +101,7 @@ async function submit() {
             <input v-model="mode" type="radio" value="advanced" name="care-mode" class="mt-0.5" />
             <span
               ><b>{{ tr("AquacultureStockForm.cham_chut") }}</b
-              ><span class="mt-1 block text-stone-500"
+              ><span class="mt-1 block text-content"
                 >{{ tr("AquacultureStockForm.cham_de_tang_can_nang_va_co_hoi_dac_biet_toi_da")
                 }}{{ +(rule.advanced_rare_bonus * 100).toFixed(3) }}
                 {{ tr("AquacultureStockForm.diem_bo_cham_van_lon_khong_mat_ca") }}</span
@@ -112,7 +112,7 @@ async function submit() {
         <button
           type="submit"
           :disabled="!farm.canMutate || !maximum || !Number.isInteger(quantity) || quantity < 1 || quantity > maximum"
-          class="w-full rounded-lg bg-emerald-700 p-2.5 font-semibold text-white disabled:opacity-50"
+          class="w-full rounded-lg bg-accent p-2.5 font-semibold text-white disabled:opacity-50"
         >
           {{ tr("AquacultureStockForm.tha_ca") }} <Cash :amount="cost" :size="18" :interactive="false" />
         </button>

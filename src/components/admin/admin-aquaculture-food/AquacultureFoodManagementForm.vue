@@ -32,7 +32,7 @@ function isConfigured(itemId: string) {
     <div
       v-if="!editing && (!store.rules.length || !store.sourceItems.length)"
       role="status"
-      class="rounded-lg border border-amber-200 bg-amber-50 px-3 py-2 text-xs text-amber-800"
+      class="rounded-lg border border-gold bg-surface px-3 py-2 text-xs text-gold"
     >
       <div v-if="!store.rules.length">Chưa có loài được cấu hình nuôi. Hãy thêm cấu hình loài nuôi trước.</div>
       <div v-if="!store.sourceItems.length">Chưa có vật phẩm thức ăn. Hãy thêm vật phẩm tại mục Vật phẩm trước.</div>
@@ -41,7 +41,7 @@ function isConfigured(itemId: string) {
     <label v-for="field in fields" :key="field.key" class="flex flex-col gap-1 text-xs font-semibold">
       <span
         >{{ field.label
-        }}<span v-if="field.required && !(editing && field.immutable)" class="text-red-600"> *</span></span
+        }}<span v-if="field.required && !(editing && field.immutable)" class="text-danger"> *</span></span
       >
       <input
         v-if="editing && field.immutable"
@@ -76,10 +76,10 @@ function isConfigured(itemId: string) {
         :step="field.step ?? 'any'"
         class="rounded-lg border border-border-default bg-white px-3 py-2 font-normal"
       />
-      <span v-if="field.key === 'capacity_units_per_item'" class="font-normal text-gray-500">
+      <span v-if="field.key === 'capacity_units_per_item'" class="font-normal text-content">
         Số phần ăn mỗi lượt = làm tròn lên (tổng điểm sức chứa của lứa / điểm mỗi phần).
       </span>
-      <span v-if="field.key === 'quality_gain' && qualityPercent !== null" class="font-normal text-gray-500">
+      <span v-if="field.key === 'quality_gain' && qualityPercent !== null" class="font-normal text-content">
         Tăng {{ qualityPercent }}% chất lượng mỗi lượt cho ăn.
       </span>
     </label>
@@ -87,7 +87,7 @@ function isConfigured(itemId: string) {
     <div
       v-if="selectedItem?.isDisabled"
       role="status"
-      class="rounded-lg border border-amber-200 bg-amber-50 px-3 py-2 text-xs text-amber-800"
+      class="rounded-lg border border-gold bg-surface px-3 py-2 text-xs text-gold"
     >
       Vật phẩm này đang tắt. Tên, giá và trạng thái vật phẩm được quản lý tại mục Vật phẩm.
     </div>

@@ -13,25 +13,25 @@ const icons: Record<ToastVariant, string> = {
   neutral: "•",
 };
 const variantClasses: Record<ToastVariant, string> = {
-  success: "border-l-emerald-500",
-  error: "border-l-rose-500",
-  warning: "border-l-amber-500",
-  info: "border-l-sky-500",
-  neutral: "border-l-slate-400",
+  success: "border-l-accent",
+  error: "border-l-danger",
+  warning: "border-l-gold",
+  info: "border-l-sky",
+  neutral: "border-l-content",
 };
 const variantTextClasses: Record<ToastVariant, string> = {
-  success: "text-emerald-700",
-  error: "text-rose-700",
-  warning: "text-amber-700",
-  info: "text-sky-700",
-  neutral: "text-slate-600",
+  success: "text-content",
+  error: "text-danger",
+  warning: "text-gold",
+  info: "text-primary",
+  neutral: "text-content",
 };
 const variantIconClasses: Record<ToastVariant, string> = {
-  success: "bg-emerald-100",
-  error: "bg-rose-100",
-  warning: "bg-amber-100",
-  info: "bg-sky-100",
-  neutral: "bg-slate-100",
+  success: "bg-surface",
+  error: "bg-surface",
+  warning: "bg-surface",
+  info: "bg-surface",
+  neutral: "bg-surface",
 };
 const positionClasses: Record<ToastPosition, string> = {
   "top-left": "left-4 [left:max(1rem,env(safe-area-inset-left))] [top:max(1rem,env(safe-area-inset-top))]",
@@ -118,7 +118,7 @@ onBeforeUnmount(() => activeTimers.forEach(clearTimeout));
         <article
           v-for="toast in group.items"
           :key="toast.id"
-          class="shared-toast pointer-events-auto flex items-start gap-3 rounded-2xl border border-border-default border-l-4 bg-surface px-4 py-4 text-content shadow-[0_16px_40px_rgba(36,53,42,0.16)] ring-1 ring-white/80 transition-[opacity,transform,box-shadow] duration-200 ease-out hover:shadow-[0_20px_48px_rgba(36,53,42,0.2)] motion-reduce:transition-none"
+          class="shared-toast pointer-events-auto flex items-start gap-3 rounded-2xl border border-border-default border-l-4 bg-surface px-4 py-4 text-content shadow-[0_16px_40px_color-mix(in_srgb,_var(--color-content)_16%,_transparent)] ring-1 ring-white/80 transition-[opacity,transform,box-shadow] duration-200 ease-out hover:shadow-[0_20px_48px_color-mix(in_srgb,_var(--color-content)_20%,_transparent)] motion-reduce:transition-none"
           :class="variantClasses[toast.variant]"
           :data-variant="toast.variant"
           :role="toast.variant === 'error' ? 'alert' : 'status'"
@@ -135,10 +135,10 @@ onBeforeUnmount(() => activeTimers.forEach(clearTimeout));
             <strong v-if="toast.title" class="mb-1 block text-sm font-bold leading-snug tracking-[0.01em]">{{
               toast.title
             }}</strong>
-            <div class="shared-toast__message m-0 break-words text-sm leading-relaxed text-palette-526354">{{ toast.message }}</div>
+            <div class="shared-toast__message m-0 break-words text-sm leading-relaxed text-content">{{ toast.message }}</div>
             <button
               v-if="toast.action"
-              class="mt-2 inline-flex rounded-md bg-transparent p-0 text-sm font-bold underline decoration-1 underline-offset-4 transition-colors hover:brightness-75 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-palette-78906f focus-visible:ring-offset-2"
+              class="mt-2 inline-flex rounded-md bg-transparent p-0 text-sm font-bold underline decoration-1 underline-offset-4 transition-colors hover:brightness-75 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-content focus-visible:ring-offset-2"
               :class="variantTextClasses[toast.variant]"
               type="button"
               @click="runAction(toast)"
@@ -148,7 +148,7 @@ onBeforeUnmount(() => activeTimers.forEach(clearTimeout));
           </div>
           <button
             v-if="toast.dismissible"
-            class="-mr-1 -mt-1 grid h-8 w-8 flex-none place-items-center rounded-lg bg-transparent text-xl leading-none transition-colors hover:bg-black/5 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-palette-78906f"
+            class="-mr-1 -mt-1 grid h-8 w-8 flex-none place-items-center rounded-lg bg-transparent text-xl leading-none transition-colors hover:bg-content/5 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-content"
             :class="variantTextClasses[toast.variant]"
             type="button"
             :aria-label="tr('Toast.dong_thong_bao_value0', { value0: toast.message })"
@@ -167,15 +167,15 @@ onBeforeUnmount(() => activeTimers.forEach(clearTimeout));
 .ocean-theme .shared-toast {
   --toast-accent: var(--color-ocean-cyan);
   color: var(--color-ocean-pearl);
-  border-color: #f2c66d59;
+  border-color: color-mix(in srgb, var(--color-gold) 34.902%, transparent);
   border-left-color: var(--toast-accent);
   background: linear-gradient(135deg, var(--color-ocean-panel), var(--color-ocean-deep));
-  box-shadow: 0 16px 40px #071a2d66;
-  --tw-ring-color: #f2c66d1a;
+  box-shadow: 0 16px 40px color-mix(in srgb, var(--color-content) 40%, transparent);
+  --tw-ring-color: color-mix(in srgb, var(--color-gold) 10.196%, transparent);
 }
 
-.ocean-theme .shared-toast[data-variant="success"] { --toast-accent: #82e2cc; }
-.ocean-theme .shared-toast[data-variant="error"] { --toast-accent: #ff9d98; }
+.ocean-theme .shared-toast[data-variant="success"] { --toast-accent: var(--color-accent); }
+.ocean-theme .shared-toast[data-variant="error"] { --toast-accent: var(--color-danger); }
 .ocean-theme .shared-toast[data-variant="warning"] { --toast-accent: var(--color-ocean-gold); }
 .ocean-theme .shared-toast[data-variant="neutral"] { --toast-accent: var(--color-ocean-pearl); }
 
@@ -192,7 +192,7 @@ onBeforeUnmount(() => activeTimers.forEach(clearTimeout));
 .ocean-theme .shared-toast button {
   color: var(--toast-accent);
   --tw-ring-color: var(--color-ocean-cyan);
-  --tw-ring-offset-color: var(--color-ocean-deep);
+  --tw-ring-offset-color: var(--color-content);
 }
 
 .ocean-theme .shared-toast button:hover {

@@ -25,12 +25,12 @@ const pages = computed(() => Math.max(1, Math.ceil(props.total / props.pageSize)
 <style scoped>
 .ocean-theme .shared-pagination {
   background: var(--color-ocean-deep);
-  border-color: #f2c66d40;
+  border-color: color-mix(in srgb, var(--color-gold) 25.098%, transparent);
 }
 
 .ocean-theme .shared-pagination button {
   color: var(--color-ocean-pearl);
-  border-color: #35b9d559;
+  border-color: color-mix(in srgb, var(--color-sky) 34.902%, transparent);
   background: var(--color-ocean-panel);
   transition: border-color 150ms ease, background-color 150ms ease;
 }

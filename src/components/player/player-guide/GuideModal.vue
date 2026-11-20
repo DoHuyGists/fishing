@@ -36,7 +36,7 @@ onMounted(() => guideStore.loadGuides());
         <div class="text-sm">{{ tr("GuideModal.xem_huong_dan_tung_buoc_ngay_tai_sanh") }}</div>
         <button
           type="button"
-          class="shrink-0 rounded-xl border border-border-default bg-white px-3 py-1.5 text-xs font-bold cursor-pointer transition-colors hover:border-palette-70a77e hover:bg-palette-eaf5e8"
+          class="shrink-0 rounded-xl border border-border-default bg-white px-3 py-1.5 text-xs font-bold cursor-pointer transition-colors hover:border-accent hover:bg-surface"
           @click="startPlayingGuide"
         >
           {{ tr("GuideModal.huong_dan_choi") }}
@@ -50,7 +50,7 @@ onMounted(() => guideStore.loadGuides());
         class="flex min-h-0 flex-1 flex-col overflow-hidden rounded-xl border border-border-default bg-surface text-content"
       >
         <div v-if="guideStore.loading" role="status" class="p-5 text-sm">{{ tr("GuideModal.dang_tai_huong_dan") }}</div>
-        <div v-else-if="guideStore.loadError" role="alert" class="p-5 text-sm text-red-700">
+        <div v-else-if="guideStore.loadError" role="alert" class="p-5 text-sm text-danger">
           <div>{{ guideStore.loadError }}</div>
           <button type="button" class="mt-2 font-bold underline" @click="guideStore.loadGuides(true)">
             {{ tr("Maintenance.thu_lai") }}
@@ -70,8 +70,8 @@ onMounted(() => guideStore.loadGuides());
               type="button"
               :aria-current="guideStore.selectedId === guide.id ? 'true' : undefined"
               aria-controls="guide-content"
-              class="block w-full break-words border-b border-border-default px-4 py-3 text-left text-sm transition-colors hover:bg-palette-eaf5e8 focus-visible:outline-2 focus-visible:outline-offset-[-2px] focus-visible:outline-emerald-700"
-              :class="guideStore.selectedId === guide.id ? 'bg-palette-e0eedb font-bold' : ''"
+              class="block w-full break-words border-b border-border-default px-4 py-3 text-left text-sm transition-colors hover:bg-surface focus-visible:outline-2 focus-visible:outline-offset-[-2px] focus-visible:outline-accent"
+              :class="guideStore.selectedId === guide.id ? 'bg-surface font-bold' : ''"
               @click="guideStore.selectGuide(guide.id)"
             >
               {{ guide.title }}

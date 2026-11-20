@@ -1,17 +1,17 @@
 <template>
   <section class="slide-fade-in from-right player-content-in flex min-w-0 flex-col overflow-hidden rounded-2xl border border-border-default bg-white text-content" aria-labelledby="donation-payment-title">
-    <div class="flex items-center gap-3 border-b border-border-default bg-palette-edf3e7 px-5 py-4">
-      <div class="flex size-10 shrink-0 items-center justify-center rounded-xl border border-border-default bg-white text-palette-36513f">
+    <div class="flex items-center gap-3 border-b border-border-default bg-surface px-5 py-4">
+      <div class="flex size-10 shrink-0 items-center justify-center rounded-xl border border-border-default bg-white text-content">
         <svg aria-hidden="true" class="size-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
           <rect x="2" y="5" width="20" height="14" rx="3" />
           <path d="M2 10h20M6 15h3" />
         </svg>
       </div>
       <div id="donation-payment-title" role="heading" aria-level="2" class="min-w-0 flex-1 text-base font-bold sm:text-lg">{{ tr('donationPayment.title') }}</div>
-      <span class="shrink-0 rounded-full border border-border-default bg-white px-2.5 py-1 text-xs font-semibold text-palette-52634f">USD</span>
+      <span class="shrink-0 rounded-full border border-border-default bg-white px-2.5 py-1 text-xs font-semibold text-content">USD</span>
     </div>
     <div class="flex min-w-0 flex-1 flex-col gap-4 p-5">
-    <div class="text-sm leading-6 text-palette-52634f">{{ tr('donationPayment.description') }}</div>
+    <div class="text-sm leading-6 text-content">{{ tr('donationPayment.description') }}</div>
     <div v-if="!configured" role="status" class="text-sm">{{ tr('donationPayment.unavailable') }}</div>
     <div v-else-if="!auth.isAuthenticated" role="status" class="text-sm">{{ tr('donationPayment.signIn') }}</div>
     <template v-else>
@@ -19,15 +19,15 @@
         <span>{{ tr('donationPayment.amount') }}</span>
         <input id="donation-usd" v-model="donation.amount" type="text" inputmode="decimal" autocomplete="off"
           :disabled="donation.busy || !!donation.attempt" :aria-invalid="donation.amount.trim() !== '' && !donation.validAmount" aria-describedby="donation-amount-help"
-          class="min-h-12 w-full rounded-xl border border-border-default bg-surface px-4 text-base font-semibold text-content tabular-nums transition focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-palette-36513f disabled:opacity-60 aria-invalid:border-red-300" />
+          class="min-h-12 w-full rounded-xl border border-border-default bg-surface px-4 text-base font-semibold text-content tabular-nums transition focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-content disabled:opacity-60 aria-invalid:border-danger" />
       </label>
-      <div id="donation-amount-help" class="text-xs leading-5 text-palette-52634f">{{ tr('donationPayment.amountHelp') }}</div>
+      <div id="donation-amount-help" class="text-xs leading-5 text-content">{{ tr('donationPayment.amountHelp') }}</div>
       <div v-if="loading" role="status" class="text-sm">{{ tr('donationPayment.loading') }}</div>
       <div v-if="donation.busy" role="status" class="text-sm">{{ tr('donationPayment.processing') }}</div>
       <div v-if="donation.status" role="status" aria-live="polite" class="rounded-xl border px-4 py-3 text-sm font-semibold leading-6"
-        :class="donation.status === 'COMPLETED' ? 'border-border-default bg-palette-edf3e7 text-content' : 'border-border-default bg-surface text-palette-52634f'">{{ tr(`donationPayment.status_${donation.status}`) }}</div>
+        :class="donation.status === 'COMPLETED' ? 'border-border-default bg-surface text-content' : 'border-border-default bg-surface text-content'">{{ tr(`donationPayment.status_${donation.status}`) }}</div>
       <div v-if="donation.cancelled" role="status" class="text-sm">{{ tr('donationPayment.cancelled') }}</div>
-      <div v-if="errorKey" role="alert" class="rounded-xl border border-red-200 bg-red-50 px-4 py-3 text-sm leading-6 text-red-700">{{ tr(errorKey) }}</div>
+      <div v-if="errorKey" role="alert" class="rounded-xl border border-danger bg-surface px-4 py-3 text-sm leading-6 text-danger">{{ tr(errorKey) }}</div>
       <div v-if="sdk && donation.validAmount && !donation.settled && !['APPROVED', 'PENDING'].includes(donation.status)" class="donation-payment-buttons grid min-w-0 gap-3"
         :class="{ 'pointer-events-none opacity-50': donation.busy }" :inert="donation.busy">
         <component :is="'paypal-button'" v-if="paypalEligible" type="pay" @click="startPayment('paypal', $event)" />
@@ -37,12 +37,12 @@
         <div v-if="!loading && !paypalEligible && !cardEligible" class="text-sm">{{ tr('donationPayment.ineligible') }}</div>
       </div>
       <div v-if="donation.attempt && !donation.busy && !donation.settled" class="space-y-3">
-        <button type="button" class="min-h-11 w-full rounded-xl border border-border-default bg-surface px-4 py-3 text-sm font-semibold transition hover:bg-palette-e6efdf focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-content" @click="donation.verify(true)">{{ tr('donationPayment.verify') }}</button>
+        <button type="button" class="min-h-11 w-full rounded-xl border border-border-default bg-surface px-4 py-3 text-sm font-semibold transition hover:bg-surface focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-content" @click="donation.verify(true)">{{ tr('donationPayment.verify') }}</button>
       </div>
       <button v-if="donation.settled || donation.status === 'CREATED' || donation.errorCode === 'ATTEMPT_EXPIRED'" type="button"
-        :disabled="donation.busy" class="min-h-11 w-full rounded-xl border border-border-default bg-surface px-4 py-3 text-sm font-semibold transition hover:bg-palette-e6efdf focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-content disabled:opacity-50"
+        :disabled="donation.busy" class="min-h-11 w-full rounded-xl border border-border-default bg-surface px-4 py-3 text-sm font-semibold transition hover:bg-surface focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-content disabled:opacity-50"
         @click="donation.resetAttempt()">{{ tr('donationPayment.newDonation') }}</button>
-      <button v-if="sdkError" type="button" class="min-h-11 rounded-xl border border-border-default bg-surface px-4 py-3 text-sm font-semibold transition hover:bg-palette-e6efdf focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-content" @click="initialize()">{{ tr('donationPayment.retry') }}</button>
+      <button v-if="sdkError" type="button" class="min-h-11 rounded-xl border border-border-default bg-surface px-4 py-3 text-sm font-semibold transition hover:bg-surface focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-content" @click="initialize()">{{ tr('donationPayment.retry') }}</button>
     </template>
     </div>
   </section>

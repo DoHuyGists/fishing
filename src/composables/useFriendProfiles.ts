@@ -5,8 +5,8 @@ import { useCountryStore } from "../stores/player-country-store";
 import type { UserFriend } from "../types/model/friend";
 
 const avatarGradients = [
-  "from-emerald-600 to-teal-700", "from-blue-600 to-cyan-700", "from-amber-600 to-orange-700",
-  "from-violet-600 to-purple-700", "from-rose-600 to-pink-700", "from-teal-600 to-emerald-800",
+  "from-accent to-accent", "from-primary to-primary", "from-gold to-gold",
+  "from-special to-special", "from-danger to-danger", "from-accent to-accent",
 ];
 
 export function useFriendProfiles() {

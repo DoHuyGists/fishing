@@ -32,16 +32,16 @@ const displayedGroups = computed(() => inventoryViewStore.displayedGroups(props.
         :key="mode.value"
         type="button"
         :aria-pressed="viewMode === mode.value"
-        class="flex-1 rounded-md border px-2 py-1.5 text-xs font-semibold transition focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-emerald-700"
-        :class="viewMode === mode.value ? 'border-emerald-700 bg-emerald-700 text-white' : 'border-border-default bg-white hover:bg-surface-muted'"
+        class="flex-1 rounded-md border px-2 py-1.5 text-xs font-semibold transition focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-accent"
+        :class="viewMode === mode.value ? 'border-accent bg-accent text-white' : 'border-border-default bg-white hover:bg-surface-muted'"
         @click="viewMode = mode.value"
       >
         {{ tr(mode.labelKey) }}
       </button>
     </div>
-    <input v-model="searchQuery" type="search" :placeholder="tr('ShopModal.tim_vat_pham')" class="mb-3 w-full rounded-md border border-border-default bg-white px-3 py-2 text-xs outline-none focus:border-emerald-700" />
+    <input v-model="searchQuery" type="search" :placeholder="tr('ShopModal.tim_vat_pham')" class="mb-3 w-full rounded-md border border-border-default bg-white px-3 py-2 text-xs outline-none focus:border-accent" />
     <div v-if="isLoading" class="py-6 text-center text-xs opacity-60">{{ tr('WorkBenchModal.dang_tai_du_lieu') }}</div>
-    <div v-else-if="errorMessage" class="rounded-md border border-red-200 bg-red-50 p-2 text-xs text-red-700">{{ errorMessage }}</div>
+    <div v-else-if="errorMessage" class="rounded-md border border-danger bg-surface p-2 text-xs text-danger">{{ errorMessage }}</div>
     <div v-else class="max-h-[min(65vh,44rem)] overflow-y-auto pr-1 lg:min-h-0 lg:max-h-none lg:flex-1">
       <div v-for="group in displayedGroups" :key="group.category" class="mb-3 last:mb-0">
         <div v-if="viewMode === 'group'" class="mb-2 flex items-center justify-between gap-2 text-xs font-bold">

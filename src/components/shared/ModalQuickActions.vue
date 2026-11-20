@@ -75,9 +75,9 @@ onUnmounted(() => {
 <style scoped>
 .ocean-theme .shared-quick-actions {
   color: var(--color-ocean-pearl);
-  border-color: #f2c66d99;
+  border-color: color-mix(in srgb, var(--color-gold) 60%, transparent);
   background: var(--color-ocean-panel);
-  box-shadow: 0 8px 24px #071a2d66;
+  box-shadow: 0 8px 24px color-mix(in srgb, var(--color-content) 40%, transparent);
 }
 
 .ocean-theme .shared-quick-actions button:hover {

@@ -67,10 +67,10 @@ const userInitial = computed(() => {
 <template>
   <div class="flex flex-col gap-5">
     <div
-      class="profile-captain slide-fade-in from-top player-content-in flex items-center gap-4 bg-linear-to-r from-emerald-50 to-teal-50/70 border border-emerald-100/80 rounded-xl p-4"
+      class="profile-captain slide-fade-in from-top player-content-in flex items-center gap-4 bg-linear-to-r from-surface to-surface/70 border border-surface/80 rounded-xl p-4"
     >
       <div
-        class="profile-captain__avatar w-14 h-14 rounded-full bg-emerald-600 text-white flex items-center justify-center text-xl font-black shadow-md shrink-0"
+        class="profile-captain__avatar w-14 h-14 rounded-full bg-accent text-white flex items-center justify-center text-xl font-black shadow-md shrink-0"
       >
         <img
           v-if="userProfileStore.profile?.avatar_url"
@@ -82,17 +82,17 @@ const userInitial = computed(() => {
         <span v-else>{{ userInitial }}</span>
       </div>
       <div class="flex flex-col min-w-0 flex-1">
-        <span class="font-bold text-sm text-palette-263238 truncate" :title="authStore.user?.email || ''">
+        <span class="font-bold text-sm text-content truncate" :title="authStore.user?.email || ''">
           {{ userProfileStore.profile?.display_name || authStore.user?.email || tr("UserProfile.chua_cap_nhat_email") }}
         </span>
         <div class="flex flex-wrap items-center gap-2 mt-1.5">
           <span
-            class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-bold bg-amber-100 text-amber-800 border border-amber-200"
+            class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-bold bg-surface text-gold border border-gold"
           >
             {{ tr("UserProfile.cap") }} {{ userProfileStore.level }}
           </span>
           <span
-            class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-semibold bg-emerald-100 text-emerald-800 border border-emerald-200"
+            class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-semibold bg-surface text-content border border-accent"
           >
             ✨ {{ formattedExp }} EXP
           </span>
@@ -101,59 +101,59 @@ const userInitial = computed(() => {
     </div>
 
     <div>
-      <div class="text-xs font-bold text-gray-400 uppercase tracking-wider mb-2">
+      <div class="text-xs font-bold text-content uppercase tracking-wider mb-2">
         {{ tr("UserProfile.chi_so_can_thu") }}
       </div>
       <div class="slide-fade-in from-bottom player-content-in grid grid-cols-2 md:grid-cols-4 lg:grid-cols-6 gap-2.5">
-        <div class="bg-gray-50 border border-gray-100 rounded-xl p-3 flex flex-col gap-1">
-          <div class="flex items-center gap-1.5 text-gray-500 text-[11px] font-medium">
+        <div class="bg-white border border-border rounded-xl p-3 flex flex-col gap-1">
+          <div class="flex items-center gap-1.5 text-content text-[11px] font-medium">
             <span>🎒</span><span>{{ tr("UserProfile.suc_chua_tui_do") }}</span>
           </div>
-          <span class="text-sm font-bold text-palette-263238">
+          <span class="text-sm font-bold text-content">
             {{ userProfileStore.inventoryCapacity }}
-            <span class="text-xs font-normal text-gray-500">{{ tr("UserProfile.o") }}</span>
+            <span class="text-xs font-normal text-content">{{ tr("UserProfile.o") }}</span>
           </span>
         </div>
-        <div class="bg-gray-50 border border-gray-100 rounded-xl p-3 flex flex-col gap-1">
-          <div class="flex items-center gap-1.5 text-gray-500 text-[11px] font-medium">
+        <div class="bg-white border border-border rounded-xl p-3 flex flex-col gap-1">
+          <div class="flex items-center gap-1.5 text-content text-[11px] font-medium">
             <span>🐟</span><span>{{ tr("UserProfile.suc_chua_kho_ca") }}</span>
           </div>
-          <span class="text-sm font-bold text-palette-263238">
+          <span class="text-sm font-bold text-content">
             {{ userProfileStore.speciesStorageCapacity }}
-            <span class="text-xs font-normal text-gray-500">{{ tr("UserProfile.con") }}</span>
+            <span class="text-xs font-normal text-content">{{ tr("UserProfile.con") }}</span>
           </span>
         </div>
-        <div class="bg-gray-50 border border-gray-100 rounded-xl p-3 flex flex-col gap-1">
-          <div class="flex items-center gap-1.5 text-gray-500 text-[11px] font-medium">
+        <div class="bg-white border border-border rounded-xl p-3 flex flex-col gap-1">
+          <div class="flex items-center gap-1.5 text-content text-[11px] font-medium">
             <span>🎣</span><span>{{ tr("UserProfile.suc_chua_bo_trang_bi") }}</span>
           </div>
-          <span class="text-sm font-bold text-palette-263238">
+          <span class="text-sm font-bold text-content">
             {{ userProfileStore.equipmentCapacity }}
-            <span class="text-xs font-normal text-gray-500">{{ tr("UserProfile.o") }}</span>
+            <span class="text-xs font-normal text-content">{{ tr("UserProfile.o") }}</span>
           </span>
         </div>
-        <div class="bg-gray-50 border border-gray-100 rounded-xl p-3 flex flex-col gap-1">
-          <div class="flex items-center gap-1.5 text-gray-500 text-[11px] font-medium">
+        <div class="bg-white border border-border rounded-xl p-3 flex flex-col gap-1">
+          <div class="flex items-center gap-1.5 text-content text-[11px] font-medium">
             <span>🧺</span><span>{{ tr("UserProfile.suc_chua_gio_ca") }}</span>
           </div>
-          <span class="text-sm font-bold text-palette-263238">
+          <span class="text-sm font-bold text-content">
             {{ userProfileStore.fishingNetCapacity }}
-            <span class="text-xs font-normal text-gray-500">{{ tr("UserProfile.con") }}</span>
+            <span class="text-xs font-normal text-content">{{ tr("UserProfile.con") }}</span>
           </span>
         </div>
-        <div class="bg-gray-50 border border-gray-100 rounded-xl p-3 flex flex-col gap-1">
-          <div class="flex items-center gap-1.5 text-gray-500 text-[11px] font-medium">
+        <div class="bg-white border border-border rounded-xl p-3 flex flex-col gap-1">
+          <div class="flex items-center gap-1.5 text-content text-[11px] font-medium">
             <span>🏆</span><span>{{ tr("UserProfile.cap_do") }}</span>
           </div>
-          <span class="text-sm font-bold text-palette-263238"
+          <span class="text-sm font-bold text-content"
             >{{ tr("UserProfile.level") }} {{ userProfileStore.level }}</span
           >
         </div>
-        <div class="bg-gray-50 border border-gray-100 rounded-xl p-3 flex flex-col gap-1">
-          <div class="flex items-center gap-1.5 text-gray-500 text-[11px] font-medium">
+        <div class="bg-white border border-border rounded-xl p-3 flex flex-col gap-1">
+          <div class="flex items-center gap-1.5 text-content text-[11px] font-medium">
             <span>⚡</span><span>{{ tr("UserProfile.diem_kinh_nghiem") }}</span>
           </div>
-          <div class="flex items-center gap-1 text-md text-palette-263238">
+          <div class="flex items-center gap-1 text-md text-content">
             <span class="font-bold">{{ formattedExp }}</span
             ><span>/</span><span>{{ maxExp }}</span>
           </div>
@@ -162,29 +162,29 @@ const userInitial = computed(() => {
     </div>
 
     <div>
-      <div class="text-xs font-bold text-gray-400 uppercase tracking-wider mb-2">
+      <div class="text-xs font-bold text-content uppercase tracking-wider mb-2">
         {{ tr("UserProfile.chi_tiet_tai_khoan") }}
       </div>
       <div
-        class="slide-fade-in from-bottom player-content-in bg-gray-50 border border-gray-100 rounded-xl divide-y divide-gray-100 text-xs"
+        class="slide-fade-in from-bottom player-content-in bg-white border border-border rounded-xl divide-y divide-border text-xs"
       >
         <div class="flex justify-between items-center gap-3 px-3.5 py-2.5">
-          <span class="text-gray-500 font-medium">{{ tr("UserProfile.quoc_gia") }}</span>
+          <span class="text-content font-medium">{{ tr("UserProfile.quoc_gia") }}</span>
           <span class="text-right font-semibold text-content">{{
             currentCountry?.name ||
             (countryStore.isLoading ? tr("UserProfile.dang_tai_quoc_gia") : tr("UserProfile.chua_co_thong_tin"))
           }}</span>
         </div>
         <div class="flex justify-between items-center px-3.5 py-2.5">
-          <span class="text-gray-500 font-medium">{{ tr("UserProfile.user_id") }}</span>
+          <span class="text-content font-medium">{{ tr("UserProfile.user_id") }}</span>
           <div class="flex items-center gap-1.5">
             <span
-              class="font-mono text-[11px] bg-white border border-gray-200 px-2 py-0.5 rounded text-gray-700 max-w-[170px] sm:max-w-[220px] truncate"
+              class="font-mono text-[11px] bg-white border border-border px-2 py-0.5 rounded text-content max-w-[170px] sm:max-w-[220px] truncate"
               >{{ authStore.user?.id || "N/A" }}</span
             >
             <button
               type="button"
-              class="cursor-pointer text-[10px] font-semibold text-emerald-700 bg-emerald-50 hover:bg-emerald-100 border border-emerald-200 px-2 py-0.5 rounded transition-colors"
+              class="cursor-pointer text-[10px] font-semibold text-content bg-surface hover:bg-surface border border-accent px-2 py-0.5 rounded transition-colors"
               @click="copyUserId"
               :title="tr('UserProfile.sao_chep_user_id')"
             >
@@ -193,7 +193,7 @@ const userInitial = computed(() => {
           </div>
         </div>
         <div class="flex justify-between items-center px-3.5 py-2.5">
-          <span class="text-gray-500 font-medium">{{ tr("UserProfile.ngay_tham_gia") }}</span>
+          <span class="text-content font-medium">{{ tr("UserProfile.ngay_tham_gia") }}</span>
           <span class="font-semibold text-content">{{ joinedDate }}</span>
         </div>
       </div>
@@ -203,7 +203,7 @@ const userInitial = computed(() => {
       <LanguageSelector />
       <button
         type="button"
-        class="rounded-lg border border-border-default bg-surface px-4 py-2 text-sm font-semibold text-content transition-colors hover:bg-emerald-100 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-emerald-600"
+        class="rounded-lg border border-border-default bg-surface px-4 py-2 text-sm font-semibold text-content transition-colors hover:bg-surface focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-accent"
         aria-haspopup="dialog"
         @click="showCountryModal = true"
       >
@@ -211,7 +211,7 @@ const userInitial = computed(() => {
       </button>
       <button
         type="button"
-        class="rounded-lg border border-border-default bg-surface px-4 py-2 text-sm font-semibold text-content transition-colors hover:bg-emerald-100 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-emerald-600"
+        class="rounded-lg border border-border-default bg-surface px-4 py-2 text-sm font-semibold text-content transition-colors hover:bg-surface focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-accent"
         aria-haspopup="dialog"
         @click="showIdentityModal = true"
       >
@@ -219,7 +219,7 @@ const userInitial = computed(() => {
       </button>
       <button
         type="button"
-        class="rounded-lg border border-border-default bg-surface px-4 py-2 text-sm font-semibold text-content transition-colors hover:bg-emerald-100 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-emerald-600"
+        class="rounded-lg border border-border-default bg-surface px-4 py-2 text-sm font-semibold text-content transition-colors hover:bg-surface focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-accent"
         aria-haspopup="dialog"
         @click="showPasswordModal = true"
       >
@@ -227,7 +227,7 @@ const userInitial = computed(() => {
       </button>
       <button
         type="button"
-        class="inline-flex items-center gap-2 rounded-lg border border-red-200 bg-red-50 px-4 py-2 text-sm font-semibold text-red-700 transition-colors hover:border-red-300 hover:bg-red-100 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-red-600"
+        class="inline-flex items-center gap-2 rounded-lg border border-danger bg-surface px-4 py-2 text-sm font-semibold text-danger transition-colors hover:border-danger hover:bg-surface focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-danger"
         @click="$emit('signOut')"
       >
         <span aria-hidden="true"><img src="/icons/signout.svg?v=2" width="20" alt="" draggable="false" /></span>
@@ -246,14 +246,14 @@ const userInitial = computed(() => {
 <style scoped>
 html.ocean-theme .profile-captain {
   border-color: color-mix(in srgb, var(--color-ocean-gold) 70%, transparent);
-  background: radial-gradient(ellipse at top right, rgb(53 185 213 / 20%), transparent 65%), linear-gradient(125deg, var(--color-ocean-panel), var(--color-ocean-deep));
-  box-shadow: inset 0 1px 0 rgb(245 235 212 / 12%), 0 4px 16px rgb(0 0 0 / 18%);
+  background: radial-gradient(ellipse at top right, color-mix(in srgb, var(--color-sky) 20%, transparent), transparent 65%), linear-gradient(125deg, var(--color-ocean-panel), var(--color-ocean-deep));
+  box-shadow: inset 0 1px 0 color-mix(in srgb, var(--color-surface) 12%, transparent), 0 4px 16px color-mix(in srgb, var(--color-content) 18%, transparent);
 }
 
 html.ocean-theme .profile-captain__avatar {
   border: 2px solid var(--color-ocean-gold);
   background: linear-gradient(145deg, var(--color-ocean-cyan), var(--color-ocean-panel));
-  box-shadow: 0 0 0 3px rgb(242 198 109 / 16%), 0 4px 10px rgb(0 0 0 / 25%);
+  box-shadow: 0 0 0 3px color-mix(in srgb, var(--color-gold) 16%, transparent), 0 4px 10px color-mix(in srgb, var(--color-content) 25%, transparent);
   color: var(--color-ocean-pearl);
 }
 </style>

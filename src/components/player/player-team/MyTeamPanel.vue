@@ -61,11 +61,11 @@ const statusLabel: Record<string, string> = {
   },
 };
 const statusClass: Record<string, string> = {
-  PENDING: "bg-palette-f0e0e0 text-palette-8a2020",
-  OPEN: "bg-palette-d4f4dd text-palette-1a6e35",
-  FULL: "bg-palette-fde8cc text-palette-8a4500",
-  FISHING: "bg-palette-dceeff text-palette-1a4fa0",
-  CLOSED: "bg-palette-f0e0e0 text-palette-8a2020",
+  PENDING: "bg-surface text-danger",
+  OPEN: "bg-surface text-content",
+  FULL: "bg-surface text-gold",
+  FISHING: "bg-surface text-primary",
+  CLOSED: "bg-surface text-danger",
 };
 </script>
 
@@ -119,7 +119,7 @@ const statusClass: Record<string, string> = {
           <div class="mt-2 flex justify-end gap-2">
             <button
               :disabled="actionLoading"
-              class="rounded-lg border border-palette-f5b7b1 bg-palette-fde8e8 px-3 py-1 text-xs font-bold text-danger"
+              class="rounded-lg border border-surface bg-surface px-3 py-1 text-xs font-bold text-danger"
               @click="emit('respondInvite', invite.id, false)"
             >
               {{ tr("FriendModal.tu_choi") }}
@@ -149,42 +149,42 @@ const statusClass: Record<string, string> = {
     <template v-else>
       <section v-if="team" class="flex flex-col gap-4">
         <div
-          class="slide-fade-in from-top player-content-in flex items-start justify-between gap-3 rounded-2xl border border-palette-b8dab0 bg-linear-to-br from-palette-e8f5e2 to-palette-d4edcc p-4"
+          class="slide-fade-in from-top player-content-in flex items-start justify-between gap-3 rounded-2xl border border-border bg-linear-to-br from-surface to-surface p-4"
         >
           <div>
-            <div class="m-0 mb-1 text-[1.1rem] font-extrabold text-palette-1a3a1a">{{ team.name }}</div>
+            <div class="m-0 mb-1 text-[1.1rem] font-extrabold text-content">{{ team.name }}</div>
             <div v-if="team.description" class="m-0 mb-2 text-[0.82rem] text-content-caption">{{ team.description }}</div>
             <span :class="['inline-block rounded-full px-2 py-1 text-[0.72rem] font-bold', statusClass[team.status]]">{{
               statusLabel[team.status]
             }}</span>
           </div>
-          <span class="font-bold text-palette-2e6644">{{ members.length }} / {{ team.max_members }}</span>
+          <span class="font-bold text-content">{{ members.length }} / {{ team.max_members }}</span>
         </div>
         <div class="m-0 grid list-none grid-cols-1 gap-3 p-0 sm:grid-cols-2">
           <div
             v-for="member in members"
             :key="member.id"
-            class="slide-fade-in from-bottom player-content-in rounded-xl border border-palette-daefd4 bg-white p-3"
+            class="slide-fade-in from-bottom player-content-in rounded-xl border border-border bg-white p-3"
           >
             <PlayerIdentity :user-id="member.user_id" :profile="member.user_profile">
-              <span class="text-[0.72rem] font-bold text-palette-2e6644">{{
+              <span class="text-[0.72rem] font-bold text-content">{{
                 member.role === "LEADER" ? tr("MyTeamPanel.truong_nhom") : tr("MyTeamPanel.thanh_vien")
               }}</span>
             </PlayerIdentity>
             <div
               v-if="isLeader && member.user_id !== userId"
-              class="mt-3 flex justify-end gap-2 border-t border-palette-e3eee0 pt-2"
+              class="mt-3 flex justify-end gap-2 border-t border-border pt-2"
             >
               <button
                 :disabled="actionLoading"
-                class="rounded-lg border border-palette-c0d8b8 px-2 py-1 text-xs"
+                class="rounded-lg border border-border px-2 py-1 text-xs"
                 :title="tr('MyTeamPanel.chuyen_quyen')"
                 @click="emit('transfer', member.user_id)"
               >
                 👑</button
               ><button
                 :disabled="actionLoading"
-                class="rounded-lg border border-palette-f5b7b1 bg-palette-fde8e8 px-2 py-1 text-xs text-danger"
+                class="rounded-lg border border-surface bg-surface px-2 py-1 text-xs text-danger"
                 @click="emit('kick', member.user_id)"
               >
                 ✕
@@ -235,7 +235,7 @@ const statusClass: Record<string, string> = {
           ><button
             v-if="isLeader"
             :disabled="actionLoading"
-            class="rounded-lg border border-palette-f5b7b1 bg-palette-fde8e8 px-4 py-2 text-[0.85rem] font-bold text-danger"
+            class="rounded-lg border border-surface bg-surface px-4 py-2 text-[0.85rem] font-bold text-danger"
             @click="emit('close')"
           >
             {{ tr("MyTeamPanel.huy_nhom") }}</button
@@ -250,9 +250,9 @@ const statusClass: Record<string, string> = {
       </section>
       <section
         v-else
-        class="slide-fade-in from-bottom player-content-in flex min-h-[240px] flex-col items-center justify-center rounded-2xl border border-dashed border-palette-c0d8b8 bg-palette-fafefc p-6 text-center"
+        class="slide-fade-in from-bottom player-content-in flex min-h-[240px] flex-col items-center justify-center rounded-2xl border border-dashed border-border bg-white p-6 text-center"
       >
-        <div class="m-0 text-lg font-bold text-palette-1a3a1a">{{ tr("MyTeamPanel.ban_chua_tham_gia_to_doi") }}</div>
+        <div class="m-0 text-lg font-bold text-content">{{ tr("MyTeamPanel.ban_chua_tham_gia_to_doi") }}</div>
         <div class="mb-4 text-sm text-content-caption">
           {{ tr("MyTeamPanel.chon_mot_to_doi_o_ben_trai_hoac_tu_tao_to_doi_moi") }}
         </div>

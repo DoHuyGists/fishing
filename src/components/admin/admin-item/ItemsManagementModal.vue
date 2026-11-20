@@ -47,30 +47,30 @@ onMounted(loadItems);
 
 <template>
   <AdminModal title="Quản lý vật phẩm" icon="🎒" @close="emit('close')">
-    <div class="flex shrink-0 flex-wrap items-center gap-3 border-b border-gray-200 bg-white px-5 py-3 md:px-7">
+    <div class="flex shrink-0 flex-wrap items-center gap-3 border-b border-border bg-white px-5 py-3 md:px-7">
       <div class="min-w-55 flex-1">
         <input
           v-model="search"
           type="search"
           placeholder="Tìm tên, mô tả, biểu tượng, đường dẫn..."
-          class="w-full rounded-lg border border-gray-300 bg-gray-50 px-3 py-2 text-sm focus:border-emerald-600 focus:outline-none"
+          class="w-full rounded-lg border border-content bg-white px-3 py-2 text-sm focus:border-accent focus:outline-none"
         />
       </div>
-      <label class="flex items-center gap-2 text-xs font-semibold text-gray-600">
+      <label class="flex items-center gap-2 text-xs font-semibold text-content">
         Danh mục
         <select
           v-model="categoryFilter"
-          class="max-w-44 rounded-lg border border-gray-300 bg-white px-2.5 py-2 text-sm text-gray-700"
+          class="max-w-44 rounded-lg border border-content bg-white px-2.5 py-2 text-sm text-content"
         >
           <option value="ALL">Tất cả</option>
           <option v-for="category in categories" :key="category" :value="category">{{ category }}</option>
         </select>
       </label>
-      <label class="flex items-center gap-2 text-xs font-semibold text-gray-600">
+      <label class="flex items-center gap-2 text-xs font-semibold text-content">
         Hiển thị
         <select
           v-model="statusFilter"
-          class="rounded-lg border border-gray-300 bg-white px-2.5 py-2 text-sm text-gray-700"
+          class="rounded-lg border border-content bg-white px-2.5 py-2 text-sm text-content"
         >
           <option value="ALL">Tất cả</option>
           <option value="ENABLED">Đang bật</option>
@@ -78,11 +78,11 @@ onMounted(loadItems);
         </select>
       </label>
       <div class="ml-auto flex items-center gap-2">
-        <span class="hidden text-xs text-gray-500 sm:inline">{{ filteredItems.length }} kết quả</span>
+        <span class="hidden text-xs text-content sm:inline">{{ filteredItems.length }} kết quả</span>
         <button
           type="button"
           title="Làm mới danh sách"
-          class="grid size-9 place-items-center rounded-lg border border-gray-300 bg-white text-gray-700 hover:bg-gray-100 disabled:opacity-50"
+          class="grid size-9 place-items-center rounded-lg border border-content bg-white text-content hover:bg-surface disabled:opacity-50"
           :disabled="isLoading"
           @click="loadItems()"
         >
@@ -103,7 +103,7 @@ onMounted(loadItems);
         </button>
         <button
           type="button"
-          class="rounded-lg bg-content-strong px-3.5 py-2 text-sm font-bold text-white hover:bg-emerald-800"
+          class="rounded-lg bg-content-strong px-3.5 py-2 text-sm font-bold text-white hover:bg-accent"
           @click="openCreateForm"
         >
           + Thêm vật phẩm
@@ -115,62 +115,62 @@ onMounted(loadItems);
       <section class="flex min-h-0 min-w-0 flex-1 flex-col overflow-hidden p-4 md:p-6">
         <div
           v-if="loadError"
-          class="mb-4 flex items-center justify-between gap-3 rounded-lg border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-700"
+          class="mb-4 flex items-center justify-between gap-3 rounded-lg border border-danger bg-surface px-4 py-3 text-sm text-danger"
         >
           <span>{{ loadError }}</span>
           <button type="button" class="font-bold underline" @click="loadItems()">Thử lại</button>
         </div>
-        <div v-if="isLoading" class="grid min-h-64 place-items-center text-sm text-gray-500">
+        <div v-if="isLoading" class="grid min-h-64 place-items-center text-sm text-content">
           Đang tải danh sách vật phẩm...
         </div>
         <div
           v-else-if="!filteredItems.length"
-          class="grid min-h-64 place-items-center text-center text-sm text-gray-500"
+          class="grid min-h-64 place-items-center text-center text-sm text-content"
         >
           <div>
             <span class="mb-2 block text-3xl">🎒</span
             >{{ items.length ? "Không tìm thấy vật phẩm phù hợp." : "Chưa có vật phẩm nào." }}
           </div>
         </div>
-        <div v-else class="min-h-0 flex-1 overflow-auto rounded-lg border border-gray-200 bg-white shadow-sm">
+        <div v-else class="min-h-0 flex-1 overflow-auto rounded-lg border border-border bg-white shadow-sm">
           <table class="w-full min-w-280 border-separate border-spacing-0 text-left text-sm">
-            <thead class="text-[11px] uppercase text-gray-600">
+            <thead class="text-[11px] uppercase text-content">
               <tr>
-                <th class="sticky top-0 z-10 bg-gray-100 px-4 py-3">Vật phẩm</th>
-                <th class="sticky top-0 z-10 bg-gray-100 px-4 py-3">Danh mục / phân loại</th>
-                <th class="sticky top-0 z-10 bg-gray-100 px-4 py-3">Giá / tồn kho</th>
-                <th class="sticky top-0 z-10 bg-gray-100 px-4 py-3">Biểu tượng</th>
-                <th class="sticky top-0 z-10 bg-gray-100 px-4 py-3">Hiển thị</th>
-                <th class="sticky top-0 z-10 bg-gray-100 px-4 py-3">Ngày tạo</th>
-                <th class="sticky top-0 z-10 bg-gray-100 px-4 py-3">Cập nhật</th>
-                <th class="sticky top-0 z-10 bg-gray-100 px-4 py-3 text-right">Thao tác</th>
+                <th class="sticky top-0 z-10 bg-surface px-4 py-3">Vật phẩm</th>
+                <th class="sticky top-0 z-10 bg-surface px-4 py-3">Danh mục / phân loại</th>
+                <th class="sticky top-0 z-10 bg-surface px-4 py-3">Giá / tồn kho</th>
+                <th class="sticky top-0 z-10 bg-surface px-4 py-3">Biểu tượng</th>
+                <th class="sticky top-0 z-10 bg-surface px-4 py-3">Hiển thị</th>
+                <th class="sticky top-0 z-10 bg-surface px-4 py-3">Ngày tạo</th>
+                <th class="sticky top-0 z-10 bg-surface px-4 py-3">Cập nhật</th>
+                <th class="sticky top-0 z-10 bg-surface px-4 py-3 text-right">Thao tác</th>
               </tr>
             </thead>
             <tbody>
-              <tr v-for="item in filteredItems" :key="item.id" class="border-t border-gray-100 hover:bg-emerald-50/40">
+              <tr v-for="item in filteredItems" :key="item.id" class="border-t border-border hover:bg-surface/40">
                 <td class="max-w-120 px-4 py-3">
                   <div class="flex items-center gap-3">
                     <img
                       v-if="item.image"
                       :src="item.image"
                       :alt="item.name"
-                      class="size-12 shrink-0 rounded-md border border-gray-200 bg-gray-50 object-cover"
+                      class="size-12 shrink-0 rounded-md border border-border bg-white object-cover"
                       loading="lazy"
                     />
                     <div
                       v-else
-                      class="grid size-12 shrink-0 place-items-center rounded-md border border-gray-200 bg-gray-50 text-xl"
+                      class="grid size-12 shrink-0 place-items-center rounded-md border border-border bg-white text-xl"
                     >
                       {{ item.icon || "🎒" }}
                     </div>
                     <div class="min-w-0">
-                      <div class="truncate font-bold text-gray-800" :title="item.name">{{ item.name }}</div>
-                      <div class="mt-1 max-w-104 truncate text-xs text-gray-500" :title="item.information">
+                      <div class="truncate font-bold text-content" :title="item.name">{{ item.name }}</div>
+                      <div class="mt-1 max-w-104 truncate text-xs text-content" :title="item.information">
                         {{ item.information }}
                       </div>
                       <div
                         v-if="item.image"
-                        class="mt-1 max-w-104 truncate text-[10px] text-emerald-700"
+                        class="mt-1 max-w-104 truncate text-[10px] text-content"
                         :title="item.image"
                       >
                         {{ item.image }}
@@ -178,13 +178,13 @@ onMounted(loadItems);
                     </div>
                   </div>
                 </td>
-                <td class="px-4 py-3 text-gray-700">
+                <td class="px-4 py-3 text-content">
                   <div>{{ item.category || "—" }}</div>
-                  <div class="mt-1 text-xs text-gray-500">{{ item.classification || "—" }}</div>
+                  <div class="mt-1 text-xs text-content">{{ item.classification || "—" }}</div>
                 </td>
-                <td class="whitespace-nowrap px-4 py-3 text-gray-700">
+                <td class="whitespace-nowrap px-4 py-3 text-content">
                   <div class="font-semibold">{{ item.price.toLocaleString("vi-VN") }} đ</div>
-                  <div class="mt-1 text-xs text-gray-500">
+                  <div class="mt-1 text-xs text-content">
                     {{ item.quantity == null ? "Không giới hạn" : `Tồn ${item.quantity.toLocaleString("vi-VN")}` }}
                   </div>
                 </td>
@@ -194,19 +194,19 @@ onMounted(loadItems);
                     class="rounded-full border px-2.5 py-1 text-xs font-semibold"
                     :class="
                       item.isDisabled === false
-                        ? 'border-emerald-200 bg-emerald-50 text-emerald-800'
-                        : 'border-gray-200 bg-gray-100 text-gray-600'
+                        ? 'border-accent bg-surface text-content'
+                        : 'border-border bg-surface text-content'
                     "
                     >{{ item.isDisabled === false ? "Đang bật" : "Đang tắt" }}</span
                   >
                 </td>
-                <td class="whitespace-nowrap px-4 py-3 text-xs text-gray-500">{{ formatDate(item.createdAt) }}</td>
-                <td class="whitespace-nowrap px-4 py-3 text-xs text-gray-500">{{ formatDate(item.updatedAt) }}</td>
+                <td class="whitespace-nowrap px-4 py-3 text-xs text-content">{{ formatDate(item.createdAt) }}</td>
+                <td class="whitespace-nowrap px-4 py-3 text-xs text-content">{{ formatDate(item.updatedAt) }}</td>
                 <td class="px-4 py-3">
                   <div class="flex justify-end gap-2">
                     <button
                       type="button"
-                      class="rounded-md border border-emerald-200 px-2.5 py-1.5 text-xs font-bold text-emerald-800 hover:bg-emerald-50 disabled:opacity-50"
+                      class="rounded-md border border-accent px-2.5 py-1.5 text-xs font-bold text-content hover:bg-surface disabled:opacity-50"
                       :disabled="updatingId === item.id"
                       @click="toggleEnabled(item)"
                     >
@@ -214,14 +214,14 @@ onMounted(loadItems);
                     </button>
                     <button
                       type="button"
-                      class="rounded-md border border-gray-300 px-2.5 py-1.5 text-xs font-bold text-gray-700 hover:bg-gray-100"
+                      class="rounded-md border border-content px-2.5 py-1.5 text-xs font-bold text-content hover:bg-surface"
                       @click="openEditForm(item)"
                     >
                       Sửa
                     </button>
                     <button
                       type="button"
-                      class="rounded-md border border-red-200 px-2.5 py-1.5 text-xs font-bold text-red-700 hover:bg-red-50"
+                      class="rounded-md border border-danger px-2.5 py-1.5 text-xs font-bold text-danger hover:bg-surface"
                       @click="confirmDeleteId = item.id"
                     >
                       Xoá
@@ -245,16 +245,16 @@ onMounted(loadItems);
       />
     </main>
 
-    <div v-if="confirmDeleteId" class="fixed inset-0 z-40 grid place-items-center bg-black/45 p-4">
+    <div v-if="confirmDeleteId" class="fixed inset-0 z-40 grid place-items-center bg-content/45 p-4">
       <div class="w-full max-w-sm rounded-xl bg-white p-5 shadow-xl">
-        <div class="m-0 text-base font-extrabold text-gray-800">Xác nhận xoá vật phẩm?</div>
-        <div class="my-3 text-sm text-gray-600">
+        <div class="m-0 text-base font-extrabold text-content">Xác nhận xoá vật phẩm?</div>
+        <div class="my-3 text-sm text-content">
           Thao tác này không thể hoàn tác. Các dữ liệu liên quan có thể bị ràng buộc bởi cơ sở dữ liệu.
         </div>
         <div class="flex justify-end gap-2">
           <button
             type="button"
-            class="rounded-lg border border-gray-300 px-3 py-2 text-sm font-bold text-gray-700"
+            class="rounded-lg border border-content px-3 py-2 text-sm font-bold text-content"
             @click="confirmDeleteId = null"
           >
             Huỷ
@@ -262,7 +262,7 @@ onMounted(loadItems);
           <button
             type="button"
             :disabled="deletingId === confirmDeleteId"
-            class="rounded-lg bg-red-600 px-3 py-2 text-sm font-bold text-white disabled:opacity-50"
+            class="rounded-lg bg-danger px-3 py-2 text-sm font-bold text-white disabled:opacity-50"
             @click="deleteItem"
           >
             {{ deletingId ? "Đang xoá..." : "Xoá vật phẩm" }}

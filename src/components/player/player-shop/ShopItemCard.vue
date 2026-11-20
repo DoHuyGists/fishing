@@ -21,7 +21,7 @@ const emit = defineEmits<{
     class="shop-item-card slide-fade-in from-bottom player-content-in group flex w-full min-w-0 overflow-hidden rounded-xl border bg-white text-left shadow-sm transition hover:-translate-y-0.5 hover:shadow-md"
     :aria-pressed="selected"
     :class="
-      selected ? 'border-emerald-700 ring-2 ring-emerald-700/20' : 'border-border-default'
+      selected ? 'border-accent ring-2 ring-accent/20' : 'border-border-default'
     "
     @click="emit('select', item.id)"
   >
@@ -41,24 +41,24 @@ const emit = defineEmits<{
     <div class="flex min-w-0 flex-1 flex-col p-3">
       <div
         v-if="item.classification"
-        class="m-0 text-[10px] font-bold uppercase tracking-wide text-emerald-800"
+        class="m-0 text-[10px] font-bold uppercase tracking-wide text-content"
       >
         {{ item.classification }}
       </div>
       <div class="m-0 truncate text-sm font-extrabold" :title="item.name">{{ item.name }}</div>
-      <div class="m-0 mt-1 line-clamp-2 text-xs text-emerald-950/65">{{ item.information }}</div>
+      <div class="m-0 mt-1 line-clamp-2 text-xs text-content/65">{{ item.information }}</div>
       <div
         class="mt-auto flex items-center justify-between gap-1 border-t border-border-default/70 pt-2 text-xs"
       >
-        <span class="rounded bg-emerald-50 px-1.5 py-0.5 text-emerald-900">{{
+        <span class="rounded bg-surface px-1.5 py-0.5 text-content">{{
           item.category || tr('ShopModal.vat_pham')
         }}</span>
-        <strong class="whitespace-nowrap text-amber-700">{{ item.price.toLocaleString(getFormattingLocale()) }} {{ tr('currency.cashUnit') }}</strong>
+        <strong class="whitespace-nowrap text-primary">{{ item.price.toLocaleString(getFormattingLocale()) }} {{ tr('currency.cashUnit') }}</strong>
       </div>
-      <div class="m-0 mt-1 text-[10px] text-emerald-950/55">
+      <div class="m-0 mt-1 text-[10px] text-content/55">
         {{ tr('ShopModal.so_luong_moi_luot') }}: {{ (item.quantity ?? 1).toLocaleString(getFormattingLocale()) }}
       </div>
-      <div class="m-0 mt-1 text-xs font-semibold text-emerald-800">
+      <div class="m-0 mt-1 text-xs font-semibold text-content">
         {{ tr('ShopModal.dang_so_huu') }}: {{ ownedQuantity.toLocaleString(getFormattingLocale()) }}
       </div>
     </div>
@@ -68,9 +68,9 @@ const emit = defineEmits<{
 <style scoped>
 html.ocean-theme .shop-item-card {
   border-color: color-mix(in srgb, var(--color-ocean-wood) 70%, var(--color-ocean-gold));
-  background: var(--color-ocean-panel);
-  color: var(--color-ocean-pearl);
-  box-shadow: inset 0 1px 0 rgb(245 235 212 / 10%), 0 3px 8px rgb(0 0 0 / 15%);
+  background: var(--color-white);
+  color: var(--color-content);
+  box-shadow: inset 0 1px 0 color-mix(in srgb, var(--color-surface) 10%, transparent), 0 3px 8px color-mix(in srgb, var(--color-content) 15%, transparent);
 }
 
 html.ocean-theme .shop-item-card__art {
@@ -84,6 +84,6 @@ html.ocean-theme .shop-item-card:hover {
 
 html.ocean-theme .shop-item-card[aria-pressed="true"] {
   border-color: var(--color-ocean-gold);
-  box-shadow: 0 0 0 2px rgb(242 198 109 / 30%), inset 0 1px 0 rgb(245 235 212 / 15%);
+  box-shadow: 0 0 0 2px color-mix(in srgb, var(--color-gold) 30%, transparent), inset 0 1px 0 color-mix(in srgb, var(--color-surface) 15%, transparent);
 }
 </style>

@@ -76,7 +76,7 @@ const percentOf = (id: string) => {
       @remove="boundaryEditor.removeNode"
     />
     <div
-      class="overflow-hidden rounded-xl border border-border-default bg-palette-e5e9d6"
+      class="overflow-hidden rounded-xl border border-border-default bg-surface"
       :class="{ 'pointer-events-none opacity-60': disabled }"
     >
       <svg
@@ -110,14 +110,14 @@ const percentOf = (id: string) => {
         <defs>
           <clipPath :id="clipId"><polygon :points="lakePoints" /></clipPath>
         </defs>
-        <polygon :points="lakePoints" fill="#d8e8ea" stroke="#f5f9f0" stroke-width="14" stroke-linejoin="round" />
+        <polygon :points="lakePoints" fill="#f5f9f0" stroke="#f5f9f0" stroke-width="14" stroke-linejoin="round" />
         <g :clip-path="`url(#${clipId})`">
           <polygon
             v-for="(cell, index) in cells"
             :key="cell.id"
             :points="cell.polygon.map((point) => `${point.x},${point.y}`).join(' ')"
             :fill="zones[index]?.color"
-            stroke="#fff"
+            stroke="#ffffff"
             :stroke-width="selectedId === cell.id ? 3 : 1.5"
             class="cursor-pointer transition-opacity hover:opacity-90"
             :class="{ 'opacity-60': selectedId && selectedId !== cell.id }"
@@ -136,7 +136,7 @@ const percentOf = (id: string) => {
           <text
             :x="cell.center.x"
             :y="cell.center.y - 7"
-            fill="white"
+            fill="var(--color-white)"
             stroke="#24352a"
             stroke-width="3"
             paint-order="stroke"
@@ -148,7 +148,7 @@ const percentOf = (id: string) => {
           <text
             :x="cell.center.x"
             :y="cell.center.y + 9"
-            fill="white"
+            fill="var(--color-white)"
             stroke="#24352a"
             stroke-width="3"
             paint-order="stroke"
@@ -164,7 +164,7 @@ const percentOf = (id: string) => {
               :cy="selected.seed.y"
               :r="selectedRadius"
               fill="none"
-              stroke="white"
+              stroke="var(--color-white)"
               stroke-width="1.5"
               stroke-dasharray="5 4"
               class="pointer-events-none"
@@ -174,7 +174,7 @@ const percentOf = (id: string) => {
               :y1="selected.seed.y"
               :x2="sizeHandle.x"
               :y2="sizeHandle.y"
-              stroke="white"
+              stroke="var(--color-white)"
               stroke-width="1.5"
               class="pointer-events-none"
             />
@@ -184,7 +184,7 @@ const percentOf = (id: string) => {
               width="14"
               height="14"
               rx="2"
-              fill="white"
+              fill="var(--color-white)"
               :stroke="selected.color"
               stroke-width="3"
               class="cursor-nwse-resize"
@@ -201,7 +201,7 @@ const percentOf = (id: string) => {
             :cx="zone.seed.x"
             :cy="zone.seed.y"
             r="8"
-            fill="white"
+            fill="var(--color-white)"
             :stroke="zone.color"
             stroke-width="4"
             class="cursor-grab"
@@ -219,8 +219,8 @@ const percentOf = (id: string) => {
               :cx="node.x"
               :cy="node.y"
               :r="selectedNode === index ? 8 : 6"
-              :fill="selectedNode === index ? '#047857' : '#24352a'"
-              stroke="white"
+              :fill="selectedNode === index ? '#1abc9c' : '#24352a'"
+              stroke="var(--color-white)"
               stroke-width="2"
               class="cursor-move"
               :aria-label="`Node vòng biên ${index + 1}`"
@@ -246,11 +246,11 @@ const percentOf = (id: string) => {
                 width="92"
                 height="26"
                 rx="13"
-                :fill="boundary.nodes.length > 6 ? '#dc2626' : '#94a3b8'"
-                stroke="white"
+                :fill="boundary.nodes.length > 6 ? '#f75353' : '#24352a'"
+                stroke="var(--color-white)"
                 stroke-width="2"
               />
-              <text x="46" y="17" text-anchor="middle" font-size="12" fill="white" class="pointer-events-none">
+              <text x="46" y="17" text-anchor="middle" font-size="12" fill="var(--color-white)" class="pointer-events-none">
                 {{ boundary.nodes.length > 6 ? "Xóa node" : "Tối thiểu 6" }}
               </text>
             </g>
@@ -263,7 +263,7 @@ const percentOf = (id: string) => {
               height="24"
               rx="4"
               fill="#24352a"
-              stroke="white"
+              stroke="var(--color-white)"
               stroke-width="2"
               class="cursor-ew-resize"
               aria-label="Kéo chiều rộng vòng biên"
@@ -276,7 +276,7 @@ const percentOf = (id: string) => {
               height="10"
               rx="4"
               fill="#24352a"
-              stroke="white"
+              stroke="var(--color-white)"
               stroke-width="2"
               class="cursor-ns-resize"
               aria-label="Kéo chiều cao vòng biên"

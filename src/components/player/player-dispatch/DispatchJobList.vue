@@ -13,7 +13,7 @@ const store = useDispatchStore();
       v-for="job in store.jobs"
       :key="job.id"
       class="dispatch-card slide-fade-in player-content-in"
-      :class="{ 'ring-2 ring-palette-527547': store.selectedJobId === job.id }"
+      :class="{ 'ring-2 ring-accent': store.selectedJobId === job.id }"
     >
       <div class="flex items-center gap-2">
         <img
@@ -31,7 +31,7 @@ const store = useDispatchStore();
         >
         <div class="min-w-0">
           <div class="font-bold">{{ dispatchText(job.name) }}</div>
-          <div class="text-xs text-palette-61745d">
+          <div class="text-xs text-content">
             {{ tr("Dispatch.duration", { minutes: Math.ceil(job.duration_seconds / 60) }) }}
           </div>
         </div>
@@ -45,7 +45,7 @@ const store = useDispatchStore();
         <span v-if="!Object.keys(job.data.requirements ?? {}).length">{{ tr("Dispatch.noRequirements") }}</span>
       </div>
       <DispatchRewards :rewards="job.rewards" />
-      <div v-if="store.selectedNpc && !dispatchEligible(store.selectedNpc, job)" class="text-xs text-amber-800">
+      <div v-if="store.selectedNpc && !dispatchEligible(store.selectedNpc, job)" class="text-xs text-gold">
         {{ tr("Dispatch.errorRequirements") }}
       </div>
       <button type="button" class="dispatch-button w-full" :disabled="store.locked" @click="store.selectJob(job.id)">

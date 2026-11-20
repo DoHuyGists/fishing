@@ -101,7 +101,7 @@ onMounted(() => void loadDailyMissions());
     <div
       v-else-if="errorMessage"
       role="alert"
-      class="rounded-xl border border-red-200 bg-red-50 p-4 text-sm text-red-800"
+      class="rounded-xl border border-danger bg-surface p-4 text-sm text-danger"
     >
       {{ errorMessage }}
       <button type="button" class="ml-2 font-bold underline" @click="loadDailyMissions">
@@ -115,13 +115,13 @@ onMounted(() => void loadDailyMissions());
         <div class="flex flex-wrap items-center justify-between gap-2">
           <div>
             <div class="m-0 text-base font-extrabold">{{ tr("DailyMission.nhiem_vu_hang_ngay") }}</div>
-            <div class="mb-0 mt-0.5 text-xs capitalize text-emerald-900/65">
+            <div class="mb-0 mt-0.5 text-xs capitalize text-content/65">
               {{ formatDate(missionStore.dailyMissions.mission_date) }}
             </div>
           </div>
           <div class="flex items-baseline gap-1.5 rounded-lg bg-white px-3 py-1.5">
             <strong class="text-xl tabular-nums">{{ missionStore.dailyMissions.total_points }}</strong>
-            <span class="text-xs text-emerald-900/65">{{ tr("DailyMission.diem_nhiem_vu") }}</span>
+            <span class="text-xs text-content/65">{{ tr("DailyMission.diem_nhiem_vu") }}</span>
           </div>
         </div>
       </header>
@@ -135,7 +135,7 @@ onMounted(() => void loadDailyMissions());
             <div>
               <div class="m-0 text-sm font-extrabold">{{ tr("DailyMission.moc_thuong") }}</div>
             </div>
-            <span class="text-xs font-bold text-emerald-800"
+            <span class="text-xs font-bold text-content"
               >{{ missionStore.dailyMissions.total_points }} {{ tr("DailyMission.diem") }}</span
             >
           </div>
@@ -143,11 +143,11 @@ onMounted(() => void loadDailyMissions());
             <div ref="trackElement" class="relative m-0 flex flex-col gap-2 pb-0 pt-6">
               <div
                 aria-hidden="true"
-                class="pointer-events-none absolute left-4 top-0 w-1 overflow-hidden rounded-full bg-emerald-950/10"
+                class="pointer-events-none absolute left-4 top-0 w-1 overflow-hidden rounded-full bg-accent/10"
                 :style="{ height: `${trackHeight}px` }"
               >
                 <div
-                  class="w-full rounded-full bg-emerald-600 transition-[height] motion-reduce:transition-none"
+                  class="w-full rounded-full bg-accent transition-[height] motion-reduce:transition-none"
                   :style="{ height: `${filledHeight}px` }"
                 />
               </div>
@@ -159,13 +159,13 @@ onMounted(() => void loadDailyMissions());
               >
                 <span
                   class="absolute left-1.5 top-1/2 z-10 flex size-6 -translate-y-1/2 items-center justify-center rounded-full border-2 border-white shadow-sm"
-                  :class="reward.is_unlocked ? 'bg-emerald-600' : 'bg-border-default'"
+                  :class="reward.is_unlocked ? 'bg-accent' : 'bg-border-default'"
                 >
                   <span v-if="reward.is_claimed" class="text-xs font-black text-white">✓</span>
                 </span>
                 <article
                   class="rounded-lg border p-2 transition-colors xl:p-2.5"
-                  :class="reward.is_unlocked ? 'border-emerald-300 bg-white shadow-sm' : 'border-border-default bg-white/70'"
+                  :class="reward.is_unlocked ? 'border-accent bg-white shadow-sm' : 'border-border-default bg-white/70'"
                 >
                   <div class="mb-1.5 flex items-center justify-between gap-2">
                     <strong class="text-xs">{{ reward.required_points }} {{ tr("DailyMission.diem") }}</strong>
@@ -173,8 +173,8 @@ onMounted(() => void loadDailyMissions());
                       class="rounded-full px-2 py-0.5 text-[10px] font-bold"
                       :class="
                         reward.is_claimed || reward.is_unlocked
-                          ? 'bg-emerald-100 text-emerald-800'
-                          : 'bg-surface text-emerald-900/55'
+                          ? 'bg-surface text-content'
+                          : 'bg-surface text-content/55'
                       "
                     >
                       {{
@@ -206,7 +206,7 @@ onMounted(() => void loadDailyMissions());
                       >
                     </div>
                   </div>
-                  <div v-else class="m-0 text-xs text-emerald-900/55">
+                  <div v-else class="m-0 text-xs text-content/55">
                     {{ tr("DailyMission.phan_thuong_theo_moc") }}
                   </div>
                   <button
@@ -214,7 +214,7 @@ onMounted(() => void loadDailyMissions());
                     type="button"
                     :disabled="!!missionStore.claimingDailyRewardId"
                     :aria-busy="missionStore.claimingDailyRewardId === reward.id"
-                    class="mt-2 w-full rounded-lg bg-emerald-700 px-2 py-1.5 text-xs font-bold text-white transition hover:bg-emerald-800 disabled:cursor-not-allowed disabled:opacity-60"
+                    class="mt-2 w-full rounded-lg bg-accent px-2 py-1.5 text-xs font-bold text-white transition hover:bg-accent disabled:cursor-not-allowed disabled:opacity-60"
                     @click="claimReward(reward.id)"
                   >
                     {{
@@ -223,7 +223,7 @@ onMounted(() => void loadDailyMissions());
                         : tr("DailyAttendance.nhan_thuong")
                     }}
                   </button>
-                  <div v-else-if="!reward.is_unlocked" class="mb-0 mt-2 text-[10px] text-emerald-900/55">
+                  <div v-else-if="!reward.is_unlocked" class="mb-0 mt-2 text-[10px] text-content/55">
                     {{ tr("Fishfarm.con") }}
                     {{ Math.max(0, reward.required_points - missionStore.dailyMissions.total_points) }}
                     {{ tr("DailyMission.diem") }}
@@ -232,7 +232,7 @@ onMounted(() => void loadDailyMissions());
               </div>
             </div>
           </div>
-          <div v-else class="m-0 rounded-xl bg-white/70 p-4 text-center text-xs text-emerald-900/55">
+          <div v-else class="m-0 rounded-xl bg-white/70 p-4 text-center text-xs text-content/55">
             {{ tr("DailyMission.chua_co_moc_thuong") }}
           </div>
         </section>
@@ -243,7 +243,7 @@ onMounted(() => void loadDailyMissions());
         >
           <div class="m-0 text-sm font-extrabold">
             {{ tr("DailyMission.tien_do_nhiem_vu") }}
-            <span class="font-medium text-emerald-900/60"
+            <span class="font-medium text-content/60"
               >({{ missionStore.completedDailyMissionCount }}/{{ missionStore.dailyMissions.missions.length }})</span
             >
           </div>
@@ -252,7 +252,7 @@ onMounted(() => void loadDailyMissions());
               v-for="mission in missionStore.dailyMissionProgress"
               :key="mission.id"
               class="slide-fade-in from-bottom player-content-in rounded-lg border p-2.5 xl:p-3"
-              :class="mission.isTargetReached ? 'border-emerald-300 bg-surface' : 'border-border-default bg-white'"
+              :class="mission.isTargetReached ? 'border-accent bg-surface' : 'border-border-default bg-white'"
             >
               <div class="flex flex-wrap items-start justify-between gap-2">
                 <div class="min-w-0 flex-1">
@@ -262,7 +262,7 @@ onMounted(() => void loadDailyMissions());
                       difficultyLabel(mission.difficulty)
                     }}</span>
                   </div>
-                  <div class="mb-0 mt-0.5 text-xs text-emerald-900/65">{{ mission.description }}</div>
+                  <div class="mb-0 mt-0.5 text-xs text-content/65">{{ mission.description }}</div>
                 </div>
                 <span class="shrink-0 text-xs font-bold"
                   >{{ mission.mission_points }} {{ tr("DailyMission.diem") }}</span
@@ -275,14 +275,14 @@ onMounted(() => void loadDailyMissions());
                   :aria-valuenow="mission.progressPercent"
                   :aria-valuemin="0"
                   :aria-valuemax="100"
-                  class="h-1.5 min-w-12 flex-1 overflow-hidden rounded-full bg-emerald-950/10"
+                  class="h-1.5 min-w-12 flex-1 overflow-hidden rounded-full bg-accent/10"
                 >
-                  <div class="h-full rounded-full bg-emerald-600" :style="{ width: `${mission.progressPercent}%` }" />
+                  <div class="h-full rounded-full bg-accent" :style="{ width: `${mission.progressPercent}%` }" />
                 </div>
                 <span class="text-xs tabular-nums"
                   >{{ Math.min(mission.current_value, mission.target_value) }}/{{ mission.target_value }}</span
                 >
-                <span v-if="mission.isTargetReached" class="text-[10px] font-bold text-emerald-700"
+                <span v-if="mission.isTargetReached" class="text-[10px] font-bold text-content"
                   >✓ {{ tr("FlipBook.hoan_thanh") }}</span
                 >
               </div>

@@ -44,33 +44,33 @@ onUnmounted(() => {
     :close-disabled="store.isSaving || store.isDeleting"
     @close="close"
   >
-    <div class="flex shrink-0 flex-wrap items-center gap-3 border-b border-gray-200 bg-white px-5 py-3 md:px-7">
+    <div class="flex shrink-0 flex-wrap items-center gap-3 border-b border-border bg-white px-5 py-3 md:px-7">
       <input
         v-model="store.search"
         type="search"
         aria-label="Tìm kiếm"
         placeholder="Tìm theo mốc điểm..."
-        class="min-w-48 flex-1 rounded-lg border border-slate-300 bg-gray-50 px-3 py-2.5 text-sm placeholder:text-slate-400 focus:border-emerald-600 focus:outline-none focus:ring-2 focus:ring-emerald-600/15"
+        class="min-w-48 flex-1 rounded-lg border border-content bg-white px-3 py-2.5 text-sm placeholder:text-content focus:border-accent focus:outline-none focus:ring-2 focus:ring-accent/15"
       />
-      <label class="flex items-center gap-2 text-sm text-slate-600">
+      <label class="flex items-center gap-2 text-sm text-content">
         Trạng thái
         <select
           v-model="store.statusFilter"
-          class="rounded-lg border border-slate-300 bg-white px-3 py-2.5 text-sm text-slate-700 focus:border-emerald-600 focus:outline-none"
+          class="rounded-lg border border-content bg-white px-3 py-2.5 text-sm text-content focus:border-accent focus:outline-none"
         >
           <option value="ALL">Tất cả</option>
           <option value="ACTIVE">Đang bật</option>
           <option value="INACTIVE">Đã tắt</option>
         </select>
       </label>
-      <span class="text-sm text-slate-500">{{ store.filteredItems.length }} kết quả</span>
+      <span class="text-sm text-content">{{ store.filteredItems.length }} kết quả</span>
       <div class="ml-auto flex items-center gap-2">
         <button
           type="button"
           title="Làm mới danh sách"
           aria-label="Làm mới danh sách"
           :disabled="store.isLoading || store.isSaving || store.isDeleting"
-          class="grid size-10 place-items-center rounded-lg border border-slate-300 bg-white text-slate-600 hover:bg-gray-50 focus-visible:outline-2 focus-visible:outline-emerald-600 disabled:opacity-50"
+          class="grid size-10 place-items-center rounded-lg border border-content bg-white text-content hover:bg-white focus-visible:outline-2 focus-visible:outline-accent disabled:opacity-50"
           @click="store.load()"
         >
           <svg
@@ -91,23 +91,23 @@ onUnmounted(() => {
         </button>
         <button
           type="button"
-          class="rounded-lg bg-content-strong px-4 py-2.5 text-sm font-bold text-white hover:bg-emerald-800 focus-visible:outline-2 focus-visible:outline-emerald-600"
+          class="rounded-lg bg-content-strong px-4 py-2.5 text-sm font-bold text-white hover:bg-accent focus-visible:outline-2 focus-visible:outline-accent"
           @click="store.openCreateForm()"
         >
           + Thêm mốc thưởng
         </button>
       </div>
     </div>
-    <div v-if="store.loadError" role="alert" class="m-4 rounded-lg bg-red-50 p-3 text-red-700">
+    <div v-if="store.loadError" role="alert" class="m-4 rounded-lg bg-surface p-3 text-danger">
       {{ store.loadError }}
     </div>
     <main class="min-h-0 flex-1 overflow-auto p-4 md:p-6">
-      <div v-if="store.isLoading" role="status" class="grid min-h-56 place-items-center text-sm text-slate-500">
+      <div v-if="store.isLoading" role="status" class="grid min-h-56 place-items-center text-sm text-content">
         Đang tải danh sách...
       </div>
-      <div v-else class="h-full overflow-auto rounded-lg border border-gray-200 bg-white shadow-sm">
+      <div v-else class="h-full overflow-auto rounded-lg border border-border bg-white shadow-sm">
         <table class="w-full min-w-[1000px] border-separate border-spacing-0 text-left text-sm">
-          <thead class="sticky top-0 z-10 bg-gray-100 text-xs font-medium uppercase text-slate-600">
+          <thead class="sticky top-0 z-10 bg-surface text-xs font-medium uppercase text-content">
             <tr>
               <th class="whitespace-nowrap px-5 py-4">Mốc điểm</th>
               <th class="whitespace-nowrap px-5 py-4">Phần thưởng</th>
@@ -121,16 +121,16 @@ onUnmounted(() => {
             <tr
               v-for="item in store.filteredItems"
               :key="item.id"
-              class="align-top transition-colors hover:bg-emerald-50/40"
+              class="align-top transition-colors hover:bg-surface/40"
             >
               <td class="max-w-sm px-5 py-4">
-                <span class="font-semibold text-emerald-800"
+                <span class="font-semibold text-content"
                   >{{ item.required_points.toLocaleString("vi-VN") }} điểm</span
                 >
               </td>
               <td class="max-w-sm px-5 py-4">
                 <pre
-                  class="max-h-28 min-w-48 overflow-auto whitespace-pre-wrap break-all rounded-md border border-gray-200 bg-gray-50 px-3 py-2 font-mono text-xs leading-relaxed text-slate-600"
+                  class="max-h-28 min-w-48 overflow-auto whitespace-pre-wrap break-all rounded-md border border-border bg-white px-3 py-2 font-mono text-xs leading-relaxed text-content"
                   >{{ JSON.stringify(item.reward_data, null, 2) }}</pre
                 >
               </td>
@@ -139,25 +139,25 @@ onUnmounted(() => {
                   class="inline-flex rounded-full border px-2.5 py-1 text-xs font-medium"
                   :class="
                     item.is_active
-                      ? 'border-emerald-200 bg-emerald-50 text-emerald-800'
-                      : 'border-gray-200 bg-gray-100 text-gray-500'
+                      ? 'border-accent bg-surface text-content'
+                      : 'border-border bg-surface text-content'
                   "
                   >{{ item.is_active ? "Đang bật" : "Đã tắt" }}</span
                 >
               </td>
-              <td class="whitespace-nowrap px-5 py-4 text-xs text-slate-500">{{ formatDate(item.created_at) }}</td>
-              <td class="whitespace-nowrap px-5 py-4 text-xs text-slate-500">{{ formatDate(item.updated_at) }}</td>
+              <td class="whitespace-nowrap px-5 py-4 text-xs text-content">{{ formatDate(item.created_at) }}</td>
+              <td class="whitespace-nowrap px-5 py-4 text-xs text-content">{{ formatDate(item.updated_at) }}</td>
               <td class="whitespace-nowrap px-5 py-4 text-right">
                 <button
                   type="button"
-                  class="rounded-md border border-slate-300 px-3 py-2 text-xs font-medium text-slate-600 hover:bg-gray-100 focus-visible:outline-2 focus-visible:outline-emerald-600"
+                  class="rounded-md border border-content px-3 py-2 text-xs font-medium text-content hover:bg-surface focus-visible:outline-2 focus-visible:outline-accent"
                   @click="store.openEditForm(item)"
                 >
                   Sửa
                 </button>
                 <button
                   type="button"
-                  class="ml-2 rounded-md border border-red-200 px-3 py-2 text-xs font-medium text-red-600 hover:bg-red-50 focus-visible:outline-2 focus-visible:outline-red-500"
+                  class="ml-2 rounded-md border border-danger px-3 py-2 text-xs font-medium text-danger hover:bg-surface focus-visible:outline-2 focus-visible:outline-danger"
                   @click="store.confirmDeleteId = item.id"
                 >
                   Xoá
@@ -165,7 +165,7 @@ onUnmounted(() => {
               </td>
             </tr>
             <tr v-if="!store.filteredItems.length">
-              <td colspan="6" class="p-12 text-center text-sm text-slate-500">Không có bản ghi phù hợp.</td>
+              <td colspan="6" class="p-12 text-center text-sm text-content">Không có bản ghi phù hợp.</td>
             </tr>
           </tbody>
         </table>
@@ -187,7 +187,7 @@ onUnmounted(() => {
       :on-second="store.remove"
     >
       <div>Bản ghi sẽ bị xoá vĩnh viễn.</div>
-      <div v-if="store.loadError" role="alert" class="mt-2 text-red-700">{{ store.loadError }}</div>
+      <div v-if="store.loadError" role="alert" class="mt-2 text-danger">{{ store.loadError }}</div>
     </TwoOptionsModal>
     <Pagination
       :page="store.page"

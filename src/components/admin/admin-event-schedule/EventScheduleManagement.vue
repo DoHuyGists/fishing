@@ -28,30 +28,30 @@ onMounted(() => store.loadAll());
 
 <template>
   <AdminModal title="Quản lý lịch sự kiện" icon="🗓️" @close="emit('close')">
-    <div class="flex shrink-0 flex-wrap items-center gap-3 border-b border-gray-200 bg-white px-5 py-3 md:px-7">
+    <div class="flex shrink-0 flex-wrap items-center gap-3 border-b border-border bg-white px-5 py-3 md:px-7">
       <div class="relative min-w-55 flex-1">
         <input
           v-model="store.search"
           type="search"
           placeholder="Tìm theo tên sự kiện..."
-          class="w-full rounded-lg border border-gray-300 bg-gray-50 px-3 py-2 text-sm focus:border-emerald-600 focus:outline-none"
+          class="w-full rounded-lg border border-content bg-white px-3 py-2 text-sm focus:border-accent focus:outline-none"
         />
       </div>
-      <label class="flex items-center gap-2 text-xs font-semibold text-gray-600">
+      <label class="flex items-center gap-2 text-xs font-semibold text-content">
         Sự kiện
         <select
           v-model="store.eventFilter"
-          class="rounded-lg border border-gray-300 bg-white px-2.5 py-2 text-sm text-gray-700"
+          class="rounded-lg border border-content bg-white px-2.5 py-2 text-sm text-content"
         >
           <option value="ALL">Tất cả</option>
           <option v-for="event in store.eventOptions" :key="event.id" :value="event.id">{{ event.name }}</option>
         </select>
       </label>
-      <label class="flex items-center gap-2 text-xs font-semibold text-gray-600">
+      <label class="flex items-center gap-2 text-xs font-semibold text-content">
         Trạng thái
         <select
           v-model="store.statusFilter"
-          class="rounded-lg border border-gray-300 bg-white px-2.5 py-2 text-sm text-gray-700"
+          class="rounded-lg border border-content bg-white px-2.5 py-2 text-sm text-content"
         >
           <option value="ALL">Tất cả</option>
           <option value="ACTIVE">Đang bật</option>
@@ -59,11 +59,11 @@ onMounted(() => store.loadAll());
         </select>
       </label>
       <div class="ml-auto flex items-center gap-2">
-        <span class="hidden text-xs text-gray-500 sm:inline">{{ store.filteredSchedules.length }} kết quả</span>
+        <span class="hidden text-xs text-content sm:inline">{{ store.filteredSchedules.length }} kết quả</span>
         <button
           type="button"
           title="Làm mới danh sách"
-          class="grid size-9 place-items-center rounded-lg border border-gray-300 bg-white text-gray-700 hover:bg-gray-100 disabled:opacity-50"
+          class="grid size-9 place-items-center rounded-lg border border-content bg-white text-content hover:bg-surface disabled:opacity-50"
           :disabled="store.isLoading"
           @click="store.loadAll()"
         >
@@ -85,7 +85,7 @@ onMounted(() => store.loadAll());
         <button
           type="button"
           :disabled="!store.eventOptions.length"
-          class="rounded-lg bg-content-strong px-3.5 py-2 text-sm font-bold text-white hover:bg-emerald-800 disabled:opacity-50"
+          class="rounded-lg bg-content-strong px-3.5 py-2 text-sm font-bold text-white hover:bg-accent disabled:opacity-50"
           @click="store.openCreateForm()"
         >
           + Thêm lịch
@@ -97,65 +97,65 @@ onMounted(() => store.loadAll());
       <section class="flex min-h-0 min-w-0 flex-1 flex-col overflow-hidden p-4 md:p-6">
         <div
           v-if="store.loadError"
-          class="mb-4 flex shrink-0 items-center justify-between gap-3 rounded-lg border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-700"
+          class="mb-4 flex shrink-0 items-center justify-between gap-3 rounded-lg border border-danger bg-surface px-4 py-3 text-sm text-danger"
         >
           <span>{{ store.loadError }}</span>
           <button type="button" class="font-bold underline" @click="store.loadAll()">Thử lại</button>
         </div>
         <div
           v-if="!store.isLoading && !store.events.length"
-          class="mb-4 shrink-0 rounded-lg border border-amber-200 bg-amber-50 px-4 py-3 text-sm text-amber-700"
+          class="mb-4 shrink-0 rounded-lg border border-gold bg-surface px-4 py-3 text-sm text-gold"
         >
           Chưa có sự kiện nào. Vui lòng tạo sự kiện trước khi thêm lịch.
         </div>
-        <div v-if="store.isLoading" class="grid min-h-64 place-items-center text-sm text-gray-500">
+        <div v-if="store.isLoading" class="grid min-h-64 place-items-center text-sm text-content">
           Đang tải danh sách lịch sự kiện...
         </div>
         <div
           v-else-if="!store.filteredSchedules.length"
-          class="grid min-h-64 place-items-center text-center text-sm text-gray-500"
+          class="grid min-h-64 place-items-center text-center text-sm text-content"
         >
           <div>
             <span class="mb-2 block text-3xl">🗓️</span
             >{{ store.schedules.length ? "Không tìm thấy lịch phù hợp." : "Chưa có lịch sự kiện nào." }}
           </div>
         </div>
-        <div v-else class="min-h-0 flex-1 overflow-auto rounded-lg border border-gray-200 bg-white shadow-sm">
+        <div v-else class="min-h-0 flex-1 overflow-auto rounded-lg border border-border bg-white shadow-sm">
           <table class="w-full min-w-[1000px] border-collapse text-left text-sm">
-            <thead class="text-[11px] uppercase text-gray-600">
+            <thead class="text-[11px] uppercase text-content">
               <tr>
-                <th class="sticky top-0 z-10 bg-gray-100 px-4 py-3">Sự kiện</th>
-                <th class="sticky top-0 z-10 bg-gray-100 px-4 py-3">Bắt đầu</th>
-                <th class="sticky top-0 z-10 bg-gray-100 px-4 py-3">Kết thúc</th>
-                <th class="sticky top-0 z-10 bg-gray-100 px-4 py-3">Lượt xem</th>
-                <th class="sticky top-0 z-10 bg-gray-100 px-4 py-3">Trạng thái</th>
-                <th class="sticky top-0 z-10 bg-gray-100 px-4 py-3 text-right">Thao tác</th>
+                <th class="sticky top-0 z-10 bg-surface px-4 py-3">Sự kiện</th>
+                <th class="sticky top-0 z-10 bg-surface px-4 py-3">Bắt đầu</th>
+                <th class="sticky top-0 z-10 bg-surface px-4 py-3">Kết thúc</th>
+                <th class="sticky top-0 z-10 bg-surface px-4 py-3">Lượt xem</th>
+                <th class="sticky top-0 z-10 bg-surface px-4 py-3">Trạng thái</th>
+                <th class="sticky top-0 z-10 bg-surface px-4 py-3 text-right">Thao tác</th>
               </tr>
             </thead>
             <tbody>
               <tr
                 v-for="item in store.filteredSchedules"
                 :key="item.id"
-                class="border-t border-gray-100 hover:bg-emerald-50/40"
+                class="border-t border-border hover:bg-surface/40"
               >
                 <td class="px-4 py-3">
                   <div class="flex items-center gap-2">
                     <EventThumbnail :src="item.eventThumbnail" :rotate="-8" :width="80" :height="80" />
-                    <span class="font-bold text-gray-800">{{ item.eventName || "—" }}</span>
+                    <span class="font-bold text-content">{{ item.eventName || "—" }}</span>
                   </div>
                 </td>
-                <td class="whitespace-nowrap px-4 py-3 text-gray-700">{{ formatDate(item.start) }}</td>
-                <td class="whitespace-nowrap px-4 py-3 text-gray-700">{{ formatDate(item.end) }}</td>
-                <td class="px-4 py-3 text-gray-700">{{ item.viewCount }}</td>
+                <td class="whitespace-nowrap px-4 py-3 text-content">{{ formatDate(item.start) }}</td>
+                <td class="whitespace-nowrap px-4 py-3 text-content">{{ formatDate(item.end) }}</td>
+                <td class="px-4 py-3 text-content">{{ item.viewCount }}</td>
                 <td class="px-4 py-3">
                   <span
                     v-if="!item.isDisabled"
-                    class="rounded-full border border-emerald-200 bg-emerald-50 px-2.5 py-1 text-xs font-semibold text-emerald-800"
+                    class="rounded-full border border-accent bg-surface px-2.5 py-1 text-xs font-semibold text-content"
                     >Đang bật</span
                   >
                   <span
                     v-else
-                    class="rounded-full border border-gray-200 bg-gray-100 px-2.5 py-1 text-xs font-semibold text-gray-600"
+                    class="rounded-full border border-border bg-surface px-2.5 py-1 text-xs font-semibold text-content"
                     >Đã tắt</span
                   >
                 </td>
@@ -163,14 +163,14 @@ onMounted(() => store.loadAll());
                   <div class="flex justify-end gap-2">
                     <button
                       type="button"
-                      class="rounded-md border border-gray-300 px-2.5 py-1.5 text-xs font-bold text-gray-700 hover:bg-gray-100"
+                      class="rounded-md border border-content px-2.5 py-1.5 text-xs font-bold text-content hover:bg-surface"
                       @click="store.openEditForm(item)"
                     >
                       Sửa
                     </button>
                     <button
                       type="button"
-                      class="rounded-md border border-red-200 px-2.5 py-1.5 text-xs font-bold text-red-700 hover:bg-red-50"
+                      class="rounded-md border border-danger px-2.5 py-1.5 text-xs font-bold text-danger hover:bg-surface"
                       @click="store.confirmDeleteId = item.id"
                     >
                       Xoá
@@ -185,14 +185,14 @@ onMounted(() => store.loadAll());
       <EventScheduleForm />
     </main>
 
-    <div v-if="store.confirmDeleteId" class="fixed inset-0 z-40 grid place-items-center bg-black/45 p-4">
+    <div v-if="store.confirmDeleteId" class="fixed inset-0 z-40 grid place-items-center bg-content/45 p-4">
       <div class="w-full max-w-sm rounded-xl bg-white p-5 shadow-xl">
-        <div class="m-0 text-base font-extrabold text-gray-800">Xác nhận xoá lịch sự kiện?</div>
-        <div class="my-3 text-sm text-gray-600">Thao tác này không thể hoàn tác.</div>
+        <div class="m-0 text-base font-extrabold text-content">Xác nhận xoá lịch sự kiện?</div>
+        <div class="my-3 text-sm text-content">Thao tác này không thể hoàn tác.</div>
         <div class="flex justify-end gap-2">
           <button
             type="button"
-            class="rounded-lg border border-gray-300 px-3 py-2 text-sm font-bold text-gray-700"
+            class="rounded-lg border border-content px-3 py-2 text-sm font-bold text-content"
             @click="store.confirmDeleteId = null"
           >
             Huỷ
@@ -200,7 +200,7 @@ onMounted(() => store.loadAll());
           <button
             type="button"
             :disabled="store.deletingId === store.confirmDeleteId"
-            class="rounded-lg bg-red-600 px-3 py-2 text-sm font-bold text-white disabled:opacity-50"
+            class="rounded-lg bg-danger px-3 py-2 text-sm font-bold text-white disabled:opacity-50"
             @click="store.remove()"
           >
             {{ store.deletingId ? "Đang xoá..." : "Xoá lịch" }}

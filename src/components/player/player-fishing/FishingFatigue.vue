@@ -57,13 +57,13 @@ onBeforeUnmount(() => clearInterval(timer));
           :aria-valuetext="description"
           :aria-valuemin="0"
           :aria-valuemax="100"
-          class="h-2.5 overflow-hidden rounded-full bg-palette-dce8d5"
+          class="h-2.5 overflow-hidden rounded-full bg-surface"
           :class="variant === 'compact' ? 'min-w-0 flex-1' : 'my-2'"
         >
           <div
             v-if="snapshot"
             class="h-full rounded-full transition-[width,background-color] duration-300 motion-reduce:transition-none"
-            :class="score >= 70 ? 'bg-red-500' : score >= 40 ? 'bg-amber-500' : 'bg-emerald-600'"
+            :class="score >= 70 ? 'bg-danger' : score >= 40 ? 'bg-gold' : 'bg-accent'"
             :style="{ width: `${score}%` }"
           />
         </div>
@@ -78,7 +78,7 @@ onBeforeUnmount(() => clearInterval(timer));
           <div v-if="!snapshot.effects.length" class="text-content-muted">{{ tr('FishingFatigue.noEffects') }}</div>
           <div v-for="(effect, index) in snapshot.effects" :key="`${effect.code}:${effect.target}:${index}`" class="flex justify-between gap-2 text-content-muted">
             <span>{{ tr(`FishingFatigue.${effect.target}`) }}</span>
-            <span class="shrink-0 font-semibold text-red-700">{{ formatter.format(effect.value) }}%</span>
+            <span class="shrink-0 font-semibold text-danger">{{ formatter.format(effect.value) }}%</span>
           </div>
         </div>
         <div class="mt-2 text-[10px] leading-relaxed text-content-muted">{{ tr('FishingFatigue.recovery') }}</div>
@@ -86,6 +86,6 @@ onBeforeUnmount(() => clearInterval(timer));
     </template>
     <div v-else-if="!store.errors[key]" role="status">{{ tr('FishingFatigue.loading') }}</div>
     <div v-if="variant === 'compact' && !snapshot && !store.errors[key]" role="status" class="sr-only">{{ tr('FishingFatigue.loading') }}</div>
-    <div v-if="store.errors[key]" role="status" :class="variant === 'compact' ? 'sr-only' : 'mt-1 text-amber-800'">{{ tr('FishingFatigue.unavailable') }}</div>
+    <div v-if="store.errors[key]" role="status" :class="variant === 'compact' ? 'sr-only' : 'mt-1 text-gold'">{{ tr('FishingFatigue.unavailable') }}</div>
   </section>
 </template>

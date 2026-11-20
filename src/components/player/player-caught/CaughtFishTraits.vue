@@ -11,9 +11,9 @@ defineProps<{ fish: Pick<CaughtFish, "variant_type" | "star_rating" | "is_shiny"
       class="rounded border px-1.5 py-0.5"
       :class="
         fish.variant_type === 'GOLDEN'
-          ? 'border-amber-300 bg-amber-50 text-amber-800'
+          ? 'border-gold bg-surface text-gold'
           : fish.variant_type === 'MUTATED'
-            ? 'border-purple-300 bg-purple-50 text-purple-800'
+            ? 'border-special bg-surface text-special'
             : 'border-border-default bg-surface text-content'
       "
     >
@@ -21,12 +21,12 @@ defineProps<{ fish: Pick<CaughtFish, "variant_type" | "star_rating" | "is_shiny"
     </span>
     <span
       v-if="fish.star_rating != null"
-      class="text-amber-700"
+      class="text-gold"
       :aria-label="tr('CatchDialog.star_rating', { count: fish.star_rating })"
     >
       {{ fish.star_rating }}<span aria-hidden="true"> ★</span>
     </span>
-    <span v-if="fish.is_shiny" class="rounded border border-amber-200 bg-amber-50 px-1.5 py-0.5 text-amber-800">
+    <span v-if="fish.is_shiny" class="rounded border border-gold bg-surface px-1.5 py-0.5 text-gold">
       {{ tr("CatchDialog.ca_xin") }}
     </span>
   </div>

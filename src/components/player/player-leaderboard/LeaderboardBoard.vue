@@ -23,7 +23,7 @@ const formatter = computed(
     <div
       v-if="board.error"
       role="alert"
-      class="rounded-2xl border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-700"
+      class="rounded-2xl border border-danger bg-surface px-4 py-3 text-sm text-danger"
     >
       {{ board.error }} {{ tr("LeaderboardModal.hay_thu_lam_moi_bang_xep_hang") }}
     </div>
@@ -69,7 +69,7 @@ const formatter = computed(
             </div>
           </div>
           <template v-if="board.myEntry && board.myRank !== null">
-            <span class="text-xl font-black tabular-nums text-emerald-800">#{{ board.myRank }}</span>
+            <span class="text-xl font-black tabular-nums text-content">#{{ board.myRank }}</span>
             <div class="text-right">
               <div class="break-words text-sm font-extrabold tabular-nums">{{ formatter.format(board.myValue) }}</div>
               <div class="text-[10px] text-content-muted">{{ board.unit }}</div>
@@ -96,13 +96,13 @@ const formatter = computed(
             v-for="entry in board.remaining"
             :key="entry.id"
             class="flex items-center gap-2 px-3 py-2"
-            :class="entry.userId === auth.userId ? 'bg-emerald-50 ring-1 ring-inset ring-emerald-600/30' : ''"
+            :class="entry.userId === auth.userId ? 'bg-surface ring-1 ring-inset ring-accent/30' : ''"
           >
             <span class="w-7 shrink-0 text-center text-sm font-extrabold tabular-nums text-content-muted"
               >#{{ entry.rank }}</span
             >
             <div
-              class="hidden size-7 shrink-0 items-center justify-center overflow-hidden rounded-full bg-surface-muted text-[10px] font-bold text-emerald-800 sm:flex"
+              class="hidden size-7 shrink-0 items-center justify-center overflow-hidden rounded-full bg-surface-muted text-[10px] font-bold text-content sm:flex"
             >
               <img
                 v-if="entry.avatarUrl"
@@ -119,7 +119,7 @@ const formatter = computed(
                 <span class="truncate text-xs font-semibold" :title="entry.displayName">{{ entry.displayName }}</span>
                 <span
                   v-if="entry.userId === auth.userId"
-                  class="shrink-0 rounded-full bg-emerald-100 px-1.5 py-0.5 text-[10px] font-bold text-emerald-800"
+                  class="shrink-0 rounded-full bg-surface px-1.5 py-0.5 text-[10px] font-bold text-content"
                   >{{ tr("LeaderboardModal.ban_2") }}</span
                 >
               </div>

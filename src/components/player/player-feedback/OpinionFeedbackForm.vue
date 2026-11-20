@@ -10,7 +10,7 @@ const form = reactive({ like: "", dislike: "", contribute: "" });
 const errors = reactive({ like: "", dislike: "" });
 const submitError = ref("");
 const textareaBase =
-  "w-full resize-y rounded-lg border bg-white px-3 py-2.5 text-sm text-gray-900 placeholder:text-gray-400 focus:outline-none focus:ring-2 disabled:opacity-60";
+  "w-full resize-y rounded-lg border bg-white px-3 py-2.5 text-sm text-content placeholder:text-content focus:outline-none focus:ring-2 disabled:opacity-60";
 
 function validate() {
   errors.like = form.like.trim() ? "" : tr("OpinionFeedbackForm.vui_long_cho_biet_ban_thich_dieu_gi");
@@ -38,8 +38,8 @@ async function handleSubmit() {
   <form class="flex min-h-0 flex-1 flex-col" novalidate @submit.prevent="handleSubmit">
     <div class="slide-fade-in from-bottom player-content-in flex-1 space-y-5 overflow-y-auto px-6 py-5">
       <div>
-        <label for="fb-like" class="mb-1.5 block text-sm font-medium text-gray-800"
-          >{{ tr("OpinionFeedbackForm.ban_thich_dieu_gi") }} <span class="text-red-500">*</span></label
+        <label for="fb-like" class="mb-1.5 block text-sm font-medium text-content"
+          >{{ tr("OpinionFeedbackForm.ban_thich_dieu_gi") }} <span class="text-danger">*</span></label
         >
         <textarea
           id="fb-like"
@@ -51,16 +51,16 @@ async function handleSubmit() {
           :class="[
             textareaBase,
             errors.like
-              ? 'border-red-400 focus:border-red-500 focus:ring-red-200'
-              : 'border-gray-300 focus:border-indigo-500 focus:ring-indigo-200',
+              ? 'border-danger focus:border-danger focus:ring-danger'
+              : 'border-content focus:border-primary focus:ring-primary',
           ]"
           @input="errors.like = ''"
         />
-        <div v-if="errors.like" class="mt-1 text-sm text-red-600">{{ errors.like }}</div>
+        <div v-if="errors.like" class="mt-1 text-sm text-danger">{{ errors.like }}</div>
       </div>
       <div>
-        <label for="fb-dislike" class="mb-1.5 block text-sm font-medium text-gray-800"
-          >{{ tr("OpinionFeedbackForm.ban_chua_hai_long_dieu_gi") }} <span class="text-red-500">*</span></label
+        <label for="fb-dislike" class="mb-1.5 block text-sm font-medium text-content"
+          >{{ tr("OpinionFeedbackForm.ban_chua_hai_long_dieu_gi") }} <span class="text-danger">*</span></label
         >
         <textarea
           id="fb-dislike"
@@ -72,17 +72,17 @@ async function handleSubmit() {
           :class="[
             textareaBase,
             errors.dislike
-              ? 'border-red-400 focus:border-red-500 focus:ring-red-200'
-              : 'border-gray-300 focus:border-indigo-500 focus:ring-indigo-200',
+              ? 'border-danger focus:border-danger focus:ring-danger'
+              : 'border-content focus:border-primary focus:ring-primary',
           ]"
           @input="errors.dislike = ''"
         />
-        <div v-if="errors.dislike" class="mt-1 text-sm text-red-600">{{ errors.dislike }}</div>
+        <div v-if="errors.dislike" class="mt-1 text-sm text-danger">{{ errors.dislike }}</div>
       </div>
       <div>
-        <label for="fb-contribute" class="mb-1.5 block text-sm font-medium text-gray-800"
+        <label for="fb-contribute" class="mb-1.5 block text-sm font-medium text-content"
           >{{ tr("OpinionFeedbackForm.ban_mong_muon_dieu_gi") }}
-          <span class="font-normal text-gray-400">{{ tr("ErrorFeedbackForm.khong_bat_buoc") }}</span></label
+          <span class="font-normal text-content">{{ tr("ErrorFeedbackForm.khong_bat_buoc") }}</span></label
         >
         <textarea
           id="fb-contribute"
@@ -90,17 +90,17 @@ async function handleSubmit() {
           rows="3"
           :disabled="feedbackStore.submitting"
           :placeholder="tr('OpinionFeedbackForm.y_tuong_hoac_tinh_nang_ban_mong_muon')"
-          :class="[textareaBase, 'border-gray-300 focus:border-indigo-500 focus:ring-indigo-200']"
+          :class="[textareaBase, 'border-content focus:border-primary focus:ring-primary']"
         />
       </div>
-      <div v-if="submitError" role="alert" class="rounded-lg bg-red-50 px-3 py-2 text-sm text-red-700">
+      <div v-if="submitError" role="alert" class="rounded-lg bg-surface px-3 py-2 text-sm text-danger">
         {{ submitError }}
       </div>
     </div>
-    <div class="flex justify-end gap-3 border-t border-gray-200 px-6 py-4">
+    <div class="flex justify-end gap-3 border-t border-border px-6 py-4">
       <button
         type="submit"
-        class="inline-flex items-center gap-2 rounded-lg bg-indigo-600 px-4 py-2 text-sm font-medium text-white hover:bg-indigo-700 focus:outline-none focus-visible:ring-2 focus-visible:ring-indigo-500 focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-60"
+        class="inline-flex items-center gap-2 rounded-lg bg-primary px-4 py-2 text-sm font-medium text-white hover:bg-primary focus:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-60"
         :disabled="feedbackStore.submitting"
       >
         <svg

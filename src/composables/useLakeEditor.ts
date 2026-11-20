@@ -157,14 +157,14 @@ const handleBottom = computed<Pt>(() => ({ x: CX, y: CY + size.value.h / 2 }))
 
 /* ---------- Dữ liệu vùng ---------- */
 let seq = 6
-const palette = ['#c084fc', '#f472b6', '#facc15', '#34d399', '#fb923c', '#60a5fa']
+const palette = ['#a66bff', '#f75353', '#ffd166', '#1abc9c', '#4fc3ff', '#1e5fbf']
 
 const zones = ref<Zone[]>([
-  { id: 'z1', name: 'Vùng nước nông ven bờ', note: 'Nhiều rong rêu', color: '#8fbf6a', seed: { x: 150, y: 145 }, r: 70, ang: 0 },
-  { id: 'z2', name: 'Vùng nước xoáy dòng chảy', note: 'Khó câu', color: '#e8894a', seed: { x: 215, y: 265 }, r: 60, ang: 0 },
-  { id: 'z3', name: 'Vùng phổ biến', note: 'Ít cá lớn', color: '#3f8fc9', seed: { x: 390, y: 290 }, r: 70, ang: 0 },
-  { id: 'z4', name: 'Vùng nước sâu tĩnh lặng', note: 'Cá lớn', color: '#1f5f9e', seed: { x: 430, y: 150 }, r: 70, ang: 0 },
-  { id: 'z5', name: 'Vùng giữa hồ', note: 'Cá vừa', color: '#5fb3b3', seed: { x: 300, y: 190 }, r: 50, ang: 0 },
+  { id: 'z1', name: 'Vùng nước nông ven bờ', note: 'Nhiều rong rêu', color: '#1abc9c', seed: { x: 150, y: 145 }, r: 70, ang: 0 },
+  { id: 'z2', name: 'Vùng nước xoáy dòng chảy', note: 'Khó câu', color: '#ffd166', seed: { x: 215, y: 265 }, r: 60, ang: 0 },
+  { id: 'z3', name: 'Vùng phổ biến', note: 'Ít cá lớn', color: '#1e5fbf', seed: { x: 390, y: 290 }, r: 70, ang: 0 },
+  { id: 'z4', name: 'Vùng nước sâu tĩnh lặng', note: 'Cá lớn', color: '#1e5fbf', seed: { x: 430, y: 150 }, r: 70, ang: 0 },
+  { id: 'z5', name: 'Vùng giữa hồ', note: 'Cá vừa', color: '#4fc3ff', seed: { x: 300, y: 190 }, r: 50, ang: 0 },
 ])
 
 // Node vùng nào rơi ra ngoài hồ thì kéo vào trong

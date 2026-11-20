@@ -43,7 +43,7 @@ function addBoundaryPoint(event: MouseEvent) {
 <template>
   <Teleport to="body">
     <div
-      class="fixed inset-0 z-[60] grid place-items-center bg-black/70 p-3 backdrop-blur-sm sm:p-5"
+      class="fixed inset-0 z-[60] grid place-items-center bg-content/70 p-3 backdrop-blur-sm sm:p-5"
       @click.self="emit('close')"
       @keydown.esc="emit('close')"
     >
@@ -56,20 +56,20 @@ function addBoundaryPoint(event: MouseEvent) {
         <header class="flex items-center justify-between gap-3 border-b border-border-default px-4 py-3 sm:px-5">
           <div>
             <div id="fishing-boundary-picker-title" class="m-0 text-sm font-extrabold">Thiết lập vùng câu</div>
-            <div class="m-0 mt-1 text-xs text-gray-600">Nhấn vào ảnh để thêm các điểm giới hạn vùng câu.</div>
+            <div class="m-0 mt-1 text-xs text-content">Nhấn vào ảnh để thêm các điểm giới hạn vùng câu.</div>
           </div>
           <button
             type="button"
             @click="emit('close')"
             aria-label="Đóng"
-            class="text-xl leading-none text-gray-500 hover:text-gray-800"
+            class="text-xl leading-none text-content hover:text-content"
           >
             &times;
           </button>
         </header>
 
         <div class="flex min-h-0 flex-1 items-center justify-center overflow-auto p-3 sm:p-5">
-          <div v-if="sceneImageError" class="rounded-lg border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-700">
+          <div v-if="sceneImageError" class="rounded-lg border border-danger bg-surface px-4 py-3 text-sm text-danger">
             Không thể tải ảnh cảnh: {{ sceneImageUrl }}
           </div>
           <div v-else class="relative inline-block max-h-full max-w-full">
@@ -89,8 +89,8 @@ function addBoundaryPoint(event: MouseEvent) {
             >
               <polygon
                 :points="boundaryDraft.map(({ x, y }) => `${x},${y}`).join(' ')"
-                fill="rgba(34, 197, 94, 0.18)"
-                stroke="rgb(252, 143, 1)"
+                fill="rgba(26, 188, 156, 0.18)"
+                stroke="#ffd166"
                 stroke-width="0.6"
                 stroke-dasharray="2 1"
                 vector-effect="non-scaling-stroke"
@@ -101,12 +101,12 @@ function addBoundaryPoint(event: MouseEvent) {
 
         <footer class="flex items-center justify-between gap-3 border-t border-border-default px-4 py-3 sm:px-5">
           <div class="flex items-center gap-3">
-            <span class="text-xs text-gray-600">{{ boundaryDraft.length }} điểm</span>
+            <span class="text-xs text-content">{{ boundaryDraft.length }} điểm</span>
             <button
               type="button"
               @click="clearBoundaryPoints"
               :disabled="boundaryDraft.length <= 2"
-              class="rounded-lg border border-red-200 bg-white px-3 py-2 text-xs font-bold text-red-700 hover:bg-red-50 disabled:cursor-not-allowed disabled:opacity-50"
+              class="rounded-lg border border-danger bg-white px-3 py-2 text-xs font-bold text-danger hover:bg-surface disabled:cursor-not-allowed disabled:opacity-50"
             >
               Xóa điểm giữa
             </button>
@@ -114,7 +114,7 @@ function addBoundaryPoint(event: MouseEvent) {
               type="button"
               @click="clearAllBoundaryPoints"
               :disabled="boundaryDraft.length === 0"
-              class="rounded-lg border border-red-200 bg-white px-3 py-2 text-xs font-bold text-red-700 hover:bg-red-50 disabled:cursor-not-allowed disabled:opacity-50"
+              class="rounded-lg border border-danger bg-white px-3 py-2 text-xs font-bold text-danger hover:bg-surface disabled:cursor-not-allowed disabled:opacity-50"
             >
               Xóa toàn bộ
             </button>
@@ -123,7 +123,7 @@ function addBoundaryPoint(event: MouseEvent) {
             <button
               type="button"
               @click="emit('close')"
-              class="rounded-lg border border-gray-300 bg-white px-3 py-2 text-xs font-bold text-gray-700 hover:bg-gray-100"
+              class="rounded-lg border border-content bg-white px-3 py-2 text-xs font-bold text-content hover:bg-surface"
             >
               Huỷ
             </button>
@@ -131,7 +131,7 @@ function addBoundaryPoint(event: MouseEvent) {
               type="button"
               @click="emit('complete', boundaryDraft.map(({ x, y }) => ({ x, y })))"
               :disabled="sceneImageError"
-              class="rounded-lg bg-content-strong px-3 py-2 text-xs font-bold text-white hover:bg-emerald-800 disabled:cursor-not-allowed disabled:opacity-50"
+              class="rounded-lg bg-content-strong px-3 py-2 text-xs font-bold text-white hover:bg-accent disabled:cursor-not-allowed disabled:opacity-50"
             >
               Hoàn tất
             </button>

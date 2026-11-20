@@ -45,10 +45,10 @@ const caughtDate = computed(() => {
     :class="list ? 'sm:flex' : ''"
   >
     <div
-      class="flex items-center justify-center border-border-default bg-palette-edf3e7 p-3"
+      class="flex items-center justify-center border-border-default bg-surface p-3"
       :class="list ? 'h-28 border-b sm:h-36 sm:w-40 sm:shrink-0 sm:border-b-0 sm:border-r' : 'aspect-[2/1] border-b'"
     >
-      <span v-if="!entry.isCaught" class="flex flex-col items-center gap-2 text-center text-xs text-palette-52664e">
+      <span v-if="!entry.isCaught" class="flex flex-col items-center gap-2 text-center text-xs text-content">
         <span aria-hidden="true" class="text-3xl">🔒</span>
         {{ tr("CatchDiaryModal.notConquered") }}
       </span>
@@ -78,14 +78,14 @@ const caughtDate = computed(() => {
         @toggle="($event.target as HTMLDetailsElement).open && diaryStore.loadSpeciesDetails(entry.species.id)"
       >
         <summary
-          class="cursor-pointer rounded text-sm font-semibold text-palette-52664e focus-visible:outline-2 focus-visible:outline-palette-698563"
+          class="cursor-pointer rounded text-sm font-semibold text-content focus-visible:outline-2 focus-visible:outline-content"
         >
           {{ tr("CatchDiaryModal.speciesDetails") }}
         </summary>
         <div v-if="diaryStore.detailsLoading[entry.species.id]" role="status" class="py-3 text-xs">
           {{ tr("CatchDiaryModal.dang_tai_nhat_ky") }}
         </div>
-        <div v-else-if="diaryStore.detailsErrors[entry.species.id]" role="alert" class="py-3 text-xs text-red-800">
+        <div v-else-if="diaryStore.detailsErrors[entry.species.id]" role="alert" class="py-3 text-xs text-danger">
           <div>{{ diaryStore.detailsErrors[entry.species.id] }}</div>
           <button type="button" class="mt-2 underline" @click="diaryStore.loadSpeciesDetails(entry.species.id)">
             {{ tr("Maintenance.thu_lai") }}
@@ -97,7 +97,7 @@ const caughtDate = computed(() => {
             :key="stat.key"
             class="min-w-0 rounded-lg border border-border-default bg-surface p-2"
           >
-            <div class="text-xs text-palette-52664e">{{ tr(`FishingMapModal.${stat.key}`) }}</div>
+            <div class="text-xs text-content">{{ tr(`FishingMapModal.${stat.key}`) }}</div>
             <div class="mt-1 break-words text-sm font-semibold">{{ stat.value }}</div>
           </div>
         </div>

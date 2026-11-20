@@ -89,7 +89,7 @@ onBeforeUnmount(() => {
     <div
       v-if="hallOfFame && store.error"
       role="alert"
-      class="rounded-lg border border-red-200 bg-red-50 px-3 py-2 text-red-700"
+      class="rounded-lg border border-danger bg-surface px-3 py-2 text-danger"
     >
       {{ store.error }} {{ tr("LeaderboardModal.hay_thu_lam_moi_bang_xep_hang") }}
     </div>
@@ -102,7 +102,7 @@ onBeforeUnmount(() => {
       </div>
       <details v-if="!hallOfFame" class="border-t border-border-default pt-2">
         <summary
-          class="cursor-pointer rounded text-xs font-semibold text-content-muted focus-visible:outline-2 focus-visible:outline-emerald-600"
+          class="cursor-pointer rounded text-xs font-semibold text-content-muted focus-visible:outline-2 focus-visible:outline-accent"
         >
           {{ tr("LeaderboardSeason.details") }}
         </summary>
@@ -112,7 +112,7 @@ onBeforeUnmount(() => {
             v-for="species in board.meta"
             :key="species.species_id"
             class="rounded-lg border px-2 py-1 text-xs"
-            :class="species.season_weight < 1 ? 'border-amber-200 bg-amber-50' : 'border-emerald-200 bg-emerald-50'"
+            :class="species.season_weight < 1 ? 'border-gold bg-surface' : 'border-accent bg-surface'"
           >
             {{ species.name }} · ×{{ numberFormatter.format(species.season_weight) }}
           </div>

@@ -65,8 +65,8 @@ onBeforeUnmount(() => {
     :aria-label="tr('Dispatch.title')"
   >
     <div class="dispatch-content w-full min-w-0 space-y-2 bg-surface p-2 text-xs text-content">
-      <div class="text-xs text-palette-61745d">{{ tr("Dispatch.rules") }}</div>
-      <div v-if="store.error" role="alert" class="rounded-lg border border-red-200 bg-white p-3 text-sm text-red-700">
+      <div class="text-xs text-content">{{ tr("Dispatch.rules") }}</div>
+      <div v-if="store.error" role="alert" class="rounded-lg border border-danger bg-white p-3 text-sm text-danger">
         {{ store.error }}
       </div>
       <button
@@ -96,7 +96,7 @@ onBeforeUnmount(() => {
 <style>
 @reference 'tailwindcss';
 .dispatch-button {
-  @apply min-h-8 rounded-md border border-[var(--color-border-default)] bg-[var(--color-brand)] px-2.5 py-1.5 text-xs font-semibold text-white transition-colors hover:bg-[var(--color-brand-hover)] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--color-palette-527547)] disabled:cursor-not-allowed disabled:opacity-50;
+  @apply min-h-8 rounded-md border border-[var(--color-border-default)] bg-[var(--color-brand)] px-2.5 py-1.5 text-xs font-semibold text-white transition-colors hover:bg-[var(--color-brand-hover)] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--color-accent)] disabled:cursor-not-allowed disabled:opacity-50;
 }
 .dispatch-grid {
   display: grid;
@@ -117,8 +117,8 @@ onBeforeUnmount(() => {
 html.ocean-theme .dispatch-button {
   border-color: var(--color-ocean-gold);
   background: linear-gradient(var(--color-ocean-gold), color-mix(in srgb, var(--color-ocean-gold) 75%, var(--color-ocean-wood)));
-  color: var(--color-ocean-deep);
-  box-shadow: inset 0 1px 0 rgb(245 235 212 / 40%), 0 2px 0 var(--color-ocean-wood);
+  color: var(--color-content);
+  box-shadow: inset 0 1px 0 color-mix(in srgb, var(--color-surface) 40%, transparent), 0 2px 0 var(--color-ocean-wood);
 }
 
 html.ocean-theme .dispatch-button:not(:disabled):hover {
@@ -127,6 +127,6 @@ html.ocean-theme .dispatch-button:not(:disabled):hover {
 
 html.ocean-theme .dispatch-card {
   background: linear-gradient(145deg, var(--color-ocean-panel), var(--color-ocean-deep));
-  box-shadow: inset 0 1px 0 rgb(245 235 212 / 8%);
+  box-shadow: inset 0 1px 0 color-mix(in srgb, var(--color-surface) 8%, transparent);
 }
 </style>

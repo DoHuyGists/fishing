@@ -85,8 +85,8 @@ async function run(action: () => Promise<void>) {
           class="min-w-0 rounded-md border p-1.5 transition"
           :class="
             store.selectedSetId === set.id && store.selectedSlot === slot
-              ? 'border-emerald-600 bg-emerald-50 ring-1 ring-emerald-600'
-              : 'border-border-default hover:border-teal-500'
+              ? 'border-accent bg-surface ring-1 ring-accent'
+              : 'border-border-default hover:border-accent'
           "
         >
           <button
@@ -109,14 +109,14 @@ async function run(action: () => Promise<void>) {
             <button
               type="button"
               :disabled="store.busy || store.loading"
-              class="shrink-0 rounded px-1 text-palette-526650 hover:bg-rose-100 hover:text-rose-700 disabled:opacity-40"
+              class="shrink-0 rounded px-1 text-content hover:bg-surface hover:text-danger disabled:opacity-40"
               :aria-label="tr('Health.unequipNamed', { item: name(item.inventory_id) })"
               @click="store.unequip(set, slot, item.inventory_id)"
             >
               ×
             </button>
           </div>
-          <div v-if="!set[slot].length" class="py-2 text-center text-xs text-palette-526650">{{ tr("FlipBook.trong") }}</div>
+          <div v-if="!set[slot].length" class="py-2 text-center text-xs text-content">{{ tr("FlipBook.trong") }}</div>
         </div>
       </div>
     </EquipmentSetCard>

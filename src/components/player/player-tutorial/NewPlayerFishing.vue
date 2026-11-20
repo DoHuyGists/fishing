@@ -24,13 +24,13 @@ onBeforeUnmount(() => lesson.stop());
 </script>
 
 <template>
-  <main class="flex h-dvh flex-col overflow-hidden bg-palette-193224 text-content">
+  <main class="flex h-dvh flex-col overflow-hidden bg-content text-content">
     <header
       class="z-10 flex shrink-0 flex-wrap items-center justify-between gap-2 border-b border-border-default bg-surface px-3 py-2 sm:px-5"
     >
       <div>
         <div class="text-sm font-bold sm:text-base">{{ tr("NewPlayerFishing.buoi_cau_dau_tien") }}</div>
-        <div class="text-[11px] text-palette-61745d">
+        <div class="text-[11px] text-content">
           {{ tr("NewPlayerFishing.man_tap_luyen_trang_bi_va_ket_qua_chi_dung_trong_luot_nay") }}
         </div>
       </div>
@@ -38,21 +38,21 @@ onBeforeUnmount(() => lesson.stop());
         <button
           v-if="lesson.objective !== 'complete'"
           type="button"
-          class="rounded-lg border border-border-default bg-white px-3 py-2 hover:bg-palette-e2ecdc"
+          class="rounded-lg border border-border-default bg-white px-3 py-2 hover:bg-surface"
           @click="lesson.showGuide"
         >
           {{ tr("NewPlayerFishing.chi_dan") }}
         </button>
         <button
           type="button"
-          class="rounded-lg border border-border-default bg-white px-3 py-2 hover:bg-palette-e2ecdc"
+          class="rounded-lg border border-border-default bg-white px-3 py-2 hover:bg-surface"
           @click="lesson.start"
         >
           {{ tr("NewPlayerFishing.choi_lai") }}
         </button>
         <button
           type="button"
-          class="rounded-lg border border-border-default bg-white px-3 py-2 hover:bg-palette-e2ecdc"
+          class="rounded-lg border border-border-default bg-white px-3 py-2 hover:bg-surface"
           @click="exit"
         >
           {{ tr("NewPlayerFishing.thoat") }}
@@ -80,7 +80,7 @@ onBeforeUnmount(() => lesson.stop());
       <FishingScene v-if="session.config" :key="lesson.attempt" :context="session.sceneContext" class="h-full" />
       <div
         id="tutorial-water-target"
-        class="pointer-events-none absolute left-[42%] top-[51%] grid h-12 w-[24%] place-items-center rounded-full border border-dashed border-white/70 bg-black/20 text-center text-xs font-bold text-white"
+        class="pointer-events-none absolute left-[42%] top-[51%] grid h-12 w-[24%] place-items-center rounded-full border border-dashed border-white/70 bg-content/20 text-center text-xs font-bold text-white"
         :class="session.castPhase === 'idle' || session.castPhase === 'lost' ? '' : 'invisible'"
       >
         {{ tr("AdjusDepth.mat_nuoc") }}
@@ -103,12 +103,12 @@ onBeforeUnmount(() => lesson.stop());
           <div>
             <div class="text-lg font-bold">{{ tr("NewPlayerFishing.hoan_thanh_buoi_cau_dau_tien") }}</div>
             <div class="mt-1 text-sm">{{ session.inventory[0]?.name }} · {{ session.inventory[0]?.weight }} kg</div>
-            <div class="mt-1 text-xs text-palette-61745d">
+            <div class="mt-1 text-xs text-content">
               {{ tr("NewPlayerFishing.ban_da_biet_chon_trang_bi_quang_can_va_giu_luc_cang_day") }}
             </div>
           </div>
         </div>
-        <button type="button" class="rounded-lg bg-emerald-800 px-4 py-2 text-sm font-bold text-white" @click="exit">
+        <button type="button" class="rounded-lg bg-accent px-4 py-2 text-sm font-bold text-white" @click="exit">
           {{ tr("NewPlayerFishing.ve_danh_sach_man_choi") }}
         </button>
       </div>
@@ -121,8 +121,8 @@ onBeforeUnmount(() => lesson.stop());
               :key="item.id"
               type="button"
               :aria-pressed="session.loadout[item.tool] === item.id"
-              class="flex min-w-0 flex-col items-center gap-1 rounded-xl border border-border-default p-2 text-center text-[10px] font-semibold hover:bg-palette-e2ecdc sm:text-xs"
-              :class="session.loadout[item.tool] === item.id ? 'bg-palette-dcebd3 ring-2 ring-emerald-700' : 'bg-white'"
+              class="flex min-w-0 flex-col items-center gap-1 rounded-xl border border-border-default p-2 text-center text-[10px] font-semibold hover:bg-surface sm:text-xs"
+              :class="session.loadout[item.tool] === item.id ? 'bg-surface ring-2 ring-accent' : 'bg-white'"
               @click="session.selectEquipment(item.id)"
             >
               <img :src="item.image" alt="" class="size-8 object-contain sm:size-10" />
@@ -134,7 +134,7 @@ onBeforeUnmount(() => lesson.stop());
           </div>
           <button
             type="button"
-            class="w-full rounded-lg bg-emerald-800 px-4 py-2 text-sm font-bold text-white disabled:opacity-40"
+            class="w-full rounded-lg bg-accent px-4 py-2 text-sm font-bold text-white disabled:opacity-40"
             :disabled="!session.equipmentReady"
             @click="session.confirmEquipment"
           >
@@ -157,7 +157,7 @@ onBeforeUnmount(() => lesson.stop());
             <button
               v-if="session.canCast"
               type="button"
-              class="rounded-lg bg-emerald-800 px-4 py-2 text-sm font-bold text-white"
+              class="rounded-lg bg-accent px-4 py-2 text-sm font-bold text-white"
               @click="session.castTo(56, 60)"
             >
               {{ tr("NewPlayerFishing.quang_can") }}

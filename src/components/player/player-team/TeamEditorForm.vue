@@ -9,22 +9,22 @@ const emit = defineEmits<{ back: []; submit: [] }>();
 <div class="max-w-[480px] mx-auto">
         <div class="flex items-center justify-between gap-3 mb-4">
           <button
-            class="inline-flex items-center justify-center gap-1.5 px-4 py-2 rounded-lg text-[0.87rem] font-bold bg-transparent text-content-caption border border-palette-c0d8b8 cursor-pointer hover:bg-palette-f0f7ec active:scale-[0.97] transition-colors"
+            class="inline-flex items-center justify-center gap-1.5 px-4 py-2 rounded-lg text-[0.87rem] font-bold bg-transparent text-content-caption border border-border cursor-pointer hover:bg-surface active:scale-[0.97] transition-colors"
             @click="emit('back')"
           >
             {{ tr("TeamModal.quay_lai") }}
           </button>
-          <div class="m-0 text-base font-bold text-palette-1a3a1a">
+          <div class="m-0 text-base font-bold text-content">
             {{ editing ? tr("MyTeamPanel.cap_nhat_to_doi") : tr("TeamModal.tao_nhom_moi") }}
           </div>
         </div>
 
         <form class="flex flex-col gap-4" @submit.prevent="emit('submit')">
-          <label class="flex flex-col gap-1.5 text-[0.85rem] font-semibold text-palette-2a4a2a">
+          <label class="flex flex-col gap-1.5 text-[0.85rem] font-semibold text-content">
             {{ tr("TeamModal.ten_nhom") }} <span class="text-danger">*</span>
             <input
               v-model="createForm.name"
-              class="px-3 py-[9px] border border-palette-c0d8b8 rounded-lg bg-palette-fafefc text-[0.9rem] text-palette-1a3a1a outline-none transition focus:border-brand focus:shadow-[0_0_0_3px_var(--color-border-default)]"
+              class="px-3 py-[9px] border border-border rounded-lg bg-white text-[0.9rem] text-content outline-none transition focus:border-brand focus:shadow-[0_0_0_3px_var(--color-border-default)]"
               type="text"
               :placeholder="tr('TeamModal.vd_hoi_cau_da_lat')"
               maxlength="50"
@@ -32,18 +32,18 @@ const emit = defineEmits<{ back: []; submit: [] }>();
             />
           </label>
 
-          <label class="flex flex-col gap-1.5 text-[0.85rem] font-semibold text-palette-2a4a2a">
+          <label class="flex flex-col gap-1.5 text-[0.85rem] font-semibold text-content">
             {{ tr("TeamModal.mo_ta") }}
             <textarea
               v-model="createForm.description"
-              class="px-3 py-[9px] border border-palette-c0d8b8 rounded-lg bg-palette-fafefc text-[0.9rem] text-palette-1a3a1a outline-none transition resize-y min-h-[72px] focus:border-brand focus:shadow-[0_0_0_3px_var(--color-border-default)]"
+              class="px-3 py-[9px] border border-border rounded-lg bg-white text-[0.9rem] text-content outline-none transition resize-y min-h-[72px] focus:border-brand focus:shadow-[0_0_0_3px_var(--color-border-default)]"
               :placeholder="tr('TeamModal.mo_ta_ngan_ve_nhom_cua_ban')"
               rows="3"
               maxlength="200"
             />
           </label>
 
-          <label class="flex flex-col gap-1.5 text-[0.85rem] font-semibold text-palette-2a4a2a">
+          <label class="flex flex-col gap-1.5 text-[0.85rem] font-semibold text-content">
             {{ tr("TeamModal.so_thanh_vien_toi_da") }}
             <div class="flex items-center gap-3">
               <input
@@ -60,11 +60,11 @@ const emit = defineEmits<{ back: []; submit: [] }>();
             </div>
           </label>
 
-          <label class="flex flex-col gap-1.5 text-[0.85rem] font-semibold text-palette-2a4a2a"
+          <label class="flex flex-col gap-1.5 text-[0.85rem] font-semibold text-content"
             >{{ tr("TeamModal.trang_thai") }}
             <select
               v-model="createForm.status"
-              class="px-3 py-[9px] border border-palette-c0d8b8 rounded-lg bg-palette-fafefc text-[0.9rem] text-palette-1a3a1a"
+              class="px-3 py-[9px] border border-border rounded-lg bg-white text-[0.9rem] text-content"
             >
               <option value="PENDING">{{ tr("TeamModal.cho_duyet_chua_hien_thi") }}</option>
               <option value="OPEN">{{ tr("MyTeamPanel.mo") }}</option>
@@ -73,11 +73,11 @@ const emit = defineEmits<{ back: []; submit: [] }>();
               <option value="CLOSED">{{ tr("Feedbackmodal.da_dong") }}</option>
             </select>
           </label>
-          <label class="flex flex-col gap-1.5 text-[0.85rem] font-semibold text-palette-2a4a2a"
+          <label class="flex flex-col gap-1.5 text-[0.85rem] font-semibold text-content"
             >{{ tr("TeamModal.quyen_tham_gia") }}
             <select
               v-model="createForm.joinType"
-              class="px-3 py-[9px] border border-palette-c0d8b8 rounded-lg bg-palette-fafefc text-[0.9rem] text-palette-1a3a1a"
+              class="px-3 py-[9px] border border-border rounded-lg bg-white text-[0.9rem] text-content"
             >
               <option value="everyone">{{ tr("TeamListSidebar.ai_cung_co_the_tham_gia") }}</option>
               <option value="friend">{{ tr("TeamListSidebar.chi_ban_be_cua_truong_nhom") }}</option>
@@ -86,14 +86,14 @@ const emit = defineEmits<{ back: []; submit: [] }>();
           </label>
           <div
             v-if="error"
-            class="m-0 text-danger bg-palette-fef0ef border border-palette-f5c6c3 rounded-lg px-3 py-2 text-[0.83rem]"
+            class="m-0 text-danger bg-surface border border-border rounded-lg px-3 py-2 text-[0.83rem]"
           >
             {{ error }}
           </div>
 
           <button
             type="submit"
-            class="w-full inline-flex items-center justify-center gap-1.5 px-4 py-2 rounded-lg text-[0.87rem] font-bold bg-linear-to-br from-brand to-palette-2e6644 text-white cursor-pointer hover:from-palette-2e6644 hover:to-palette-245236 active:scale-[0.97] disabled:opacity-55 disabled:cursor-not-allowed transition-all"
+            class="w-full inline-flex items-center justify-center gap-1.5 px-4 py-2 rounded-lg text-[0.87rem] font-bold bg-linear-to-br from-brand to-accent text-white cursor-pointer hover:from-accent hover:to-content active:scale-[0.97] disabled:opacity-55 disabled:cursor-not-allowed transition-all"
             :disabled="loading"
           >
             {{

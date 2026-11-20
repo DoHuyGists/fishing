@@ -62,15 +62,15 @@ onMounted(() => store.load());
             :key="mode.value"
             type="button"
             :aria-pressed="store.viewMode === mode.value"
-            class="rounded-md px-3 py-2 text-xs font-bold hover:bg-palette-e2ecdc"
-            :class="store.viewMode === mode.value ? 'bg-palette-e2ecdc' : ''"
+            class="rounded-md px-3 py-2 text-xs font-bold hover:bg-surface"
+            :class="store.viewMode === mode.value ? 'bg-surface' : ''"
             @click="store.setViewMode(mode.value)"
           >
             {{ mode.label }}
           </button>
         </div>
       </div>
-      <div v-if="navigationError" role="alert" class="text-sm text-red-700">{{ navigationError }}</div>
+      <div v-if="navigationError" role="alert" class="text-sm text-danger">{{ navigationError }}</div>
       <div v-if="store.loading" role="status" class="py-12 text-center">
         {{ tr("TutorialModal.dang_tai_man_huong_dan") }}
       </div>
@@ -95,7 +95,7 @@ onMounted(() => store.load());
           type="button"
           :disabled="opening"
           :aria-label="tr('TutorialModal.choi_man_value0', { value0: lesson.title })"
-          class="slide-fade-in from-bottom player-content-in overflow-hidden rounded-2xl border border-border-default bg-surface text-left transition hover:border-palette-70a77e hover:shadow-md focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-emerald-700 disabled:opacity-50"
+          class="slide-fade-in from-bottom player-content-in overflow-hidden rounded-2xl border border-border-default bg-surface text-left transition hover:border-accent hover:shadow-md focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-accent disabled:opacity-50"
           :class="store.viewMode === 'list' ? 'flex flex-col sm:flex-row' : ''"
           @click="enterLesson(lesson.slug)"
         >
@@ -108,13 +108,13 @@ onMounted(() => store.load());
             draggable="false"
           />
           <div class="flex flex-1 flex-col gap-3 p-4">
-            <div class="text-xs font-semibold text-palette-61745d">
+            <div class="text-xs font-semibold text-content">
               {{ tr("TutorialModal.khoang") }} {{ lesson.duration_minutes }}
               {{ tr("TutorialModal.phut_tap_luyen_tu_do") }}
             </div>
             <div class="text-lg font-bold">{{ lesson.title }}</div>
             <div class="text-sm leading-6">{{ lesson.description }}</div>
-            <span class="mt-auto pt-2 text-sm font-bold text-emerald-800">{{
+            <span class="mt-auto pt-2 text-sm font-bold text-content">{{
               tr("TutorialModal.bat_dau_thuc_hanh")
             }}</span>
           </div>

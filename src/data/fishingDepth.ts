@@ -20,10 +20,10 @@ export function buildDepthConfig(maxDepth: unknown) {
     ticksMeters: [0, at(1 / 3), at(2 / 3), maxMeters],
     quickStopsMeters: [1, 2, 3, 4, 5, 6].map((i) => at(i / 6)),
     layers: [
-      { id: "surface", get label() { return tr('fishingDepth.tang_mat'); }, minMeters: 0, maxMeters: at(1 / 6), color: "#b6e5d5" },
-      { id: "mid", get label() { return tr('AdjusDepth.tang_giua'); }, minMeters: at(1 / 6), maxMeters: at(1 / 2), color: "#64c7ac" },
-      { id: "deep", get label() { return tr('AdjusDepth.tang_sau'); }, minMeters: at(1 / 2), maxMeters: at(5 / 6), color: "#368b79" },
-      { id: "bottom", get label() { return tr('AdjusDepth.day_ho'); }, minMeters: at(5 / 6), maxMeters, color: "#c5b878" },
+      { id: "surface", get label() { return tr('fishingDepth.tang_mat'); }, minMeters: 0, maxMeters: at(1 / 6), color: "#4fc3ff" },
+      { id: "mid", get label() { return tr('AdjusDepth.tang_giua'); }, minMeters: at(1 / 6), maxMeters: at(1 / 2), color: "#1abc9c" },
+      { id: "deep", get label() { return tr('AdjusDepth.tang_sau'); }, minMeters: at(1 / 2), maxMeters: at(5 / 6), color: "#1e5fbf" },
+      { id: "bottom", get label() { return tr('AdjusDepth.day_ho'); }, minMeters: at(5 / 6), maxMeters, color: "#ffd166" },
     ],
   };
 }

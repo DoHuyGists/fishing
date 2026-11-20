@@ -224,7 +224,7 @@ async function confirm() {
     <div class="flex flex-col w-full h-full bg-surface text-content overflow-hidden">
       <!-- Body -->
       <div
-        class="flex-1 overflow-y-auto flex flex-col gap-4 pb-1 [&::-webkit-scrollbar]:w-1.5 [&::-webkit-scrollbar-thumb]:bg-palette-b7cbb4 [&::-webkit-scrollbar-thumb]:rounded-full [&::-webkit-scrollbar-track]:bg-transparent"
+        class="flex-1 overflow-y-auto flex flex-col gap-4 pb-1 [&::-webkit-scrollbar]:w-1.5 [&::-webkit-scrollbar-thumb]:bg-surface [&::-webkit-scrollbar-thumb]:rounded-full [&::-webkit-scrollbar-track]:bg-transparent"
       >
         <WeatherSection :area-id="worldStore.selectedArea.id" inline />
         <FishingFatigue variant="default" :area-id="worldStore.selectedArea.id || null" />
@@ -233,14 +233,14 @@ async function confirm() {
 
         <!-- Loading state -->
         <div v-if="loading" class="flex-1 flex flex-col items-center justify-center gap-3.5 text-content-subtle text-sm">
-          <div class="w-9 h-9 border-[3px] border-border-default border-t-palette-526a58 rounded-full animate-spin"></div>
+          <div class="w-9 h-9 border-[3px] border-border-default border-t-content rounded-full animate-spin"></div>
           <span>{{ tr("PrepareModal.dang_tai_trang_bi") }}</span>
         </div>
 
         <!-- Error state -->
         <div v-else-if="error" class="flex-1 flex flex-col items-center justify-center gap-2.5 text-center">
           <span class="text-4xl">⚠️</span>
-          <div class="m-0 text-red-400 text-sm">{{ error }}</div>
+          <div class="m-0 text-danger text-sm">{{ error }}</div>
         </div>
 
         <!-- Content -->
@@ -268,7 +268,7 @@ async function confirm() {
       >
         <div
           v-if="proceedBlockReason"
-          class="flex items-center gap-2 px-3.5 py-2 bg-amber-100 border border-amber-300 rounded-lg text-amber-800 text-sm leading-snug max-w-[65%]"
+          class="flex items-center gap-2 px-3.5 py-2 bg-surface border border-gold rounded-lg text-gold text-sm leading-snug max-w-[65%]"
         >
           <span class="text-base shrink-0">⚠️</span>
           <span class="font-medium">{{ proceedBlockReason }}</span>

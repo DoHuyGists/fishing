@@ -85,15 +85,15 @@ function showDetails() {
     :class="[
       'slide-fade-in from-bottom player-content-in relative min-w-0 cursor-pointer rounded-md border text-content transition',
       list ? 'flex items-start gap-3 px-3 py-2' : 'p-3',
-      selected.has(item.id) ? 'border-red-400 bg-red-50' : 'border-border-default bg-white hover:bg-surface',
-      hasActiveSlot && isCompatible(item) ? 'ring-2 ring-teal-400' : '',
+      selected.has(item.id) ? 'border-danger bg-surface' : 'border-border-default bg-white hover:bg-surface',
+      hasActiveSlot && isCompatible(item) ? 'ring-2 ring-accent' : '',
       hasActiveSlot && !isCompatible(item) ? 'opacity-40' : '',
     ]"
     @click="pickItem(item)"
   >
     <input
       type="checkbox"
-      class="h-4 w-4 accent-red-600"
+      class="h-4 w-4 accent-danger"
       :class="list ? 'mt-1 shrink-0' : 'absolute left-2 top-2'"
       :checked="selected.has(item.id)"
       :aria-label="tr('InventoryItems.chon_value0_de_xoa', { value0: name })"
@@ -103,7 +103,7 @@ function showDetails() {
 
     <div
       :class="[
-        'flex items-center justify-center overflow-hidden rounded bg-surface text-slate-400',
+        'flex items-center justify-center overflow-hidden rounded bg-surface text-content',
         list ? 'h-12 w-12 shrink-0' : 'mx-auto mb-2 h-16 w-16',
       ]"
     >
@@ -114,8 +114,8 @@ function showDetails() {
     <div class="min-w-0 flex-1">
       <div :class="list ? '' : 'text-center'">
         <div class="break-words text-sm font-medium">{{ name }}</div>
-        <div class="break-words text-xs text-slate-500">{{ category }}</div>
-        <div v-if="classification" class="mt-1 break-words text-xs font-semibold text-teal-700">
+        <div class="break-words text-xs text-content">{{ category }}</div>
+        <div v-if="classification" class="mt-1 break-words text-xs font-semibold text-content">
           {{ classification }}
         </div>
       </div>
@@ -130,13 +130,13 @@ function showDetails() {
       </div>
       <div v-if="details.length" class="mt-2 space-y-1 border-t border-border-default pt-2 text-xs">
         <div v-for="detail in details" :key="detail.label" class="flex flex-wrap justify-between gap-x-2 gap-y-0.5">
-          <span class="text-slate-500">{{ detail.label }}</span>
+          <span class="text-content">{{ detail.label }}</span>
           <span class="min-w-0 break-words font-medium">{{ detail.value }}</span>
         </div>
       </div>
       <div
         v-if="isInActiveSlot(item)"
-        class="mt-2 text-xs font-medium text-teal-700"
+        class="mt-2 text-xs font-medium text-content"
         :class="list ? '' : 'text-center'"
       >
         {{ activeTab === "health" ? tr("Health.equipped") : tr("InventoryItems.da_them") }}

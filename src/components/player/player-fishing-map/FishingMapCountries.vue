@@ -34,8 +34,8 @@ const store = useFishingMapStore();
         class="flex w-full items-center gap-2 rounded-lg border border-border-default px-3 py-3 text-left text-sm disabled:cursor-not-allowed disabled:opacity-50 focus-visible:outline-2 focus-visible:outline-content"
         :class="
           store.selectedCountryId === country.id && store.canView
-            ? 'bg-palette-dce9d4 font-bold'
-            : 'bg-white enabled:hover:bg-palette-e5eddf'
+            ? 'bg-surface font-bold'
+            : 'bg-white enabled:hover:bg-surface'
         "
         :disabled="store.loading || !store.unlockedIds.has(country.id)"
         :aria-current="store.selectedCountryId === country.id && store.canView ? 'true' : undefined"

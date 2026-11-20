@@ -35,12 +35,12 @@ const waitTime = computed(() => {
     <div class="slide-fade-in from-top player-content-in flex flex-wrap items-center justify-between gap-3 rounded-2xl border border-border-default bg-surface p-4 sm:p-5">
       <div>
         <div class="m-0 text-lg font-extrabold text-content">{{ tr('DailyAttendance.qua_diem_danh_ngay') }}</div>
-        <div class="mb-0 mt-1 text-sm text-emerald-900/65">{{ tr('DailyAttendance.moi_ngay_chi_nhan_mot_phan_thuong_ngau_nhien_trong_danh_sach') }}</div>
-        <div class="mb-0 mt-1 text-sm text-emerald-900/65">{{ tr('DailyAttendance.sau_khi_nhan_can_cho_24h_de_nhan_tiep') }}</div>
+        <div class="mb-0 mt-1 text-sm text-content/65">{{ tr('DailyAttendance.moi_ngay_chi_nhan_mot_phan_thuong_ngau_nhien_trong_danh_sach') }}</div>
+        <div class="mb-0 mt-1 text-sm text-content/65">{{ tr('DailyAttendance.sau_khi_nhan_can_cho_24h_de_nhan_tiep') }}</div>
 
-        <div v-if="!canClaim" class="mb-0 mt-2 text-sm font-bold text-emerald-800" role="timer" aria-live="off">{{ tr('DailyAttendance.thoi_gian_cho') }} {{ waitTime }}</div>
+        <div v-if="!canClaim" class="mb-0 mt-2 text-sm font-bold text-content" role="timer" aria-live="off">{{ tr('DailyAttendance.thoi_gian_cho') }} {{ waitTime }}</div>
       </div>
-      <button type="button" class="rounded-xl bg-emerald-700 px-5 py-2.5 text-sm font-extrabold text-white hover:bg-emerald-800 disabled:cursor-default disabled:bg-emerald-900/40" :disabled="!canClaim || isClaiming" @click="emit('claim')">
+      <button type="button" class="rounded-xl bg-accent px-5 py-2.5 text-sm font-extrabold text-white hover:bg-accent disabled:cursor-default disabled:bg-accent/40" :disabled="!canClaim || isClaiming" @click="emit('claim')">
         {{ isClaiming ? tr('DailyAttendance.dang_xu_ly') : canClaim ? tr('DailyAttendance.nhan_thuong') : tr('DailyAttendance.chua_den_gio_nhan_thuong') }}
       </button>
     </div>
@@ -49,7 +49,7 @@ const waitTime = computed(() => {
       <div v-if="attendanceStore.loadingRewards" class="m-0 rounded-2xl border border-border-default bg-surface p-5 text-center text-sm text-content" role="status">{{ tr('DailyAttendance.dang_tai_phan_qua') }}</div>
       <div v-else-if="attendanceStore.rewardsError" class="rounded-2xl border border-border-default bg-surface p-4 text-sm text-content" role="alert">
         <div class="m-0">{{ attendanceStore.rewardsError }}</div>
-        <button type="button" class="mt-2 rounded-lg px-3 py-2 font-bold text-emerald-800 hover:bg-emerald-100" @click="attendanceStore.fetchPossibleRewards()">{{ tr('Maintenance.thu_lai') }}</button>
+        <button type="button" class="mt-2 rounded-lg px-3 py-2 font-bold text-content hover:bg-surface" @click="attendanceStore.fetchPossibleRewards()">{{ tr('Maintenance.thu_lai') }}</button>
       </div>
       <div v-else-if="!attendanceStore.possibleRewards.length" class="m-0 rounded-2xl border border-border-default bg-surface p-5 text-center text-sm text-content">{{ tr('DailyAttendance.hien_chua_co_phan_qua_de_xem_truoc') }}</div>
       <div v-else class="m-0 grid list-none grid-cols-2 gap-3 p-0 sm:grid-cols-3 lg:grid-cols-4">
@@ -62,10 +62,10 @@ const waitTime = computed(() => {
         </div>
       </div>
     </section>
-    <div v-if="reward" class="slide-fade-in from-bottom player-content-in flex items-center gap-4 rounded-2xl border border-amber-300 bg-amber-50 p-4" role="status">
+    <div v-if="reward" class="slide-fade-in from-bottom player-content-in flex items-center gap-4 rounded-2xl border border-gold bg-surface p-4" role="status">
       <span class="text-4xl" aria-hidden="true">{{ reward.icon }}</span>
       <div>
-        <div class="m-0 text-xs font-bold uppercase tracking-wide text-amber-800">{{ tr('DailyAttendance.ban_nhan_duoc') }}</div>
+        <div class="m-0 text-xs font-bold uppercase tracking-wide text-gold">{{ tr('DailyAttendance.ban_nhan_duoc') }}</div>
         <div class="mb-0 mt-1 font-extrabold text-content">{{ reward.name }}<span v-if="reward.amount"> ×{{ reward.amount }}</span></div>
       </div>
     </div>

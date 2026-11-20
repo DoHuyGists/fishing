@@ -18,7 +18,7 @@ defineProps<{
     <div class="mb-3 flex flex-wrap items-center justify-between gap-2">
       <div class="flex gap-2 items-center">
         <div class="m-0 mt-1 text-xl font-bold">{{ pond.name }}</div>
-        <span class="rounded-lg bg-surface/90 px-3 py-1.5 text-xs text-emerald-900">{{ pond.batches.length }} {{ tr('FishPond.lua_dang_nuoi') }}</span>
+        <span class="rounded-lg bg-surface/90 px-3 py-1.5 text-xs text-content">{{ pond.batches.length }} {{ tr('FishPond.lua_dang_nuoi') }}</span>
       </div>
       <span class="rounded-full border border-white/70 bg-white/80 px-3 py-1.5 text-xs font-semibold">{{ tr('FishPond.cap') }} {{ pond.level }} · {{ pond.fish.length }} {{ tr('UserProfile.con') }}</span>
     </div>
@@ -28,7 +28,7 @@ defineProps<{
       <div class="pond-water relative h-full overflow-hidden">
         <div class="water-light pointer-events-none absolute inset-0" aria-hidden="true" />
         <div class="water-ripples pointer-events-none absolute inset-0" aria-hidden="true"><i /><i /><i /></div>
-        <span v-if="pond.fish.some(f => f.status === 'ready')" class="absolute right-4 top-4 rounded-lg bg-amber-100 px-3 py-1.5 text-xs font-semibold text-amber-900">{{ tr('FishPond.co_ca_truong_thanh') }}</span>
+        <span v-if="pond.fish.some(f => f.status === 'ready')" class="absolute right-4 top-4 rounded-lg bg-surface px-3 py-1.5 text-xs font-semibold text-gold">{{ tr('FishPond.co_ca_truong_thanh') }}</span>
         <div v-if="!pond.fish.length" class="empty-plaque absolute inset-x-4 top-1/2 m-0 text-center text-sm">{{ tr('FishPond.ao_da_san_sang_tha_lua_ca_dau_tien_nhe') }}</div>
         <div class="swimming-area absolute inset-x-4 bottom-5 top-14" aria-hidden="true">
           <FishSwim
@@ -56,10 +56,10 @@ defineProps<{
     </div>
     <div class="mt-5 rounded-xl border border-white/80 bg-white/85 p-3">
       <div class="flex justify-between gap-2 text-xs"><span>{{ tr('FishPond.suc_chua_da_dung') }}</span><b>{{ pond.used_capacity }} / {{ pond.capacity }}</b></div>
-      <div class="my-2 h-2 overflow-hidden rounded-full bg-palette-dfe8d8" role="progressbar" :aria-label="tr('FishPond.suc_chua_ao')" :aria-valuenow="pond.used_capacity" :aria-valuemin="0" :aria-valuemax="pond.capacity">
-        <div class="h-full rounded-full bg-emerald-600" :style="{ width: (pond.used_capacity / pond.capacity * 100) + '%' }" />
+      <div class="my-2 h-2 overflow-hidden rounded-full bg-surface" role="progressbar" :aria-label="tr('FishPond.suc_chua_ao')" :aria-valuenow="pond.used_capacity" :aria-valuemin="0" :aria-valuemax="pond.capacity">
+        <div class="h-full rounded-full bg-accent" :style="{ width: (pond.used_capacity / pond.capacity * 100) + '%' }" />
       </div>
-      <div class="m-0 text-[11px] text-stone-600">{{ tr('Fishfarm.con') }} {{ pond.available_capacity }} {{ tr('FishPond.suc_chua_de_tha_ca_tong_suc_chua_ca_phai_nho_hon') }} {{ pond.capacity }}.</div>
+      <div class="m-0 text-[11px] text-content">{{ tr('Fishfarm.con') }} {{ pond.available_capacity }} {{ tr('FishPond.suc_chua_de_tha_ca_tong_suc_chua_ca_phai_nho_hon') }} {{ pond.capacity }}.</div>
     </div>
   </section>
 </template>
@@ -74,29 +74,29 @@ defineProps<{
 
 .pond-bank {
   padding: 10px;
-  border: 1px solid var(--color-palette-a8b09a);
+  border: 1px solid var(--color-content);
   border-radius: 30px;
-  background: var(--color-palette-b5bda3);
-  box-shadow: 0 6px 0 var(--color-palette-738061);
+  background: var(--color-surface);
+  box-shadow: 0 6px 0 var(--color-content);
 }
 
 .pond-water {
   min-height: 260px;
-  border: 2px solid var(--color-palette-3e7e7c);
+  border: 2px solid var(--color-primary);
   border-radius: 19px 26px 20px 25px;
-  background: linear-gradient(155deg, var(--color-palette-79c4bd) 0%, var(--color-palette-4fa9ae) 34%, var(--color-palette-338b9c) 75%, var(--color-palette-3c97a0) 100%);
-  box-shadow: inset 0 5px 9px var(--color-palette-255b654d), inset 0 -3px 5px var(--color-palette-d2f1c84d);
+  background: linear-gradient(155deg, var(--color-accent) 0%, var(--color-sky) 34%, var(--color-primary) 75%, var(--color-primary) 100%);
+  box-shadow: inset 0 5px 9px color-mix(in srgb, var(--color-primary) 30.196%, transparent), inset 0 -3px 5px color-mix(in srgb, var(--color-surface) 30.196%, transparent);
 }
 
 .water-light {
-  background: repeating-linear-gradient(165deg, transparent 0 32px, var(--color-palette-e1fff910) 33px 35px, transparent 36px 56px);
+  background: repeating-linear-gradient(165deg, transparent 0 32px, color-mix(in srgb, var(--color-surface) 6.275%, transparent) 33px 35px, transparent 36px 56px);
 }
 
 .water-ripples i {
   position: absolute;
   width: 45px;
   height: 9px;
-  border: 1px solid var(--color-palette-d8ffff40);
+  border: 1px solid color-mix(in srgb, var(--color-surface) 25.098%, transparent);
   border-radius: 50%;
 }
 
@@ -118,8 +118,8 @@ defineProps<{
 }
 
 .empty-plaque {
-  color: var(--color-palette-e4fff4);
-  text-shadow: 0 1px 2px var(--color-palette-205b63);
+  color: var(--color-surface);
+  text-shadow: 0 1px 2px var(--color-primary);
 }
 
 .bank-grass {
@@ -127,7 +127,7 @@ defineProps<{
   z-index: 2;
   width: 18px;
   height: 21px;
-  background: var(--color-palette-688c48);
+  background: var(--color-accent);
   clip-path: polygon(0 100%, 2% 20%, 34% 70%, 39% 0, 62% 72%, 95% 17%, 100% 100%);
 }
 
@@ -147,9 +147,9 @@ defineProps<{
   position: absolute;
   width: 19px;
   height: 12px;
-  border: 1px solid var(--color-palette-548a5c);
+  border: 1px solid var(--color-accent);
   border-radius: 50%;
-  background: var(--color-palette-83b971);
+  background: var(--color-accent);
   clip-path: polygon(0 0, 100% 0, 100% 100%, 46% 100%, 53% 52%, 27% 100%, 0 100%);
 }
 
@@ -165,7 +165,7 @@ defineProps<{
   width: 13px;
   height: 9px;
   transform: rotate(42deg);
-  background: var(--color-palette-a7c67b);
+  background: var(--color-accent);
 }
 
 .pond-dock {
@@ -176,9 +176,9 @@ defineProps<{
   width: 36px;
   height: 23px;
   transform: translateX(-50%) rotate(-3deg);
-  border: 2px solid var(--color-palette-98774d);
+  border: 2px solid var(--color-gold);
   border-radius: 2px;
-  background: repeating-linear-gradient(0deg, var(--color-palette-c6a573) 0 5px, var(--color-palette-9d7e52) 5px 6px);
+  background: repeating-linear-gradient(0deg, var(--color-gold) 0 5px, var(--color-gold) 5px 6px);
 }
 
 .swimming-area .fish {
@@ -204,10 +204,10 @@ defineProps<{
   position: absolute;
   right: 20%;
   top: -18%;
-  color: var(--color-palette-fffbe6);
+  color: var(--color-surface);
   font-size: 24px;
   line-height: 1;
-  text-shadow: 0 0 3px var(--color-white), 0 0 8px var(--color-palette-ffcf45);
+  text-shadow: 0 0 3px var(--color-white), 0 0 8px var(--color-gold);
   animation: golden-sparkle 4s ease-in-out infinite;
 }
 

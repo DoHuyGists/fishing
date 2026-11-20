@@ -62,7 +62,7 @@ onMounted(() => {
     <div
       v-if="state?.error"
       role="alert"
-      class="mb-3 rounded-lg border border-red-200 bg-red-50 px-3 py-2 text-sm text-red-700"
+      class="mb-3 rounded-lg border border-danger bg-surface px-3 py-2 text-sm text-danger"
     >
       {{ state.error }}
     </div>
@@ -105,7 +105,7 @@ onMounted(() => {
                 :value="weights[row.speciesId]"
                 :aria-label="`Tỉ trọng ${row.speciesName || row.speciesId}`"
                 :disabled="state.saving"
-                class="w-28 rounded-md border border-border-default bg-surface px-2 py-1.5 text-right text-xs focus:outline-emerald-600 disabled:opacity-50"
+                class="w-28 rounded-md border border-border-default bg-surface px-2 py-1.5 text-right text-xs focus:outline-accent disabled:opacity-50"
                 @input="setWeight(row.speciesId, $event)"
               />
             </label>
@@ -114,19 +114,19 @@ onMounted(() => {
             Tỉ trọng là giá trị tương đối, không bắt buộc tổng bằng 100. Biểu đồ luôn bao gồm mọi loài của bãi câu, kể
             cả khi danh sách đang lọc hoặc phân trang.
           </div>
-          <div v-if="!valid" role="alert" class="mt-2 text-xs text-red-700">
+          <div v-if="!valid" role="alert" class="mt-2 text-xs text-danger">
             Tỉ trọng phải là số hữu hạn không âm và tổng phải hữu hạn.
           </div>
-          <div v-else-if="total === 0" class="mt-2 text-xs text-amber-800">
+          <div v-else-if="total === 0" class="mt-2 text-xs text-gold">
             Tất cả tỉ trọng bằng 0: không có loài nào xuất hiện. Nhập tỉ trọng lớn hơn 0 để tạo vùng.
           </div>
         </div>
       </div>
       <div class="mt-3 flex flex-wrap items-center justify-end gap-2 border-t border-border-default pt-3">
-        <span v-if="state.saved" role="status" class="mr-auto text-xs font-semibold text-emerald-800"
+        <span v-if="state.saved" role="status" class="mr-auto text-xs font-semibold text-content"
           >Đã lưu phân bổ.</span
         >
-        <span v-else-if="dirty" class="mr-auto text-xs text-amber-800">Có thay đổi chưa lưu</span>
+        <span v-else-if="dirty" class="mr-auto text-xs text-gold">Có thay đổi chưa lưu</span>
         <button
           type="button"
           :disabled="!dirty || state.saving"
@@ -138,7 +138,7 @@ onMounted(() => {
         <button
           type="button"
           :disabled="!dirty || !valid || state.saving"
-          class="rounded-lg bg-content-strong px-3 py-2 text-xs font-bold text-white hover:bg-emerald-800 disabled:opacity-40"
+          class="rounded-lg bg-content-strong px-3 py-2 text-xs font-bold text-white hover:bg-accent disabled:opacity-40"
           @click="store.saveDistribution(areaId)"
         >
           {{ state.saving ? "Đang lưu..." : "Lưu phân bổ" }}

@@ -57,7 +57,7 @@ store.fetchAll();
   <AdminModal title="Quản lý vé câu" @close="emit('close')" @keydown.esc="emit('close')">
     <div v-if="formOpen" class="overflow-y-auto p-5 sm:p-7">
       <div class="mb-4 text-base font-bold">{{ editing ? "Sửa vé câu" : "Tạo vé câu" }}</div>
-      <div v-if="store.error" class="mb-3 rounded-lg bg-red-50 p-3 text-sm text-red-700">{{ store.error }}</div>
+      <div v-if="store.error" class="mb-3 rounded-lg bg-surface p-3 text-sm text-danger">{{ store.error }}</div>
       <FishingPassFormManagement :pass="editing" :saving="store.saving" @save="save" @cancel="formOpen = false" />
     </div>
     <template v-else>
@@ -83,13 +83,13 @@ store.fetchAll();
         </button>
         <button
           type="button"
-          class="rounded-lg bg-emerald-800 px-4 py-2 text-sm font-semibold text-white"
+          class="rounded-lg bg-accent px-4 py-2 text-sm font-semibold text-white"
           @click="openCreate"
         >
           + Tạo vé
         </button>
       </div>
-      <div v-if="store.error" class="mx-5 mt-4 rounded-lg bg-red-50 p-3 text-sm text-red-700 sm:mx-6">
+      <div v-if="store.error" class="mx-5 mt-4 rounded-lg bg-surface p-3 text-sm text-danger sm:mx-6">
         {{ store.error }}
       </div>
       <div class="min-h-0 flex-1 overflow-auto p-4 sm:p-6">
@@ -104,7 +104,7 @@ store.fetchAll();
         </div>
         <div v-else class="overflow-x-auto rounded-xl border border-border-default bg-white">
           <table class="w-full min-w-[850px] text-left text-sm">
-            <thead class="bg-palette-eaf1e5 text-xs uppercase text-content/70">
+            <thead class="bg-surface text-xs uppercase text-content/70">
               <tr>
                 <th class="px-4 py-3">Tên vé</th>
                 <th class="px-4 py-3">Giá / số ngày</th>
@@ -114,7 +114,7 @@ store.fetchAll();
               </tr>
             </thead>
             <tbody>
-              <tr v-for="pass in filtered" :key="pass.id" class="border-t border-palette-e5ece1 align-top">
+              <tr v-for="pass in filtered" :key="pass.id" class="border-t border-border align-top">
                 <td class="max-w-72 px-4 py-3">
                   <div class="font-semibold">{{ pass.name }}</div>
                   <div v-if="pass.description" class="mt-1 line-clamp-2 text-xs text-content/65">
@@ -132,7 +132,7 @@ store.fetchAll();
                 <td class="px-4 py-3">
                   <span
                     class="rounded-full px-2.5 py-1 text-xs font-semibold"
-                    :class="pass.isActive ? 'bg-emerald-100 text-emerald-800' : 'bg-slate-100 text-slate-600'"
+                    :class="pass.isActive ? 'bg-surface text-content' : 'bg-surface text-content'"
                     >{{ pass.isActive ? "Hoạt động" : "Đã tắt" }}</span
                   >
                 </td>
@@ -145,7 +145,7 @@ store.fetchAll();
                     Sửa</button
                   ><button
                     type="button"
-                    class="ml-2 rounded-lg border border-red-200 px-3 py-1.5 text-xs font-semibold text-red-700 hover:bg-red-50"
+                    class="ml-2 rounded-lg border border-danger px-3 py-1.5 text-xs font-semibold text-danger hover:bg-surface"
                     @click="deleting = pass"
                   >
                     Xoá
@@ -157,15 +157,15 @@ store.fetchAll();
         </div>
       </div>
     </template>
-    <div v-if="deleting" class="fixed inset-0 z-[60] grid place-items-center bg-black/45 p-4">
+    <div v-if="deleting" class="fixed inset-0 z-[60] grid place-items-center bg-content/45 p-4">
       <div class="w-full max-w-sm rounded-xl bg-white p-5 shadow-xl">
         <div class="font-bold">Xác nhận xoá vé</div>
-        <div class="my-3 text-sm text-slate-600">Bạn có chắc muốn xoá “{{ deleting.name }}”?</div>
+        <div class="my-3 text-sm text-content">Bạn có chắc muốn xoá “{{ deleting.name }}”?</div>
         <div class="flex justify-end gap-2">
           <button type="button" class="rounded-lg border px-3 py-2 text-sm" @click="deleting = null">Huỷ</button
           ><button
             type="button"
-            class="rounded-lg bg-red-700 px-3 py-2 text-sm font-semibold text-white"
+            class="rounded-lg bg-danger px-3 py-2 text-sm font-semibold text-white"
             @click="confirmRemove"
           >
             Xoá vé

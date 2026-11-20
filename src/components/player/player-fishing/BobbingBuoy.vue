@@ -29,7 +29,7 @@ const props = withDefaults(defineProps<Props>(), {
   src: '',
   size: 48,
   waterline: 0.75,
-  rippleColor: '#3b9bb0',
+  rippleColor: '#1e5fbf',
   rippleInterval: 1.6,
   squash: 0.32,
   clickable: true,
@@ -285,8 +285,8 @@ function drawFishShadow(fx: number, fy: number) {
   const a = (0.18 + tension * 0.14) * presence
   const soft = (c: CanvasRenderingContext2D, rx: number, ry: number) => {
     const g = c.createRadialGradient(0, 0, 0, 0, 0, rx)
-    g.addColorStop(0, `rgba(2,20,28,${a})`)
-    g.addColorStop(1, 'rgba(2,20,28,0)')
+    g.addColorStop(0, `rgba(36, 53, 42, ${a})`)
+    g.addColorStop(1, 'rgba(36, 53, 42, 0)')
     c.fillStyle = g
     c.save()
     c.scale(1, ry / rx)
@@ -311,7 +311,7 @@ function drawSplashes() {
   for (const s of splashes) {
     const life = 1 - s.r / s.max
     ctx.lineWidth = s.width
-    ctx.strokeStyle = `rgba(235,252,255,${life * 0.6})`
+    ctx.strokeStyle = `rgba(245, 249, 240, ${life * 0.6})`
     ctx.beginPath()
     ctx.ellipse(s.x, s.y, s.r, s.r * sq, 0, 0, Math.PI * 2)
     ctx.stroke()
@@ -334,8 +334,8 @@ function drawFoam() {
     ctx.translate(f.x, f.y)
     ctx.scale(1, props.squash + 0.1)
     const g = ctx.createRadialGradient(0, 0, 0, 0, 0, r)
-    g.addColorStop(0, `rgba(255,255,255,${0.75 * (1 - k)})`)
-    g.addColorStop(1, 'rgba(255,255,255,0)')
+    g.addColorStop(0, `rgba(255, 255, 255, ${0.75 * (1 - k)})`)
+    g.addColorStop(1, 'rgba(255, 255, 255, 0)')
     ctx.fillStyle = g
     ctx.beginPath()
     ctx.arc(0, 0, r, 0, Math.PI * 2)
@@ -363,7 +363,7 @@ function drawLine(wx: number, wy: number) {
   const fx = wx - 34 * u + Math.sin(simTime * 9) * tension * 10 * u
   const fy = wy + 30 * u
   ctx.globalAlpha = presence
-  ctx.strokeStyle = 'rgba(255,255,255,0.22)'
+  ctx.strokeStyle = 'rgba(255, 255, 255, 0.22)'
   ctx.lineWidth = 1
   ctx.beginPath()
   ctx.moveTo(wx, wy)
@@ -371,7 +371,7 @@ function drawLine(wx: number, wy: number) {
   ctx.stroke()
 
   // phần dây trên không
-  ctx.strokeStyle = 'rgba(255,255,255,0.8)'
+  ctx.strokeStyle = 'rgba(255, 255, 255, 0.8)'
   ctx.lineWidth = 1.2
   ctx.beginPath()
   ctx.moveTo(tipX, tipY)
@@ -381,7 +381,7 @@ function drawLine(wx: number, wy: number) {
   // vệt nước kéo theo dây tại điểm chạm
   const w = (10 + tension * 18) * u
   const sq = props.squash
-  ctx.strokeStyle = `rgba(255,255,255,${0.25 + tension * 0.4})`
+  ctx.strokeStyle = `rgba(255, 255, 255, ${0.25 + tension * 0.4})`
   ctx.lineWidth = 1
   ctx.beginPath()
   ctx.moveTo(endX, wy)
@@ -395,7 +395,7 @@ function drawLine(wx: number, wy: number) {
 function drawDrops() {
   if (!ctx) return
   ctx.lineCap = 'round'
-  ctx.strokeStyle = 'rgba(255,255,255,0.88)'
+  ctx.strokeStyle = 'rgba(255, 255, 255, 0.88)'
   for (const d of drops) {
     ctx.lineWidth = d.r
     ctx.beginPath()
@@ -417,7 +417,7 @@ function onPointerDown(e: PointerEvent) {
 
 function drawDefaultFloat(c: CanvasRenderingContext2D) {
   // Gốc toạ độ = mực nước, đơn vị: thân phao rộng ~30
-  c.strokeStyle = 'rgba(120,120,120,0.6)'
+  c.strokeStyle = 'rgba(36, 53, 42, 0.6)'
   c.lineWidth = 1
   c.beginPath()
   c.moveTo(0, -62)
@@ -425,24 +425,24 @@ function drawDefaultFloat(c: CanvasRenderingContext2D) {
   c.stroke()
 
   const bands: [string, number, number][] = [
-    ['#f2f0ea', -62, -48],
-    ['#e4452f', -48, -34],
-    ['#f2f0ea', -34, -20],
-    ['#e4452f', -20, -6],
+    ['#f5f9f0', -62, -48],
+    ['#f75353', -48, -34],
+    ['#f5f9f0', -34, -20],
+    ['#f75353', -20, -6],
   ]
   for (const [color, y0, y1] of bands) {
     c.fillStyle = color
     c.fillRect(-3, y0, 6, y1 - y0 + 0.5)
   }
-  c.fillStyle = '#e4452f'
+  c.fillStyle = '#f75353'
   c.beginPath()
   c.ellipse(0, 0, 15, 20, 0, Math.PI, 0)
   c.fill()
-  c.fillStyle = '#f2f0ea'
+  c.fillStyle = '#f5f9f0'
   c.beginPath()
   c.ellipse(0, 0, 15, 10, 0, 0, Math.PI)
   c.fill()
-  c.fillStyle = 'rgba(255,255,255,0.5)'
+  c.fillStyle = 'rgba(255, 255, 255, 0.5)'
   c.beginPath()
   c.ellipse(-6, -8, 3, 6, -0.4, 0, Math.PI * 2)
   c.fill()

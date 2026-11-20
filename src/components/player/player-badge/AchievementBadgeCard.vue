@@ -9,11 +9,11 @@ const emit = defineEmits<{ select: [badgeId: string] }>();
 <template>
   <button
     type="button"
-    class="slide-fade-in from-bottom player-content-in group relative flex min-h-32 cursor-pointer flex-col items-center overflow-hidden rounded-xl border p-1.5 text-center transition duration-300 hover:-translate-y-0.5 hover:shadow-md focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-emerald-700 sm:min-h-36 sm:rounded-2xl sm:p-2"
+    class="slide-fade-in from-bottom player-content-in group relative flex min-h-32 cursor-pointer flex-col items-center overflow-hidden rounded-xl border p-1.5 text-center transition duration-300 hover:-translate-y-0.5 hover:shadow-md focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-accent sm:min-h-36 sm:rounded-2xl sm:p-2"
     :class="
       badge.is_earned
-        ? 'border-emerald-200 bg-white hover:border-emerald-400'
-        : 'border-palette-dce4d8 bg-palette-f8faf6 hover:border-emerald-200'
+        ? 'border-accent bg-white hover:border-accent'
+        : 'border-border bg-surface hover:border-accent'
     "
     :style="{ '--delay': `${index * 45}ms` }"
     :aria-label="
@@ -26,11 +26,11 @@ const emit = defineEmits<{ select: [badgeId: string] }>();
   >
     <span
       aria-hidden="true"
-      class="absolute -right-7 -top-8 h-16 w-16 rounded-full bg-amber-100/70 blur-xl transition group-hover:bg-amber-200/80"
+      class="absolute -right-7 -top-8 h-16 w-16 rounded-full bg-surface/70 blur-xl transition group-hover:bg-gold/80"
     ></span>
     <span class="relative grid h-12 w-full place-items-center sm:h-14">
       <span
-        class="absolute h-10 w-10 rounded-full border border-amber-200/70 bg-linear-to-br from-amber-50 to-orange-100 shadow-inner transition duration-300 group-hover:scale-110 group-hover:rotate-6 sm:h-12 sm:w-12"
+        class="absolute h-10 w-10 rounded-full border border-gold/70 bg-linear-to-br from-surface to-surface inset-shadow-sm transition duration-300 group-hover:scale-110 group-hover:rotate-6 sm:h-12 sm:w-12"
       ></span>
       <img
         v-if="badge.icon_url"
@@ -49,13 +49,13 @@ const emit = defineEmits<{ select: [badgeId: string] }>();
       >
       <span
         v-if="badge.is_earned"
-        class="absolute bottom-0 right-[calc(50%-1.5rem)] z-20 grid h-4 w-4 place-items-center rounded-full border border-white bg-emerald-600 text-[9px] font-black text-white shadow sm:right-[calc(50%-1.75rem)] sm:h-5 sm:w-5 sm:text-[10px]"
+        class="absolute bottom-0 right-[calc(50%-1.5rem)] z-20 grid h-4 w-4 place-items-center rounded-full border border-white bg-accent text-[9px] font-black text-white shadow-sm sm:right-[calc(50%-1.75rem)] sm:h-5 sm:w-5 sm:text-[10px]"
         :aria-label="tr('Achievement.da_dat')"
         >✓</span
       >
       <span
         v-else
-        class="absolute bottom-0 right-[calc(50%-1.5rem)] z-20 grid h-4 w-4 place-items-center rounded-full border border-white bg-gray-300 text-[8px] text-white sm:right-[calc(50%-1.75rem)] sm:h-5 sm:w-5 sm:text-[10px]"
+        class="absolute bottom-0 right-[calc(50%-1.5rem)] z-20 grid h-4 w-4 place-items-center rounded-full border border-white bg-content text-[8px] text-white sm:right-[calc(50%-1.75rem)] sm:h-5 sm:w-5 sm:text-[10px]"
         aria-hidden="true"
         >✦</span
       >
@@ -68,17 +68,17 @@ const emit = defineEmits<{ select: [badgeId: string] }>();
     </div>
     <span
       v-if="badge.can_claim"
-      class="relative mt-1 rounded-full bg-amber-100 px-1.5 py-0.5 text-[9px] font-bold leading-tight text-amber-800 sm:mt-1.5 sm:px-2 sm:text-[10px]"
+      class="relative mt-1 rounded-full bg-surface px-1.5 py-0.5 text-[9px] font-bold leading-tight text-gold sm:mt-1.5 sm:px-2 sm:text-[10px]"
       >{{ tr("Achievement.nhan_thuong") }}</span
     >
     <span
       v-else-if="badge.is_earned"
-      class="relative mt-1 rounded-full bg-emerald-50 px-1.5 py-0.5 text-[9px] font-bold leading-tight text-emerald-800 sm:mt-1.5 sm:px-2 sm:text-[10px]"
+      class="relative mt-1 rounded-full bg-surface px-1.5 py-0.5 text-[9px] font-bold leading-tight text-content sm:mt-1.5 sm:px-2 sm:text-[10px]"
       >{{ tr("Achievement.dat") }} {{ badge.quantity }} {{ tr("Achievement.lan") }}</span
     >
     <span
       v-else
-      class="relative mt-1 rounded-full bg-gray-100 px-1.5 py-0.5 text-[9px] font-semibold leading-tight text-gray-500 sm:mt-1.5 sm:px-2 sm:text-[10px]"
+      class="relative mt-1 rounded-full bg-surface px-1.5 py-0.5 text-[9px] font-semibold leading-tight text-content sm:mt-1.5 sm:px-2 sm:text-[10px]"
       >{{ tr("Achievement.chua_mo_khoa") }}</span
     >
   </button>

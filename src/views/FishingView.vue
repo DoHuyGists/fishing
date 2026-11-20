@@ -183,7 +183,7 @@ onBeforeUnmount(() => {
     <div>{{ tr("FishingView.khong_the_chuan_bi_phien_cau") }} {{ sessionError }}</div>
     <button
       type="button"
-      class="rounded-xl border border-[var(--color-ocean-gold)] bg-[var(--color-ocean-gold)] px-4 py-2 font-bold text-[var(--color-ocean-deep)] transition hover:brightness-110"
+      class="rounded-xl border border-[var(--color-ocean-gold)] bg-[var(--color-ocean-gold)] px-4 py-2 font-bold text-content transition hover:brightness-110"
       @click="retrySetup"
     >
       {{ tr("Maintenance.thu_lai") }}
@@ -266,7 +266,7 @@ onBeforeUnmount(() => {
           <button
             v-if="fishingStore.pendingResult"
             type="button"
-            class="rounded-[10px] border border-[var(--color-ocean-gold)] bg-[var(--color-ocean-gold)] px-3 py-2 text-xs font-bold text-[var(--color-ocean-deep)] transition enabled:hover:brightness-110 disabled:opacity-45"
+            class="rounded-[10px] border border-[var(--color-ocean-gold)] bg-[var(--color-ocean-gold)] px-3 py-2 text-xs font-bold text-content transition enabled:hover:brightness-110 disabled:opacity-45"
             :disabled="fishingStore.castPhase !== 'unconfirmed'"
             @click="fishingStore.retryPendingResult"
           >
@@ -277,7 +277,7 @@ onBeforeUnmount(() => {
           </div>
           <button
             type="button"
-            class="rounded-[10px] border border-[var(--color-ocean-gold)] bg-[var(--color-ocean-gold)] px-3 py-2 text-xs font-bold text-[var(--color-ocean-deep)] transition enabled:hover:brightness-110 disabled:cursor-not-allowed disabled:opacity-45"
+            class="rounded-[10px] border border-[var(--color-ocean-gold)] bg-[var(--color-ocean-gold)] px-3 py-2 text-xs font-bold text-content transition enabled:hover:brightness-110 disabled:cursor-not-allowed disabled:opacity-45"
             v-if="!fishingStore.pendingResult"
             :disabled="!fishingStore.canReelIn"
             @click="fishingStore.reelInBait"
@@ -295,12 +295,12 @@ onBeforeUnmount(() => {
       <Transition name="exit-dialog">
         <div
           v-if="showExitConfirmation"
-          class="fixed z-[40] inset-0 grid place-items-center p-5 bg-[rgba(8,25,40,0.78)] backdrop-blur-[7px]"
+          class="fixed z-[40] inset-0 grid place-items-center p-5 bg-[color-mix(in_srgb,_var(--color-content)_78%,_transparent)] backdrop-blur-[7px]"
           role="presentation"
           @click.self="showExitConfirmation = false"
         >
           <section
-            class="w-[min(380px,100%)] p-5 border border-[var(--color-ocean-gold)]/60 rounded-[20px] bg-[linear-gradient(145deg,var(--color-ocean-panel),var(--color-ocean-deep))] shadow-[0_24px_70px_rgba(0,0,0,0.6)] text-[var(--color-ocean-pearl)] text-center"
+            class="w-[min(380px,100%)] p-5 border border-[var(--color-ocean-gold)]/60 rounded-[20px] bg-[linear-gradient(145deg,var(--color-ocean-panel),var(--color-ocean-deep))] shadow-[0_24px_70px_color-mix(in_srgb,_var(--color-content)_60%,_transparent)] text-[var(--color-ocean-pearl)] text-center"
             role="dialog"
             aria-modal="true"
             aria-labelledby="confirm-exit-title"
@@ -313,7 +313,7 @@ onBeforeUnmount(() => {
               <strong class="text-[var(--color-ocean-gold)]">{{ fishingStore.inventory.length }}</strong>
               {{ tr("FishingView.con_ca_ban_co_chac_chan_muon_quay_lai_ban_do_khong") }}
             </div>
-            <div v-if="fishingStore.leaveAreaError" role="alert" class="my-3 text-sm text-red-300">
+            <div v-if="fishingStore.leaveAreaError" role="alert" class="my-3 text-sm text-danger">
               {{ fishingStore.leaveAreaError }}
             </div>
             <div class="flex justify-center gap-3 mt-5">
@@ -326,7 +326,7 @@ onBeforeUnmount(() => {
               </button>
               <button
                 type="button"
-                class="px-4 py-2 border border-[var(--color-ocean-gold)] rounded-xl bg-[var(--color-ocean-gold)] hover:brightness-110 text-[var(--color-ocean-deep)] text-xs font-bold shadow-[0_4px_12px_rgba(242,198,109,0.2)] transition cursor-pointer disabled:opacity-50"
+                class="px-4 py-2 border border-[var(--color-ocean-gold)] rounded-xl bg-[var(--color-ocean-gold)] hover:brightness-110 text-content text-xs font-bold shadow-[0_4px_12px_color-mix(in_srgb,_var(--color-gold)_20%,_transparent)] transition cursor-pointer disabled:opacity-50"
                 :disabled="fishingStore.isLeavingArea"
                 @click="router.push({ name: 'lobby' })"
               >
@@ -342,7 +342,7 @@ onBeforeUnmount(() => {
     <Teleport to="body">
       <div
         v-if="settingsOpen"
-        class="fixed inset-0 z-[31] grid place-items-center bg-[rgba(8,25,40,0.78)] p-5 backdrop-blur-[7px]"
+        class="fixed inset-0 z-[31] grid place-items-center bg-[color-mix(in_srgb,_var(--color-content)_78%,_transparent)] p-5 backdrop-blur-[7px]"
         @click.self="settingsOpen = false"
         @keydown.esc.stop="settingsOpen = false"
       >
@@ -350,7 +350,7 @@ onBeforeUnmount(() => {
           role="dialog"
           aria-modal="true"
           aria-labelledby="fishing-settings-title"
-          class="max-h-[85dvh] w-full max-w-lg overflow-y-auto rounded-2xl border border-[var(--color-ocean-gold)]/60 bg-surface p-5 text-content shadow-[0_24px_70px_rgba(0,0,0,0.5)]"
+          class="max-h-[85dvh] w-full max-w-lg overflow-y-auto rounded-2xl border border-[var(--color-ocean-gold)]/60 bg-surface p-5 text-content shadow-[0_24px_70px_color-mix(in_srgb,_var(--color-content)_50%,_transparent)]"
         >
           <header class="mb-4 flex items-center justify-between gap-4 border-b border-[var(--color-ocean-gold)]/25 pb-3">
             <div id="fishing-settings-title" class="text-lg font-bold text-[var(--color-ocean-gold)]">{{ tr("FishingView.cai_dat_cau_ca") }}</div>
@@ -381,7 +381,7 @@ onBeforeUnmount(() => {
               @click="userSettingStore.toggleFishingBackgroundSound"
             >
               <span
-                class="h-5 w-5 rounded-full bg-[var(--color-ocean-pearl)] shadow transition-transform"
+                class="h-5 w-5 rounded-full bg-[var(--color-ocean-pearl)] shadow-sm transition-transform"
                 :class="userSettingStore.isFishingBackgroundSoundTurnOn ? 'translate-x-6' : 'translate-x-1'"
               />
             </button>
@@ -389,7 +389,7 @@ onBeforeUnmount(() => {
           <div v-if="userSettingStore.loading || userSettingStore.saving" role="status" class="mt-3 text-sm">
             {{ userSettingStore.loading ? tr("FishingView.dang_tai_cai_dat") : tr("FishingView.dang_luu_cai_dat") }}
           </div>
-          <div v-if="userSettingStore.error" role="alert" class="mt-3 text-sm text-red-300">
+          <div v-if="userSettingStore.error" role="alert" class="mt-3 text-sm text-danger">
             <div>{{ userSettingStore.error }}</div>
             <button
               v-if="!userSettingStore.ready"
@@ -407,7 +407,7 @@ onBeforeUnmount(() => {
   <div
     v-if="!sessionReady && fishingStore.leaveAreaError"
     role="alert"
-    class="fixed bottom-4 left-4 right-4 z-50 rounded-lg border border-red-300/40 bg-surface p-3 text-center text-red-300"
+    class="fixed bottom-4 left-4 right-4 z-50 rounded-lg border border-danger/40 bg-surface p-3 text-center text-danger"
   >
     {{ fishingStore.leaveAreaError }}
   </div>
@@ -429,9 +429,9 @@ onBeforeUnmount(() => {
   display: grid;
   grid-template-columns: minmax(0, 1fr) 272px;
   gap: 8px;
-  border-top: 1px solid rgba(242, 198, 109, 0.4);
+  border-top: 1px solid color-mix(in srgb, var(--color-gold) 40%, transparent);
   background: linear-gradient(180deg, var(--color-ocean-panel), var(--color-ocean-deep));
-  box-shadow: 0 -8px 24px rgba(5, 20, 34, 0.3);
+  box-shadow: 0 -8px 24px color-mix(in srgb, var(--color-content) 30%, transparent);
 }
 
 .control-deck--tension {
@@ -442,9 +442,9 @@ onBeforeUnmount(() => {
 .side-panel {
   min-width: 0;
   padding: 6px 13px;
-  border: 1px solid rgba(53, 185, 213, 0.3);
+  border: 1px solid color-mix(in srgb, var(--color-sky) 30%, transparent);
   border-radius: 16px;
-  background: linear-gradient(135deg, rgba(16, 45, 70, 0.95), rgba(29, 84, 117, 0.82));
+  background: linear-gradient(135deg, color-mix(in srgb, var(--color-content) 95%, transparent), color-mix(in srgb, var(--color-primary) 82%, transparent));
 }
 
 .equipment-toggle {
@@ -452,8 +452,8 @@ onBeforeUnmount(() => {
 }
 
 .control-deck :deep(.tool) {
-  border-color: rgba(53, 185, 213, 0.25);
-  background: rgba(16, 45, 70, 0.85);
+  border-color: color-mix(in srgb, var(--color-sky) 25%, transparent);
+  background: color-mix(in srgb, var(--color-content) 85%, transparent);
   color: var(--color-ocean-pearl);
 }
 
@@ -463,20 +463,20 @@ onBeforeUnmount(() => {
 
 .control-deck :deep(.tool.selected) {
   border-color: var(--color-ocean-gold);
-  background: rgba(29, 84, 117, 0.95);
-  box-shadow: inset 0 0 0 1px rgba(242, 198, 109, 0.2), 0 0 14px rgba(53, 185, 213, 0.12);
+  background: color-mix(in srgb, var(--color-primary) 95%, transparent);
+  box-shadow: inset 0 0 0 1px color-mix(in srgb, var(--color-gold) 20%, transparent), 0 0 14px color-mix(in srgb, var(--color-sky) 12%, transparent);
 }
 
 .control-deck :deep(.tool-icon) {
-  background: rgba(242, 198, 109, 0.15);
+  background: color-mix(in srgb, var(--color-gold) 15%, transparent);
 }
 
 .control-deck :deep(.selected .tool-icon) {
-  background: rgba(242, 198, 109, 0.28);
+  background: color-mix(in srgb, var(--color-gold) 28%, transparent);
 }
 
 .control-deck :deep(.tool small) {
-  color: rgba(245, 235, 212, 0.7);
+  color: color-mix(in srgb, var(--color-surface) 70%, transparent);
 }
 
 @media (max-width: 720px) {
@@ -497,9 +497,9 @@ onBeforeUnmount(() => {
     justify-content: center;
     min-height: 32px;
     padding: 0 10px;
-    border: 1px solid rgba(242, 198, 109, 0.45);
+    border: 1px solid color-mix(in srgb, var(--color-gold) 45%, transparent);
     border-radius: 9px;
-    background: rgba(16, 45, 70, 0.85);
+    background: color-mix(in srgb, var(--color-content) 85%, transparent);
     color: var(--color-ocean-pearl);
     font-size: 11px;
     font-weight: 700;

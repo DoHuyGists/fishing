@@ -73,7 +73,7 @@ const save = (payload: any, id: string | null) => {
         loading="lazy"
         class="size-16 rounded-md border border-border-default bg-surface object-contain"
       />
-      <span v-else class="text-gray-400">Chưa có ảnh</span>
+      <span v-else class="text-content">Chưa có ảnh</span>
     </template>
   </AdminCrudScreen>
 </template>

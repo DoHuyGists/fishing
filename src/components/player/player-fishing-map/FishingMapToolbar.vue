@@ -36,7 +36,7 @@ const store = useFishingMapStore();
         :key="mode"
         type="button"
         class="rounded-lg border border-border-default px-3 py-2 text-sm"
-        :class="store.viewMode === mode ? 'bg-palette-dce9d4 font-bold' : 'bg-white'"
+        :class="store.viewMode === mode ? 'bg-surface font-bold' : 'bg-white'"
         :aria-pressed="store.viewMode === mode"
         @click="store.viewMode = mode"
       >

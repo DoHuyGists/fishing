@@ -16,7 +16,7 @@ const busy = (id: string) => store.runs.some((r) => r.owned_npc_id === owned(id)
       v-for="npc in store.npcs"
       :key="npc.id"
       class="dispatch-card slide-fade-in player-content-in"
-      :class="{ 'ring-2 ring-palette-527547': store.selectedNpcId === npc.id }"
+      :class="{ 'ring-2 ring-accent': store.selectedNpcId === npc.id }"
     >
       <div class="flex items-center gap-2">
         <img
@@ -34,7 +34,7 @@ const busy = (id: string) => store.runs.some((r) => r.owned_npc_id === owned(id)
         >
         <div class="min-w-0">
           <div class="font-bold">{{ dispatchText(npc.name) }}</div>
-          <div class="text-xs text-palette-61745d">
+          <div class="text-xs text-content">
             {{
               busy(npc.id) ? tr("Dispatch.working") : owned(npc.id) ? tr("Dispatch.owned") : tr("Dispatch.available")
             }}
@@ -63,8 +63,8 @@ const busy = (id: string) => store.runs.some((r) => r.owned_npc_id === owned(id)
         </button>
       </div>
       <div v-else class="space-y-2">
-        <div v-if="!npc.enabled" class="text-xs text-amber-800">{{ tr("Dispatch.errorNpc") }}</div>
-        <div v-else-if="store.selectedJob && !dispatchEligible(npc, store.selectedJob)" class="text-xs text-amber-800">
+        <div v-if="!npc.enabled" class="text-xs text-gold">{{ tr("Dispatch.errorNpc") }}</div>
+        <div v-else-if="store.selectedJob && !dispatchEligible(npc, store.selectedJob)" class="text-xs text-gold">
           {{ tr("Dispatch.errorRequirements") }}
         </div>
         <button

@@ -25,7 +25,7 @@ const props = withDefaults(defineProps<Props>(), {
   flip: false,
   vigor: 1,
   continuous: false,
-  rippleColor: '#3b9bb0',
+  rippleColor: '#1e5fbf',
   squash: 0.32,
   clickable: true,
 })

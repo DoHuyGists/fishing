@@ -2,7 +2,7 @@
   <Modal title="Gacha" :on-refresh="refreshRewards">
     <div class="flex w-full flex-col lg:flex-row">
       <div
-        class="h-75 overflow-y-scroll min-h-0 w-full border-b border-emerald-300/20 p-2 sm:p-2 lg:h-full lg:w-1/2 lg:border-b-0 lg:border-r"
+        class="h-75 overflow-y-scroll min-h-0 w-full border-b border-accent/20 p-2 sm:p-2 lg:h-full lg:w-1/2 lg:border-b-0 lg:border-r"
       >
         <ListItems />
       </div>
@@ -29,7 +29,7 @@
           <span>{{ tr("SpinWheelModal.chi_phi_moi_luot_quay") }}</span>
           <Tickets :amount="1" />
         </div>
-        <div v-if="currencyStore.tickets < 1" class="text-sm text-amber-800">
+        <div v-if="currencyStore.tickets < 1" class="text-sm text-gold">
           {{ tr("SpinWheelModal.ban_can_it_nhat_1_ve_de_quay") }}
         </div>
       </div>

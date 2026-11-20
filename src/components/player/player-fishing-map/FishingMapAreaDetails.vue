@@ -8,12 +8,12 @@ defineProps<{ area: FishingMapArea }>();
   <div class="mt-3 space-y-3 text-sm">
     <div class="grid grid-cols-2 gap-2">
       <div class="rounded-lg border border-border-default bg-surface p-2">
-        <div class="text-xs text-palette-607176">{{ tr('FishingMapModal.region') }}</div>
+        <div class="text-xs text-content">{{ tr('FishingMapModal.region') }}</div>
         <div class="mt-1 break-words font-semibold">{{ area.zone?.name || tr('FishingMapModal.unknown') }}</div>
-        <div v-if="area.zone" class="text-xs text-palette-607176">{{ area.zone.code }}</div>
+        <div v-if="area.zone" class="text-xs text-content">{{ area.zone.code }}</div>
       </div>
       <div class="rounded-lg border border-border-default bg-surface p-2">
-        <div class="text-xs text-palette-607176">{{ tr('FishingMapModal.maxDepth') }}</div>
+        <div class="text-xs text-content">{{ tr('FishingMapModal.maxDepth') }}</div>
         <div class="mt-1 font-semibold">{{ area.maxDepth == null ? tr('FishingMapModal.unknown') : `${area.maxDepth.toLocaleString(getFormattingLocale())} m` }}</div>
       </div>
     </div>
@@ -29,7 +29,7 @@ defineProps<{ area: FishingMapArea }>();
           <span class="min-w-0 break-words text-xs">{{ weather.name }}</span>
         </div>
       </div>
-      <div v-else class="text-xs text-palette-607176">{{ tr('FishingMapModal.noWeathers') }}</div>
+      <div v-else class="text-xs text-content">{{ tr('FishingMapModal.noWeathers') }}</div>
     </div>
   </div>
 </template>

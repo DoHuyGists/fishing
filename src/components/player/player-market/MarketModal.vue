@@ -179,7 +179,7 @@ onUnmounted(() => {
     :show-count-data="activeMarketTab !== 'history'"
     :on-refresh="() => marketStore.loadVisible()"
   >
-    <div v-if="marketStore.error" role="alert" class="mb-3 rounded bg-red-50 p-3 text-red-700">
+    <div v-if="marketStore.error" role="alert" class="mb-3 rounded bg-surface p-3 text-danger">
       {{ marketStore.error }}
     </div>
     <Tab v-model="activeMarketTab" :tabs="marketTabs" :aria-label="tr('MarketWindow.cho_ca')" lazy>

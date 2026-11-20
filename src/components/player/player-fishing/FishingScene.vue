@@ -280,7 +280,7 @@ function castAt(event: MouseEvent) {
   position: relative;
   min-height: 0;
   overflow: hidden;
-  background: var(--color-palette-294430);
+  background: var(--color-content);
 }
 
 .pond-image {
@@ -296,16 +296,16 @@ function castAt(event: MouseEvent) {
 .scene-shade {
   position: absolute;
   inset: 0;
-  background: linear-gradient(180deg, rgba(9, 27, 20, 0.42), transparent 28%, transparent 66%, rgba(7, 29, 24, 0.24));
+  background: linear-gradient(180deg, color-mix(in srgb, var(--color-content) 42%, transparent), transparent 28%, transparent 66%, color-mix(in srgb, var(--color-content) 24%, transparent));
   pointer-events: none;
 }
 
 .weather,
 .scene-status {
   backdrop-filter: blur(10px);
-  background: rgba(17, 38, 27, 0.72);
-  border: 1px solid rgba(255, 255, 255, 0.2);
-  box-shadow: 0 6px 18px rgba(9, 20, 14, 0.16);
+  background: color-mix(in srgb, var(--color-content) 72%, transparent);
+  border: 1px solid color-mix(in srgb, var(--color-white) 20%, transparent);
+  box-shadow: 0 6px 18px color-mix(in srgb, var(--color-content) 16%, transparent);
 }
 
 .weather {
@@ -319,7 +319,7 @@ function castAt(event: MouseEvent) {
 }
 
 .weather span {
-  color: var(--color-palette-ffcf67);
+  color: var(--color-gold);
   font-size: 16px;
 }
 
@@ -327,7 +327,7 @@ function castAt(event: MouseEvent) {
   width: 3px;
   height: 3px;
   border-radius: 50%;
-  background: var(--color-palette-d6dfd8);
+  background: var(--color-surface);
 }
 
 .invalid-tap {
@@ -337,8 +337,8 @@ function castAt(event: MouseEvent) {
   left: 50%;
   padding: 8px 12px;
   border-radius: 999px;
-  background: rgba(91, 39, 24, 0.86);
-  color: var(--color-palette-fff2da);
+  background: color-mix(in srgb, var(--color-content) 86%, transparent);
+  color: var(--color-surface);
   font-size: 11px;
   font-weight: 700;
   transform: translate(-50%, -50%);
@@ -358,10 +358,10 @@ function castAt(event: MouseEvent) {
 
 .casting-line path {
   fill: none;
-  stroke: rgba(241, 242, 223, 0.9);
+  stroke: color-mix(in srgb, var(--color-surface) 90%, transparent);
   stroke-width: 0.3;
   vector-effect: non-scaling-stroke;
-  filter: drop-shadow(0 1px 1px rgba(0, 0, 0, 0.35));
+  filter: drop-shadow(0 1px 1px color-mix(in srgb, var(--color-content) 35%, transparent));
 }
 
 .casting-line.phase-idle path,
@@ -425,7 +425,7 @@ function castAt(event: MouseEvent) {
   z-index: 1;
   width: 20px;
   aspect-ratio: 1;
-  border: 2px solid rgba(255, 255, 255, 0.87);
+  border: 2px solid color-mix(in srgb, var(--color-white) 87%, transparent);
   border-radius: 50%;
   transform: translate(-50%, -50%);
   animation: ripple 1s linear forwards;
@@ -435,7 +435,7 @@ function castAt(event: MouseEvent) {
   content: "";
   position: absolute;
   inset: 6px;
-  border: 1px solid rgba(255, 255, 255, 0.8);
+  border: 1px solid color-mix(in srgb, var(--color-white) 80%, transparent);
   border-radius: inherit;
 }
 
@@ -449,7 +449,7 @@ function castAt(event: MouseEvent) {
   gap: 8px;
   padding: 9px 13px;
   border-radius: 11px;
-  color: white;
+  color: var(--color-white);
   font-size: 11px;
   font-weight: 650;
 }
@@ -458,12 +458,12 @@ function castAt(event: MouseEvent) {
   width: 7px;
   height: 7px;
   border-radius: 50%;
-  background: var(--color-palette-9bdf73);
-  box-shadow: 0 0 0 3px rgba(155, 223, 115, 0.18);
+  background: var(--color-accent);
+  box-shadow: 0 0 0 3px color-mix(in srgb, var(--color-accent) 18%, transparent);
 }
 
 .scene-status.active .status-dot {
-  background: var(--color-palette-ffc653);
+  background: var(--color-gold);
   animation: pulse 0.8s infinite;
 }
 
@@ -472,25 +472,25 @@ html.ocean-theme .fishing-scene {
 }
 
 html.ocean-theme .scene-shade {
-  background: linear-gradient(180deg, rgb(16 45 70 / 42%), transparent 28%, transparent 66%, rgb(16 45 70 / 24%));
+  background: linear-gradient(180deg, color-mix(in srgb, var(--color-content) 42%, transparent), transparent 28%, transparent 66%, color-mix(in srgb, var(--color-content) 24%, transparent));
 }
 
 html.ocean-theme .weather,
 html.ocean-theme .scene-status {
-  border-color: rgb(242 198 109 / 45%);
-  background: rgb(16 45 70 / 85%);
+  border-color: color-mix(in srgb, var(--color-gold) 45%, transparent);
+  background: color-mix(in srgb, var(--color-content) 85%, transparent);
   color: var(--color-ocean-pearl);
-  box-shadow: inset 0 1px 0 rgb(245 235 212 / 10%), 0 6px 18px rgb(0 0 0 / 20%);
+  box-shadow: inset 0 1px 0 color-mix(in srgb, var(--color-surface) 10%, transparent), 0 6px 18px color-mix(in srgb, var(--color-content) 20%, transparent);
 }
 
 html.ocean-theme .status-dot {
   background: var(--color-ocean-cyan);
-  box-shadow: 0 0 0 3px rgb(53 185 213 / 18%);
+  box-shadow: 0 0 0 3px color-mix(in srgb, var(--color-sky) 18%, transparent);
 }
 
 html.ocean-theme .scene-status.active .status-dot {
   background: var(--color-ocean-gold);
-  box-shadow: 0 0 0 3px rgb(242 198 109 / 18%);
+  box-shadow: 0 0 0 3px color-mix(in srgb, var(--color-gold) 18%, transparent);
 }
 
 .bite-alert {
@@ -499,13 +499,13 @@ html.ocean-theme .scene-status.active .status-dot {
   top: 42%;
   left: 50%;
   padding: 10px 18px;
-  border: 2px solid var(--color-palette-fff1bd);
+  border: 2px solid var(--color-surface);
   border-radius: 11px;
-  background: var(--color-palette-c24d36);
+  background: var(--color-danger);
   box-shadow:
-    0 4px 0 var(--color-palette-742c25),
-    0 0 26px rgba(255, 169, 79, 0.7);
-  color: white;
+    0 4px 0 var(--color-danger),
+    0 0 26px color-mix(in srgb, var(--color-gold) 70%, transparent);
+  color: var(--color-white);
   font-size: 14px;
   font-weight: 950;
   letter-spacing: 0.09em;

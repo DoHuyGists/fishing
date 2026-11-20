@@ -31,7 +31,7 @@ const lesson = computed(() =>
     >
       {{ tr("Maintenance.thu_lai") }}
     </button>
-    <RouterLink :to="{ name: 'home' }" class="rounded-xl border border-[var(--color-ocean-gold)] bg-[var(--color-ocean-gold)] px-4 py-2 font-bold text-[var(--color-ocean-deep)] transition hover:brightness-110">{{
+    <RouterLink :to="{ name: 'home' }" class="rounded-xl border border-[var(--color-ocean-gold)] bg-[var(--color-ocean-gold)] px-4 py-2 font-bold text-content transition hover:brightness-110">{{
       tr("TutorialView.ve_sanh_cau_ca")
     }}</RouterLink>
   </main>
@@ -39,7 +39,7 @@ const lesson = computed(() =>
   <main v-else class="grid min-h-dvh place-content-center gap-4 bg-surface p-6 text-center text-content">
     <div class="text-xl font-bold">{{ tr("TutorialView.khong_tim_thay_man_huong_dan") }}</div>
     <div>{{ tr("TutorialView.man_choi_nay_chua_co_hoac_chua_duoc_ho_tro") }}</div>
-    <RouterLink :to="{ name: 'home' }" class="rounded-xl border border-[var(--color-ocean-gold)] bg-[var(--color-ocean-gold)] px-4 py-2 font-bold text-[var(--color-ocean-deep)] transition hover:brightness-110">{{
+    <RouterLink :to="{ name: 'home' }" class="rounded-xl border border-[var(--color-ocean-gold)] bg-[var(--color-ocean-gold)] px-4 py-2 font-bold text-content transition hover:brightness-110">{{
       tr("TutorialView.ve_sanh_cau_ca")
     }}</RouterLink>
   </main>

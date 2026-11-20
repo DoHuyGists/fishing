@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import { onBeforeUnmount, onMounted, ref } from 'vue'
+import { normalizeThemeColor } from '../../utils/themePalette'
 
 // Một khẩu pháo bắn thẳng lên từ giữa
 // confetti.value?.fire({ x: 0.5, angle: 90, spread: 70, count: 150 })
@@ -15,7 +16,7 @@ import { onBeforeUnmount, onMounted, ref } from 'vue'
 //   })
 
 // Bảng màu riêng
-// confetti.value?.fire({ colors: ['#fde047', '#f59e0b', '#fff'] })
+// confetti.value?.fire({ colors: ['#ffd166', '#ffd166', '#ffffff'] })
 
 interface Particle {
   x: number
@@ -51,8 +52,7 @@ export interface FireOptions {
 }
 
 const DEFAULT_COLORS = [
-  '#ef4444', '#f97316', '#facc15', '#22c55e',
-  '#06b6d4', '#3b82f6', '#a855f7', '#ec4899',
+  '#f75353', '#ffd166', '#1abc9c', '#4fc3ff', '#1e5fbf', '#a66bff',
 ]
 
 const canvasRef = ref<HTMLCanvasElement | null>(null)
@@ -94,6 +94,7 @@ function fire(options: FireOptions = {}) {
     colors = DEFAULT_COLORS,
   } = options
 
+  const palette = (colors.length ? colors : DEFAULT_COLORS).map(color => normalizeThemeColor(color))
   for (let i = 0; i < count; i++) {
     const a = ((angle + rand(-spread / 2, spread / 2)) * Math.PI) / 180
     const speed = power * rand(0.4, 1)
@@ -110,7 +111,7 @@ function fire(options: FireOptions = {}) {
       spin: rand(-0.25, 0.25),
       tilt: rand(0, Math.PI * 2),
       tiltSpeed: rand(0.05, 0.25),
-      color: colors[Math.floor(Math.random() * colors.length)],
+      color: palette[Math.floor(Math.random() * palette.length)]!,
       life: 1,
       decay: rand(0.004, 0.009),
       round: Math.random() < 0.2,

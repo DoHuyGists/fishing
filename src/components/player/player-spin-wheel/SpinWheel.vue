@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import type { SpinWheelReward as Reward, SpinWheelProps as Props } from "../../../types/model/spinWheel";
 import { t as tr } from "../../../i18n";
+import { normalizeThemeColor } from '../../../utils/themePalette';
 
 /**
  * SpinningWheel.vue
@@ -38,9 +39,7 @@ const emit = defineEmits<{
 }>()
 
 const DEFAULT_COLORS = [
-  '#FF6B6B', '#4ECDC4', '#FFD93D', '#6C5CE7',
-  '#00B894', '#FD79A8', '#0984E3', '#E17055',
-  '#A29BFE', '#55EFC4', '#FAB1A0', '#74B9FF',
+  '#f75353', '#1abc9c', '#ffd166', '#1e5fbf', '#4fc3ff', '#a66bff',
 ]
 
 const spinning = ref(false)
@@ -55,9 +54,9 @@ const segmentAngle = computed(() => 360 / Math.max(props.rewards.length, 1))
 
 const gradientBackground = computed(() => {
   const n = props.rewards.length
-  if (n === 0) return '#e5e7eb'
+  if (n === 0) return '#f5f9f0'
   const stops = props.rewards.map((reward, i) => {
-    const color = reward.color ?? DEFAULT_COLORS[i % DEFAULT_COLORS.length]
+    const color = normalizeThemeColor(reward.color ?? DEFAULT_COLORS[i % DEFAULT_COLORS.length]!)
     const start = i * segmentAngle.value
     const end = (i + 1) * segmentAngle.value
     return `${color} ${start}deg ${end}deg`
@@ -187,14 +186,14 @@ onBeforeUnmount(() => {
       <!-- Con trỏ chỉ phần thưởng, cố định phía trên -->
       <div
         class="absolute left-1/2 -top-2 z-20 -translate-x-1/2"
-        style="filter: drop-shadow(0 1px 1px rgba(0,0,0,0.35))"
+        style="filter: drop-shadow(0 1px 1px rgba(36, 53, 42, 0.35))"
       >
-        <div class="h-0 w-0 border-x-14 border-t-24 border-x-transparent border-t-amber-400" />
+        <div class="h-0 w-0 border-x-14 border-t-24 border-x-transparent border-t-gold" />
       </div>
 
       <!-- Bánh xe -->
       <div
-        class="absolute inset-0 overflow-hidden rounded-full border-[6px] border-white shadow-[0_1px_10px_rgba(0,0,0,0.25)]"
+        class="absolute inset-0 overflow-hidden rounded-full border-[6px] border-white shadow-[0_1px_10px_color-mix(in_srgb,_var(--color-content)_25%,_transparent)]"
         :style="wheelStyle"
         @transitionend="onTransitionEnd"
         @transitionrun="armFallback"
@@ -212,7 +211,7 @@ onBeforeUnmount(() => {
               :alt="reward.label"
               class="h-10 w-10 object-contain drop-shadow-md"
             />
-            <span class="max-w-[64px] truncate text-center text-[11px] font-semibold text-white drop-shadow">
+            <span class="max-w-[64px] truncate text-center text-[11px] font-semibold text-white drop-shadow-sm">
               {{ reward.label }}
             </span>
           </div>
@@ -222,7 +221,7 @@ onBeforeUnmount(() => {
       <!-- Nút quay ở tâm -->
       <button
         type="button"
-        class="absolute cursor-pointer inset-0 m-auto flex h-16 w-16 items-center justify-center rounded-full border-4 border-white bg-slate-900 text-xs font-bold tracking-wide text-white shadow-lg transition-transform active:scale-95 disabled:cursor-not-allowed disabled:opacity-60"
+        class="absolute cursor-pointer inset-0 m-auto flex h-16 w-16 items-center justify-center rounded-full border-4 border-white bg-content text-xs font-bold tracking-wide text-white shadow-lg transition-transform active:scale-95 disabled:cursor-not-allowed disabled:opacity-60"
         :disabled="spinning || disabled || rewards.length === 0"
         @click="requestSpin"
       >
@@ -230,7 +229,7 @@ onBeforeUnmount(() => {
       </button>
     </div>
 
-    <div v-if="errorMsg" role="alert" class="text-sm font-medium text-red-500">{{ errorMsg }}</div>
+    <div v-if="errorMsg" role="alert" class="text-sm font-medium text-danger">{{ errorMsg }}</div>
 
     <PaymentConfirmation
       v-if="showSpinConfirmation && spinConfirmation"
@@ -251,7 +250,7 @@ onBeforeUnmount(() => {
       <Transition name="player-popup" :duration="{ enter: 220, leave: 150 }">
         <div
           v-if="showResult"
-          class="fixed inset-0 z-[10000] flex items-center justify-center bg-black/60 px-4"
+          class="fixed inset-0 z-[10000] flex items-center justify-center bg-content/60 px-4"
           @click.self="closeResult"
         >
           <div class="player-popup-panel w-full max-w-sm rounded-2xl bg-white p-8 text-center shadow-2xl">
@@ -261,11 +260,11 @@ onBeforeUnmount(() => {
               :alt="resultReward.label"
               class="mx-auto mb-4 h-24 w-24 object-contain"
             />
-            <div class="mb-1 text-sm text-slate-500">{{ tr('SpinWheel.chuc_mung_ban_da_nhan_duoc') }}</div>
-            <div class="mb-6 text-2xl font-bold text-slate-900">{{ resultReward?.label }}</div>
+            <div class="mb-1 text-sm text-content">{{ tr('SpinWheel.chuc_mung_ban_da_nhan_duoc') }}</div>
+            <div class="mb-6 text-2xl font-bold text-content">{{ resultReward?.label }}</div>
             <button
               type="button"
-              class="rounded-full bg-slate-900 px-6 py-2 text-sm font-semibold text-white transition-colors hover:bg-slate-700"
+              class="rounded-full bg-content px-6 py-2 text-sm font-semibold text-white transition-colors hover:bg-content"
               @click="closeResult"
             >
               {{ tr('DailyAttendance.nhan_thuong') }}

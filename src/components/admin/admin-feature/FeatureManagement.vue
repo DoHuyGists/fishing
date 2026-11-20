@@ -90,16 +90,16 @@ const fields: CrudField[] = [
         class="inline-flex items-center gap-1.5 whitespace-nowrap rounded-full border px-2.5 py-1 text-xs font-bold"
         :class="
           item.enabled === true
-            ? 'border-emerald-300 bg-emerald-100 text-emerald-900'
+            ? 'border-accent bg-surface text-content'
             : item.enabled === false
-              ? 'border-red-300 bg-red-100 text-red-900'
-              : 'border-amber-300 bg-amber-100 text-amber-900'
+              ? 'border-danger bg-surface text-danger'
+              : 'border-gold bg-surface text-gold'
         "
       >
         <span
           aria-hidden="true"
           class="size-2 rounded-full"
-          :class="item.enabled === true ? 'bg-emerald-600' : item.enabled === false ? 'bg-red-600' : 'bg-amber-600'"
+          :class="item.enabled === true ? 'bg-accent' : item.enabled === false ? 'bg-danger' : 'bg-gold'"
         ></span>
         {{ value }}
       </span>

@@ -104,7 +104,7 @@ function closeCountryModal() {
       <div
         v-if="!canChangeCountry"
         role="status"
-        class="rounded-lg border border-amber-200 bg-amber-50 p-3 text-xs text-amber-800"
+        class="rounded-lg border border-gold bg-surface p-3 text-xs text-gold"
       >
         {{ tr("UserProfile.ban_con") }} {{ countryCooldownDaysRemaining }}
         {{ tr("UserProfile.ngay_nua_moi_co_the_doi_quoc_gia") }}
@@ -120,10 +120,10 @@ function closeCountryModal() {
           autocomplete="off"
           :placeholder="tr('UserProfile.tim_quoc_gia')"
           :aria-label="tr('UserProfile.tim_quoc_gia_2')"
-          class="w-full rounded-lg border border-border-default bg-white px-3 py-2 outline-none focus:ring-2 focus:ring-emerald-600"
+          class="w-full rounded-lg border border-border-default bg-white px-3 py-2 outline-none focus:ring-2 focus:ring-accent"
         />
         <div class="max-h-40 overflow-y-auto rounded-lg border border-border-default bg-surface">
-          <div v-if="countryStore.isLoading" role="status" class="px-3 py-2 text-xs text-gray-500">
+          <div v-if="countryStore.isLoading" role="status" class="px-3 py-2 text-xs text-content">
             {{ tr("UserProfile.dang_tai_quoc_gia") }}
           </div>
           <template v-else>
@@ -143,13 +143,13 @@ function closeCountryModal() {
               />
               <span>{{ country.name }}</span>
             </label>
-            <div v-if="filteredCountries.length === 0" class="px-3 py-2 text-xs text-gray-500">
+            <div v-if="filteredCountries.length === 0" class="px-3 py-2 text-xs text-content">
               {{ tr("UserProfile.khong_tim_thay_quoc_gia") }}
             </div>
           </template>
         </div>
       </fieldset>
-      <div v-if="countryError" role="alert" class="rounded-lg border border-red-200 bg-red-50 p-3 text-xs text-red-700">
+      <div v-if="countryError" role="alert" class="rounded-lg border border-danger bg-surface p-3 text-xs text-danger">
         {{ countryError }}
       </div>
     </div>

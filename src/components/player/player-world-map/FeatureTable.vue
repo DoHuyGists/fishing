@@ -52,7 +52,7 @@ const actionGroups: { key: string; label: string; iconClass: string; actions: Lo
     get label() {
       return tr("FeatureTable.hanh_trang");
     },
-    iconClass: "bg-palette-e7f0df",
+    iconClass: "bg-surface",
     actions: [
       {
         modal: "inventory",
@@ -107,7 +107,7 @@ const actionGroups: { key: string; label: string; iconClass: string; actions: Lo
     get label() {
       return tr("FeatureTable.hoat_dong");
     },
-    iconClass: "bg-palette-fcf0d9",
+    iconClass: "bg-surface",
     actions: [
       {
         modal: "story",
@@ -176,7 +176,7 @@ const actionGroups: { key: string; label: string; iconClass: string; actions: Lo
     get label() {
       return tr("FeatureTable.cong_dong_thanh_tich");
     },
-    iconClass: "bg-palette-e7eff7",
+    iconClass: "bg-surface",
     actions: [
       {
         modal: "friend",
@@ -265,9 +265,9 @@ const supportActions: LobbyAction[] = [
 <template>
   <nav
     :aria-label="tr('FeatureTable.chuc_nang_sanh_cau_ca')"
-    class="lobby-menu flex max-h-[calc(100dvh-6rem)] w-full min-w-0 max-w-sm flex-col self-start overflow-hidden rounded-xl border border-border-default bg-surface text-content shadow-[0_4px_20px_-12px_rgba(36,53,42,0.3)]"
+    class="lobby-menu flex max-h-[calc(100dvh-6rem)] w-full min-w-0 max-w-sm flex-col self-start overflow-hidden rounded-xl border border-border-default bg-surface text-content shadow-[0_4px_20px_-12px_color-mix(in_srgb,_var(--color-content)_30%,_transparent)]"
   >
-    <div class="lobby-menu__header shrink-0 border-b border-border-default bg-linear-to-br from-palette-edf5e5 to-surface px-2.5 py-2">
+    <div class="lobby-menu__header shrink-0 border-b border-border-default bg-linear-to-br from-surface to-surface px-2.5 py-2">
       <div class="mb-2 flex items-center gap-2">
         <span
           aria-hidden="true"
@@ -285,7 +285,7 @@ const supportActions: LobbyAction[] = [
           :key="action.modal"
           type="button"
           :data-locked="!features.canOpen(action.modal)"
-          class="slide-fade-in lobby-menu__button [--slide-distance:24px]! [transition:background-color_150ms_ease,border-color_150ms_ease,box-shadow_150ms_ease] [&[data-locked=true]]:cursor-pointer [&[data-locked=true]]:border-dashed [&[data-locked=true]]:bg-palette-f1f3ed [&[data-locked=true]]:shadow-none [&[data-locked=true]>[aria-hidden=true]]:grayscale [&[data-locked=true]>[aria-hidden=true]]:opacity-60 enabled:hover:border-palette-8bab7a enabled:hover:bg-palette-edf5e5 enabled:hover:shadow-[0_2px_0_var(--color-border-default)] enabled:active:bg-palette-e2edd8 enabled:active:shadow-[inset_0_1px_3px_var(--color-border-default)] focus-visible:outline-2 focus-visible:outline-palette-527547 focus-visible:outline-offset-2 disabled:cursor-not-allowed! disabled:border-dashed disabled:bg-palette-f1f3ed disabled:shadow-none [&:disabled>[aria-hidden=true]]:grayscale [&:disabled>[aria-hidden=true]]:opacity-60 motion-reduce:transition-none relative flex min-h-9 min-w-0 flex-wrap items-center justify-center gap-x-1 gap-y-0.5 rounded-lg border border-border-default bg-white/85 px-1 py-1.5 text-[11px] leading-4"
+          class="slide-fade-in lobby-menu__button [--slide-distance:24px]! [transition:background-color_150ms_ease,border-color_150ms_ease,box-shadow_150ms_ease] [&[data-locked=true]]:cursor-pointer [&[data-locked=true]]:border-dashed [&[data-locked=true]]:bg-surface [&[data-locked=true]]:shadow-none [&[data-locked=true]>[aria-hidden=true]]:grayscale [&[data-locked=true]>[aria-hidden=true]]:opacity-60 enabled:hover:border-accent enabled:hover:bg-surface enabled:hover:shadow-[0_2px_0_var(--color-border-default)] enabled:active:bg-surface enabled:active:shadow-[inset_0_1px_3px_var(--color-border-default)] focus-visible:outline-2 focus-visible:outline-accent focus-visible:outline-offset-2 disabled:cursor-not-allowed! disabled:border-dashed disabled:bg-surface disabled:shadow-none [&:disabled>[aria-hidden=true]]:grayscale [&:disabled>[aria-hidden=true]]:opacity-60 motion-reduce:transition-none relative flex min-h-9 min-w-0 flex-wrap items-center justify-center gap-x-1 gap-y-0.5 rounded-lg border border-border-default bg-white/85 px-1 py-1.5 text-[11px] leading-4"
           :class="buttonDirections[actionIndex % buttonDirections.length]"
           aria-haspopup="dialog"
           @click="features.canOpen(action.modal) ? modalStore.open(action.modal) : features.showDetails(action.modal)"
@@ -297,7 +297,7 @@ const supportActions: LobbyAction[] = [
           }}</span>
           <span
             v-if="action.modal === 'notifications' && notificationStore.unreadCount"
-            class="absolute -right-1 -top-1 flex min-h-4 min-w-4 items-center justify-center rounded-full bg-palette-b84436 px-1 text-[9px] font-bold leading-4 text-white ring-2 ring-surface"
+            class="absolute -right-1 -top-1 flex min-h-4 min-w-4 items-center justify-center rounded-full bg-danger px-1 text-[9px] font-bold leading-4 text-white ring-2 ring-surface"
             :aria-label="tr('FeatureTable.value0_thong_bao_chua_doc', { value0: notificationStore.unreadCount })"
             >{{ notificationStore.unreadCount > 99 ? "99+" : notificationStore.unreadCount }}</span
           >
@@ -309,7 +309,7 @@ const supportActions: LobbyAction[] = [
       role="region"
       :aria-label="tr('FeatureTable.danh_sach_chuc_nang')"
       tabindex="0"
-      class="lobby-menu__body [scrollbar-width:thin] [scrollbar-color:var(--color-ocean-cyan)_transparent] scroll-py-2 min-h-0 flex-1 space-y-3 overflow-x-hidden overflow-y-auto overscroll-contain px-2.5 py-2 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-palette-527547"
+      class="lobby-menu__body [scrollbar-width:thin] [scrollbar-color:var(--color-ocean-cyan)_transparent] scroll-py-2 min-h-0 flex-1 space-y-3 overflow-x-hidden overflow-y-auto overscroll-contain px-2.5 py-2 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-accent"
     >
       <section
         v-for="(group, groupIndex) in actionGroups"
@@ -319,10 +319,10 @@ const supportActions: LobbyAction[] = [
         <div class="mb-1.5 flex items-center gap-2">
           <span
             :id="`lobby-group-${group.key}`"
-            class="shrink-0 text-[11px] font-bold uppercase tracking-wider text-palette-61745d"
+            class="shrink-0 text-[11px] font-bold uppercase tracking-wider text-content"
             >{{ group.label }}</span
           >
-          <span aria-hidden="true" class="h-px flex-1 bg-palette-dce5d6"></span>
+          <span aria-hidden="true" class="h-px flex-1 bg-surface"></span>
         </div>
         <div class="grid grid-cols-3 gap-1.5">
           <button
@@ -332,7 +332,7 @@ const supportActions: LobbyAction[] = [
             type="button"
             :disabled="features.canOpen(action.modal) && action.requiresUnlock && !configStore.isUnlocked(action.modal)"
             :data-locked="!features.canOpen(action.modal)"
-            class="slide-fade-in lobby-menu__button [--slide-distance:24px]! [transition:background-color_150ms_ease,border-color_150ms_ease,box-shadow_150ms_ease] [&[data-locked=true]]:cursor-pointer [&[data-locked=true]]:border-dashed [&[data-locked=true]]:bg-palette-f1f3ed [&[data-locked=true]]:shadow-none [&[data-locked=true]>[aria-hidden=true]]:grayscale [&[data-locked=true]>[aria-hidden=true]]:opacity-60 enabled:hover:border-palette-8bab7a enabled:hover:bg-palette-edf5e5 enabled:hover:shadow-[0_2px_0_var(--color-border-default)] enabled:active:bg-palette-e2edd8 enabled:active:shadow-[inset_0_1px_3px_var(--color-border-default)] focus-visible:outline-2 focus-visible:outline-palette-527547 focus-visible:outline-offset-2 disabled:cursor-not-allowed! disabled:border-dashed disabled:bg-palette-f1f3ed disabled:shadow-none [&:disabled>[aria-hidden=true]]:grayscale [&:disabled>[aria-hidden=true]]:opacity-60 motion-reduce:transition-none flex min-h-14 min-w-0 flex-col items-center justify-center gap-1 rounded-lg border border-palette-d9e3d3 bg-white px-1 py-1.5 text-center shadow-[0_2px_0_var(--color-palette-e2e9dc)]"
+            class="slide-fade-in lobby-menu__button [--slide-distance:24px]! [transition:background-color_150ms_ease,border-color_150ms_ease,box-shadow_150ms_ease] [&[data-locked=true]]:cursor-pointer [&[data-locked=true]]:border-dashed [&[data-locked=true]]:bg-surface [&[data-locked=true]]:shadow-none [&[data-locked=true]>[aria-hidden=true]]:grayscale [&[data-locked=true]>[aria-hidden=true]]:opacity-60 enabled:hover:border-accent enabled:hover:bg-surface enabled:hover:shadow-[0_2px_0_var(--color-border-default)] enabled:active:bg-surface enabled:active:shadow-[inset_0_1px_3px_var(--color-border-default)] focus-visible:outline-2 focus-visible:outline-accent focus-visible:outline-offset-2 disabled:cursor-not-allowed! disabled:border-dashed disabled:bg-surface disabled:shadow-none [&:disabled>[aria-hidden=true]]:grayscale [&:disabled>[aria-hidden=true]]:opacity-60 motion-reduce:transition-none flex min-h-14 min-w-0 flex-col items-center justify-center gap-1 rounded-lg border border-border bg-white px-1 py-1.5 text-center shadow-[0_2px_0_var(--color-surface)]"
             :class="buttonDirections[(actionIndex + groupIndex) % buttonDirections.length]"
             aria-haspopup="dialog"
             @click="features.canOpen(action.modal) ? modalStore.open(action.modal) : features.showDetails(action.modal)"
@@ -346,12 +346,12 @@ const supportActions: LobbyAction[] = [
             <span class="text-[11px] font-semibold leading-4">{{ action.label }}</span>
             <span
               v-if="!features.canOpen(action.modal)"
-              class="rounded bg-amber-100 px-1 py-0.5 text-[9px] leading-3 text-amber-900 underline underline-offset-2"
+              class="rounded bg-surface px-1 py-0.5 text-[9px] leading-3 text-gold underline underline-offset-2"
               >{{ tr("FeatureAvailability.maintenanceBadge") }}</span
             >
             <span
               v-else-if="action.requiresUnlock && !configStore.isUnlocked(action.modal)"
-              class="inline-flex items-center gap-0.5 rounded bg-palette-eef1e9 px-1 py-0.5 text-[9px] leading-3 text-palette-64715e"
+              class="inline-flex items-center gap-0.5 rounded bg-surface px-1 py-0.5 text-[9px] leading-3 text-content"
               ><span aria-hidden="true">🔒</span> {{ tr("FishPond.cap") }}
               {{ configStore.requiredLevel(action.modal) }}</span
             >
@@ -360,14 +360,14 @@ const supportActions: LobbyAction[] = [
       </section>
     </div>
 
-    <div class="lobby-menu__footer grid shrink-0 grid-cols-2 gap-1 border-t border-border-default bg-palette-edf3e7 px-2 py-1">
+    <div class="lobby-menu__footer grid shrink-0 grid-cols-2 gap-1 border-t border-border-default bg-surface px-2 py-1">
       <button
         v-for="(action, actionIndex) in supportActions"
         :key="action.modal"
         type="button"
         :disabled="features.canOpen(action.modal) && action.requiresUnlock && !configStore.isUnlocked(action.modal)"
         :data-locked="!features.canOpen(action.modal)"
-        class="slide-fade-in lobby-menu__button [--slide-distance:24px]! [transition:background-color_150ms_ease,border-color_150ms_ease,box-shadow_150ms_ease] [&[data-locked=true]]:cursor-pointer [&[data-locked=true]]:border-dashed [&[data-locked=true]]:bg-palette-f1f3ed [&[data-locked=true]]:shadow-none [&[data-locked=true]>[aria-hidden=true]]:grayscale [&[data-locked=true]>[aria-hidden=true]]:opacity-60 enabled:hover:border-palette-8bab7a enabled:hover:bg-palette-edf5e5 enabled:hover:shadow-[0_2px_0_var(--color-border-default)] enabled:active:bg-palette-e2edd8 enabled:active:shadow-[inset_0_1px_3px_var(--color-border-default)] focus-visible:outline-2 focus-visible:outline-palette-527547 focus-visible:outline-offset-2 disabled:cursor-not-allowed! disabled:border-dashed disabled:bg-palette-f1f3ed disabled:shadow-none [&:disabled>[aria-hidden=true]]:grayscale [&:disabled>[aria-hidden=true]]:opacity-60 motion-reduce:transition-none flex min-h-9 min-w-0 flex-wrap items-center justify-center gap-1 rounded-lg border border-transparent px-1 py-1 text-[11px] leading-4"
+        class="slide-fade-in lobby-menu__button [--slide-distance:24px]! [transition:background-color_150ms_ease,border-color_150ms_ease,box-shadow_150ms_ease] [&[data-locked=true]]:cursor-pointer [&[data-locked=true]]:border-dashed [&[data-locked=true]]:bg-surface [&[data-locked=true]]:shadow-none [&[data-locked=true]>[aria-hidden=true]]:grayscale [&[data-locked=true]>[aria-hidden=true]]:opacity-60 enabled:hover:border-accent enabled:hover:bg-surface enabled:hover:shadow-[0_2px_0_var(--color-border-default)] enabled:active:bg-surface enabled:active:shadow-[inset_0_1px_3px_var(--color-border-default)] focus-visible:outline-2 focus-visible:outline-accent focus-visible:outline-offset-2 disabled:cursor-not-allowed! disabled:border-dashed disabled:bg-surface disabled:shadow-none [&:disabled>[aria-hidden=true]]:grayscale [&:disabled>[aria-hidden=true]]:opacity-60 motion-reduce:transition-none flex min-h-9 min-w-0 flex-wrap items-center justify-center gap-1 rounded-lg border border-transparent px-1 py-1 text-[11px] leading-4"
         :class="buttonDirections[(actionIndex + 2) % buttonDirections.length]"
         aria-haspopup="dialog"
         @click="features.canOpen(action.modal) ? modalStore.open(action.modal) : features.showDetails(action.modal)"
@@ -376,12 +376,12 @@ const supportActions: LobbyAction[] = [
         <span>{{ action.label }}</span>
         <span
           v-if="!features.canOpen(action.modal)"
-          class="w-full text-[9px] text-amber-900 underline underline-offset-2"
+          class="w-full text-[9px] text-gold underline underline-offset-2"
           >{{ tr("FeatureAvailability.maintenanceBadge") }}</span
         >
         <span
           v-else-if="action.requiresUnlock && !configStore.isUnlocked(action.modal)"
-          class="w-full text-[9px] leading-3 text-palette-64715e"
+          class="w-full text-[9px] leading-3 text-content"
           ><span aria-hidden="true">🔒</span> {{ tr("FishPond.cap") }}
           {{ configStore.requiredLevel(action.modal) }}</span
         >
@@ -394,7 +394,7 @@ const supportActions: LobbyAction[] = [
 html.ocean-theme .lobby-menu {
   border-color: color-mix(in srgb, var(--color-ocean-gold) 70%, transparent);
   background: var(--color-ocean-deep);
-  box-shadow: inset 0 0 0 2px color-mix(in srgb, var(--color-ocean-panel) 80%, transparent), 0 12px 28px rgb(0 0 0 / 25%);
+  box-shadow: inset 0 0 0 2px color-mix(in srgb, var(--color-ocean-panel) 80%, transparent), 0 12px 28px color-mix(in srgb, var(--color-content) 25%, transparent);
 }
 
 html.ocean-theme .lobby-menu__header,
@@ -407,13 +407,13 @@ html.ocean-theme .lobby-menu__button {
   border-color: color-mix(in srgb, var(--color-ocean-gold) 42%, var(--color-ocean-panel));
   background: linear-gradient(155deg, var(--color-ocean-panel), var(--color-ocean-deep));
   color: var(--color-ocean-pearl);
-  box-shadow: inset 0 1px 0 rgb(245 235 212 / 12%), 0 2px 0 rgb(0 0 0 / 20%);
+  box-shadow: inset 0 1px 0 color-mix(in srgb, var(--color-surface) 12%, transparent), 0 2px 0 color-mix(in srgb, var(--color-content) 20%, transparent);
 }
 
 html.ocean-theme .lobby-menu__button:enabled:hover {
   border-color: var(--color-ocean-cyan);
   background: linear-gradient(155deg, color-mix(in srgb, var(--color-ocean-cyan) 28%, var(--color-ocean-panel)), var(--color-ocean-panel));
-  box-shadow: inset 0 1px 0 rgb(245 235 212 / 18%), 0 0 12px rgb(53 185 213 / 18%);
+  box-shadow: inset 0 1px 0 color-mix(in srgb, var(--color-surface) 18%, transparent), 0 0 12px color-mix(in srgb, var(--color-sky) 18%, transparent);
 }
 
 html.ocean-theme .lobby-menu__button:disabled,

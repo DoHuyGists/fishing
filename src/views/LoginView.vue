@@ -18,8 +18,8 @@ async function submit() {
 </script>
 
 <template>
-  <main class="grid min-h-screen place-items-center bg-[var(--color-ocean-deep)] bg-[radial-gradient(ellipse_at_12%_0%,rgba(53,185,213,0.22),transparent_50%),radial-gradient(ellipse_at_100%_100%,rgba(29,84,117,0.8),transparent_55%)] px-6 py-8 text-[var(--color-ocean-pearl)]">
-    <section class="player-popup-in w-full max-w-[408px] rounded-3xl border border-[var(--color-ocean-gold)]/60 bg-[linear-gradient(145deg,var(--color-ocean-panel),var(--color-ocean-deep))] p-8 shadow-[0_24px_80px_rgba(0,0,0,0.35),inset_0_1px_0_rgba(245,235,212,0.12)] sm:p-[42px]" aria-labelledby="login-title">
+  <main class="grid min-h-screen place-items-center bg-[var(--color-ocean-deep)] bg-[radial-gradient(ellipse_at_12%_0%,color-mix(in_srgb,_var(--color-sky)_22%,_transparent),transparent_50%),radial-gradient(ellipse_at_100%_100%,color-mix(in_srgb,_var(--color-primary)_80%,_transparent),transparent_55%)] px-6 py-8 text-[var(--color-ocean-pearl)]">
+    <section class="player-popup-in w-full max-w-[408px] rounded-3xl border border-[var(--color-ocean-gold)]/60 bg-[linear-gradient(145deg,var(--color-ocean-panel),var(--color-ocean-deep))] p-8 shadow-[0_24px_80px_color-mix(in_srgb,_var(--color-content)_35%,_transparent),inset_0_1px_0_color-mix(in_srgb,_var(--color-surface)_12%,_transparent)] sm:p-[42px]" aria-labelledby="login-title">
       <LanguageSelector />
       <div class="mb-[5px] mt-7 text-xs font-bold uppercase tracking-[0.08em] text-[var(--color-ocean-cyan)]">{{ tr('LoginView.chao_mung_tro_lai') }}</div>
       <div id="login-title" class="mb-7 font-serif text-[34px] leading-tight text-[var(--color-ocean-gold)]">{{ tr('LoginView.dang_nhap') }}</div>
@@ -36,8 +36,8 @@ async function submit() {
             <button class="absolute inset-y-0 right-0 rounded-r-xl px-3 text-xs font-bold text-[var(--color-ocean-cyan)] hover:text-[var(--color-ocean-gold)]" type="button" :aria-label="showPassword ? tr('LoginView.an_mat_khau') : tr('LoginView.hien_mat_khau')" @click="showPassword = !showPassword">{{ showPassword ? tr('FishingBag.an') : tr('LoginView.hien') }}</button>
           </div>
         </label>
-        <div v-if="auth.error" class="-mt-1 text-[13px] leading-relaxed text-red-300" role="alert">{{ auth.error }}</div>
-        <button class="min-h-12 rounded-xl border border-[var(--color-ocean-gold)] bg-[var(--color-ocean-gold)] font-bold text-[var(--color-ocean-deep)] shadow-[0_4px_0_rgba(147,100,63,0.75)] transition hover:brightness-110 active:translate-y-0.5 focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-[var(--color-ocean-cyan)] disabled:cursor-wait disabled:opacity-70" type="submit" :disabled="auth.loading">
+        <div v-if="auth.error" class="-mt-1 text-[13px] leading-relaxed text-danger" role="alert">{{ auth.error }}</div>
+        <button class="min-h-12 rounded-xl border border-[var(--color-ocean-gold)] bg-[var(--color-ocean-gold)] font-bold text-content shadow-[0_4px_0_color-mix(in_srgb,_var(--color-gold)_75%,_transparent)] transition hover:brightness-110 active:translate-y-0.5 focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-[var(--color-ocean-cyan)] disabled:cursor-wait disabled:opacity-70" type="submit" :disabled="auth.loading">
           {{ auth.loading ? tr('LoginView.dang_dang_nhap') : tr('LoginView.dang_nhap') }}
         </button>
       </form>

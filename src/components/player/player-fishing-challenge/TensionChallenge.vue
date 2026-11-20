@@ -109,7 +109,7 @@ onBeforeUnmount(() => {
   >
     <header class="flex items-center justify-between gap-3">
       <div class="flex min-w-0 items-center gap-2">
-        <span aria-hidden="true" class="grid size-6 shrink-0 place-items-center rounded-lg bg-palette-e2ecdc text-sm"
+        <span aria-hidden="true" class="grid size-6 shrink-0 place-items-center rounded-lg bg-surface text-sm"
           >🎣</span
         >
         <span class="text-sm font-bold">{{
@@ -117,7 +117,7 @@ onBeforeUnmount(() => {
         }}</span>
       </div>
       <span
-        class="inline-flex shrink-0 items-center gap-1.5 rounded-full border border-palette-dce6d7 bg-white/70 px-2 py-0.5 text-xs font-semibold tabular-nums"
+        class="inline-flex shrink-0 items-center gap-1.5 rounded-full border border-border bg-white/70 px-2 py-0.5 text-xs font-semibold tabular-nums"
         :aria-label="
           ready
             ? untimedStart
@@ -139,7 +139,7 @@ onBeforeUnmount(() => {
           <circle cx="10" cy="11" r="6.5" />
           <path d="M8 1.5h4M10 4.5v-3M10 7v4l2 1.5" />
         </svg>
-        <span v-else aria-hidden="true" class="size-1.5 rounded-full bg-emerald-600" />
+        <span v-else aria-hidden="true" class="size-1.5 rounded-full bg-accent" />
         {{
           ready
             ? untimedStart
@@ -163,7 +163,7 @@ onBeforeUnmount(() => {
         <svg
           aria-hidden="true"
           viewBox="0 0 24 24"
-          class="size-5 shrink-0 text-sky-700"
+          class="size-5 shrink-0 text-primary"
           fill="none"
           stroke="currentColor"
           stroke-width="1.6"
@@ -174,7 +174,7 @@ onBeforeUnmount(() => {
           <circle cx="7" cy="11" r=".7" fill="currentColor" stroke="none" />
         </svg>
         <div
-          class="h-1.5 min-w-0 flex-1 overflow-hidden rounded-full bg-palette-dce6d7"
+          class="h-1.5 min-w-0 flex-1 overflow-hidden rounded-full bg-surface"
           role="progressbar"
           :aria-label="tr('TensionChallenge.khoang_cach_ca')"
           :aria-valuenow="distance"
@@ -183,7 +183,7 @@ onBeforeUnmount(() => {
           :aria-valuetext="tr('TensionChallenge.value0_met_keo_ve_0_met_de_thang', { value0: distance.toFixed(1) })"
         >
           <div
-            class="h-full rounded-full bg-sky-600"
+            class="h-full rounded-full bg-primary"
             :style="{ width: Math.min(100, (distance / challenge.config.startDistance) * 100) + '%' }"
           />
         </div>
@@ -204,8 +204,8 @@ onBeforeUnmount(() => {
       <button
         ref="reelControl"
         type="button"
-        class="flex min-h-7 touch-none select-none items-center justify-center gap-1.5 rounded-lg bg-emerald-700 px-2 py-1 text-xs font-bold leading-4 text-white shadow-[0_2px_0_var(--color-palette-065f46)] transition-colors hover:bg-emerald-800 focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-emerald-700 disabled:opacity-50"
-        :class="{ 'bg-emerald-900': store.tensionReeling }"
+        class="flex min-h-7 touch-none select-none items-center justify-center gap-1.5 rounded-lg bg-accent px-2 py-1 text-xs font-bold leading-4 text-white shadow-[0_2px_0_var(--color-accent)] transition-colors hover:bg-accent focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-accent disabled:opacity-50"
+        :class="{ 'bg-accent': store.tensionReeling }"
         :disabled="store.castPhase !== 'bite'"
         :aria-pressed="store.tensionReeling"
         aria-describedby="tension-control-hint"

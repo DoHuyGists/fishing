@@ -59,7 +59,7 @@ onUnmounted(() => {
       <div
         v-if="store.error && !store.deleteTarget"
         role="alert"
-        class="shrink-0 rounded-lg border border-red-200 bg-red-50 p-3 text-sm text-red-700"
+        class="shrink-0 rounded-lg border border-danger bg-surface p-3 text-sm text-danger"
       >
         {{ store.error }}
       </div>
@@ -90,7 +90,7 @@ onUnmounted(() => {
               <td class="p-3 font-mono">{{ item.code }}</td>
               <td class="max-w-sm p-3">
                 <div class="m-0 font-bold">{{ item.name }}</div>
-                <div v-if="item.description" class="mb-0 mt-1 whitespace-pre-line text-xs text-gray-500">
+                <div v-if="item.description" class="mb-0 mt-1 whitespace-pre-line text-xs text-content">
                   {{ item.description }}
                 </div>
               </td>
@@ -109,7 +109,7 @@ onUnmounted(() => {
                   <button
                     type="button"
                     :disabled="store.busy"
-                    class="rounded-lg border border-red-200 px-3 py-1.5 text-red-700 disabled:opacity-50"
+                    class="rounded-lg border border-danger px-3 py-1.5 text-danger disabled:opacity-50"
                     @click="store.requestDelete(item)"
                   >
                     Xóa
@@ -136,7 +136,7 @@ onUnmounted(() => {
       :on-dismiss="store.cancelDelete"
     >
       <div class="text-sm">Xóa kỹ năng “{{ store.deleteTarget.name }}”?</div>
-      <div v-if="store.error" role="alert" class="text-sm text-red-700">{{ store.error }}</div>
+      <div v-if="store.error" role="alert" class="text-sm text-danger">{{ store.error }}</div>
     </TwoOptionsModal>
     <Pagination
       :page="store.page"

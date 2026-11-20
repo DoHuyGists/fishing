@@ -62,7 +62,7 @@ onUnmounted(() => store.resetView());
       <div
         v-if="store.formError"
         role="alert"
-        class="rounded-lg border border-red-200 bg-red-50 p-3 text-sm text-red-700"
+        class="rounded-lg border border-danger bg-surface p-3 text-sm text-danger"
       >
         {{ store.formError }}
       </div>
@@ -74,7 +74,7 @@ onUnmounted(() => store.resetView());
             v-model="store.form.title"
             type="text"
             required
-            class="mt-1 w-full rounded-lg border border-border-default bg-white px-3 py-2 font-normal focus:outline-emerald-700"
+            class="mt-1 w-full rounded-lg border border-border-default bg-white px-3 py-2 font-normal focus:outline-accent"
             placeholder="Nhập tiêu đề hướng dẫn"
           />
         </label>
@@ -88,11 +88,11 @@ onUnmounted(() => store.resetView());
               min="-2147483648"
               max="2147483647"
               required
-              class="mt-1 block w-48 rounded-lg border border-border-default bg-white px-3 py-2 font-normal focus:outline-emerald-700"
+              class="mt-1 block w-48 rounded-lg border border-border-default bg-white px-3 py-2 font-normal focus:outline-accent"
             />
           </label>
           <label class="flex min-h-10 items-center gap-2 text-sm font-semibold"
-            ><input v-model="store.form.is_published" type="checkbox" class="size-4 accent-emerald-800" />Xuất bản cho
+            ><input v-model="store.form.is_published" type="checkbox" class="size-4 accent-accent" />Xuất bản cho
             người chơi</label
           >
         </div>
@@ -133,7 +133,7 @@ onUnmounted(() => store.resetView());
         <button
           type="submit"
           :disabled="store.saving || store.loading"
-          class="rounded-lg bg-emerald-800 px-4 py-2 text-sm font-bold text-white hover:bg-emerald-900 disabled:cursor-not-allowed disabled:opacity-50"
+          class="rounded-lg bg-accent px-4 py-2 text-sm font-bold text-white hover:bg-accent disabled:cursor-not-allowed disabled:opacity-50"
         >
           {{ store.saving ? "Đang lưu…" : "Lưu hướng dẫn" }}
         </button>
@@ -146,7 +146,7 @@ onUnmounted(() => store.resetView());
           type="search"
           aria-label="Tìm hướng dẫn"
           placeholder="Tìm tiêu đề hoặc nội dung…"
-          class="min-w-48 flex-1 rounded-lg border border-border-default bg-white px-3 py-2 text-sm focus:outline-emerald-700"
+          class="min-w-48 flex-1 rounded-lg border border-border-default bg-white px-3 py-2 text-sm focus:outline-accent"
         />
         <select
           v-model="store.status"
@@ -168,7 +168,7 @@ onUnmounted(() => store.resetView());
         <button
           type="button"
           :disabled="store.loading || store.busy"
-          class="rounded-lg bg-emerald-800 px-4 py-2 text-sm font-bold text-white hover:bg-emerald-900 disabled:opacity-50"
+          class="rounded-lg bg-accent px-4 py-2 text-sm font-bold text-white hover:bg-accent disabled:opacity-50"
           @click="openCreate"
         >
           + Tạo hướng dẫn
@@ -177,7 +177,7 @@ onUnmounted(() => store.resetView());
       <div
         v-if="store.error"
         role="alert"
-        class="mx-4 mt-4 rounded-lg border border-red-200 bg-red-50 p-3 text-sm text-red-700 sm:mx-6"
+        class="mx-4 mt-4 rounded-lg border border-danger bg-surface p-3 text-sm text-danger sm:mx-6"
       >
         {{ store.error }}
       </div>
@@ -193,7 +193,7 @@ onUnmounted(() => store.resetView());
         </div>
         <div v-else class="overflow-x-auto rounded-xl border border-border-default bg-white">
           <table class="w-full min-w-[760px] text-left text-sm">
-            <thead class="bg-palette-eaf1e5 text-xs uppercase">
+            <thead class="bg-surface text-xs uppercase">
               <tr>
                 <th scope="col" class="px-4 py-3">Thứ tự</th>
                 <th scope="col" class="px-4 py-3">Hướng dẫn</th>
@@ -216,7 +216,7 @@ onUnmounted(() => store.resetView());
                 <td class="whitespace-nowrap px-4 py-3">
                   <span
                     class="rounded-full px-2.5 py-1 text-xs font-semibold"
-                    :class="row.is_published ? 'bg-emerald-100 text-emerald-800' : 'bg-slate-100 text-slate-600'"
+                    :class="row.is_published ? 'bg-surface text-content' : 'bg-surface text-content'"
                     >{{ row.is_published ? "Đã xuất bản" : "Đang ẩn" }}</span
                   >
                 </td>
@@ -226,7 +226,7 @@ onUnmounted(() => store.resetView());
                     <button
                       type="button"
                       :disabled="store.loading || store.busy"
-                      class="rounded-lg border border-border-default px-3 py-1.5 text-xs font-semibold hover:bg-emerald-100 disabled:opacity-50"
+                      class="rounded-lg border border-border-default px-3 py-1.5 text-xs font-semibold hover:bg-surface disabled:opacity-50"
                       :aria-label="`Sửa hướng dẫn ${row.title}`"
                       @click="openEdit(row)"
                     >
@@ -235,7 +235,7 @@ onUnmounted(() => store.resetView());
                     <button
                       type="button"
                       :disabled="store.loading || store.busy"
-                      class="rounded-lg border border-red-200 px-3 py-1.5 text-xs font-semibold text-red-700 hover:bg-red-50 disabled:opacity-50"
+                      class="rounded-lg border border-danger px-3 py-1.5 text-xs font-semibold text-danger hover:bg-surface disabled:opacity-50"
                       :aria-label="`Xóa hướng dẫn ${row.title}`"
                       @click="store.requestDelete(row)"
                     >
@@ -263,7 +263,7 @@ onUnmounted(() => store.resetView());
       <div class="break-words text-sm">
         Bạn có chắc muốn xóa “{{ store.deleting.title }}”? Thao tác này không thể hoàn tác.
       </div>
-      <div v-if="store.deleteError" role="alert" class="mt-3 text-sm text-red-700">{{ store.deleteError }}</div>
+      <div v-if="store.deleteError" role="alert" class="mt-3 text-sm text-danger">{{ store.deleteError }}</div>
     </TwoOptionsModal>
     <Pagination
       :page="store.page"

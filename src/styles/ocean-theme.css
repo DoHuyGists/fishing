@@ -1,508 +1,58 @@
-/* Keep the legacy palette on admin routes. Document scope also covers Teleport. */
+/* Document scope covers Teleport and uses the same palette as admin routes. */
 html.ocean-theme {
-  color-scheme: dark;
-  color: var(--color-ocean-pearl);
-  background: var(--color-ocean-deep);
-
-  --color-surface: var(--color-ocean-panel);
-  --color-surface-muted: var(--color-ocean-deep);
-  --color-surface-code: #102d4680;
-  --color-surface-hover: #246684;
-  --color-surface-selected: #235f7d;
-  --color-border-default: #35b9d54d;
-  --color-border-strong: #35b9d580;
-  --color-content: var(--color-ocean-pearl);
-  --color-content-strong: var(--color-ocean-pearl);
-  --color-content-secondary: #e0dfcf;
-  --color-content-muted: #c2d8db;
-  --color-content-caption: #b6d0d7;
-  --color-content-subtle: #adc9d2;
-  --color-content-disabled: #85a7b5;
-  --color-brand: var(--color-ocean-panel);
-  --color-brand-hover: var(--color-ocean-cyan);
-  --color-brand-secondary: var(--color-ocean-cyan);
-  --color-accent: var(--color-ocean-cyan);
-  --color-danger: #ffb8ad;
-  --color-story-accent: var(--color-ocean-cyan);
-
-  /* Compatibility for existing decorative tokens, grouped by their UI role.
-   * Keep reward rarity, weather, map terrain and danger colors independent. */
-  --color-palette-1a3a1a: var(--color-content);
-  --color-palette-18312d: var(--color-content);
-  --color-palette-20372a: var(--color-content);
-  --color-palette-254130: var(--color-content);
-  --color-palette-263238: var(--color-content);
-  --color-palette-2a4a2a: var(--color-content);
-  --color-palette-374151: var(--color-content);
-  --color-palette-385645: var(--color-content);
-  --color-palette-405346: var(--color-content-secondary);
-  --color-palette-405446: var(--color-content-secondary);
-  --color-palette-445544: var(--color-content-secondary);
-  --color-palette-4b5f50: var(--color-content-secondary);
-  --color-palette-52634c: var(--color-content-muted);
-  --color-palette-52634f: var(--color-content-muted);
-  --color-palette-526354: var(--color-content-muted);
-  --color-palette-52664e: var(--color-content-muted);
-  --color-palette-526650: var(--color-content-muted);
-  --color-palette-526a58: var(--color-content-muted);
-  --color-palette-526a5e: var(--color-content-muted);
-  --color-palette-5a7a5a: var(--color-content-muted);
-  --color-palette-607176: var(--color-content-muted);
-  --color-palette-60745d: var(--color-content-muted);
-  --color-palette-61716d: var(--color-content-muted);
-  --color-palette-617265: var(--color-content-muted);
-  --color-palette-617363: var(--color-content-muted);
-  --color-palette-61745d: var(--color-content-muted);
-  --color-palette-64715e: var(--color-content-subtle);
-  --color-palette-648064: var(--color-content-subtle);
-  --color-palette-6b7280: var(--color-content-muted);
-  --color-palette-718174: var(--color-content-subtle);
-  --color-palette-75826e: var(--color-content-subtle);
-  --color-palette-778877: var(--color-content-subtle);
-  --color-palette-78856b: var(--color-content-subtle);
-  --color-palette-78958a: var(--color-content-subtle);
-  --color-palette-83917c: var(--color-content-subtle);
-  --color-palette-879188: var(--color-content-subtle);
-  --color-palette-91aaa0: var(--color-content-subtle);
-  --color-palette-93aa9f: var(--color-content-subtle);
-
-  --color-palette-071f1a: var(--color-ocean-deep);
-  --color-palette-0e281b: var(--color-ocean-deep);
-  --color-palette-0f2e1f: var(--color-ocean-deep);
-  --color-palette-102d25: var(--color-ocean-deep);
-  --color-palette-11251a: var(--color-ocean-deep);
-  --color-palette-122b1e: var(--color-ocean-deep);
-  --color-palette-14221a: var(--color-ocean-deep);
-  --color-palette-173223: var(--color-ocean-deep);
-  --color-palette-173d2b: var(--color-ocean-panel);
-  --color-palette-193224: var(--color-ocean-deep);
-  --color-palette-1c3f2d: var(--color-ocean-panel);
-  --color-palette-1c432d: var(--color-ocean-panel);
-  --color-palette-1a3e29: var(--color-ocean-panel);
-  --color-palette-174a3d: var(--color-ocean-panel);
-  --color-palette-243f32: var(--color-ocean-panel);
-  --color-palette-245234: var(--color-ocean-panel);
-  --color-palette-245236: var(--color-ocean-panel);
-  --color-palette-254b40: var(--color-ocean-panel);
-  --color-palette-2e6644: var(--color-ocean-panel);
-  --color-palette-314a39: var(--color-ocean-panel);
-  --color-palette-315b4d: var(--color-border-strong);
-  --color-palette-364c3d: var(--color-ocean-panel);
-  --color-palette-36513f: var(--color-ocean-panel);
-  --color-palette-405e37: var(--color-ocean-panel);
-  --color-palette-426b3e: var(--color-ocean-panel);
-  --color-palette-527547: var(--color-ocean-cyan);
-
-  --color-palette-b7cbb4: var(--color-border-default);
-  --color-palette-b8cbc3: var(--color-border-default);
-  --color-palette-c0d8b8: var(--color-border-default);
-  --color-palette-c7d5b2: var(--color-border-default);
-  --color-palette-cde0c9: var(--color-border-default);
-  --color-palette-d1e7d1: var(--color-border-default);
-  --color-palette-d5e1d0: var(--color-border-default);
-  --color-palette-d9e3d3: var(--color-border-default);
-  --color-palette-dce4d3: var(--color-border-default);
-  --color-palette-dce4d8: var(--color-border-default);
-  --color-palette-dce6d7: var(--color-border-default);
-  --color-palette-e3eee0: var(--color-border-default);
-  --color-palette-698563: var(--color-border-strong);
-  --color-palette-70a77e: var(--color-border-strong);
-  --color-palette-8bab7a: var(--color-border-strong);
-  --color-palette-94ac83: var(--color-border-strong);
-  --color-palette-9eb3aa: var(--color-border-strong);
-
-  --color-palette-dce5d6: var(--color-ocean-deep);
-  --color-palette-dce8cd: var(--color-ocean-deep);
-  --color-palette-dce8d5: var(--color-ocean-deep);
-  --color-palette-dce9d4: var(--color-ocean-deep);
-  --color-palette-dcebd3: var(--color-ocean-deep);
-  --color-palette-dcebd6: var(--color-ocean-deep);
-  --color-palette-dcebe4: var(--color-ocean-deep);
-  --color-palette-dfe8d8: var(--color-ocean-deep);
-  --color-palette-e0eedb: var(--color-ocean-deep);
-  --color-palette-e1eadc: var(--color-ocean-deep);
-  --color-palette-e2ecdc: var(--color-ocean-deep);
-  --color-palette-e2edd8: var(--color-ocean-deep);
-  --color-palette-e2e9dc: var(--color-border-default);
-  --color-palette-e3e9dc: var(--color-ocean-deep);
-  --color-palette-e4eddd: var(--color-ocean-panel);
-  --color-palette-e5eddf: var(--color-ocean-panel);
-  --color-palette-e6e9df: var(--color-ocean-deep);
-  --color-palette-e6efdf: var(--color-ocean-deep);
-  --color-palette-e7efdf: var(--color-ocean-deep);
-  --color-palette-e7eff7: var(--color-ocean-panel);
-  --color-palette-e7f0df: var(--color-ocean-panel);
-  --color-palette-e8f0e0: var(--color-surface-hover);
-  --color-palette-e8f5e2: var(--color-ocean-panel);
-  --color-palette-e9f0df: var(--color-ocean-deep);
-  --color-palette-eaf5e8: var(--color-ocean-panel);
-  --color-palette-edf2e6: var(--color-ocean-deep);
-  --color-palette-edf3e7: var(--color-ocean-panel);
-  --color-palette-edf5e5: var(--color-ocean-panel);
-  --color-palette-eef1e9: var(--color-ocean-deep);
-  --color-palette-eef8e9: var(--color-ocean-panel);
-  --color-palette-f0f7ec: var(--color-ocean-panel);
-  --color-palette-f1f3ed: var(--color-ocean-deep);
-  --color-palette-f4f5e9: var(--color-ocean-panel);
-  --color-palette-f5faf2: var(--color-ocean-panel);
-  --color-palette-f8faf6: var(--color-ocean-panel);
-  --color-palette-fafefc: var(--color-ocean-panel);
-  --color-palette-fffdf8: var(--color-ocean-panel);
-  --color-palette-fffefa: var(--color-ocean-panel);
-
-  --color-palette-24733d: var(--color-ocean-cyan);
-  --color-palette-2f8f4e: var(--color-ocean-cyan);
-  --color-palette-398d80: var(--color-ocean-cyan);
-  --color-palette-3f9d70: var(--color-ocean-cyan);
-  --color-palette-59bb79: var(--color-ocean-cyan);
-  --color-palette-75b865: var(--color-ocean-cyan);
-  --color-palette-78906f: var(--color-ocean-cyan);
-  --color-palette-d4f4dd: #154459;
-  --color-palette-1a6e35: #8be0cf;
-  --color-palette-dceeff: #183e62;
-  --color-palette-1a4fa0: #a1d9f1;
-  --color-palette-d4edcc: var(--color-ocean-panel);
-  --color-palette-f4f0df: var(--color-ocean-pearl);
-  --color-palette-e8bd62: var(--color-ocean-gold);
-  --color-palette-fcf0d9: #3d4b4f;
+  color-scheme: light;
+  color: var(--color-content);
+  background: var(--color-surface);
 }
 
 @layer base {
   .ocean-theme body {
-    background: var(--color-ocean-deep);
+    background: var(--color-surface);
     color: var(--color-content);
   }
 
   .ocean-theme ::selection {
-    background: var(--color-ocean-cyan);
-    color: var(--color-ocean-deep);
+    background: var(--color-sky);
+    color: var(--color-content);
   }
 
   .ocean-theme :where(input, select, textarea) {
-    accent-color: var(--color-ocean-cyan);
+    accent-color: var(--color-primary);
   }
 
   .ocean-theme :where(input, textarea)::placeholder {
-    color: var(--color-content-subtle);
+    color: var(--color-content);
     opacity: 1;
   }
 
   .ocean-theme select option {
-    background: var(--color-ocean-deep);
-    color: var(--color-ocean-pearl);
+    background: var(--color-white);
+    color: var(--color-content);
   }
 
   .ocean-theme :where(button, a, input, select, textarea, [tabindex]):focus-visible {
-    outline: 2px solid var(--color-ocean-cyan);
+    outline: 2px solid var(--color-primary);
     outline-offset: 3px;
   }
 
   .ocean-theme :where(*) {
-    scrollbar-color: var(--color-ocean-cyan) var(--color-ocean-deep);
+    scrollbar-color: var(--color-primary) var(--color-surface);
     scrollbar-width: thin;
   }
 }
 
-/* Existing Tailwind utilities use colors for several roles. Adapt each role
- * separately: changing --color-white would also recolor white text and sprites.
- * Utilities stay layered so component styles and responsive variants can win. */
-@layer utilities {
-  .ocean-theme :is(.bg-white, .bg-gray-50, .bg-slate-50, .bg-emerald-50, .bg-teal-50) {
-    background-color: var(--color-ocean-panel);
-  }
-
-  .ocean-theme :is(.bg-gray-100, .bg-gray-200, .bg-gray-300, .bg-slate-100,
-    .bg-emerald-100, .bg-emerald-200, .bg-emerald-300, .bg-green-100,
-    .bg-gray-900, .bg-slate-800, .bg-slate-900, .bg-emerald-900, .bg-emerald-950) {
-    background-color: var(--color-ocean-deep);
-  }
-
-  .ocean-theme :is(.bg-content, .bg-content-strong, .bg-content-secondary,
-    .bg-emerald-700, .bg-emerald-800, .bg-green-700, .bg-teal-700, .bg-teal-800) {
-    background-color: var(--color-ocean-panel);
-  }
-
-  .ocean-theme :is(.bg-emerald-600, .bg-green-500, .bg-green-600) {
-    background-color: var(--color-ocean-cyan);
-    color: var(--color-ocean-deep);
-  }
-
-  .ocean-theme :is(.text-gray-400, .text-gray-500, .text-gray-600,
-    .text-slate-400, .text-slate-500, .text-slate-600,
-    .text-stone-400, .text-stone-500, .text-stone-600) {
-    color: var(--color-content-muted);
-  }
-
-  .ocean-theme :is(.text-gray-700, .text-gray-800, .text-gray-900,
-    .text-slate-700, .text-slate-800, .text-slate-900,
-    .text-emerald-50, .text-emerald-100, .text-emerald-900, .text-emerald-950,
-    .text-palette-173223) {
-    color: var(--color-ocean-pearl);
-  }
-
-  .ocean-theme :is(.text-emerald-200, .text-emerald-300, .text-emerald-400,
-    .text-emerald-700, .text-emerald-800, .text-green-700, .text-teal-700, .text-teal-900,
-    .text-brand, .text-palette-2e6644, .text-palette-36513f) {
-    color: color-mix(in srgb, var(--color-ocean-cyan) 55%, var(--color-ocean-pearl));
-  }
-
-  .ocean-theme :is(.text-border-default, .text-border-strong) {
-    color: var(--color-content-muted);
-  }
-
-  .ocean-theme :is(.border-gray-100, .border-gray-200, .border-gray-300,
-    .border-slate-200, .border-slate-300, .border-emerald-100, .border-emerald-200,
-    .border-emerald-300, .border-emerald-900, .border-green-200) {
-    border-color: var(--color-border-default);
-  }
-
-  .ocean-theme :is(.border-emerald-400, .border-emerald-500, .border-emerald-600,
-    .border-emerald-700, .border-emerald-800, .border-green-600, .border-green-700) {
-    border-color: var(--color-border-strong);
-  }
-
-  .ocean-theme :is(.ring-emerald-500, .ring-emerald-600, .ring-emerald-700, .ring-teal-400) {
-    --tw-ring-color: var(--color-ocean-cyan);
-  }
-
-  .ocean-theme :is(.from-white, .from-emerald-50) {
-    --tw-gradient-from: var(--color-ocean-panel);
-  }
-
-  .ocean-theme :is(.from-emerald-600, .from-emerald-700, .from-teal-600) {
-    --tw-gradient-from: var(--color-ocean-panel);
-  }
-
-  .ocean-theme :is(.to-white, .to-emerald-50, .to-teal-50) {
-    --tw-gradient-to: var(--color-ocean-panel);
-  }
-
-  .ocean-theme :is(.to-emerald-800, .to-emerald-950, .to-teal-700) {
-    --tw-gradient-to: var(--color-ocean-deep);
-  }
-
-  .ocean-theme :is(.via-white, .via-emerald-600, .via-teal-800) {
-    --tw-gradient-via: var(--color-ocean-panel);
-  }
-
-  .ocean-theme :is(.to-emerald-500, .to-teal-400) {
-    --tw-gradient-to: var(--color-ocean-cyan);
-  }
-
-  /* Reward panels retain a warm accent against the ocean surface. */
-  .ocean-theme :is(.bg-amber-50, .bg-amber-100, .bg-amber-200,
-    .bg-palette-fff1a8, .bg-palette-fff3cd, .bg-palette-fde8cc) {
-    background-color: color-mix(in srgb, var(--color-ocean-gold) 14%, var(--color-ocean-deep));
-  }
-
-  .ocean-theme :is(.text-amber-600, .text-amber-700, .text-amber-800,
-    .text-amber-900, .text-amber-950, .text-palette-8b651b,
-    .text-palette-8a4500, .text-palette-6b4b00, .text-palette-7d6000) {
-    color: var(--color-ocean-gold);
-  }
-
-  .ocean-theme :is(.from-amber-50, .from-amber-100) {
-    --tw-gradient-from: #3d4b4f;
-  }
-
-  .ocean-theme :is(.to-amber-100) {
-    --tw-gradient-to: #3d4b4f;
-  }
-
-  .ocean-theme :is(.bg-content, .bg-content-strong, .bg-content-secondary,
-    .bg-accent, .bg-brand-secondary) :is(.text-white, .text-surface) {
-    color: inherit;
-  }
-
-  .ocean-theme :is(.bg-content, .bg-content-strong, .bg-content-secondary).text-surface {
-    color: var(--color-ocean-pearl);
-  }
-
-  .ocean-theme :is(.bg-accent, .bg-brand-secondary) {
-    color: var(--color-ocean-deep);
-  }
-
-  .ocean-theme :is(.bg-palette-e8bd62, .bg-palette-dcae52, .bg-palette-e1aa49) {
-    color: var(--color-ocean-deep);
-  }
-
-  .ocean-theme :is(.bg-palette-e8bd62, .bg-palette-dcae52, .bg-palette-e1aa49)
-    :is(.text-palette-173d2b, .text-palette-254130, .text-palette-173223) {
-    color: var(--color-ocean-deep);
-  }
-
-  .ocean-theme :is(.bg-red-50, .bg-red-100, .bg-rose-50, .bg-rose-100,
-    .bg-palette-fef0ef, .bg-palette-fde8e8, .bg-palette-f0e0e0, .bg-palette-fbd4d4) {
-    background-color: #542d3d;
-  }
-
-  .ocean-theme :is(.text-red-600, .text-red-700, .text-red-800, .text-red-900,
-    .text-rose-600, .text-rose-700, .text-rose-800, .text-palette-8a2020,
-    .text-palette-b91c1c) {
-    color: #ffb8ad;
-  }
-
-  /* Disabled controls keep their existing semantics and opacity. */
-  .ocean-theme :is(.disabled\:bg-gray-100, .disabled\:bg-slate-200):disabled {
-    background-color: var(--color-ocean-deep);
-  }
-
-  .ocean-theme .disabled\:text-slate-400:disabled {
-    color: var(--color-content-disabled);
-  }
-
-  @media (hover: hover) {
-    .ocean-theme :is(.hover\:bg-white, .hover\:bg-gray-50, .hover\:bg-gray-100,
-      .hover\:bg-gray-200, .hover\:bg-gray-300, .hover\:bg-slate-100,
-      .hover\:bg-emerald-50, .hover\:bg-emerald-100):hover {
-      background-color: var(--color-surface-hover);
-    }
-
-    .ocean-theme :is(.hover\:bg-emerald-700, .hover\:bg-emerald-800,
-      .hover\:bg-emerald-900, .hover\:bg-green-600, .hover\:bg-teal-800,
-      .hover\:bg-slate-700, .hover\:bg-slate-900):hover {
-      background-color: var(--color-surface-hover);
-    }
-
-    .ocean-theme :is(.hover\:text-emerald-700, .hover\:text-emerald-800,
-      .hover\:text-emerald-900, .hover\:text-green-700):hover {
-      color: var(--color-ocean-cyan);
-    }
-
-    .ocean-theme .hover\:text-gray-600:hover {
-      color: var(--color-ocean-pearl);
-    }
-
-    .ocean-theme :is(.hover\:border-emerald-200, .hover\:border-emerald-300,
-      .hover\:border-emerald-400, .hover\:border-green-300, .hover\:border-teal-500):hover {
-      border-color: var(--color-ocean-cyan);
-    }
-  }
-}
-
-/* Opacity and focus variants need the same role mapping as solid utilities. */
-@layer utilities {
-  .ocean-theme :is(.bg-emerald-500\/20) {
-    background-color: color-mix(in srgb, var(--color-ocean-cyan) 20%, transparent);
-  }
-
-  .ocean-theme :is(.bg-emerald-500\/80, .bg-emerald-900\/80, .bg-emerald-950\/60, .bg-gray-50\/50, .bg-gray-50\/70, .bg-gray-50\/80, .bg-slate-900\/50, .bg-white\/40, .bg-white\/50, .bg-white\/55, .bg-white\/60, .bg-white\/65, .bg-white\/70, .bg-white\/75, .bg-white\/80, .bg-white\/85, .disabled\:bg-emerald-900\/40:disabled) {
-    background-color: color-mix(in srgb, var(--color-ocean-panel) 85%, transparent);
-  }
-
-  .ocean-theme :is(.bg-emerald-600\/30) {
-    background-color: color-mix(in srgb, var(--color-ocean-cyan) 30%, transparent);
-  }
-
-  .ocean-theme :is(.bg-emerald-900\/10, .bg-emerald-950\/10) {
-    background-color: color-mix(in srgb, var(--color-ocean-cyan) 10%, transparent);
-  }
-
-  .ocean-theme :is(.bg-emerald-950\/5) {
-    background-color: color-mix(in srgb, var(--color-ocean-cyan) 5%, transparent);
-  }
-
-  .ocean-theme :is(.bg-white\/90) {
-    background-color: color-mix(in srgb, var(--color-ocean-panel) 90%, transparent);
-  }
-
-  .ocean-theme :is(.bg-white\/95) {
-    background-color: color-mix(in srgb, var(--color-ocean-panel) 95%, transparent);
-  }
-
-  .ocean-theme :is(.border-emerald-100\/80, .border-emerald-500\/80) {
-    border-color: color-mix(in srgb, var(--color-ocean-cyan) 80%, transparent);
-  }
-
-  .ocean-theme :is(.border-emerald-300\/20, .border-emerald-400\/30, .border-emerald-700\/20, .border-emerald-700\/25, .border-emerald-700\/30, .border-emerald-900\/10, .border-emerald-900\/15, .border-emerald-900\/20, .border-emerald-950\/10) {
-    border-color: color-mix(in srgb, var(--color-ocean-cyan) 35%, transparent);
-  }
-
-  .ocean-theme :is(.border-emerald-400\/40, .border-emerald-600\/40, .border-emerald-800\/40) {
-    border-color: color-mix(in srgb, var(--color-ocean-cyan) 40%, transparent);
-  }
-
-  .ocean-theme :is(.border-emerald-500\/70) {
-    border-color: color-mix(in srgb, var(--color-ocean-cyan) 70%, transparent);
-  }
-
-  .ocean-theme :is(.focus-visible\:bg-green-600:focus-visible) {
-    background-color: var(--color-ocean-panel);
-  }
-
-  .ocean-theme :is(.focus-visible\:ring-green-500:focus-visible, .focus\:ring-emerald-600:focus, .focus\:ring-teal-100:focus) {
-    --tw-ring-color: var(--color-ocean-cyan);
-  }
-
-  .ocean-theme :is(.focus-visible\:text-white:focus-visible) {
-    color: var(--color-ocean-pearl);
-  }
-
-  .ocean-theme :is(.focus-within\:border-emerald-700:focus-within, .focus\:border-emerald-600:focus, .focus\:border-emerald-700:focus, .focus\:border-gray-300:focus, .focus\:border-teal-600:focus) {
-    border-color: var(--color-ocean-cyan);
-  }
-
-  .ocean-theme :is(.focus-within\:ring-emerald-700\/20:focus-within, .ring-emerald-700\/20) {
-    --tw-ring-color: color-mix(in srgb, var(--color-ocean-cyan) 20%, transparent);
-  }
-
-  .ocean-theme :is(.focus\:ring-emerald-600\/15:focus, .focus\:ring-emerald-700\/15:focus) {
-    --tw-ring-color: color-mix(in srgb, var(--color-ocean-cyan) 15%, transparent);
-  }
-
-  .ocean-theme :is(.focus\:ring-emerald-700\/30:focus, .ring-emerald-600\/30) {
-    --tw-ring-color: color-mix(in srgb, var(--color-ocean-cyan) 30%, transparent);
-  }
-
-  @media (hover: hover) {
-    .ocean-theme :is(.hover\:bg-emerald-50\/30:hover) {
-      background-color: color-mix(in srgb, var(--color-ocean-cyan) 30%, transparent);
-    }
-  }
-
-  @media (hover: hover) {
-    .ocean-theme :is(.hover\:bg-emerald-600\/50:hover) {
-      background-color: color-mix(in srgb, var(--color-ocean-panel) 85%, transparent);
-    }
-  }
-
-  @media (hover: hover) {
-    .ocean-theme :is(.hover\:border-emerald-500\/50:hover) {
-      border-color: color-mix(in srgb, var(--color-ocean-cyan) 50%, transparent);
-    }
-  }
-
-  .ocean-theme .placeholder\:text-gray-400::placeholder {
-    color: var(--color-content-subtle);
-  }
-
-  .ocean-theme :is(.text-emerald-200\/70, .text-emerald-900\/55, .text-emerald-900\/60, .text-emerald-900\/65, .text-emerald-900\/70, .text-emerald-900\/75, .text-emerald-950\/45, .text-emerald-950\/55, .text-emerald-950\/60, .text-emerald-950\/65) {
-    color: color-mix(in srgb, var(--color-ocean-pearl) 78%, transparent);
-  }
-
-  .ocean-theme :is(.text-emerald-300\/80, .text-emerald-950\/80) {
-    color: color-mix(in srgb, var(--color-ocean-pearl) 80%, transparent);
-  }
-
-  .ocean-theme :is(.to-teal-50\/70) {
-    --tw-gradient-to: color-mix(in srgb, var(--color-ocean-panel) 70%, transparent);
-  }
-
-}
-
-/* Reusable nautical treatments for navigation currency and important actions. */
 .ocean-theme .ocean-currency-chip {
-  color: var(--color-ocean-pearl);
-  border-color: color-mix(in srgb, var(--color-ocean-gold) 65%, transparent);
-  background: var(--color-ocean-deep);
-  box-shadow: inset 0 1px 0 #35b9d52e, 0 2px 5px #081d3266;
+  color: var(--color-content);
+  border-color: var(--color-gold);
+  background: var(--color-gold);
+  box-shadow: var(--shadow-xs);
 }
 
 .ocean-theme .ocean-primary-action {
-  color: var(--color-ocean-deep);
-  border: 1px solid var(--color-ocean-gold);
-  background: linear-gradient(180deg, var(--color-ocean-pearl) -70%, var(--color-ocean-gold) 70%);
-  box-shadow: inset 0 1px 0 #f5ebd480, 0 3px 0 var(--color-ocean-wood), 0 5px 12px #102d4655;
+  color: var(--color-content);
+  border: 1px solid var(--color-gold);
+  background: var(--color-gold);
+  box-shadow: var(--shadow-sm);
 }
 
 .ocean-theme .ocean-primary-action:disabled {
@@ -511,12 +61,9 @@ html.ocean-theme {
 }
 
 @media (hover: hover) {
-  .ocean-theme .ocean-currency-chip:hover {
-    border-color: var(--color-ocean-cyan);
-    background: var(--color-ocean-panel);
-  }
-
+  .ocean-theme .ocean-currency-chip:hover,
   .ocean-theme .ocean-primary-action:not(:disabled):hover {
-    filter: brightness(1.08);
+    outline: 2px solid var(--color-primary);
+    outline-offset: 2px;
   }
 }

@@ -99,7 +99,7 @@ async function claimReward(rewardId: string) {
     </div>
     <div
       v-else-if="fishingPassStore.loadError"
-      class="rounded-2xl border border-red-200 bg-red-50 p-4 text-sm text-red-800"
+      class="rounded-2xl border border-danger bg-surface p-4 text-sm text-danger"
       role="alert"
     >
       {{ fishingPassStore.loadError }}
@@ -127,25 +127,25 @@ async function claimReward(rewardId: string) {
                 v-for="day in rewardsByDay"
                 :key="`day-${day.day}`"
                 class="w-24 shrink-0 rounded-lg border px-2 py-2 text-center text-xs font-bold text-content"
-                :class="day.unlocked ? 'border-border-default bg-surface' : 'border-slate-200 bg-slate-50 text-slate-500'"
+                :class="day.unlocked ? 'border-border-default bg-surface' : 'border-border bg-white text-content'"
               >
                 {{ tr("FishingPassRewards.ngay") }} {{ day.day }}
               </div>
             </div>
             <div class="flex w-max gap-2">
               <div
-                class="sticky left-0 z-10 flex w-24 shrink-0 flex-col items-center justify-center gap-2 rounded-lg bg-amber-100 px-2 text-center text-xs font-black uppercase text-amber-900"
+                class="sticky left-0 z-10 flex w-24 shrink-0 flex-col items-center justify-center gap-2 rounded-lg bg-surface px-2 text-center text-xs font-black uppercase text-gold"
               >
                 <span>Fishing Pass</span>
                 <button
                   v-if="!fishingPassStore.hasFishingPass"
                   type="button"
-                  class="rounded-md bg-amber-700 px-2 py-1 text-[10px] font-extrabold normal-case text-white hover:bg-amber-800"
+                  class="rounded-md bg-gold px-2 py-1 text-[10px] font-extrabold normal-case text-white hover:bg-gold"
                   @click="showPassConfirm = true"
                 >
                   {{ tr("FishingPassRewards.mua_pass") }}
                 </button>
-                <span v-else class="text-[10px] normal-case text-emerald-800">{{
+                <span v-else class="text-[10px] normal-case text-content">{{
                   tr("FishingPassRewards.da_so_huu")
                 }}</span>
               </div>
@@ -153,7 +153,7 @@ async function claimReward(rewardId: string) {
                 v-for="day in rewardsByDay"
                 :key="`pass-${day.day}`"
                 class="w-24 shrink-0 rounded-lg border p-2 text-center"
-                :class="day.unlocked ? 'border-amber-200 bg-amber-50' : 'border-slate-200 bg-slate-50 opacity-60'"
+                :class="day.unlocked ? 'border-gold bg-surface' : 'border-border bg-white opacity-60'"
               >
                 <template v-if="day.passReward">
                   <img
@@ -171,13 +171,13 @@ async function claimReward(rewardId: string) {
                     }}
                   </div>
                 </template>
-                <span v-else class="my-2 block text-[10px] text-slate-500">{{
+                <span v-else class="my-2 block text-[10px] text-content">{{
                   tr("FishingPassRewards.chua_co_qua")
                 }}</span>
                 <div class="flex h-7 items-center justify-center">
                   <span
                     v-if="day.passReward?.claimed_at"
-                    class="text-[10px] font-bold text-emerald-700"
+                    class="text-[10px] font-bold text-content"
                     :title="
                       tr('FishingPassRewards.da_nhan_luc_value0', {
                         value0: new Date(day.passReward.claimed_at).toLocaleString(getFormattingLocale()),
@@ -188,7 +188,7 @@ async function claimReward(rewardId: string) {
                   <button
                     v-else-if="day.passReward && day.unlocked && fishingPassStore.hasFishingPass"
                     type="button"
-                    class="rounded-md bg-amber-700 px-2 py-1 text-[10px] font-bold text-white hover:bg-amber-800 disabled:cursor-not-allowed disabled:opacity-50"
+                    class="rounded-md bg-gold px-2 py-1 text-[10px] font-bold text-white hover:bg-gold disabled:cursor-not-allowed disabled:opacity-50"
                     :disabled="claimingRewardId !== null"
                     @click="claimReward(day.passReward.id)"
                   >
@@ -200,7 +200,7 @@ async function claimReward(rewardId: string) {
                   </button>
                   <span
                     v-else-if="!fishingPassStore.hasFishingPass"
-                    class="text-slate-500"
+                    class="text-content"
                     :aria-label="tr('FishingPassRewards.khoa_fishing_pass')"
                     :title="tr('FishingPassRewards.can_co_fishing_pass_de_nhan')"
                     ><svg
@@ -215,7 +215,7 @@ async function claimReward(rewardId: string) {
                       <rect x="4" y="10" width="16" height="11" rx="2" />
                       <path stroke-linecap="round" stroke-linejoin="round" d="M8 10V7a4 4 0 1 1 8 0v3" /></svg
                   ></span>
-                  <span v-else class="text-[10px] font-bold text-slate-500">{{
+                  <span v-else class="text-[10px] font-bold text-content">{{
                     tr("FishingPassRewards.chua_mo")
                   }}</span>
                 </div>
@@ -223,7 +223,7 @@ async function claimReward(rewardId: string) {
             </div>
             <div class="flex w-max gap-2">
               <div
-                class="sticky left-0 z-10 flex w-24 shrink-0 items-center justify-center rounded-lg bg-emerald-100 px-2 text-center text-xs font-black uppercase text-emerald-900"
+                class="sticky left-0 z-10 flex w-24 shrink-0 items-center justify-center rounded-lg bg-surface px-2 text-center text-xs font-black uppercase text-content"
               >
                 {{ tr("FishingPassRewards.mien_phi") }}
               </div>
@@ -231,7 +231,7 @@ async function claimReward(rewardId: string) {
                 v-for="day in rewardsByDay"
                 :key="`free-${day.day}`"
                 class="w-24 shrink-0 rounded-lg border p-2 text-center"
-                :class="day.unlocked ? 'border-emerald-200 bg-surface' : 'border-slate-200 bg-slate-50 opacity-60'"
+                :class="day.unlocked ? 'border-accent bg-surface' : 'border-border bg-white opacity-60'"
               >
                 <template v-if="day.freeReward">
                   <img
@@ -249,14 +249,14 @@ async function claimReward(rewardId: string) {
                     }}
                   </div>
                 </template>
-                <span v-else class="my-2 block text-[10px] text-slate-500">{{
+                <span v-else class="my-2 block text-[10px] text-content">{{
                   tr("FishingPassRewards.chua_co_qua")
                 }}</span>
                 <div class="flex h-7 items-center justify-center">
                   <button
                     v-if="day.freeReward && day.unlocked && !day.freeReward.claimed_at"
                     type="button"
-                    class="rounded-md bg-emerald-700 px-2 py-1 text-[10px] font-bold text-white hover:bg-emerald-800 disabled:cursor-not-allowed disabled:opacity-50"
+                    class="rounded-md bg-accent px-2 py-1 text-[10px] font-bold text-white hover:bg-accent disabled:cursor-not-allowed disabled:opacity-50"
                     :disabled="claimingRewardId !== null"
                     @click="claimReward(day.freeReward.id)"
                   >
@@ -266,10 +266,10 @@ async function claimReward(rewardId: string) {
                         : tr("FishingPassRewards.nhan")
                     }}
                   </button>
-                  <span v-else-if="day.freeReward?.claimed_at" class="text-[10px] font-bold text-emerald-700">{{
+                  <span v-else-if="day.freeReward?.claimed_at" class="text-[10px] font-bold text-content">{{
                     tr("AttendanceModal.da_nhan")
                   }}</span>
-                  <span v-else class="text-[10px] font-bold text-slate-500">{{
+                  <span v-else class="text-[10px] font-bold text-content">{{
                     day.unlocked ? tr("FishingPassRewards.dang_mo") : tr("FishingPassRewards.khoa")
                   }}</span>
                 </div>
@@ -281,11 +281,11 @@ async function claimReward(rewardId: string) {
           class="slide-fade-in from-right player-content-in rounded-2xl border border-border-default bg-surface px-5 py-3"
           aria-labelledby="fishing-pass-info-title"
         >
-          <div class="mb-0 mt-2 text-sm text-emerald-900/75 space-y-3">
+          <div class="mb-0 mt-2 text-sm text-content/75 space-y-3">
             <div id="fishing-pass-info-title" class="text-base font-extrabold text-content">
               {{ fishingPassStore.currentPass.name }}
             </div>
-            <div v-if="fishingPassStore.currentPass.description" class="text-sm text-emerald-900/75">
+            <div v-if="fishingPassStore.currentPass.description" class="text-sm text-content/75">
               {{ fishingPassStore.currentPass.description }}
             </div>
             <div class="flex items-center gap-1">

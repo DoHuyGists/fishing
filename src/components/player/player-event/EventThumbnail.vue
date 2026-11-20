@@ -37,7 +37,7 @@ const frameStyle = computed(() => ({
 
 <template>
   <div
-    class="box-border shrink-0 select-none overflow-hidden border-solid border-zinc-100 bg-zinc-800 shadow-[0_7px_7px_rgba(0,0,0,0.35)]"
+    class="box-border shrink-0 select-none overflow-hidden border-solid border-border bg-content shadow-[0_7px_7px_color-mix(in_srgb,_var(--color-content)_35%,_transparent)]"
     :style="frameStyle"
   >
     <img
@@ -53,7 +53,7 @@ const frameStyle = computed(() => ({
       v-else
       role="img"
       :aria-label="tr('EventThumbnail.chua_co_anh')"
-      class="flex h-full w-full items-center justify-center bg-linear-to-br from-zinc-700 to-zinc-600 text-zinc-400"
+      class="flex h-full w-full items-center justify-center bg-linear-to-br from-content to-content text-content"
     >
       <svg
         class="w-[36%]"

@@ -61,12 +61,16 @@ export const useAdminMonitorStore = defineStore("admin-monitor", () => {
   const busiestCount = computed(() => occupiedAreas.value[0]?.playerCount ?? 0);
   const busiestAreas = computed(() => occupiedAreas.value.filter((area) => area.playerCount === busiestCount.value));
   const chartAreas = computed(() => occupiedAreas.value.slice(0, 10));
+  const chartColors = computed(() => chartAreas.value.map((area) => area.playerCount === busiestCount.value ? "#ffd166" : "#1abc9c"));
   const chartData = computed<ChartData<"bar">>(() => ({
     labels: chartAreas.value.map((area) => area.title),
     datasets: [{
       label: "Người đang trong bãi",
       data: chartAreas.value.map((area) => area.playerCount),
-      backgroundColor: chartAreas.value.map((area) => area.playerCount === busiestCount.value ? "#b45309" : "#15803d"),
+      backgroundColor: chartColors.value,
+      hoverBackgroundColor: chartColors.value,
+      borderColor: "#cbd9c6",
+      hoverBorderColor: "#cbd9c6",
       borderRadius: 6,
       maxBarThickness: 32,
     }],

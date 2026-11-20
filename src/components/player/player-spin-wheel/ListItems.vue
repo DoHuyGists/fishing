@@ -10,7 +10,7 @@
 
     <div class="grid grid-cols-[minmax(0,1fr)_auto] gap-2 border-b border-border-default p-3">
       <label
-        class="flex min-w-0 items-center gap-2 rounded-lg border border-border-default bg-white/70 px-3 focus-within:border-emerald-700"
+        class="flex min-w-0 items-center gap-2 rounded-lg border border-border-default bg-white/70 px-3 focus-within:border-accent"
       >
         <svg
           class="h-4 w-4 shrink-0 text-content-subtle"
@@ -28,13 +28,13 @@
           type="search"
           :placeholder="tr('ShopModal.tim_vat_pham')"
           :aria-label="tr('ListItems.tim_vat_pham')"
-          class="h-10 w-full min-w-0 bg-transparent text-sm text-content outline-none placeholder:text-palette-718174"
+          class="h-10 w-full min-w-0 bg-transparent text-sm text-content outline-none placeholder:text-content"
         />
       </label>
       <select
         v-model="selectedCategory"
         :aria-label="tr('ListItems.loc_theo_loai_vat_pham')"
-        class="h-10 max-w-36 rounded-lg border border-border-default bg-white px-2 text-sm text-content outline-none focus:border-emerald-700"
+        class="h-10 max-w-36 rounded-lg border border-border-default bg-white px-2 text-sm text-content outline-none focus:border-accent"
       >
         <option value="all">{{ tr("ListItems.tat_ca_loai") }}</option>
         <option v-for="category in categories" :key="category" :value="category">{{ category }}</option>
@@ -44,20 +44,20 @@
     <div class="min-h-0 flex-1 overflow-y-auto p-3">
       <div
         v-if="spinWheelStore.loading"
-        class="flex h-full min-h-32 items-center justify-center gap-3 text-sm text-palette-526a58"
+        class="flex h-full min-h-32 items-center justify-center gap-3 text-sm text-content"
         role="status"
       >
-        <span class="h-5 w-5 animate-spin rounded-full border-2 border-emerald-700/25 border-t-emerald-700" />
+        <span class="h-5 w-5 animate-spin rounded-full border-2 border-accent/25 border-t-accent" />
         {{ tr("ShopModal.dang_tai_vat_pham") }}
       </div>
       <div
         v-else-if="spinWheelStore.error"
         class="flex h-full min-h-32 flex-col items-center justify-center gap-3 text-center"
       >
-        <div class="text-sm text-rose-700">{{ spinWheelStore.error }}</div>
+        <div class="text-sm text-danger">{{ spinWheelStore.error }}</div>
         <button
           type="button"
-          class="text-sm font-semibold text-emerald-800 hover:text-emerald-900"
+          class="text-sm font-semibold text-content hover:text-content"
           @click="spinWheelStore.setReward()"
         >
           {{ tr("ListItems.thu_tai_lai") }}
@@ -78,14 +78,14 @@
           v-for="item in visibleRewards"
           :key="item.id"
           type="button"
-          class="group cursor-pointer relative flex flex-col items-center gap-1 rounded-lg border border-border-default bg-white/70 px-2 py-2 text-center transition-colors hover:border-emerald-300 hover:bg-surface-hover"
+          class="group cursor-pointer relative flex flex-col items-center gap-1 rounded-lg border border-border-default bg-white/70 px-2 py-2 text-center transition-colors hover:border-accent hover:bg-surface-hover"
           :aria-label="tr('ListItems.thong_tin_ve_value0', { value0: item.label })"
           @click="showInformation(item)"
         >
           <img v-if="item.image" :src="item.image" :alt="''" class="h-10 w-10 shrink-0 object-contain" />
           <span
             v-else
-            class="flex h-10 w-10 shrink-0 items-center justify-center text-lg text-emerald-700"
+            class="flex h-10 w-10 shrink-0 items-center justify-center text-lg text-content"
             aria-hidden="true"
             >✦</span
           >

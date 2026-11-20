@@ -253,20 +253,20 @@ onMounted(loadAll);
 
 <template>
   <AdminModal title="Quản lý cá theo bãi câu" icon="🎯" @close="emit('close')">
-    <div class="flex shrink-0 flex-wrap items-center gap-3 border-b border-gray-200 bg-white px-5 py-3 md:px-7">
+    <div class="flex shrink-0 flex-wrap items-center gap-3 border-b border-border bg-white px-5 py-3 md:px-7">
       <div class="relative min-w-55 flex-1">
         <input
           v-model="search"
           type="search"
           placeholder="Tìm theo bãi câu, loài cá, quốc gia, độ hiếm..."
-          class="w-full rounded-lg border border-gray-300 bg-gray-50 px-3 py-2 text-sm focus:border-emerald-600 focus:outline-none"
+          class="w-full rounded-lg border border-content bg-white px-3 py-2 text-sm focus:border-accent focus:outline-none"
         />
       </div>
-      <label class="flex items-center gap-2 text-xs font-semibold text-gray-600">
+      <label class="flex items-center gap-2 text-xs font-semibold text-content">
         Bãi câu
         <select
           v-model="areaFilter"
-          class="rounded-lg border border-gray-300 bg-white px-2.5 py-2 text-sm text-gray-700"
+          class="rounded-lg border border-content bg-white px-2.5 py-2 text-sm text-content"
         >
           <option value="ALL">Tất cả</option>
           <option v-for="area in areaFilterOptions" :key="area.id" :value="area.id">
@@ -274,21 +274,21 @@ onMounted(loadAll);
           </option>
         </select>
       </label>
-      <label class="flex items-center gap-2 text-xs font-semibold text-gray-600">
+      <label class="flex items-center gap-2 text-xs font-semibold text-content">
         Loài cá
         <select
           v-model="speciesFilter"
-          class="rounded-lg border border-gray-300 bg-white px-2.5 py-2 text-sm text-gray-700"
+          class="rounded-lg border border-content bg-white px-2.5 py-2 text-sm text-content"
         >
           <option value="ALL">Tất cả</option>
           <option v-for="item in speciesFilterOptions" :key="item.id" :value="item.id">{{ item.name }}</option>
         </select>
       </label>
-      <div class="flex items-center gap-1 rounded-lg border border-gray-300 bg-gray-50 p-0.5">
+      <div class="flex items-center gap-1 rounded-lg border border-content bg-white p-0.5">
         <button
           type="button"
           class="rounded-md px-2.5 py-1.5 text-xs font-bold transition-colors"
-          :class="viewMode === 'table' ? 'bg-white text-content-strong shadow-sm' : 'text-gray-500 hover:text-gray-700'"
+          :class="viewMode === 'table' ? 'bg-white text-content-strong shadow-sm' : 'text-content hover:text-content'"
           @click="viewMode = 'table'"
         >
           ☰ Bảng
@@ -296,18 +296,18 @@ onMounted(loadAll);
         <button
           type="button"
           class="rounded-md px-2.5 py-1.5 text-xs font-bold transition-colors"
-          :class="viewMode === 'grouped' ? 'bg-white text-content-strong shadow-sm' : 'text-gray-500 hover:text-gray-700'"
+          :class="viewMode === 'grouped' ? 'bg-white text-content-strong shadow-sm' : 'text-content hover:text-content'"
           @click="viewMode = 'grouped'"
         >
           🗂️ Gom nhóm bãi câu
         </button>
       </div>
       <div class="ml-auto flex items-center gap-2">
-        <span class="hidden text-xs text-gray-500 sm:inline">{{ store.total }} kết quả</span>
+        <span class="hidden text-xs text-content sm:inline">{{ store.total }} kết quả</span>
         <button
           type="button"
           title="Làm mới danh sách"
-          class="grid size-9 place-items-center rounded-lg border border-gray-300 bg-white text-gray-700 hover:bg-gray-100 disabled:opacity-50"
+          class="grid size-9 place-items-center rounded-lg border border-content bg-white text-content hover:bg-surface disabled:opacity-50"
           :disabled="isLoading"
           @click="loadAll"
         >
@@ -328,7 +328,7 @@ onMounted(loadAll);
         </button>
         <button
           type="button"
-          class="rounded-lg bg-content-strong px-3.5 py-2 text-sm font-bold text-white hover:bg-emerald-800"
+          class="rounded-lg bg-content-strong px-3.5 py-2 text-sm font-bold text-white hover:bg-accent"
           @click="openCreateForm"
         >
           + Thêm cấu hình
@@ -340,15 +340,15 @@ onMounted(loadAll);
       <section class="flex min-h-0 min-w-0 flex-1 flex-col overflow-hidden p-4 md:p-6">
         <div
           v-if="loadError"
-          class="mb-4 flex items-center justify-between gap-3 rounded-lg border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-700"
+          class="mb-4 flex items-center justify-between gap-3 rounded-lg border border-danger bg-surface px-4 py-3 text-sm text-danger"
         >
           <span>{{ loadError }}</span>
           <button type="button" class="font-bold underline" @click="loadAll">Thử lại</button>
         </div>
-        <div v-if="isLoading" class="grid min-h-64 place-items-center text-sm text-gray-500">Đang tải dữ liệu...</div>
+        <div v-if="isLoading" class="grid min-h-64 place-items-center text-sm text-content">Đang tải dữ liệu...</div>
         <div
           v-else-if="!filteredRows.length"
-          class="grid min-h-64 place-items-center text-center text-sm text-gray-500"
+          class="grid min-h-64 place-items-center text-center text-sm text-content"
         >
           <div>
             <span class="mb-2 block text-3xl">🎯</span
@@ -359,27 +359,27 @@ onMounted(loadAll);
           <div
             v-for="group in groupedByArea"
             :key="group.areaId"
-            class="shrink-0 overflow-hidden rounded-lg border border-gray-200 bg-white shadow-sm"
+            class="shrink-0 overflow-hidden rounded-lg border border-border bg-white shadow-sm"
           >
             <button
               type="button"
-              class="flex w-full items-center justify-between gap-3 bg-emerald-50/60 px-4 py-3 text-left hover:bg-emerald-50"
+              class="flex w-full items-center justify-between gap-3 bg-surface/60 px-4 py-3 text-left hover:bg-surface"
               @click="toggleAreaCollapsed(group.areaId)"
             >
               <div class="flex min-w-0 items-center gap-2">
                 <span
-                  class="text-sm text-gray-500 transition-transform"
+                  class="text-sm text-content transition-transform"
                   :class="{ '-rotate-90': isAreaCollapsed(group.areaId) }"
                   >▾</span
                 >
                 <span class="truncate text-sm font-extrabold text-content-strong">📍 {{ group.areaTitle }}</span>
                 <span
                   v-if="group.areaCountryId"
-                  class="shrink-0 rounded-full border border-emerald-200 bg-white px-2 py-0.5 text-[10px] font-semibold text-emerald-700"
+                  class="shrink-0 rounded-full border border-accent bg-white px-2 py-0.5 text-[10px] font-semibold text-content"
                   >{{ countryName(group.areaCountryId) }}</span
                 >
               </div>
-              <span class="shrink-0 rounded-full bg-emerald-100 px-2.5 py-1 text-xs font-bold text-emerald-800"
+              <span class="shrink-0 rounded-full bg-surface px-2.5 py-1 text-xs font-bold text-content"
                 >{{
                   store.distributions[group.areaId]?.loaded
                     ? store.distributions[group.areaId]!.rows.length
@@ -393,7 +393,7 @@ onMounted(loadAll);
               <div
                 v-for="row in group.items"
                 :key="rowKey(row)"
-                class="flex min-w-52 flex-1 items-center gap-3 rounded-lg border border-gray-200 bg-gray-50/60 px-3 py-2.5"
+                class="flex min-w-52 flex-1 items-center gap-3 rounded-lg border border-border bg-white/60 px-3 py-2.5"
               >
                 <div
                   class="grid size-12 shrink-0 place-items-center overflow-hidden rounded-md border border-border-default bg-surface"
@@ -408,13 +408,13 @@ onMounted(loadAll);
                   <span v-else class="text-center text-[10px] text-content">Chưa có ảnh</span>
                 </div>
                 <div class="min-w-0 flex-1">
-                  <div class="truncate text-sm font-bold text-gray-800" :title="row.speciesName || ''">
+                  <div class="truncate text-sm font-bold text-content" :title="row.speciesName || ''">
                     {{ row.speciesName || "—" }}
                   </div>
-                  <div class="flex items-center gap-1.5 text-[11px] text-gray-500">
+                  <div class="flex items-center gap-1.5 text-[11px] text-content">
                     <span v-if="row.speciesRarity">{{ row.speciesRarity }}</span>
                     <span
-                      class="rounded-full border border-emerald-200 bg-emerald-50 px-1.5 py-0.5 font-semibold text-emerald-800"
+                      class="rounded-full border border-accent bg-surface px-1.5 py-0.5 font-semibold text-content"
                       >Tỉ trọng {{ row.weightRate }}</span
                     >
                   </div>
@@ -423,7 +423,7 @@ onMounted(loadAll);
                   <button
                     type="button"
                     title="Sửa"
-                    class="grid size-7 place-items-center rounded-md border border-gray-300 bg-white text-xs font-bold text-gray-700 hover:bg-gray-100"
+                    class="grid size-7 place-items-center rounded-md border border-content bg-white text-xs font-bold text-content hover:bg-surface"
                     @click="openEditForm(row)"
                   >
                     ✎
@@ -431,7 +431,7 @@ onMounted(loadAll);
                   <button
                     type="button"
                     title="Xoá"
-                    class="grid size-7 place-items-center rounded-md border border-red-200 bg-white text-xs font-bold text-red-700 hover:bg-red-50"
+                    class="grid size-7 place-items-center rounded-md border border-danger bg-white text-xs font-bold text-danger hover:bg-surface"
                     @click="askDelete(row)"
                   >
                     🗑
@@ -441,31 +441,31 @@ onMounted(loadAll);
             </div>
           </div>
         </div>
-        <div v-else class="min-h-0 flex-1 overflow-auto rounded-lg border border-gray-200 bg-white shadow-sm">
+        <div v-else class="min-h-0 flex-1 overflow-auto rounded-lg border border-border bg-white shadow-sm">
           <table class="w-full min-w-225 border-separate border-spacing-0 text-left text-sm">
-            <thead class="text-[11px] uppercase text-gray-600">
+            <thead class="text-[11px] uppercase text-content">
               <tr>
-                <th class="sticky top-0 z-10 bg-gray-100 px-4 py-3">Bãi câu</th>
-                <th class="sticky top-0 z-10 bg-gray-100 px-4 py-3">Quốc gia</th>
-                <th class="sticky top-0 z-10 bg-gray-100 px-4 py-3">Loài cá</th>
-                <th class="sticky top-0 z-10 bg-gray-100 px-4 py-3">Độ hiếm</th>
-                <th class="sticky top-0 z-10 bg-gray-100 px-4 py-3">Tỉ trọng xuất hiện</th>
-                <th class="sticky top-0 z-10 bg-gray-100 px-4 py-3 text-right">Thao tác</th>
+                <th class="sticky top-0 z-10 bg-surface px-4 py-3">Bãi câu</th>
+                <th class="sticky top-0 z-10 bg-surface px-4 py-3">Quốc gia</th>
+                <th class="sticky top-0 z-10 bg-surface px-4 py-3">Loài cá</th>
+                <th class="sticky top-0 z-10 bg-surface px-4 py-3">Độ hiếm</th>
+                <th class="sticky top-0 z-10 bg-surface px-4 py-3">Tỉ trọng xuất hiện</th>
+                <th class="sticky top-0 z-10 bg-surface px-4 py-3 text-right">Thao tác</th>
               </tr>
             </thead>
             <tbody>
               <tr
                 v-for="row in filteredRows"
                 :key="rowKey(row)"
-                class="border-t border-gray-100 hover:bg-emerald-50/40"
+                class="border-t border-border hover:bg-surface/40"
               >
-                <td class="px-4 py-3 font-semibold text-gray-800">{{ row.areaTitle || "(Chưa đặt tên)" }}</td>
-                <td class="px-4 py-3 text-gray-600">{{ countryName(row.areaCountryId) }}</td>
-                <td class="px-4 py-3 text-gray-700">{{ row.speciesName || "—" }}</td>
-                <td class="px-4 py-3 text-gray-700">{{ row.speciesRarity || "—" }}</td>
+                <td class="px-4 py-3 font-semibold text-content">{{ row.areaTitle || "(Chưa đặt tên)" }}</td>
+                <td class="px-4 py-3 text-content">{{ countryName(row.areaCountryId) }}</td>
+                <td class="px-4 py-3 text-content">{{ row.speciesName || "—" }}</td>
+                <td class="px-4 py-3 text-content">{{ row.speciesRarity || "—" }}</td>
                 <td class="px-4 py-3">
                   <span
-                    class="rounded-full border border-emerald-200 bg-emerald-50 px-2.5 py-1 text-xs font-semibold text-emerald-800"
+                    class="rounded-full border border-accent bg-surface px-2.5 py-1 text-xs font-semibold text-content"
                     >{{ row.weightRate }}</span
                   >
                 </td>
@@ -473,14 +473,14 @@ onMounted(loadAll);
                   <div class="flex justify-end gap-2">
                     <button
                       type="button"
-                      class="rounded-md border border-gray-300 px-2.5 py-1.5 text-xs font-bold text-gray-700 hover:bg-gray-100"
+                      class="rounded-md border border-content px-2.5 py-1.5 text-xs font-bold text-content hover:bg-surface"
                       @click="openEditForm(row)"
                     >
                       Sửa
                     </button>
                     <button
                       type="button"
-                      class="rounded-md border border-red-200 px-2.5 py-1.5 text-xs font-bold text-red-700 hover:bg-red-50"
+                      class="rounded-md border border-danger px-2.5 py-1.5 text-xs font-bold text-danger hover:bg-surface"
                       @click="askDelete(row)"
                     >
                       Xoá
@@ -511,14 +511,14 @@ onMounted(loadAll);
       />
     </main>
 
-    <div v-if="confirmDeleteKey" class="fixed inset-0 z-40 grid place-items-center bg-black/45 p-4">
+    <div v-if="confirmDeleteKey" class="fixed inset-0 z-40 grid place-items-center bg-content/45 p-4">
       <div class="w-full max-w-sm rounded-xl bg-white p-5 shadow-xl">
-        <div class="m-0 text-base font-extrabold text-gray-800">Xác nhận xoá cấu hình?</div>
-        <div class="my-3 text-sm text-gray-600">Thao tác này không thể hoàn tác.</div>
+        <div class="m-0 text-base font-extrabold text-content">Xác nhận xoá cấu hình?</div>
+        <div class="my-3 text-sm text-content">Thao tác này không thể hoàn tác.</div>
         <div class="flex justify-end gap-2">
           <button
             type="button"
-            class="rounded-lg border border-gray-300 px-3 py-2 text-sm font-bold text-gray-700"
+            class="rounded-lg border border-content px-3 py-2 text-sm font-bold text-content"
             @click="cancelDelete"
           >
             Huỷ
@@ -526,7 +526,7 @@ onMounted(loadAll);
           <button
             type="button"
             :disabled="!!deletingKey"
-            class="rounded-lg bg-red-600 px-3 py-2 text-sm font-bold text-white disabled:opacity-50"
+            class="rounded-lg bg-danger px-3 py-2 text-sm font-bold text-white disabled:opacity-50"
             @click="handleDelete"
           >
             {{ deletingKey ? "Đang xoá..." : "Xoá" }}

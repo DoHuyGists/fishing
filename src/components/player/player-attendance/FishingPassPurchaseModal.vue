@@ -53,6 +53,6 @@ async function buyFishingPass() {
     @cancel="emit('close')"
     @confirm="buyFishingPass"
   >
-    <div class="text-sm text-emerald-900/70">{{ tr("FishingPassPurchaseModal.mo_khoa_phan_thuong_fishing_pass") }}</div>
+    <div class="text-sm text-content/70">{{ tr("FishingPassPurchaseModal.mo_khoa_phan_thuong_fishing_pass") }}</div>
   </PaymentConfirmation>
 </template>

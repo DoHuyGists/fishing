@@ -40,19 +40,19 @@ button {
 
     /* --- Other Elements --- */
     blockquote {
-        @apply border-l-4 border-gray-300 pl-4 italic my-6 text-gray-700;
+        @apply border-l-4 border-content pl-4 italic my-6 text-content;
     }
 
     code {
-        @apply bg-gray-100 px-1.5 py-0.5 rounded font-mono text-sm text-red-500;
+        @apply bg-surface px-1.5 py-0.5 rounded font-mono text-sm text-danger;
     }
 
     hr {
-        @apply my-8 border-t border-gray-200;
+        @apply my-8 border-t border-border;
     }
 
     a {
-        @apply text-blue-600 underline hover:text-blue-800 transition-colors;
+        @apply text-primary underline hover:text-primary transition-colors;
     }
 }
 

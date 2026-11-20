@@ -80,7 +80,7 @@ function handleKeydown(event: KeyboardEvent) {
     :tabindex="embedded ? undefined : -1"
     :aria-label="title"
     :aria-busy="busy"
-    :class="embedded ? 'text-content' : 'fixed inset-0 z-[10001] flex items-center justify-center overflow-y-auto bg-black/50 p-4 text-content backdrop-blur-xs outline-none'"
+    :class="embedded ? 'text-content' : 'fixed inset-0 z-[10001] flex items-center justify-center overflow-y-auto bg-content/50 p-4 text-content backdrop-blur-xs outline-none'"
     @keydown="handleKeydown"
     @click.self="!embedded && cancel()"
   >
@@ -113,12 +113,12 @@ function handleKeydown(event: KeyboardEvent) {
         </div>
       </div>
       <slot name="after-summary" />
-      <div v-if="errorMessage" role="alert" class="text-sm font-semibold text-red-700">{{ errorMessage }}</div>
+      <div v-if="errorMessage" role="alert" class="text-sm font-semibold text-danger">{{ errorMessage }}</div>
       <div class="flex justify-end gap-2">
-        <button v-if="!embedded" type="button" class="shared-payment__cancel min-h-11 rounded-lg border border-border-default px-4 py-2 text-sm font-bold hover:bg-surface focus-visible:outline-2 focus-visible:outline-emerald-700 disabled:cursor-not-allowed disabled:opacity-50" :disabled="busy" @click="cancel">
+        <button v-if="!embedded" type="button" class="shared-payment__cancel min-h-11 rounded-lg border border-border-default px-4 py-2 text-sm font-bold hover:bg-surface focus-visible:outline-2 focus-visible:outline-accent disabled:cursor-not-allowed disabled:opacity-50" :disabled="busy" @click="cancel">
           {{ tr('AccountInfoModal.huy') }}
         </button>
-        <button type="submit" class="ocean-primary-action min-h-11 rounded-lg bg-content px-4 py-2 text-sm font-bold text-white hover:bg-emerald-900 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-emerald-700 disabled:cursor-not-allowed disabled:opacity-50" :class="{ 'w-full': embedded }" :disabled="!canConfirm">
+        <button type="submit" class="ocean-primary-action min-h-11 rounded-lg bg-content px-4 py-2 text-sm font-bold text-white hover:bg-accent focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-accent disabled:cursor-not-allowed disabled:opacity-50" :class="{ 'w-full': embedded }" :disabled="!canConfirm">
           {{ busy ? (busyText || tr('DailyAttendance.dang_xu_ly')) : (confirmText || tr('Fishfarm.xac_nhan')) }}
         </button>
       </div>
@@ -135,7 +135,7 @@ function handleKeydown(event: KeyboardEvent) {
 .ocean-theme .shared-payment.player-popup-in {
   border-color: var(--color-ocean-gold);
   background: linear-gradient(145deg, var(--color-ocean-panel), var(--color-ocean-deep));
-  box-shadow: 0 24px 64px #071a2d99, inset 0 1px #f5ebd426;
+  box-shadow: 0 24px 64px color-mix(in srgb, var(--color-content) 60%, transparent), inset 0 1px color-mix(in srgb, var(--color-surface) 14.902%, transparent);
 }
 
 .ocean-theme .shared-payment__title {
@@ -143,17 +143,29 @@ function handleKeydown(event: KeyboardEvent) {
 }
 
 .ocean-theme .shared-payment__summary {
-  border-color: #35b9d540;
+  border-color: color-mix(in srgb, var(--color-sky) 25.098%, transparent);
   background: var(--color-ocean-deep);
 }
 
 .ocean-theme .shared-payment__cancel {
   color: var(--color-ocean-pearl);
-  border-color: #35b9d580;
+  border-color: color-mix(in srgb, var(--color-sky) 50.196%, transparent);
   background: var(--color-ocean-deep);
 }
 
 .ocean-theme .shared-payment button:focus-visible {
   outline-color: var(--color-ocean-cyan);
+}
+
+.ocean-theme .shared-payment:not(.player-popup-in) {
+  color: var(--color-content);
+}
+
+.ocean-theme .shared-payment:not(.player-popup-in) .shared-payment__title {
+  color: var(--color-primary);
+}
+
+.ocean-theme .shared-payment:not(.player-popup-in) .shared-payment__summary {
+  background: var(--color-surface);
 }
 </style>

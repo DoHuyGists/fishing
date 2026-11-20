@@ -96,7 +96,7 @@ function getRewardEffect(variant: "NORMAL" | "GOLDEN" | "MUTATED") {
         @click.self="store.closeBag"
       >
         <section
-          class="player-popup-panel w-[min(460px,100%)] max-h-[min(580px,80vh)] overflow-auto border border-ocean-gold/70 rounded-[20px] bg-linear-to-br from-ocean-panel to-ocean-deep shadow-[0_24px_70px_rgba(0,0,0,0.48)] text-ocean-pearl"
+          class="player-popup-panel w-[min(460px,100%)] max-h-[min(580px,80vh)] overflow-auto border border-ocean-gold/70 rounded-[20px] bg-linear-to-br from-ocean-panel to-ocean-deep shadow-[0_24px_70px_color-mix(in_srgb,_var(--color-content)_48%,_transparent)] text-ocean-pearl"
           role="dialog"
           aria-modal="true"
           aria-labelledby="bag-title"
@@ -138,7 +138,7 @@ function getRewardEffect(variant: "NORMAL" | "GOLDEN" | "MUTATED") {
                   class="rounded-md px-2 py-1 text-xs font-bold transition-colors cursor-pointer"
                   :class="
                     viewMode === mode.value
-                      ? 'bg-ocean-gold text-ocean-deep'
+                      ? 'bg-ocean-gold text-content'
                       : 'text-border-strong hover:bg-ocean-cyan/15'
                   "
                   :aria-pressed="viewMode === mode.value"
@@ -197,7 +197,7 @@ function getRewardEffect(variant: "NORMAL" | "GOLDEN" | "MUTATED") {
                     </div>
                     <button
                       type="button"
-                      class="flex-shrink-0 px-3 py-1.5 border border-[rgba(235,110,110,0.4)] rounded-lg bg-[rgba(194,59,59,0.2)] hover:bg-[rgba(194,59,59,0.4)] text-palette-ffaaaa hover:text-white text-xs font-bold transition-colors cursor-pointer"
+                      class="flex-shrink-0 px-3 py-1.5 border border-[color-mix(in_srgb,_var(--color-danger)_40%,_transparent)] rounded-lg bg-[color-mix(in_srgb,_var(--color-danger)_20%,_transparent)] hover:bg-[color-mix(in_srgb,_var(--color-danger)_40%,_transparent)] text-danger hover:text-white text-xs font-bold transition-colors cursor-pointer"
                       @click.stop="openReleaseConfirm(fish)"
                     >
                       {{ tr("Fishfarm.tha") }}
@@ -234,7 +234,7 @@ function getRewardEffect(variant: "NORMAL" | "GOLDEN" | "MUTATED") {
                 </div>
                 <button
                   type="button"
-                  class="flex-shrink-0 px-3 py-1.5 border border-[rgba(235,110,110,0.4)] rounded-lg bg-[rgba(194,59,59,0.2)] hover:bg-[rgba(194,59,59,0.4)] text-palette-ffaaaa hover:text-white text-xs font-bold transition-colors cursor-pointer"
+                  class="flex-shrink-0 px-3 py-1.5 border border-[color-mix(in_srgb,_var(--color-danger)_40%,_transparent)] rounded-lg bg-[color-mix(in_srgb,_var(--color-danger)_20%,_transparent)] hover:bg-[color-mix(in_srgb,_var(--color-danger)_40%,_transparent)] text-danger hover:text-white text-xs font-bold transition-colors cursor-pointer"
                   @click.stop="openReleaseConfirm(fish)"
                 >
                   {{ tr("Fishfarm.tha") }}
@@ -255,7 +255,7 @@ function getRewardEffect(variant: "NORMAL" | "GOLDEN" | "MUTATED") {
         @click.self="cancelRelease"
       >
         <div
-          class="player-popup-panel w-[min(380px,100%)] p-5 border border-ocean-gold/50 rounded-[20px] bg-linear-to-br from-ocean-panel to-ocean-deep shadow-[0_24px_70px_rgba(0,0,0,0.6)] text-ocean-pearl text-center"
+          class="player-popup-panel w-[min(380px,100%)] p-5 border border-ocean-gold/50 rounded-[20px] bg-linear-to-br from-ocean-panel to-ocean-deep shadow-[0_24px_70px_color-mix(in_srgb,_var(--color-content)_60%,_transparent)] text-ocean-pearl text-center"
           role="dialog"
           aria-modal="true"
           aria-labelledby="confirm-release-title"
@@ -271,14 +271,14 @@ function getRewardEffect(variant: "NORMAL" | "GOLDEN" | "MUTATED") {
           <div class="flex justify-center gap-3 mt-5">
             <button
               type="button"
-              class="px-4 py-2 border border-[rgba(255,255,255,0.2)] rounded-xl bg-[rgba(255,255,255,0.1)] hover:bg-[rgba(255,255,255,0.2)] text-white text-xs font-semibold transition-colors cursor-pointer"
+              class="px-4 py-2 border border-[color-mix(in_srgb,_var(--color-white)_20%,_transparent)] rounded-xl bg-[color-mix(in_srgb,_var(--color-white)_10%,_transparent)] hover:bg-[color-mix(in_srgb,_var(--color-white)_20%,_transparent)] text-white text-xs font-semibold transition-colors cursor-pointer"
               @click="cancelRelease"
             >
               {{ tr("AccountInfoModal.huy") }}
             </button>
             <button
               type="button"
-              class="px-4 py-2 border border-palette-e65c5c rounded-xl bg-palette-c23b3b hover:bg-palette-d94848 text-white text-xs font-bold shadow-[0_4px_12px_rgba(194,59,59,0.4)] transition-colors cursor-pointer disabled:opacity-50"
+              class="px-4 py-2 border border-danger rounded-xl bg-danger hover:bg-danger text-white text-xs font-bold shadow-[0_4px_12px_color-mix(in_srgb,_var(--color-danger)_40%,_transparent)] transition-colors cursor-pointer disabled:opacity-50"
               :disabled="isReleasing"
               @click="handleRelease"
             >

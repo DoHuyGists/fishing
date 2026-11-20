@@ -20,11 +20,11 @@ defineProps<{
         : 'w-full items-center gap-2 text-left',
       selected
         ? variant === 'grid'
-          ? 'border-emerald-600 bg-emerald-100 ring-2 ring-emerald-500'
-          : 'border-emerald-600 bg-emerald-100'
+          ? 'border-accent bg-surface ring-2 ring-accent'
+          : 'border-accent bg-surface'
         : variant === 'species'
-          ? 'border-gray-200 bg-white hover:bg-emerald-50'
-          : 'border-gray-200 bg-gray-50 hover:bg-emerald-50',
+          ? 'border-border bg-white hover:bg-surface'
+          : 'border-border bg-white hover:bg-surface',
     ]"
   >
     <img
@@ -37,6 +37,6 @@ defineProps<{
       class="truncate font-bold"
       :class="variant === 'grid' ? 'w-full text-[11px]' : variant === 'species' ? 'grow text-xs' : 'grow text-sm'"
     >{{ fish.species?.name || (variant === 'species' ? tr('CaughtModal.ca') : '') }}</span>
-    <span class="text-gray-600" :class="variant === 'grid' ? 'text-[10px]' : 'text-xs'">{{ fish.weight }} kg</span>
+    <span class="text-content" :class="variant === 'grid' ? 'text-[10px]' : 'text-xs'">{{ fish.weight }} kg</span>
   </button>
 </template>
