@@ -5,7 +5,7 @@ defineProps<{ title: string; description: string; stats: EquipmentStatDisplay[] 
 </script>
 
 <template>
-  <section class="rounded-xl border border-border-default bg-surface p-2 text-content" :aria-label="title">
+  <section class="shared-equipment-stats rounded-xl border border-border-default bg-surface p-2 text-content" :aria-label="title">
     <div class="mb-2 text-xs font-bold">{{ title }}</div>
     <div class="grid grid-cols-2 gap-1.5 sm:grid-cols-5">
       <div v-for="stat in stats" :key="stat.id" class="min-w-0 rounded-lg border border-border-default bg-white p-2">
@@ -18,3 +18,10 @@ defineProps<{ title: string; description: string; stats: EquipmentStatDisplay[] 
     <div class="mt-1 text-[10px] text-palette-526650">{{ description }}</div>
   </section>
 </template>
+
+<style scoped>
+.ocean-theme .shared-equipment-stats output {
+  color: var(--color-ocean-gold);
+  text-shadow: 0 1px 2px #071a2d4d;
+}
+</style>

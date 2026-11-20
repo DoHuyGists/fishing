@@ -8,17 +8,17 @@ const goBack = () => {
 </script>
 
 <template>
-  <main class="flex min-h-screen items-center justify-center bg-surface px-6 py-16 text-content">
+  <main class="flex min-h-screen items-center justify-center bg-surface-muted px-6 py-16 text-content">
     <section class="w-full max-w-xl" aria-labelledby="error-title">
       <!-- Khung liền nét kèm biểu tượng khóa -->
       <div
-        class="relative flex aspect-[16/7] w-full items-center justify-center rounded-2xl border-2 border-border-default bg-border-default/20"
+        class="relative flex aspect-[16/7] w-full items-center justify-center rounded-3xl border-2 border-[var(--color-ocean-gold)]/60 bg-surface text-[var(--color-ocean-gold)] shadow-[inset_0_1px_0_rgba(245,235,212,0.12),0_16px_40px_rgba(0,0,0,0.15)]"
         aria-hidden="true"
       >
         <span class="select-none text-7xl font-semibold tracking-tight sm:text-8xl">403</span>
 
         <span
-          class="absolute right-4 top-4 flex h-11 w-11 items-center justify-center rounded-full border border-border-default bg-surface"
+          class="absolute right-4 top-4 flex h-11 w-11 items-center justify-center rounded-full border border-[var(--color-ocean-gold)]/40 bg-surface-muted"
         >
           <svg
             class="h-5 w-5"
@@ -45,7 +45,7 @@ const goBack = () => {
       <div class="mt-8 flex flex-wrap gap-3">
         <a
           href="/login"
-          class="inline-flex items-center rounded-lg border border-content bg-content px-5 py-2.5 text-sm font-medium text-surface transition-colors hover:bg-content/90 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-content"
+          class="inline-flex items-center rounded-xl border border-[var(--color-ocean-gold)] bg-[var(--color-ocean-gold)] px-5 py-2.5 text-sm font-bold text-[var(--color-ocean-deep)] transition hover:brightness-110 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-[var(--color-ocean-cyan)]"
         >
           {{ tr('Forbidden.dang_nhap_tai_khoan_khac') }}
         </a>

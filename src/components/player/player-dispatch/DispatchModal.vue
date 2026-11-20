@@ -96,7 +96,7 @@ onBeforeUnmount(() => {
 <style>
 @reference 'tailwindcss';
 .dispatch-button {
-  @apply min-h-8 rounded-md border border-[var(--color-border-default)] bg-[var(--color-content)] px-2.5 py-1.5 text-xs font-semibold text-white transition-colors hover:bg-[var(--color-palette-3d5941)] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--color-palette-527547)] disabled:cursor-not-allowed disabled:opacity-50;
+  @apply min-h-8 rounded-md border border-[var(--color-border-default)] bg-[var(--color-brand)] px-2.5 py-1.5 text-xs font-semibold text-white transition-colors hover:bg-[var(--color-brand-hover)] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--color-palette-527547)] disabled:cursor-not-allowed disabled:opacity-50;
 }
 .dispatch-grid {
   display: grid;
@@ -104,7 +104,7 @@ onBeforeUnmount(() => {
   gap: 0.5rem;
 }
 .dispatch-card {
-  @apply min-w-0 space-y-2 rounded-lg border border-[var(--color-border-default)] bg-white p-2.5 text-xs;
+  @apply min-w-0 space-y-2 rounded-lg border border-[var(--color-border-default)] bg-[var(--color-surface)] p-2.5 text-xs text-[var(--color-content)];
   overflow-wrap: anywhere;
 }
 .dispatch-content [role="tablist"] > button {
@@ -112,5 +112,21 @@ onBeforeUnmount(() => {
 }
 .dispatch-content [role="tabpanel"] {
   @apply py-2;
+}
+
+html.ocean-theme .dispatch-button {
+  border-color: var(--color-ocean-gold);
+  background: linear-gradient(var(--color-ocean-gold), color-mix(in srgb, var(--color-ocean-gold) 75%, var(--color-ocean-wood)));
+  color: var(--color-ocean-deep);
+  box-shadow: inset 0 1px 0 rgb(245 235 212 / 40%), 0 2px 0 var(--color-ocean-wood);
+}
+
+html.ocean-theme .dispatch-button:not(:disabled):hover {
+  background: var(--color-ocean-gold);
+}
+
+html.ocean-theme .dispatch-card {
+  background: linear-gradient(145deg, var(--color-ocean-panel), var(--color-ocean-deep));
+  box-shadow: inset 0 1px 0 rgb(245 235 212 / 8%);
 }
 </style>

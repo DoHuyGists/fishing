@@ -267,7 +267,7 @@ const supportActions: LobbyAction[] = [
     :aria-label="tr('FeatureTable.chuc_nang_sanh_cau_ca')"
     class="lobby-menu flex max-h-[calc(100dvh-6rem)] w-full min-w-0 max-w-sm flex-col self-start overflow-hidden rounded-xl border border-border-default bg-surface text-content shadow-[0_4px_20px_-12px_rgba(36,53,42,0.3)]"
   >
-    <div class="shrink-0 border-b border-border-default bg-linear-to-br from-palette-edf5e5 to-surface px-2.5 py-2">
+    <div class="lobby-menu__header shrink-0 border-b border-border-default bg-linear-to-br from-palette-edf5e5 to-surface px-2.5 py-2">
       <div class="mb-2 flex items-center gap-2">
         <span
           aria-hidden="true"
@@ -276,9 +276,6 @@ const supportActions: LobbyAction[] = [
         >
         <div class="min-w-0">
           <div class="text-sm font-bold tracking-wide">{{ tr("FeatureTable.sanh_cau_ca") }}</div>
-          <div class="mt-0.5 text-[11px] leading-4 text-palette-61745d">
-            {{ tr("FeatureTable.chuan_bi_cho_chuyen_cau_tiep_theo") }}
-          </div>
         </div>
       </div>
       <div class="grid grid-cols-2 gap-1.5">
@@ -312,7 +309,7 @@ const supportActions: LobbyAction[] = [
       role="region"
       :aria-label="tr('FeatureTable.danh_sach_chuc_nang')"
       tabindex="0"
-      class="lobby-menu__body [scrollbar-width:thin] [scrollbar-color:#b7cbb4_transparent] scroll-py-2 min-h-0 flex-1 space-y-3 overflow-x-hidden overflow-y-auto overscroll-contain px-2.5 py-2 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-palette-527547"
+      class="lobby-menu__body [scrollbar-width:thin] [scrollbar-color:var(--color-ocean-cyan)_transparent] scroll-py-2 min-h-0 flex-1 space-y-3 overflow-x-hidden overflow-y-auto overscroll-contain px-2.5 py-2 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-palette-527547"
     >
       <section
         v-for="(group, groupIndex) in actionGroups"
@@ -363,7 +360,7 @@ const supportActions: LobbyAction[] = [
       </section>
     </div>
 
-    <div class="grid shrink-0 grid-cols-2 gap-1 border-t border-border-default bg-palette-edf3e7 px-2 py-1">
+    <div class="lobby-menu__footer grid shrink-0 grid-cols-2 gap-1 border-t border-border-default bg-palette-edf3e7 px-2 py-1">
       <button
         v-for="(action, actionIndex) in supportActions"
         :key="action.modal"
@@ -392,3 +389,41 @@ const supportActions: LobbyAction[] = [
     </div>
   </nav>
 </template>
+
+<style scoped>
+html.ocean-theme .lobby-menu {
+  border-color: color-mix(in srgb, var(--color-ocean-gold) 70%, transparent);
+  background: var(--color-ocean-deep);
+  box-shadow: inset 0 0 0 2px color-mix(in srgb, var(--color-ocean-panel) 80%, transparent), 0 12px 28px rgb(0 0 0 / 25%);
+}
+
+html.ocean-theme .lobby-menu__header,
+html.ocean-theme .lobby-menu__footer {
+  border-color: color-mix(in srgb, var(--color-ocean-gold) 45%, transparent);
+  background: linear-gradient(135deg, var(--color-ocean-panel), var(--color-ocean-deep));
+}
+
+html.ocean-theme .lobby-menu__button {
+  border-color: color-mix(in srgb, var(--color-ocean-gold) 42%, var(--color-ocean-panel));
+  background: linear-gradient(155deg, var(--color-ocean-panel), var(--color-ocean-deep));
+  color: var(--color-ocean-pearl);
+  box-shadow: inset 0 1px 0 rgb(245 235 212 / 12%), 0 2px 0 rgb(0 0 0 / 20%);
+}
+
+html.ocean-theme .lobby-menu__button:enabled:hover {
+  border-color: var(--color-ocean-cyan);
+  background: linear-gradient(155deg, color-mix(in srgb, var(--color-ocean-cyan) 28%, var(--color-ocean-panel)), var(--color-ocean-panel));
+  box-shadow: inset 0 1px 0 rgb(245 235 212 / 18%), 0 0 12px rgb(53 185 213 / 18%);
+}
+
+html.ocean-theme .lobby-menu__button:disabled,
+html.ocean-theme .lobby-menu__button[data-locked="true"] {
+  border-color: color-mix(in srgb, var(--color-ocean-pearl) 20%, transparent);
+  background: var(--color-ocean-deep);
+  box-shadow: none;
+}
+
+html.ocean-theme .lobby-menu__button:focus-visible {
+  outline-color: var(--color-ocean-cyan);
+}
+</style>

@@ -524,6 +524,47 @@ onUnmounted(() => {
   transform: translateY(-4px);
 }
 
+.ocean-theme .guide-tour__border {
+  stroke: var(--color-ocean-cyan);
+  filter: drop-shadow(0 0 8px #35b9d5b3);
+}
+
+.ocean-theme .guide-tour__tooltip {
+  color: var(--color-ocean-pearl);
+  border-color: var(--color-ocean-gold);
+  background: linear-gradient(145deg, var(--color-ocean-panel), var(--color-ocean-deep));
+  box-shadow: 0 16px 40px #071a2d99, inset 0 1px #f5ebd426;
+}
+
+.ocean-theme .guide-tour__progress {
+  color: var(--color-ocean-cyan);
+}
+
+.ocean-theme .guide-tour__title {
+  color: var(--color-ocean-gold);
+}
+
+.ocean-theme .guide-tour__description,
+.ocean-theme .guide-tour__skip,
+.ocean-theme .guide-tour__back {
+  color: var(--color-ocean-pearl);
+}
+
+.ocean-theme .guide-tour__next {
+  color: var(--color-ocean-deep);
+  background: var(--color-ocean-gold);
+  box-shadow: 0 2px 0 var(--color-ocean-wood);
+}
+
+.ocean-theme .guide-tour__actions button:hover {
+  filter: brightness(1.12);
+}
+
+.ocean-theme .guide-tour__actions button:focus-visible {
+  outline: 2px solid var(--color-ocean-cyan);
+  outline-offset: 2px;
+}
+
 @media (prefers-reduced-motion: reduce) {
   .guide-tour__hole,
   .guide-tour__border,

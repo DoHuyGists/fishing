@@ -118,14 +118,15 @@ onBeforeUnmount(() => activeTimers.forEach(clearTimeout));
         <article
           v-for="toast in group.items"
           :key="toast.id"
-          class="pointer-events-auto flex items-start gap-3 rounded-2xl border border-border-default border-l-4 bg-surface px-4 py-4 text-content shadow-[0_16px_40px_rgba(36,53,42,0.16)] ring-1 ring-white/80 transition-[opacity,transform,box-shadow] duration-200 ease-out hover:shadow-[0_20px_48px_rgba(36,53,42,0.2)] motion-reduce:transition-none"
+          class="shared-toast pointer-events-auto flex items-start gap-3 rounded-2xl border border-border-default border-l-4 bg-surface px-4 py-4 text-content shadow-[0_16px_40px_rgba(36,53,42,0.16)] ring-1 ring-white/80 transition-[opacity,transform,box-shadow] duration-200 ease-out hover:shadow-[0_20px_48px_rgba(36,53,42,0.2)] motion-reduce:transition-none"
           :class="variantClasses[toast.variant]"
+          :data-variant="toast.variant"
           :role="toast.variant === 'error' ? 'alert' : 'status'"
           @mouseenter="clearTimer(toast.id)"
           @mouseleave="startTimer(toast)"
         >
           <span
-            class="grid h-8 w-8 flex-none place-items-center rounded-xl text-sm font-extrabold leading-none"
+            class="shared-toast__icon grid h-8 w-8 flex-none place-items-center rounded-xl text-sm font-extrabold leading-none"
             :class="[variantTextClasses[toast.variant], variantIconClasses[toast.variant]]"
             aria-hidden="true"
             >{{ icons[toast.variant] }}</span
@@ -134,7 +135,7 @@ onBeforeUnmount(() => activeTimers.forEach(clearTimeout));
             <strong v-if="toast.title" class="mb-1 block text-sm font-bold leading-snug tracking-[0.01em]">{{
               toast.title
             }}</strong>
-            <div class="m-0 break-words text-sm leading-relaxed text-palette-526354">{{ toast.message }}</div>
+            <div class="shared-toast__message m-0 break-words text-sm leading-relaxed text-palette-526354">{{ toast.message }}</div>
             <button
               v-if="toast.action"
               class="mt-2 inline-flex rounded-md bg-transparent p-0 text-sm font-bold underline decoration-1 underline-offset-4 transition-colors hover:brightness-75 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-palette-78906f focus-visible:ring-offset-2"
@@ -161,3 +162,40 @@ onBeforeUnmount(() => activeTimers.forEach(clearTimeout));
   </div>
   </Teleport>
 </template>
+
+<style scoped>
+.ocean-theme .shared-toast {
+  --toast-accent: var(--color-ocean-cyan);
+  color: var(--color-ocean-pearl);
+  border-color: #f2c66d59;
+  border-left-color: var(--toast-accent);
+  background: linear-gradient(135deg, var(--color-ocean-panel), var(--color-ocean-deep));
+  box-shadow: 0 16px 40px #071a2d66;
+  --tw-ring-color: #f2c66d1a;
+}
+
+.ocean-theme .shared-toast[data-variant="success"] { --toast-accent: #82e2cc; }
+.ocean-theme .shared-toast[data-variant="error"] { --toast-accent: #ff9d98; }
+.ocean-theme .shared-toast[data-variant="warning"] { --toast-accent: var(--color-ocean-gold); }
+.ocean-theme .shared-toast[data-variant="neutral"] { --toast-accent: var(--color-ocean-pearl); }
+
+.ocean-theme .shared-toast__icon {
+  color: var(--toast-accent);
+  border: 1px solid color-mix(in srgb, var(--toast-accent) 40%, transparent);
+  background: color-mix(in srgb, var(--toast-accent) 12%, var(--color-ocean-deep));
+}
+
+.ocean-theme .shared-toast__message {
+  color: color-mix(in srgb, var(--color-ocean-pearl) 90%, transparent);
+}
+
+.ocean-theme .shared-toast button {
+  color: var(--toast-accent);
+  --tw-ring-color: var(--color-ocean-cyan);
+  --tw-ring-offset-color: var(--color-ocean-deep);
+}
+
+.ocean-theme .shared-toast button:hover {
+  filter: brightness(1.15);
+}
+</style>

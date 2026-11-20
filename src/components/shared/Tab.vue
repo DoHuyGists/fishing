@@ -106,7 +106,7 @@ async function onKeydown(e: KeyboardEvent, index: number) {
     <div
       role="tablist"
       :aria-label="ariaLabel"
-      class="flex shrink-0 gap-1 border-b border-green-200"
+      class="shared-tabs flex shrink-0 gap-1 border-b border-green-200"
       :class="wrap ? 'flex-wrap' : 'overflow-x-auto'"
     >
       <button
@@ -120,7 +120,7 @@ async function onKeydown(e: KeyboardEvent, index: number) {
         :aria-controls="panelId(tab.key)"
         :tabindex="tab.key === activeKey ? 0 : -1"
         :disabled="tab.disabled"
-        class="inline-flex shrink-0 items-center gap-2 whitespace-nowrap border-b-2 px-4 py-2.5 text-sm font-medium transition-colors duration-150 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-green-500 disabled:cursor-not-allowed disabled:opacity-40"
+        class="shared-tabs__tab inline-flex shrink-0 items-center gap-2 whitespace-nowrap border-b-2 px-4 py-2.5 text-sm font-medium transition-colors duration-150 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-green-500 disabled:cursor-not-allowed disabled:opacity-40"
         :class="
           tab.key === activeKey
             ? 'border-green-600 text-green-700'
@@ -141,7 +141,7 @@ async function onKeydown(e: KeyboardEvent, index: number) {
           {{ tab.label }}
           <span
             v-if="tab.badge !== undefined"
-            class="rounded-full px-1.5 py-0.5 text-[11px] font-semibold leading-none"
+            class="shared-tabs__badge rounded-full px-1.5 py-0.5 text-[11px] font-semibold leading-none"
             :class="
               tab.key === activeKey
                 ? 'bg-green-600 text-white'
@@ -171,3 +171,51 @@ async function onKeydown(e: KeyboardEvent, index: number) {
     </template>
   </div>
 </template>
+
+<style scoped>
+.ocean-theme .shared-tabs {
+  gap: 0.375rem;
+  padding: 0.375rem 0.375rem 0;
+  border-color: color-mix(in srgb, var(--color-ocean-gold) 45%, transparent);
+  background: color-mix(in srgb, var(--color-ocean-deep) 85%, transparent);
+}
+
+.ocean-theme .shared-tabs__tab {
+  color: color-mix(in srgb, var(--color-ocean-pearl) 75%, transparent);
+  border: 1px solid transparent;
+  border-bottom-width: 2px;
+  border-radius: 0.625rem 0.625rem 0 0;
+}
+
+.ocean-theme .shared-tabs__tab[aria-selected="true"] {
+  color: var(--color-ocean-gold);
+  border-color: color-mix(in srgb, var(--color-ocean-gold) 45%, transparent);
+  border-bottom-color: var(--color-ocean-gold);
+  background: linear-gradient(180deg, var(--color-ocean-panel), #1d54754d);
+  box-shadow: inset 0 1px #f5ebd41a;
+}
+
+.ocean-theme .shared-tabs__tab:hover:not(:disabled) {
+  color: var(--color-ocean-pearl);
+  border-color: var(--color-ocean-cyan);
+  background-color: var(--color-ocean-panel);
+}
+
+.ocean-theme .shared-tabs__tab:focus-visible {
+  outline: 2px solid var(--color-ocean-cyan);
+  outline-offset: -3px;
+  --tw-ring-color: var(--color-ocean-cyan);
+}
+
+.ocean-theme .shared-tabs__badge {
+  color: var(--color-ocean-pearl);
+  background: var(--color-ocean-panel);
+  border: 1px solid #35b9d566;
+}
+
+.ocean-theme .shared-tabs__tab[aria-selected="true"] .shared-tabs__badge {
+  color: var(--color-ocean-deep);
+  background: var(--color-ocean-gold);
+  border-color: var(--color-ocean-gold);
+}
+</style>

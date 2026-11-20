@@ -56,7 +56,7 @@ async function upgrade(skillId: string) {
 <template>
   <Modal :title="tr('SkillModal.ky_nang')" :on-refresh="() => refresh(true)">
     <section
-      class="skill-board bg-palette-edf2e6 bg-[radial-gradient(#b6c6a84d_0.7px,transparent_0.7px)] bg-size-[12px_12px] min-h-full w-full space-y-4 rounded-2xl p-3 text-content sm:p-4"
+      class="skill-board bg-palette-edf2e6 bg-[radial-gradient(var(--color-border-default)_0.7px,transparent_0.7px)] bg-size-[12px_12px] min-h-full w-full space-y-4 rounded-2xl p-3 text-content sm:p-4"
       :aria-busy="skillStore.loading"
     >
       <button

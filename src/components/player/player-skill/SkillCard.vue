@@ -19,7 +19,7 @@ const emit = defineEmits<{
     class="slide-fade-in from-bottom player-content-in skill-card relative flex min-w-0 flex-col rounded-xl border shadow-[0_1px_2px_var(--color-palette-24352a08)] p-3 sm:p-4"
     :class="
       skill.isMaxLevel
-        ? 'skill-card-mastered border-palette-c9ad61 bg-[linear-gradient(145deg,var(--color-palette-fff9e6),#f5f9f0_65%)]'
+        ? 'skill-card-mastered border-palette-c9ad61 bg-[linear-gradient(145deg,var(--color-palette-fff9e6),var(--color-surface)_65%)]'
         : 'border-border-default bg-surface'
     "
   >
@@ -118,3 +118,23 @@ const emit = defineEmits<{
     </button>
   </article>
 </template>
+
+<style scoped>
+html.ocean-theme .skill-card-mastered {
+  border-color: var(--color-ocean-gold);
+  background: linear-gradient(145deg, color-mix(in srgb, var(--color-ocean-gold) 16%, var(--color-ocean-panel)), var(--color-ocean-deep) 70%);
+}
+
+html.ocean-theme .skill-emblem {
+  border-color: var(--color-ocean-gold);
+  background: radial-gradient(circle at top, var(--color-ocean-panel), var(--color-ocean-deep));
+  box-shadow: inset 0 0 0 2px rgb(242 198 109 / 15%);
+}
+
+html.ocean-theme .skill-upgrade {
+  border-color: var(--color-ocean-gold);
+  background: linear-gradient(var(--color-ocean-gold), color-mix(in srgb, var(--color-ocean-gold) 72%, var(--color-ocean-wood)));
+  color: var(--color-ocean-deep);
+  box-shadow: 0 2px 0 var(--color-ocean-wood), inset 0 1px 0 rgb(245 235 212 / 45%);
+}
+</style>

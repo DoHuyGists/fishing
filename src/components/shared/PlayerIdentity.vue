@@ -22,7 +22,7 @@ watch(
 <template>
   <div class="flex min-w-0 items-center gap-3 text-content">
     <div
-      class="flex size-10 shrink-0 items-center justify-center overflow-hidden rounded-full bg-brand text-sm font-bold text-white"
+      class="shared-player-avatar flex size-10 shrink-0 items-center justify-center overflow-hidden rounded-full bg-brand text-sm font-bold text-white"
     >
       <img
         v-if="profile?.avatar_url && !failedAvatar"
@@ -43,3 +43,12 @@ watch(
     </div>
   </div>
 </template>
+
+<style scoped>
+.ocean-theme .shared-player-avatar {
+  color: var(--color-ocean-pearl);
+  border: 2px solid var(--color-ocean-gold);
+  background: linear-gradient(145deg, var(--color-ocean-panel), var(--color-ocean-deep));
+  box-shadow: 0 2px 6px #071a2d40, inset 0 1px #f5ebd426;
+}
+</style>

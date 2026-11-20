@@ -1,5 +1,6 @@
 @import "tailwindcss";
 @import "./theme.css";
+@import "./ocean-theme.css";
 
 @tailwind utilities;
 

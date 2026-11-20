@@ -516,7 +516,7 @@ onMounted(async () => {
           <div
             v-for="team in filteredTeams"
             :key="team.id"
-            class="slide-fade-in from-bottom player-content-in bg-surface border border-palette-cde0c9 rounded-xl overflow-hidden transition-shadow hover:shadow-[0_4px_16px_rgba(59,122,87,0.12)]"
+            class="slide-fade-in from-bottom player-content-in bg-surface border border-palette-cde0c9 rounded-xl overflow-hidden transition-shadow hover:shadow-[0_4px_16px_var(--color-border-default)]"
           >
             <div class="px-4 py-[14px]">
               <div class="flex items-center justify-between gap-2 mb-1">

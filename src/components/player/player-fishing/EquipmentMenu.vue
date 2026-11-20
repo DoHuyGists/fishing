@@ -72,7 +72,7 @@ watch(
         }}
         <span
           v-if="!store.canAdjustDepth"
-          class="depth-lock-overlay bg-[repeating-linear-gradient(135deg,rgb(203_217_198_/_85%)_0_5px,rgb(245_249_240_/_75%)_5px_10px)] pointer-events-none absolute inset-0 flex items-center justify-center rounded-[inherit]"
+          class="depth-lock-overlay bg-[repeating-linear-gradient(135deg,var(--color-surface-muted)_0_5px,var(--color-surface)_5px_10px)] pointer-events-none absolute inset-0 flex items-center justify-center rounded-[inherit]"
           aria-hidden="true"
         >
           <span

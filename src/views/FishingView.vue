@@ -183,21 +183,21 @@ onBeforeUnmount(() => {
     <div>{{ tr("FishingView.khong_the_chuan_bi_phien_cau") }} {{ sessionError }}</div>
     <button
       type="button"
-      class="rounded-lg border border-border-default bg-white px-4 py-2 font-medium hover:bg-surface"
+      class="rounded-xl border border-[var(--color-ocean-gold)] bg-[var(--color-ocean-gold)] px-4 py-2 font-bold text-[var(--color-ocean-deep)] transition hover:brightness-110"
       @click="retrySetup"
     >
       {{ tr("Maintenance.thu_lai") }}
     </button>
     <button
       type="button"
-      class="rounded-lg border border-border-default bg-white px-4 py-2 font-medium hover:bg-surface disabled:opacity-50"
+      class="rounded-xl border border-border-default bg-surface px-4 py-2 font-medium transition hover:border-[var(--color-ocean-cyan)] disabled:opacity-50"
       :disabled="fishingStore.isLeavingArea"
       @click="router.push({ name: 'home' })"
     >
       {{ tr("FishingView.quay_lai_ban_do") }}
     </button>
   </section>
-  <main v-else-if="sessionReady" class="w-full h-screen overflow-hidden touch-none overscroll-none bg-palette-193224 text-palette-e9f4e8">
+  <main v-else-if="sessionReady" class="w-full h-screen overflow-hidden touch-none overscroll-none bg-[var(--color-ocean-deep)] text-[var(--color-ocean-pearl)]">
     <div class="fixed top-3 left-3 z-20 text-white flex justify-between items-start">
       <div class="flex flex-col gap-2">
         <DayPhaseClock :area-id="userInAreaStore.userInArea?.area_id" />
@@ -207,10 +207,10 @@ onBeforeUnmount(() => {
           :area-id="userInAreaStore.userInArea?.area_id ?? null"
           presence
         />
-        <div class="backdrop-blur-2xl h-fit w-fit rounded p-1">
+        <div class="backdrop-blur-2xl h-fit w-fit rounded-xl border border-[var(--color-ocean-gold)]/35 bg-[var(--color-ocean-deep)]/85 px-3 py-2">
           <button
             type="button"
-            class="text-sm text-red-500 bg-transparent border-0 cursor-pointer font-medium p-0 hover:underline disabled:opacity-50"
+            class="text-sm text-[var(--color-ocean-gold)] bg-transparent border-0 cursor-pointer font-medium p-0 hover:underline disabled:opacity-50"
             :disabled="fishingStore.isLeavingArea"
             @click="showExitConfirmation = true"
           >
@@ -221,7 +221,7 @@ onBeforeUnmount(() => {
     </div>
     <button
       type="button"
-      class="fixed right-3 top-3 z-20 rounded-lg border border-border-default bg-surface px-3 py-1.5 text-xs font-bold text-content hover:bg-palette-e2ecdc"
+      class="fixed right-3 top-3 z-20 rounded-xl border border-[var(--color-ocean-gold)]/60 bg-[var(--color-ocean-deep)]/90 px-3 py-2 text-xs font-bold text-[var(--color-ocean-pearl)] backdrop-blur-md transition hover:border-[var(--color-ocean-cyan)] hover:bg-[var(--color-ocean-panel)]"
       aria-haspopup="dialog"
       @click="settingsOpen = true"
     >
@@ -248,7 +248,7 @@ onBeforeUnmount(() => {
               <img :src="selectedBait?.image ?? ''" class="size-6 object-contain" alt="" />
               <div class="flex flex-col gap-0.5">
                 <span class="font-bold">{{ selectedBait?.name ?? tr("EquipmentMenu.chua_chon_moi") }}</span>
-                <span class="text-palette-4b5f50">{{ tr("EquipmentMenu.con") }} {{ selectedBait?.quantity ?? 0 }}</span>
+                <span class="text-[var(--color-ocean-pearl)]/70">{{ tr("EquipmentMenu.con") }} {{ selectedBait?.quantity ?? 0 }}</span>
               </div>
             </div>
           </div>
@@ -266,18 +266,18 @@ onBeforeUnmount(() => {
           <button
             v-if="fishingStore.pendingResult"
             type="button"
-            class="rounded-[10px] border border-border-default bg-white px-3 py-2 text-xs font-bold enabled:hover:bg-palette-e2ecdc disabled:opacity-45"
+            class="rounded-[10px] border border-[var(--color-ocean-gold)] bg-[var(--color-ocean-gold)] px-3 py-2 text-xs font-bold text-[var(--color-ocean-deep)] transition enabled:hover:brightness-110 disabled:opacity-45"
             :disabled="fishingStore.castPhase !== 'unconfirmed'"
             @click="fishingStore.retryPendingResult"
           >
             {{ tr("fishing.retry_result") }}
           </button>
-          <div v-if="fishingStore.isFishingNetFull" role="status" class="text-xs font-bold text-amber-800">
+          <div v-if="fishingStore.isFishingNetFull" role="status" class="text-xs font-bold text-[var(--color-ocean-gold)]">
             {{ tr("FishingBag.capacity_reached", { capacity: fishingStore.fishingNetCapacity }) }}
           </div>
           <button
             type="button"
-            class="rounded-[10px] border border-border-default bg-white px-3 py-2 text-xs font-bold enabled:hover:bg-palette-e2ecdc disabled:cursor-not-allowed disabled:opacity-45"
+            class="rounded-[10px] border border-[var(--color-ocean-gold)] bg-[var(--color-ocean-gold)] px-3 py-2 text-xs font-bold text-[var(--color-ocean-deep)] transition enabled:hover:brightness-110 disabled:cursor-not-allowed disabled:opacity-45"
             v-if="!fishingStore.pendingResult"
             :disabled="!fishingStore.canReelIn"
             @click="fishingStore.reelInBait"
@@ -295,22 +295,22 @@ onBeforeUnmount(() => {
       <Transition name="exit-dialog">
         <div
           v-if="showExitConfirmation"
-          class="fixed z-[40] inset-0 grid place-items-center p-5 bg-[rgba(4,17,11,0.72)] backdrop-blur-[7px]"
+          class="fixed z-[40] inset-0 grid place-items-center p-5 bg-[rgba(8,25,40,0.78)] backdrop-blur-[7px]"
           role="presentation"
           @click.self="showExitConfirmation = false"
         >
           <section
-            class="w-[min(380px,100%)] p-5 border border-[rgba(255,226,149,0.5)] rounded-[20px] bg-[linear-gradient(145deg,var(--color-palette-1b4531),var(--color-palette-0f2e1f))] shadow-[0_24px_70px_rgba(0,0,0,0.6)] text-palette-f4f0df text-center"
+            class="w-[min(380px,100%)] p-5 border border-[var(--color-ocean-gold)]/60 rounded-[20px] bg-[linear-gradient(145deg,var(--color-ocean-panel),var(--color-ocean-deep))] shadow-[0_24px_70px_rgba(0,0,0,0.6)] text-[var(--color-ocean-pearl)] text-center"
             role="dialog"
             aria-modal="true"
             aria-labelledby="confirm-exit-title"
           >
-            <div id="confirm-exit-title" class="m-0 text-lg font-bold text-palette-e8bd62">
+            <div id="confirm-exit-title" class="m-0 text-lg font-bold text-[var(--color-ocean-gold)]">
               {{ tr("FishingView.ket_thuc_chuyen_cau_2") }}
             </div>
-            <div class="my-4 text-sm text-palette-c8dccb leading-relaxed">
+            <div class="my-4 text-sm text-[var(--color-ocean-pearl)]/80 leading-relaxed">
               {{ tr("FishingView.gio_ca_hien_co") }}
-              <strong class="text-white">{{ fishingStore.inventory.length }}</strong>
+              <strong class="text-[var(--color-ocean-gold)]">{{ fishingStore.inventory.length }}</strong>
               {{ tr("FishingView.con_ca_ban_co_chac_chan_muon_quay_lai_ban_do_khong") }}
             </div>
             <div v-if="fishingStore.leaveAreaError" role="alert" class="my-3 text-sm text-red-300">
@@ -319,14 +319,14 @@ onBeforeUnmount(() => {
             <div class="flex justify-center gap-3 mt-5">
               <button
                 type="button"
-                class="px-4 py-2 border border-[rgba(255,255,255,0.2)] rounded-xl bg-[rgba(255,255,255,0.1)] hover:bg-[rgba(255,255,255,0.2)] text-white text-xs font-semibold transition-colors cursor-pointer"
+                class="px-4 py-2 border border-[var(--color-ocean-cyan)]/40 rounded-xl bg-[var(--color-ocean-deep)] hover:bg-[var(--color-ocean-panel)] text-[var(--color-ocean-pearl)] text-xs font-semibold transition-colors cursor-pointer"
                 @click="showExitConfirmation = false"
               >
                 {{ tr("FishingView.o_lai_cau") }}
               </button>
               <button
                 type="button"
-                class="px-4 py-2 border border-palette-e65c5c rounded-xl bg-palette-c23b3b hover:bg-palette-d94848 text-white text-xs font-bold shadow-[0_4px_12px_rgba(194,59,59,0.4)] transition-colors cursor-pointer disabled:opacity-50"
+                class="px-4 py-2 border border-[var(--color-ocean-gold)] rounded-xl bg-[var(--color-ocean-gold)] hover:brightness-110 text-[var(--color-ocean-deep)] text-xs font-bold shadow-[0_4px_12px_rgba(242,198,109,0.2)] transition cursor-pointer disabled:opacity-50"
                 :disabled="fishingStore.isLeavingArea"
                 @click="router.push({ name: 'lobby' })"
               >
@@ -342,7 +342,7 @@ onBeforeUnmount(() => {
     <Teleport to="body">
       <div
         v-if="settingsOpen"
-        class="fixed inset-0 z-[31] grid place-items-center bg-[rgba(4,17,11,0.72)] p-5 backdrop-blur-[7px]"
+        class="fixed inset-0 z-[31] grid place-items-center bg-[rgba(8,25,40,0.78)] p-5 backdrop-blur-[7px]"
         @click.self="settingsOpen = false"
         @keydown.esc.stop="settingsOpen = false"
       >
@@ -350,13 +350,13 @@ onBeforeUnmount(() => {
           role="dialog"
           aria-modal="true"
           aria-labelledby="fishing-settings-title"
-          class="max-h-[85dvh] w-full max-w-lg overflow-y-auto rounded-xl border border-border-default bg-surface p-4 text-content"
+          class="max-h-[85dvh] w-full max-w-lg overflow-y-auto rounded-2xl border border-[var(--color-ocean-gold)]/60 bg-surface p-5 text-content shadow-[0_24px_70px_rgba(0,0,0,0.5)]"
         >
-          <header class="mb-4 flex items-center justify-between gap-4 border-b pb-2">
-            <div id="fishing-settings-title" class="text-lg font-bold">{{ tr("FishingView.cai_dat_cau_ca") }}</div>
+          <header class="mb-4 flex items-center justify-between gap-4 border-b border-[var(--color-ocean-gold)]/25 pb-3">
+            <div id="fishing-settings-title" class="text-lg font-bold text-[var(--color-ocean-gold)]">{{ tr("FishingView.cai_dat_cau_ca") }}</div>
             <button
               type="button"
-              class="flex size-8 shrink-0 items-center justify-center rounded-full border border-border-default text-2xl leading-none hover:bg-palette-e2ecdc"
+              class="flex size-8 shrink-0 items-center justify-center rounded-full border border-border-default text-2xl leading-none transition hover:border-[var(--color-ocean-cyan)] hover:bg-[var(--color-ocean-deep)]"
               :aria-label="tr('FishingView.dong_cai_dat')"
               @click="settingsOpen = false"
             >
@@ -377,11 +377,11 @@ onBeforeUnmount(() => {
               :aria-checked="userSettingStore.isFishingBackgroundSoundTurnOn"
               :disabled="!userSettingStore.ready || userSettingStore.saving"
               class="relative inline-flex h-7 w-12 shrink-0 items-center rounded-full border border-border-default transition-colors disabled:opacity-50"
-              :class="userSettingStore.isFishingBackgroundSoundTurnOn ? 'bg-palette-426b3e' : 'bg-border-default'"
+              :class="userSettingStore.isFishingBackgroundSoundTurnOn ? 'bg-[var(--color-ocean-cyan)]' : 'bg-[var(--color-ocean-deep)]'"
               @click="userSettingStore.toggleFishingBackgroundSound"
             >
               <span
-                class="h-5 w-5 rounded-full bg-white shadow transition-transform"
+                class="h-5 w-5 rounded-full bg-[var(--color-ocean-pearl)] shadow transition-transform"
                 :class="userSettingStore.isFishingBackgroundSoundTurnOn ? 'translate-x-6' : 'translate-x-1'"
               />
             </button>
@@ -389,7 +389,7 @@ onBeforeUnmount(() => {
           <div v-if="userSettingStore.loading || userSettingStore.saving" role="status" class="mt-3 text-sm">
             {{ userSettingStore.loading ? tr("FishingView.dang_tai_cai_dat") : tr("FishingView.dang_luu_cai_dat") }}
           </div>
-          <div v-if="userSettingStore.error" role="alert" class="mt-3 text-sm text-red-700">
+          <div v-if="userSettingStore.error" role="alert" class="mt-3 text-sm text-red-300">
             <div>{{ userSettingStore.error }}</div>
             <button
               v-if="!userSettingStore.ready"
@@ -407,7 +407,7 @@ onBeforeUnmount(() => {
   <div
     v-if="!sessionReady && fishingStore.leaveAreaError"
     role="alert"
-    class="fixed bottom-4 left-4 right-4 z-50 rounded-lg bg-surface p-3 text-center text-red-700"
+    class="fixed bottom-4 left-4 right-4 z-50 rounded-lg border border-red-300/40 bg-surface p-3 text-center text-red-300"
   >
     {{ fishingStore.leaveAreaError }}
   </div>
@@ -429,8 +429,9 @@ onBeforeUnmount(() => {
   display: grid;
   grid-template-columns: minmax(0, 1fr) 272px;
   gap: 8px;
-  background: linear-gradient(180deg, var(--color-palette-1b3929), var(--color-palette-11251a));
-  box-shadow: 0 -8px 24px rgba(3, 13, 7, 0.25);
+  border-top: 1px solid rgba(242, 198, 109, 0.4);
+  background: linear-gradient(180deg, var(--color-ocean-panel), var(--color-ocean-deep));
+  box-shadow: 0 -8px 24px rgba(5, 20, 34, 0.3);
 }
 
 .control-deck--tension {
@@ -441,9 +442,9 @@ onBeforeUnmount(() => {
 .side-panel {
   min-width: 0;
   padding: 6px 13px;
-  border: 1px solid rgba(225, 246, 214, 0.23);
+  border: 1px solid rgba(53, 185, 213, 0.3);
   border-radius: 16px;
-  background: linear-gradient(135deg, rgba(16, 42, 27, 0.89), rgba(27, 61, 41, 0.82));
+  background: linear-gradient(135deg, rgba(16, 45, 70, 0.95), rgba(29, 84, 117, 0.82));
 }
 
 .equipment-toggle {
@@ -451,31 +452,31 @@ onBeforeUnmount(() => {
 }
 
 .control-deck :deep(.tool) {
-  border-color: rgba(237, 248, 221, 0.14);
-  background: rgba(11, 35, 22, 0.72);
-  color: var(--color-palette-edf4e8);
+  border-color: rgba(53, 185, 213, 0.25);
+  background: rgba(16, 45, 70, 0.85);
+  color: var(--color-ocean-pearl);
 }
 
 .control-deck :deep(.tool:hover) {
-  border-color: var(--color-palette-b6d67f);
+  border-color: var(--color-ocean-cyan);
 }
 
 .control-deck :deep(.tool.selected) {
-  border-color: var(--color-palette-a6cc78);
-  background: rgba(62, 109, 55, 0.87);
-  box-shadow: inset 0 0 0 1px rgba(211, 239, 164, 0.24);
+  border-color: var(--color-ocean-gold);
+  background: rgba(29, 84, 117, 0.95);
+  box-shadow: inset 0 0 0 1px rgba(242, 198, 109, 0.2), 0 0 14px rgba(53, 185, 213, 0.12);
 }
 
 .control-deck :deep(.tool-icon) {
-  background: rgba(238, 210, 136, 0.2);
+  background: rgba(242, 198, 109, 0.15);
 }
 
 .control-deck :deep(.selected .tool-icon) {
-  background: rgba(194, 225, 142, 0.3);
+  background: rgba(242, 198, 109, 0.28);
 }
 
 .control-deck :deep(.tool small) {
-  color: var(--color-palette-aebfaa);
+  color: rgba(245, 235, 212, 0.7);
 }
 
 @media (max-width: 720px) {
@@ -496,10 +497,10 @@ onBeforeUnmount(() => {
     justify-content: center;
     min-height: 32px;
     padding: 0 10px;
-    border: 1px solid rgba(225, 246, 214, 0.24);
+    border: 1px solid rgba(242, 198, 109, 0.45);
     border-radius: 9px;
-    background: rgba(11, 35, 22, 0.58);
-    color: var(--color-palette-e9f4e8);
+    background: rgba(16, 45, 70, 0.85);
+    color: var(--color-ocean-pearl);
     font-size: 11px;
     font-weight: 700;
   }

@@ -67,10 +67,10 @@ const userInitial = computed(() => {
 <template>
   <div class="flex flex-col gap-5">
     <div
-      class="slide-fade-in from-top player-content-in flex items-center gap-4 bg-linear-to-r from-emerald-50 to-teal-50/70 border border-emerald-100/80 rounded-xl p-4"
+      class="profile-captain slide-fade-in from-top player-content-in flex items-center gap-4 bg-linear-to-r from-emerald-50 to-teal-50/70 border border-emerald-100/80 rounded-xl p-4"
     >
       <div
-        class="w-14 h-14 rounded-full bg-emerald-600 text-white flex items-center justify-center text-xl font-black shadow-md shrink-0"
+        class="profile-captain__avatar w-14 h-14 rounded-full bg-emerald-600 text-white flex items-center justify-center text-xl font-black shadow-md shrink-0"
       >
         <img
           v-if="userProfileStore.profile?.avatar_url"
@@ -242,3 +242,18 @@ const userInitial = computed(() => {
     </Teleport>
   </div>
 </template>
+
+<style scoped>
+html.ocean-theme .profile-captain {
+  border-color: color-mix(in srgb, var(--color-ocean-gold) 70%, transparent);
+  background: radial-gradient(ellipse at top right, rgb(53 185 213 / 20%), transparent 65%), linear-gradient(125deg, var(--color-ocean-panel), var(--color-ocean-deep));
+  box-shadow: inset 0 1px 0 rgb(245 235 212 / 12%), 0 4px 16px rgb(0 0 0 / 18%);
+}
+
+html.ocean-theme .profile-captain__avatar {
+  border: 2px solid var(--color-ocean-gold);
+  background: linear-gradient(145deg, var(--color-ocean-cyan), var(--color-ocean-panel));
+  box-shadow: 0 0 0 3px rgb(242 198 109 / 16%), 0 4px 10px rgb(0 0 0 / 25%);
+  color: var(--color-ocean-pearl);
+}
+</style>

@@ -180,7 +180,7 @@ onUnmounted(() => {
 </script>
 
 <template>
-  <div class="w-screen min-h-screen p-3 relative flex flex-col gap-2 overflow-hidden">
+  <div class="w-screen min-h-screen p-3 relative flex flex-col gap-2 overflow-hidden bg-[var(--color-ocean-deep)] bg-[radial-gradient(ellipse_at_50%_0%,rgba(53,185,213,0.12),transparent_65%)] text-content">
     <TeamMembersSticky
       v-if="features.isAvailable('team') && configStore.showTeam && teamStore.myTeamMembers.length"
       class="slide-fade-in from-right"
@@ -188,9 +188,9 @@ onUnmounted(() => {
       @open-team="modalStore.open('team')"
     />
     <header
-      class="slide-fade-in from-top flex flex-wrap items-center justify-between gap-3 rounded-xl border border-border-default bg-surface px-4 py-2.5 text-content"
+      class="slide-fade-in from-top flex flex-wrap items-center justify-between gap-3 rounded-2xl border border-[var(--color-ocean-gold)]/60 bg-[linear-gradient(115deg,var(--color-ocean-panel),var(--color-ocean-deep))] px-4 py-3 text-content shadow-[0_6px_20px_rgba(0,0,0,0.2),inset_0_1px_0_rgba(245,235,212,0.08)]"
     >
-      <span class="font-bold">{{ tr("Lobby.tieu_de") }}</span>
+      <span class="font-bold tracking-wide text-[var(--color-ocean-gold)]">{{ tr("Lobby.tieu_de") }}</span>
       <div class="flex flex-wrap items-center justify-end gap-2">
         <Cash :amount="currencyStore.formattedCash" />
         <Shells :amount="currencyStore.formattedShells" />
@@ -215,7 +215,7 @@ onUnmounted(() => {
       </div>
     </main>
 
-    <div v-if="onboarding.error" role="alert" class="text-sm text-red-700">
+    <div v-if="onboarding.error" role="alert" class="text-sm text-red-300">
       {{ onboarding.error }} <button class="underline" @click="onboarding.finish()">{{ tr("Lobby.luu_lai") }}</button>
     </div>
     <GuideTour

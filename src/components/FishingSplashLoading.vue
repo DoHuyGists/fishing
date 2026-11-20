@@ -356,7 +356,7 @@ defineExpose({ thrash });
 <template>
   <div
     ref="root"
-    class="fixed inset-0 z-[10000] isolate h-dvh w-screen select-none overflow-hidden bg-gradient-to-b from-sky-900 via-teal-800 to-emerald-950"
+    class="fixed inset-0 z-[10000] isolate h-dvh w-screen select-none overflow-hidden bg-gradient-to-b from-[var(--color-ocean-panel)] via-[var(--color-ocean-deep)] to-[var(--color-ocean-deep)]"
     role="status"
     aria-live="polite"
     aria-busy="true"
@@ -364,7 +364,7 @@ defineExpose({ thrash });
   >
     <!-- ánh sáng phản chiếu trên mặt hồ -->
     <div
-      class="pointer-events-none absolute inset-0 bg-[radial-gradient(ellipse_at_70%_0%,rgba(255,255,255,0.22),transparent_55%)]"
+      class="pointer-events-none absolute inset-0 bg-[radial-gradient(ellipse_at_70%_0%,rgba(53,185,213,0.3),transparent_60%)]"
     />
     <div
       class="pointer-events-none absolute inset-0 opacity-30 mix-blend-soft-light bg-[repeating-linear-gradient(180deg,transparent_0_9px,rgba(255,255,255,0.18)_9px_10px)]"
@@ -378,7 +378,7 @@ defineExpose({ thrash });
     />
 
     <div class="pointer-events-none absolute inset-x-0 bottom-8 flex flex-col items-center gap-1.5 text-center">
-      <div class="text-base font-medium tracking-wide text-white/90 animate-pulse">
+      <div class="rounded-full border border-[var(--color-ocean-gold)]/40 bg-[var(--color-ocean-deep)]/70 px-5 py-2 text-sm font-medium tracking-wide text-[var(--color-ocean-pearl)] animate-pulse">
         {{ tr("FishingView.dang_chuan_bi_du_lieu_cau_ca") }}
       </div>
     </div>

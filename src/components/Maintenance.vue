@@ -13,17 +13,17 @@ const retry = () => {
 </script>
 
 <template>
-  <main class="flex min-h-screen items-center justify-center bg-surface px-6 py-16 text-content">
+  <main class="flex min-h-screen items-center justify-center bg-surface-muted px-6 py-16 text-content">
     <section class="w-full max-w-xl" aria-labelledby="error-title">
       <!-- Khung có thanh trạng thái đang bảo trì -->
       <div
-        class="relative flex aspect-[16/7] w-full items-center justify-center overflow-hidden rounded-2xl border-2 border-border-default"
+        class="relative flex aspect-[16/7] w-full items-center justify-center overflow-hidden rounded-3xl border-2 border-[var(--color-ocean-gold)]/60 bg-surface text-[var(--color-ocean-gold)] shadow-[inset_0_1px_0_rgba(245,235,212,0.12),0_16px_40px_rgba(0,0,0,0.15)]"
         aria-hidden="true"
       >
         <span class="select-none text-7xl font-semibold tracking-tight sm:text-8xl">503</span>
 
         <div class="absolute inset-x-0 bottom-0 h-1.5 bg-border-default/50">
-          <div class="h-full w-1/3 animate-[slide_2.4s_ease-in-out_infinite] bg-content" />
+          <div class="h-full w-1/3 animate-[slide_2.4s_ease-in-out_infinite] bg-[var(--color-ocean-cyan)]" />
         </div>
       </div>
 
@@ -38,7 +38,7 @@ const retry = () => {
         <button
           type="button"
           :disabled="retrying"
-          class="inline-flex items-center gap-2 rounded-lg border border-content bg-content px-5 py-2.5 text-sm font-medium text-surface transition-colors hover:bg-content/90 disabled:cursor-wait disabled:opacity-70 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-content"
+          class="inline-flex items-center gap-2 rounded-xl border border-[var(--color-ocean-gold)] bg-[var(--color-ocean-gold)] px-5 py-2.5 text-sm font-bold text-[var(--color-ocean-deep)] transition hover:brightness-110 disabled:cursor-wait disabled:opacity-70 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-[var(--color-ocean-cyan)]"
           @click="retry"
         >
           <svg

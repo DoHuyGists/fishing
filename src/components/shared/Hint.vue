@@ -26,7 +26,7 @@ const tooltipClasses = computed(() => ['w-max', props.maxWidthClass])
 </script>
 
 <template>
-  <span class="group relative inline-flex align-middle">
+  <span class="shared-hint group relative inline-flex align-middle">
     <button
       type="button"
       :aria-label="label ?? tr('Hint.xem_goi_y')"
@@ -52,3 +52,30 @@ const tooltipClasses = computed(() => ['w-max', props.maxWidthClass])
     </span>
   </span>
 </template>
+
+<style scoped>
+.ocean-theme .shared-hint > button {
+  color: var(--color-ocean-cyan);
+  border-color: var(--color-ocean-cyan);
+  background: var(--color-ocean-deep);
+}
+
+.ocean-theme .shared-hint > button:hover,
+.ocean-theme .shared-hint > button:focus-visible {
+  color: var(--color-ocean-deep);
+  background: var(--color-ocean-cyan);
+  --tw-ring-color: var(--color-ocean-cyan);
+  --tw-ring-offset-color: var(--color-ocean-deep);
+}
+
+.ocean-theme .shared-hint > [role="tooltip"] {
+  color: var(--color-ocean-pearl);
+  border: 1px solid #f2c66d80;
+  background: var(--color-ocean-panel);
+  box-shadow: 0 8px 24px #071a2d66;
+}
+
+.ocean-theme .shared-hint > [role="tooltip"] > [aria-hidden="true"] {
+  background: var(--color-ocean-panel);
+}
+</style>

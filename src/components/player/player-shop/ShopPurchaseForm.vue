@@ -18,7 +18,7 @@ const emit = defineEmits<{ buy: [] }>();
 </script>
 
 <template>
-  <aside class="slide-fade-in from-right player-content-in h-fit rounded-xl border border-border-default bg-surface p-4 lg:sticky lg:top-0">
+  <aside class="shop-order slide-fade-in from-right player-content-in h-fit rounded-xl border border-border-default bg-surface p-4 lg:sticky lg:top-0">
     <PaymentConfirmation
       v-if="selectedItem"
       embedded
@@ -75,3 +75,11 @@ const emit = defineEmits<{ buy: [] }>();
     </template>
   </aside>
 </template>
+
+<style scoped>
+html.ocean-theme .shop-order {
+  border: 2px solid var(--color-ocean-wood);
+  background: linear-gradient(160deg, var(--color-ocean-panel), var(--color-ocean-deep));
+  box-shadow: inset 0 0 0 1px color-mix(in srgb, var(--color-ocean-gold) 45%, transparent), 0 4px 12px rgb(0 0 0 / 18%);
+}
+</style>

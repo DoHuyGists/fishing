@@ -86,7 +86,7 @@ onBeforeUnmount(() => {
     <Transition name="player-popup" :duration="{ enter: 220, leave: 150 }">
       <div
         v-if="store.depthAdjusterOpen && store.canAdjustLakeDepth"
-        class="fixed inset-0 z-[45] grid place-items-center overflow-y-auto bg-[rgba(3,15,11,0.78)] p-3 backdrop-blur-[7px] sm:p-5"
+        class="fixed inset-0 z-[45] grid place-items-center overflow-y-auto bg-ocean-deep/80 p-3 backdrop-blur-[7px] sm:p-5"
         @click.self="close"
       >
         <section
@@ -96,7 +96,7 @@ onBeforeUnmount(() => {
           aria-labelledby="depth-title"
         >
           <header class="flex items-center justify-between border-b border-white/10 px-5 py-3.5 sm:px-6">
-            <div id="depth-title" class="m-0 flex items-center gap-2.5 text-base font-bold">
+            <div id="depth-title" class="m-0 flex items-center gap-2.5 text-base font-bold text-ocean-gold">
               <span class="text-palette-5ad0b3" aria-hidden="true">≋</span>{{ tr("AdjusDepth.dieu_chinh_do_sau") }}
             </div>
             <button
@@ -504,6 +504,37 @@ onBeforeUnmount(() => {
   border-color: var(--color-palette-5cbd8a);
   background: var(--color-palette-28694b);
   color: var(--color-palette-f0fff3);
+}
+
+html.ocean-theme .water-card,
+html.ocean-theme .control-card,
+html.ocean-theme .info-card {
+  border-color: rgb(53 185 213 / 25%);
+  background: rgb(29 84 117 / 45%);
+}
+
+html.ocean-theme .bait-marker {
+  border-color: var(--color-ocean-gold);
+  background: var(--color-ocean-panel);
+  color: var(--color-ocean-pearl);
+  box-shadow: 0 0 12px rgb(53 185 213 / 65%);
+}
+
+html.ocean-theme .vertical-slider {
+  accent-color: var(--color-ocean-cyan);
+}
+
+html.ocean-theme .quick-stops button {
+  border-color: rgb(53 185 213 / 35%);
+  background: var(--color-ocean-deep);
+  color: var(--color-ocean-pearl);
+}
+
+html.ocean-theme .quick-stops button.active,
+html.ocean-theme .quick-stops button:hover {
+  border-color: var(--color-ocean-gold);
+  background: var(--color-ocean-panel);
+  color: var(--color-ocean-gold);
 }
 
 @media (max-width: 639px) {

@@ -50,10 +50,10 @@ withDefaults(
     @click.self="onDismiss?.()"
   >
     <div
-      class="player-popup-in w-[90%] max-w-[420px] rounded-xl bg-white p-6 shadow-[0_20px_25px_-5px_rgba(0,0,0,0.1)]"
+      class="shared-confirmation player-popup-in w-[90%] max-w-[420px] rounded-xl bg-white p-6 shadow-[0_20px_25px_-5px_rgba(0,0,0,0.1)]"
     >
       <div>
-        <div class="mb-3 text-xl leading-normal font-bold text-palette-b91c1c">
+        <div class="shared-confirmation__title mb-3 text-xl leading-normal font-bold text-palette-b91c1c">
           {{ title }}
         </div>
       </div>
@@ -61,11 +61,11 @@ withDefaults(
       <div>
         <!-- Slot mặc định cho phép thay nội dung chính bằng HTML tùy ý -->
         <slot>
-          <div v-if="message" class="mb-2 text-[0.95rem] leading-normal text-palette-374151">
+          <div v-if="message" class="shared-confirmation__message mb-2 text-[0.95rem] leading-normal text-palette-374151">
             {{ message }}
           </div>
         </slot>
-        <div v-if="subText" class="mb-2 text-[0.85rem] leading-normal text-palette-6b7280">
+        <div v-if="subText" class="shared-confirmation__subtext mb-2 text-[0.85rem] leading-normal text-palette-6b7280">
           {{ subText }}
         </div>
       </div>
@@ -74,7 +74,7 @@ withDefaults(
         <button
           type="button"
           :disabled="firstDisabled"
-          class="cursor-pointer rounded-md bg-palette-e5e7eb px-4 py-2 text-[13.3333px] leading-normal font-medium text-palette-1f2937 transition-opacity duration-200 hover:opacity-90"
+          class="shared-confirmation__secondary cursor-pointer rounded-md bg-palette-e5e7eb px-4 py-2 text-[13.3333px] leading-normal font-medium text-palette-1f2937 transition-opacity duration-200 hover:opacity-90"
           :class="{ 'cursor-not-allowed opacity-50': firstDisabled }"
           @click="onFirst?.()"
         >
@@ -83,7 +83,7 @@ withDefaults(
         <button
           type="button"
           :disabled="secondDisabled"
-          class="cursor-pointer rounded-md bg-palette-dc2626 px-4 py-2 text-[13.3333px] leading-normal font-medium text-white transition-opacity duration-200 hover:opacity-90"
+          class="shared-confirmation__danger cursor-pointer rounded-md bg-palette-dc2626 px-4 py-2 text-[13.3333px] leading-normal font-medium text-white transition-opacity duration-200 hover:opacity-90"
           :class="{ 'cursor-not-allowed opacity-50': secondDisabled }"
           @click="onSecond?.()"
         >
@@ -93,3 +93,42 @@ withDefaults(
     </div>
   </div>
 </template>
+
+<style scoped>
+.ocean-theme .shared-confirmation {
+  color: var(--color-ocean-pearl);
+  border: 1px solid #f2c66db3;
+  background: linear-gradient(145deg, var(--color-ocean-panel), var(--color-ocean-deep));
+  box-shadow: 0 24px 64px #071a2d99, inset 0 1px #f5ebd426;
+}
+
+.ocean-theme .shared-confirmation__title {
+  color: var(--color-ocean-gold);
+}
+
+.ocean-theme .shared-confirmation__message {
+  color: var(--color-ocean-pearl);
+}
+
+.ocean-theme .shared-confirmation__subtext {
+  color: color-mix(in srgb, var(--color-ocean-pearl) 75%, transparent);
+}
+
+.ocean-theme .shared-confirmation__secondary {
+  color: var(--color-ocean-pearl);
+  border: 1px solid #35b9d580;
+  background: var(--color-ocean-deep);
+}
+
+.ocean-theme .shared-confirmation__danger {
+  color: var(--color-ocean-pearl);
+  border: 1px solid #f2c66d80;
+  background: #a73c46;
+  box-shadow: inset 0 1px #f5ebd426, 0 3px 0 #071a2d66;
+}
+
+.ocean-theme .shared-confirmation button:focus-visible {
+  outline: 2px solid var(--color-ocean-cyan);
+  outline-offset: 3px;
+}
+</style>

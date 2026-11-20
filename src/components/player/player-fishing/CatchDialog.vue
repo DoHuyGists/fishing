@@ -45,7 +45,7 @@ const variantFrameClass = computed(() => {
     <Transition name="player-popup" :duration="{ enter: 220, leave: 150 }">
       <div
         v-if="store.catchDialogOpen && caught"
-        class="fixed z-30 inset-0 grid place-items-center p-5 bg-[rgba(4,17,11,0.72)] backdrop-blur-[7px]"
+        class="fixed z-30 inset-0 grid place-items-center p-5 bg-ocean-deep/75 backdrop-blur-[7px]"
         role="presentation"
         @click.self="closeDialog"
       >
@@ -63,7 +63,7 @@ const variantFrameClass = computed(() => {
           <div class="flex min-w-0 flex-col gap-4 p-5 sm:p-6">
             <div class="flex flex-wrap items-center gap-2">
               <span
-                class="inline-block px-2 py-1 rounded-full bg-palette-dcae52 text-palette-254130 text-[9px] font-black tracking-[0.1em]"
+                class="inline-block px-2 py-1 rounded-full bg-ocean-gold text-ocean-deep text-[9px] font-black tracking-[0.1em]"
               >
                 {{ caught.variantType }}
               </span>
@@ -106,7 +106,7 @@ const variantFrameClass = computed(() => {
               </button>
               <button
                 type="button"
-                class="p-3 border-0 rounded-[10px] bg-palette-e1aa49 text-sm text-palette-173223 cursor-pointer font-black transition-colors hover:bg-palette-edbd66 disabled:cursor-not-allowed disabled:opacity-50"
+                class="ocean-primary-action p-3 rounded-[10px] text-sm cursor-pointer font-black transition-colors disabled:cursor-not-allowed disabled:opacity-50"
                 :disabled="store.isReleasingFish"
                 @click="closeDialog"
               >

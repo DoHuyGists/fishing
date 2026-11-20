@@ -26,7 +26,7 @@ defineEmits<{ action: []; "change-page": [page: number] }>();
         <div class="text-sm font-bold">
           {{ title }} <span class="font-normal text-palette-526650">({{ count }})</span>
         </div>
-        <button :id="actionId" type="button" :disabled="actionDisabled" class="rounded-md bg-teal-700 px-3 py-1.5 text-xs text-white hover:bg-teal-800 disabled:cursor-not-allowed disabled:opacity-40" @click="$emit('action')">
+        <button :id="actionId" type="button" :disabled="actionDisabled" class="ocean-primary-action rounded-md bg-teal-700 px-3 py-1.5 text-xs text-white hover:bg-teal-800 disabled:cursor-not-allowed disabled:opacity-40" @click="$emit('action')">
           {{ actionLabel }}
         </button>
       </div>

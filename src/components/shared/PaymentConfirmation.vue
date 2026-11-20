@@ -85,15 +85,15 @@ function handleKeydown(event: KeyboardEvent) {
     @click.self="!embedded && cancel()"
   >
     <form
-      class="min-w-0 space-y-4"
+      class="shared-payment min-w-0 space-y-4"
       :class="embedded ? 'w-full' : 'player-popup-in my-auto w-full max-w-sm rounded-2xl border border-border-default bg-white p-5 shadow-xl'"
       @submit.prevent="confirm"
     >
-      <div role="heading" aria-level="2" class="text-base font-extrabold">{{ title }}</div>
+      <div role="heading" aria-level="2" class="shared-payment__title text-base font-extrabold">{{ title }}</div>
       <fieldset :disabled="busy" class="m-0 min-w-0 space-y-4 border-0 p-0">
         <slot />
       </fieldset>
-      <div class="space-y-3 rounded-xl border border-border-default bg-surface p-3 text-sm">
+      <div class="shared-payment__summary space-y-3 rounded-xl border border-border-default bg-surface p-3 text-sm">
         <div class="flex items-center justify-between gap-3">
           <span>{{ balanceLabel || tr('FishSellConfirm.so_du_hien_tai') }}</span>
           <component :is="currencies[currency]" :amount="balance" :size="22" :interactive="false" class="shrink-0" />
@@ -115,10 +115,10 @@ function handleKeydown(event: KeyboardEvent) {
       <slot name="after-summary" />
       <div v-if="errorMessage" role="alert" class="text-sm font-semibold text-red-700">{{ errorMessage }}</div>
       <div class="flex justify-end gap-2">
-        <button v-if="!embedded" type="button" class="min-h-11 rounded-lg border border-border-default px-4 py-2 text-sm font-bold hover:bg-surface focus-visible:outline-2 focus-visible:outline-emerald-700 disabled:cursor-not-allowed disabled:opacity-50" :disabled="busy" @click="cancel">
+        <button v-if="!embedded" type="button" class="shared-payment__cancel min-h-11 rounded-lg border border-border-default px-4 py-2 text-sm font-bold hover:bg-surface focus-visible:outline-2 focus-visible:outline-emerald-700 disabled:cursor-not-allowed disabled:opacity-50" :disabled="busy" @click="cancel">
           {{ tr('AccountInfoModal.huy') }}
         </button>
-        <button type="submit" class="min-h-11 rounded-lg bg-content px-4 py-2 text-sm font-bold text-white hover:bg-emerald-900 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-emerald-700 disabled:cursor-not-allowed disabled:opacity-50" :class="{ 'w-full': embedded }" :disabled="!canConfirm">
+        <button type="submit" class="ocean-primary-action min-h-11 rounded-lg bg-content px-4 py-2 text-sm font-bold text-white hover:bg-emerald-900 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-emerald-700 disabled:cursor-not-allowed disabled:opacity-50" :class="{ 'w-full': embedded }" :disabled="!canConfirm">
           {{ busy ? (busyText || tr('DailyAttendance.dang_xu_ly')) : (confirmText || tr('Fishfarm.xac_nhan')) }}
         </button>
       </div>
@@ -126,3 +126,34 @@ function handleKeydown(event: KeyboardEvent) {
   </section>
   </Teleport>
 </template>
+
+<style scoped>
+.ocean-theme .shared-payment {
+  color: var(--color-ocean-pearl);
+}
+
+.ocean-theme .shared-payment.player-popup-in {
+  border-color: var(--color-ocean-gold);
+  background: linear-gradient(145deg, var(--color-ocean-panel), var(--color-ocean-deep));
+  box-shadow: 0 24px 64px #071a2d99, inset 0 1px #f5ebd426;
+}
+
+.ocean-theme .shared-payment__title {
+  color: var(--color-ocean-gold);
+}
+
+.ocean-theme .shared-payment__summary {
+  border-color: #35b9d540;
+  background: var(--color-ocean-deep);
+}
+
+.ocean-theme .shared-payment__cancel {
+  color: var(--color-ocean-pearl);
+  border-color: #35b9d580;
+  background: var(--color-ocean-deep);
+}
+
+.ocean-theme .shared-payment button:focus-visible {
+  outline-color: var(--color-ocean-cyan);
+}
+</style>

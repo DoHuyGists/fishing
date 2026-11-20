@@ -19,4 +19,10 @@ const html = computed(() => sanitizeGuideContent(props.content));
 .rich-text-content :deep(img) { display: block; max-width: 100%; height: auto; margin: 0.75rem 0; border-radius: 0.5rem; }
 .rich-text-content :deep(video) { display: block; width: 100%; max-height: 70dvh; margin: 0.75rem 0; border-radius: 0.5rem; background: var(--color-black); }
 .rich-text-content :deep(a) { color: var(--color-accent); text-decoration: underline; text-underline-offset: 2px; }
+
+.ocean-theme .rich-text-content :deep(pre) {
+  color: var(--color-ocean-pearl);
+  border: 1px solid #35b9d540;
+  background: var(--color-ocean-deep);
+}
 </style>

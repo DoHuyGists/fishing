@@ -11,16 +11,16 @@ const store = useFishingStore();
     <Transition name="player-popup" :duration="{ enter: 220, leave: 150 }">
       <div
         v-if="store.playersOpen"
-        class="fixed z-[31] inset-0 grid place-items-center p-5 bg-[rgba(4,17,11,0.72)] backdrop-blur-[7px]"
+        class="fixed z-[31] inset-0 grid place-items-center p-5 bg-ocean-deep/75 backdrop-blur-[7px]"
         @click.self="store.closePlayers"
       >
         <section
-          class="player-popup-panel w-[min(440px,100%)] overflow-hidden border border-[rgba(255,226,149,0.68)] rounded-[20px] bg-[linear-gradient(145deg,var(--color-palette-173d2b),var(--color-palette-0e281b))] shadow-[0_24px_70px_rgba(0,0,0,0.48)] text-palette-f4f0df"
+          class="player-popup-panel w-[min(440px,100%)] overflow-hidden border border-ocean-gold/70 rounded-[20px] bg-linear-to-br from-ocean-panel to-ocean-deep shadow-[0_24px_70px_rgba(0,0,0,0.48)] text-ocean-pearl"
           role="dialog"
           aria-modal="true"
           aria-labelledby="players-title"
         >
-          <header class="flex justify-between px-5 pt-[19px] pb-3 border-b border-[rgba(223,241,207,0.14)]">
+          <header class="flex justify-between px-5 pt-[19px] pb-3 border-b border-ocean-gold/20 text-ocean-gold">
             <div>
               <div id="players-title" class="m-0 text-xl">
                 {{ tr("FishingPlayers.nguoi_choi_dang_cau") }}{{ store.nearbyPlayers.length }})
@@ -28,7 +28,7 @@ const store = useFishingStore();
             </div>
             <button
               type="button"
-              class="w-[29px] h-[29px] border-0 rounded-full bg-[rgba(235,243,219,0.13)] text-white cursor-pointer text-[22px] leading-none"
+              class="w-[29px] h-[29px] border-0 rounded-full bg-ocean-cyan/15 text-white cursor-pointer text-[22px] leading-none"
               :aria-label="tr('FishingPlayers.dong_danh_sach')"
               @click="store.closePlayers"
             >
@@ -50,11 +50,11 @@ const store = useFishingStore();
             <div v-for="player in store.nearbyPlayers" :key="player.id">
               <button
                 type="button"
-                class="flex items-center w-full gap-[11px] p-2.5 border rounded-xl bg-[rgba(7,28,18,0.35)] text-inherit cursor-pointer text-left hover:border-palette-d8b866 hover:bg-[rgba(55,91,57,0.5)] transition-colors"
+                class="flex items-center w-full gap-[11px] p-2.5 border rounded-xl bg-ocean-deep/40 text-inherit cursor-pointer text-left hover:border-ocean-gold hover:bg-ocean-panel transition-colors"
                 :class="
                   player.isCurrentUser
-                    ? 'border-palette-22c55e/60 bg-[rgba(34,197,94,0.08)]'
-                    : 'border-[rgba(223,241,207,0.15)]'
+                    ? 'border-ocean-cyan/60 bg-ocean-cyan/10'
+                    : 'border-ocean-cyan/20'
                 "
                 @click="store.selectPlayer(player)"
               >
@@ -71,14 +71,14 @@ const store = useFishingStore();
                     >{{ tr("FishPond.cap") }} {{ player.level }} · {{ player.title }}</small
                   >
                 </span>
-                <span class="ml-auto text-palette-e8bd62 text-[11px] font-extrabold">{{ tr("FishingPlayers.xem") }}</span>
+                <span class="ml-auto text-ocean-gold text-[11px] font-extrabold">{{ tr("FishingPlayers.xem") }}</span>
               </button>
             </div>
           </div>
           <article v-else class="grid justify-items-center px-5 pt-4 pb-[22px] text-center">
             <button
               type="button"
-              class="justify-self-start border-0 bg-transparent text-palette-e8bd62 cursor-pointer text-xs font-extrabold"
+              class="justify-self-start border-0 bg-transparent text-ocean-gold cursor-pointer text-xs font-extrabold"
               @click="store.selectedPlayer = null"
             >
               {{ tr("FishingPlayers.danh_sach") }}
@@ -94,13 +94,13 @@ const store = useFishingStore();
             </div>
             <div class="grid grid-cols-2 w-full gap-2 mt-[18px]">
               <span
-                class="grid gap-1 py-[11px] px-1.5 rounded-[10px] bg-[rgba(7,28,18,0.38)] text-border-strong text-[10px]"
-                ><b class="text-palette-f4f0df text-[13px]">{{ store.selectedPlayer.caughtCount }}</b
+                class="grid gap-1 py-[11px] px-1.5 rounded-[10px] bg-ocean-deep/40 text-border-strong text-[10px]"
+                ><b class="text-ocean-pearl text-[13px]">{{ store.selectedPlayer.caughtCount }}</b
                 >{{ tr("FishingPlayers.ca_da_cau") }}</span
               >
               <span
-                class="grid gap-1 py-[11px] px-1.5 rounded-[10px] bg-[rgba(7,28,18,0.38)] text-border-strong text-[10px]"
-                ><b class="text-palette-f4f0df text-[13px]">{{ store.selectedPlayer.bestCatch }}</b
+                class="grid gap-1 py-[11px] px-1.5 rounded-[10px] bg-ocean-deep/40 text-border-strong text-[10px]"
+                ><b class="text-ocean-pearl text-[13px]">{{ store.selectedPlayer.bestCatch }}</b
                 >{{ tr("FishingPlayers.ky_luc") }}</span
               >
             </div>

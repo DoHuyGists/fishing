@@ -57,7 +57,7 @@ onUnmounted(() => {
     <div
       v-if="modalStore.isModalOpening && modalStore.quickActions.visible"
       ref="quickActionsBox"
-      class="fixed z-[10001] flex h-12 w-28 max-w-screen items-center rounded-lg border border-border-default bg-surface p-1 text-content shadow-lg"
+      class="shared-quick-actions fixed z-[10001] flex h-12 w-28 max-w-screen items-center rounded-lg border border-border-default bg-surface p-1 text-content shadow-lg"
       :style="{ left: `${modalStore.quickActions.x}px`, top: `${modalStore.quickActions.y}px` }"
     >
       <button
@@ -71,3 +71,21 @@ onUnmounted(() => {
     </div>
   </Teleport>
 </template>
+
+<style scoped>
+.ocean-theme .shared-quick-actions {
+  color: var(--color-ocean-pearl);
+  border-color: #f2c66d99;
+  background: var(--color-ocean-panel);
+  box-shadow: 0 8px 24px #071a2d66;
+}
+
+.ocean-theme .shared-quick-actions button:hover {
+  color: var(--color-ocean-cyan);
+  background: var(--color-ocean-deep);
+}
+
+.ocean-theme .shared-quick-actions button:focus-visible {
+  outline-color: var(--color-ocean-cyan);
+}
+</style>

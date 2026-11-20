@@ -15,7 +15,7 @@ defineEmits<{ choose: [event: Event]; save: [] }>();
 </script>
 
 <template>
-  <article class="slide-fade-in from-bottom player-content-in min-w-0 rounded-lg border border-border-default bg-white p-2">
+  <article class="shared-equipment-card slide-fade-in from-bottom player-content-in min-w-0 rounded-lg border border-border-default bg-white p-2" :class="{ 'shared-equipment-card--used': used }">
     <div class="mb-2 flex flex-wrap items-center justify-between gap-2 text-xs">
       <div class="min-w-0 font-semibold">
         {{ tr("EquipmentSets.setNumber", { number }) }}
@@ -26,10 +26,25 @@ defineEmits<{ choose: [event: Event]; save: [] }>();
         <input :key="radioKey" type="radio" :name="radioName" :checked="used" :disabled="useDisabled" class="accent-teal-700" @change="$emit('choose', $event)" />
         {{ tr("EquipmentSets.su_dung") }}
       </label>
-      <button type="button" :disabled="saveDisabled" class="rounded-md bg-slate-800 px-3 py-1 text-white hover:bg-slate-900 disabled:cursor-not-allowed disabled:opacity-40" @click="$emit('save')">
+      <button type="button" :disabled="saveDisabled" class="ocean-primary-action rounded-md bg-slate-800 px-3 py-1 text-white hover:bg-slate-900 disabled:cursor-not-allowed disabled:opacity-40" @click="$emit('save')">
         {{ saving ? tr("ChangePasswordModal.dang_luu") : tr("EquipmentSets.luu_set") }}
       </button>
     </div>
     <slot />
   </article>
 </template>
+
+<style scoped>
+.ocean-theme .shared-equipment-card {
+  box-shadow: inset 0 1px #f5ebd40d;
+}
+
+.ocean-theme .shared-equipment-card--used {
+  border-color: var(--color-ocean-gold);
+  box-shadow: 0 0 0 1px #f2c66d26, inset 0 1px #f5ebd41a;
+}
+
+.ocean-theme .shared-equipment-card input[type="radio"] {
+  accent-color: var(--color-ocean-gold);
+}
+</style>

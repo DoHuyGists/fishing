@@ -20,7 +20,7 @@ withDefaults(
     role="status"
     aria-live="polite"
     :class="[
-      'flex items-center justify-center bg-surface px-6 text-content',
+      'loading-screen flex items-center justify-center bg-surface px-6 text-content',
       fullscreen ? 'fixed inset-0 z-50 min-h-screen' : 'min-h-[240px] w-full',
     ]"
   >
@@ -46,6 +46,15 @@ withDefaults(
 <style scoped>
 .loading-ring {
   animation: loading-spin 0.9s linear infinite;
+}
+
+html.ocean-theme .loading-screen {
+  background: radial-gradient(ellipse at 50% 0%, rgba(53, 185, 213, 0.14), transparent 60%), var(--color-ocean-deep);
+}
+
+html.ocean-theme .loading-ring {
+  border-color: rgba(53, 185, 213, 0.2);
+  border-top-color: var(--color-ocean-gold);
 }
 
 .loading-dots span {

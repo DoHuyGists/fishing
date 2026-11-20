@@ -396,6 +396,45 @@
   pointer-events: none;
 }
 
+html.ocean-theme .book-backdrop {
+  background: radial-gradient(ellipse at center, rgb(29 84 117 / 78%), rgb(16 45 70 / 96%));
+}
+
+html.ocean-theme .cover {
+  box-shadow: inset 4px 0 10px rgb(0 0 0 / 18%), inset 0 0 0 2px rgb(242 198 109 / 65%);
+}
+
+html.ocean-theme .paper {
+  color: var(--color-ocean-pearl);
+}
+
+html.ocean-theme .paper.face-front {
+  background: linear-gradient(90deg, rgb(16 45 70 / 65%), transparent 12%), var(--color-ocean-panel);
+}
+
+html.ocean-theme .paper.face-back {
+  background: linear-gradient(270deg, rgb(16 45 70 / 65%), transparent 12%), var(--color-ocean-panel);
+}
+
+html.ocean-theme .ctl {
+  border-color: rgb(242 198 109 / 70%);
+  background: var(--color-ocean-deep);
+  color: var(--color-ocean-pearl);
+}
+
+html.ocean-theme .ctl:hover:not(:disabled) {
+  background: var(--color-ocean-panel);
+  border-color: var(--color-ocean-cyan);
+}
+
+html.ocean-theme .ctl:focus-visible {
+  outline-color: var(--color-ocean-cyan);
+}
+
+html.ocean-theme .ctl-label {
+  color: var(--color-ocean-pearl);
+}
+
 .book-fade-enter-active,
 .book-fade-leave-active {
   transition: opacity 0.35s;

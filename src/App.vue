@@ -22,6 +22,13 @@ const features = useFeatureAvailabilityStore();
 const modals = useModalStore();
 const stories = useStoryStore();
 const fishingTransition = useFishingTransitionStore();
+// Theme the document so dialogs teleported to body inherit the same palette.
+// The admin area keeps the original tokens, including its shared components.
+watch(
+  () => router.currentRoute.value.matched.some((record) => record.path === "/admin"),
+  (isAdminArea) => document.documentElement.classList.toggle("ocean-theme", !isAdminArea),
+  { immediate: true, flush: "sync" },
+);
 watch(
   () => router.currentRoute.value.name,
   (name) => {
@@ -67,6 +74,7 @@ onMounted(() => {
   document.addEventListener("visibilitychange", refreshFeatures);
 });
 onUnmounted(() => {
+  document.documentElement.classList.remove("ocean-theme");
   features.stop();
   window.removeEventListener("online", refreshFeatures);
   window.removeEventListener("focus", refreshFeatures);

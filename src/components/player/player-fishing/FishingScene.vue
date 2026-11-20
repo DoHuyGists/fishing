@@ -467,6 +467,32 @@ function castAt(event: MouseEvent) {
   animation: pulse 0.8s infinite;
 }
 
+html.ocean-theme .fishing-scene {
+  background: var(--color-ocean-deep);
+}
+
+html.ocean-theme .scene-shade {
+  background: linear-gradient(180deg, rgb(16 45 70 / 42%), transparent 28%, transparent 66%, rgb(16 45 70 / 24%));
+}
+
+html.ocean-theme .weather,
+html.ocean-theme .scene-status {
+  border-color: rgb(242 198 109 / 45%);
+  background: rgb(16 45 70 / 85%);
+  color: var(--color-ocean-pearl);
+  box-shadow: inset 0 1px 0 rgb(245 235 212 / 10%), 0 6px 18px rgb(0 0 0 / 20%);
+}
+
+html.ocean-theme .status-dot {
+  background: var(--color-ocean-cyan);
+  box-shadow: 0 0 0 3px rgb(53 185 213 / 18%);
+}
+
+html.ocean-theme .scene-status.active .status-dot {
+  background: var(--color-ocean-gold);
+  box-shadow: 0 0 0 3px rgb(242 198 109 / 18%);
+}
+
 .bite-alert {
   position: absolute;
   z-index: 6;

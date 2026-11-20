@@ -156,7 +156,7 @@ const guideSteps = [
 <template>
   <Modal :title="tr('WorkBenchModal.ban_che_tao')" :guid-steps="guideSteps" :on-refresh="() => loadData(true)">
     <section
-      class="grid min-h-full w-full grid-cols-1 gap-4 text-content lg:h-full lg:min-h-0 lg:grid-cols-[minmax(15rem,0.8fr)_minmax(0,1.8fr)]"
+      class="workbench grid min-h-full w-full grid-cols-1 gap-4 text-content lg:h-full lg:min-h-0 lg:grid-cols-[minmax(15rem,0.8fr)_minmax(0,1.8fr)]"
     >
       <WorkBenchInventory
         v-model:search-query="searchQuery"
@@ -191,3 +191,18 @@ const guideSteps = [
     </section>
   </Modal>
 </template>
+
+<style scoped>
+html.ocean-theme .workbench :deep(#workbench-palette),
+html.ocean-theme .workbench :deep(#workbench-blueprints),
+html.ocean-theme .workbench :deep(#workbench-recipe) {
+  border: 2px solid var(--color-ocean-wood);
+  background: linear-gradient(160deg, var(--color-ocean-panel), var(--color-ocean-deep));
+  box-shadow: inset 0 0 0 1px color-mix(in srgb, var(--color-ocean-gold) 45%, transparent), 0 4px 12px rgb(0 0 0 / 18%);
+}
+
+html.ocean-theme .workbench :deep(#workbench-palette > :first-child),
+html.ocean-theme .workbench :deep(#workbench-blueprints > :first-child) {
+  color: var(--color-ocean-gold);
+}
+</style>

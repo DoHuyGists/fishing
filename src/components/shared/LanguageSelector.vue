@@ -15,7 +15,7 @@ const localeStore = useLocaleStore();
         v-model="localeStore.locale"
         :disabled="localeStore.saving"
         :aria-busy="localeStore.saving"
-        class="cursor-pointer rounded bg-transparent focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-emerald-600 disabled:cursor-wait disabled:opacity-60"
+        class="shared-language-select cursor-pointer rounded bg-transparent focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-emerald-600 disabled:cursor-wait disabled:opacity-60"
       >
         <option value="vi" lang="vi">Tiếng Việt</option>
         <option value="en" lang="en">English</option>
@@ -24,3 +24,19 @@ const localeStore = useLocaleStore();
     <div v-if="localeStore.error" role="alert" class="text-xs text-red-700">{{ localeStore.error }}</div>
   </div>
 </template>
+
+<style scoped>
+.ocean-theme .shared-language-select {
+  color: var(--color-ocean-pearl);
+  color-scheme: dark;
+}
+
+.ocean-theme .shared-language-select:focus-visible {
+  outline-color: var(--color-ocean-cyan);
+}
+
+.ocean-theme .shared-language-select option {
+  color: var(--color-ocean-pearl);
+  background: var(--color-ocean-deep);
+}
+</style>

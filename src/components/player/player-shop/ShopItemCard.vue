@@ -18,13 +18,14 @@ const emit = defineEmits<{
 <template>
   <button
     type="button"
-    class="slide-fade-in from-bottom player-content-in group flex w-full min-w-0 overflow-hidden rounded-xl border bg-white text-left shadow-sm transition hover:-translate-y-0.5 hover:shadow-md"
+    class="shop-item-card slide-fade-in from-bottom player-content-in group flex w-full min-w-0 overflow-hidden rounded-xl border bg-white text-left shadow-sm transition hover:-translate-y-0.5 hover:shadow-md"
+    :aria-pressed="selected"
     :class="
       selected ? 'border-emerald-700 ring-2 ring-emerald-700/20' : 'border-border-default'
     "
     @click="emit('select', item.id)"
   >
-    <div class="grid h-40 aspect-square shrink-0 place-items-center overflow-hidden bg-surface">
+    <div class="shop-item-card__art grid h-40 aspect-square shrink-0 place-items-center overflow-hidden bg-surface">
       <img
         v-if="item.image"
         :src="item.image"
@@ -63,3 +64,26 @@ const emit = defineEmits<{
     </div>
   </button>
 </template>
+
+<style scoped>
+html.ocean-theme .shop-item-card {
+  border-color: color-mix(in srgb, var(--color-ocean-wood) 70%, var(--color-ocean-gold));
+  background: var(--color-ocean-panel);
+  color: var(--color-ocean-pearl);
+  box-shadow: inset 0 1px 0 rgb(245 235 212 / 10%), 0 3px 8px rgb(0 0 0 / 15%);
+}
+
+html.ocean-theme .shop-item-card__art {
+  background: radial-gradient(circle, color-mix(in srgb, var(--color-ocean-cyan) 18%, var(--color-ocean-panel)), var(--color-ocean-deep));
+  border-right: 1px solid color-mix(in srgb, var(--color-ocean-gold) 32%, transparent);
+}
+
+html.ocean-theme .shop-item-card:hover {
+  border-color: var(--color-ocean-cyan);
+}
+
+html.ocean-theme .shop-item-card[aria-pressed="true"] {
+  border-color: var(--color-ocean-gold);
+  box-shadow: 0 0 0 2px rgb(242 198 109 / 30%), inset 0 1px 0 rgb(245 235 212 / 15%);
+}
+</style>

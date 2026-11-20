@@ -1418,3 +1418,114 @@
     opacity: 0
   }
 }
+
+/* Keep story artwork and weather intact while matching the game's ocean chrome. */
+html.ocean-theme :is(.story-view, .story-dialog-backdrop) {
+  --color-story-accent: var(--color-ocean-gold);
+  --story-accent: var(--color-ocean-gold);
+  --story-line: rgb(242 198 109 / 30%);
+  --story-ink: var(--color-ocean-pearl);
+  --story-muted: color-mix(in srgb, var(--color-ocean-pearl) 68%, var(--color-ocean-cyan));
+}
+
+html.ocean-theme :is(.story-view, .story-player, .story-empty-screen) {
+  background: var(--color-ocean-deep);
+}
+
+html.ocean-theme .story-dialogue {
+  border-color: rgb(242 198 109 / 60%);
+  border-left-color: var(--color-ocean-gold);
+  border-radius: 14px;
+  background: linear-gradient(120deg, rgb(16 45 70 / 96%), rgb(29 84 117 / 94%));
+  box-shadow: inset 0 1px 0 rgb(245 235 212 / 12%), 0 15px 60px rgb(0 0 0 / 35%);
+  color: var(--color-ocean-pearl);
+}
+
+html.ocean-theme .story-speaker {
+  color: var(--color-ocean-gold);
+}
+
+html.ocean-theme :is(.story-speaker-title, .story-speed, .story-library-intro, .story-title-summary) {
+  color: var(--story-muted);
+}
+
+html.ocean-theme .story-choice {
+  border-color: rgb(242 198 109 / 50%);
+  border-radius: 10px;
+  background: rgb(16 45 70 / 94%);
+  color: var(--color-ocean-pearl);
+}
+
+html.ocean-theme .story-choice:hover {
+  border-color: var(--color-ocean-cyan);
+  background: var(--color-ocean-panel);
+}
+
+html.ocean-theme :is(.story-hud-button, .story-restore, .story-speed select) {
+  border-color: rgb(242 198 109 / 40%);
+  border-radius: 8px;
+  background: rgb(16 45 70 / 86%);
+  color: var(--color-ocean-pearl);
+}
+
+html.ocean-theme :is(.story-hud-button:hover, .story-hud-button[aria-pressed=true]) {
+  border-color: var(--color-ocean-cyan);
+  background: var(--color-ocean-panel);
+}
+
+html.ocean-theme .story-auto-track>span {
+  background: var(--color-ocean-cyan);
+}
+
+html.ocean-theme :is(.story-view, .story-dialog-backdrop) .story-button {
+  border-color: rgb(242 198 109 / 50%);
+  border-radius: 8px;
+  background: var(--color-ocean-panel);
+  color: var(--color-ocean-pearl);
+}
+
+html.ocean-theme :is(.story-view, .story-dialog-backdrop) .story-button:hover:not(:disabled) {
+  border-color: var(--color-ocean-cyan);
+  background: color-mix(in srgb, var(--color-ocean-cyan) 20%, var(--color-ocean-panel));
+}
+
+html.ocean-theme :is(.story-view, .story-dialog-backdrop) .story-button--primary {
+  border-color: var(--color-ocean-gold);
+  background: linear-gradient(var(--color-ocean-gold), color-mix(in srgb, var(--color-ocean-gold) 75%, var(--color-ocean-wood)));
+  color: var(--color-ocean-deep);
+  box-shadow: inset 0 1px 0 rgb(245 235 212 / 50%), 0 2px 0 var(--color-ocean-wood);
+}
+
+html.ocean-theme :is(.story-view, .story-dialog-backdrop) .story-button--primary:hover:not(:disabled) {
+  border-color: var(--color-ocean-gold);
+  background: var(--color-ocean-gold);
+}
+
+html.ocean-theme .story-dialog {
+  border: 1px solid var(--color-ocean-gold);
+  border-radius: 16px;
+  overflow: hidden;
+  background: linear-gradient(145deg, var(--color-ocean-panel), var(--color-ocean-deep));
+  box-shadow: inset 0 0 0 2px rgb(242 198 109 / 15%), 0 30px 100px rgb(0 0 0 / 50%);
+}
+
+html.ocean-theme .story-chapter-card {
+  border-color: rgb(242 198 109 / 40%);
+  border-radius: 12px;
+  background: linear-gradient(110deg, var(--color-ocean-panel), var(--color-ocean-deep));
+  color: var(--color-ocean-pearl);
+}
+
+html.ocean-theme .story-chapter-card:hover {
+  border-color: var(--color-ocean-cyan);
+  background: var(--color-ocean-panel);
+}
+
+html.ocean-theme :is(.story-chapter-number, .story-library-divider) {
+  color: var(--color-ocean-gold);
+}
+
+html.ocean-theme :is(.story-view, .story-dialog-backdrop) :is(button, a, select):focus-visible {
+  outline: 2px solid var(--color-ocean-cyan);
+  outline-offset: 3px;
+}

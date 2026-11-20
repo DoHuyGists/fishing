@@ -52,7 +52,7 @@ const emit = defineEmits<{
           <span class="relative grid size-16 place-items-center rounded-lg bg-surface text-xl">
             <img v-if="material.item?.image" :src="material.item.image" :alt="material.item.name" class="h-full w-full object-contain p-1" />
             <span v-else>{{ material.item?.icon || material.item?.name.charAt(0) || "?" }}</span>
-            <span class="absolute -right-2 -top-2 rounded-full bg-content px-2 py-1 text-[10px] font-bold text-white">×{{ material.required }}</span>
+            <span class="workbench-material-count absolute -right-2 -top-2 rounded-full bg-content px-2 py-1 text-[10px] font-bold text-white">×{{ material.required }}</span>
           </span>
           <span class="line-clamp-2 text-xs font-bold">{{ material.item?.name ?? tr('WorkBenchModal.nguyen_lieu') }}</span>
           <span class="text-[10px]" :class="material.owned >= material.required ? 'text-emerald-700' : 'text-red-600'">{{ tr('WorkBenchModal.co') }} {{ material.owned }}</span>
@@ -60,8 +60,27 @@ const emit = defineEmits<{
         <div v-if="!materials.length" class="col-span-full py-5 text-center text-xs opacity-60">{{ tr('WorkBenchModal.ban_ve_nay_chua_khai_bao_nguyen_lieu') }}</div>
       </div>
       <div class="mt-4 text-center text-xs font-semibold" :class="canCraft ? 'text-emerald-700' : 'text-red-600'">{{ !quantityValid ? tr('WorkBenchModal.nhap_so_nguyen_tu_1_den_1000') : currencyError || (cash < craftCost ? tr('WorkBenchModal.khong_du_tien_che_tao') : canCraft ? tr('WorkBenchModal.du_nguyen_lieu_value0_vang', { value0: craftCost }) : tr('WorkBenchModal.khong_du_nguyen_lieu_de_che_tao_so_luong_da_chon')) }}</div>
-      <button type="button" class="mt-3 w-full rounded-md bg-emerald-700 px-4 py-2 text-sm font-bold text-white disabled:cursor-not-allowed disabled:opacity-50" :disabled="!canCraft || isLoading" @click="emit('craft')">{{ isLoading ? tr('WorkBenchModal.dang_che_tao') : tr('WorkBenchModal.che_tao') }}</button>
+      <button type="button" class="workbench-craft mt-3 w-full rounded-md bg-emerald-700 px-4 py-2 text-sm font-bold text-white disabled:cursor-not-allowed disabled:opacity-50" :disabled="!canCraft || isLoading" @click="emit('craft')">{{ isLoading ? tr('WorkBenchModal.dang_che_tao') : tr('WorkBenchModal.che_tao') }}</button>
     </template>
     <div v-else class="grid h-full min-h-64 place-items-center text-center text-sm opacity-60">{{ tr('WorkBenchModal.chon_mot_ban_ve_de_xem_cong_thuc_che_tao') }}</div>
   </section>
 </template>
+
+<style scoped>
+html.ocean-theme .workbench-material-count {
+  background: var(--color-ocean-deep);
+  color: var(--color-ocean-pearl);
+  box-shadow: 0 0 0 1px var(--color-ocean-gold);
+}
+
+html.ocean-theme .workbench-craft {
+  border: 1px solid var(--color-ocean-gold);
+  background: linear-gradient(var(--color-ocean-gold), color-mix(in srgb, var(--color-ocean-gold) 72%, var(--color-ocean-wood)));
+  color: var(--color-ocean-deep);
+  box-shadow: inset 0 1px 0 rgb(245 235 212 / 50%), 0 2px 0 var(--color-ocean-wood);
+}
+
+html.ocean-theme .workbench-craft:enabled:hover {
+  filter: brightness(1.12);
+}
+</style>

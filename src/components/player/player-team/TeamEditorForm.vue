@@ -24,7 +24,7 @@ const emit = defineEmits<{ back: []; submit: [] }>();
             {{ tr("TeamModal.ten_nhom") }} <span class="text-danger">*</span>
             <input
               v-model="createForm.name"
-              class="px-3 py-[9px] border border-palette-c0d8b8 rounded-lg bg-palette-fafefc text-[0.9rem] text-palette-1a3a1a outline-none transition focus:border-brand focus:shadow-[0_0_0_3px_rgba(59,122,87,0.12)]"
+              class="px-3 py-[9px] border border-palette-c0d8b8 rounded-lg bg-palette-fafefc text-[0.9rem] text-palette-1a3a1a outline-none transition focus:border-brand focus:shadow-[0_0_0_3px_var(--color-border-default)]"
               type="text"
               :placeholder="tr('TeamModal.vd_hoi_cau_da_lat')"
               maxlength="50"
@@ -36,7 +36,7 @@ const emit = defineEmits<{ back: []; submit: [] }>();
             {{ tr("TeamModal.mo_ta") }}
             <textarea
               v-model="createForm.description"
-              class="px-3 py-[9px] border border-palette-c0d8b8 rounded-lg bg-palette-fafefc text-[0.9rem] text-palette-1a3a1a outline-none transition resize-y min-h-[72px] focus:border-brand focus:shadow-[0_0_0_3px_rgba(59,122,87,0.12)]"
+              class="px-3 py-[9px] border border-palette-c0d8b8 rounded-lg bg-palette-fafefc text-[0.9rem] text-palette-1a3a1a outline-none transition resize-y min-h-[72px] focus:border-brand focus:shadow-[0_0_0_3px_var(--color-border-default)]"
               :placeholder="tr('TeamModal.mo_ta_ngan_ve_nhom_cua_ban')"
               rows="3"
               maxlength="200"

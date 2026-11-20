@@ -34,7 +34,7 @@ function handleClick(event: MouseEvent) {
     <component
         :is="props.interactive ? 'button' : 'span'"
         :type="props.interactive ? 'button' : undefined"
-        class="gap-2 items-center bg-white rounded-full px-3 py-1 w-fit h-fit"
+        class="ocean-currency-chip gap-2 items-center bg-white rounded-full px-3 py-1 w-fit h-fit"
         :class="props.interactive ? 'flex cursor-pointer' : 'inline-flex text-content'"
         :aria-label="props.interactive ? tr('Cash.thong_tin_ve_tien') : undefined"
         @click="handleClick"

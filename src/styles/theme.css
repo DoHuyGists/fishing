@@ -3,6 +3,12 @@
  * Default Tailwind status utilities remain available.
  */
 @theme static {
+  --color-ocean-deep: #102d46;
+  --color-ocean-panel: #1d5475;
+  --color-ocean-cyan: #35b9d5;
+  --color-ocean-gold: #f2c66d;
+  --color-ocean-wood: #93643f;
+  --color-ocean-pearl: #f5ebd4;
   --color-accent: #047857;
   --color-black: #000;
   --color-border-default: #cbd9c6;
