@@ -6,6 +6,7 @@ import { useConfigStore } from "../../../stores/player-config-store.ts";
 import { useModalStore } from "../../../stores/player-modal-store.ts";
 import { useNotificationStore } from "../../../stores/player-notification-store.ts";
 import { useFeatureAvailabilityStore } from "../../../stores/player-feature-availability-store.ts";
+import FeatureIndicator from "../../shared/FeatureIndicator.vue";
 
 const configStore = useConfigStore();
 const modalStore = useModalStore();
@@ -351,6 +352,10 @@ const supportActions: LobbyAction[] = [
               >{{ action.icon }}</span
             >
             <span class="text-[11px] font-semibold leading-4">{{ action.label }}</span>
+            <FeatureIndicator
+              :modal="action.modal"
+              :disabled="!features.canOpen(action.modal) || Boolean(action.requiresUnlock && !configStore.isUnlocked(action.modal))"
+            />
             <span
               v-if="!features.canOpen(action.modal)"
               class="rounded bg-surface px-1 py-0.5 text-[9px] leading-3 text-accent underline underline-offset-2"
@@ -398,6 +403,10 @@ const supportActions: LobbyAction[] = [
 </template>
 
 <style scoped>
+.lobby-menu__button {
+  position: relative;
+}
+
 html.ocean-theme .lobby-menu {
   border-color: color-mix(in srgb, var(--color-ocean-gold) 70%, transparent);
   background: var(--color-ocean-deep);

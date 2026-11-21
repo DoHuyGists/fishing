@@ -5,11 +5,19 @@ import { catalogRequestBody } from './requestBody.ts';
 // response from a previous login cannot refresh the next user's stores.
 let capture: ((snapshots: PlayerSnapshot[]) => () => void) | undefined;
 export function setMutationRefreshHandler(handler: typeof capture) { capture = handler; }
+let captureIndicators: (() => () => void) | undefined;
+export function setFeatureIndicatorRefreshHandler(handler: typeof captureIndicators) { captureIndicators = handler; }
+
+const indicatorMutations = new Set([
+  'claim_daily_reward', 'claim_daily_mission_reward', 'claim_fishing_pass_reward', 'claim_badge_reward',
+  'dispatch_action', 'respond_friend_request', 'cancel_friend_request', 'remove_friend',
+  'cast_rod', 'submit_challenge', 'submit_tension_challenge', 'user_complete_fishing', 'complete_hour_mission',
+]);
 
 const rewards: PlayerSnapshot[] = ['currency', 'profile', 'countries'];
 const mutations: Record<string, PlayerSnapshot[]> = {
   submit_challenge: ['profile', 'countries'], submit_tension_challenge: ['profile', 'countries'],
-  claim_daily_reward: rewards, claim_fishing_pass_reward: rewards, claim_badge_reward: rewards,
+  claim_daily_reward: rewards, claim_daily_mission_reward: rewards, claim_fishing_pass_reward: rewards, claim_badge_reward: rewards,
   complete_hour_mission: rewards, redeem_code: rewards, spin_wheel: rewards,
   use_inventory_item: rewards, purchase_item: ['currency'], buy_equipment_set: ['currency'],
   purchase_fishing_pass: ['currency'], craft_blueprint: ['currency'],
@@ -36,19 +44,25 @@ export function createMutationRefreshFetch(baseUrl: string, transport: typeof fe
     // the captured list before invoking the notifier, after resolving the RPC.
     const snapshots = url.origin === origin && method === 'POST' && rpc ? wrapper ? [] as PlayerSnapshot[] : mutations[rpc] : undefined;
     const notify = snapshots ? capture?.(snapshots) : undefined;
+    const notifyIndicators = url.origin === origin && method === 'POST'
+      && (wrapper || (rpc && indicatorMutations.has(rpc))) ? captureIndicators?.() : undefined;
     if (wrapper) {
       const body = await catalogRequestBody(input, init);
       rpc = typeof body.p_action === 'string' ? body.p_action : undefined;
       snapshots?.push(...(rpc ? mutations[rpc] ?? [] : []));
     }
     const response = await transport(input, init);
-    if (notify && snapshots?.length && response.ok) {
+    if (((notify && snapshots?.length) || (notifyIndicators && rpc && indicatorMutations.has(rpc))) && response.ok) {
+      const reconcile = () => {
+        if (snapshots?.length) notify?.();
+        if (rpc && indicatorMutations.has(rpc)) notifyIndicators?.();
+      };
       // Some RPCs return a business failure in an HTTP 200 response.
       try {
         const result = await response.clone().json();
-        if (result?.success !== false) notify();
+        if (result?.success !== false) reconcile();
       } catch {
-        if (response.status === 204) notify();
+        if (response.status === 204) reconcile();
       }
     }
     return response;

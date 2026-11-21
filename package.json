@@ -18,6 +18,7 @@
     "build": "vue-tsc -b && vite build",
     "test:leaderboard": "node --test --test-isolation=none scripts/test-leaderboard.mjs scripts/test-seasonal-fishing.mjs",
     "test:data-refresh": "node --test scripts/test-data-refresh.mjs scripts/test-refresh-stores.mjs",
+    "test:feature-indicators": "node --test scripts/test-feature-indicators.mjs",
     "test:dispatch": "node --test --test-isolation=none scripts/test-dispatch-sql.mjs scripts/test-dispatch-store.mjs",
     "test:game-cache": "node --test --test-concurrency=1 scripts/test-game-cache.mjs scripts/test-game-catalog.mjs scripts/test-catalog-sql.mjs",
     "test:game-cache:browser": "node scripts/test-game-cache-browser.mjs",

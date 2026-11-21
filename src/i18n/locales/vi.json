@@ -1622,6 +1622,8 @@
     "work_bench": "Bàn chế tạo"
   },
   "FeatureTable": {
+    "claimableRewards": "Có {count} phần thưởng có thể nhận",
+    "pendingAttention": "Có hoạt động mới cần xem",
     "tai_khoan": "Tài khoản",
     "huong_dan": "Hướng dẫn",
     "hanh_trang": "Hành trang",

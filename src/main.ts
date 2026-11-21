@@ -10,7 +10,8 @@ import { i18n } from "./i18n";
 import { useLocaleStore } from "./stores/player-locale-store.ts";
 import { setFeatureRequestGuard } from "./database/featureRequestGate";
 import { useFeatureAvailabilityStore } from "./stores/player-feature-availability-store.ts";
-import { setMutationRefreshHandler } from "./database/mutationRefresh";
+import { setMutationRefreshHandler, setFeatureIndicatorRefreshHandler } from "./database/mutationRefresh";
+import { useFeatureIndicatorStore } from "./stores/player-feature-indicator-store";
 import { usePlayerRefreshStore } from "./stores/player-refresh-store.ts";
 import { useGameCatalogStore } from "./stores/player-game-catalog-store.ts";
 import { setCatalogMutationHandler } from "./database/catalogRequests";
@@ -23,6 +24,15 @@ const pinia = createPinia();
 pinia.use(resetPlayerSnapshots);
 
 app.use(pinia);
+setFeatureIndicatorRefreshHandler(() => {
+  const auth = useAuthStore(pinia);
+  const owner = auth.user?.id;
+  const generation = auth.sessionGeneration;
+  return () => {
+    if (owner && auth.user?.id === owner && auth.sessionGeneration === generation)
+      useFeatureIndicatorStore(pinia).requestRefresh();
+  };
+});
 setMutationRefreshHandler((snapshots) => {
   const auth = useAuthStore(pinia);
   const owner = auth.user?.id;

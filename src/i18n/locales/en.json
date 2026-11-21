@@ -1618,6 +1618,8 @@
     "work_bench": "Workbench"
   },
   "FeatureTable": {
+    "claimableRewards": "{count} rewards available to claim",
+    "pendingAttention": "New activity to review",
     "tai_khoan": "Account",
     "huong_dan": "Help",
     "hanh_trang": "Inventory",

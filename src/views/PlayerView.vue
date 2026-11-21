@@ -23,6 +23,7 @@ import FeatureTable from "../components/player/player-world-map/FeatureTable.vue
 import GuideTour from "../components/shared/GuideTour.vue";
 import { useOnboardingStore } from "../stores/player-onboarding-store.ts";
 import { useFeatureAvailabilityStore } from "../stores/player-feature-availability-store.ts";
+import { useFeatureIndicatorStore } from "../stores/player-feature-indicator-store";
 
 const InteractWorldMap2 = defineAsyncComponent(
   () => import("../components/player/player-world-map/InteractWorldMap.vue"),
@@ -81,6 +82,7 @@ const currencyStore = useCurrencyStore();
 const userProfileStore = useUserProfileStore();
 const onboarding = useOnboardingStore();
 const features = useFeatureAvailabilityStore();
+const indicators = useFeatureIndicatorStore();
 
 const firstPlaySteps = [
   {
@@ -145,6 +147,17 @@ watch(
   },
   { immediate: true },
 );
+
+watch(
+  () => [authStore.user?.id, authStore.sessionGeneration, features.ready] as const,
+  ([userId, , ready], _, onCleanup) => {
+    if (userId && ready) indicators.start();
+    onCleanup(() => indicators.resetSession());
+  },
+  { immediate: true },
+);
+
+watch(() => indicators.enabledFeatures.join(","), () => indicators.requestRefresh());
 
 watch(
   () => [authStore.user?.id, features.isAvailable("notifications")] as const,

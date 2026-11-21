@@ -42,6 +42,7 @@ export const cachedReadRpcs: Record<string, string> = {
 export const personalReadDomains = Object.keys(readCachePolicies).filter(key => !readCachePolicies[key]!.persist);
 export const catalogReadDomains = Object.keys(readCachePolicies).filter(key => readCachePolicies[key]!.persist);
 export const uncachedReadRpcs = new Set([
+  'get_my_feature_indicators',
   'get_game_catalog_versions', 'get_game_catalog_snapshot', 'get_currency_conversion_rates',
   'get_user_status', 'get_user_equipment_set_using', 'get_caught_in_area', 'get_area_species_diary',
   'preview_fish_by_depth', 'get_aquaculture_farm', 'get_dispatch_state',
