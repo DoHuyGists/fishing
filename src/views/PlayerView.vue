@@ -32,7 +32,8 @@ const MarketModal = defineAsyncComponent(() => import("../components/player/play
 const ShopModal = defineAsyncComponent(() => import("../components/player/player-shop/ShopModal.vue"));
 const CatchDiaryModal = defineAsyncComponent(() => import("../components/player/player-diary/CatchDiaryModal.vue"));
 const SpinWheelModal = defineAsyncComponent(() => import("../components/player/player-spin-wheel/SpinWheelModal.vue"));
-const InventoryModal = defineAsyncComponent(() => import("../components/player/player-inventory/InventoryModal.vue"));
+const StorageModal = defineAsyncComponent(() => import("../components/player/player-inventory/StorageModal.vue"));
+const EquipmentModal = defineAsyncComponent(() => import("../components/player/player-inventory/EquipmentModal.vue"));
 const Feedbackmodal = defineAsyncComponent(() => import("../components/player/player-feedback/Feedbackmodal.vue"));
 const MissionModal = defineAsyncComponent(() => import("../components/player/player-mission/MissionModal.vue"));
 const EventModal = defineAsyncComponent(() => import("../components/player/player-event/EventModal.vue"));
@@ -237,8 +238,10 @@ onUnmounted(() => {
           <ShopModal v-if="modalStore.isOpening('shop')" />
           <CatchDiaryModal v-if="modalStore.isOpening('diary')" />
           <SpinWheelModal v-if="configStore.isUnlocked('gacha') && modalStore.isOpening('gacha')" />
-          <InventoryModal
+          <StorageModal v-if="modalStore.isOpening('storage')" />
+          <EquipmentModal
             v-if="modalStore.isOpening('inventory') || modalStore.isOpening('body')"
+            :key="modalStore.modalOpening ?? 'inventory'"
             :initial-tab="modalStore.isOpening('body') ? 'health' : 'fishing'"
           />
           <SkillModal v-if="modalStore.isOpening('skill')" />

@@ -1,4 +1,4 @@
-import type { InventoryTableContext, InventoryTab } from "../../../types/model/inventory";
+import type { EquipmentInventoryTableContext, EquipmentInventoryTab } from "../../../types/model/inventory";
 import type { UserInventory } from "../../../types/model/userInventory";
 import { t as tr } from "../../../i18n";
 import { inject, type InjectionKey } from "vue";
@@ -40,8 +40,8 @@ const LABELS: Record<Category, string> = {
 const SET_PRICE = 50000;
 const SETS_PER_PAGE = 3;
 
-export function useInventoryTable(initialTab: InventoryTab = "fishing") {
-  const activeTab = ref<InventoryTab>(initialTab);
+export function useEquipmentInventoryTable(initialTab: EquipmentInventoryTab = "fishing") {
+  const activeTab = ref<EquipmentInventoryTab>(initialTab);
   const healthStore = useHealthStore();
   const userId = ref<string | null>(null);
   const loading = ref(true);
@@ -430,10 +430,10 @@ export function useInventoryTable(initialTab: InventoryTab = "fishing") {
     buySet,
   };
 }
-export const inventoryTableContextKey: InjectionKey<InventoryTableContext> = Symbol("InventoryTableContext");
+export const equipmentInventoryTableContextKey: InjectionKey<EquipmentInventoryTableContext> = Symbol("EquipmentInventoryTableContext");
 
-export function useInventoryTableContext() {
-  const context = inject(inventoryTableContextKey);
+export function useEquipmentInventoryTableContext() {
+  const context = inject(equipmentInventoryTableContextKey);
   if (!context) throw new Error("Inventory table context is not provided.");
   return context;
 }

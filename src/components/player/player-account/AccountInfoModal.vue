@@ -41,7 +41,7 @@ async function signOut() {
     signOutError.value = tr("AccountInfoModal.khong_the_dang_xuat_vui_long_thu_lai");
   } finally {
     isSigningOut.value = false;
-    router.replace("login");
+    router.replace("home");
   }
 }
 </script>

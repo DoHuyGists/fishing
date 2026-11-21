@@ -73,7 +73,7 @@
   },
   {
     "key": "inventory",
-    "labelKey": "InventoryModal.tui_do",
+    "labelKey": "InventoryModal.kho_do",
     "rpcs": [
       "use_inventory_item",
       "delete_inventory_items",

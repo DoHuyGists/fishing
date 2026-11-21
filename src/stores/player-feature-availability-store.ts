@@ -41,6 +41,7 @@ export const useFeatureAvailabilityStore = defineStore("FeatureAvailability", {
   },
   actions: {
     showDetails(key: string) {
+      key = modalFeatures(key).find((feature) => !this.isAvailable(feature)) ?? key;
       const feature = FEATURE_CATALOG.find((feature) => feature.key === key);
       useInformationModalStore().open({
         name: `${feature ? tr(feature.labelKey) : tr("FeatureAvailability.title")} · ${tr("FeatureAvailability.maintenanceBadge")}`,

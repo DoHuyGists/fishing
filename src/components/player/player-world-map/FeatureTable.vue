@@ -57,10 +57,17 @@ const actionGroups: { key: string; label: string; iconClass: string; actions: Lo
       {
         modal: "inventory",
         get label() {
-          return tr("InventoryModal.tui_do");
+          return tr("InventoryModal.trang_bi");
+        },
+        icon: "🎽",
+        tourId: "first-play-inventory",
+      },
+      {
+        modal: "storage",
+        get label() {
+          return tr("InventoryModal.kho_do");
         },
         icon: "🎒",
-        tourId: "first-play-inventory",
       },
       {
         modal: "caught",

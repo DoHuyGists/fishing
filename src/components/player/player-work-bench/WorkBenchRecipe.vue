@@ -25,8 +25,8 @@ const emit = defineEmits<{
 </script>
 
 <template>
-  <section id="workbench-recipe" class="slide-fade-in from-right player-content-in min-h-72 rounded-lg border border-border-default bg-surface p-4 lg:min-h-0 lg:overflow-y-auto">
-    <template v-if="selectedBlueprint">
+  <section id="workbench-recipe" class="player-content-in min-h-72 rounded-lg border border-border-default bg-surface p-4 lg:min-h-0 lg:overflow-y-auto">
+    <div v-if="selectedBlueprint" class="slide-fade-in from-bottom">
       <div class="flex flex-col items-center border-b border-border-default pb-5 text-center">
         <span class="relative grid size-24 place-items-center rounded-xl border border-border-default bg-white text-3xl">
           <img v-if="resultItem?.image" :src="resultItem.image" :alt="resultItem.name" class="h-full w-full object-contain p-2" />
@@ -61,7 +61,7 @@ const emit = defineEmits<{
       </div>
       <div class="mt-4 text-center text-xs font-semibold" :class="canCraft ? 'text-content' : 'text-danger'">{{ !quantityValid ? tr('WorkBenchModal.nhap_so_nguyen_tu_1_den_1000') : currencyError || (cash < craftCost ? tr('WorkBenchModal.khong_du_tien_che_tao') : canCraft ? tr('WorkBenchModal.du_nguyen_lieu_value0_vang', { value0: craftCost }) : tr('WorkBenchModal.khong_du_nguyen_lieu_de_che_tao_so_luong_da_chon')) }}</div>
       <button type="button" class="workbench-craft mt-3 w-full rounded-md bg-accent px-4 py-2 text-sm font-bold text-white disabled:cursor-not-allowed disabled:opacity-50" :disabled="!canCraft || isLoading" @click="emit('craft')">{{ isLoading ? tr('WorkBenchModal.dang_che_tao') : tr('WorkBenchModal.che_tao') }}</button>
-    </template>
+    </div>
     <div v-else class="grid h-full min-h-64 place-items-center text-center text-sm opacity-60">{{ tr('WorkBenchModal.chon_mot_ban_ve_de_xem_cong_thuc_che_tao') }}</div>
   </section>
 </template>

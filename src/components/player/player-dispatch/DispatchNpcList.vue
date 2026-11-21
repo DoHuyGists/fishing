@@ -13,10 +13,11 @@ const busy = (id: string) => store.runs.some((r) => r.owned_npc_id === owned(id)
   <div v-if="!store.npcs.length" class="py-8 text-center text-sm">{{ tr("Dispatch.emptyNpcs") }}</div>
   <div class="dispatch-grid">
     <article
-      v-for="npc in store.npcs"
+      v-for="(npc,index) in store.npcs"
       :key="npc.id"
-      class="dispatch-card slide-fade-in player-content-in"
+      class="slide-fade-in from-bottom dispatch-card slide-fade-in player-content-in"
       :class="{ 'ring-2 ring-accent': store.selectedNpcId === npc.id }"
+      :style="{ '--delay': `${index * 45}ms` }"
     >
       <div class="flex items-center gap-2">
         <img

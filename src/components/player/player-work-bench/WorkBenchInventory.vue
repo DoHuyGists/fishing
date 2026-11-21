@@ -50,10 +50,11 @@ const displayedGroups = computed(() => inventoryViewStore.displayedGroups(props.
         </div>
         <div class="grid content-start gap-2" :class="viewMode === 'list' ? 'grid-cols-1' : 'grid-cols-2'">
           <div
-            v-for="item in group.items"
+            v-for="(item, index) in group.items"
             :key="item.id"
-            class="flex min-w-0 items-center rounded-md border border-border-default bg-white p-2"
+            class="slide-fade-in from-bottom flex min-w-0 items-center rounded-md border border-border-default bg-white p-2"
             :class="viewMode === 'list' ? 'gap-2 text-left' : 'flex-col gap-1 text-center'"
+            :style="{ '--delay': `${index * 45}ms` }"
           >
             <span class="grid shrink-0 place-items-center overflow-hidden rounded-lg bg-surface text-xl" :class="viewMode === 'list' ? 'size-10' : 'size-14'">
               <img v-if="item.image" :src="item.image" :alt="item.name" class="h-full w-full object-contain p-1" />

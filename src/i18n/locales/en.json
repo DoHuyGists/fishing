@@ -1133,10 +1133,37 @@
     "chon_value0_de_xoa": "Select {value0} to delete",
     "da_them": "Added"
   },
+  "Storage": {
+    "search": "Search items",
+    "classification": "Item group",
+    "category": "Item category",
+    "all": "All",
+    "status": "Status",
+    "usable": "Usable",
+    "protected": "Assigned to an equipment set",
+    "unassigned": "Not assigned to an equipment set",
+    "sort": "Sort by",
+    "newest": "Newest first",
+    "oldest": "Oldest first",
+    "name": "Item name",
+    "quantity": "Quantity, high to low",
+    "pageSize": "Items per page",
+    "reset": "Reset filters",
+    "results": "{count} results",
+    "totalItems": "Item slots:",
+    "totalQuantity": "Total quantity:",
+    "selected": "Selected:",
+    "selectResults": "Select all results",
+    "clearSelection": "Clear selection",
+    "protectedSelection": "{count} selected items belong to equipment sets. Deselect them or remove them from their sets and save before deleting.",
+    "received": "Received at",
+    "confirmDelete": "Delete {count} selected items?",
+    "deleteWarning": "The selected items and their entire quantities will be permanently deleted. This cannot be undone."
+  },
   "InventoryModal": {
     "fishingTab": "Fishing tools",
     "healthTab": "Health & equipment",
-    "tui_do": "Inventory",
+    "kho_do": "Storage",
     "day_la_cac_vat_pham_ban_dang_o_huu": "Items you own",
     "day_la_cac_set_trang_bi_ban_cai_dat_truoc_khi_cau": "Equipment sets prepared before fishing",
     "slot_trang_bi": "Equipment slot",
@@ -1634,7 +1661,7 @@
     "chao_mung_ban_den_voi_ho_cau": "Welcome to the fishing lake",
     "trong_tai_khoan_chon_ten_anh_dai_dien_va_quoc_gia_de_bat_dau_han": "In Account, choose your name, avatar and country to begin your journey.",
     "chuan_bi_trang_bi": "Prepare your equipment",
-    "mo_tui_do_va_chon_du_can_day_may_luoi_moi_trong_mot_set_vao_cua_": "Open Inventory and select a rod, line, reel, hook and bait in a set. Visit the Shop if anything is missing.",
+    "mo_tui_do_va_chon_du_can_day_may_luoi_moi_trong_mot_set_vao_cua_": "Open Equipment and select a rod, line, reel, hook and bait in a set. Visit the Shop if anything is missing.",
     "chon_bai_cau": "Choose a fishing area",
     "mo_mot_quoc_gia_tren_ban_do_chon_bai_cau_roi_kiem_tra_trang_bi_t": "Unlock a country on the map, select a fishing area and check your equipment before entering.",
     "tha_cau_va_keo_ca": "Cast and reel in a fish",
@@ -1685,6 +1712,9 @@
     "xem_goi_y": "Show hint"
   },
   "InformationModal": {
+    "description": "Description",
+    "stats": "Item stats",
+    "itemId": "Item ID",
     "dong_thong_tin": "Close information"
   },
   "Modal": {

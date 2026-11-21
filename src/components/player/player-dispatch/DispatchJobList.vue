@@ -10,10 +10,11 @@ const store = useDispatchStore();
   <div v-if="!store.jobs.length" class="py-8 text-center text-sm">{{ tr("Dispatch.emptyJobs") }}</div>
   <div class="dispatch-grid">
     <article
-      v-for="job in store.jobs"
+      v-for="(job, index) in store.jobs"
       :key="job.id"
-      class="dispatch-card slide-fade-in player-content-in"
+      class="dispatch-card slide-fade-in from-bottom player-content-in"
       :class="{ 'ring-2 ring-accent': store.selectedJobId === job.id }"
+      :style="{ '--delay': `${index * 45}ms` }"
     >
       <div class="flex items-center gap-2">
         <img

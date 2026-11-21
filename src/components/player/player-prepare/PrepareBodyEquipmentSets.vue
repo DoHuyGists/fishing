@@ -54,7 +54,7 @@ async function switchSet(set: BodyEquipmentSet) {
           @click="modalStore.open('body')"
         >
           <span aria-hidden="true">🎒</span>
-          {{ tr("InventoryModal.tui_do") }}
+          {{ tr("InventoryModal.kho_do") }}
         </button>
       </div>
     </header>

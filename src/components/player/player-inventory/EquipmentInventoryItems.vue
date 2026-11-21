@@ -2,8 +2,8 @@
 import { t as tr } from "../../../i18n";
 
 import { computed } from "vue";
-import InventoryItemCard from "./InventoryItemCard.vue";
-import { useInventoryTableContext } from "./useInventoryTable.ts";
+import EquipmentInventoryItemCard from "./EquipmentInventoryItemCard.vue";
+import { useEquipmentInventoryTableContext } from "./useEquipmentInventoryTable.ts";
 
 defineEmits<{ "request-delete": [] }>();
 
@@ -25,7 +25,7 @@ const {
   useSelectedItem,
   usingItemId,
   viewMode,
-} = useInventoryTableContext();
+} = useEquipmentInventoryTableContext();
 
 const categoryName = (category: string) => LABELS[category as keyof typeof LABELS] ?? category;
 const groupedPagedItems = computed(() => {
@@ -126,7 +126,7 @@ const displayedGroups = computed(() =>
           <span class="font-normal text-content">({{ group.items.length }})</span>
         </div>
         <div :class="viewMode === 'list' ? 'flex flex-col gap-2' : 'grid grid-cols-2 gap-3 sm:grid-cols-3 xl:grid-cols-4'">
-          <InventoryItemCard
+          <EquipmentInventoryItemCard
             v-for="(item, index) in group.items"
             :key="item.id"
             :style="{ '--delay': `${index * 45}ms` }"

@@ -8,7 +8,9 @@ const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
   routes: [
     {
-      path: '/story', name: 'story', component: () => import('../views/StoryView.vue'),
+      path: "/story",
+      name: "story",
+      component: () => import("../views/StoryView.vue"),
       meta: { requiresAuth: true, localContext: true },
     },
     {
@@ -24,14 +26,14 @@ const router = createRouter({
       children: [
         {
           path: "",
+          name: "home",
+          component: () => import("../views/HomeView.vue"),
+          meta: { requiresAuth: false },
+        },
+        {
+          path: "",
           component: PlayerLayout,
           children: [
-            {
-              path: "",
-              name: "home",
-              component: () => import("../views/HomeView.vue"),
-              meta: { requiresAuth: true },
-            },
             {
               path: "/lobby",
               name: "lobby",

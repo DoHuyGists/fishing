@@ -3,6 +3,7 @@ import { t as tr } from "../../i18n";
 
 import { ref, watch } from "vue";
 import { useInformationModal } from "../../composables/useInformationModal";
+import ItemInformationContent from "./ItemInformationContent.vue";
 
 const { content, close } = useInformationModal();
 const dialog = ref<HTMLDialogElement | null>(null);
@@ -21,13 +22,13 @@ watch([content, dialog], () => {
     <dialog
       ref="dialog"
       aria-labelledby="information-modal-title"
-      aria-describedby="information-modal-description"
-      class="shared-information fixed inset-0 m-auto max-h-[85dvh] w-[calc(100%-2rem)] max-w-sm overflow-y-auto rounded-2xl border border-border-default bg-surface p-0 text-content shadow-xl backdrop:bg-content/40"
+      :aria-describedby="content?.description ? 'information-modal-description' : undefined"
+      class="shared-information fixed inset-0 m-auto max-h-[85dvh] w-[calc(100%-2rem)] overflow-y-auto rounded-2xl border border-border-default bg-surface p-0 text-content shadow-xl backdrop:bg-content/40"
+      :class="content?.itemDetails ? 'max-w-2xl' : 'max-w-sm'"
       @cancel.prevent="close"
-      @close="close"
       @click.self="close"
     >
-      <div v-if="content" class="relative p-6 text-center" @click.stop>
+      <div v-if="content" class="player-popup-in relative p-5 text-center sm:p-6" @click.stop>
         <button
           type="button"
           autofocus
@@ -35,9 +36,12 @@ watch([content, dialog], () => {
           class="absolute right-2 top-2 flex size-8 cursor-pointer items-center justify-center rounded-full text-2xl hover:bg-border-default/50 focus-visible:outline-2 focus-visible:outline-offset-2"
           @click="close"
         >×</button>
-        <img v-if="content.image" :src="content.image" :alt="content.name" class="mx-auto mb-4 size-16 object-contain" draggable="false">
-        <div id="information-modal-title" class="text-lg font-bold">{{ content.name }}</div>
-        <div id="information-modal-description" class="mt-2 whitespace-pre-line text-sm leading-relaxed">{{ content.description }}</div>
+        <ItemInformationContent v-if="content.itemDetails" :content="content" />
+        <template v-else>
+          <img v-if="content.image" :src="content.image" :alt="content.name" class="mx-auto mb-4 size-16 object-contain" draggable="false">
+          <div id="information-modal-title" class="text-lg font-bold">{{ content.name }}</div>
+          <div id="information-modal-description" class="mt-2 whitespace-pre-line text-sm leading-relaxed">{{ content.description }}</div>
+        </template>
       </div>
     </dialog>
   </Teleport>

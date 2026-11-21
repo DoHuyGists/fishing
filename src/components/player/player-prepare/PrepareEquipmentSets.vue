@@ -94,7 +94,7 @@ function countSetItems(s: EquipmentSet): number {
           @click="modalStore.open('inventory')"
         >
           <span aria-hidden="true">🎒</span>
-          {{ tr("InventoryModal.tui_do") }}
+          {{ tr("InventoryModal.kho_do") }}
         </button>
       </div>
     </div>

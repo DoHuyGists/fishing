@@ -10,7 +10,10 @@ const store = useDispatchStore();
 <template>
   <div v-if="!store.runs.length" class="py-8 text-center text-sm">{{ tr("Dispatch.emptyRuns") }}</div>
   <div class="grid gap-2 lg:grid-cols-2 2xl:grid-cols-3">
-    <article v-for="run in store.runs" :key="run.id" class="dispatch-card slide-fade-in player-content-in">
+    <article v-for="(run, index) in store.runs" :key="run.id" 
+    class="dispatch-card slide-fade-in from-bottom player-content-in"
+    :style="{ '--delay': `${index * 45}ms` }"
+    >
       <div class="font-bold">{{ dispatchText(run.npc_snapshot.name) }} · {{ dispatchText(run.job_snapshot.name) }}</div>
       <div class="space-y-1 text-xs text-content">
         <div>{{ tr("Dispatch.startedAt") }}: {{ formatDateTime(run.started_at) }}</div>

@@ -1,10 +1,6 @@
 import { defineStore } from "pinia";
-
-export interface InformationModalContent {
-  name: string;
-  image?: string;
-  description: string;
-}
+import type { InformationModalContent } from "../types/model/informationModal";
+export type { InformationModalContent } from "../types/model/informationModal";
 
 export const useInformationModalStore = defineStore("informationModal", {
   state: () => ({

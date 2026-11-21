@@ -1,5 +1,5 @@
-import type { useInventoryTable } from "../../components/player/player-inventory/useInventoryTable";
+import type { useEquipmentInventoryTable } from "../../components/player/player-inventory/useEquipmentInventoryTable";
 
-export type InventoryTableContext = ReturnType<typeof useInventoryTable>;
-export type InventoryTab = 'fishing' | 'health';
+export type EquipmentInventoryTableContext = ReturnType<typeof useEquipmentInventoryTable>;
+export type EquipmentInventoryTab = 'fishing' | 'health';
 export type InventoryClassification = 'fishing' | 'body';

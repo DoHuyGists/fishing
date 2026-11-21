@@ -10,6 +10,7 @@ const modalNames = [
   "diary",
   "gacha",
   "inventory",
+  "storage",
   "body",
   "feedback",
   "mission",

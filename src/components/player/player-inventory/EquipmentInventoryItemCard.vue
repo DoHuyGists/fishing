@@ -5,7 +5,7 @@ import { getFormattingLocale, t as tr } from "../../../i18n";
 import { useInformationModal } from "../../../composables/useInformationModal";
 
 import type { ItemData } from "../../../stores/player-equipment-store";
-import { useInventoryTableContext } from "./useInventoryTable";
+import { useEquipmentInventoryTableContext } from "./useEquipmentInventoryTable";
 import { healthEquipment } from "../../../data/healthEquipment";
 
 const props = defineProps<{ item: UserInventory; list?: boolean }>();
@@ -21,7 +21,7 @@ const {
   pickItem,
   selected,
   toggleSelect,
-} = useInventoryTableContext();
+} = useEquipmentInventoryTableContext();
 
 const data = computed(() => props.item.data as ItemData);
 const healthItem = computed(() => healthEquipment(props.item));
@@ -50,7 +50,7 @@ const details = computed(() => {
   addNumber("durability", tr("InventoryItemCard.do_ben"));
   addNumber("catch_rate", tr("InventoryItemCard.bonus_moc_ca"), "percent");
   addNumber("luck_bonus", tr("InventoryItemCard.may_man"));
-  if (activeTab.value === "health") {
+  if (activeTab.value === "health" || classification.value === "body") {
     for (const [id, bonus] of Object.entries(healthItem.value.bonuses)) {
       rows.push({ label: tr(`Health.${id}`), value: `+${bonus?.toLocaleString(getFormattingLocale())}` });
     }
@@ -68,14 +68,14 @@ function showDetails() {
   open({
     name: name.value,
     image: typeof data.value.image === "string" ? data.value.image : undefined,
-    description: [
-      category.value,
-      classification.value,
-      description.value,
-      ...details.value.map(({ label, value }) => `${label}: ${value}`),
-    ]
-      .filter(Boolean)
-      .join("\n\n"),
+    icon: icon.value,
+    description: description.value,
+    itemDetails: {
+      badges: [category.value, classification.value === 'body' ? tr('InventoryModal.healthTab')
+        : classification.value === 'fishing' ? tr('InventoryModal.fishingTab') : classification.value].filter(Boolean),
+      stats: details.value,
+      metadata: [{ label: tr('InformationModal.itemId'), value: props.item.id }],
+    },
   });
 }
 </script>

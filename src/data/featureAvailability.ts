@@ -5,6 +5,7 @@ const catalog: FeatureDefinition[] = rawCatalog;
 export const FEATURE_CATALOG = catalog;
 
 export function modalFeatures(modal: string): string[] {
+  if (modal === "storage") return ["inventory"];
   if (modal === "prepare") return ["world-map", "enter-area"];
   return catalog.some(feature => feature.key === modal) ? [modal] : [];
 }

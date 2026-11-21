@@ -21,7 +21,7 @@ const store = useDispatchStore();
     {{ tr("Dispatch.emptyHistory") }}
   </div>
   <div class="grid gap-2 lg:grid-cols-2 2xl:grid-cols-3">
-    <article v-for="record in store.history" :key="record.id" class="dispatch-card">
+    <article v-for="(record, index) in store.history" :key="record.id" class="dispatch-card slide-fade-in from-bottom" :style="{ '--delay': `${index * 45}ms` }">
       <div class="font-bold">
         {{ dispatchText(record.npc_snapshot.name) }} · {{ dispatchText(record.job_snapshot.name) }}
       </div>

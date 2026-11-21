@@ -3,7 +3,7 @@ import { t as tr } from "../../../../i18n/index.ts";
 import EquipmentSetsPanel from "../../../shared/EquipmentSetsPanel.vue";
 import EquipmentSetCard from "../../../shared/EquipmentSetCard.vue";
 
-import { useInventoryTableContext } from "../useInventoryTable.ts";
+import { useEquipmentInventoryTableContext } from "../useEquipmentInventoryTable.ts";
 
 defineEmits<{ "request-buy": [] }>();
 
@@ -29,7 +29,7 @@ const {
   setSearch,
   toggleActive,
   handleUpdateSetUsed,
-} = useInventoryTableContext();
+} = useEquipmentInventoryTableContext();
 </script>
 
 <template>

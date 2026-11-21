@@ -4,18 +4,18 @@ import { t as tr } from "../../../i18n";
 import { computed, provide } from "vue";
 import FishingEquipmentSets from "./fishing-equipment/FishingEquipmentSets.vue";
 import FishingEquipmentOverview from "./fishing-equipment/FishingEquipmentOverview.vue";
-import InventoryItems from "./InventoryItems.vue";
+import EquipmentInventoryItems from "./EquipmentInventoryItems.vue";
 import Modal from "../../shared/Modal.vue";
 import PaymentConfirmation from "../../shared/PaymentConfirmation.vue";
-import { inventoryTableContextKey, useInventoryTable } from "./useInventoryTable.ts";
+import { equipmentInventoryTableContextKey, useEquipmentInventoryTable } from "./useEquipmentInventoryTable.ts";
 import Tab from "../../shared/Tab.vue";
 import HealthPanel from "./body-equipment/HealthPanel.vue";
-import type { InventoryTab } from "../../../types/model/inventory";
+import type { EquipmentInventoryTab } from "../../../types/model/inventory";
 import { useModalStore } from "../../../stores/player-modal-store.ts";
 
-const { initialTab = "fishing", compact = false } = defineProps<{ initialTab?: InventoryTab; compact?: boolean }>();
-const inventory = useInventoryTable(initialTab);
-provide(inventoryTableContextKey, inventory);
+const { initialTab = "fishing", compact = false } = defineProps<{ initialTab?: EquipmentInventoryTab; compact?: boolean }>();
+const inventory = useEquipmentInventoryTable(initialTab);
+provide(equipmentInventoryTableContextKey, inventory);
 const modalStore = useModalStore();
 
 const { activeTab, busy, buySet, currencyStore, deleteSelected, load, loading, modal, selected, SET_PRICE } = inventory;
@@ -28,7 +28,7 @@ const guildeSteps = [
   {
     target: "#user-inventory",
     get title() {
-      return tr("InventoryModal.tui_do");
+      return tr("InventoryModal.kho_do");
     },
     get description() {
       return tr("InventoryModal.day_la_cac_vat_pham_ban_dang_o_huu");
@@ -83,7 +83,7 @@ const guildeSteps = [
       </div>
 
       <div v-else class="grid min-w-0 grid-cols-1 items-start gap-3 lg:grid-cols-2">
-        <InventoryItems @request-delete="modal = 'delete'" />
+        <EquipmentInventoryItems @request-delete="modal = 'delete'" />
         <div class="min-w-0">
           <Tab v-model="activeTab" :tabs="tabs" :aria-label="tr('InventoryModal.trang_bi')">
             <template #fishing>
