@@ -3,6 +3,7 @@ import { t as tr } from "../../../i18n";
 import { dispatchText } from "../../../data/dispatch";
 import { useDispatchStore } from "../../../stores/player-dispatch-store.ts";
 import Cash from "../player-currency/Cash.vue";
+import DispatchRewards from "./DispatchRewards.vue";
 const store = useDispatchStore();
 </script>
 
@@ -56,6 +57,7 @@ const store = useDispatchStore();
       <span>{{ tr("Dispatch.operatingCost") }}</span
       ><Cash :amount="store.selectedNpc.operating_cash" :size="20" :interactive="false" />
     </div>
+    <DispatchRewards v-if="store.selectedJob" :rewards="store.selectedJob.rewards" :delivery-items="store.selectedJob.data.delivery_items" />
     <div v-if="store.selectedNpc && store.selectedJob && !store.canAssign" class="text-xs text-gold">
       {{ tr("Dispatch.assignmentHint") }}
     </div>

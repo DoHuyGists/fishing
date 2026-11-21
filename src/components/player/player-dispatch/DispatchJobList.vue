@@ -45,7 +45,7 @@ const store = useDispatchStore();
         >
         <span v-if="!Object.keys(job.data.requirements ?? {}).length">{{ tr("Dispatch.noRequirements") }}</span>
       </div>
-      <DispatchRewards :rewards="job.rewards" />
+      <DispatchRewards :rewards="job.rewards" :delivery-items="job.data.delivery_items" />
       <div v-if="store.selectedNpc && !dispatchEligible(store.selectedNpc, job)" class="text-xs text-gold">
         {{ tr("Dispatch.errorRequirements") }}
       </div>

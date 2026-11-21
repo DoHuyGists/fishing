@@ -2,6 +2,7 @@ export interface DispatchText { vi: string; en: string }
 export type DispatchCatalogKind = 'npcs' | 'jobs';
 export type DispatchStats = Record<string, number>;
 export interface DispatchRewards { cash?: number; shells?: number; tickets?: number }
+export interface DispatchDeliveryItem { item_id: string; quantity: number }
 
 export interface DispatchCatalogRow {
   id: string;
@@ -21,7 +22,7 @@ export interface DispatchNpc extends DispatchCatalogRow {
 }
 export interface DispatchJob extends DispatchCatalogRow {
   duration_seconds: number;
-  data: { requirements?: DispatchStats; [key: string]: unknown };
+  data: { requirements?: DispatchStats; delivery_items?: DispatchDeliveryItem[]; [key: string]: unknown };
   rewards: DispatchRewards;
 }
 export interface DispatchOwnedNpc {

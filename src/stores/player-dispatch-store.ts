@@ -6,6 +6,8 @@ import { RepositoryError } from '../data/repositoryError';
 import { createUuid } from '../utils/uuid';
 import { useAuthStore } from './auth';
 import { useToast } from '../composables/useToast';
+import { useGameCatalogStore } from './player-game-catalog-store';
+import type { Item } from '../types/model/item';
 import type { DispatchConfirmation, DispatchRequest, DispatchState } from '../types/model/dispatch';
 import type { DispatchHistory, DispatchJob, DispatchNpc, DispatchOwnedNpc, DispatchRun } from '../types/table/dispatch';
 
@@ -43,6 +45,7 @@ function errorMessage(error: unknown) {
 export const useDispatchStore = defineStore('DispatchPlayer', {
   state: () => ({
     ownerId: '', snapshot: null as DispatchState | null,
+    rewardItems: {} as Record<string, Item>,
     tab: 'npcs', selectedNpcId: '', selectedJobId: '',
     confirmation: null as DispatchConfirmation | null,
     pending: null as DispatchRequest | null,
@@ -79,6 +82,21 @@ export const useDispatchStore = defineStore('DispatchPlayer', {
     },
   },
   actions: {
+    async loadRewardItems() {
+      const epoch = this.epoch;
+      const ids = [...new Set([
+        ...this.jobs.map(job => job.data.delivery_items ?? []),
+        ...this.runs.map(run => run.job_snapshot.data.delivery_items ?? []),
+        ...this.history.map(record => record.job_snapshot.data.delivery_items ?? []),
+      ].flat().map(item => item.item_id))];
+      if (!ids.length) return;
+      await useGameCatalogStore().get('items', {
+        ids, consumer: 'dispatch',
+        onUpdate: items => {
+          if (epoch === this.epoch) this.rewardItems = Object.fromEntries((items ?? []).map(item => [item.id, item]));
+        },
+      });
+    },
     resetSession() { const epoch = this.epoch + 1; this.$reset(); this.epoch = epoch; },
     async initialize(owner: string) {
       this.resetSession();
@@ -100,6 +118,7 @@ export const useDispatchStore = defineStore('DispatchPlayer', {
         const state = await repository.fetchState();
         if (!current()) return false;
         this.snapshot = state;
+        void this.loadRewardItems().catch(() => {});
         this.clockBase = Date.parse(state.server_time);
         this.clockAnchor = performance.now();
         this.updateClock();
@@ -120,6 +139,7 @@ export const useDispatchStore = defineStore('DispatchPlayer', {
         const result = await repository.fetchHistory(page, this.historyPageSize);
         if (!current()) return;
         this.history = result.items; this.historyTotal = result.total; this.historyPage = page;
+        void this.loadRewardItems().catch(() => {});
       } catch (error) { if (current()) this.historyError = errorMessage(error); }
       finally { if (current()) this.historyLoading = false; }
     },

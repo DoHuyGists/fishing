@@ -35,7 +35,7 @@ const store = useDispatchStore();
         <span>{{ tr("Dispatch.operatingCost") }}</span
         ><Cash :amount="record.operating_cash" :size="20" :interactive="false" />
       </div>
-      <DispatchRewards :rewards="record.rewards" />
+      <DispatchRewards :rewards="record.rewards" :delivery-items="record.outcome === 'claimed' ? record.job_snapshot.data.delivery_items : undefined" />
     </article>
   </div>
   <Pagination

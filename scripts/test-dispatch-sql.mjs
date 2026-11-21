@@ -7,6 +7,7 @@ import { PGlite } from '@electric-sql/pglite';
 test('dispatch transactions enforce ownership, time, snapshots, refunds and idempotency', async () => {
   const db = new PGlite();
   const owner = randomUUID(), other = randomUUID(), npc = randomUUID(), job = randomUUID();
+  const stackItem = randomUUID(), singleItem = randomUUID();
   const rows = async (sql, args) => (await db.query(sql, args)).rows;
   const scalar = async (sql, args) => Object.values((await rows(sql, args))[0])[0];
   const requests = new Map();
@@ -35,12 +36,18 @@ test('dispatch transactions enforce ownership, time, snapshots, refunds and idem
       GRANT USAGE ON SCHEMA auth TO authenticated;
       CREATE TABLE public.user_profile(id UUID PRIMARY KEY REFERENCES auth.users(id));
       CREATE TABLE public.currency(id UUID PRIMARY KEY DEFAULT gen_random_uuid(),user_id UUID UNIQUE REFERENCES auth.users(id),cash NUMERIC,shells NUMERIC,tickets NUMERIC);
+      CREATE TABLE public.items(id UUID PRIMARY KEY,name TEXT,image TEXT,icon TEXT,category TEXT,information TEXT,classification TEXT,rpc TEXT,storage_type TEXT,data JSONB,quantity INTEGER,"isDisabled" BOOLEAN DEFAULT FALSE);
+      CREATE TABLE public.user_inventory(id UUID PRIMARY KEY DEFAULT gen_random_uuid(),user_id UUID REFERENCES auth.users(id),rpc TEXT,data JSONB);
       CREATE TABLE public.feature_flags(feature_key TEXT PRIMARY KEY,enabled BOOLEAN DEFAULT TRUE);
       CREATE TABLE feature_control.request_rules(feature_key TEXT,path TEXT,writes_only BOOLEAN,PRIMARY KEY(feature_key,path));
       CREATE FUNCTION public.feature_flags_is_admin() RETURNS BOOLEAN LANGUAGE sql AS $$ SELECT coalesce(current_setting('test.admin',true),'false')='true' $$;
       CREATE FUNCTION public.feature_is_enabled(k TEXT) RETURNS BOOLEAN LANGUAGE sql AS $$ SELECT enabled FROM public.feature_flags WHERE feature_key=k $$;
     `);
     await db.exec(await readFile(new URL('./supabase/migrations/20261114_dispatch.sql', import.meta.url), 'utf8'));
+    await db.exec(await readFile(new URL('./supabase/migrations/20261121_dispatch_delivery_items.sql', import.meta.url), 'utf8'));
+    await db.query("INSERT INTO public.items(id,name,storage_type,quantity) VALUES($1,'Stack','stack',99),($2,'Single','single',20)", [stackItem, singleItem]);
+    const delivered = () => rows("SELECT data->>'id' AS item_id,(data->>'quantity')::INTEGER AS quantity FROM public.user_inventory WHERE user_id=$1 ORDER BY data->>'id',id", [owner]);
+    const deliveries = [{ item_id: stackItem, quantity: 2 }, { item_id: singleItem, quantity: 1 }];
     await db.query('INSERT INTO auth.users VALUES($1),($2)', [owner, other]);
     await db.query('INSERT INTO public.user_profile VALUES($1),($2)', [owner, other]);
     await db.query('INSERT INTO public.currency(user_id,cash,shells,tickets) VALUES($1,1000,100,0),($2,1000,100,0)', [owner, other]);
@@ -48,6 +55,7 @@ test('dispatch transactions enforce ownership, time, snapshots, refunds and idem
       VALUES($1,'sailor','{"vi":"Thủy thủ","en":"Sailor"}',50,100,'{"stats":{"strength":10}}',true)`, [npc]);
     await db.query(`INSERT INTO public.dispatch_jobs(id,code,name,duration_seconds,data,rewards,enabled)
       VALUES($1,'explore','{"vi":"Khám phá","en":"Explore"}',60,'{"requirements":{"strength":5}}','{"cash":150,"shells":2,"tickets":1}',true)`, [job]);
+    await db.query("UPDATE public.dispatch_jobs SET data=data || jsonb_build_object('delivery_items',$2::JSONB) WHERE id=$1", [job, JSON.stringify(deliveries)]);
     await db.query("SELECT set_config('test.uid',$1,false)", [owner]);
     await db.exec('SET ROLE authenticated');
 
@@ -78,6 +86,7 @@ test('dispatch transactions enforce ownership, time, snapshots, refunds and idem
     assert.deepEqual(await wallet(), { cash: '900', shells: '50', tickets: '0' });
     await finishTime(run);
     await db.query('UPDATE public.dispatch_jobs SET rewards=$2,duration_seconds=120 WHERE id=$1', [job, { cash: 9999 }]);
+    await db.query("UPDATE public.dispatch_jobs SET data=jsonb_set(data,'{delivery_items}',$2::JSONB) WHERE id=$1", [job, JSON.stringify([{ item_id: stackItem, quantity: 5 }])]);
     await db.exec('SET ROLE authenticated');
     const repeatReceipt = randomUUID();
     const next = (await act('repeat', run, null, repeatReceipt)).id;
@@ -90,6 +99,7 @@ test('dispatch transactions enforce ownership, time, snapshots, refunds and idem
     await assert.rejects(act('claim', run), /DISPATCH_RUN_UNAVAILABLE/);
     await db.exec('RESET ROLE');
     assert.deepEqual(await wallet(), { cash: '950', shells: '52', tickets: '1' });
+    assert.deepEqual(await delivered(), deliveries.map(item => ({ item_id: item.item_id, quantity: item.quantity })).sort((a,b) => a.item_id.localeCompare(b.item_id)), 'repeat pays the old snapshot once, with exact quantities');
 
     // A failed repeat must roll back its claim, history and wallet delta together.
     await finishTime(next);
@@ -101,6 +111,7 @@ test('dispatch transactions enforce ownership, time, snapshots, refunds and idem
     assert.equal((await rows('SELECT * FROM public.dispatch_history')).length, 1);
     await db.exec('RESET ROLE');
     assert.equal((await wallet()).cash, '0');
+    assert.equal((await delivered()).find(item => item.item_id === stackItem).quantity, 2, 'failed repeat rolls back items');
     await db.query('UPDATE public.dispatch_jobs SET enabled=false WHERE id=$1', [job]);
     await db.query('UPDATE public.dispatch_npcs SET enabled=false WHERE id=$1', [npc]);
     await db.exec('SET ROLE authenticated');
@@ -108,6 +119,8 @@ test('dispatch transactions enforce ownership, time, snapshots, refunds and idem
     assert.equal((await ownState()).runs.length, 0);
     await db.exec('RESET ROLE');
     assert.equal((await wallet()).cash, '9999');
+    assert.equal((await delivered()).find(item => item.item_id === stackItem).quantity, 7, 'claim stacks new snapshot rewards');
+    assert.equal((await delivered()).length, 2);
 
     await db.query('UPDATE public.dispatch_npcs SET enabled=true,operating_cash=100 WHERE id=$1', [npc]);
     await db.query('UPDATE public.dispatch_jobs SET enabled=true WHERE id=$1', [job]);
@@ -124,6 +137,7 @@ test('dispatch transactions enforce ownership, time, snapshots, refunds and idem
     assert.deepEqual(history[2].rewards, {});
     await db.exec('RESET ROLE');
     assert.equal((await wallet()).cash, '9899', 'cancel does not refund or pay rewards');
+    assert.equal((await delivered()).find(item => item.item_id === stackItem).quantity, 7, 'cancel never delivers items');
 
     const oldVersion = (await scalar('SELECT public.get_dispatch_state()')).npcs[0].updated_at;
     await db.query('UPDATE public.dispatch_npcs SET operating_cash=101 WHERE id=$1', [npc]);
@@ -140,6 +154,9 @@ test('dispatch transactions enforce ownership, time, snapshots, refunds and idem
     await db.exec('RESET ROLE');
     await assert.rejects(db.query(`UPDATE public.dispatch_jobs SET rewards='{"cash":-1}' WHERE id=$1`, [job]), /check constraint/);
     await assert.rejects(db.query(`UPDATE public.dispatch_jobs SET rewards='{"items":1}' WHERE id=$1`, [job]), /check constraint/);
+    for (const invalid of [null, {}, [{ item_id: 'invalid', quantity: 1 }], [{ item_id: stackItem, quantity: 0 }], [{ item_id: stackItem, quantity: 1.5 }], [{ item_id: stackItem, quantity: '2' }]]) {
+      await assert.rejects(db.query("UPDATE public.dispatch_jobs SET data=jsonb_set(data,'{delivery_items}',$2::JSONB) WHERE id=$1", [job, JSON.stringify(invalid)]), /check constraint/);
+    }
     await assert.rejects(db.query(`UPDATE public.dispatch_npcs SET data='{"stats":{"strength":"999"}}' WHERE id=$1`, [npc]), /check constraint/);
     await db.query('UPDATE public.currency SET shells=0 WHERE user_id=$1', [other]);
     await db.query("SELECT set_config('test.uid',$1,false)", [other]);

@@ -1,6 +1,6 @@
 # Phái NPC
 
-Chạy `migrations/20261114_dispatch.sql` trong Supabase SQL Editor sau migration feature flags. File tạo mới sáu bảng, RLS và RPC; không cần cron hoặc Realtime. Chưa có dữ liệu NPC/công việc mặc định. Vào trang quản trị → Phái NPC → NPC / Công việc để tạo và bật cấu hình.
+Chạy `migrations/20261114_dispatch.sql` trong Supabase SQL Editor sau migration feature flags, rồi chạy `migrations/20261121_dispatch_delivery_items.sql` để hỗ trợ thưởng vật phẩm (cần có bảng `items`, `user_inventory`). File tạo mới sáu bảng, RLS và RPC; không cần cron hoặc Realtime. Chưa có dữ liệu NPC/công việc mặc định. Vào trang quản trị → Phái NPC → NPC / Công việc để tạo và bật cấu hình.
 
 ## Quy tắc
 
@@ -16,7 +16,9 @@ Chạy `migrations/20261114_dispatch.sql` trong Supabase SQL Editor sau migratio
 
 `dispatch_npcs`: mã duy nhất, tên/mô tả song ngữ, ảnh, giá mua sò, phí vận hành tiền, `data`, trạng thái bật, thứ tự, thời gian tạo/cập nhật. Ví dụ `name = {"vi":"Thủy thủ","en":"Sailor"}`, `data = {"stats":{"strength":10,"navigation":5}}`.
 
-`dispatch_jobs`: mã, tên/mô tả song ngữ, ảnh, thời lượng giây (60 đến 2.592.000), `data`, `rewards`, trạng thái bật, thứ tự, thời gian tạo/cập nhật. Ví dụ `data = {"requirements":{"strength":5}}`, `rewards = {"cash":150,"shells":1}`. Các khóa khác trong `data` dành cho metadata mở rộng, chưa tự tạo hiệu ứng gameplay.
+`dispatch_jobs`: mã, tên/mô tả song ngữ, ảnh, thời lượng giây (60 đến 2.592.000), `data`, `rewards`, trạng thái bật, thứ tự, thời gian tạo/cập nhật. Ví dụ `data = {"requirements":{"strength":5},"delivery_items":[{"item_id":"094731c2-291b-40b2-86c2-744e55232d23","quantity":1}]}`, `rewards = {"cash":150,"shells":1}`. `delivery_items` có thể bỏ qua hoặc để mảng rỗng; mỗi phần tử cần UUID vật phẩm và số lượng nguyên từ 1 đến 1.000.000. Số lượng là số vật phẩm thực nhận, không nhân với kích thước gói bán trong `items.quantity`. Các khóa khác trong `data` dành cho metadata mở rộng, chưa tự tạo hiệu ứng gameplay.
+
+Khi nhận thưởng hoặc lặp việc, trigger cấp vật phẩm vào `user_inventory` trong cùng transaction của `dispatch_action`, cộng dồn với vật phẩm có `storage_type = 'stack'`. Hủy không cấp vật phẩm. Snapshot giữ danh sách và số lượng đã hứa; vật phẩm đã tắt vẫn được cấp cho lượt cũ, vật phẩm bị xóa khiến giao dịch nhận thưởng rollback. Lượt bắt đầu trước khi thêm `delivery_items` không nhận thêm thưởng hồi tố. Thử lại cùng request không cấp trùng; lặp việc thất bại rollback cả vật phẩm.
 
 `dispatch_owned_npcs`: NPC sở hữu, giá sò đã trả, thời điểm mua. `dispatch_runs`: lượt làm việc và snapshot NPC/công việc/thưởng/chi phí. `dispatch_history`: kết quả nhận thưởng hoặc hủy, chi phí, snapshot và ba mốc thời gian. `dispatch_actions`: biên nhận chống lặp giao dịch.
 

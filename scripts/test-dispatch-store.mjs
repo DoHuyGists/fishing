@@ -41,6 +41,7 @@ test('dispatch state handles lost responses, stale reads and account switches', 
     '../data/supabaseDispatchRepository': { supabaseDispatchRepository: repository },
     '../data/repositoryError': { RepositoryError }, '../utils/uuid': { createUuid: randomUUID },
     './auth': { useAuthStore: () => auth }, '../composables/useToast': { useToast: () => ({ success() {} }) },
+    './player-game-catalog-store': { useGameCatalogStore: () => ({ get: async () => [] }) },
   });
     function setup() {
       setActivePinia(createPinia()); storage.clear();

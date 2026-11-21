@@ -72,7 +72,7 @@ const fields: CrudField[] = [
           max: 2592000,
           step: 1,
         },
-        { key: "data", label: 'Đối kháng: {"requirements":{"strength":5}}', type: "json", required: true },
+        { key: "data", label: 'Yêu cầu và vật phẩm thưởng: {"requirements":{"strength":5},"delivery_items":[{"item_id":"UUID","quantity":1}]}', type: "json", required: true },
         {
           key: "rewards",
           label: 'Thưởng tiền/sò/vé: {"cash":100,"shells":1,"tickets":0}',

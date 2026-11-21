@@ -39,7 +39,7 @@ const store = useDispatchStore();
             : tr("Dispatch.remaining", { minutes: Math.ceil((Date.parse(run.ends_at) - store.now) / 60000) })
         }}
       </div>
-      <DispatchRewards :rewards="run.rewards" />
+      <DispatchRewards :rewards="run.rewards" :delivery-items="run.job_snapshot.data.delivery_items" />
       <div class="flex flex-wrap gap-2">
         <template v-if="store.now >= Date.parse(run.ends_at)">
           <button type="button" class="dispatch-button" :disabled="store.locked" @click="store.ask('claim', run.id)">
