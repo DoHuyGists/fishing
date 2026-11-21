@@ -3,6 +3,7 @@ import supabase from "../database/connection";
 import { supabaseUserInAreaRepository } from "../data/supabaseUserInAreaRepository.ts";
 import PlayerLayout from "../layouts/PlayerLayout.vue";
 import AdminLayout from "../layouts/AdminLayout.vue";
+import HomeLayout from "../layouts/HomeLayout.vue";
 
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
@@ -26,9 +27,15 @@ const router = createRouter({
       children: [
         {
           path: "",
-          name: "home",
-          component: () => import("../views/HomeView.vue"),
-          meta: { requiresAuth: false },
+          component: HomeLayout,
+          children: [
+            {
+              path: "",
+              name: "home",
+              component: () => import("../views/HomeView.vue"),
+              meta: { requiresAuth: false },
+            },
+          ] 
         },
         {
           path: "",
