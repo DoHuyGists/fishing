@@ -178,7 +178,7 @@ defineProps<{
   transform: translateX(-50%) rotate(-3deg);
   border: 2px solid var(--color-gold);
   border-radius: 2px;
-  background: repeating-linear-gradient(0deg, var(--color-gold) 0 5px, var(--color-gold) 5px 6px);
+  background: var(--color-gold);
 }
 
 .swimming-area .fish {

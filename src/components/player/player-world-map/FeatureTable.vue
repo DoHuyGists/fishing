@@ -275,7 +275,7 @@ const supportActions: LobbyAction[] = [
     :aria-label="tr('FeatureTable.chuc_nang_sanh_cau_ca')"
     class="lobby-menu flex max-h-[calc(100dvh-6rem)] w-full min-w-0 max-w-sm flex-col self-start overflow-hidden rounded-xl border border-border-default bg-surface text-content shadow-[0_4px_20px_-12px_color-mix(in_srgb,_var(--color-content)_30%,_transparent)]"
   >
-    <div class="lobby-menu__header shrink-0 border-b border-border-default bg-linear-to-br from-surface to-surface px-2.5 py-2">
+    <div class="lobby-menu__header shrink-0 border-b border-border-default bg-surface px-2.5 py-2">
       <div class="mb-2 flex items-center gap-2">
         <span
           aria-hidden="true"
@@ -416,7 +416,7 @@ html.ocean-theme .lobby-menu {
 html.ocean-theme .lobby-menu__header,
 html.ocean-theme .lobby-menu__footer {
   border-color: color-mix(in srgb, var(--color-ocean-gold) 45%, transparent);
-  background: linear-gradient(135deg, var(--color-ocean-panel), var(--color-ocean-deep));
+  background: var(--color-primary);
 }
 
 html.ocean-theme .lobby-menu__button {
@@ -428,7 +428,7 @@ html.ocean-theme .lobby-menu__button {
 
 html.ocean-theme .lobby-menu__button:enabled:hover {
   border-color: var(--color-ocean-cyan);
-  background: linear-gradient(155deg, color-mix(in srgb, var(--color-ocean-cyan) 28%, var(--color-ocean-panel)), var(--color-ocean-panel));
+  background: var(--color-primary);
   box-shadow: inset 0 1px 0 color-mix(in srgb, var(--color-surface) 18%, transparent), 0 0 12px color-mix(in srgb, var(--color-sky) 18%, transparent);
 }
 

@@ -23,27 +23,27 @@ const emit = defineEmits<{
 
 const VARIANT_PRESETS: Record<BookVariant, { coverBg: string; spineBg: string; textColor: string }> = {
   default: {
-    coverBg: "linear-gradient(45deg, #24352a 0%, #e7ecda 100%)",
+    coverBg: "var(--color-accent)",
     spineBg: "#ffd166",
     textColor: "#f5f9f0",
   },
   ocean: {
-    coverBg: "linear-gradient(45deg, #24352a 0%, #e7ecda 65%, #4fc3ff 100%)",
+    coverBg: "var(--color-sky)",
     spineBg: "#24352a",
     textColor: "#ffd166",
   },
   gold: {
-    coverBg: "linear-gradient(45deg, #ffd166 0%, #ffd166 100%)",
+    coverBg: "var(--color-gold)",
     spineBg: "#ffd166",
     textColor: "#24352a",
   },
   dark: {
-    coverBg: "linear-gradient(45deg, #24352a 0%, #24352a 100%)",
+    coverBg: "var(--color-content)",
     spineBg: "#24352a",
     textColor: "#f5f9f0",
   },
   emerald: {
-    coverBg: "linear-gradient(45deg, #24352a 0%, #1abc9c 100%)",
+    coverBg: "var(--color-accent)",
     spineBg: "#24352a",
     textColor: "#f5f9f0",
   },

@@ -67,7 +67,7 @@ const userInitial = computed(() => {
 <template>
   <div class="flex flex-col gap-5">
     <div
-      class="profile-captain slide-fade-in from-top player-content-in flex items-center gap-4 bg-linear-to-r from-surface to-surface/70 border border-surface/80 rounded-xl p-4"
+      class="profile-captain slide-fade-in from-top player-content-in flex items-center gap-4 bg-surface border border-surface/80 rounded-xl p-4"
     >
       <div
         class="profile-captain__avatar w-14 h-14 rounded-full bg-accent text-white flex items-center justify-center text-xl font-black shadow-md shrink-0"
@@ -246,14 +246,14 @@ const userInitial = computed(() => {
 <style scoped>
 html.ocean-theme .profile-captain {
   border-color: color-mix(in srgb, var(--color-ocean-gold) 70%, transparent);
-  background: radial-gradient(ellipse at top right, color-mix(in srgb, var(--color-sky) 20%, transparent), transparent 65%), linear-gradient(125deg, var(--color-ocean-panel), var(--color-ocean-deep));
+  background: var(--color-primary);
   box-shadow: inset 0 1px 0 color-mix(in srgb, var(--color-surface) 12%, transparent), 0 4px 16px color-mix(in srgb, var(--color-content) 18%, transparent);
 }
 
 html.ocean-theme .profile-captain__avatar {
   border: 2px solid var(--color-ocean-gold);
-  background: linear-gradient(145deg, var(--color-ocean-cyan), var(--color-ocean-panel));
+  background: var(--color-accent);
   box-shadow: 0 0 0 3px color-mix(in srgb, var(--color-gold) 16%, transparent), 0 4px 10px color-mix(in srgb, var(--color-content) 25%, transparent);
-  color: var(--color-ocean-pearl);
+  color: var(--color-white);
 }
 </style>

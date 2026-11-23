@@ -50,7 +50,7 @@ const variantFrameClass = computed(() => {
         @click.self="closeDialog"
       >
         <section
-          class="player-popup-panel catch-card grid w-full max-w-[680px] max-h-[calc(100dvh-40px)] overflow-y-auto border-2 rounded-[22px] bg-[linear-gradient(145deg,var(--color-content),var(--color-content))] shadow-[0_24px_70px_color-mix(in_srgb,_var(--color-content)_48%,_transparent)] text-white sm:grid-cols-[260px_minmax(0,1fr)]"
+          class="player-popup-panel catch-card grid w-full max-w-[680px] max-h-[calc(100dvh-40px)] overflow-y-auto border-2 rounded-[22px] bg-content shadow-[0_24px_70px_color-mix(in_srgb,_var(--color-content)_48%,_transparent)] text-white sm:grid-cols-[260px_minmax(0,1fr)]"
           :class="variantFrameClass"
           role="dialog"
           aria-modal="true"

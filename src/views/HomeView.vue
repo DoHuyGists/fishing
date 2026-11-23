@@ -7,6 +7,7 @@ import HomeGallery from "../components/home/HomeGallery.vue";
 import HomeSpecies from "../components/home/HomeSpecies.vue";
 import { homeFeatures } from "../data/home";
 
+
 const year = new Date().getFullYear();
 </script>
 

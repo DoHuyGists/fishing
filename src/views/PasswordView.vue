@@ -28,8 +28,8 @@ async function submit() {
 </script>
 
 <template>
-  <main class="grid min-h-screen place-items-center bg-[var(--color-ocean-deep)] bg-[radial-gradient(ellipse_at_12%_0%,color-mix(in_srgb,_var(--color-sky)_22%,_transparent),transparent_50%),radial-gradient(ellipse_at_100%_100%,color-mix(in_srgb,_var(--color-primary)_80%,_transparent),transparent_55%)] p-6 text-[var(--color-ocean-pearl)]">
-    <section class="player-popup-in w-full max-w-md space-y-5 rounded-3xl border border-[var(--color-ocean-gold)]/60 bg-[linear-gradient(145deg,var(--color-ocean-panel),var(--color-ocean-deep))] p-8 shadow-[0_24px_80px_color-mix(in_srgb,_var(--color-content)_35%,_transparent),inset_0_1px_0_color-mix(in_srgb,_var(--color-surface)_12%,_transparent)]">
+  <main class="grid min-h-screen place-items-center b p-6 text-[var(--color-ocean-pearl)] bg-no-repeat bg-center bg-cover" :style="{backgroundImage: 'url(/go_to_the_beach_bg.png)'}">
+    <section class="player-popup-in w-full max-w-md space-y-5 rounded-3xl border border-[var(--color-ocean-gold)]/60 bg-primary p-8 shadow-[0_24px_80px_color-mix(in_srgb,_var(--color-content)_35%,_transparent),inset_0_1px_0_color-mix(in_srgb,_var(--color-surface)_12%,_transparent)]">
       <div class="text-2xl font-bold text-[var(--color-ocean-gold)]">{{ isRequest ? tr('PasswordView.quen_mat_khau') : tr('PasswordView.dat_lai_mat_khau') }}</div>
       <div v-if="success" role="status">{{ isRequest ? tr('PasswordView.neu_email_co_tai_khoan_ban_se_nhan_duoc_lien_ket_dat_lai_mat_kha') : tr('PasswordView.da_cap_nhat_mat_khau') }}</div>
       <form v-else class="space-y-4" @submit.prevent="submit">

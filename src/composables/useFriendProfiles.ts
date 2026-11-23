@@ -4,9 +4,9 @@ import { useFriendStore } from "../stores/player-friend-store";
 import { useCountryStore } from "../stores/player-country-store";
 import type { UserFriend } from "../types/model/friend";
 
-const avatarGradients = [
-  "from-accent to-accent", "from-primary to-primary", "from-gold to-gold",
-  "from-special to-special", "from-danger to-danger", "from-accent to-accent",
+const avatarColors = [
+  "bg-accent", "bg-primary", "bg-gold",
+  "bg-special", "bg-danger", "bg-accent",
 ];
 
 export function useFriendProfiles() {
@@ -24,13 +24,13 @@ export function useFriendProfiles() {
   const getSenderProfile = (record: UserFriend) => getProfile(record.user_id);
   const getRecipientProfile = (record: UserFriend) => getProfile(record.friend_id);
   const getRelation = (id: string) => friendStore.getFriendshipWithUser(id, currentUserId.value);
-  function getAvatarGradient(id: string) {
-    return avatarGradients[id ? (id.charCodeAt(0) + id.charCodeAt(id.length - 1)) % avatarGradients.length : 0];
+  function getAvatarColor(id: string) {
+    return avatarColors[id ? (id.charCodeAt(0) + id.charCodeAt(id.length - 1)) % avatarColors.length : 0];
   }
   function formatUuid(id: string) {
     return !id || id.length < 12 ? id : `${id.slice(0, 8)}...${id.slice(-4)}`;
   }
   return { friendStore, countryStore, currentUserId, filteredFriends, receivedRequests, sentRequests,
     filteredPlayers, searchQuery, getFriendProfile, getSenderProfile, getRecipientProfile,
-    getRelation, getAvatarGradient, formatUuid };
+    getRelation, getAvatarColor, formatUuid };
 }

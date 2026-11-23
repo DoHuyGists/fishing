@@ -13,12 +13,12 @@ const showPassword = ref(false);
 
 async function submit() {
   const isSignedIn = await auth.signIn(form);
-  if (isSignedIn) router.replace("/");
+  if (isSignedIn) router.replace("/lobby");
 }
 </script>
 
 <template>
-  <main class="grid min-h-screen place-items-center bg-primary bg-[radial-gradient(ellipse_at_12%_0%,color-mix(in_srgb,_var(--color-sky)_10%,_transparent),transparent_50%),radial-gradient(ellipse_at_100%_100%,color-mix(in_srgb,_var(--color-gold)_12%,_transparent),transparent_55%)] px-6 py-8 text-content">
+  <main class="grid min-h-screen place-items-center px-6 py-8 text-content bg-no-repeat bg-center bg-cover" :style="{backgroundImage: 'url(/prepare_bg.png)'}">
     <section class="player-popup-in w-full max-w-[408px] rounded-3xl border border-border-default bg-surface p-8 shadow-xl sm:p-[42px]" aria-labelledby="login-title">
       <LanguageSelector />
       <div class="mb-[5px] mt-7 text-xs font-bold uppercase tracking-[0.08em] text-sky">{{ tr('LoginView.chao_mung_tro_lai') }}</div>
@@ -27,7 +27,7 @@ async function submit() {
       <form class="grid gap-[18px]" @submit.prevent="submit">
         <label class="grid gap-[7px] text-sm font-bold">
           <span>Email</span>
-          <input v-model.trim="form.email" class="min-h-[46px] w-full rounded-xl border border-border-default bg-white px-3 py-[10px] font-normal text-content outline-none transition placeholder:text-content/60 focus:border-accent focus:ring-[3px] focus:ring-accent/20" type="email" autocomplete="email" required placeholder="...@gmail.com" />
+          <input v-model.trim="form.email" class="min-h-[46px] w-full rounded-xl border border-border-default bg-white px-3 py-[10px] font-normal text-content outline-none transition placeholder:text-content/60 focus:border-accent focus:ring-[3px] focus:ring-accent/20" type="email" autocomplete="email" required placeholder="@" />
         </label>
         <label class="grid gap-[7px] text-sm font-bold">
           <span>{{ tr('LoginView.mat_khau') }}</span>

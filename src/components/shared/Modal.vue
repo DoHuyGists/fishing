@@ -146,7 +146,7 @@ onUnmounted(() => {
 .ocean-theme .shared-modal__header {
   padding: 0.75rem;
   border-bottom-color: color-mix(in srgb, var(--color-ocean-gold) 65%, transparent);
-  background: linear-gradient(135deg, var(--color-ocean-panel), var(--color-ocean-deep));
+  background: var(--color-primary);
   box-shadow: 0 3px 16px color-mix(in srgb, var(--color-content) 25.098%, transparent), inset 0 1px color-mix(in srgb, var(--color-surface) 10.196%, transparent);
 }
 
@@ -175,6 +175,6 @@ onUnmounted(() => {
 }
 
 .ocean-theme .shared-modal__content {
-  background: radial-gradient(ellipse at 90% 0%, color-mix(in srgb, var(--color-sky) 3.922%, transparent), transparent 65%);
+  background: var(--color-surface);
 }
 </style>

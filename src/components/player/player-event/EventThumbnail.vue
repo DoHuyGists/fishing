@@ -53,7 +53,7 @@ const frameStyle = computed(() => ({
       v-else
       role="img"
       :aria-label="tr('EventThumbnail.chua_co_anh')"
-      class="flex h-full w-full items-center justify-center bg-linear-to-br from-content to-content text-content"
+      class="flex h-full w-full items-center justify-center bg-content text-content"
     >
       <svg
         class="w-[36%]"

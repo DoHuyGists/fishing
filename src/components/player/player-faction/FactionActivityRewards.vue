@@ -97,7 +97,7 @@ function isMilestoneReached(pointsRequired: number): boolean {
       </div>
       <div class="w-full h-2 rounded-full bg-surface border border-border-default overflow-hidden p-[1px]">
         <div
-          class="h-full rounded-full bg-linear-to-r from-accent via-accent to-accent transition-all duration-500 ease-out shadow-sm"
+          class="h-full rounded-full bg-accent transition-all duration-500 ease-out shadow-sm"
           :style="{ width: `${overallProgressPercent}%` }"
         />
       </div>
@@ -112,7 +112,7 @@ function isMilestoneReached(pointsRequired: number): boolean {
           class="milestone-card shrink-0 w-[160px] sm:w-[175px] rounded-lg border p-3 flex flex-col justify-between transition-all duration-200 relative overflow-hidden"
           :class="[
             isMilestoneReached(item.points)
-              ? 'reached-card bg-gradient-to-b from-surface to-surface-hover border-accent/70 shadow-[0_0_12px_color-mix(in_srgb,_var(--color-accent)_12%,_transparent)]'
+              ? 'reached-card bg-surface border-accent/70 shadow-[0_0_12px_color-mix(in_srgb,_var(--color-accent)_12%,_transparent)]'
               : 'locked-card bg-surface-hover border-border-default opacity-90 hover:opacity-100 hover:border-content-disabled',
           ]"
         >

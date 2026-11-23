@@ -19,7 +19,7 @@ const emit = defineEmits<{
     class="slide-fade-in from-bottom player-content-in skill-card relative flex min-w-0 flex-col rounded-xl border shadow-[0_1px_2px_color-mix(in srgb, var(--color-content) 3.137%, transparent)] p-3 sm:p-4"
     :class="
       skill.isMaxLevel
-        ? 'skill-card-mastered border-gold bg-[linear-gradient(145deg,var(--color-surface),var(--color-surface)_65%)]'
+        ? 'skill-card-mastered border-gold bg-surface'
         : 'border-border-default bg-surface'
     "
   >
@@ -37,7 +37,7 @@ const emit = defineEmits<{
     </div>
     <div class="flex items-center gap-2.5">
       <div
-        class="skill-emblem border-2 border-border bg-[linear-gradient(145deg,var(--color-white),var(--color-surface))] shadow-[inset_0_0_0_2px_color-mix(in srgb, var(--color-white) 50.196%, transparent)] flex size-12 shrink-0 items-center justify-center overflow-hidden rounded-xl text-2xl"
+        class="skill-emblem border-2 border-border bg-white shadow-[inset_0_0_0_2px_color-mix(in srgb, var(--color-white) 50.196%, transparent)] flex size-12 shrink-0 items-center justify-center overflow-hidden rounded-xl text-2xl"
         aria-hidden="true"
       >
         <img v-if="skill.isImageIcon" :src="skill.icon!" alt="" class="size-8 object-contain" />
@@ -64,7 +64,7 @@ const emit = defineEmits<{
         class="min-w-0 flex-1 rounded-sm border"
         :class="
           step <= skill.level
-            ? 'border-accent/20 bg-gradient-to-t from-accent to-accent'
+            ? 'border-accent/20 bg-accent'
             : 'border-border-default/60 bg-surface'
         "
         aria-hidden="true"
@@ -103,7 +103,7 @@ const emit = defineEmits<{
     </div>
     <button
       type="button"
-      class="skill-upgrade border border-content bg-[linear-gradient(var(--color-accent),var(--color-accent))] shadow-[0_1px_1px_color-mix(in srgb, var(--color-content) 12.549%, transparent)] [transition:transform_150ms,filter_150ms,box-shadow_150ms] enabled:hover:brightness-110 enabled:active:[transform:translateY(1px)] enabled:active:shadow-none motion-reduce:transition-none mt-auto flex cursor-pointer items-center justify-center gap-2 rounded-lg px-3 py-2.5 text-xs font-extrabold tracking-wide text-white focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-accent disabled:cursor-not-allowed disabled:opacity-50"
+      class="skill-upgrade border border-content bg-accent shadow-[0_1px_1px_color-mix(in srgb, var(--color-content) 12.549%, transparent)] [transition:transform_150ms,filter_150ms,box-shadow_150ms] enabled:hover:brightness-110 enabled:active:[transform:translateY(1px)] enabled:active:shadow-none motion-reduce:transition-none mt-auto flex cursor-pointer items-center justify-center gap-2 rounded-lg px-3 py-2.5 text-xs font-extrabold tracking-wide text-white focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-accent disabled:cursor-not-allowed disabled:opacity-50"
       :disabled="skill.isMaxLevel || disabled || upgrading"
       @click="emit('upgrade', skill.id)"
     >
@@ -122,18 +122,18 @@ const emit = defineEmits<{
 <style scoped>
 html.ocean-theme .skill-card-mastered {
   border-color: var(--color-ocean-gold);
-  background: linear-gradient(145deg, color-mix(in srgb, var(--color-ocean-gold) 16%, var(--color-ocean-panel)), var(--color-ocean-deep) 70%);
+  background: var(--color-primary);
 }
 
 html.ocean-theme .skill-emblem {
   border-color: var(--color-ocean-gold);
-  background: radial-gradient(circle at top, var(--color-ocean-panel), var(--color-ocean-deep));
+  background: var(--color-primary);
   box-shadow: inset 0 0 0 2px color-mix(in srgb, var(--color-gold) 15%, transparent);
 }
 
 html.ocean-theme .skill-upgrade {
   border-color: var(--color-ocean-gold);
-  background: linear-gradient(var(--color-ocean-gold), color-mix(in srgb, var(--color-ocean-gold) 72%, var(--color-ocean-wood)));
+  background: var(--color-gold);
   color: var(--color-content);
   box-shadow: 0 2px 0 var(--color-ocean-wood), inset 0 1px 0 color-mix(in srgb, var(--color-surface) 45%, transparent);
 }

@@ -18,7 +18,7 @@ defineProps<{
       :key="entry.id"
       class="slide-fade-in from-bottom player-content-in relative min-w-0 border text-center"
       :class="[
-        index === 0 ? 'col-start-2 row-start-1 border-gold bg-linear-to-b from-surface to-surface/60 shadow-sm' : index === 1 ? 'col-start-1 row-start-1 border-border-default bg-linear-to-b from-surface to-white' : 'col-start-3 row-start-1 border-gold bg-linear-to-b from-surface to-white',
+        index === 0 ? 'col-start-2 row-start-1 border-gold bg-surface shadow-sm' : index === 1 ? 'col-start-1 row-start-1 border-border-default bg-surface' : 'col-start-3 row-start-1 border-gold bg-surface',
         fishCards ? 'rounded-xl' : ['rounded-t-2xl rounded-b-xl px-2 pb-3 sm:px-3', index === 0 ? 'pt-6 sm:pt-7' : 'pt-4'],
         entry.userId === userId ? 'ring-2 ring-inset ring-accent' : '',
       ]"

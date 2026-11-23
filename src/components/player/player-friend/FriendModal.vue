@@ -195,7 +195,7 @@ async function executeDelete() {
     <div class="w-full min-w-0 space-y-3 pb-6 sm:space-y-4 sm:pb-10">
       <!-- ID Người chơi hiện tại & Banner -->
       <div
-        class="slide-fade-in from-top player-content-in bg-linear-to-r from-content via-content to-content rounded-2xl p-3 sm:p-5 border border-accent/40 shadow-md text-white flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 sm:gap-4"
+        class="slide-fade-in from-top player-content-in bg-content rounded-2xl p-3 sm:p-5 border border-accent/40 shadow-md text-white flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 sm:gap-4"
       >
         <div class="flex items-center gap-3.5 min-w-0">
           <div

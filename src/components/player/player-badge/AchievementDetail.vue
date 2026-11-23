@@ -22,7 +22,7 @@ const emit = defineEmits<{ close: []; claim: [badgeId: string] }>();
       >
         <div
           aria-hidden="true"
-          class="absolute inset-x-0 top-0 h-32 bg-linear-to-b from-surface/80 to-transparent"
+          class="absolute inset-x-0 top-0 h-32 bg-surface"
         ></div>
         <button
           type="button"
@@ -33,7 +33,7 @@ const emit = defineEmits<{ close: []; claim: [badgeId: string] }>();
           ×
         </button>
         <div
-          class="relative mx-auto grid h-32 w-32 place-items-center rounded-full border border-gold bg-linear-to-br from-surface to-surface inset-shadow-sm"
+          class="relative mx-auto grid h-32 w-32 place-items-center rounded-full border border-gold bg-surface inset-shadow-sm"
         >
           <img
             v-if="badge.icon_url"

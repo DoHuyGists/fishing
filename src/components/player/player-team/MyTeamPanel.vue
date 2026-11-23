@@ -149,7 +149,7 @@ const statusClass: Record<string, string> = {
     <template v-else>
       <section v-if="team" class="flex flex-col gap-4">
         <div
-          class="slide-fade-in from-top player-content-in flex items-start justify-between gap-3 rounded-2xl border border-border bg-linear-to-br from-surface to-surface p-4"
+          class="slide-fade-in from-top player-content-in flex items-start justify-between gap-3 rounded-2xl border border-border bg-surface p-4"
         >
           <div>
             <div class="m-0 mb-1 text-[1.1rem] font-extrabold text-content">{{ team.name }}</div>

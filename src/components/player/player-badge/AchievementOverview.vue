@@ -10,7 +10,7 @@ const emit = defineEmits<{ refresh: [] }>();
 
 <template>
   <div
-    class="slide-fade-in from-top player-content-in relative isolate overflow-hidden rounded-2xl border border-border-default bg-linear-to-br from-surface via-white to-surface p-3 shadow-sm sm:p-4"
+    class="slide-fade-in from-top player-content-in relative isolate overflow-hidden rounded-2xl border border-border-default bg-surface p-3 shadow-sm sm:p-4"
   >
     <div
       aria-hidden="true"
@@ -53,7 +53,7 @@ const emit = defineEmits<{ refresh: [] }>();
     <div v-if="badgesStore.collectionTotal" class="relative mt-3 flex items-center gap-2 sm:mt-4 sm:gap-3">
       <div class="h-1.5 flex-1 overflow-hidden rounded-full bg-accent/10">
         <div
-          class="h-full rounded-full bg-linear-to-r from-accent to-accent transition-[width] duration-700"
+          class="h-full rounded-full bg-accent transition-[width] duration-700"
           :style="{ width: `${completion}%` }"
         ></div>
       </div>

@@ -532,7 +532,7 @@ onUnmounted(() => {
 .ocean-theme .guide-tour__tooltip {
   color: var(--color-ocean-pearl);
   border-color: var(--color-ocean-gold);
-  background: linear-gradient(145deg, var(--color-ocean-panel), var(--color-ocean-deep));
+  background: var(--color-primary);
   box-shadow: 0 16px 40px color-mix(in srgb, var(--color-content) 60%, transparent), inset 0 1px color-mix(in srgb, var(--color-surface) 14.902%, transparent);
 }
 

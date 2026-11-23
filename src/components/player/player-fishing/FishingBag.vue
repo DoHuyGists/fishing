@@ -96,7 +96,7 @@ function getRewardEffect(variant: "NORMAL" | "GOLDEN" | "MUTATED") {
         @click.self="store.closeBag"
       >
         <section
-          class="player-popup-panel w-[min(460px,100%)] max-h-[min(580px,80vh)] overflow-auto border border-ocean-gold/70 rounded-[20px] bg-linear-to-br from-ocean-panel to-ocean-deep shadow-[0_24px_70px_color-mix(in_srgb,_var(--color-content)_48%,_transparent)] text-ocean-pearl"
+          class="player-popup-panel w-[min(460px,100%)] max-h-[min(580px,80vh)] overflow-auto border border-ocean-gold/70 rounded-[20px] bg-primary shadow-[0_24px_70px_color-mix(in_srgb,_var(--color-content)_48%,_transparent)] text-ocean-pearl"
           role="dialog"
           aria-modal="true"
           aria-labelledby="bag-title"
@@ -255,7 +255,7 @@ function getRewardEffect(variant: "NORMAL" | "GOLDEN" | "MUTATED") {
         @click.self="cancelRelease"
       >
         <div
-          class="player-popup-panel w-[min(380px,100%)] p-5 border border-ocean-gold/50 rounded-[20px] bg-linear-to-br from-ocean-panel to-ocean-deep shadow-[0_24px_70px_color-mix(in_srgb,_var(--color-content)_60%,_transparent)] text-ocean-pearl text-center"
+          class="player-popup-panel w-[min(380px,100%)] p-5 border border-ocean-gold/50 rounded-[20px] bg-primary shadow-[0_24px_70px_color-mix(in_srgb,_var(--color-content)_60%,_transparent)] text-ocean-pearl text-center"
           role="dialog"
           aria-modal="true"
           aria-labelledby="confirm-release-title"

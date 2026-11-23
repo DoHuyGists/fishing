@@ -17,7 +17,7 @@
 .book-backdrop {
   position: absolute;
   inset: 0;
-  background: radial-gradient(ellipse at center, color-mix(in srgb, var(--color-content) 78%, transparent) 0%, color-mix(in srgb, var(--color-content) 94%, transparent) 100%);
+  background: color-mix(in srgb, var(--color-content) 86%, transparent);
   backdrop-filter: blur(6px);
   -webkit-backdrop-filter: blur(6px);
 }
@@ -397,7 +397,7 @@
 }
 
 html.ocean-theme .book-backdrop {
-  background: radial-gradient(ellipse at center, color-mix(in srgb, var(--color-primary) 78%, transparent), color-mix(in srgb, var(--color-content) 96%, transparent));
+  background: color-mix(in srgb, var(--color-content) 86%, transparent);
 }
 
 html.ocean-theme .cover {

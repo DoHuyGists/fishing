@@ -306,7 +306,7 @@ onBeforeUnmount(() => {
           @click.self="showExitConfirmation = false"
         >
           <section
-            class="w-[min(380px,100%)] p-5 border border-[var(--color-ocean-gold)]/60 rounded-[20px] bg-[linear-gradient(145deg,var(--color-ocean-panel),var(--color-ocean-deep))] shadow-[0_24px_70px_color-mix(in_srgb,_var(--color-content)_60%,_transparent)] text-[var(--color-ocean-pearl)] text-center"
+            class="w-[min(380px,100%)] p-5 border border-[var(--color-ocean-gold)]/60 rounded-[20px] bg-primary shadow-[0_24px_70px_color-mix(in_srgb,_var(--color-content)_60%,_transparent)] text-[var(--color-ocean-pearl)] text-center"
             role="dialog"
             aria-modal="true"
             aria-labelledby="confirm-exit-title"
@@ -436,7 +436,7 @@ onBeforeUnmount(() => {
   grid-template-columns: minmax(0, 1fr) 272px;
   gap: 8px;
   border-top: 1px solid color-mix(in srgb, var(--color-gold) 40%, transparent);
-  background: linear-gradient(180deg, var(--color-ocean-panel), var(--color-ocean-deep));
+  background: var(--color-primary);
   box-shadow: 0 -8px 24px color-mix(in srgb, var(--color-content) 30%, transparent);
 }
 

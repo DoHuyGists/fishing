@@ -116,7 +116,7 @@ onBeforeUnmount(() => {
 
 html.ocean-theme .dispatch-button {
   border-color: var(--color-ocean-gold);
-  background: linear-gradient(var(--color-ocean-gold), color-mix(in srgb, var(--color-ocean-gold) 75%, var(--color-ocean-wood)));
+  background: var(--color-gold);
   color: var(--color-content);
   box-shadow: inset 0 1px 0 color-mix(in srgb, var(--color-surface) 40%, transparent), 0 2px 0 var(--color-ocean-wood);
 }
@@ -126,7 +126,7 @@ html.ocean-theme .dispatch-button:not(:disabled):hover {
 }
 
 html.ocean-theme .dispatch-card {
-  background: linear-gradient(145deg, var(--color-ocean-panel), var(--color-ocean-deep));
+  background: var(--color-primary);
   box-shadow: inset 0 1px 0 color-mix(in srgb, var(--color-surface) 8%, transparent);
 }
 </style>

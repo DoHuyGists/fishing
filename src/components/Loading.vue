@@ -49,7 +49,7 @@ withDefaults(
 }
 
 html.ocean-theme .loading-screen {
-  background: radial-gradient(ellipse at 50% 0%, color-mix(in srgb, var(--color-sky) 14%, transparent), transparent 60%), var(--color-ocean-deep);
+  background: var(--color-primary);
 }
 
 html.ocean-theme .loading-ring {

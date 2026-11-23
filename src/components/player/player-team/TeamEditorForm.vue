@@ -93,7 +93,7 @@ const emit = defineEmits<{ back: []; submit: [] }>();
 
           <button
             type="submit"
-            class="w-full inline-flex items-center justify-center gap-1.5 px-4 py-2 rounded-lg text-[0.87rem] font-bold bg-linear-to-br from-brand to-accent text-white cursor-pointer hover:from-accent hover:to-content active:scale-[0.97] disabled:opacity-55 disabled:cursor-not-allowed transition-all"
+            class="w-full inline-flex items-center justify-center gap-1.5 px-4 py-2 rounded-lg text-[0.87rem] font-bold bg-accent text-white cursor-pointer hover:bg-content active:scale-[0.97] disabled:opacity-55 disabled:cursor-not-allowed transition-all"
             :disabled="loading"
           >
             {{

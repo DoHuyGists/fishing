@@ -196,7 +196,7 @@ onUnmounted(() => {
 </script>
 
 <template>
-  <div :style="{backgroundImage: 'url(/lobby_bg.png)', backgroundRepeat: 'no-repeat', backgroundSize: 'cover'}" class="w-screen min-h-screen p-3 relative flex flex-col gap-2 overflow-hidden bg-[var(--color-ocean-deep)] bg-[radial-gradient(ellipse_at_50%_0%,color-mix(in_srgb,_var(--color-sky)_12%,_transparent),transparent_65%)] text-content">
+  <div :style="{backgroundImage: 'url(/lobby_bg.png)', backgroundRepeat: 'no-repeat', backgroundSize: 'cover'}" class="w-screen min-h-screen p-3 relative flex flex-col gap-2 overflow-hidden bg-[var(--color-ocean-deep)] text-content">
     <TeamMembersSticky
       v-if="features.isAvailable('team') && configStore.showTeam && teamStore.myTeamMembers.length"
       class="slide-fade-in from-right"
@@ -204,7 +204,7 @@ onUnmounted(() => {
       @open-team="modalStore.open('team')"
     />
     <header
-      class="slide-fade-in from-top flex flex-wrap items-center justify-between gap-3 rounded-2xl border border-[var(--color-ocean-gold)]/60 bg-[linear-gradient(115deg,var(--color-ocean-panel),var(--color-ocean-deep))] px-4 py-3 text-content shadow-[0_6px_20px_color-mix(in_srgb,_var(--color-content)_20%,_transparent),inset_0_1px_0_color-mix(in_srgb,_var(--color-surface)_8%,_transparent)]"
+      class="slide-fade-in from-top flex flex-wrap items-center justify-between gap-3 rounded-2xl border border-[var(--color-ocean-gold)]/60 bg-primary px-4 py-3 text-content shadow-[0_6px_20px_color-mix(in_srgb,_var(--color-content)_20%,_transparent),inset_0_1px_0_color-mix(in_srgb,_var(--color-surface)_8%,_transparent)]"
     >
       <span class="font-bold tracking-wide text-accent">{{ tr("Lobby.tieu_de") }}</span>
       <div class="flex flex-wrap items-center justify-end gap-2">

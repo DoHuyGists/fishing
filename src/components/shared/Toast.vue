@@ -169,7 +169,7 @@ onBeforeUnmount(() => activeTimers.forEach(clearTimeout));
   color: var(--color-ocean-pearl);
   border-color: color-mix(in srgb, var(--color-gold) 34.902%, transparent);
   border-left-color: var(--toast-accent);
-  background: linear-gradient(135deg, var(--color-ocean-panel), var(--color-ocean-deep));
+  background: var(--color-primary);
   box-shadow: 0 16px 40px color-mix(in srgb, var(--color-content) 40%, transparent);
   --tw-ring-color: color-mix(in srgb, var(--color-gold) 10.196%, transparent);
 }

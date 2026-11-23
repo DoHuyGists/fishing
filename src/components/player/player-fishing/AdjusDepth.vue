@@ -315,7 +315,7 @@ onBeforeUnmount(() => {
               </button>
               <button
                 type="button"
-                class="rounded-xl bg-gradient-to-r from-accent to-accent px-5 py-2 text-[11px] font-extrabold text-white shadow-lg shadow-accent/30 transition hover:brightness-110 disabled:cursor-not-allowed disabled:opacity-45"
+                class="rounded-xl bg-accent px-5 py-2 text-[11px] font-extrabold text-white shadow-lg shadow-accent/30 transition hover:brightness-110 disabled:cursor-not-allowed disabled:opacity-45"
                 :disabled="!store.canAdjustDepth"
                 @click="apply"
               >

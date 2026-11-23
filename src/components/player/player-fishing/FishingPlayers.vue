@@ -15,7 +15,7 @@ const store = useFishingStore();
         @click.self="store.closePlayers"
       >
         <section
-          class="player-popup-panel w-[min(440px,100%)] overflow-hidden border border-ocean-gold/70 rounded-[20px] bg-linear-to-br from-ocean-panel to-ocean-deep shadow-[0_24px_70px_color-mix(in_srgb,_var(--color-content)_48%,_transparent)] text-ocean-pearl"
+          class="player-popup-panel w-[min(440px,100%)] overflow-hidden border border-ocean-gold/70 rounded-[20px] bg-primary shadow-[0_24px_70px_color-mix(in_srgb,_var(--color-content)_48%,_transparent)] text-ocean-pearl"
           role="dialog"
           aria-modal="true"
           aria-labelledby="players-title"

@@ -74,7 +74,7 @@ html.ocean-theme .shop-item-card {
 }
 
 html.ocean-theme .shop-item-card__art {
-  background: radial-gradient(circle, color-mix(in srgb, var(--color-ocean-cyan) 18%, var(--color-ocean-panel)), var(--color-ocean-deep));
+  background: var(--color-primary);
   border-right: 1px solid color-mix(in srgb, var(--color-ocean-gold) 32%, transparent);
 }
 

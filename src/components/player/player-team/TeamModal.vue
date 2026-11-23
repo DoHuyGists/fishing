@@ -338,7 +338,7 @@ onMounted(async () => {
       <div v-if="view === 'list' && teamStore.myTeam" class="flex flex-col gap-4">
         <!-- Room header -->
         <div
-          class="slide-fade-in from-top player-content-in flex items-start justify-between gap-3 p-4 bg-linear-to-br from-surface to-surface rounded-2xl border border-border"
+          class="slide-fade-in from-top player-content-in flex items-start justify-between gap-3 p-4 bg-surface rounded-2xl border border-border"
         >
           <div>
             <div class="m-0 mb-1 text-[1.1rem] font-extrabold text-content">{{ teamStore.myTeam.name }}</div>
@@ -369,7 +369,7 @@ onMounted(async () => {
           <div
             v-for="member in teamStore.myTeamMembers"
             :key="member.id"
-            class="slide-fade-in from-bottom player-content-in flex flex-col gap-3 p-4 bg-linear-to-br from-white to-surface border border-border rounded-2xl shadow-sm"
+            class="slide-fade-in from-bottom player-content-in flex flex-col gap-3 p-4 bg-white border border-border rounded-2xl shadow-sm"
           >
             <div class="flex items-center gap-3 min-w-0">
               <PlayerIdentity :user-id="member.user_id" :profile="member.user_profile" class="flex-1" />
@@ -490,7 +490,7 @@ onMounted(async () => {
         <div class="flex items-center justify-between gap-3 mb-4">
           <div class="m-0 text-base font-bold text-content">{{ tr("TeamModal.nhom_dang_hoat_dong") }}</div>
           <button
-            class="inline-flex items-center justify-center gap-1.5 px-4 py-2 rounded-lg text-[0.87rem] font-bold bg-linear-to-br from-brand to-accent text-white cursor-pointer hover:from-accent hover:to-content active:scale-[0.97] transition-all"
+            class="inline-flex items-center justify-center gap-1.5 px-4 py-2 rounded-lg text-[0.87rem] font-bold bg-accent text-white cursor-pointer hover:bg-content active:scale-[0.97] transition-all"
             @click="view = 'create'"
           >
             {{ tr("MyTeamPanel.tao_nhom") }}
@@ -551,7 +551,7 @@ onMounted(async () => {
                 >
                 <button
                   v-if="canJoinTeam(team)"
-                  class="inline-flex items-center justify-center gap-1.5 px-[10px] py-[5px] rounded-lg text-[0.78rem] font-bold bg-linear-to-br from-brand to-accent text-white cursor-pointer hover:from-accent hover:to-content active:scale-[0.97] disabled:opacity-55 disabled:cursor-not-allowed transition-all"
+                  class="inline-flex items-center justify-center gap-1.5 px-[10px] py-[5px] rounded-lg text-[0.78rem] font-bold bg-accent text-white cursor-pointer hover:bg-content active:scale-[0.97] disabled:opacity-55 disabled:cursor-not-allowed transition-all"
                   :disabled="teamStore.actionLoading"
                   @click="handleJoin(team.id)"
                 >
@@ -645,7 +645,7 @@ onMounted(async () => {
 
           <div class="flex flex-col gap-2 mt-4">
             <button
-              class="inline-flex items-center justify-center gap-1.5 px-4 py-2 rounded-lg text-[0.87rem] font-bold bg-linear-to-br from-brand to-accent text-white cursor-pointer hover:from-accent hover:to-content active:scale-[0.97] disabled:opacity-55 disabled:cursor-not-allowed transition-all"
+              class="inline-flex items-center justify-center gap-1.5 px-4 py-2 rounded-lg text-[0.87rem] font-bold bg-accent text-white cursor-pointer hover:bg-content active:scale-[0.97] disabled:opacity-55 disabled:cursor-not-allowed transition-all"
               :disabled="!transferTargetId || teamStore.actionLoading"
               @click="handleLeaveAndTransfer"
             >
@@ -690,7 +690,7 @@ onMounted(async () => {
           </div>
           <div class="flex flex-col gap-2 mt-4">
             <button
-              class="inline-flex items-center justify-center gap-1.5 px-4 py-2 rounded-lg text-[0.87rem] font-bold bg-linear-to-br from-brand to-accent text-white cursor-pointer hover:from-accent hover:to-content active:scale-[0.97] disabled:opacity-55 disabled:cursor-not-allowed transition-all"
+              class="inline-flex items-center justify-center gap-1.5 px-4 py-2 rounded-lg text-[0.87rem] font-bold bg-accent text-white cursor-pointer hover:bg-content active:scale-[0.97] disabled:opacity-55 disabled:cursor-not-allowed transition-all"
               :disabled="teamStore.actionLoading"
               @click="handleTransfer"
             >

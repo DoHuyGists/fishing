@@ -30,7 +30,7 @@ const emit = defineEmits<{ select: [badgeId: string] }>();
     ></span>
     <span class="relative grid h-12 w-full place-items-center sm:h-14">
       <span
-        class="absolute h-10 w-10 rounded-full border border-gold/70 bg-linear-to-br from-surface to-surface inset-shadow-sm transition duration-300 group-hover:scale-110 group-hover:rotate-6 sm:h-12 sm:w-12"
+        class="absolute h-10 w-10 rounded-full border border-gold/70 bg-surface inset-shadow-sm transition duration-300 group-hover:scale-110 group-hover:rotate-6 sm:h-12 sm:w-12"
       ></span>
       <img
         v-if="badge.icon_url"

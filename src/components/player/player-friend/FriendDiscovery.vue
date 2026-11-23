@@ -5,7 +5,7 @@ import { useFriendProfiles } from "../../../composables/useFriendProfiles";
 
 const { friendStore, countryStore, currentUserId, filteredFriends, receivedRequests, sentRequests,
   filteredPlayers, searchQuery, getFriendProfile, getSenderProfile, getRecipientProfile,
-  getRelation, getAvatarGradient, formatUuid } = useFriendProfiles();
+  getRelation, getAvatarColor, formatUuid } = useFriendProfiles();
 const emit = defineEmits<{
   copy: [id: string];
   delete: [record: UserFriend, kind: FriendDeleteKind];
@@ -43,8 +43,8 @@ const emit = defineEmits<{
               <div class="flex items-center gap-3 min-w-0">
                 <!-- Avatar -->
                 <div
-                  class="size-11 rounded-xl bg-linear-to-br flex items-center justify-center text-white text-sm font-black shadow-sm shrink-0"
-                  :class="getAvatarGradient(player.id)"
+                  class="size-11 rounded-xl flex items-center justify-center text-white text-sm font-black shadow-sm shrink-0"
+                  :class="getAvatarColor(player.id)"
                 >
                   <img
                     v-if="player.avatar_url"

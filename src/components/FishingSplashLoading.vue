@@ -356,7 +356,7 @@ defineExpose({ thrash });
 <template>
   <div
     ref="root"
-    class="fixed inset-0 z-[10000] isolate h-dvh w-screen select-none overflow-hidden bg-gradient-to-b from-[var(--color-ocean-panel)] via-[var(--color-ocean-deep)] to-[var(--color-ocean-deep)]"
+    class="fixed inset-0 z-[10000] isolate h-dvh w-screen select-none overflow-hidden bg-primary"
     role="status"
     aria-live="polite"
     aria-busy="true"

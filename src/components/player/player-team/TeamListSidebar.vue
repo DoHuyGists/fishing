@@ -113,7 +113,7 @@ function joinTypeLabel(team: UserTeam) {
     <div class="flex items-center justify-between gap-2">
       <div class="m-0 text-base font-bold text-content">{{ tr("TeamListSidebar.to_doi_hien_hanh") }}</div>
       <button
-        class="inline-flex items-center justify-center rounded-lg bg-linear-to-br from-brand to-accent px-3 py-2 text-[0.8rem] font-bold text-white transition-all hover:from-accent hover:to-content"
+        class="inline-flex items-center justify-center rounded-lg bg-accent px-3 py-2 text-[0.8rem] font-bold text-white transition-all hover:bg-content"
         @click="emit('create')"
       >
         {{ tr("TeamListSidebar.tao") }}
