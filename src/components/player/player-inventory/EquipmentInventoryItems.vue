@@ -56,7 +56,7 @@ const displayedGroups = computed(() =>
 </script>
 
 <template>
-  <div id="user-inventory" class="flex min-w-0 flex-col rounded-lg border border-border bg-white">
+  <div id="user-inventory" class="flex min-w-0 h-full flex-col rounded-lg border border-border bg-white">
     <header class="space-y-3 border-b border-border p-4">
       <div class="flex flex-wrap items-center justify-between gap-2">
         <div class="text-lg font-semibold">
@@ -115,7 +115,7 @@ const displayedGroups = computed(() =>
       </div>
     </header>
 
-    <div class="min-h-0 max-h-[60dvh] flex-1 overflow-y-scroll p-4">
+    <div class="h-0 grow overflow-y-scroll p-4">
       <div v-if="pagedItems.length === 0" class="py-12 text-center text-sm text-content">
         {{ inventoryStore.ownedTotal === 0 ? tr('InventoryItems.kho_do_dang_trong') : tr('InventoryItems.khong_co_vat_pham_nao_khop_voi_tim_kiem') }}
       </div>

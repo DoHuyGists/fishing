@@ -82,12 +82,12 @@ const guildeSteps = [
         {{ tr("InventoryModal.dang_tai_kho_do") }}
       </div>
 
-      <div v-else class="grid min-w-0 grid-cols-1 items-start gap-3 lg:grid-cols-2">
+      <div v-else class="grid min-w-0 h-full grid-cols-1 items-start gap-3 lg:grid-cols-2">
         <EquipmentInventoryItems @request-delete="modal = 'delete'" />
-        <div class="min-w-0">
-          <Tab v-model="activeTab" :tabs="tabs" :aria-label="tr('InventoryModal.trang_bi')">
+        <div class="min-w-0 h-full">
+          <Tab v-model="activeTab" :tabs="tabs" :aria-label="tr('InventoryModal.trang_bi')" contained>
             <template #fishing>
-              <div class="space-y-2.5 py-2">
+              <div class="space-y-2.5 py-2 h-full flex flex-col">
                 <FishingEquipmentOverview />
                 <FishingEquipmentSets @request-buy="modal = 'buy'" />
               </div>

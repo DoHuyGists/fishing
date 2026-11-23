@@ -20,8 +20,8 @@ defineEmits<{ action: []; "change-page": [page: number] }>();
 </script>
 
 <template>
-  <section class="flex min-w-0 flex-col overflow-hidden rounded-xl border border-border-default bg-surface text-content" :aria-label="title">
-    <header class="space-y-2 border-b border-border-default p-3">
+  <section class="flex min-h-0 min-w-0 flex-col h-full rounded-xl border border-border-default bg-surface text-content" :aria-label="title">
+    <header class="shrink-0 space-y-2 border-b border-border-default p-3">
       <div class="flex flex-wrap items-center justify-between gap-2">
         <div class="text-sm font-bold">
           {{ title }} <span class="font-normal text-content">({{ count }})</span>
@@ -32,7 +32,7 @@ defineEmits<{ action: []; "change-page": [page: number] }>();
       </div>
       <input v-model="search" type="search" :aria-label="tr('EquipmentSets.tim_theo_so_set_hoac_ten_vat_pham')" :placeholder="tr('EquipmentSets.tim_theo_so_set_hoac_ten_vat_pham')" class="w-full rounded-md border border-border-default bg-white px-3 py-2 text-xs outline-none focus:border-accent focus:ring-2 focus:ring-surface" />
     </header>
-    <div class="min-w-0 flex-1 space-y-3 p-3">
+    <div class="min-h-0 min-w-0 h-0 grow space-y-3 overflow-y-scroll p-3">
       <div v-if="empty" class="py-6 text-center text-xs text-content">{{ emptyText }}</div>
       <slot />
     </div>
