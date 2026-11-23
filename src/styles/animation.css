@@ -2,6 +2,18 @@
   transition: opacity 0.4s ease;
 }
 
+.home-species-track {
+  transition: transform 0.8s cubic-bezier(0.45, 0, 0.55, 1);
+  will-change: transform;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .home-species-track {
+    transition: none;
+    will-change: auto;
+  }
+}
+
 .fishing-splash-leave-to {
   opacity: 0;
 }

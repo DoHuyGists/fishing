@@ -4,6 +4,8 @@
   "version": "0.0.0",
   "type": "module",
   "scripts": {
+    "export:home-assets": "node scripts/export-home-assets.mjs",
+    "test:home:browser": "node scripts/test-home-browser.mjs",
     "export:world-map-tiles": "node scripts/export-world-map-tiles.mjs",
     "test:jwt-clock-skew": "node --test scripts/test-jwt-clock-skew.mjs",
     "test:day-phase": "node --test --test-isolation=none scripts/test-day-phase.mjs",
