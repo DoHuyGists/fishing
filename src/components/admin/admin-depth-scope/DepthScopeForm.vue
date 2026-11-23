@@ -48,8 +48,8 @@ async function submit() {
     class="fixed inset-0 z-[60] grid place-items-center bg-content/40 p-4"
     @click.self="store.closeForm()"
   >
-    <form class="w-full max-w-lg rounded-2xl border border-border-default bg-white shadow-xl" @submit.prevent="submit">
-      <header class="flex items-center justify-between border-b border-border-default px-5 py-4">
+    <form class="flex max-h-[calc(100dvh-2rem)] w-full max-w-lg flex-col overflow-hidden rounded-2xl border border-border-default bg-white shadow-xl" @submit.prevent="submit">
+      <header class="flex shrink-0 items-center justify-between border-b border-border-default px-5 py-4">
         <div>
           <div class="m-0 text-lg font-bold text-content">
             {{ store.editingId ? "Chỉnh sửa phạm vi" : "Thêm phạm vi độ sâu" }}
@@ -65,7 +65,7 @@ async function submit() {
           &times;
         </button>
       </header>
-      <div class="grid grid-cols-1 gap-4 p-5 sm:grid-cols-2">
+      <div class="grid min-h-0 grid-cols-1 gap-4 overflow-y-auto overscroll-contain p-5 sm:grid-cols-2">
         <label class="flex flex-col gap-1 text-xs font-semibold text-content"
           >Mã
           <input
@@ -134,7 +134,7 @@ async function submit() {
           {{ error }}
         </div>
       </div>
-      <footer class="flex justify-end gap-2 border-t border-border-default px-5 py-4">
+      <footer class="flex shrink-0 justify-end gap-2 border-t border-border-default px-5 py-4">
         <button
           type="button"
           class="rounded-lg border border-border-default px-4 py-2 text-sm text-content hover:bg-surface"

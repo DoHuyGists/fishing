@@ -44,13 +44,13 @@ withDefaults(
 <template>
   <div
     v-if="show"
-    class="fixed top-0 left-0 z-[9999] flex h-screen w-screen items-center justify-center bg-content/60 backdrop-blur-[4px]"
+    class="fixed inset-0 z-[9999] flex items-center justify-center overflow-y-auto bg-content/60 p-4 backdrop-blur-[4px]"
     role="dialog"
     aria-modal="true"
     @click.self="onDismiss?.()"
   >
     <div
-      class="shared-confirmation player-popup-in w-[90%] max-w-[420px] rounded-xl bg-white p-6 shadow-[0_20px_25px_-5px_color-mix(in_srgb,_var(--color-content)_10%,_transparent)]"
+      class="shared-confirmation player-popup-in my-auto max-h-[calc(100dvh-2rem)] w-full max-w-[420px] overflow-y-auto overscroll-contain rounded-xl bg-white p-6 shadow-[0_20px_25px_-5px_color-mix(in_srgb,_var(--color-content)_10%,_transparent)]"
     >
       <div>
         <div class="shared-confirmation__title mb-3 text-xl leading-normal font-bold text-danger">
@@ -70,7 +70,7 @@ withDefaults(
         </div>
       </div>
 
-      <div class="mt-5 flex justify-center gap-3">
+      <div class="mt-5 flex flex-wrap justify-center gap-3">
         <button
           type="button"
           :disabled="firstDisabled"

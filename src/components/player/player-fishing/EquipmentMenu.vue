@@ -35,7 +35,7 @@ watch(
     <div class="equipment-actions flex flex-wrap items-start gap-2" :aria-label="tr('EquipmentMenu.dung_cu_cau_ca')">
       <button
         type="button"
-        class="slide-fade-in from-top player-content-in flex items-center gap-2 rounded-lg border border-border-default bg-surface min-h-7 px-3 py-[3px] text-[11px] font-bold text-content transition hover:border-accent hover:bg-surface"
+        class="slide-fade-in from-top player-content-in flex items-center gap-2 rounded-lg border border-border-default bg-surface min-h-11 [@media(pointer:fine)]:min-h-7 px-3 py-[3px] text-[11px] font-bold text-content transition hover:border-accent hover:bg-surface"
         :disabled="!store.canAdjustDepth"
         @click="openPicker"
       >
@@ -46,7 +46,7 @@ watch(
       <button
         v-if="store.areaAllowsDepthTool"
         type="button"
-        class="slide-fade-in from-top player-content-in relative flex items-center gap-2 rounded-lg border border-border-default bg-surface min-h-7 px-3 py-[3px] text-[11px] font-bold text-content transition hover:border-accent hover:bg-surface"
+        class="slide-fade-in from-top player-content-in relative flex items-center gap-2 rounded-lg border border-border-default bg-surface min-h-11 [@media(pointer:fine)]:min-h-7 px-3 py-[3px] text-[11px] font-bold text-content transition hover:border-accent hover:bg-surface"
         :disabled="!store.canAdjustDepth || !store.currentAreaId || store.isLoadingCurrentArea"
         :title="
           !store.canAdjustDepth
@@ -97,7 +97,7 @@ watch(
       <AdjusDepth />
       <button
         type="button"
-        class="slide-fade-in from-top player-content-in relative flex items-center gap-2 rounded-lg border border-border-default bg-surface min-h-7 px-3 py-[3px] text-[11px] font-bold text-content transition hover:border-accent hover:bg-surface"
+        class="slide-fade-in from-top player-content-in relative flex items-center gap-2 rounded-lg border border-border-default bg-surface min-h-11 [@media(pointer:fine)]:min-h-7 px-3 py-[3px] text-[11px] font-bold text-content transition hover:border-accent hover:bg-surface"
         @click="store.openBag"
       >
         <span aria-hidden="true" class="text-base">🕸️</span>
@@ -111,7 +111,7 @@ watch(
       </button>
       <button
         type="button"
-        class="slide-fade-in from-top player-content-in relative flex items-center gap-2 rounded-lg border border-border-default bg-surface min-h-7 px-3 py-[3px] text-[11px] font-bold text-content transition hover:border-accent hover:bg-surface"
+        class="slide-fade-in from-top player-content-in relative flex items-center gap-2 rounded-lg border border-border-default bg-surface min-h-11 [@media(pointer:fine)]:min-h-7 px-3 py-[3px] text-[11px] font-bold text-content transition hover:border-accent hover:bg-surface"
         @click="store.openLakeGuide"
       >
         <span aria-hidden="true" class="text-base">🐠</span>
@@ -125,7 +125,7 @@ watch(
       </button>
       <button
         type="button"
-        class="slide-fade-in from-top player-content-in relative flex items-center gap-2 rounded-lg border border-border-default bg-surface min-h-7 px-3 py-[3px] text-[11px] font-bold text-content transition hover:border-accent hover:bg-surface"
+        class="slide-fade-in from-top player-content-in relative flex items-center gap-2 rounded-lg border border-border-default bg-surface min-h-11 [@media(pointer:fine)]:min-h-7 px-3 py-[3px] text-[11px] font-bold text-content transition hover:border-accent hover:bg-surface"
         @click="store.openPlayers"
       >
         <span aria-hidden="true" class="text-base">👥</span>

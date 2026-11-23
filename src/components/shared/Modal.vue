@@ -64,7 +64,7 @@ onUnmounted(() => {
     :class="compact ? 'flex items-center justify-center bg-content/40 p-3 backdrop-blur-xs' : ''"
   >
     <div
-      class="shared-modal__panel player-window-panel flex flex-col bg-white"
+      class="shared-modal__panel player-window-panel @container/modal flex flex-col bg-white"
       :class="
         [
           { 'slide-fade-in from-bottom player-modal-restored': modalStore.restoredEntrance },
@@ -78,14 +78,14 @@ onUnmounted(() => {
       "
     >
       <header
-        class="shared-modal__header grid grid-cols-2 md:grid-cols-[auto_1fr_auto] gap-x-3 gap-y-2 p-2 border-b border-accent/10 bg-surface-muted sm:flex-nowrap sm:gap-4"
+        class="shared-modal__header grid shrink-0 grid-cols-[minmax(0,1fr)_auto] @[72rem]/modal:grid-cols-[auto_minmax(0,1fr)_auto] gap-x-3 gap-y-2 p-2 border-b border-accent/10 bg-surface-muted sm:gap-4"
       >
-        <div class="min-w-0 flex-1 sm:flex-none order-1 md:order-1">
+        <div class="min-w-0 order-1">
           <div class="shared-modal__title m-0 mt-1 break-words text-lg font-bold sm:text-xl">{{ title }}</div>
         </div>
         <div
           v-if="showCountData"
-          class="order-3 md:order-2 col-span-2 md:col-span-1 flex flex-row items-center md:justify-center shrink-0 gap-1 text-xs md:text-sm"
+          class="order-3 @[72rem]/modal:order-2 col-span-2 @[72rem]/modal:col-span-1 flex min-w-0 flex-wrap items-center @[72rem]/modal:justify-center gap-1 text-xs md:text-sm [&>*]:shrink-0"
         >
           <Cash :amount="currencyStore.formattedCash" />
           <Shells :amount="currencyStore.formattedShells" />
@@ -93,7 +93,7 @@ onUnmounted(() => {
           <SkillPoints :amount="userProfileStore.skillPoints" />
           <UserTurn />
         </div>
-        <div class="order-2 md:order-3 flex items-center justify-end shrink-0 gap-1 sm:ml-0 sm:gap-2">
+        <div class="order-2 @[72rem]/modal:order-3 flex items-center justify-end gap-1 sm:gap-2">
           <button
             v-if="hasGuideSteps"
             type="button"

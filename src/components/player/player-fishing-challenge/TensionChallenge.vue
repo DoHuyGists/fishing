@@ -204,7 +204,7 @@ onBeforeUnmount(() => {
       <button
         ref="reelControl"
         type="button"
-        class="flex min-h-7 touch-none select-none items-center justify-center gap-1.5 rounded-lg bg-accent px-2 py-1 text-xs font-bold leading-4 text-white shadow-[0_2px_0_var(--color-accent)] transition-colors hover:bg-accent focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-accent disabled:opacity-50"
+        class="flex min-h-11 [@media(pointer:fine)]:min-h-7 touch-none select-none items-center justify-center gap-1.5 rounded-lg bg-accent px-2 py-1 text-xs font-bold leading-4 text-white shadow-[0_2px_0_var(--color-accent)] transition-colors hover:bg-accent focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-accent disabled:opacity-50"
         :class="{ 'bg-accent': store.tensionReeling }"
         :disabled="store.castPhase !== 'bite'"
         :aria-pressed="store.tensionReeling"

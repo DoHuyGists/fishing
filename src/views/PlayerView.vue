@@ -216,12 +216,12 @@ onUnmounted(() => {
       </div>
     </header>
 
-    <main class="grid flex-1 grid-cols-1 gap-2 md:grid-cols-2">
+    <main class="grid min-w-0 flex-1 grid-cols-1 gap-2 xl:grid-cols-2">
       <!-- Khung Bản đồ trung tâm -->
       <div id="first-play-map">
         <InteractWorldMap2 collapsible />
       </div>
-      <div class="grid grid-cols-1 md:grid-cols-2 gap-2">
+      <div class="grid min-w-0 grid-cols-1 sm:grid-cols-2 gap-2">
         <div class="slide-fade-in from-top-right">
           <LatestCaughtList />
         </div>

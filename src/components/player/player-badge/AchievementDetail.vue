@@ -18,7 +18,7 @@ const emit = defineEmits<{ close: []; claim: [badgeId: string] }>();
         role="dialog"
         aria-modal="true"
         aria-labelledby="badge-detail-title"
-        class="player-popup-in relative w-full max-w-sm overflow-hidden rounded-3xl border border-white/70 bg-surface p-6 text-center shadow-2xl"
+        class="player-popup-in relative max-h-[calc(100dvh-2rem)] w-full max-w-sm overflow-y-auto overscroll-contain rounded-3xl border border-white/70 bg-surface p-6 text-center shadow-2xl"
       >
         <div
           aria-hidden="true"

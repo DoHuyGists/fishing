@@ -150,7 +150,7 @@ function confirmBuy(item: MarketListing) {
 
       <div
         v-else-if="viewMode === 'species'"
-        class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-4"
+        class="grid grid-cols-[repeat(auto-fill,minmax(min(100%,20rem),1fr))] gap-4"
       >
         <section
           v-for="group in groupedListings"
@@ -169,18 +169,18 @@ function confirmBuy(item: MarketListing) {
             <article
               v-for="item in group.listings"
               :key="item.id"
-              class="flex items-center gap-2 rounded-lg border border-border p-2"
+              class="grid grid-cols-[3.5rem_minmax(0,1fr)] items-start gap-2 rounded-lg border border-border p-2"
             >
               <img
                 :src="item.caught?.fish?.image || '/fish/VN/fish.jpg'"
                 :alt="item.caught?.fish?.name"
-                class="h-12 w-14 shrink-0 rounded object-cover"
+                class="row-span-2 h-12 w-14 rounded object-cover"
               />
               <div class="min-w-0 flex-1">
                 <div class="truncate text-[11px] text-content">
                   {{ item.caught?.fish?.weight }} kg · {{ formatDate(item.created_at) }}
                 </div>
-                <div class="text-xs font-bold text-gold">
+                <div class="break-words text-xs font-bold text-gold">
                   {{ item.price.toLocaleString(getFormattingLocale()) }} {{ tr("currency.cashUnit") }}
                 </div>
               </div>
@@ -188,14 +188,14 @@ function confirmBuy(item: MarketListing) {
                 v-if="item.user_id === authStore.userId"
                 type="button"
                 disabled
-                class="rounded bg-surface px-2 py-1 text-[10px] text-content"
+                class="col-start-2 min-h-11 justify-self-start rounded bg-surface px-3 py-2 text-xs text-content"
               >
                 {{ tr("MarketWindow.da_dang") }}
               </button>
               <button
                 v-else
                 type="button"
-                class="rounded bg-content-strong px-2 py-1 text-[10px] font-bold text-white"
+                class="col-start-2 min-h-11 justify-self-start rounded bg-content-strong px-3 py-2 text-xs font-bold text-white"
                 @click="confirmBuy(item)"
               >
                 {{ tr("InventoryModal.mua") }}

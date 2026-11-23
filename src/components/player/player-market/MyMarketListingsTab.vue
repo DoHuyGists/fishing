@@ -26,7 +26,7 @@ const myMarketListings = computed(() => marketStore.marketListings.filter((item)
 
     <div
       v-else
-      :class="viewMode === 'grid' ? 'grid grid-cols-1 sm:grid-cols-3 md:grid-cols-5 gap-4' : 'flex flex-col gap-2'"
+      :class="viewMode === 'grid' ? 'grid grid-cols-[repeat(auto-fill,minmax(min(100%,16rem),1fr))] gap-4' : 'flex flex-col gap-2'"
     >
       <div
         v-for="item in myMarketListings"
@@ -71,7 +71,7 @@ const myMarketListings = computed(() => marketStore.marketListings.filter((item)
           </div>
         </div>
 
-        <div class="pt-2 border-t border-border flex items-center justify-between gap-2">
+        <div class="pt-2 border-t border-border flex flex-wrap items-center justify-between gap-2">
           <div>
             <span class="text-[10px] text-content uppercase font-bold block">{{
               tr("MarketWindow.gia_niem_yet")
