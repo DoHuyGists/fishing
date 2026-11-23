@@ -31,7 +31,7 @@ defineProps<{
       :src="fish.species?.image || '/fish/VN/fish.jpg'"
       :alt="fish.species?.name || tr('CaughtModal.ca')"
       class="rounded object-cover"
-      :class="variant === 'grid' ? 'h-14 w-full' : variant === 'species' ? 'h-9 w-12 shrink-0' : 'h-10 w-14 shrink-0'"
+      :class="variant === 'grid' ? 'w-full' : variant === 'species' ? 'h-9 w-12 shrink-0' : 'h-10 w-14 shrink-0'"
     />
     <span
       class="truncate font-bold"
