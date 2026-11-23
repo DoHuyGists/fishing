@@ -70,14 +70,12 @@ const emit = defineEmits<{
 html.ocean-theme .workbench-material-count {
   background: var(--color-ocean-deep);
   color: var(--color-ocean-pearl);
-  box-shadow: 0 0 0 1px var(--color-ocean-gold);
 }
 
 html.ocean-theme .workbench-craft {
   border: 1px solid var(--color-ocean-gold);
   background: var(--color-gold);
   color: var(--color-content);
-  box-shadow: inset 0 1px 0 color-mix(in srgb, var(--color-surface) 50%, transparent), 0 2px 0 var(--color-ocean-wood);
 }
 
 html.ocean-theme .workbench-craft:enabled:hover {

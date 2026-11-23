@@ -196,9 +196,8 @@ const guideSteps = [
 html.ocean-theme .workbench :deep(#workbench-palette),
 html.ocean-theme .workbench :deep(#workbench-blueprints),
 html.ocean-theme .workbench :deep(#workbench-recipe) {
-  border: 2px solid var(--color-ocean-wood);
+  border: 2px solid var(--color-border-default);
   background: var(--color-white);
-  box-shadow: inset 0 0 0 1px color-mix(in srgb, var(--color-ocean-gold) 45%, transparent), 0 4px 12px color-mix(in srgb, var(--color-content) 18%, transparent);
 }
 
 html.ocean-theme .workbench :deep(#workbench-palette > :first-child),

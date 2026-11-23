@@ -9,8 +9,8 @@ watch(() => storage.classification, () => { storage.category = ""; }, { flush: "
 
 <template>
   <div class="space-y-3 rounded-xl border border-border-default bg-surface p-3">
-    <fieldset :disabled="storage.busy || storage.loading" class="grid min-w-0 grid-cols-2 gap-3 border-0 p-0 lg:grid-cols-4">
-      <label class="col-span-2 flex flex-col gap-1 text-xs">
+    <fieldset :disabled="storage.busy || storage.loading" class="grid min-w-0 grid-cols-2 gap-3 border-0 p-0 lg:grid-cols-1 [&>label]:min-w-0 [&_input]:w-full [&_input]:min-w-0 [&_select]:w-full [&_select]:min-w-0">
+      <label class="col-span-2 flex flex-col gap-1 text-xs lg:col-span-1">
         <span>{{ tr('Storage.search') }}</span>
         <input v-model="storage.search" type="search" :placeholder="tr('InventoryItems.tim_theo_ten_hoac_loai_vat_pham')" class="min-h-10 rounded-lg border border-border-default bg-white px-3 text-sm" />
       </label>
