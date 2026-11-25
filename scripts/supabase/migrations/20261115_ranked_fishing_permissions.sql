@@ -26,14 +26,19 @@ BEGIN
     'public.submit_challenge(uuid,boolean,integer)',
     'public.start_tension_challenge(uuid)',
     'public.submit_tension_challenge(jsonb)',
-    'public.replay_tension_challenge(jsonb,jsonb,integer)'
+    'public.replay_tension_challenge(jsonb,jsonb,integer)',
+    'public.fishing_weather_modifiers(jsonb)',
+    'public.fishing_effective_stat(numeric,jsonb,text,numeric,numeric)',
+    'public.fishing_weather_spawn_weight(numeric,text,jsonb)'
   ] LOOP
     v_function := to_regprocedure(v_signature);
     IF v_function IS NULL THEN CONTINUE; END IF;
     EXECUTE format('ALTER FUNCTION %s OWNER TO %I', v_function, v_owner);
     EXECUTE format('ALTER FUNCTION %s SET search_path = public', v_function);
     EXECUTE format('REVOKE ALL ON FUNCTION %s FROM PUBLIC, anon, authenticated', v_function);
-    IF v_signature = 'public.replay_tension_challenge(jsonb,jsonb,integer)' THEN
+    IF v_signature = 'public.replay_tension_challenge(jsonb,jsonb,integer)'
+       OR v_signature LIKE 'public.fishing_weather_%'
+       OR v_signature LIKE 'public.fishing_effective_stat(%' THEN
       EXECUTE format('ALTER FUNCTION %s SECURITY INVOKER', v_function);
     ELSE
       EXECUTE format('ALTER FUNCTION %s SECURITY DEFINER', v_function);

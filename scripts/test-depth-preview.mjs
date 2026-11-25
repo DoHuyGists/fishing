@@ -23,6 +23,9 @@ test('depth preview uses a writable RPC transaction and still renews presence', 
       CREATE TABLE public.species_in_area(species_id UUID, area_id UUID, weight_rate NUMERIC, depth_scope_id UUID);
       CREATE TABLE public.depth_scope(id UUID, min_depth NUMERIC, max_depth NUMERIC, peak_depth NUMERIC, curve_power NUMERIC);
       CREATE TABLE public.caught_diary(user_id UUID, species_id UUID);
+      CREATE TABLE public.weathers(id UUID PRIMARY KEY);
+      CREATE TABLE public.zones(id UUID PRIMARY KEY, weather_id UUID, weather_expires_at TIMESTAMPTZ, weather_active_modifiers JSONB);
+      CREATE TABLE public.fishing_areas(id UUID PRIMARY KEY, zone_id UUID);
       CREATE FUNCTION public.touch_fishing_presence() RETURNS JSONB LANGUAGE plpgsql AS $$
       BEGIN
         PERFORM 1 FROM public.user_in_area WHERE user_id = auth.uid() FOR SHARE;
@@ -41,6 +44,10 @@ test('depth preview uses a writable RPC transaction and still renews presence', 
     const multiplier = ranked.match(/CREATE FUNCTION public\.fishing_fatigue_multiplier[\s\S]*?\$\$;/);
     assert.ok(multiplier);
     await db.exec(multiplier[0]);
+    const castSql = await read('./supabase/rpc/fishing/cast_rod.sql');
+    for (const helper of castSql.matchAll(/CREATE OR REPLACE FUNCTION public\.fishing_(?:weather_modifiers|effective_stat|weather_spawn_weight)\([\s\S]*?\$\$;/g)) {
+      await db.exec(helper[0]);
+    }
     await db.exec(await read('./supabase/rpc/fishing/preview_fish_by_depth.sql'));
 
     // Reproduce PostgREST's transaction choice for a legacy STABLE RPC.

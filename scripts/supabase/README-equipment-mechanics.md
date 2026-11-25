@@ -8,7 +8,7 @@ Mỗi lượt câu mới chỉ dùng tension challenge. Replay vẫn là protoco
 2. Điền dữ liệu loài cá, trang bị trong inventory và nguồn cấp vật phẩm theo các bảng bên dưới. Migration không tự suy diễn chỉ số mới từ `strength` của lưỡi cũ.
 3. Chạy toàn bộ `rpc/submit_challenge.sql`, rồi `rpc/submit_tension_challenge.sql`.
 4. Triển khai client đã hỗ trợ `start_tension_challenge.resolution`.
-5. Chạy `migrations/20261118_fishing_area_depth_tool.sql`, rồi toàn bộ `rpc/fishing/cast_rod.sql` trong SQL Editor. Migration thêm `fishing_areas.allow_depth_tool` mặc định `false` nếu chưa có cột, giữ nguyên cấu hình nếu cột đã tồn tại. File RPC chứa định nghĩa `CREATE OR REPLACE FUNCTION` đầy đủ với chữ ký `(p_area_id UUID, p_cast_depth NUMERIC) RETURNS JSONB`, `SECURITY DEFINER` và `SET search_path = public`. Nếu RPC cũ có owner khác, áp dụng thêm `migrations/20261115_ranked_fishing_permissions.sql` theo hướng dẫn ranked fishing.
+5. Chạy `migrations/20261118_fishing_area_depth_tool.sql`, rồi toàn bộ `rpc/fishing/cast_rod.sql` trong SQL Editor. Migration thêm `fishing_areas.allow_depth_tool` mặc định `false` nếu chưa có cột, giữ nguyên cấu hình nếu cột đã tồn tại. File RPC chứa cả ba helper thời tiết riêng tư và định nghĩa `cast_rod(p_area_id UUID, p_cast_depth NUMERIC)` trong cùng giao dịch. Sau đó chạy `rpc/fishing/preview_fish_by_depth.sql` để cập nhật trọng số thời tiết trong xem trước. Nếu RPC cũ có owner khác, áp dụng thêm `migrations/20261115_ranked_fishing_permissions.sql` theo hướng dẫn ranked fishing; bản repair cũng đồng bộ owner của helper thời tiết.
 
 Các script được kiểm chứng bằng PostgreSQL cục bộ qua PGlite; không tự cập nhật Supabase đang chạy. Session cũ không có snapshot tiếp tục được resolver xử lý theo nhánh tương thích.
 
@@ -63,9 +63,44 @@ Ví dụ phần `data` của từng vật phẩm (năm inventory row riêng):
 effective_stat = (base_stat + tổng bonus cộng) × tích các hệ số nhân
 ```
 
-`v_modifiers` chứa các giá trị trung tính `add = 0`, `multiplier = 1`. Thêm truy vấn kỹ năng, thời tiết, sự kiện hoặc buff ở đầu phần B, trước vòng tính `v_effective`. Ví dụ cần 10 kg, bonus +2 kg và hệ số 1.1 cho tải hiệu lực `(10 + 2) × 1.1 = 13.2 kg`.
+`v_modifiers` chứa các giá trị trung tính `add = 0`, `multiplier = 1`. Thời tiết được đọc ở phần A; các nguồn kỹ năng, sự kiện hoặc buff bổ sung phải được tổng hợp trước vòng tính `v_effective` ở phần B. Ví dụ cần 10 kg, bonus +2 kg và hệ số 1.1 cho tải hiệu lực `(10 + 2) × 1.1 = 13.2 kg`.
 
-Chỉ tổng hợp dữ liệu đáng tin từ server. Sau tổng hợp mới giới hạn miền: tải cần/sức máy ≥ 0, dây 10–1000, bonus lưỡi 0–1, sức cá 0.4–400. `v_balance` tách riêng tham số cân bằng chung, không phải hiệu ứng của người chơi.
+Chỉ tổng hợp dữ liệu đáng tin từ server. Sau tổng hợp mới giới hạn miền: tải cần/sức máy ≥ 0, dây 10–1000, bonus lưỡi 0–1, sức cá 0.4–400. `v_balance` lưu tham số cân bằng và các giá trị đã điều chỉnh cho lượt câu, tách khỏi chỉ số trang bị.
+
+Thời tiết lấy từ `fishing_areas.zone_id → zones.weather_active_modifiers`. Chỉ thời tiết có `weather_id` hợp lệ và `weather_expires_at` trong tương lai mới có hiệu lực. Không roll lại giá trị từ `weather_modifiers`; sử dụng đúng mảng đang hoạt động của zone. Các giá trị gốc, hiệu ứng đã nhận/bỏ qua, zone, weather và hạn thời tiết được giữ trong `fishing_session_mechanics.modifiers._weather`, không đưa vào challenge gửi client.
+
+`PERCENT` là thay đổi tương đối: `18.82` nhân `1.1882`, `-20` nhân `0.8`; nhiều hiệu ứng nhân liên tiếp. `POINT` chỉ dành cho `LUCK_BONUS` và `SPAWN_ADD`, được cộng trước các hệ số nhân. `LUCK_BONUS = 1 POINT` cộng 2 điểm phần trăm shiny theo công thức hiện tại. Giảm từ 100% trở lên cho hệ số 0 trước giới hạn miền; giá trị phải là JSON number hữu hạn, có trị tuyệt đối không quá 1,000,000. Mã/đơn vị không hỗ trợ, chuỗi số và dữ liệu sai bị bỏ qua và lưu trong audit riêng tư.
+
+42 mã được hỗ trợ:
+
+| Nhóm | Mã |
+| --- | --- |
+| Trang bị và móc | `MAX_WEIGHT`, `PULL_STRENGTH`, `DURABILITY`, `CATCH_RATE`, `LUCK_BONUS`, `FISH_STRENGTH`, `CATCH_PROBABILITY` |
+| Xuất hiện | `SPAWN_ADD`, `SPAWN_MULTIPLIER`, `RARE_SPAWN` |
+| Mồi | `MATCHED_ATTRACTION`, `UNMATCHED_ATTRACTION`, `MATCHED_CATCH_FACTOR`, `UNMATCHED_CATCH_FACTOR` |
+| Cá | `WEIGHT_CAP`, `FISH_WEIGHT_BIAS`, `FISH_WEIGHT`, `ALERTNESS` |
+| Nhịp câu | `WAIT_TIME`, `REEL_SPEED`, `FIGHT_SECONDS`, `START_DISTANCE` |
+| Giật và thể lực cá | `BURST_CHANCE`, `BURST_MULTIPLIER`, `STAMINA_DRAIN` |
+| Lực căng | `SAFE_MIN_RATIO`, `SAFE_MAX_RATIO`, `START_TENSION_RATIO`, `REEL_RATE`, `RELEASE_RATE` |
+| Dây chùng | `SLACK_ESCAPE_SECONDS`, `SLACK_DISTANCE_RATE`, `SLACK_THRESHOLD_RATIO` |
+| Mô phỏng lực cá | `FISH_PULL_MULTIPLIER`, `PULL_PERIOD_TICKS`, `BURST_MIN_TICKS`, `BURST_MAX_TICKS`, `BASE_PULL`, `PULL_AMPLITUDE`, `MINIMUM_STRENGTH` |
+| Điểm | `EXTREME_WEIGHT`, `FATIGUE_SCORE` |
+
+`SPAWN_ADD` và `SPAWN_MULTIPLIER` có thể thêm thuộc tính `rarity` với một mã `COMMON`, `UNCOMMON`, `RARE`, `EPIC` hoặc `LEGENDARY`. Không có scope thì áp dụng cho mọi ứng viên; nhân chung mọi loài không đổi xác suất tương đối. `RARE_SPAWN` áp dụng chung RARE/EPIC/LEGENDARY. Hiệu ứng không kích hoạt loài có `weight_rate <= 0` và không vượt điều kiện giờ/độ sâu của cast.
+
+```json
+[
+  { "code": "SPAWN_MULTIPLIER", "unit": "PERCENT", "value": 18.82, "rarity": "EPIC" },
+  { "code": "REEL_SPEED", "unit": "PERCENT", "value": -18.46 },
+  { "code": "LUCK_BONUS", "unit": "POINT", "value": 1 }
+]
+```
+
+Tương thích mã cũ: `RARE_CATCH_RATE`, `EPIC_CATCH_RATE`, `LEGENDARY_CATCH_RATE` tăng trọng số đúng rarity; `FISHING_SPEED`/`FISHING_SPEED_DOWN` đổi tốc độ thu cá; `LUCK`/`LUCK_DOWN` đổi luck; `FISH_WEIGHT_DOWN` giảm kg; `CATCH_RATE_DOWN` giảm xác suất móc cuối; `RARE_RATE_DOWN` giảm trọng số chung ba nhóm hiếm. Mã giảm dùng `-abs(value)` để không đảo dấu hai lần. Các mã XP, tiền, câu đôi, vật phẩm, năng lượng và hồi lượt chưa có cơ chế trong cast nên không được ánh xạ ngầm.
+
+`FISH_WEIGHT_BIAS` điều chỉnh tỷ số `r / (1-r)` của mẫu khối lượng trước khi nhân cap; không đổi gì khi hệ số bằng 1. `WEIGHT_CAP` điều chỉnh cap mệt mỏi hiện tại trong khoảng 0–1, nên hiệu ứng dương có thể bù một phần cap giảm. `FISH_WEIGHT` áp dụng trước lần làm tròn duy nhất và bị giới hạn bởi min loài và cap hiệu lực. Sức cá, sao, kiểm tra cần và điểm cùng dùng khối lượng cuối. `EXTREME_WEIGHT` nhân hệ số điểm của weather; `FATIGUE_SCORE` nhân hệ số hiệu suất điểm đã tính từ mệt mỏi, không đổi lượng mệt mỏi.
+
+Thông số challenge được giới hạn theo protocol v1: chờ 100–120,000 ms, đấu 1–180 giây, tốc độ thu 0.1–1000; vùng an toàn có hai biên hợp lệ, biên độ lực không vượt lực nền, thời lượng giật tối đa không nhỏ hơn tối thiểu. `RELEASE_RATE` tác động lên giá trị âm: tăng phần trăm làm tốc độ giảm lực căng mạnh hơn. Client và replay dùng cùng cấu hình đã làm tròn; không cần đổi công thức mô phỏng.
 
 ### 2. Chọn loài theo hồ, giờ, độ sâu và mồi
 
@@ -80,7 +115,7 @@ P_gặp_i = W_i / tổng W của các loài hợp lệ
 - Khi `allow_depth_tool` là `false` hoặc `NULL`, mọi loài có hệ số độ sâu bằng 1, kể cả scope sai hoặc ngoài khoảng. Việc chọn cá ngẫu nhiên dựa trên `weight_rate`, mồi và hiệu ứng hiện có; vẫn lọc theo giờ hoạt động. `p_cast_depth` vẫn phải là số hữu hạn không âm và được lưu vào session, nhưng không ảnh hưởng xác suất chọn cá.
 - Đúng nhóm mồi → thu hút 1.8; sai nhóm → 1. Không dùng mồi để vượt điều kiện giờ hoặc điều kiện độ sâu ở bãi đã bật công cụ.
 - Hiệu ứng tăng xuất hiện cho một nhóm loài được thêm tại `spawn_add`/`spawn_multiplier` trong CTE `candidates`. Nhân cùng một hệ số cho mọi loài không thay đổi xác suất tương đối.
-- Không có ứng viên → lưu `NO_FISH`. Tính năng preview độ sâu cần dùng cùng công thức nếu muốn hiển thị xác suất đã bao gồm mồi/hiệu ứng; SQL của RPC preview chưa có trong repo này.
+- Không có ứng viên → lưu `NO_FISH`. RPC preview dùng chung helper trọng số thời tiết, gồm scope rarity và hệ số nhóm hiếm. Preview vẫn giữ cách xem trước độ sâu hiện có; chưa tính mồi và lọc giờ như cast, nên xác suất xem trước không phải xác suất cuối đã gồm trang bị.
 
 ### 3. Khối lượng, sức cá, móc và tải cần
 

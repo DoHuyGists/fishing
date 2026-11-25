@@ -1,4 +1,5 @@
 -- This preview renews presence, so PostgREST must use a read-write transaction.
+-- Deploy the helpers in cast_rod.sql first.
 CREATE OR REPLACE FUNCTION public.preview_fish_by_depth(p_cast_depth NUMERIC)
 RETURNS JSONB
 LANGUAGE plpgsql VOLATILE SECURITY DEFINER SET search_path = '' AS $$
@@ -10,6 +11,7 @@ DECLARE
     v_result JSONB;
     v_presence JSONB;
     v_rare_spawn NUMERIC;
+    v_weather JSONB;
 BEGIN
     -- 1. Xác định người chơi đang đăng nhập
     v_user_id := auth.uid();
@@ -49,6 +51,12 @@ BEGIN
 
     v_presence := public.touch_fishing_presence();
     v_rare_spawn := public.fishing_fatigue_multiplier(v_presence->'effects', 'rare_spawn');
+    SELECT public.fishing_weather_modifiers(z.weather_active_modifiers)->'stats' INTO v_weather
+    FROM public.fishing_areas a
+    JOIN public.zones z ON z.id = a.zone_id
+    JOIN public.weathers w ON w.id = z.weather_id
+    WHERE a.id = v_area_id AND z.weather_expires_at > clock_timestamp();
+    v_weather := COALESCE(v_weather, '{}'::JSONB);
 
     -- 5. Lấy danh sách cá có thể xuất hiện ở độ sâu đã chọn
     WITH raw_fishes AS (
@@ -144,7 +152,7 @@ BEGIN
     candidates AS (
         SELECT
             *,
-            weight_rate::NUMERIC * depth_factor
+            public.fishing_weather_spawn_weight(weight_rate::NUMERIC, rarity, v_weather) * depth_factor
               * CASE WHEN UPPER(rarity) IN ('RARE', 'EPIC', 'LEGENDARY') THEN v_rare_spawn ELSE 1 END AS spawn_weight
         FROM raw_fishes
         WHERE depth_factor > 0
@@ -155,7 +163,7 @@ BEGIN
         SELECT
             *,
             SUM(spawn_weight) OVER () AS total_weight
-        FROM candidates
+        FROM candidates WHERE spawn_weight > 0
     )
 
     -- 8. Tạo JSON trả về Client

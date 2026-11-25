@@ -3,6 +3,104 @@
 -- Requires fishing_areas.timezone and countries.default_timezone (IANA names).
 -- Deploy 20261118_fishing_area_depth_tool.sql before this definition.
 -- Rules v2; tension replay protocol remains v1 (only configuration changes).
+-- Deploy the helpers and cast together; preview_fish_by_depth uses these helpers too.
+BEGIN;
+
+-- Normalize server-owned weather data only. Unsupported/malformed entries are
+-- retained in the private audit, but cannot break fishing or change other stats.
+CREATE OR REPLACE FUNCTION public.fishing_weather_modifiers(p_effects JSONB)
+RETURNS JSONB LANGUAGE plpgsql IMMUTABLE SET search_path = '' AS $$
+DECLARE
+    e JSONB; code TEXT; target TEXT; unit TEXT; rarity TEXT; amount NUMERIC;
+    stats JSONB := '{}'; applied JSONB := '[]'; ignored JSONB := '[]';
+    entry JSONB; addition NUMERIC; multiplier NUMERIC;
+BEGIN
+    IF jsonb_typeof(p_effects) IS DISTINCT FROM 'array' THEN
+        RETURN jsonb_build_object('stats', stats, 'applied', applied, 'ignored',
+            CASE WHEN p_effects IS NULL THEN '[]'::JSONB ELSE jsonb_build_array(p_effects) END);
+    END IF;
+    FOR e IN SELECT value FROM jsonb_array_elements(p_effects) LOOP
+        code := upper(btrim(e->>'code'));
+        unit := upper(btrim(e->>'unit'));
+        target := CASE code
+            WHEN 'EPIC_CATCH_RATE' THEN 'spawn_multiplier_EPIC'
+            WHEN 'LEGENDARY_CATCH_RATE' THEN 'spawn_multiplier_LEGENDARY'
+            WHEN 'RARE_CATCH_RATE' THEN 'spawn_multiplier_RARE'
+            WHEN 'RARE_RATE_DOWN' THEN 'rare_spawn'
+            WHEN 'FISHING_SPEED' THEN 'reel_speed'
+            WHEN 'FISHING_SPEED_DOWN' THEN 'reel_speed'
+            WHEN 'LUCK' THEN 'luck_bonus'
+            WHEN 'LUCK_DOWN' THEN 'luck_bonus'
+            WHEN 'FISH_WEIGHT_DOWN' THEN 'fish_weight'
+            WHEN 'CATCH_RATE_DOWN' THEN 'catch_probability'
+            ELSE lower(code) END;
+        IF target IS NULL OR target <> ALL(ARRAY[
+            'max_weight','pull_strength','durability','catch_rate','luck_bonus','fish_strength','catch_probability',
+            'spawn_add','spawn_multiplier','rare_spawn','spawn_multiplier_RARE','spawn_multiplier_EPIC','spawn_multiplier_LEGENDARY',
+            'matched_attraction','unmatched_attraction','matched_catch_factor','unmatched_catch_factor',
+            'weight_cap','fish_weight_bias','fish_weight','alertness','wait_time','reel_speed','fight_seconds',
+            'start_distance','burst_chance','burst_multiplier','stamina_drain','safe_min_ratio','safe_max_ratio',
+            'start_tension_ratio','slack_escape_seconds','slack_distance_rate','slack_threshold_ratio',
+            'fish_pull_multiplier','reel_rate','release_rate','pull_period_ticks','burst_min_ticks','burst_max_ticks',
+            'base_pull','pull_amplitude','minimum_strength','extreme_weight','fatigue_score'
+        ]) OR jsonb_typeof(e->'value') IS DISTINCT FROM 'number'
+           OR unit IS NULL OR unit NOT IN ('PERCENT', 'POINT') THEN
+            ignored := ignored || jsonb_build_array(e); CONTINUE;
+        END IF;
+        amount := (e->>'value')::NUMERIC;
+        IF amount::TEXT IN ('NaN','Infinity','-Infinity') OR abs(amount) > 1000000
+           OR (target = 'spawn_add' AND unit <> 'POINT')
+           OR (unit = 'POINT' AND target NOT IN ('luck_bonus','spawn_add')) THEN
+            ignored := ignored || jsonb_build_array(e); CONTINUE;
+        END IF;
+        IF code IN ('RARE_RATE_DOWN','FISHING_SPEED_DOWN','LUCK_DOWN','FISH_WEIGHT_DOWN','CATCH_RATE_DOWN') THEN
+            amount := -abs(amount);
+        END IF;
+        -- Optional rarity scope for generic spawn effects. No scope means all
+        -- species; a common multiplier cancels in relative encounter chances.
+        IF target IN ('spawn_add','spawn_multiplier') AND e ? 'rarity' THEN
+            rarity := upper(btrim(e->>'rarity'));
+            IF rarity IS NULL OR rarity NOT IN ('COMMON','UNCOMMON','RARE','EPIC','LEGENDARY') THEN
+                ignored := ignored || jsonb_build_array(e); CONTINUE;
+            END IF;
+            target := target || '_' || rarity;
+        END IF;
+        entry := stats->target;
+        addition := COALESCE((entry->>'add')::NUMERIC, 0);
+        multiplier := COALESCE((entry->>'multiplier')::NUMERIC, 1);
+        IF unit = 'POINT' THEN addition := LEAST(1000000, GREATEST(-1000000, addition + amount));
+        ELSE multiplier := LEAST(1000000, multiplier * GREATEST(0, 1 + amount / 100)); END IF;
+        stats := jsonb_set(stats, ARRAY[target], jsonb_build_object('add', addition, 'multiplier', multiplier));
+        applied := applied || jsonb_build_array(jsonb_build_object('code', code, 'target', target, 'unit', unit, 'value', amount));
+    END LOOP;
+    RETURN jsonb_build_object('stats', stats, 'applied', applied, 'ignored', ignored);
+END;
+$$;
+
+CREATE OR REPLACE FUNCTION public.fishing_effective_stat(
+    p_base NUMERIC, p_modifiers JSONB, p_target TEXT,
+    p_min NUMERIC DEFAULT 0, p_max NUMERIC DEFAULT 1000000
+) RETURNS NUMERIC LANGUAGE sql IMMUTABLE SET search_path = '' AS $$
+    SELECT LEAST(p_max, GREATEST(p_min,
+        (p_base + COALESCE((p_modifiers#>>ARRAY[p_target,'add'])::NUMERIC, 0))
+        * COALESCE((p_modifiers#>>ARRAY[p_target,'multiplier'])::NUMERIC, 1)));
+$$;
+
+CREATE OR REPLACE FUNCTION public.fishing_weather_spawn_weight(p_weight NUMERIC, p_rarity TEXT, p_modifiers JSONB)
+RETURNS NUMERIC LANGUAGE sql IMMUTABLE SET search_path = '' AS $$
+    SELECT GREATEST(0, p_weight
+        + COALESCE((p_modifiers#>>'{spawn_add,add}')::NUMERIC, 0)
+        + COALESCE((p_modifiers#>>ARRAY['spawn_add_' || upper(p_rarity),'add'])::NUMERIC, 0))
+        * public.fishing_effective_stat(1, p_modifiers, 'spawn_multiplier')
+        * public.fishing_effective_stat(1, p_modifiers, 'spawn_multiplier_' || upper(p_rarity))
+        * CASE WHEN upper(p_rarity) IN ('RARE','EPIC','LEGENDARY')
+            THEN public.fishing_effective_stat(1, p_modifiers, 'rare_spawn') ELSE 1 END;
+$$;
+
+REVOKE ALL ON FUNCTION public.fishing_weather_modifiers(JSONB) FROM PUBLIC, anon, authenticated;
+REVOKE ALL ON FUNCTION public.fishing_effective_stat(NUMERIC, JSONB, TEXT, NUMERIC, NUMERIC) FROM PUBLIC, anon, authenticated;
+REVOKE ALL ON FUNCTION public.fishing_weather_spawn_weight(NUMERIC, TEXT, JSONB) FROM PUBLIC, anon, authenticated;
+
 CREATE OR REPLACE FUNCTION public.cast_rod(p_area_id UUID, p_cast_depth NUMERIC)
 RETURNS JSONB
 LANGUAGE plpgsql SECURITY DEFINER SET search_path = public
@@ -33,7 +131,7 @@ DECLARE
         "catch_probability": {"add": 0, "multiplier": 1}
     }'::JSONB;
 
-    -- BALANCE: independent of equipment values and external effect sources.
+    -- BALANCE defaults: selected weather adjustments are snapshotted below.
     v_balance JSONB := '{
         "matched_attraction": 1.8, "unmatched_attraction": 1,
         "matched_catch_factor": 1, "unmatched_catch_factor": 0.5,
@@ -77,6 +175,16 @@ DECLARE
     v_rare_spawn NUMERIC := 1;
     v_extreme_weight NUMERIC := 1;
     v_weather_id UUID;
+    v_weather_effects JSONB;
+    v_weather JSONB;
+    v_zone_id UUID;
+    v_weather_expires_at TIMESTAMPTZ;
+    v_alertness NUMERIC;
+    v_safe_min NUMERIC;
+    v_safe_max NUMERIC;
+    v_base_pull NUMERIC;
+    v_burst_min_ticks INTEGER;
+    v_burst_max_ticks INTEGER;
 BEGIN
     -- ================================================================
     -- A. Snapshot exactly one equipped item per slot.
@@ -94,11 +202,19 @@ BEGIN
     v_rare_spawn := public.fishing_fatigue_multiplier(v_presence->'effects', 'rare_spawn');
     -- Snapshot the actual server-owned weather at cast time. An expired or
     -- missing weather is neutral, never supplied by the client.
-    SELECT w.id, w.extreme_weight INTO v_weather_id, v_extreme_weight
+    SELECT w.id, w.extreme_weight, z.id, z.weather_expires_at, z.weather_active_modifiers
+    INTO v_weather_id, v_extreme_weight, v_zone_id, v_weather_expires_at, v_weather_effects
     FROM public.fishing_areas a JOIN public.zones z ON z.id = a.zone_id
     JOIN public.weathers w ON w.id = z.weather_id
     WHERE a.id = p_area_id AND z.weather_expires_at > clock_timestamp();
     v_extreme_weight := COALESCE(v_extreme_weight, 1);
+    v_weather := public.fishing_weather_modifiers(v_weather_effects);
+    v_modifiers := v_modifiers || (v_weather->'stats') || jsonb_build_object('_weather',
+        jsonb_build_object('weather_id', v_weather_id, 'zone_id', v_zone_id,
+            'expires_at', v_weather_expires_at, 'effects', COALESCE(v_weather_effects, '[]'::JSONB),
+            'applied', v_weather->'applied', 'ignored', v_weather->'ignored'));
+    v_extreme_weight := public.fishing_effective_stat(v_extreme_weight, v_modifiers, 'extreme_weight');
+    v_weight_cap := public.fishing_effective_stat(v_weight_cap, v_modifiers, 'weight_cap', 0, 1);
     IF p_cast_depth IS NULL OR p_cast_depth < 0
        OR p_cast_depth::TEXT IN ('NaN', 'Infinity', '-Infinity') THEN
         RAISE EXCEPTION 'Invalid cast depth';
@@ -192,8 +308,8 @@ BEGIN
     IF v_value < 1 OR trunc(v_value) <> v_value THEN RAISE EXCEPTION 'No usable bait remaining'; END IF;
 
     -- ================================================================
-    -- B. Resolve effective player stats once. INSERT FUTURE SERVER EFFECT
-    -- QUERIES HERE to aggregate v_modifiers before applying the formulas.
+    -- B. Weather has been normalized above; future server effects also compose
+    -- before resolving player stats. Equipment JSON never supplies modifiers.
     -- ================================================================
     v_effective := '{}'::JSONB;
     FOREACH v_stat IN ARRAY ARRAY['max_weight', 'pull_strength', 'durability', 'catch_rate', 'luck_bonus'] LOOP
@@ -207,6 +323,12 @@ BEGIN
             ELSE v_value END;
         v_effective := jsonb_set(v_effective, ARRAY[v_stat], to_jsonb(v_value));
     END LOOP;
+    FOREACH v_stat IN ARRAY ARRAY['matched_attraction','unmatched_attraction','matched_catch_factor','unmatched_catch_factor'] LOOP
+        v_balance := jsonb_set(v_balance, ARRAY[v_stat], to_jsonb(
+            public.fishing_effective_stat((v_balance->>v_stat)::NUMERIC, v_modifiers, v_stat)));
+    END LOOP;
+    v_balance := jsonb_set(v_balance, '{fight_seconds}', to_jsonb(
+        public.fishing_effective_stat((v_balance->>'fight_seconds')::NUMERIC, v_modifiers, 'fight_seconds', 1, 180)));
     v_hour := EXTRACT(HOUR FROM (NOW() AT TIME ZONE v_timezone));
     v_time_bucket := CASE WHEN v_hour BETWEEN 6 AND 18 THEN 'DAY' ELSE 'NIGHT' END;
 
@@ -254,7 +376,7 @@ BEGIN
           AND sa.weight_rate::TEXT NOT IN ('NaN', 'Infinity', '-Infinity')
     ), weighted_candidates AS (
         SELECT species_id,
-            GREATEST(0, weight_rate + spawn_add) * spawn_multiplier * depth_weight
+            public.fishing_weather_spawn_weight(GREATEST(0, weight_rate + spawn_add) * spawn_multiplier, rarity, v_modifiers) * depth_weight
             * CASE WHEN UPPER(rarity) IN ('RARE', 'EPIC', 'LEGENDARY') THEN v_rare_spawn ELSE 1 END
             * CASE WHEN v_bait_types ? fish_type
                 THEN (v_balance->>'matched_attraction')::NUMERIC
@@ -289,9 +411,19 @@ BEGIN
         IF v_burst_multiplier NOT BETWEEN 1 AND 10 THEN
             RAISE EXCEPTION 'Species burst_multiplier must be between 1 and 10';
         END IF;
-        v_weight_ratio := (random() + random() + random()) / 3.0 * v_weight_cap;
-        v_weight := LEAST(ROUND(v_species.weight_min + v_weight_ratio *
-            (v_species.weight_max - v_species.weight_min), 2),
+        v_burst_multiplier := public.fishing_effective_stat(v_burst_multiplier, v_modifiers, 'burst_multiplier', 1, 10);
+        v_alertness := public.fishing_effective_stat(v_species.alertness, v_modifiers, 'alertness', 0, 1);
+        v_weight_ratio := (random() + random() + random()) / 3.0;
+        -- Positive bias favors heavy fish without exceeding the effective cap.
+        v_value := public.fishing_effective_stat(1, v_modifiers, 'fish_weight_bias');
+        IF v_value = 0 THEN v_weight_ratio := 0;
+        ELSIF v_value <> 1 THEN
+            v_weight_ratio := v_weight_ratio * v_value / (1 - v_weight_ratio + v_weight_ratio * v_value);
+        END IF;
+        v_weight_ratio := v_weight_ratio * v_weight_cap;
+        v_weight := LEAST(ROUND(public.fishing_effective_stat(v_species.weight_min + v_weight_ratio *
+            (v_species.weight_max - v_species.weight_min), v_modifiers, 'fish_weight', v_species.weight_min,
+            v_species.weight_min + v_weight_cap * (v_species.weight_max - v_species.weight_min)), 2),
             v_species.weight_min + v_weight_cap * (v_species.weight_max - v_species.weight_min));
         v_weight_ratio := CASE WHEN v_species.weight_max = v_species.weight_min THEN 0.5
             ELSE LEAST(1, GREATEST(0, (v_weight - v_species.weight_min)
@@ -310,7 +442,7 @@ BEGIN
         -- Roll hooking ONCE. There is no second probability roll at submit.
         v_catch_probability := LEAST(1, GREATEST(0,
             (((v_species.base_catch_rate + (v_effective->>'catch_rate')::NUMERIC)
-                * v_bait_factor * (1 - v_species.alertness))
+                * v_bait_factor * (1 - v_alertness))
                 + (v_modifiers#>>'{catch_probability,add}')::NUMERIC)
             * (v_modifiers#>>'{catch_probability,multiplier}')::NUMERIC));
         IF random() >= v_catch_probability THEN v_failure_reason := 'HOOK_MISSED';
@@ -320,14 +452,15 @@ BEGIN
         v_fish_snapshot := jsonb_build_object('species_id', v_species_id,
             'weight', v_weight, 'weight_ratio', v_weight_ratio, 'base_strength', v_species.strength,
             'effective_strength', v_fish_strength, 'burst_multiplier', v_burst_multiplier,
-            'fish_type', v_species.fish_type, 'alertness', v_species.alertness,
+            'fish_type', v_species.fish_type, 'alertness', v_alertness, 'base_alertness', v_species.alertness,
             'base_catch_rate', v_species.base_catch_rate, 'bait_matches', v_bait_matches,
             'catch_probability', v_catch_probability,
             'scoring', jsonb_build_object(
                 'w_norm', v_weight_ratio, 'rare_weight', v_species.rare_weight,
                 'extreme_weight', v_extreme_weight, 'weather_id', v_weather_id,
                 'fatigue_score', v_presence->'fatigue_score',
-                'fatigue_multiplier', public.fishing_fatigue_multiplier(v_presence->'effects', 'score'),
+                'fatigue_multiplier', public.fishing_effective_stat(
+                    public.fishing_fatigue_multiplier(v_presence->'effects', 'score'), v_modifiers, 'fatigue_score'),
                 'fatigue_effects', v_presence->'effects',
                 'fish', jsonb_build_object('species_id', v_species_id, 'name', v_species.name,
                     'image', v_species.image, 'rarity', v_species.rarity, 'weight', v_weight)));
@@ -350,6 +483,9 @@ BEGIN
             ELSE NULL;
         END CASE;
     END IF;
+    v_start_distance := ROUND(public.fishing_effective_stat(v_start_distance, v_modifiers, 'start_distance', 0.0001, 1000), 4);
+    v_burst_chance := ROUND(public.fishing_effective_stat(v_burst_chance, v_modifiers, 'burst_chance', 0, 1), 4);
+    v_stamina_drain := ROUND(public.fishing_effective_stat(v_stamina_drain, v_modifiers, 'stamina_drain', 0, 1), 4);
 
     -- ================================================================
     -- E. All casts use tension, with no timing-bar data.
@@ -360,13 +496,23 @@ BEGIN
     -- Quantize emitted values to the replay's 1/10000 precision so decimal
     -- half-rounding cannot differ between JSON/JavaScript and PostgreSQL.
     v_max_tension := ROUND((v_effective->>'durability')::NUMERIC, 4);
-    v_reel_speed := ROUND(LEAST(1000, GREATEST(0.1,
-        (v_balance->>'base_reel_speed')::NUMERIC
-        * (1 + (v_effective->>'pull_strength')::NUMERIC / v_fish_strength))), 4);
-    v_wait_time := FLOOR((v_balance->>'wait_min_ms')::NUMERIC
-        + random() * (v_balance->>'wait_range_ms')::NUMERIC);
+    v_reel_speed := (v_balance->>'base_reel_speed')::NUMERIC
+        * (1 + (v_effective->>'pull_strength')::NUMERIC / v_fish_strength);
+    v_reel_speed := ROUND(public.fishing_effective_stat(v_reel_speed, v_modifiers, 'reel_speed', 0.1, 1000), 4);
+    v_wait_time := FLOOR(public.fishing_effective_stat(((v_balance->>'wait_min_ms')::NUMERIC
+        + random() * (v_balance->>'wait_range_ms')::NUMERIC)::NUMERIC, v_modifiers, 'wait_time', 100, 120000));
     v_bite_at := NOW() + v_wait_time * INTERVAL '1 millisecond';
-    v_expires_at := v_bite_at + (v_balance->>'fight_seconds')::INTEGER * INTERVAL '1 second';
+    v_expires_at := v_bite_at + (v_balance->>'fight_seconds')::NUMERIC * INTERVAL '1 second';
+    v_safe_min := ROUND(v_max_tension * public.fishing_effective_stat(
+        (v_balance->>'safe_min_ratio')::NUMERIC, v_modifiers, 'safe_min_ratio', 0.0001, 0.9998), 4);
+    v_safe_max := LEAST(v_max_tension - 0.0001, GREATEST(v_safe_min + 0.0001,
+        ROUND(v_max_tension * public.fishing_effective_stat(
+            (v_balance->>'safe_max_ratio')::NUMERIC, v_modifiers, 'safe_max_ratio', 0.0001, 0.9999), 4)));
+    v_base_pull := ROUND(public.fishing_effective_stat(0.8 * (v_balance->>'strength_reference')::NUMERIC,
+        v_modifiers, 'base_pull', 0, 1000), 4);
+    v_burst_min_ticks := ROUND(public.fishing_effective_stat(24, v_modifiers, 'burst_min_ticks', 1, 10800));
+    v_burst_max_ticks := GREATEST(v_burst_min_ticks,
+        ROUND(public.fishing_effective_stat(84, v_modifiers, 'burst_max_ticks', 1, 10800)));
     v_challenge := jsonb_build_object(
         'sessionId', v_session_id, 'type', 'tension-challenge', 'version', 1,
         'seed', 1 + FLOOR(random() * 2147483646)::BIGINT,
@@ -374,26 +520,34 @@ BEGIN
         'expiresAt', FLOOR(EXTRACT(EPOCH FROM v_expires_at) * 1000)::BIGINT,
         'config', jsonb_build_object(
             'tickRate', 60,
-            'safeMin', ROUND(v_max_tension * (v_balance->>'safe_min_ratio')::NUMERIC, 4),
-            'safeMax', ROUND(v_max_tension * (v_balance->>'safe_max_ratio')::NUMERIC, 4),
+            'safeMin', v_safe_min,
+            'safeMax', v_safe_max,
             'maxTension', v_max_tension,
-            'startTension', ROUND(v_max_tension * (v_balance->>'start_tension_ratio')::NUMERIC, 4),
+            'startTension', LEAST(v_max_tension - 0.0001, ROUND(v_max_tension * public.fishing_effective_stat(
+                (v_balance->>'start_tension_ratio')::NUMERIC, v_modifiers, 'start_tension_ratio', 0, 1), 4)),
             'startDistance', v_start_distance,
-            'reelRate', 24, 'releaseRate', -48, 'reelSpeed', v_reel_speed,
-            'slackEscapeSeconds', 2.5, 'slackThresholdRatio', 0.5,
-            'slackDistanceRate', 2, 'fishPullMultiplier', 1, 'minimumStrength', 0.4
+            'reelRate', ROUND(public.fishing_effective_stat(24, v_modifiers, 'reel_rate', 0.0001, 1000), 4),
+            'releaseRate', ROUND(public.fishing_effective_stat(-48, v_modifiers, 'release_rate', -1000, -0.0001), 4),
+            'reelSpeed', v_reel_speed,
+            'slackEscapeSeconds', ROUND(public.fishing_effective_stat(2.5, v_modifiers, 'slack_escape_seconds', 0.0001, 180), 4),
+            'slackThresholdRatio', ROUND(public.fishing_effective_stat(0.5, v_modifiers, 'slack_threshold_ratio', 0.0001, 1), 4),
+            'slackDistanceRate', ROUND(public.fishing_effective_stat(2, v_modifiers, 'slack_distance_rate', 0, 1000), 4),
+            'fishPullMultiplier', ROUND(public.fishing_effective_stat(1, v_modifiers, 'fish_pull_multiplier', 0, 10), 4),
+            'minimumStrength', ROUND(public.fishing_effective_stat(0.4, v_modifiers, 'minimum_strength', 0, 1), 4)
         ),
         'fish', jsonb_build_object(
             'id', COALESCE(v_species_id::TEXT, ''),
             'baseStrength', ROUND(v_fish_strength / (v_balance->>'strength_reference')::NUMERIC, 4),
             -- Full-stamina peak pull = effective_strength * burst_multiplier.
-            'basePull', 0.8 * (v_balance->>'strength_reference')::NUMERIC,
-            'pullAmplitude', 0.2 * (v_balance->>'strength_reference')::NUMERIC,
+            'basePull', v_base_pull,
+            'pullAmplitude', LEAST(v_base_pull, ROUND(public.fishing_effective_stat(
+                0.2 * (v_balance->>'strength_reference')::NUMERIC, v_modifiers, 'pull_amplitude', 0, 1000), 4)),
             'burstChance', v_burst_chance,
             'burstMin', ROUND(0.5 * (v_balance->>'strength_reference')::NUMERIC * (v_burst_multiplier - 1), 4),
             'burstMax', ROUND((v_balance->>'strength_reference')::NUMERIC * (v_burst_multiplier - 1), 4),
             'staminaDrain', v_stamina_drain,
-            'pullPeriodTicks', 126, 'burstMinTicks', 24, 'burstMaxTicks', 84
+            'pullPeriodTicks', ROUND(public.fishing_effective_stat(126, v_modifiers, 'pull_period_ticks', 4, 10800)),
+            'burstMinTicks', v_burst_min_ticks, 'burstMaxTicks', v_burst_max_ticks
         )
     );
 
@@ -425,3 +579,4 @@ END;
 $function$;
 REVOKE ALL ON FUNCTION public.cast_rod(UUID, NUMERIC) FROM PUBLIC, anon;
 GRANT EXECUTE ON FUNCTION public.cast_rod(UUID, NUMERIC) TO authenticated;
+COMMIT;

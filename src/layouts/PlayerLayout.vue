@@ -11,6 +11,7 @@ import { useRouter } from "vue-router";
 import { useCurrencyStore } from "../stores/player-currency-store.ts";
 import { useUserInAreaStore } from "../stores/player-user-In-area-store.ts";
 import TwoOptionsModal from "../components/shared/TwoOptionsModal.vue";
+import FishingSplashLoading from "../components/FishingSplashLoading.vue";
 import { useConfigStore } from "../stores/player-config-store.ts";
 import { useUserProfileStore } from "../stores/player-user-profile-store.ts";
 import { useFishingStore } from "../stores/player-fishing-store.ts";
@@ -93,12 +94,13 @@ watch(
 <template>
   <div>
     <router-view v-if="features.ready && sessionReady" />
+    <FishingSplashLoading v-else-if="!sessionReady && !sessionError" />
     <div
       v-else-if="!sessionReady"
       class="m-4 rounded-xl border border-border-default bg-surface p-4 text-content"
       role="status"
     >
-      {{ sessionError || tr("use_single_session.checking") }}
+      {{ sessionError }}
       <button v-if="sessionError" type="button" class="ml-2 underline" @click="retrySession">
         {{ tr("Maintenance.thu_lai") }}
       </button>

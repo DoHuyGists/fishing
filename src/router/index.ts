@@ -9,6 +9,10 @@ const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
   routes: [
     {
+      path: "/test",
+      component: () => import("../components/FishingSplashLoading.vue")
+    },
+    {
       path: "/story",
       name: "story",
       component: () => import("../views/StoryView.vue"),

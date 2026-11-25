@@ -3,6 +3,7 @@ import assert from 'node:assert/strict';
 import { readFile } from 'node:fs/promises';
 import { randomUUID } from 'node:crypto';
 import { PGlite } from '@electric-sql/pglite';
+import { isTensionChallenge, createTensionFight, stepTensionFight } from '../src/data/tensionChallenge.ts';
 
 const read = path => readFile(new URL(path, import.meta.url), 'utf8');
 
@@ -32,7 +33,7 @@ test('ranked fishing integrates server catches, fatigue, seasons, ties and perma
         total_caught BIGINT, best_fish JSONB, created_at TIMESTAMPTZ NOT NULL, updated_at TIMESTAMPTZ NOT NULL);
       CREATE TABLE public.countries(id UUID PRIMARY KEY,default_timezone TEXT);
       CREATE TABLE public.weathers(id UUID PRIMARY KEY);
-      CREATE TABLE public.zones(id UUID PRIMARY KEY,weather_id UUID,weather_expires_at TIMESTAMPTZ);
+      CREATE TABLE public.zones(id UUID PRIMARY KEY,weather_id UUID,weather_expires_at TIMESTAMPTZ,weather_active_modifiers JSONB DEFAULT '[]');
       CREATE TABLE public.fishing_areas(id UUID PRIMARY KEY,country_id UUID,timezone TEXT,zone_id UUID,is_available BOOLEAN DEFAULT TRUE);
       CREATE TABLE public.modifiers(id UUID PRIMARY KEY DEFAULT gen_random_uuid(),code TEXT UNIQUE,name TEXT,unit TEXT DEFAULT 'PERCENT');
       CREATE TABLE public.species(id UUID PRIMARY KEY,name TEXT,image TEXT,rarity TEXT,weight_min NUMERIC DEFAULT 1,weight_max NUMERIC DEFAULT 10,
@@ -92,7 +93,7 @@ test('ranked fishing integrates server catches, fatigue, seasons, ties and perma
     await db.query("SELECT set_config('test.uid',$1,false)", [uid]);
     await db.query("INSERT INTO countries VALUES($1,'Asia/Ho_Chi_Minh')", [country]);
     await db.query('INSERT INTO weathers VALUES($1,2)', [weather]);
-    await db.query("INSERT INTO zones VALUES($1,$2,clock_timestamp()+interval '1 hour')", [zone, weather]);
+    await db.query("INSERT INTO zones(id,weather_id,weather_expires_at) VALUES($1,$2,clock_timestamp()+interval '1 hour')", [zone, weather]);
     await db.query('INSERT INTO fishing_areas(id,country_id,zone_id) VALUES($1,$3,$4),($2,$3,$4)', [area, areaB, country, zone]);
     for (const [i, id] of species.entries()) {
       await db.query("INSERT INTO species(id,name,rarity,rare_weight) VALUES($1,$2,'RARE',3)", [id, `Cá ${i}`]);
@@ -113,7 +114,7 @@ test('ranked fishing integrates server catches, fatigue, seasons, ties and perma
       const response = await rpc('public.cast_rod($1,$2)', [area, depth]);
       assert.equal(Number(await scalar('SELECT count(*) FROM daily_mission_events')), eventsBefore + 1);
       assert.deepEqual((await query('SELECT user_id,event_type,value FROM daily_mission_events ORDER BY id DESC LIMIT 1'))[0], { user_id: uid, event_type: 'CAST_ROD', value: '1' });
-      return (await query('SELECT s.*,m.fish_snapshot FROM fishing_sessions s JOIN fishing_session_mechanics m ON m.session_id=s.id WHERE s.id=$1', [response.session_id]))[0];
+      return (await query('SELECT s.*,m.fish_snapshot,m.modifiers,m.equipment_snapshot,m.balance,m.failure_reason FROM fishing_sessions s JOIN fishing_session_mechanics m ON m.session_id=s.id WHERE s.id=$1', [response.session_id]))[0];
     };
     const resolve = async session => {
       await db.query("UPDATE fishing_sessions SET status='BITE',bite_at=clock_timestamp()-interval '1 second',expires_at=clock_timestamp()+interval '90 seconds' WHERE id=$1", [session.id]);
@@ -137,6 +138,161 @@ test('ranked fishing integrates server catches, fatigue, seasons, ties and perma
       assert.ok(Math.abs(scoreAfter - (scoreBefore + (result.success ? result.scoring?.score ?? 0 : 0))) < 1e-10);
       return result;
     };
+
+    const weatherEffect = (code, value, unit = 'PERCENT', extra = {}) => ({ code, value, unit, ...extra });
+    const setWeather = effects => db.query('UPDATE zones SET weather_active_modifiers=$1 WHERE id=$2', [JSON.stringify(effects), zone]);
+    const weatherTransaction = async run => {
+      await db.exec('BEGIN');
+      try { await run(); } finally { await db.exec('ROLLBACK'); }
+    };
+
+    await check('weather registry accepts all 42 catalog codes and safely rejects malformed data', () => weatherTransaction(async () => {
+      const codes = [
+        'MAX_WEIGHT','PULL_STRENGTH','DURABILITY','CATCH_RATE','LUCK_BONUS','FISH_STRENGTH','CATCH_PROBABILITY',
+        'SPAWN_ADD','SPAWN_MULTIPLIER','RARE_SPAWN','MATCHED_ATTRACTION','UNMATCHED_ATTRACTION',
+        'MATCHED_CATCH_FACTOR','UNMATCHED_CATCH_FACTOR','WEIGHT_CAP','FISH_WEIGHT_BIAS','FISH_WEIGHT','ALERTNESS',
+        'WAIT_TIME','REEL_SPEED','FIGHT_SECONDS','START_DISTANCE','BURST_CHANCE','BURST_MULTIPLIER','STAMINA_DRAIN',
+        'SAFE_MIN_RATIO','SAFE_MAX_RATIO','START_TENSION_RATIO','SLACK_ESCAPE_SECONDS','SLACK_DISTANCE_RATE',
+        'SLACK_THRESHOLD_RATIO','FISH_PULL_MULTIPLIER','REEL_RATE','RELEASE_RATE','PULL_PERIOD_TICKS',
+        'BURST_MIN_TICKS','BURST_MAX_TICKS','BASE_PULL','PULL_AMPLITUDE','MINIMUM_STRENGTH','EXTREME_WEIGHT','FATIGUE_SCORE',
+      ];
+      assert.equal(codes.length, 42);
+      const effects = codes.map(code => weatherEffect(code, 10, ['SPAWN_ADD','LUCK_BONUS'].includes(code) ? 'POINT' : 'PERCENT'));
+      const normalized = await rpc('fishing_weather_modifiers($1)', [effects]);
+      assert.equal(normalized.applied.length, 42);
+      assert.deepEqual(normalized.ignored, []);
+      const mixed = await rpc('fishing_weather_modifiers($1)', [[weatherEffect('LUCK_BONUS', 2, 'POINT'),
+        weatherEffect('LUCK_BONUS', 50), weatherEffect('LUCK_DOWN', -1, 'POINT')]]);
+      assert.equal(Number(await rpc("fishing_effective_stat(0,$1,'luck_bonus')", [mixed.stats])), 1.5);
+      assert.equal(Number(await rpc("fishing_weather_spawn_weight(10,NULL,'{}')")), 10);
+      const invalid = [null, 123, {}, weatherEffect('UNKNOWN', 1), weatherEffect('MAX_WEIGHT', '10'),
+        weatherEffect('MAX_WEIGHT', 1, 'KG'), weatherEffect('MAX_WEIGHT', 1, 'POINT'),
+        weatherEffect('SPAWN_ADD', 1), weatherEffect('LUCK_BONUS', 1000001, 'POINT'),
+        weatherEffect('SPAWN_MULTIPLIER', 10, 'PERCENT', { rarity: 'INVALID' })];
+      const bad = await rpc('fishing_weather_modifiers($1)', [JSON.stringify(invalid)]);
+      assert.deepEqual(bad.stats, {});
+      assert.equal(bad.ignored.length, invalid.length);
+      for (const value of [null, {}, 'invalid']) {
+        await setWeather(value);
+        assert.equal((await cast()).equipment_snapshot.effective.max_weight, 100);
+      }
+      await setWeather(invalid);
+      assert.equal((await cast()).modifiers._weather.ignored.length, invalid.length);
+    }));
+
+    await check('weather uses the current area zone, relative percentages, luck points and immutable snapshots', () => weatherTransaction(async () => {
+      await rpc("start_fishing_seasons(clock_timestamp()-interval '1 day')");
+      const effects = [weatherEffect('MAX_WEIGHT', 20), weatherEffect('MAX_WEIGHT', -10),
+        weatherEffect('PULL_STRENGTH', 50), weatherEffect('DURABILITY', 50),
+        weatherEffect('LUCK_BONUS', 50, 'POINT'), weatherEffect('FISHING_SPEED_DOWN', 18.46),
+        weatherEffect('EXTREME_WEIGHT', 50), weatherEffect('FATIGUE_SCORE', -20)];
+      await setWeather(effects);
+      const session = await cast();
+      const effective = session.equipment_snapshot.effective;
+      assert.equal(effective.max_weight, 108);
+      assert.equal(effective.pull_strength, 150);
+      assert.equal(effective.durability, 150);
+      assert.equal(effective.luck_bonus, 50);
+      assert.equal(session.is_shiny, true);
+      assert.equal(session.fish_snapshot.scoring.extreme_weight, 3);
+      assert.equal(session.fish_snapshot.scoring.fatigue_multiplier, 0.8);
+      assert.equal(session.modifiers._weather.zone_id, zone);
+      assert.deepEqual(session.modifiers._weather.effects, effects);
+      const baseSpeed = 2 * (1 + 150 / session.fish_snapshot.effective_strength);
+      assert.equal(session.challenge_data.config.reelSpeed, Math.round(baseSpeed * 0.8154 * 10000) / 10000);
+      assert.equal(session.challenge_data._weather, undefined);
+
+      await setWeather([]);
+      const saved = await scalar('SELECT modifiers FROM fishing_session_mechanics WHERE session_id=$1', [session.id]);
+      assert.deepEqual(saved, session.modifiers);
+      const outcome = await resolve(session);
+      assert.equal(outcome.scoring.factors.extreme_weight, 3);
+      assert.equal(outcome.scoring.factors.fatigue_multiplier, 0.8);
+
+      const otherZone = randomUUID();
+      await db.query('INSERT INTO zones(id,weather_id,weather_expires_at,weather_active_modifiers) VALUES($1,$2,clock_timestamp()+interval \'1 hour\',$3)',
+        [otherZone, weather, [weatherEffect('MAX_WEIGHT', -50)]]);
+      await db.query('UPDATE fishing_areas SET zone_id=$1 WHERE id=$2', [otherZone, area]);
+      assert.equal((await cast()).equipment_snapshot.effective.max_weight, 50);
+      await db.query("UPDATE zones SET weather_expires_at=clock_timestamp()-interval '1 second' WHERE id=$1", [otherZone]);
+      const expired = await cast();
+      assert.equal(expired.equipment_snapshot.effective.max_weight, 100);
+      assert.equal(expired.fish_snapshot.scoring.extreme_weight, 1);
+      assert.deepEqual(expired.modifiers._weather.applied, []);
+      await db.query('UPDATE fishing_areas SET zone_id=NULL WHERE id=$1', [area]);
+      assert.equal((await cast()).equipment_snapshot.effective.max_weight, 100);
+    }));
+
+    await check('weather changes fish weight before strength, rod checks and hook rolls', () => weatherTransaction(async () => {
+      const seededCast = async effects => {
+        await setWeather(effects); await db.exec('SELECT setseed(0.42)'); return cast();
+      };
+      const neutral = await seededCast([]);
+      const heavy = await seededCast([weatherEffect('FISH_WEIGHT_BIAS', 100)]);
+      assert.ok(heavy.fish_snapshot.weight > neutral.fish_snapshot.weight);
+      assert.ok(heavy.fish_snapshot.effective_strength > neutral.fish_snapshot.effective_strength);
+      const capped = await seededCast([weatherEffect('WEIGHT_CAP', -50), weatherEffect('FISH_WEIGHT', 1000000)]);
+      assert.ok(capped.fish_snapshot.weight <= 5.5);
+      assert.ok(capped.fish_snapshot.weight_ratio <= 0.5);
+      const light = await seededCast([weatherEffect('FISH_WEIGHT_DOWN', 100)]);
+      assert.equal(light.fish_snapshot.weight, 1);
+      const overweight = await seededCast([weatherEffect('MAX_WEIGHT', -100)]);
+      assert.equal(overweight.failure_reason, 'ROD_OVERWEIGHT');
+      assert.equal(overweight.species_id, null);
+      const missed = await seededCast([weatherEffect('CATCH_PROBABILITY', -100)]);
+      assert.equal(missed.failure_reason, 'HOOK_MISSED');
+      await db.query('UPDATE species SET alertness=0.2,base_catch_rate=0.2 WHERE id=$1', [species[0]]);
+      await db.query("UPDATE user_inventory SET data=jsonb_set(data,'{catch_rate}','0.2') WHERE id=$1", [slots.hook[0].inventory_id]);
+      const hooked = await seededCast([weatherEffect('CATCH_RATE', 50), weatherEffect('ALERTNESS', 50),
+        weatherEffect('MATCHED_CATCH_FACTOR', 20), weatherEffect('CATCH_PROBABILITY', 10)]);
+      assert.ok(Math.abs(hooked.fish_snapshot.catch_probability - (0.2 + 0.3) * 0.7 * 1.2 * 1.1) < 1e-12);
+    }));
+
+    await check('weather rarity scopes affect actual encounters and preview weights, preserving zero-weight exclusions', () => weatherTransaction(async () => {
+      const effects = [weatherEffect('EPIC_CATCH_RATE', 18.82), weatherEffect('SPAWN_ADD', 2, 'POINT', { rarity: 'EPIC' }),
+        weatherEffect('RARE_SPAWN', -50)];
+      const normalized = await rpc('fishing_weather_modifiers($1)', [effects]);
+      assert.ok(Math.abs(Number(await rpc('fishing_weather_spawn_weight(10,\'EPIC\',$1)', [normalized.stats])) - 7.1292) < 1e-12);
+      assert.equal(Number(await rpc('fishing_weather_spawn_weight(10,\'COMMON\',$1)', [normalized.stats])), 10);
+      await db.query("UPDATE species SET rarity='EPIC' WHERE id=$1", [species[0]]);
+      await setWeather([weatherEffect('SPAWN_MULTIPLIER', -100, 'PERCENT', { rarity: 'EPIC' })]);
+      assert.equal((await cast()).failure_reason, 'NO_FISH');
+      await setWeather([weatherEffect('SPAWN_ADD', 1000, 'POINT', { rarity: 'LEGENDARY' })]);
+      // Weather cannot enable species with weight_rate=0.
+      assert.equal((await cast()).fish_snapshot.species_id, species[0]);
+      await db.exec('ALTER TABLE species ADD COLUMN information TEXT; CREATE TABLE caught_diary(user_id UUID,species_id UUID);');
+      await db.exec(await read('./supabase/rpc/fishing/preview_fish_by_depth.sql'));
+      await db.query("UPDATE species SET rarity='COMMON' WHERE id=$1", [species[0]]);
+      await db.query("UPDATE species SET rarity='EPIC' WHERE id=$1", [species[1]]);
+      await db.query('UPDATE species_in_area SET weight_rate=1 WHERE species_id=$1', [species[1]]);
+      await setWeather([weatherEffect('EPIC_CATCH_RATE', 100)]);
+      const preview = await rpc('preview_fish_by_depth(10)');
+      const epic = preview.fishes.find(fish => fish.species_id === species[1]);
+      assert.equal(epic.spawn_weight, 2);
+      assert.equal(epic.spawn_chance, 66.67);
+      await setWeather([weatherEffect('EPIC_CATCH_RATE', -100)]);
+      assert.equal((await rpc('preview_fish_by_depth(10)')).total_species, 1);
+    }));
+
+    await check('extreme weather keeps challenges valid and JavaScript/SQL replay identical', () => weatherTransaction(async () => {
+      const sql = await read('./supabase/rpc/fishing/submit_tension_challenge.sql');
+      await db.exec(sql.match(/CREATE OR REPLACE FUNCTION public\.replay_tension_challenge[\s\S]*?\$function\$;/)[0]);
+      const codes = ['MAX_WEIGHT','PULL_STRENGTH','DURABILITY','FISH_STRENGTH','REEL_SPEED','WAIT_TIME','FIGHT_SECONDS',
+        'START_DISTANCE','BURST_CHANCE','BURST_MULTIPLIER','STAMINA_DRAIN','SAFE_MIN_RATIO','SAFE_MAX_RATIO',
+        'START_TENSION_RATIO','SLACK_ESCAPE_SECONDS','SLACK_DISTANCE_RATE','SLACK_THRESHOLD_RATIO','FISH_PULL_MULTIPLIER',
+        'REEL_RATE','RELEASE_RATE','PULL_PERIOD_TICKS','BURST_MIN_TICKS','BURST_MAX_TICKS','BASE_PULL','PULL_AMPLITUDE','MINIMUM_STRENGTH'];
+      const inputs = [{ tick: 0, reeling: true }];
+      for (const amount of [-1000, -100, 50, 1000000]) {
+        await setWeather(codes.map(code => weatherEffect(code, amount)));
+        const session = await cast(), challenge = session.challenge_data;
+        assert.equal(isTensionChallenge(challenge), true, `Invalid challenge for ${amount}%: ${JSON.stringify(challenge)}`);
+        const fight = createTensionFight(challenge);
+        while (fight.result === 'fighting') stepTensionFight(challenge, fight, true);
+        const replay = await rpc('replay_tension_challenge($1,$2,$3)', [challenge, inputs, fight.tick]);
+        assert.equal(replay.result, fight.result);
+        for (const key of ['tension','distance','stamina','rng']) assert.equal(replay[key], fight[key]);
+      }
+    }));
 
     await check('area depth tool gates depth scopes while disabled casts follow relative spawn weights', async () => {
       const scope = randomUUID();
@@ -207,6 +363,9 @@ test('ranked fishing integrates server catches, fatigue, seasons, ties and perma
       await db.exec('SET ROLE authenticated');
       assert.ok((await rpc('cast_rod($1,10)', [area])).session_id);
       await assert.rejects(rpc("fishing_fatigue_multiplier('[]','score')"), /permission denied/);
+      await assert.rejects(rpc("fishing_weather_modifiers('[]')"), /permission denied/);
+      await assert.rejects(rpc("fishing_effective_stat(1,'{}','max_weight')"), /permission denied/);
+      await assert.rejects(rpc("fishing_weather_spawn_weight(1,'RARE','{}')"), /permission denied/);
       await db.exec(`
         RESET ROLE;
         CREATE ROLE legacy_fishing_owner;
