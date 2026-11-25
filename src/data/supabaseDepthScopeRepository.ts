@@ -1,6 +1,7 @@
 import type { DepthScopeRow, DepthScopePayload } from "../types/table/depthScope";
 import supabase from "../database/connection";
 import { fetchAdminListPage } from './supabaseAdminListRepository';
+import { readCatalogPages } from './readCatalogPages';
 
 function mapRow(row: any): DepthScopeRow {
   return {
@@ -22,9 +23,9 @@ class SupabaseDepthScopeRepository {
     return { ...result, items: result.items.map(mapRow) };
   }
   async fetchAll(): Promise<DepthScopeRow[]> {
-    const { data, error } = await supabase.from("depth_scope").select("*").order("code", { ascending: true });
-    if (error) throw new Error(error.message);
-    return (data ?? []).map(mapRow);
+    const data = await readCatalogPages((from, to) => supabase.from("depth_scope").select("*")
+      .order("code", { ascending: true }).order("id").range(from, to));
+    return data.map(mapRow);
   }
 
   async create(payload: DepthScopePayload): Promise<DepthScopeRow> {

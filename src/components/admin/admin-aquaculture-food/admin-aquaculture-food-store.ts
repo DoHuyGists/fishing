@@ -34,9 +34,9 @@ export const useAdminAquacultureFoodStore = defineStore("AdminAquacultureFood", 
       try {
         const [result, species, rules, items] = await Promise.all([
           repository.fetchPage(page, this.search),
-          this.species.length ? Promise.resolve(this.species) : supabaseSpeciesRepository.fetchAll(),
-          this.rules.length ? Promise.resolve(this.rules) : supabaseAquacultureRulesAdminRepository.fetchAll(),
-          this.sourceItems.length ? Promise.resolve(this.sourceItems) : supabaseItemRepository.fetchAll(),
+          supabaseSpeciesRepository.fetchAll(),
+          supabaseAquacultureRulesAdminRepository.fetchAll(),
+          supabaseItemRepository.fetchAll(),
         ]);
         if (request !== this.requestId) return;
         this.items = result.items;

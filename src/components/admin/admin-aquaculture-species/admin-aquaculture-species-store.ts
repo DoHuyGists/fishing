@@ -25,7 +25,7 @@ export const useAdminAquacultureSpeciesStore = defineStore('AdminAquacultureSpec
       const request = ++this.requestId;
       this.loading = true; this.error = ''
       try {
-        const [result, species] = await Promise.all([repository.fetchPage(page, this.search), this.species.length ? Promise.resolve(this.species) : supabaseSpeciesRepository.fetchAll()]);
+        const [result, species] = await Promise.all([repository.fetchPage(page, this.search), supabaseSpeciesRepository.fetchAll()]);
         if (request !== this.requestId) return;
         this.items = result.items; this.species = species; this.total = result.total; this.page = page;
         if (!result.items.length && page > 1) await this.fetchAll(Math.max(1, Math.ceil(result.total / this.pageSize)));

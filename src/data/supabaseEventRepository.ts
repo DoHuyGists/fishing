@@ -1,15 +1,15 @@
 import type { EventRow, EventPayload } from "../types/table/event";
 import supabase from "../database/connection";
 import { fetchAdminListPage } from './supabaseAdminListRepository';
+import { readCatalogPages } from './readCatalogPages';
 
 class SupabaseEventRepository {
   fetchPage(page: number, search: string, status: string) {
     return fetchAdminListPage<EventRow>('event', page, search, status === 'ALL' ? {} : { is_disabled: status === 'DISABLED' });
   }
   async fetchAll(): Promise<EventRow[]> {
-    const { data, error } = await supabase.from("event").select("*").order("created_at", { ascending: false });
-    if (error) throw new Error(error.message);
-    return (data ?? []) as EventRow[];
+    return readCatalogPages<EventRow>((from, to) => supabase.from("event").select("*")
+      .order("created_at", { ascending: false }).order("id").range(from, to));
   }
 
   async create(payload: EventPayload): Promise<EventRow> {

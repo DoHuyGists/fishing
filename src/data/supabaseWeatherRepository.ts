@@ -2,6 +2,7 @@ import type { CrudRepository } from "../types/model/weather";
 import type { ModifierRow, ModifierPayload, WeatherRow, WeatherPayload, ZoneRow, ZonePayload, ZoneWeatherRow, ZoneWeatherPayload, WeatherModifierRow, WeatherModifierPayload } from "../types/table/weather";
 import supabase from "../database/connection";
 import { fetchAdminListPage } from './supabaseAdminListRepository';
+import { readCatalogPages } from './readCatalogPages';
 
 function createRepository<Row extends { id: string }, Payload>(
   table: string,
@@ -15,9 +16,9 @@ function createRepository<Row extends { id: string }, Payload>(
       return { ...result, items: result.items.map(mapRow) };
     },
     async fetchAll() {
-      const { data, error } = await supabase.from(table).select("*").order(orderBy, { ascending: true });
-      if (error) throw new Error(error.message);
-      return (data ?? []).map(mapRow);
+      const data = await readCatalogPages((from, to) => supabase.from(table).select("*")
+        .order(orderBy, { ascending: true }).order("id").range(from, to));
+      return data.map(mapRow);
     },
     async create(payload) {
       const { data, error } = await supabase.from(table).insert(toDb(payload)).select("*").single();

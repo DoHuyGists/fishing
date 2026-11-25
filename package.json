@@ -4,6 +4,8 @@
   "version": "0.0.0",
   "type": "module",
   "scripts": {
+    "test:admin": "node --test scripts/test-admin-regressions.mjs",
+    "test:admin:browser": "node scripts/test-admin-state-browser.mjs",
     "export:home-assets": "node scripts/export-home-assets.mjs",
     "test:home:browser": "node scripts/test-home-browser.mjs",
     "test:responsive:browser": "node scripts/test-responsive-browser.mjs",

@@ -2,7 +2,8 @@
 import type { ErrorFeedbackStatus } from "../../../types/model/feedback.ts";
 import AdminModal from "../AdminModal.vue";
 import Pagination from "../../shared/Pagination.vue";
-import { onMounted, ref, watch } from "vue";
+import { onMounted, onUnmounted, ref } from "vue";
+import { startVisibleRefresh } from "../../../utils/visibleRefresh";
 
 import { useErrorFeedbackManagementStore } from "./admin-error-feedback-store.ts";
 
@@ -15,17 +16,18 @@ const statuses: { value: ErrorFeedbackStatus; label: string }[] = [
   { value: "resolved", label: "Đã giải quyết" },
   { value: "closed", label: "Đã đóng" },
 ];
-onMounted(() => store.fetchErrorFeedback());
+const attachmentPaths = () => store.errorFeedback.flatMap(item => item.attachments ?? []).map(file => file.path);
+let stopAttachmentRefresh: (() => void) | undefined;
+onMounted(() => {
+  void store.fetchErrorFeedback();
+  stopAttachmentRefresh = startVisibleRefresh(() => store.fetchAttachmentUrls(attachmentPaths()), 60_000, false);
+});
+onUnmounted(() => stopAttachmentRefresh?.());
 
-watch(
-  () =>
-    store.errorFeedback
-      .flatMap((item) => item.attachments ?? [])
-      .map((file) => file.path)
-      .join("|"),
-  () =>
-    store.fetchAttachmentUrls(store.errorFeedback.flatMap((item) => item.attachments ?? []).map((file) => file.path)),
-);
+function toggleAttachments(id: string) {
+  expandedAttachments.value[id] = !expandedAttachments.value[id];
+  if (expandedAttachments.value[id]) void store.fetchAttachmentUrls(attachmentPaths());
+}
 
 function formatDate(value: string) {
   return new Date(value).toLocaleString("vi-VN");
@@ -59,6 +61,7 @@ function attachmentUrl(path: string) {
       >
         Không thể tạo signed URL cho tệp đính kèm. Kiểm tra quyền đọc Storage của tài khoản admin:
         {{ store.attachmentError }}
+        <button type="button" :disabled="store.loadingAttachments" class="ml-2 underline disabled:opacity-50" @click="store.fetchAttachmentUrls(attachmentPaths(), true)">Thử lại</button>
       </div>
       <div v-else-if="store.loadingAttachments" class="mb-4 text-sm text-content">
         Đang tạo liên kết an toàn cho tệp đính kèm…
@@ -105,7 +108,7 @@ function attachmentUrl(path: string) {
               class="flex w-full items-center justify-between gap-3 px-4 py-3 text-left text-sm font-semibold text-content hover:bg-white"
               :aria-expanded="!!expandedAttachments[item.id]"
               :aria-controls="`attachments-${item.id}`"
-              @click="expandedAttachments[item.id] = !expandedAttachments[item.id]"
+              @click="toggleAttachments(item.id)"
             >
               <span>Tệp đính kèm ({{ item.attachments.length }})</span>
               <svg

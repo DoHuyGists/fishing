@@ -1,5 +1,6 @@
 import type { SpeciesRow, SpeciesPayload } from "../types/table/species";
 import supabase from "../database/connection";
+import { readCatalogPages } from './readCatalogPages';
 import { fetchAdminListPage } from './supabaseAdminListRepository';
 
 class SupabaseSpeciesRepository {
@@ -15,9 +16,8 @@ class SupabaseSpeciesRepository {
     });
   }
   async fetchAll(): Promise<SpeciesRow[]> {
-    const { data, error } = await supabase.from("species").select("*").order("name", { ascending: true });
-    if (error) throw new Error(error.message);
-    return (data ?? []) as SpeciesRow[];
+    return readCatalogPages<SpeciesRow>((from, to) => supabase.from("species").select("*")
+      .order("name", { ascending: true }).order("id").range(from, to));
   }
 
   async create(payload: SpeciesPayload): Promise<SpeciesRow> {

@@ -1,6 +1,7 @@
 import type { AquacultureRuleRow, AquacultureRulePayload, AquacultureFoodPayload, AquacultureFoodRow } from "../types/table/aquacultureAdmin";
 import supabase from '../database/connection'
 import { fetchAdminListPage } from './supabaseAdminListRepository';
+import { readCatalogPages } from './readCatalogPages';
 
 const ruleRow = (r: any): AquacultureRuleRow => ({ ...r, id: r.species_id })
 const foodRow = (r: any): AquacultureFoodRow => ({ ...r, id: r.species_id + ':' + r.item_id })
@@ -11,9 +12,9 @@ export const supabaseAquacultureRulesAdminRepository = {
     return { ...result, items: result.items.map(ruleRow) };
   },
   async fetchAll(): Promise<AquacultureRuleRow[]> {
-    const { data, error } = await supabase.from('aquaculture_species_rules').select('*').order('species_id')
-    if (error) throw new Error(error.message)
-    return (data ?? []).map(ruleRow)
+    const data = await readCatalogPages((from, to) => supabase.from('aquaculture_species_rules').select('*')
+      .order('species_id').range(from, to))
+    return data.map(ruleRow)
   },
   async create(payload: AquacultureRulePayload): Promise<AquacultureRuleRow> {
     const { data, error } = await supabase.from('aquaculture_species_rules').insert(payload).select('*').single()

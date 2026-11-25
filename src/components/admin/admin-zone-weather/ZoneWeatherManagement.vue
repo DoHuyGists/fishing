@@ -36,7 +36,7 @@ const fields = computed<CrudField[]>(() => [
     required: true,
     options: weatherStore.options.map((w) => ({ value: w.id, label: `${w.name} (${w.code})` })),
   },
-  { key: "weightModifier", label: "Hệ số trọng số", type: "number" },
+  { key: "weightModifier", label: "Hệ số trọng số", type: "number", min: 0 },
 ]);
 
 const save = (payload: any, id: string | null) => (id ? store.update(id, payload) : store.create(payload));
@@ -50,6 +50,7 @@ const save = (payload: any, id: string | null) => (id ? store.update(id, payload
     :fields="fields"
     :items="store.items"
     :page="store.page"
+    :search="store.search"
     :page-size="store.pageSize"
     :total="store.total"
     @page="store.fetchAll"

@@ -91,6 +91,7 @@ const fields: CrudField[] = [
     :fields="fields"
     :items="store.items"
     :page="store.page"
+    :search="store.search"
     :page-size="store.pageSize"
     :total="store.total"
     :loading="store.loading"

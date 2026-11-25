@@ -174,7 +174,7 @@ watch(
 onMounted(() => {
   worldStore.showAnchorSelectButton = true;
   countryStore.fetchCountries();
-  if (!zoneStore.options.length) void zoneStore.fetchOptions();
+  void zoneStore.fetchOptions();
 });
 
 onUnmounted(() => {

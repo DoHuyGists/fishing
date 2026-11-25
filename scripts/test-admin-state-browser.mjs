@@ -38,22 +38,27 @@ const server = await createServer({
         import { useAuthStore } from '/src/stores/auth.ts';
         import { useReadCacheStore } from '/src/stores/player-read-cache.ts';
         import { supabaseUserProfileRepository } from '/src/data/supabaseUserProfileRepository.ts';
-        import { supabaseZoneRepository, supabaseWeatherRepository } from '/src/data/supabaseWeatherRepository.ts';
+        import { supabaseZoneRepository, supabaseWeatherRepository, supabaseModifierRepository, supabaseWeatherModifierRepository } from '/src/data/supabaseWeatherRepository.ts';
         import supabase from '/src/database/connection.ts';
         import { i18n } from '/src/i18n/index.ts';
         import '/src/styles/index.css';
         const pinia = createPinia(), auth = useAuthStore(pinia);
         const session = { user: { id: 'admin-owner' }, access_token: 'test-token' };
-        let authChange, settleRole, zoneReads = 0;
+        let authChange, settleRole, zoneReads = 0, zoneSearch = '', weatherWrites = 0, modifierWrites = 0;
         supabase.auth.onAuthStateChange = callback => { authChange = callback; return { data: { subscription: { unsubscribe() {} } } }; };
         supabase.auth.getSession = async () => ({ data: { session }, error: null });
         useReadCacheStore(pinia).invalidate = async () => {};
         supabaseUserProfileRepository.fetchUserProfile = () => new Promise((resolve, reject) => { settleRole = { resolve, reject }; });
-        supabaseZoneRepository.fetchPage = async () => {
+        supabaseZoneRepository.fetchPage = async (_page, search) => {
           zoneReads++;
+          zoneSearch = search;
           return { items: [{ id: 'zone', code: 'original', name: 'Original zone' }], total: 1 };
         };
-        supabaseWeatherRepository.fetchAll = async () => [];
+        supabaseWeatherRepository.fetchAll = async () => [{ id: 'weather', code: 'sun', name: 'Sun' }];
+        supabaseModifierRepository.fetchAll = async () => [{ id: 'modifier', code: 'strength', name: 'Strength' }];
+        supabaseWeatherRepository.fetchPage = supabaseWeatherModifierRepository.fetchPage = async () => ({ items: [], total: 0 });
+        supabaseWeatherRepository.create = async payload => { weatherWrites++; return { id: 'weather', ...payload }; };
+        supabaseWeatherModifierRepository.create = async payload => { modifierWrites++; return { id: 'weather-modifier', ...payload }; };
         const router = createRouter({ history: createMemoryHistory(), routes: [
           { path: '/', redirect: '/admin' },
           { path: '/admin', component: AdminLayout, children: [{ path: '', component: AdminView }] },
@@ -63,7 +68,8 @@ const server = await createServer({
         await router.push('/admin'); await router.isReady();
         void auth.initialize(); app.mount('#app');
         window.adminTest = {
-          auth, get zoneReads() { return zoneReads; },
+          auth, get zoneReads() { return zoneReads; }, get zoneSearch() { return zoneSearch; },
+          get weatherWrites() { return weatherWrites; }, get modifierWrites() { return modifierWrites; },
           get rolePending() { return Boolean(settleRole); },
           refresh: () => authChange('TOKEN_REFRESHED', session),
           resolveRole(isAdmin) { const pending = settleRole; settleRole = null; pending.resolve({ id: session.user.id, is_admin: isAdmin }); },
@@ -96,6 +102,7 @@ try {
   async function openDraft() {
     await page.locator('aside').getByRole('button', { name: 'Vùng', exact: true }).click();
     await dialog.waitFor();
+    assert.equal(await dialog.getByRole('button', { name: 'Xoá', exact: true }).count(), 1, 'CRUD deletion is available unless explicitly disabled');
     await dialog.getByRole('button', { name: 'Sửa', exact: true }).click();
     await dialog.getByLabel(/^Mã/).fill('unsaved-zone');
     await dialog.getByLabel(/^Tên/).fill('Vùng đang soạn');
@@ -141,6 +148,54 @@ try {
   await page.evaluate(() => adminTest.resolveRole(true));
   await page.locator('aside').waitFor();
   await openDraft();
+  await dialog.getByRole('button', { name: 'Huỷ', exact: true }).click();
+  await dialog.getByPlaceholder('Tìm kiếm...').fill('Original');
+  await page.waitForFunction(() => adminTest.zoneSearch === 'Original');
+  await dialog.getByRole('button', { name: 'Đóng', exact: true }).click();
+  await page.locator('aside').getByRole('button', { name: 'Vùng', exact: true }).click();
+  await dialog.waitFor();
+  assert.equal(await dialog.getByPlaceholder('Tìm kiếm...').inputValue(), 'Original', 'Reopened search must match the active repository filter');
+  await dialog.getByPlaceholder('Tìm kiếm...').fill('');
+  await page.waitForFunction(() => adminTest.zoneSearch === '');
+  await dialog.getByRole('button', { name: 'Đóng', exact: true }).click();
+
+  await page.locator('aside').getByRole('button', { name: 'Thời tiết', exact: true }).click();
+  const weatherDialog = page.getByRole('dialog', { name: 'Quản lý thời tiết', exact: true });
+  await weatherDialog.getByRole('button', { name: '+ Thêm mới', exact: true }).click();
+  await weatherDialog.getByLabel(/^Mã/).fill('sun');
+  await weatherDialog.getByLabel(/^Tên/).fill('Sun');
+  await weatherDialog.getByLabel(/^Độ hiếm/).fill('COMMON');
+  await weatherDialog.getByLabel(/^Thời lượng tối thiểu/).fill('-1');
+  await weatherDialog.getByLabel(/^Thời lượng tối đa/).fill('5');
+  // Dispatch directly so application validation is tested independently of HTML min/max.
+  await weatherDialog.locator('form').dispatchEvent('submit');
+  await weatherDialog.getByText('"Thời lượng tối thiểu (phút)" nằm ngoài phạm vi hợp lệ', { exact: true }).waitFor();
+  assert.equal(await page.evaluate(() => adminTest.weatherWrites), 0);
+  await weatherDialog.getByLabel(/^Thời lượng tối thiểu/).fill('1');
+  await weatherDialog.getByRole('button', { name: 'Lưu', exact: true }).click();
+  await page.waitForFunction(() => adminTest.weatherWrites === 1);
+  await weatherDialog.locator('form').waitFor({ state: 'detached' });
+  await weatherDialog.getByRole('button', { name: 'Đóng', exact: true }).click();
+
+  await page.locator('aside').getByRole('button', { name: 'Chỉ số theo thời tiết', exact: true }).click();
+  const modifierDialog = page.getByRole('dialog', { name: 'Chỉ số theo thời tiết', exact: true });
+  await modifierDialog.getByRole('button', { name: '+ Thêm mới', exact: true }).click();
+  await modifierDialog.getByLabel(/^Thời tiết/).selectOption('weather');
+  await modifierDialog.getByLabel(/^Chỉ số/).selectOption('modifier');
+  await modifierDialog.getByLabel(/^Giá trị nhỏ nhất/).fill('0');
+  await modifierDialog.getByLabel(/^Giá trị lớn nhất/).fill('1');
+  for (const chance of ['-0.1', '1.1']) {
+    await modifierDialog.getByLabel(/^Tỷ lệ cơ bản/).fill(chance);
+    await modifierDialog.locator('form').dispatchEvent('submit');
+    await modifierDialog.getByText('"Tỷ lệ cơ bản (0-1)" nằm ngoài phạm vi hợp lệ', { exact: true }).waitFor();
+    assert.equal(await page.evaluate(() => adminTest.modifierWrites), 0);
+  }
+  await modifierDialog.getByLabel(/^Tỷ lệ cơ bản/).fill('1');
+  await modifierDialog.getByRole('button', { name: 'Lưu', exact: true }).click();
+  await page.waitForFunction(() => adminTest.modifierWrites === 1);
+  await modifierDialog.locator('form').waitFor({ state: 'detached' });
+  await modifierDialog.getByRole('button', { name: 'Đóng', exact: true }).click();
+  await openDraft();
   await page.evaluate(() => adminTest.changeAccount());
   await page.waitForFunction(() => adminTest.rolePending && adminTest.auth.user.id === 'other-owner');
   assert.equal(await page.locator('aside').count(), 0, 'Account changes must unmount admin immediately');
@@ -150,7 +205,7 @@ try {
   await page.evaluate(() => adminTest.resolveRole(true));
   assert.equal(await page.locator('aside').count(), 0, 'Late role responses must not restore a signed-out account');
   assert.deepEqual(errors, []);
-  console.log('Admin state checks passed: refresh preserves modal/draft; revocation, errors and account changes remove access.');
+  console.log('Admin browser checks passed: permissions, draft preservation, search restoration and weather validation.');
 } finally {
   await browser?.close();
   await server.close();

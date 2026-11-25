@@ -18,8 +18,8 @@ export const useAdminFishingPassRewardsStore = defineStore("admin-fishing-pass-r
     loading.value = true; error.value = "";
     try {
       const [result, nextPasses, nextItems] = await Promise.all([supabaseFishingPassRewardsAdminRepository.fetchPage(nextPage, search.value, passFilter.value, typeFilter.value),
-        passes.value.length ? Promise.resolve(passes.value) : supabaseFishingPassRewardsAdminRepository.fetchPasses(),
-        items.value.length ? Promise.resolve(items.value) : supabaseFishingPassRewardsAdminRepository.fetchItems()]);
+        supabaseFishingPassRewardsAdminRepository.fetchPasses(),
+        supabaseFishingPassRewardsAdminRepository.fetchItems()]);
       if (request !== requestId.value) return;
       rewards.value = result.items; passes.value = nextPasses; items.value = nextItems; page.value = nextPage; total.value = result.total;
       if (!result.items.length && nextPage > 1) await fetchAll(Math.max(1, Math.ceil(result.total / pageSize)));

@@ -27,10 +27,9 @@ const fields: CrudField[] = [
     defaultValue: 1,
     min: 0.000001,
     max: 1000000,
-    step: 0.01,
   },
-  { key: "durationMin", label: "Thời lượng tối thiểu (phút)", type: "number", required: true },
-  { key: "durationMax", label: "Thời lượng tối đa (phút)", type: "number", required: true },
+  { key: "durationMin", label: "Thời lượng tối thiểu (phút)", type: "number", required: true, min: 0 },
+  { key: "durationMax", label: "Thời lượng tối đa (phút)", type: "number", required: true, min: 0 },
   { key: "image", label: "Ảnh", type: "text" },
   { key: "createdAt", label: "Ngày tạo", type: "datetime", readonly: true },
 ];
@@ -55,6 +54,7 @@ const save = (payload: any, id: string | null) => {
     :fields="fields"
     :items="store.items"
     :page="store.page"
+    :search="store.search"
     :page-size="store.pageSize"
     :total="store.total"
     @page="store.fetchAll"

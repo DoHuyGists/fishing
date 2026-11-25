@@ -34,9 +34,8 @@ class SupabaseItemRepository {
   }
 
   async fetchAll(): Promise<AdminItemRow[]> {
-    const { data, error } = await supabase.from("items").select("*").order("created_at", { ascending: false });
-    if (error) throw new RepositoryError(error);
-
+    const data = await readCatalogPages((from, to) => supabase.from("items").select("*")
+      .order("created_at", { ascending: false }).order("id").range(from, to));
     return data.map(mapAdminItem);
   }
 

@@ -40,7 +40,7 @@ const fields = computed<CrudField[]>(() => [
   },
   { key: "minValue", label: "Giá trị nhỏ nhất", type: "number", required: true },
   { key: "maxValue", label: "Giá trị lớn nhất", type: "number", required: true },
-  { key: "baseChance", label: "Tỷ lệ cơ bản (0-1)", type: "number" },
+  { key: "baseChance", label: "Tỷ lệ cơ bản (0-1)", type: "number", min: 0, max: 1 },
 ]);
 
 const save = (payload: any, id: string | null) => {
@@ -57,6 +57,7 @@ const save = (payload: any, id: string | null) => {
     :fields="fields"
     :items="store.items"
     :page="store.page"
+    :search="store.search"
     :page-size="store.pageSize"
     :total="store.total"
     @page="store.fetchAll"

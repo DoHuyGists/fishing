@@ -1,5 +1,6 @@
 import type { FishingAreaPayload, FishingAreaRow } from "../../../types/table/fishingArea";
 import { defineStore } from "pinia";
+import { toRaw } from "vue";
 import { supabaseFishingAreaRepository } from "../../../data/supabaseFishingAreaRepository";
 
 export const useAdminFishingAreaStore = defineStore("AdminFishingArea", {
@@ -84,13 +85,13 @@ export const useAdminFishingAreaStore = defineStore("AdminFishingArea", {
 
     openForm(fishingAreaData?: FishingAreaRow) {
       this.isFormOpen = true;
+      this.isCreate = !fishingAreaData;
+      this.isUpdate = Boolean(fishingAreaData);
       if (fishingAreaData) {
-        this.target = fishingAreaData;
-        this.isUpdate = true;
+        this.target = structuredClone(toRaw(fishingAreaData));
         this.isFormLock = true;
       } else {
         this.target = this.emptyForm();
-        this.isCreate = true;
         this.isFormLock = false;
       }
       this.adminError = "";

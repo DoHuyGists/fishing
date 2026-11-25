@@ -26,7 +26,7 @@ export interface CrudColumn {
   format?: (row: any) => string;
 }
 
-const props = defineProps<{
+const props = withDefaults(defineProps<{
   title: string;
   icon: string;
   columns: CrudColumn[];
@@ -37,14 +37,18 @@ const props = defineProps<{
   page?: number;
   total?: number;
   pageSize?: number;
+  search?: string;
   allowCreate?: boolean;
   allowDelete?: boolean;
   save: (payload: Record<string, unknown>, id: string | null) => Promise<unknown>;
   remove: (id: string) => Promise<unknown>;
-}>();
+}>(), { allowCreate: true, allowDelete: true });
 const emit = defineEmits<{ (e: "close"): void; (e: "refresh"): void; (e: 'page', page: number, search: string): void }>();
 
-const search = ref("");
+const search = ref(props.search ?? "");
+watch(() => props.search, (value) => {
+  if (value !== undefined) search.value = value;
+});
 let searchTimer: ReturnType<typeof setTimeout> | undefined;
 watch(search, () => {
   if (props.page === undefined) return;
@@ -111,10 +115,16 @@ function buildPayload(): Record<string, unknown> {
   const payload: Record<string, unknown> = {};
   for (const f of props.fields) {
     if (isReadonly(f)) continue;
-    const v = form[f.key];
+    const v = typeof form[f.key] === "string" ? form[f.key].trim() : form[f.key];
     const empty = v === null || v === undefined || v === "";
     if (f.required && empty) throw new Error(`Vui lòng nhập "${f.label}"`);
-    if (f.type === "number") payload[f.key] = empty ? null : Number(v);
+    if (f.type === "number") {
+      const value = empty ? null : Number(v);
+      if (value !== null && (!Number.isFinite(value) || (f.min !== undefined && value < f.min) || (f.max !== undefined && value > f.max))) {
+        throw new Error(`"${f.label}" nằm ngoài phạm vi hợp lệ`);
+      }
+      payload[f.key] = value;
+    }
     else if (f.type === "datetime") payload[f.key] = empty ? null : new Date(v).toISOString();
     else if (f.type === "json") {
       try {

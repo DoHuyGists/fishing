@@ -12,7 +12,7 @@ export const useAdminBlueprintStore = defineStore("admin-blueprints", {
       const request = ++this.requestId;
       this.loading = true; this.error = "";
       try {
-        const [recipes, items] = await Promise.all([supabaseBlueprintRepository.fetchPage(page, this.search), this.sourceItems.length ? Promise.resolve(this.sourceItems) : supabaseItemRepository.fetchAll()]);
+        const [recipes, items] = await Promise.all([supabaseBlueprintRepository.fetchPage(page, this.search), supabaseItemRepository.fetchAll()]);
         if (request !== this.requestId) return;
         this.items = recipes.items; this.page = page; this.total = recipes.total;
         this.sourceItems = items;

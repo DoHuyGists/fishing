@@ -128,11 +128,8 @@ class SupabaseFishingAreaRepository {
   }
 
   async fetchAllAreasAdmin(): Promise<FishingAreaRow[]> {
-    const { data, error } = await supabase.from("fishing_areas").select("*").order("created_at", { ascending: false });
-
-    if (error) throw new RepositoryError(error);
-    if (!data) return [];
-
+    const data = await readCatalogPages((from, to) => supabase.from("fishing_areas").select("*")
+      .order("created_at", { ascending: false }).order("id").range(from, to));
     return data.map(mapRow);
   }
 
