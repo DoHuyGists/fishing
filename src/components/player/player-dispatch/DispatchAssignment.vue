@@ -9,18 +9,18 @@ const store = useDispatchStore();
 
 <template>
   <form
-    class="space-y-2 rounded-lg border border-border-default bg-white p-2.5"
+    class="space-y-4 rounded-xl border border-border-default bg-white p-4"
     @submit.prevent="
       store.selectedOwned && store.selectedJob && store.ask('start', store.selectedOwned.id, store.selectedJob.id)
     "
   >
-    <div class="text-xs font-bold">{{ tr("Dispatch.assignment") }}</div>
-    <div class="grid items-end gap-2 sm:grid-cols-2 lg:grid-cols-[minmax(0,1fr)_minmax(0,1fr)_auto]">
-      <label class="space-y-1 text-xs">
+    <div class="font-bold">{{ tr("Dispatch.assignment") }}</div>
+    <div class="grid items-end gap-3 sm:grid-cols-2 lg:grid-cols-1">
+      <label class="min-w-0 space-y-2 text-xs">
         <span>{{ tr("Dispatch.chooseNpc") }}</span>
         <select
           v-model="store.selectedNpcId"
-          class="min-h-8 w-full min-w-0 rounded-md border border-border-default bg-surface px-2 py-1"
+          class="min-h-10 w-full min-w-0 rounded-lg border border-border-default bg-surface px-3 py-2 text-sm"
           :disabled="store.locked"
         >
           <option value="">{{ tr("Dispatch.chooseNpc") }}</option>
@@ -38,18 +38,18 @@ const store = useDispatchStore();
           </option>
         </select>
       </label>
-      <label class="space-y-1 text-xs">
+      <label class="min-w-0 space-y-2 text-xs">
         <span>{{ tr("Dispatch.chooseJob") }}</span>
         <select
           v-model="store.selectedJobId"
-          class="min-h-8 w-full min-w-0 rounded-md border border-border-default bg-surface px-2 py-1"
+          class="min-h-10 w-full min-w-0 rounded-lg border border-border-default bg-surface px-3 py-2 text-sm"
           :disabled="store.locked"
         >
           <option value="">{{ tr("Dispatch.chooseJob") }}</option>
           <option v-for="job in store.jobs" :key="job.id" :value="job.id">{{ dispatchText(job.name) }}</option>
         </select>
       </label>
-      <button type="submit" class="dispatch-button" :disabled="store.locked || !store.canAssign">
+      <button type="submit" class="dispatch-button sm:col-span-2 lg:col-span-1" :disabled="store.locked || !store.canAssign">
         {{ tr("Dispatch.start") }}
       </button>
     </div>

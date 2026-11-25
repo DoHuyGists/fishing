@@ -175,6 +175,10 @@
     "close": "Đã hiểu"
   },
   "Dispatch": {
+    "rulesTitle": "Quy tắc phái NPC",
+    "strength": "Sức mạnh",
+    "navigation": "Định hướng",
+    "perception": "Quan sát",
     "adminNpcs": "Giá mua bằng sò, phí vận hành, chỉ số và hình ảnh NPC.",
     "adminJobs": "Thời lượng, chỉ số đối kháng và phần thưởng công việc NPC.",
     "title": "Phái NPC",

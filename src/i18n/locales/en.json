@@ -175,6 +175,10 @@
     "close": "Got it"
   },
   "Dispatch": {
+    "rulesTitle": "Dispatch rules",
+    "strength": "Strength",
+    "navigation": "Navigation",
+    "perception": "Perception",
     "adminNpcs": "NPC shell prices, operating costs, stats and images.",
     "adminJobs": "NPC job duration, stat requirements and rewards.",
     "title": "NPC dispatch",

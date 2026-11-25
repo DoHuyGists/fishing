@@ -20,8 +20,8 @@ const store = useDispatchStore();
   <div v-else-if="!store.history.length && !store.historyError" class="py-8 text-center text-sm">
     {{ tr("Dispatch.emptyHistory") }}
   </div>
-  <div class="grid gap-2 lg:grid-cols-2 2xl:grid-cols-3">
-    <article v-for="(record, index) in store.history" :key="record.id" class="dispatch-card slide-fade-in from-bottom" :style="{ '--delay': `${index * 45}ms` }">
+  <div class="dispatch-grid">
+    <article v-for="(record, index) in store.history" :key="record.id" class="dispatch-card slide-fade-in from-bottom player-content-in" :style="{ '--delay': `${index * 45}ms` }">
       <div class="font-bold">
         {{ dispatchText(record.npc_snapshot.name) }} · {{ dispatchText(record.job_snapshot.name) }}
       </div>

@@ -64,8 +64,7 @@ onBeforeUnmount(() => {
     aria-modal="true"
     :aria-label="tr('Dispatch.title')"
   >
-    <div class="dispatch-content w-full min-w-0 space-y-2 bg-surface p-2 text-xs text-content">
-      <div class="text-xs text-content">{{ tr("Dispatch.rules") }}</div>
+    <div class="dispatch-content mx-auto w-full max-w-384 min-w-0 space-y-4 p-1 text-sm text-content sm:p-3">
       <div v-if="store.error" role="alert" class="rounded-lg border border-danger bg-white p-3 text-sm text-danger">
         {{ store.error }}
       </div>
@@ -80,13 +79,21 @@ onBeforeUnmount(() => {
       </button>
       <div v-if="store.loading" role="status" class="text-sm">{{ tr("Dispatch.loading") }}</div>
       <template v-if="store.snapshot">
-        <DispatchAssignment />
-        <Tab v-model="store.tab" :tabs="tabs" :aria-label="tr('Dispatch.title')">
+        <div class="grid items-start gap-5 lg:grid-cols-[18rem_minmax(0,1fr)]">
+          <aside class="min-w-0 space-y-3 lg:sticky lg:top-0">
+            <DispatchAssignment />
+            <details class="rounded-xl border border-border-default bg-surface p-4 text-xs leading-relaxed">
+              <summary class="cursor-pointer font-semibold">{{ tr('Dispatch.rulesTitle') }}</summary>
+              <div class="mt-3">{{ tr('Dispatch.rules') }}</div>
+            </details>
+          </aside>
+        <Tab v-model="store.tab" class="min-w-0" :tabs="tabs" :aria-label="tr('Dispatch.title')">
           <template #npcs><DispatchNpcList /></template>
           <template #jobs><DispatchJobList /></template>
           <template #runs><DispatchRunList /></template>
           <template #history><DispatchHistory /></template>
         </Tab>
+        </div>
       </template>
       <DispatchConfirmation />
     </div>
@@ -96,22 +103,23 @@ onBeforeUnmount(() => {
 <style>
 @reference 'tailwindcss';
 .dispatch-button {
-  @apply min-h-8 rounded-md border border-[var(--color-border-default)] bg-[var(--color-brand)] px-2.5 py-1.5 text-xs font-semibold text-white transition-colors hover:bg-[var(--color-brand-hover)] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--color-accent)] disabled:cursor-not-allowed disabled:opacity-50;
+  @apply min-h-10 rounded-lg border border-[var(--color-border-default)] bg-[var(--color-brand)] px-4 py-2 text-sm font-semibold text-white transition-colors hover:bg-[var(--color-brand-hover)] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--color-accent)] disabled:cursor-not-allowed disabled:opacity-50;
 }
 .dispatch-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(min(100%, 16rem), 1fr));
-  gap: 0.5rem;
+  grid-template-columns: repeat(auto-fill, minmax(min(100%, 20rem), 1fr));
+  gap: 1rem;
+  grid-auto-rows: max-content;
 }
 .dispatch-card {
-  @apply min-w-0 space-y-2 rounded-lg border border-[var(--color-border-default)] bg-[var(--color-surface)] p-2.5 text-xs text-[var(--color-content)];
+  @apply flex min-w-0 flex-col gap-4 rounded-xl border border-[var(--color-border-default)] bg-white p-4 text-sm text-[var(--color-content)];
   overflow-wrap: anywhere;
 }
 .dispatch-content [role="tablist"] > button {
-  @apply gap-1.5 px-3 py-2 text-xs;
+  @apply gap-2 px-4 py-3 text-sm;
 }
 .dispatch-content [role="tabpanel"] {
-  @apply py-2;
+  @apply h-auto py-4;
 }
 
 html.ocean-theme .dispatch-button {
@@ -126,7 +134,19 @@ html.ocean-theme .dispatch-button:not(:disabled):hover {
 }
 
 html.ocean-theme .dispatch-card {
-  background: var(--color-primary);
-  box-shadow: inset 0 1px 0 color-mix(in srgb, var(--color-surface) 8%, transparent);
+  background: var(--color-white);
+}
+
+.dispatch-content .ocean-currency-chip {
+  padding: 0;
+  color: var(--color-content);
+  background: transparent;
+  border: 0;
+  box-shadow: none;
+  font-weight: 600;
+}
+
+.dispatch-content .ocean-currency-chip img {
+  width: 1.25rem;
 }
 </style>

@@ -9,7 +9,7 @@ const store = useDispatchStore();
 
 <template>
   <div v-if="!store.runs.length" class="py-8 text-center text-sm">{{ tr("Dispatch.emptyRuns") }}</div>
-  <div class="grid gap-2 lg:grid-cols-2 2xl:grid-cols-3">
+  <div class="dispatch-grid">
     <article v-for="(run, index) in store.runs" :key="run.id" 
     class="dispatch-card slide-fade-in from-bottom player-content-in"
     :style="{ '--delay': `${index * 45}ms` }"
@@ -40,7 +40,7 @@ const store = useDispatchStore();
         }}
       </div>
       <DispatchRewards :rewards="run.rewards" :delivery-items="run.job_snapshot.data.delivery_items" />
-      <div class="flex flex-wrap gap-2">
+      <div class="mt-auto flex flex-wrap gap-2 border-t border-border-default pt-3">
         <template v-if="store.now >= Date.parse(run.ends_at)">
           <button type="button" class="dispatch-button" :disabled="store.locked" @click="store.ask('claim', run.id)">
             {{ tr("Dispatch.finish") }}
