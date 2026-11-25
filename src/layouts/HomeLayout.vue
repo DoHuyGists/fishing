@@ -2,6 +2,7 @@
 import { watch } from "vue";
 import { useRouter } from "vue-router";
 import { useAuthStore } from "../stores/auth";
+import FishingSplashLoading from "../components/FishingSplashLoading.vue";
 
 const router = useRouter();
 const auth = useAuthStore();
@@ -15,5 +16,6 @@ watch(
 );
 </script>
 <template>
-    <router-view></router-view>
+  <FishingSplashLoading v-if="!auth.initialized || auth.isAuthenticated" />
+  <router-view v-else />
 </template>
