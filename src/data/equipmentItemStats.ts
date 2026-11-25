@@ -29,7 +29,11 @@ export function equipmentItemStats(item: object): InformationModalField[] {
       for (const resource of survivalResources) {
         const value = (bonuses as Record<string, unknown>)[resource];
         if (typeof value === "number" && Number.isFinite(value) && value > 0) {
-          rows.push({ label: tr(`Health.${resource}`), value: `+${value.toLocaleString(getFormattingLocale())}` });
+          const remaining = data.health_remaining;
+          const current = remaining && typeof remaining === 'object' && Object.prototype.hasOwnProperty.call(remaining, resource)
+            ? (remaining as Record<string, unknown>)[resource] : value;
+          const normalized = typeof current === 'number' && Number.isFinite(current) ? Math.max(0, Math.min(value, current)) : 0;
+          rows.push({ label: tr(`Health.${resource}`), value: `${normalized.toLocaleString(getFormattingLocale())}/${value.toLocaleString(getFormattingLocale())}` });
         }
       }
     }

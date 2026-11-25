@@ -7,7 +7,7 @@ import { reactive } from 'vue';
 import * as equipment from '../src/data/healthEquipment.ts';
 
 const auth = reactive({ user: { id: 'owner' }, sessionGeneration: 1 });
-const inventory = reactive({ items: [], async setUserInventory() {} });
+const inventory = reactive({ items: [], viewItems: [], inventoryRequest: 0, async setUserInventory() {} });
 let rows, failSave;
 const copy = value => JSON.parse(JSON.stringify(value));
 const makeSet = (id, used = false) => ({ id, user_id: 'owner', is_used: used, ...Object.fromEntries(equipment.healthSlots.map(slot => [slot, []])) });
@@ -85,4 +85,21 @@ test('late requests cannot overwrite a newer session', async () => {
 test('malformed effects are excluded without capping legitimate stats', () => {
   const item = equipment.healthEquipment(row('bad', 'head', { vitality: Infinity, morale: '20', energy: -10, hydration: 500 }, { quantity: 'invalid' }));
   assert.deepEqual(item.bonuses, { hydration: 500 }); assert.equal(item.quantity, 0);
+});
+
+test('remaining stats persist on items across equipment switches and cannot exceed their original capacity', async () => {
+  const store = useHealthStore();
+  inventory.items = [row('hat','head',{vitality:10,energy:5})];
+  await store.loadInventory(); store.selectedSetId = 'one'; store.selectedSlot = 'head';
+  store.equip('hat'); await store.saveSet(store.sets[0]);
+  assert.equal(store.bonuses.vitality,10);
+  store.applySurvival({enabled:true,equipment:[{inventory_id:'hat',remaining:{vitality:0,energy:3}}]});
+  assert.equal(store.bonuses.vitality,0); assert.equal(store.bonuses.energy,3);
+  assert.equal(store.maximums.vitality,10);
+  await store.chooseSet('two'); assert.equal(store.bonuses.energy,0);
+  await store.chooseSet('one'); assert.equal(store.bonuses.energy,3);
+  assert.equal(equipment.healthEquipment(row('bounded','head',{vitality:10,energy:5},
+    {health_remaining:{vitality:1000,energy:-1}})).bonuses.vitality,10);
+  assert.equal(equipment.healthEquipment(row('invalid','head',{vitality:10},
+    {health_remaining:{vitality:'10'}})).bonuses.vitality,0);
 });

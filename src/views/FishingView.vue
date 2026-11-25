@@ -20,6 +20,8 @@ import { useUserSettingStore } from "../stores/player-user-setting-store.ts";
 import { useFishingBackgroundSoundStore } from "../stores/player-fishing-background-sound-store.ts";
 import DayPhaseClock from "../components/player/player-fishing/DayPhaseClock.vue";
 import FishingFatigue from "../components/player/player-fishing/FishingFatigue.vue";
+import FishingSurvival from '../components/player/player-fishing/FishingSurvival.vue';
+import SurvivalDeathDialog from '../components/player/player-fishing/SurvivalDeathDialog.vue';
 import { useDayPhaseClock } from "../composables/useDayPhaseClock";
 import { useAreaWeather } from "../composables/useAreaWeather";
 import { useFishingSceneStore } from "../stores/player-fishing-scene-store";
@@ -204,10 +206,13 @@ onBeforeUnmount(() => {
     </button>
   </section>
   <main v-else-if="sessionReady" class="w-full h-screen overflow-hidden touch-none overscroll-none bg-[var(--color-ocean-deep)] text-[var(--color-ocean-pearl)]">
+    <SurvivalDeathDialog />
     <div class="fixed top-3 left-3 z-20 text-white flex justify-between items-start">
       <div class="flex flex-col gap-2">
         <DayPhaseClock />
+        <FishingSurvival v-if="fishingStore.currentArea.survivalMode" class="w-[min(21rem,calc(100vw-1.5rem))]" />
         <FishingFatigue
+          v-else
           variant="compact"
           class="max-w-60"
           :area-id="userInAreaStore.userInArea?.area_id ?? null"

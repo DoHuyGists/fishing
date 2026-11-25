@@ -2480,6 +2480,12 @@
     "dang_tao_tai_khoan": "Đang tạo tài khoản...",
     "da_co_tai_khoan": "Đã có tài khoản?"
   },
+  "FishingSurvival": {
+    "title": "Câu sinh tồn",
+    "rules": "Mỗi lần câu thành công tiêu hao 1 điểm ở cả 5 chỉ số trang bị. Sinh lực về 0 sẽ mất toàn bộ cá của chuyến này. Không áp dụng mệt mỏi.",
+    "dead": "Bạn đã tử vong",
+    "loss": "Đã mất {count} cá của chuyến câu này. XP, điểm và phần thưởng đã nhận được giữ nguyên."
+  },
   "Health": {
     "activeSetTotals": "Tổng chỉ số từ bộ trang bị cơ thể đã lưu và đang sử dụng.",
     "addSet": "Thêm set",

@@ -13,6 +13,8 @@ import { useUserProfileStore } from "./player-user-profile-store";
 import { useEquipmentStore } from "./player-equipment-store";
 import { useUserInAreaStore } from "./player-user-In-area-store";
 import { useDayPhaseStore } from "./player-day-phase-store";
+import { useHealthStore } from './player-health-store';
+import type { FishingSurvivalState } from '../types/model/health';
 import { supabaseEquipmentRepository } from "../data/supabaseEquipmentRepository";
 import { supabaseFishRepository } from "../data/supabaseFishRepository";
 import { supabaseUserInAreaRepository } from "../data/supabaseUserInAreaRepository";
@@ -110,6 +112,7 @@ export const useFishingStore = defineStore("fishing", {
     selectedTool: "rod" as FishingTool,
     castPhase: "idle" as CastPhase,
     pendingResult: null as PendingFishingResult | null,
+    survival: null as FishingSurvivalState | null,
     baitPosition: { x: 56, y: 60 },
     castMessage: tr("fishing.san_sang_tha_cau"),
     isCasting: false,
@@ -164,6 +167,7 @@ export const useFishingStore = defineStore("fishing", {
     canCast(): boolean {
       return (
         this.sessionReady &&
+        !this.survival?.dead &&
         !this.isLeavingArea &&
         !this.hasLeftArea &&
         !this.isRetrievingBait &&
@@ -224,6 +228,11 @@ export const useFishingStore = defineStore("fishing", {
         if (requestId !== this.sessionRequestId) return;
         if (this.currentAreaLoadError) throw new Error(this.currentAreaLoadError);
         if (this.inventoryError) throw new Error(this.inventoryError);
+        if (this.currentArea.survivalMode) {
+          const survival = await useHealthStore().loadSurvival();
+          if (requestId !== this.sessionRequestId) return;
+          this.applySurvival(survival);
+        }
         useDayPhaseStore().setCurrentScenePhase(this.currentArea);
         this.sessionReady = true;
         const pending = restorePendingResult(userId);
@@ -537,7 +546,7 @@ export const useFishingStore = defineStore("fishing", {
         return;
       }
       if (!this.canCast) {
-        this.rejectCast(tr("fishing.hay_thu_moi_truoc_khi_quang_moi_lai"));
+        this.rejectCast(tr(this.survival?.dead ? 'FishingSurvival.dead' : "fishing.hay_thu_moi_truoc_khi_quang_moi_lai"));
         return;
       }
       const areaId = this.currentAreaId;
@@ -569,6 +578,11 @@ export const useFishingStore = defineStore("fishing", {
         if (requestId !== this.castRequestId) return;
 
         const response = data as unknown as CastRodResponse;
+        if (response?.survival?.dead) {
+          this.isCasting = false;
+          this.applySurvival(response.survival);
+          return;
+        }
         if (!response || typeof response.session_id !== "string") {
           throw new Error("Invalid cast response");
         }
@@ -848,7 +862,11 @@ export const useFishingStore = defineStore("fishing", {
         if (!response || typeof response.success !== "boolean" || (response.success && !response.caught)) {
           throw new Error("Invalid fishing result response");
         }
-        if (response?.success && response.caught) {
+        if (response.survival) this.applySurvival(response.survival);
+        if (response.survival?.dead) {
+          this.castPhase = 'lost';
+          this.castMessage = tr('FishingSurvival.dead');
+        } else if (response?.success && response.caught) {
           const caught: CaughtFish = {
             id: response.caught.id,
             name: response.caught.name,
@@ -891,6 +909,17 @@ export const useFishingStore = defineStore("fishing", {
       this.resetTensionChallenge();
       this.castPhase = "idle";
       this.castMessage = tr("fishing.cham_mat_ho_de_cau_tiep");
+    },
+    applySurvival(snapshot: FishingSurvivalState) {
+      this.survival = snapshot;
+      useHealthStore().applySurvival(snapshot);
+      if (snapshot.dead) {
+        this.inventoryRequestId++;
+        this.inventory = [];
+        this.catchDialogOpen = false;
+        this.castPhase = 'lost';
+        this.castMessage = tr('FishingSurvival.dead');
+      }
     },
     async openBag() {
       this.bagOpen = true;

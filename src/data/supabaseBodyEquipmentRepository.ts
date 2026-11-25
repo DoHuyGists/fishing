@@ -1,8 +1,14 @@
 import supabase from '../database/connection';
 import { healthSlots } from './healthEquipment';
-import type { BodyEquipmentSet } from '../types/model/health';
+import type { BodyEquipmentSet, FishingSurvivalState } from '../types/model/health';
+import { RepositoryError } from './repositoryError';
 
 export const supabaseBodyEquipmentRepository = {
+  async fetchSurvival(): Promise<FishingSurvivalState> {
+    const { data, error } = await supabase.rpc('get_fishing_survival');
+    if (error) throw new RepositoryError(error);
+    return data as unknown as FishingSurvivalState;
+  },
   async fetchSets(): Promise<BodyEquipmentSet[]> {
     const { data, error } = await supabase.from('user_body_equipments').select('*').order('created_at').order('id');
     if (error) throw new Error(error.message);

@@ -222,6 +222,7 @@ watch(
                 <th class="px-4 py-2.5">Vùng câu</th>
                 <th class="px-4 py-2.5">Múi giờ</th>
                 <th class="px-4 py-2.5">Công cụ đo độ sâu</th>
+                <th class="px-4 py-2.5">Sinh tồn</th>
                 <th class="px-4 py-2.5">Trạng thái</th>
                 <th class="px-4 py-2.5">Tạo lúc</th>
                 <th class="px-4 py-2.5 text-right">Hành động</th>
@@ -244,6 +245,9 @@ watch(
                     :aria-label="`Cho phép công cụ đo độ sâu: ${area.title || area.id}`"
                     class="w-4 h-4 accent-accent"
                   />
+                </td>
+                <td class="px-4 py-2.5">
+                  <span :class="area.survivalMode ? 'font-bold text-danger' : 'text-content-muted'">{{ area.survivalMode ? 'Bật' : 'Tắt' }}</span>
                 </td>
                 <td class="px-4 py-2.5">
                   <span

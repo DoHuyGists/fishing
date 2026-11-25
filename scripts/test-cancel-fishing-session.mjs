@@ -67,6 +67,7 @@ test('bait retrieval waits for cancellation, allows retries and ignores stale re
     './auth': { useAuthStore: () => ({ userId: 'user-1' }) },
     './player-user-profile-store': { useUserProfileStore: () => ({ fishingNetCapacity: 10 }) },
     './player-equipment-store': {}, './player-user-In-area-store': {},
+    './player-health-store': {},
     './player-day-phase-store': { useDayPhaseStore: () => ({ $reset() {} }) },
     '../data/supabaseFishRepository': {},
     '../data/supabaseFishingAreaRepository': { supabaseFishingAreaRepository: {

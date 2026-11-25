@@ -85,6 +85,8 @@ test('ranked fishing integrates server catches, fatigue, seasons, ties and perma
     });
     const depthToolMigration = await read('./supabase/migrations/20261118_fishing_area_depth_tool.sql');
     await db.exec(depthToolMigration);
+    await db.exec(await read('./supabase/migrations/20261113_user_body_equipments.sql'));
+    await db.exec(await read('./supabase/migrations/20261125_fishing_survival.sql'));
     await db.exec(await read('./supabase/rpc/fishing/cast_rod.sql'));
     await db.exec(await read('./supabase/rpc/fishing/submit_challenge.sql'));
     await db.exec(await read('./supabase/migrations/20261115_leaderboard_season_best_fish.sql'));
@@ -357,7 +359,7 @@ test('ranked fishing integrates server catches, fatigue, seasons, ties and perma
         GRANT SELECT ON public.user_in_area TO authenticated;
         SET ROLE authenticated;
       `);
-      await assert.rejects(rpc('cast_rod($1,10)', [area]), /permission denied for function fishing_fatigue_multiplier/);
+      await assert.rejects(rpc('cast_rod($1,10)', [area]), /permission denied/);
       await db.exec('RESET ROLE');
       await db.exec(repair);
       await db.exec('SET ROLE authenticated');
@@ -375,7 +377,7 @@ test('ranked fishing integrates server catches, fatigue, seasons, ties and perma
         ALTER FUNCTION public.cast_rod(UUID,NUMERIC) OWNER TO legacy_fishing_owner;
         SET ROLE authenticated;
       `);
-      await assert.rejects(rpc('cast_rod($1,10)', [area]), /permission denied for function fishing_fatigue_multiplier/);
+      await assert.rejects(rpc('cast_rod($1,10)', [area]), /permission denied/);
       await db.exec('RESET ROLE');
       await db.exec(repair);
       await db.exec(repair); // Reapplying must preserve privileges and data.
@@ -648,6 +650,115 @@ test('ranked fishing integrates server catches, fatigue, seasons, ties and perma
         await assert.rejects(cast(), /No usable bait remaining/);
         await db.exec('ROLLBACK TO SAVEPOINT failed_cast');
         assert.equal(Number(await scalar('SELECT count(*) FROM daily_mission_events')), eventsBeforeMissingBait);
+      } finally {
+        await db.exec('ROLLBACK');
+      }
+    });
+
+    await check('survival consumes active equipment once, disables fatigue and loses only this trip fish at death', async () => {
+      // The preview deployment exercised above replaces an older RPC definition.
+      const migration = await read('./supabase/migrations/20261125_fishing_survival.sql');
+      await db.exec(migration);
+      await db.exec(migration);
+      await db.exec(await read('./supabase/rpc/equipment/save_body_equipment_set.sql'));
+      await db.exec(await read('./supabase/rpc/fishing/submit_tension_challenge.sql'));
+      await db.exec('BEGIN');
+      try {
+        const trip = randomUUID(), previousTrip = randomUUID(), activeSet = randomUUID(), spareSet = randomUUID();
+        const hat = randomUUID(), coat = randomUUID(), spare = randomUUID();
+        const resources = ['vitality','hydration','nutrition','energy','morale'];
+        for (const [id,category,bonuses] of [
+          [hat,'head',{ vitality: 2,hydration: 3,nutrition: 0.3,energy: 3,morale: 3 }],
+          [coat,'torso',{ vitality: 1,hydration: 0.2,nutrition: 0.2,energy: 0,morale: 0 }],
+          [spare,'head',Object.fromEntries(resources.map(key => [key,100]))],
+        ]) await db.query('INSERT INTO user_inventory VALUES($1,$2,$3)', [id,uid,{category,health_bonuses:bonuses,quantity:1}]);
+        await db.query('INSERT INTO user_body_equipments(id,user_id,is_used,head,torso) VALUES($1,$2,TRUE,$3,$4)',
+          [activeSet,uid,[{inventory_id:hat}],[{inventory_id:coat}]]);
+        await db.query('INSERT INTO user_body_equipments(id,user_id,is_used,head) VALUES($1,$2,FALSE,$3)',
+          [spareSet,uid,[{inventory_id:spare}]]);
+        const item = id => scalar('SELECT data FROM user_inventory WHERE id=$1',[id]);
+
+        // Ordinary areas do not consume body resources.
+        assert.equal((await resolve(await cast())).success,true);
+        assert.equal((await item(hat)).health_remaining,undefined);
+        await db.query('UPDATE fishing_areas SET survival_mode=TRUE WHERE id=$1',[area]);
+        await db.query("UPDATE user_in_area SET session_id=$1 WHERE user_id=$2",[trip,uid]);
+        await db.query("UPDATE user_area_fatigue SET fatigue_score=100,calculated_at=clock_timestamp(),active_until=NULL WHERE user_id=$1 AND area_id=$2",[uid,area]);
+        const preview = await rpc('get_fishing_fatigue($1)',[area]);
+        assert.equal(preview.fatigue_score,0); assert.deepEqual(preview.effects,[]);
+        assert.deepEqual((await rpc('touch_fishing_presence()')).effects,[]);
+        assert.equal(await scalar('SELECT active_until FROM user_area_fatigue WHERE user_id=$1 AND area_id=$2',[uid,area]),null);
+        await setWeather([{code:'FATIGUE_SCORE',unit:'PERCENT',value:-50}]);
+        const initial = await rpc('get_fishing_survival()');
+        assert.equal(initial.dead,false); assert.equal(initial.remaining.vitality,3);
+        await db.query("INSERT INTO caught(user_id,area_session_id,status) VALUES($1,$2,'in-net'),($1,$3,'normal'),($4,$5,'in-net')",
+          [uid,previousTrip,previousTrip,other,trip]);
+        const oldFish = await scalar('SELECT count(*) FROM caught WHERE user_id=$1 AND area_session_id<>$2',[uid,trip]);
+
+        // Failed catches and bait retrieval do not consume any resources.
+        const failed = await cast();
+        await db.query("UPDATE fishing_sessions SET status='BITE',bite_at=clock_timestamp()-interval '1 second' WHERE id=$1",[failed.id]);
+        const failure = await rpc('resolve_fishing_challenge($1,FALSE,1000)',[failed.id]);
+        assert.equal(failure.success,false);
+        assert.equal((await item(hat)).health_remaining,undefined);
+
+        const firstSession = await cast();
+        assert.equal(firstSession.modifiers._survival,true);
+        assert.equal(firstSession.fish_snapshot.scoring.fatigue_multiplier,1);
+        const first = await resolve(firstSession);
+        assert.equal(first.success,true); assert.equal(first.survival.dead,false);
+        assert.deepEqual(first.survival.remaining,{vitality:2,hydration:2.2,nutrition:0,energy:2,morale:2});
+        assert.equal((await item(spare)).health_remaining,undefined);
+        assert.equal((await item(hat)).health_bonuses.vitality,2);
+        assert.equal((await item(coat)).health_remaining.nutrition,0);
+
+        // A retry through the real replay RPC consumes once, including fatal catches.
+        const submitWin = async () => {
+          const session = await cast();
+          const now = Date.now()-2000;
+          const challenge = {...session.challenge_data,startedAt:now,activatedAt:now,expiresAt:now+90000,
+            config:{...session.challenge_data.config,tickRate:1,startDistance:1,reelSpeed:2,
+              startTension:50,safeMin:10,safeMax:80,maxTension:100,reelRate:0,releaseRate:0,minimumStrength:1},
+            fish:{...session.challenge_data.fish,baseStrength:1,basePull:0,pullAmplitude:0,burstChance:0}};
+          await db.query("UPDATE fishing_sessions SET status='BITE',bite_at=clock_timestamp()-interval '2 seconds',expires_at=clock_timestamp()+interval '1 minute',challenge_data=$2 WHERE id=$1",[session.id,challenge]);
+          const payload = {sessionId:session.id,totalTicks:1,inputs:[{tick:0,reeling:true}],claimedResult:'won'};
+          const result = await rpc('submit_tension_challenge($1)',[payload]);
+          const beforeRetry = await item(hat);
+          assert.deepEqual(await rpc('submit_tension_challenge($1)',[payload]),result);
+          assert.deepEqual((await rpc('start_tension_challenge($1)',[session.id])).resolution,result);
+          assert.deepEqual(await item(hat),beforeRetry);
+          return result;
+        };
+        const second = await submitWin();
+        assert.equal(second.success,true); assert.equal(second.survival.remaining.vitality,1);
+
+        // Switching away and back preserves each individual item's remaining stats.
+        await rpc('switch_body_equipment($1)',[spareSet]);
+        assert.equal((await rpc('get_fishing_survival()')).remaining.vitality,100);
+        await rpc('switch_body_equipment($1)',[activeSet]);
+        assert.equal((await rpc('get_fishing_survival()')).remaining.vitality,1);
+        const xpBefore = Number(await scalar('SELECT experience_point FROM user_profile WHERE id=$1',[uid]));
+        const countBefore = Number(await scalar('SELECT total_caught FROM leaderboard WHERE id=$1',[uid]));
+        const scoreBefore = Number(await scalar('SELECT score FROM leaderboard WHERE id=$1',[uid]));
+        const death = await submitWin();
+        assert.equal(death.success,true); assert.equal(death.survival.dead,true);
+        assert.equal(death.survival.remaining.vitality,0); assert.equal(death.survival.lost_fish,3);
+        assert.equal(Number(await scalar('SELECT count(*) FROM caught WHERE user_id=$1 AND area_session_id=$2',[uid,trip])),0);
+        assert.equal(await scalar('SELECT count(*) FROM caught WHERE user_id=$1 AND area_session_id<>$2',[uid,trip]),oldFish);
+        assert.equal(Number(await scalar('SELECT count(*) FROM caught WHERE user_id=$1 AND area_session_id=$2',[other,trip])),1);
+        assert.equal(Number(await scalar('SELECT total_caught FROM leaderboard WHERE id=$1',[uid])),countBefore+1);
+        assert.ok(Number(await scalar('SELECT score FROM leaderboard WHERE id=$1',[uid]))>=scoreBefore);
+        assert.ok(Number(await scalar('SELECT experience_point FROM user_profile WHERE id=$1',[uid]))>=xpBefore);
+        assert.equal((await rpc('get_fishing_survival()')).dead,true);
+        assert.equal((await rpc('cast_rod($1,10)',[area])).survival.dead,true);
+        await rpc('switch_body_equipment($1)',[spareSet]);
+        assert.equal((await rpc('get_fishing_survival()')).dead,true);
+        await db.query('UPDATE user_in_area SET session_id=$1 WHERE user_id=$2',[randomUUID(),uid]);
+        assert.equal((await rpc('get_fishing_survival()')).dead,false);
+        await db.exec('SET LOCAL ROLE authenticated');
+        assert.equal((await rpc('get_fishing_survival()')).remaining.vitality,100);
+        await assert.rejects(rpc('fishing_survival_settle($1,$2,TRUE)',[uid,trip]),/permission denied/);
+        await db.exec('ROLLBACK');
       } finally {
         await db.exec('ROLLBACK');
       }

@@ -1,4 +1,4 @@
--- Deploy equipment_mechanics.sql first, then this file, then submit_tension_challenge.sql.
+-- Deploy equipment_mechanics.sql and 20261125_fishing_survival.sql first, then this file and submit_tension_challenge.sql.
 -- Only the two validated RPC wrappers may call the shared reward function.
 CREATE OR REPLACE FUNCTION public.resolve_fishing_challenge(
     p_session_id UUID, p_success BOOLEAN, p_time_spent_ms INTEGER
@@ -30,6 +30,7 @@ DECLARE
     v_bait_quantity NUMERIC;
     v_caught_id UUID;
     v_scoring JSONB;
+    v_survival JSONB;
 BEGIN
     -- =====================================================
     -- 0. Kiểm tra xác thực người dùng
@@ -38,6 +39,7 @@ BEGIN
     IF v_user_id IS NULL THEN
         RAISE EXCEPTION 'User not authenticated';
     END IF;
+    PERFORM pg_advisory_xact_lock(hashtextextended(v_user_id::TEXT, 0));
 
     -- =====================================================
     -- 1. Tìm và khóa dòng session
@@ -74,6 +76,12 @@ BEGIN
     SELECT * INTO v_mechanics FROM public.fishing_session_mechanics
     WHERE session_id = p_session_id FOR UPDATE;
     v_has_mechanics := FOUND;
+    IF v_has_mechanics AND v_mechanics.modifiers->>'_survival' = 'true' THEN
+        v_survival := public.fishing_survival_settle(v_user_id,v_session.area_session_id,FALSE);
+        IF (v_survival->>'dead')::BOOLEAN THEN
+            RETURN jsonb_build_object('success',FALSE,'result','SURVIVAL_DEAD','survival',v_survival);
+        END IF;
+    END IF;
     IF v_has_mechanics THEN
         -- Freeze inventory identity at cast time, even if the player switches sets.
         v_bait_inventory_id := (v_mechanics.equipment_snapshot#>>'{items,bait,inventory_id}')::UUID;
@@ -355,11 +363,17 @@ BEGIN
         PERFORM public.update_daily_mission_progress(event_type => 'CATCH_EPIC');
     END IF;
 
+    -- Rewards above are permanent. The successful catch is included in trip loss.
+    IF v_survival IS NOT NULL THEN
+        v_survival := public.fishing_survival_settle(v_user_id,v_session.area_session_id,TRUE);
+    END IF;
+
     RETURN jsonb_build_object(
         'success', TRUE,
         'caught_fish', TRUE,
         'result', 'CAUGHT',
         'scoring', v_scoring,
+        'survival', v_survival,
 
         'caught', jsonb_build_object(
             'id', v_caught_id,
@@ -396,6 +410,7 @@ DECLARE
     v_session public.fishing_sessions%ROWTYPE;
 BEGIN
     IF auth.uid() IS NULL THEN RAISE EXCEPTION 'User not authenticated'; END IF;
+    PERFORM pg_advisory_xact_lock(hashtextextended(auth.uid()::TEXT, 0));
     SELECT * INTO v_session FROM public.fishing_sessions
     WHERE id = p_session_id AND user_id = auth.uid() FOR UPDATE;
     IF NOT FOUND THEN RAISE EXCEPTION 'Session not found or unauthorized'; END IF;

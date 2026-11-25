@@ -11,7 +11,11 @@ export function healthEquipment(inventory: UserInventory): HealthEquipment {
   const bonuses: HealthEquipment['bonuses'] = {};
   for (const resource of survivalResources) {
     const value = data.health_bonuses?.[resource];
-    if (slot && typeof value === 'number' && Number.isFinite(value) && value > 0) bonuses[resource] = value;
+    if (slot && typeof value === 'number' && Number.isFinite(value) && value > 0) {
+      const remaining = data.health_remaining;
+      const current = remaining && Object.prototype.hasOwnProperty.call(remaining, resource) ? remaining[resource] : value;
+      bonuses[resource] = typeof current === 'number' && Number.isFinite(current) ? Math.max(0, Math.min(value, current)) : 0;
+    }
   }
   const quantity = data.quantity == null ? 1 : Number(data.quantity);
   return {

@@ -22,6 +22,7 @@ DECLARE
     v_response JSONB;
 BEGIN
     IF auth.uid() IS NULL THEN RAISE EXCEPTION 'User not authenticated'; END IF;
+    PERFORM pg_advisory_xact_lock(hashtextextended(auth.uid()::TEXT, 0));
     SELECT * INTO v_session FROM public.fishing_sessions
     WHERE id = p_session_id AND user_id = auth.uid() FOR UPDATE;
     IF NOT FOUND THEN RAISE EXCEPTION 'Session not found or unauthorized'; END IF;
@@ -244,6 +245,7 @@ BEGIN
     v_session_id := (p_payload->>'sessionId')::UUID;
     v_total_ticks := (p_payload->>'totalTicks')::INTEGER;
     v_claimed := p_payload->>'claimedResult';
+    PERFORM pg_advisory_xact_lock(hashtextextended(auth.uid()::TEXT, 0));
     SELECT * INTO v_session FROM public.fishing_sessions
     WHERE id = v_session_id AND user_id = auth.uid() FOR UPDATE;
     IF NOT FOUND THEN RAISE EXCEPTION 'Session not found or unauthorized'; END IF;

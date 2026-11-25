@@ -6,6 +6,7 @@ defineProps<{ area: FishingMapArea }>();
 
 <template>
   <div class="mt-3 space-y-3 text-sm">
+    <div v-if="area.survivalMode" class="rounded-lg border border-danger/40 bg-surface p-2 text-xs text-danger">{{ tr('FishingSurvival.rules') }}</div>
     <div class="grid grid-cols-2 gap-2">
       <div class="rounded-lg border border-border-default bg-surface p-2">
         <div class="text-xs text-content">{{ tr('FishingMapModal.region') }}</div>

@@ -29,7 +29,13 @@ BEGIN
     'public.replay_tension_challenge(jsonb,jsonb,integer)',
     'public.fishing_weather_modifiers(jsonb)',
     'public.fishing_effective_stat(numeric,jsonb,text,numeric,numeric)',
-    'public.fishing_weather_spawn_weight(numeric,text,jsonb)'
+    'public.fishing_weather_spawn_weight(numeric,text,jsonb)',
+    'public.fishing_health_value(jsonb,text)',
+    'public.fishing_survival_settle(uuid,uuid,boolean)',
+    'public.get_fishing_survival()',
+    'public.touch_fishing_presence()',
+    'public.get_fishing_fatigue(uuid)',
+    'public.fishing_set_presence(uuid,uuid,timestamp with time zone)'
   ] LOOP
     v_function := to_regprocedure(v_signature);
     IF v_function IS NULL THEN CONTINUE; END IF;
@@ -38,11 +44,14 @@ BEGIN
     EXECUTE format('REVOKE ALL ON FUNCTION %s FROM PUBLIC, anon, authenticated', v_function);
     IF v_signature = 'public.replay_tension_challenge(jsonb,jsonb,integer)'
        OR v_signature LIKE 'public.fishing_weather_%'
-       OR v_signature LIKE 'public.fishing_effective_stat(%' THEN
+       OR v_signature LIKE 'public.fishing_effective_stat(%'
+       OR v_signature LIKE 'public.fishing_health_value(%' THEN
       EXECUTE format('ALTER FUNCTION %s SECURITY INVOKER', v_function);
     ELSE
       EXECUTE format('ALTER FUNCTION %s SECURITY DEFINER', v_function);
-      IF v_signature <> 'public.resolve_fishing_challenge(uuid,boolean,integer)' THEN
+      IF v_signature NOT IN ('public.resolve_fishing_challenge(uuid,boolean,integer)',
+        'public.fishing_survival_settle(uuid,uuid,boolean)',
+        'public.fishing_set_presence(uuid,uuid,timestamp with time zone)') THEN
         EXECUTE format('GRANT EXECUTE ON FUNCTION %s TO authenticated', v_function);
       END IF;
     END IF;

@@ -1,5 +1,5 @@
 -- Execute this complete definition, including the SECURITY DEFINER wrapper.
--- Deploy equipment_mechanics.sql, 20261115_ranked_fishing.sql and both submit RPC files first.
+-- Deploy equipment_mechanics.sql, ranked fishing, 20261125_fishing_survival.sql and both submit RPC files first.
 -- Requires fishing_areas.timezone and countries.default_timezone (IANA names).
 -- Deploy 20261118_fishing_area_depth_tool.sql before this definition.
 -- Rules v2; tension replay protocol remains v1 (only configuration changes).
@@ -185,6 +185,8 @@ DECLARE
     v_base_pull NUMERIC;
     v_burst_min_ticks INTEGER;
     v_burst_max_ticks INTEGER;
+    v_survival BOOLEAN := FALSE;
+    v_survival_state JSONB;
 BEGIN
     -- ================================================================
     -- A. Snapshot exactly one equipped item per slot.
@@ -192,12 +194,23 @@ BEGIN
     -- and selection flags only and cannot override inventory stats.
     -- ================================================================
     IF v_user_id IS NULL THEN RAISE EXCEPTION 'User not authenticated'; END IF;
+    PERFORM pg_advisory_xact_lock(hashtextextended(v_user_id::TEXT, 0));
     IF p_area_id IS NULL THEN RAISE EXCEPTION 'Fishing area is required'; END IF;
     IF NOT EXISTS (SELECT 1 FROM public.user_in_area
         WHERE user_id = v_user_id AND area_id = p_area_id AND status = 'enter') THEN
         RAISE EXCEPTION 'Player is not in this fishing area';
     END IF;
     v_presence := public.touch_fishing_presence();
+    SELECT a.survival_mode,u.session_id INTO v_survival,v_area_session_id
+      FROM public.fishing_areas a JOIN public.user_in_area u ON u.area_id = a.id
+      WHERE a.id = p_area_id AND u.user_id = v_user_id AND u.status = 'enter';
+    IF v_survival THEN
+        v_survival_state := public.fishing_survival_settle(v_user_id,v_area_session_id,FALSE);
+        IF (v_survival_state->>'dead')::BOOLEAN THEN
+            RETURN jsonb_build_object('survival',v_survival_state);
+        END IF;
+    END IF;
+    v_modifiers := v_modifiers || jsonb_build_object('_survival',COALESCE(v_survival,FALSE));
     v_weight_cap := public.fishing_fatigue_multiplier(v_presence->'effects', 'weight_cap');
     v_rare_spawn := public.fishing_fatigue_multiplier(v_presence->'effects', 'rare_spawn');
     -- Snapshot the actual server-owned weather at cast time. An expired or
@@ -459,8 +472,8 @@ BEGIN
                 'w_norm', v_weight_ratio, 'rare_weight', v_species.rare_weight,
                 'extreme_weight', v_extreme_weight, 'weather_id', v_weather_id,
                 'fatigue_score', v_presence->'fatigue_score',
-                'fatigue_multiplier', public.fishing_effective_stat(
-                    public.fishing_fatigue_multiplier(v_presence->'effects', 'score'), v_modifiers, 'fatigue_score'),
+                'fatigue_multiplier', CASE WHEN v_survival THEN 1 ELSE public.fishing_effective_stat(
+                    public.fishing_fatigue_multiplier(v_presence->'effects', 'score'), v_modifiers, 'fatigue_score') END,
                 'fatigue_effects', v_presence->'effects',
                 'fish', jsonb_build_object('species_id', v_species_id, 'name', v_species.name,
                     'image', v_species.image, 'rarity', v_species.rarity, 'weight', v_weight)));

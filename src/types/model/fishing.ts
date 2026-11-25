@@ -1,4 +1,5 @@
 import type { FishingPhase, FishingCatchScore } from "./fishingGameplay";
+import type { FishingSurvivalState } from './health';
 
 export type FishingTool = "rod" | "line" | "reel" | "hook" | "bait";
 export type CastPhase = FishingPhase;
@@ -33,10 +34,12 @@ export type CastRodResponse = {
   session_id: string;
   wait_time_ms: number;
   server_time_ms: number;
+  survival?: FishingSurvivalState;
 };
 
 export type SubmitChallengeResponse = {
   success: boolean;
+  survival?: FishingSurvivalState | null;
   scoring?: FishingCatchScore | null;
   message?: string;
   caught?: {

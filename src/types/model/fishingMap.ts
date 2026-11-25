@@ -7,7 +7,7 @@ export type MapPoint = { x: number; y: number };
 
 export type FishingMapSpecies = SpeciesInAreaRow & { details: SpeciesRow | null };
 
-export type FishingMapAreaDetails = Pick<FishingAreaRow, 'id' | 'countryId' | 'title' | 'location' | 'scenePath' | 'isAvailable' | 'zoneId' | 'maxDepth' | 'allowDepthTool' | 'timezone'> & {
+export type FishingMapAreaDetails = Pick<FishingAreaRow, 'id' | 'countryId' | 'title' | 'location' | 'scenePath' | 'isAvailable' | 'zoneId' | 'maxDepth' | 'allowDepthTool' | 'survivalMode' | 'timezone'> & {
   zone: { id: string; code: string; name: string; weathers: WeatherRow[] } | null;
 };
 

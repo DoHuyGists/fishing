@@ -21,6 +21,7 @@ function mapRow(row: any): FishingAreaRow {
     zoneId: row.zone_id ?? null,
     maxDepth: row.max_depth == null ? null : Number(row.max_depth),
     allowDepthTool: row.allow_depth_tool === true,
+    survivalMode: row.survival_mode === true,
     timezone: row.timezone ?? null,
   };
 }
@@ -37,13 +38,14 @@ function toDbPayload(payload: FishingAreaPayload) {
     max_depth: payload.maxDepth,
     timezone: payload.timezone,
     allow_depth_tool: payload.allowDepthTool,
+    survival_mode: payload.survivalMode,
   };
 }
 
 class SupabaseFishingAreaRepository {
   async fetchMapAreas(countryId: string): Promise<FishingMapAreaDetails[]> {
     const rows = await readCatalogPages<any>((from, to) => supabase.from('fishing_areas')
-      .select('id, country_id, title, location, scene_path, is_available, zone_id, max_depth, allow_depth_tool, timezone, zone:zones!zone_id(id, code, name, allowed:zone_allowed_weathers(weather:weathers!weather_id(id, code, name, rarity_tier, duration_min, duration_max, image)))')
+      .select('id, country_id, title, location, scene_path, is_available, zone_id, max_depth, allow_depth_tool, survival_mode, timezone, zone:zones!zone_id(id, code, name, allowed:zone_allowed_weathers(weather:weathers!weather_id(id, code, name, rarity_tier, duration_min, duration_max, image)))')
       .eq('country_id', countryId).order('id').range(from, to));
     return rows.map(row => ({
       ...mapRow(row),
@@ -152,7 +154,7 @@ class SupabaseFishingAreaRepository {
     if (error) throw new RepositoryError(error);
   }
   async fetchAreas(signal?: AbortSignal): Promise<any[]> {
-    const data = await readCatalogPages((from, to) => supabase.from("fishing_areas").select("id, country_id, title, location, scene_path").eq("is_available", true).order("id").abortSignal(signal ?? new AbortController().signal).range(from, to));
+    const data = await readCatalogPages((from, to) => supabase.from("fishing_areas").select("id, country_id, title, location, scene_path, survival_mode").eq("is_available", true).order("id").abortSignal(signal ?? new AbortController().signal).range(from, to));
 
     if (!data) return [];
 
@@ -162,10 +164,11 @@ class SupabaseFishingAreaRepository {
       countryId: x.country_id,
       location: x.location,
       scenePath: x.scene_path,
+      survivalMode: x.survival_mode === true,
     }));
   }
   async fetchOneAreas(areaId: string): Promise<FishingAreaDetails | null> {
-    const { data, error } = await supabase.from("fishing_areas").select("id, country_id, title, location, scene_path, fishing_boundary, max_depth, allow_depth_tool, timezone, country:countries!country_id(default_timezone)").eq("id", areaId).maybeSingle();
+    const { data, error } = await supabase.from("fishing_areas").select("id, country_id, title, location, scene_path, fishing_boundary, max_depth, allow_depth_tool, survival_mode, timezone, country:countries!country_id(default_timezone)").eq("id", areaId).maybeSingle();
 
     if (error) throw new RepositoryError(error);
 
@@ -182,6 +185,7 @@ class SupabaseFishingAreaRepository {
       timezone: data.timezone?.trim() || country?.default_timezone?.trim() || null,
       maxDepth: data.max_depth == null ? null : Number(data.max_depth),
       allowDepthTool: data.allow_depth_tool === true,
+      survivalMode: data.survival_mode === true,
     };
   }
 }

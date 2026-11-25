@@ -2476,6 +2476,12 @@
     "dang_tao_tai_khoan": "Creating account...",
     "da_co_tai_khoan": "Already have an account?"
   },
+  "FishingSurvival": {
+    "title": "Survival fishing",
+    "rules": "Each successful catch consumes 1 point from all 5 equipment stats. At 0 vitality, you lose every fish from this trip. Fatigue does not apply.",
+    "dead": "You have died",
+    "loss": "Lost {count} fish from this trip. Earned XP, scores and rewards are permanent."
+  },
   "Health": {
     "activeSetTotals": "Total stats from the saved body equipment set currently in use.",
     "addSet": "Add set",

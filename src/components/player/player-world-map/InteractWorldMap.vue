@@ -217,7 +217,8 @@ function zoomTo(k: number) {
                   draggable="false"
                 />
               </div>
-              <FishingFatigue variant="compact" :area-id="area.id" />
+              <div v-if="area.survivalMode" class="font-semibold text-danger">{{ tr('FishingSurvival.title') }}</div>
+              <FishingFatigue v-else variant="compact" :area-id="area.id" />
               <button
                 type="button"
                 class="w-full rounded-lg bg-accent px-2 py-1.5 font-bold text-white hover:bg-accent disabled:opacity-70"

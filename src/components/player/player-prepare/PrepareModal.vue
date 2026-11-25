@@ -17,6 +17,7 @@ import Modal from "../../shared/Modal.vue";
 import { useModalStore } from "../../../stores/player-modal-store.ts";
 import WeatherSection from "../player-fishing/WeatherSection.vue";
 import FishingFatigue from "../player-fishing/FishingFatigue.vue";
+import FishingSurvival from '../player-fishing/FishingSurvival.vue';
 import { useDiaryStore } from "../../../stores/player-diary-store.ts";
 import PrepareLakeFish from "./PrepareLakeFish.vue";
 import PrepareEquipmentSets from "./PrepareEquipmentSets.vue";
@@ -229,7 +230,8 @@ async function confirm() {
         class="flex-1 overflow-y-auto flex flex-col gap-4 pb-1 [&::-webkit-scrollbar]:w-1.5 [&::-webkit-scrollbar-thumb]:bg-surface [&::-webkit-scrollbar-thumb]:rounded-full [&::-webkit-scrollbar-track]:bg-transparent"
       >
         <WeatherSection inline />
-        <FishingFatigue variant="default" :area-id="worldStore.selectedArea.id || null" />
+        <FishingSurvival v-if="worldStore.selectedArea.survivalMode" preview />
+        <FishingFatigue v-else variant="default" :area-id="worldStore.selectedArea.id || null" />
 
         <PrepareLakeFish />
 

@@ -12,3 +12,12 @@ export interface HealthEquipment {
   slot: HealthSlot | null;
   bonuses: Partial<Record<SurvivalResource, number>>;
 }
+
+export interface FishingSurvivalState {
+  enabled: boolean;
+  trip_id?: string;
+  dead?: boolean;
+  lost_fish?: number;
+  remaining?: Record<SurvivalResource, number>;
+  equipment?: { inventory_id: string; remaining: Record<SurvivalResource, number> }[];
+}

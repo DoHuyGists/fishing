@@ -96,6 +96,7 @@ function buildPayload(): FishingAreaPayload | null {
   return {
     timezone: adminFishingAreaStore.target.timezone || null,
     allowDepthTool: adminFishingAreaStore.target.allowDepthTool,
+    survivalMode: adminFishingAreaStore.target.survivalMode,
     zoneId: adminFishingAreaStore.target.zoneId || null,
     maxDepth,
     countryId: adminFishingAreaStore.target.countryId,
@@ -287,6 +288,16 @@ onUnmounted(() => {
           <option v-for="timezone in timezoneOptions" :key="timezone" :value="timezone">{{ timezone }}</option>
         </select>
       </div>
+
+      <label class="flex items-center gap-2 text-xs font-medium text-content cursor-pointer select-none">
+        <input
+          v-model="adminFishingAreaStore.target.survivalMode"
+          type="checkbox"
+          class="w-4 h-4 accent-accent"
+          :disabled="adminFishingAreaStore.isFormLock"
+        />
+        Chế độ sinh tồn (survival_mode)
+      </label>
 
       <label class="flex items-center gap-2 text-xs font-medium text-content cursor-pointer select-none">
         <input

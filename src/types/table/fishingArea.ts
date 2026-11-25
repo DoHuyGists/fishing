@@ -4,7 +4,7 @@ export interface FishingSessionRow {
 }
 
 export type FishingAreaDetails = Pick<FishingAreaRow,
-  'id' | 'countryId' | 'title' | 'location' | 'scenePath' | 'fishingBoundary' | 'maxDepth' | 'allowDepthTool' | 'timezone'>;
+  'id' | 'countryId' | 'title' | 'location' | 'scenePath' | 'fishingBoundary' | 'maxDepth' | 'allowDepthTool' | 'survivalMode' | 'timezone'>;
 
 export interface FishingAreaRow {
   id: string;
@@ -18,10 +18,12 @@ export interface FishingAreaRow {
   zoneId: string | null;
   maxDepth: number | null;
   allowDepthTool: boolean;
+  survivalMode: boolean;
   timezone: string | null;
 }
 
 export interface FishingAreaPayload {
+  survivalMode: boolean;
   timezone: string | null;
   allowDepthTool: boolean;
   countryId: string;

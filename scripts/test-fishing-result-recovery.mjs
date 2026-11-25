@@ -32,6 +32,7 @@ function fixture({ timeout, storageUnavailable = false } = {}) {
     pinia: { defineStore }, '../i18n': { t: key => key },
     './auth': { useAuthStore: () => auth }, './player-user-profile-store': { useUserProfileStore: () => profile },
     './player-equipment-store': { useEquipmentStore: () => ({ error: '', async fetchEquipment() {} }) },
+    './player-health-store': { useHealthStore: () => ({ applySurvival() {} }) },
     './player-user-In-area-store': { useUserInAreaStore: () => ({ setCurrentUserInArea: async () => ({ status: 'enter', area_id: 'lake' }) }) },
     './player-day-phase-store': { useDayPhaseStore: () => ({ $reset() {}, setCurrentScenePhase() {} }) },
     '../data/supabaseFishingAreaRepository': { supabaseFishingAreaRepository: repository },
@@ -187,6 +188,21 @@ test('activation retry resumes the original server clock and preserves release i
   assert.equal(f.store.pendingResult, null);
   assert.equal(f.store.isStartingTensionChallenge, false);
   assert.equal(f.data.size, 0);
+});
+
+test('a fatal successful catch clears the trip bag and settles a lost response without reopening the catch dialog', async () => {
+  const f = fixture();
+  const death = {...result,survival:{enabled:true,dead:true,lost_fish:3,trip_id:'trip-1'}};
+  f.store.inventory = [{id:'old-trip-fish'}];
+  f.repository.submitTensionChallenge = async () => { throw new TypeError('Lost fatal response'); };
+  await f.store.submitTensionChallenge(payload);
+  assert.equal(f.store.pendingResult.kind,'submit');
+  f.repository.submitTensionChallenge = async () => death;
+  await f.store.retryPendingResult();
+  assert.deepEqual(f.store.inventory,[]); assert.equal(f.store.catchDialogOpen,false);
+  assert.equal(f.store.canCast,false); assert.equal(f.store.survival.dead,true);
+  assert.equal(f.store.castPhase,'lost'); assert.equal(f.store.pendingResult,null);
+  assert.equal(f.data.size,0);
 });
 
 test('SQL receipts protect ownership and replay successful, failed and expired results exactly once', async () => {

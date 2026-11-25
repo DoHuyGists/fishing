@@ -84,6 +84,22 @@ FROM public.modifiers WHERE code = 'FATIGUE_SCORE';
 
 Only trusted SQL/service-role code can change fatigue rules/state, season schedules or score history. Players can heartbeat only their own current membership; they cannot provide area IDs, time, score, season coefficients or accumulated fatigue. New public RPCs expose the board/archive and the player's own fatigue summary. Exact fish factors remain private during the challenge.
 
+## Survival fishing
+
+Deploy `migrations/20261125_fishing_survival.sql` after ranked fishing, the fatigue preview migration, and `migrations/20261113_user_body_equipments.sql`. Then deploy the complete `rpc/fishing/cast_rod.sql`, `rpc/fishing/submit_challenge.sql`, and `rpc/fishing/submit_tension_challenge.sql` definitions, followed by the updated `migrations/20261115_ranked_fishing_permissions.sql`. Deploy the frontend last. The repository does not apply SQL to production automatically.
+
+The fishing-area admin form controls `fishing_areas.survival_mode` (default false). Survival areas disable fatigue accumulation and all fatigue penalties, including previews and score multipliers. Existing ordinary areas retain their behavior. A cast records whether survival applies in its private mechanics snapshot.
+
+Each successful survival catch consumes **one point in total per resource**, across the currently active saved body equipment set. The resources are `vitality`, `hydration`, `nutrition`, `energy`, and `morale`. Costs are distributed proportionally to each item's remaining contribution, with deterministic rounding, and clamp at zero. Failed, cancelled, and expired catches consume no health resources. Equipment can still be changed normally, including between casting and settlement; the active set at settlement pays the cost. This first version adds no further low-stat gameplay modifiers or recovery mechanics.
+
+`user_inventory.data.health_bonuses` remains the original capacity. `health_remaining` stores the remaining amount by resource on the individual inventory item. Missing remaining keys use the original capacity, so existing items need no backfill. Explicit zero values remain zero. Referencing an item in multiple sets or re-equipping it cannot restore its resources.
+
+Trips use the existing `user_in_area.session_id` / `caught.area_session_id`. When total active vitality reaches zero, the server marks that trip dead, deletes only that owner's fish with the same trip ID (including the fatal catch), and cancels unfinished casts from the trip. Fish from earlier trips and other players are preserved. Earned XP, scores, catch counts, missions, and other rewards remain permanent. No protection or recovery feature is added. A player without positive vitality also dies when their survival state is checked; changing to a fresh set cannot revive an already dead trip. A new trip has its own state.
+
+`get_fishing_survival()` returns the caller's current trip and equipment state and settles zero-vitality deaths. It must remain uncached: it can delete trip fish. Private settlement helpers and `fishing_survival_trips` are inaccessible to player roles. Result receipts make successful submissions, resource costs, and death loss safe to retry.
+
+The integration checks in `scripts/test-seasonal-fishing.mjs` cover ordinary-area compatibility, fatigue bypass, fractional equipment costs, active/inactive sets, equipment switches, clamping, permanent rewards, fatal catches, trip ownership, retries, and new-trip recovery. `scripts/test-health-equipment.mjs` and `scripts/test-fishing-result-recovery.mjs` cover remaining-stat presentation and client recovery after a lost fatal response.
+
 ## Verification
 
 Run `npm run test:leaderboard`, `npm run check:i18n`, and `npm run build`. The SQL integration test runs the actual migration, cast and resolver in an isolated PGlite database; it exercises scoring snapshots, cross-boundary attribution, later-catch ties, fatigue recovery/caps/effects, archive retention, randomized disjoint meta groups and client privileges. It does not connect to production Supabase.

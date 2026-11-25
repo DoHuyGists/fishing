@@ -4,7 +4,7 @@ import { supabaseBodyEquipmentRepository as repository } from "../data/supabaseB
 import { useInventoryStore } from "./player-inventory-store";
 import { useAuthStore } from "./auth";
 import { t as tr } from "../i18n";
-import type { BodyEquipmentSet, HealthEquipment, HealthSlot, SurvivalResource } from "../types/model/health";
+import type { BodyEquipmentSet, HealthEquipment, HealthSlot, SurvivalResource, FishingSurvivalState } from "../types/model/health";
 
 const clone = (sets: BodyEquipmentSet[]) => JSON.parse(JSON.stringify(sets)) as BodyEquipmentSet[];
 export const useHealthStore = defineStore("health", {
@@ -63,8 +63,39 @@ export const useHealthStore = defineStore("health", {
     stats(): { id: SurvivalResource; value: number }[] {
       return survivalResources.map((id) => ({ id, value: this.bonuses[id] }));
     },
+    maximums(): Record<SurvivalResource, number> {
+      const result = { vitality: 0, hydration: 0, nutrition: 0, energy: 0, morale: 0 };
+      for (const item of this.activeItems) {
+        for (const resource of survivalResources) {
+          const value = item.inventory.data?.health_bonuses?.[resource];
+          if (typeof value === 'number' && Number.isFinite(value) && value > 0) result[resource] += value;
+        }
+      }
+      return result;
+    },
   },
   actions: {
+    async loadSurvival(): Promise<FishingSurvivalState> {
+      const auth = useAuthStore(), owner = auth.user?.id, generation = auth.sessionGeneration;
+      await this.loadInventory();
+      if (auth.user?.id !== owner || auth.sessionGeneration !== generation) throw new Error('Session changed');
+      if (this.error) throw new Error(this.error);
+      const snapshot = await repository.fetchSurvival();
+      if (auth.user?.id !== owner || auth.sessionGeneration !== generation) throw new Error('Session changed');
+      this.applySurvival(snapshot);
+      return snapshot;
+    },
+    applySurvival(snapshot: FishingSurvivalState) {
+      const auth = useAuthStore();
+      if (!auth.user?.id || this.owner !== auth.user.id || this.generation !== auth.sessionGeneration) return;
+      const inventory = useInventoryStore();
+      const remaining = new Map(snapshot.equipment?.map(item => [item.inventory_id, item.remaining]) ?? []);
+      inventory.inventoryRequest++;
+      for (const item of [...inventory.items, ...(inventory.viewItems ?? [])]) {
+        const value = remaining.get(item.id);
+        if (item.userId === this.owner && value) item.data = { ...item.data, health_remaining: { ...value } };
+      }
+    },
     async loadInventory() {
       const auth = useAuthStore(),
         userId = auth.user?.id;

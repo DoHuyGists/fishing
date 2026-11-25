@@ -17,6 +17,7 @@ test('fishing net capacity blocks casts and release restores space', async () =>
     './auth': { useAuthStore: () => ({ userId: 'user-1' }) },
     './player-user-profile-store': { useUserProfileStore: useProfile },
     './player-equipment-store': { useEquipmentStore: () => ({ error: '', fetchEquipment: async () => {} }) },
+    './player-health-store': {},
     './player-user-In-area-store': { useUserInAreaStore: () => ({ setCurrentUserInArea: async () => ({ status: 'enter', area_id: 'lake-1' }) }) },
     './player-day-phase-store': { useDayPhaseStore: () => ({ $reset() {}, setCurrentScenePhase() {} }) },
     '../data/supabaseFishRepository': { supabaseFishRepository: { deleteCaughtFish: async () => {} } },
