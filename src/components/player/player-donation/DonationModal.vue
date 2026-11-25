@@ -1,7 +1,7 @@
 <template>
-  <Modal :title="tr('DonationModal.ung_ho_phat_trien')" :show-count-data="false" :on-refresh="refreshQr">
+  <Modal :title="tr('DonationModal.ung_ho_phat_trien')" :show-count-data="false" :on-refresh="userProfile.isVietnamese ? refreshQr : undefined">
     <main class="min-h-full w-full rounded-2xl bg-surface p-4 text-content sm:p-6 lg:p-8">
-      <div class="mx-auto w-full max-w-6xl space-y-6">
+      <div class="mx-auto w-full space-y-6" :class="userProfile.isVietnamese ? 'max-w-6xl' : 'max-w-2xl'">
         <div class="max-w-3xl space-y-3">
           <div role="heading" aria-level="2" class="text-xl font-bold tracking-tight sm:text-2xl">{{ tr('DonationModal.cung_duy_tri_va_phat_trien_game') }}</div>
           <div class="text-sm leading-6 text-content sm:text-base">
@@ -9,8 +9,8 @@
           </div>
         </div>
 
-        <div class="grid items-stretch gap-5 lg:grid-cols-2">
-          <section aria-labelledby="donation-bank-title" class="slide-fade-in from-left player-content-in flex min-w-0 flex-col overflow-hidden rounded-2xl border border-border-default bg-white">
+        <div class="grid items-stretch gap-5" :class="{ 'lg:grid-cols-2': userProfile.isVietnamese }">
+          <section v-if="userProfile.isVietnamese" aria-labelledby="donation-bank-title" class="slide-fade-in from-left player-content-in flex min-w-0 flex-col overflow-hidden rounded-2xl border border-border-default bg-white">
             <div class="flex items-center gap-3 border-b border-border-default bg-surface px-5 py-4">
               <div class="flex size-10 shrink-0 items-center justify-center rounded-xl border border-border-default bg-white text-content">
                 <svg aria-hidden="true" class="size-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
@@ -65,7 +65,7 @@
           <DonationPayment />
         </div>
 
-        <section aria-labelledby="donation-instructions" class="slide-fade-in from-bottom player-content-in rounded-2xl border border-border-default bg-white p-5">
+        <section v-if="userProfile.isVietnamese" aria-labelledby="donation-instructions" class="slide-fade-in from-bottom player-content-in rounded-2xl border border-border-default bg-white p-5">
           <div id="donation-instructions" role="heading" aria-level="2" class="font-bold">{{ tr('DonationModal.bankInstructions') }}</div>
           <div class="mt-4 grid gap-3 text-sm leading-6 text-content md:grid-cols-3">
             <div class="rounded-xl bg-surface p-4">{{ tr('DonationModal.1_mo_ung_dung_ngan_hang_va_quet_ma_qr_trong_cua_so_nay') }}</div>
@@ -86,16 +86,22 @@
 <script lang="ts" setup>
 import { t as tr } from "../../../i18n";
 
-import { ref } from "vue";
+import { onMounted, ref } from "vue";
 import Modal from "../../shared/Modal.vue";
 import DonationPayment from "./DonationPayment.vue";
 import { useToast } from "../../../composables/useToast.ts";
+import { useUserProfileStore } from "../../../stores/player-user-profile-store";
+import { useCountryStore } from "../../../stores/player-country-store";
 
+const userProfile = useUserProfileStore();
+const countryStore = useCountryStore();
 const donationQrUrl = `${import.meta.env.BASE_URL}Sacombank_060319966989_DoHuy.png`;
 const donationAccountNumber = "060319966989";
 const qrFailed = ref(false);
 const qrImageUrl = ref(donationQrUrl);
 const toast = useToast();
+
+onMounted(() => countryStore.fetchCountries());
 
 function refreshQr() {
   qrFailed.value = false;

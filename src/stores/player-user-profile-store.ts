@@ -3,6 +3,7 @@ import { useReadCacheStore } from "./player-read-cache";
 import { t as tr } from "../i18n";
 import { defineStore } from "pinia";
 import { useAuthStore } from "./auth";
+import { useCountryStore } from "./player-country-store";
 import { createKeyedRefreshTask } from "../utils/refreshTask";
 import { supabaseUserProfileRepository } from "../data/supabaseUserProfileRepository";
 import { supabaseAvatarRepository } from "../data/supabaseAvatarRepository";
@@ -16,6 +17,8 @@ export const useUserProfileStore = defineStore("userProfile", {
     error: "",
   }),
   getters: {
+    isVietnamese: (state) =>
+      useCountryStore().countries.find((country) => country.id === state.profile?.country_id)?.code.trim().toUpperCase() === "VN",
     level: (state) => state.profile?.level ?? 0,
     experiencePoint: (state) => state.profile?.experience_point ?? 0,
     skillPoints: (state) => state.profile?.skill_points ?? 0,
