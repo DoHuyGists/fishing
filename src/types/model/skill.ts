@@ -26,3 +26,11 @@ export interface UpgradeSkillResult {
   remaining_skill_points: number;
   effects: Record<string, unknown>;
 }
+
+export interface ResetSkillResult {
+  success: true;
+  skill_id: string;
+  refunded_points: number;
+  remaining_skill_points: number;
+  remaining_cash: number;
+}

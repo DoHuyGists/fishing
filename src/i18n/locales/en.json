@@ -1499,6 +1499,15 @@
     "xem_anh_value0": "View image of {value0}",
     "dong_anh": "Close image"
   },
+  "SkillReset": {
+    "button": "Reset skill",
+    "busy": "Resetting...",
+    "title": "Reset {name}",
+    "fee": "Reset fee",
+    "refund": "Reset this skill to level 0 and refund {points} skill points. Fee: 10,000 cash per invested point.",
+    "success": "Skill reset. Refunded {points} skill points.",
+    "failed": "Unable to reset this skill. Reload skills, check your balance and try again."
+  },
   "SkillCard": {
     "da_tinh_thong": "✦ Mastered",
     "dang_ren_luyen": "● Training",

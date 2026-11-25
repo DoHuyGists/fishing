@@ -21,7 +21,7 @@ const mutations: Record<string, PlayerSnapshot[]> = {
   complete_hour_mission: rewards, redeem_code: rewards, spin_wheel: rewards,
   use_inventory_item: rewards, purchase_item: ['currency'], buy_equipment_set: ['currency'],
   purchase_fishing_pass: ['currency'], craft_blueprint: ['currency'],
-  upgrade_skill: ['profile'], change_faction: ['currency', 'profile'], join_faction: ['profile'],
+  upgrade_skill: ['profile'], reset_skill: ['currency', 'profile'], change_faction: ['currency', 'profile'], join_faction: ['profile'],
   convert_currency: ['currency'], update_my_identity: ['profile'],
   update_my_country: ['profile', 'countries'], complete_my_onboarding: ['profile', 'countries'],
   buy_species_with_history: ['currency'], list_species_on_market: ['currency'],

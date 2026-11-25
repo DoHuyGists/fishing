@@ -2,15 +2,18 @@
 import { t as tr } from "../../../i18n";
 
 import type { SkillCard } from "../../../stores/player-skill-store";
+import Cash from "../player-currency/Cash.vue";
 
 defineProps<{
   skill: SkillCard;
   disabled: boolean;
   upgrading: boolean;
+  resetting: boolean;
 }>();
 
 const emit = defineEmits<{
   upgrade: [skillId: string];
+  reset: [skillId: string];
 }>();
 </script>
 
@@ -115,6 +118,15 @@ const emit = defineEmits<{
             ? tr("SkillCard.da_dat_cap_toi_da")
             : tr("SkillCard.nang_cap_cap_value0", { value0: skill.level + 1 })
       }}
+    </button>
+    <button
+      type="button"
+      class="mt-2 flex min-h-11 cursor-pointer flex-wrap items-center justify-center gap-2 rounded-lg border border-border-default bg-surface px-3 py-2 text-xs font-bold text-content transition-colors enabled:hover:border-danger focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-accent disabled:cursor-not-allowed disabled:opacity-50"
+      :disabled="disabled || resetting || skill.level === 0"
+      @click="emit('reset', skill.id)"
+    >
+      <span>{{ resetting ? tr('SkillReset.busy') : tr('SkillReset.button') }}</span>
+      <Cash :amount="skill.resetCost" :interactive="false" />
     </button>
   </article>
 </template>

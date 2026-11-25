@@ -6,6 +6,7 @@ import { acceptHMRUpdate, defineStore } from "pinia";
 import { supabaseSkillRepository } from "../data/supabaseSkillRepository";
 import { useAuthStore } from "./auth";
 import { useUserProfileStore } from "./player-user-profile-store";
+import { useCurrencyStore } from "./player-currency-store";
 
 const effectLabels: Record<string, string> = {
   get catch_rate_bonus() {
@@ -56,6 +57,12 @@ export const useSkillStore = defineStore("skill", () => {
   const userSkills = ref<UserSkill[]>([]);
   const loading = ref(false);
   const upgradingId = ref("");
+  const resettingId = ref("");
+  const resetSkillId = ref("");
+  const resetLevel = ref(0);
+  const resetError = ref("");
+  const resetTarget = computed(() => skillCards.value.find((skill) => skill.id === resetSkillId.value));
+  const resetCost = computed(() => resetLevel.value * 10_000);
   const error = ref("");
   const upgradeError = ref("");
   const remainingSkillPoints = ref<number | null>(null);
@@ -70,6 +77,10 @@ export const useSkillStore = defineStore("skill", () => {
       userSkills.value = [];
       loading.value = false;
       upgradingId.value = "";
+      resettingId.value = "";
+      resetSkillId.value = "";
+      resetLevel.value = 0;
+      resetError.value = "";
       error.value = "";
       upgradeError.value = "";
       remainingSkillPoints.value = null;
@@ -86,6 +97,7 @@ export const useSkillStore = defineStore("skill", () => {
         return {
           ...skill,
           level,
+          resetCost: level * 10_000,
           isMaxLevel: level >= skill.max_level,
           progress: Math.min(100, (level / skill.max_level) * 100),
           isImageIcon: /^(https?:\/\/|\/)/i.test(skill.icon ?? ""),
@@ -103,6 +115,7 @@ export const useSkillStore = defineStore("skill", () => {
   const totalLevels = computed(() => skillCards.value.reduce((total, skill) => total + skill.level, 0));
 
   async function fetchSkills(force = false) {
+    if (upgradingId.value || resettingId.value) return false;
     const userId = authStore.user?.id;
     const currentRequest = ++requestId;
     error.value = "";
@@ -140,7 +153,7 @@ export const useSkillStore = defineStore("skill", () => {
     const userId = authStore.user?.id;
     const generation = authStore.sessionGeneration;
     const skill = skillCards.value.find((item) => item.id === skillId);
-    if (!userId || !skill || skill.isMaxLevel || upgradingId.value || loading.value || error.value) return false;
+    if (!userId || !skill || skill.isMaxLevel || upgradingId.value || resettingId.value || resetSkillId.value || loading.value || error.value) return false;
     upgradingId.value = skillId;
     upgradeError.value = "";
     try {
@@ -174,7 +187,62 @@ export const useSkillStore = defineStore("skill", () => {
     }
   }
 
+  function requestReset(skillId: string) {
+    const skill = skillCards.value.find((item) => item.id === skillId);
+    if (!authStore.user || !skill?.level || loading.value || upgradingId.value || resettingId.value || error.value) return;
+    resetSkillId.value = skillId;
+    resetLevel.value = skill.level;
+    resetError.value = "";
+    void useCurrencyStore().fetchCurrency(true);
+  }
+
+  function cancelReset() {
+    if (resettingId.value) return;
+    resetSkillId.value = "";
+    resetLevel.value = 0;
+    resetError.value = "";
+  }
+
+  async function resetSkill() {
+    const userId = authStore.user?.id;
+    const generation = authStore.sessionGeneration;
+    const skill = resetTarget.value;
+    const wallet = useCurrencyStore();
+    if (!userId || !skill || !resetLevel.value || resettingId.value || upgradingId.value || loading.value || error.value || wallet.loading || wallet.error || wallet.cash < resetCost.value) return false;
+    resettingId.value = skill.id;
+    resetError.value = "";
+    try {
+      const result = await supabaseSkillRepository.resetSkill(skill.id, resetLevel.value);
+      if (authStore.user?.id !== userId || authStore.sessionGeneration !== generation) return false;
+      const owned = userSkills.value.find((item) => item.skill_id === result.skill_id);
+      if (owned) owned.level = 0;
+      delete currentEffects.value[result.skill_id];
+      remainingSkillPoints.value = result.remaining_skill_points;
+      if (userProfileStore.profile?.id === userId) userProfileStore.profile.skill_points = result.remaining_skill_points;
+      wallet.cash = result.remaining_cash;
+      resetSkillId.value = "";
+      resetLevel.value = 0;
+      return result;
+    } catch {
+      if (authStore.user?.id === userId && authStore.sessionGeneration === generation) {
+        resetError.value = tr("SkillReset.failed");
+        await wallet.fetchCurrency(true);
+      }
+      return false;
+    } finally {
+      if (authStore.user?.id === userId && authStore.sessionGeneration === generation) resettingId.value = "";
+    }
+  }
+
   return {
+    resettingId,
+    resetTarget,
+    resetLevel,
+    resetCost,
+    resetError,
+    requestReset,
+    cancelReset,
+    resetSkill,
     skills,
     userSkills,
     currentEffects,

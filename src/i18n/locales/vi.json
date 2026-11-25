@@ -1503,6 +1503,15 @@
     "xem_anh_value0": "Xem ảnh {value0}",
     "dong_anh": "Đóng ảnh"
   },
+  "SkillReset": {
+    "button": "Reset kỹ năng",
+    "busy": "Đang reset...",
+    "title": "Reset {name}",
+    "fee": "Phí reset",
+    "refund": "Đưa kỹ năng về cấp 0 và hoàn lại {points} điểm kỹ năng. Phí: 10.000 cash cho mỗi điểm đã nâng.",
+    "success": "Đã reset kỹ năng và hoàn lại {points} điểm kỹ năng.",
+    "failed": "Không thể reset kỹ năng. Vui lòng tải lại kỹ năng, kiểm tra số dư và thử lại."
+  },
   "SkillCard": {
     "da_tinh_thong": "✦ Đã tinh thông",
     "dang_ren_luyen": "● Đang rèn luyện",

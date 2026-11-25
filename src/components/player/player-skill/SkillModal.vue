@@ -2,21 +2,31 @@
 import { useGameCatalogRefresh } from "../../../composables/useGameCatalogRefresh";
 import { t as tr } from "../../../i18n";
 
-import { watch } from "vue";
+import { onBeforeUnmount, watch } from "vue";
 import Modal from "../../shared/Modal.vue";
+import PaymentConfirmation from "../../shared/PaymentConfirmation.vue";
 import SkillCard from "./SkillCard.vue";
 import { useSkillStore } from "../../../stores/player-skill-store.ts";
 import { useAuthStore } from "../../../stores/auth";
 import { useToast } from "../../../composables/useToast";
+import { useCurrencyStore } from "../../../stores/player-currency-store";
 
 useGameCatalogRefresh(["skills"]);
 
 const skillStore = useSkillStore();
 const authStore = useAuthStore();
 const toast = useToast();
+const currencyStore = useCurrencyStore();
+
+onBeforeUnmount(() => skillStore.cancelReset());
+
+async function reset() {
+  const result = await skillStore.resetSkill();
+  if (result) toast.success(tr("SkillReset.success", { points: result.refunded_points }));
+}
 
 async function refresh(force = false) {
-  if (skillStore.upgradingId) return;
+  if (skillStore.upgradingId || skillStore.resettingId) return;
   if (!(await skillStore.fetchSkills(force)) && skillStore.error) {
     toast.error(skillStore.error, {
       get title() {
@@ -63,7 +73,7 @@ async function upgrade(skillId: string) {
         v-if="skillStore.error"
         type="button"
         class="cursor-pointer text-sm font-bold text-content underline disabled:opacity-50"
-        :disabled="skillStore.loading || !!skillStore.upgradingId"
+        :disabled="skillStore.loading || !!skillStore.upgradingId || !!skillStore.resettingId"
         @click="refresh(true)"
       >
         {{ tr("SkillModal.tai_lai_ky_nang") }}
@@ -98,12 +108,30 @@ async function upgrade(skillId: string) {
           v-for="(skill, index) in skillStore.skillCards"
           :key="skill.id"
           :skill="skill"
-          :disabled="skillStore.loading || !!skillStore.upgradingId || !!skillStore.error"
+          :disabled="skillStore.loading || !!skillStore.upgradingId || !!skillStore.resettingId || !!skillStore.error"
           :upgrading="skillStore.upgradingId === skill.id"
+          :resetting="skillStore.resettingId === skill.id"
           :style="{ '--delay': `${index * 45}ms` }"
           @upgrade="upgrade"
+          @reset="skillStore.requestReset"
         />
       </div>
     </section>
   </Modal>
+  <PaymentConfirmation
+    v-if="skillStore.resetTarget"
+    :title="tr('SkillReset.title', { name: skillStore.resetTarget.name })"
+    :balance="currencyStore.cash"
+    :total="skillStore.resetCost"
+    :total-label="tr('SkillReset.fee')"
+    :confirm-text="tr('SkillReset.button')"
+    :busy-text="tr('SkillReset.busy')"
+    :busy="!!skillStore.resettingId"
+    :disabled="currencyStore.loading || !!currencyStore.error || skillStore.loading || !!skillStore.error"
+    :error="skillStore.resetError || currencyStore.error"
+    @cancel="skillStore.cancelReset"
+    @confirm="reset"
+  >
+    <div class="text-sm text-content">{{ tr('SkillReset.refund', { points: skillStore.resetLevel }) }}</div>
+  </PaymentConfirmation>
 </template>

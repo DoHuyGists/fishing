@@ -1,12 +1,22 @@
 import { readCatalogPages } from './readCatalogPages';
 import { RepositoryError } from './repositoryError';
-import type { Skill, UserSkill, UpgradeSkillResult } from "../types/model/skill";
+import type { Skill, UserSkill, UpgradeSkillResult, ResetSkillResult } from "../types/model/skill";
 import type { SkillPayload } from "../types/table/skill";
 import { t as tr } from "../i18n";
 import supabase from "../database/connection";
 import { fetchAdminListPage } from './supabaseAdminListRepository';
 
 class SupabaseSkillRepository {
+  async resetSkill(skillId: string, expectedLevel: number): Promise<ResetSkillResult> {
+    const { data, error } = await supabase.rpc("reset_skill", {
+      p_skill_id: skillId,
+      p_expected_level: expectedLevel,
+    });
+    if (error) throw new RepositoryError(error);
+    if (data?.success !== true) throw new Error(tr("SkillReset.failed"));
+    return data as ResetSkillResult;
+  }
+
   fetchPage(page: number, search: string) {
     return fetchAdminListPage<Skill>('skills', page, search);
   }
