@@ -1,4 +1,8 @@
 {
+  "Capacity": {
+    "usage": "{used} / {capacity} ô",
+    "market": "Ô đăng bán đang dùng"
+  },
   "HomeView": {
     "brand": "Fishing",
     "home_link": "Fishing — Trang chủ",

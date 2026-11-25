@@ -1,4 +1,8 @@
 {
+  "Capacity": {
+    "usage": "{used} / {capacity} slots",
+    "market": "Selling slots in use"
+  },
   "HomeView": {
     "brand": "Fishing",
     "home_link": "Fishing — Home",

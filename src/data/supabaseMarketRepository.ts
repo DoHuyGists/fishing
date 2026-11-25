@@ -26,6 +26,14 @@ function mapCaughtRow(row: any) {
 }
 
 class SupabaseMarketRepository {
+  async fetchActiveListingCount(userId: string): Promise<number> {
+    const { count, error } = await supabase.from("species_market")
+      .select("id", { count: "exact", head: true })
+      .eq("user_id", userId).eq("status", "normal");
+    if (error) throw new Error(error.message);
+    return count ?? 0;
+  }
+
   async fetchHistory(userId: string, page: number): Promise<ListPage<MarketHistory>> {
     const { data, error, count } = await supabase.from("market_history").select("*", { count: 'exact' })
       .or(`seller_id.eq.${userId},buyer_id.eq.${userId}`).order("created_at", { ascending: false }).order("id")

@@ -4,11 +4,14 @@ import { t as tr } from "../../../i18n";
 import { useStorageStore } from "../../../stores/player-storage-store";
 import { useModalStore } from "../../../stores/player-modal-store";
 import Modal from "../../shared/Modal.vue";
+import CapacityUsage from "../../shared/CapacityUsage.vue";
+import { useUserProfileStore } from "../../../stores/player-user-profile-store";
 import Pagination from "../../shared/Pagination.vue";
 import TwoOptionsModal from "../../shared/TwoOptionsModal.vue";
 import StorageToolbar from "./StorageToolbar.vue";
 import StorageItemCard from "./StorageItemCard.vue";
 const storage = useStorageStore();
+const profile = useUserProfileStore();
 const modal = useModalStore();
 onMounted(() => { storage.confirmingDelete = false; void storage.load(); });
 function close() { if (!storage.busy) { if (storage.confirmingDelete) storage.confirmingDelete = false; else modal.close(); } }
@@ -18,7 +21,9 @@ function close() { if (!storage.busy) { if (storage.confirmingDelete) storage.co
   <Modal :title="tr('InventoryModal.kho_do')" :on-refresh="async () => { if (!storage.busy) await storage.load(); }" content-width-class="max-w-7xl" @keydown.esc.stop="close">
     <div class="space-y-4 text-content">
       <div class="grid grid-cols-2 gap-3 sm:grid-cols-3">
-        <div class="rounded-xl border border-border-default bg-surface p-3 text-sm">{{ tr('Storage.totalItems') }} <b>{{ storage.items.length }}</b></div>
+        <div class="rounded-xl border border-border-default bg-surface p-3 text-sm">
+          <CapacityUsage :label="tr('UserProfile.suc_chua_tui_do')" :used="storage.ready ? storage.items.length : null" :capacity="profile.profile ? profile.inventoryCapacity : null" />
+        </div>
         <div class="rounded-xl border border-border-default bg-surface p-3 text-sm">{{ tr('Storage.totalQuantity') }} <b>{{ storage.totalQuantity }}</b></div>
         <div class="rounded-xl border border-border-default bg-surface p-3 text-sm">{{ tr('Storage.selected') }} <b>{{ storage.selectedIds.length }}</b></div>
       </div>

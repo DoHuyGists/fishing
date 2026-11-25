@@ -3,9 +3,12 @@ import { t as tr } from "../../../i18n";
 
 import { computed } from "vue";
 import EquipmentInventoryItemCard from "./EquipmentInventoryItemCard.vue";
+import CapacityUsage from "../../shared/CapacityUsage.vue";
+import { useUserProfileStore } from "../../../stores/player-user-profile-store";
 import { useEquipmentInventoryTableContext } from "./useEquipmentInventoryTable.ts";
 
 defineEmits<{ "request-delete": [] }>();
+const profile = useUserProfileStore();
 
 const {
   LABELS,
@@ -60,7 +63,7 @@ const displayedGroups = computed(() =>
     <header class="space-y-3 border-b border-border p-4">
       <div class="flex flex-wrap items-center justify-between gap-2">
         <div class="text-lg font-semibold">
-          {{ tr('InventoryItems.kho_do') }} <span class="text-sm font-normal text-content">({{ inventoryStore.ownedTotal }})</span>
+          <CapacityUsage :label="tr('InventoryItems.kho_do')" :used="inventoryStore.ownedTotal" :capacity="profile.profile ? profile.inventoryCapacity : null" />
         </div>
         <div class="inline-flex overflow-hidden rounded-md border border-content text-sm" role="group"
           :aria-label="tr('InventoryItems.kieu_hien_thi')">

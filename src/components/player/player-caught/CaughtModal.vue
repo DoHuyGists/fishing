@@ -7,6 +7,8 @@ import type { CaughtFish, CaughtViewMode } from "../../../types/model/caughtFish
 import { useCaughtCollection } from "../../../composables/useCaughtCollection";
 import { useToast } from "../../../composables/useToast";
 import Modal from "../../shared/Modal.vue";
+import CapacityUsage from "../../shared/CapacityUsage.vue";
+import { useUserProfileStore } from "../../../stores/player-user-profile-store";
 import Tab from "../../shared/Tab.vue";
 import Pagination from "../../shared/Pagination.vue";
 import CaughtFilters from "./CaughtFilters.vue";
@@ -15,6 +17,7 @@ import FishSellConfirm from "./FishSellConfirm.vue";
 import FishReleaseConfirm from "./FishReleaseConfirm.vue";
 
 const caughtStore = useCaughtStore();
+const profile = useUserProfileStore();
 const marketStore = useMarketStore();
 const toast = useToast();
 const collection = useCaughtCollection();
@@ -119,6 +122,7 @@ async function handleRelease() {
             <span>{{ tr("CaughtModal.tong_so_ca") }}</span>
             <span class="rounded-full bg-content-strong px-2 py-0.5 text-xs text-white">{{ caughtStore.caughtFishes.length }}</span>
           </div>
+          <CapacityUsage :label="tr('UserProfile.suc_chua_kho_ca')" :used="caughtStore.isLoadingCaught ? null : caughtStore.storedFishes.length" :capacity="profile.profile ? profile.speciesStorageCapacity : null" />
           <span v-if="hasActiveFilters" class="text-xs" aria-live="polite">{{ tr("CaughtModal.filtered_count", { count: filteredFishes.length }) }}</span>
         </div>
         <Tab v-model="viewMode" :tabs="viewTabs" contained lazy :aria-label="tr('CaughtModal.che_do_hien_thi')" class="min-h-0 flex-1">

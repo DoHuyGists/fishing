@@ -13,6 +13,8 @@ import MarketListingsTab from "./MarketListingsTab.vue";
 import MyMarketListingsTab from "./MyMarketListingsTab.vue";
 import MarketHistoryTab from "./MarketHistoryTab.vue";
 import Modal from "../../shared/Modal.vue";
+import CapacityUsage from "../../shared/CapacityUsage.vue";
+import { useUserProfileStore } from "../../../stores/player-user-profile-store";
 import Tab from "../../shared/Tab.vue";
 import PaymentConfirmation from "../../shared/PaymentConfirmation.vue";
 import { useToast } from "../../../composables/useToast.ts";
@@ -27,6 +29,7 @@ const itemToBuy = ref<MarketListing | null>(null);
 const isBuying = ref(false);
 const isCancellingListing = ref(false);
 const marketStore = useMarketStore();
+const profile = useUserProfileStore();
 const {
   activeTab: activeMarketTab,
   search: marketSearch,
@@ -181,6 +184,9 @@ onUnmounted(() => {
   >
     <div v-if="marketStore.error" role="alert" class="mb-3 rounded bg-surface p-3 text-danger">
       {{ marketStore.error }}
+    </div>
+    <div class="mb-3 rounded-xl border border-border-default bg-surface p-3">
+      <CapacityUsage :label="tr('Capacity.market')" :used="marketStore.sellingCount" :capacity="profile.profile ? profile.marketSellSlots : null" />
     </div>
     <Tab v-model="activeMarketTab" :tabs="marketTabs" :aria-label="tr('MarketWindow.cho_ca')" lazy>
       <template #all>

@@ -31,6 +31,8 @@ export const useMarketStore = defineStore("species_market", {
     sort: "newest" as MarketListingQuery["sort"],
     listingPage: 1,
     listingHasNext: false,
+    sellingCount: null as number | null,
+    sellingCountRequest: 0,
   }),
   actions: {
     async loadHistory(userId: string, page?: number, invalidate = false) {
@@ -68,6 +70,7 @@ export const useMarketStore = defineStore("species_market", {
       this.stopRefreshing();
       this.ownerId = userId;
       this.marketListings = [];
+      this.sellingCount = null;
       this.history = [];
       this.error = "";
       this.historyError = "";
@@ -85,6 +88,7 @@ export const useMarketStore = defineStore("species_market", {
     stopRefreshing() {
       this.ownerId = "";
       ++this.listingRequest;
+      ++this.sellingCountRequest;
       ++this.historyRequest;
       stopRefresh?.();
       stopRefresh = null;
@@ -94,8 +98,20 @@ export const useMarketStore = defineStore("species_market", {
     async loadVisible() {
       const userId = useAuthStore().user?.id;
       if (!userId) return;
-      if (this.activeTab === "history") await this.loadHistory(userId);
+      if (this.activeTab === "history") await Promise.all([this.loadHistory(userId), this.loadSellingCount()]);
       else await this.loadMarketListings();
+    },
+    async loadSellingCount() {
+      const auth = useAuthStore(), userId = auth.user?.id, generation = auth.sessionGeneration;
+      if (!userId) return;
+      const request = ++this.sellingCountRequest;
+      const current = () => request === this.sellingCountRequest && auth.user?.id === userId && auth.sessionGeneration === generation;
+      try {
+        const count = await supabaseMarketRepository.fetchActiveListingCount(userId);
+        if (current()) this.sellingCount = count;
+      } catch {
+        if (current()) this.sellingCount = null;
+      }
     },
     async loadMarketListings(invalidate = false) {
       const auth = useAuthStore();
@@ -120,11 +136,11 @@ export const useMarketStore = defineStore("species_market", {
           await useReadCacheStore().invalidate(["market", "caught"]);
           if (!current()) return;
         }
-        const rows = await refreshListings(
+        const [rows] = await Promise.all([refreshListings(
           userId + ":" + generation + ":" + JSON.stringify(query),
           () => supabaseMarketRepository.fetchActiveListings(query),
           invalidate,
-        );
+        ), this.loadSellingCount()]);
         if (!current()) return;
         this.marketListings = rows.items;
         this.listingHasNext = this.listingPage * LIST_PAGE_SIZE < rows.total;
