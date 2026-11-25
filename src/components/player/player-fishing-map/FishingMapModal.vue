@@ -57,11 +57,11 @@ async function refresh() {
 </script>
 
 <template>
-  <Modal :title="tr('FishingMapModal.title')" :on-refresh="refresh">
-    <div class="flex min-h-full flex-col gap-3 text-content md:flex-row">
+  <Modal class="fishing-map-modal" :title="tr('FishingMapModal.title')" :on-refresh="refresh">
+    <div class="flex min-h-full min-w-0 flex-col gap-3 text-content md:h-full md:min-h-0 md:flex-row">
       <FishingMapCountries />
       <section
-        class="min-w-0 flex flex-col flex-1 rounded-xl border border-border-default bg-surface p-3 sm:p-4"
+        class="flex min-h-0 min-w-0 flex-1 flex-col rounded-xl border border-border-default bg-surface p-3 sm:p-4"
         :aria-label="tr('FishingMapModal.areas')"
         :aria-busy="store.loading || store.loadingSpecies"
       >
@@ -73,7 +73,7 @@ async function refresh() {
           </button>
         </div>
         <template v-else-if="store.canView">
-          <div class="mb-4 flex flex-wrap items-center justify-between gap-2">
+          <div class="mb-4 flex shrink-0 flex-wrap items-center justify-between gap-2">
             <div class="text-lg font-bold">{{ store.selectedCountry?.name }}</div>
             <span class="text-sm" aria-live="polite">{{
               tr("FishingMapModal.areaCount", { count: store.areas.length })
@@ -96,8 +96,8 @@ async function refresh() {
           <template v-else>
             <div
               v-if="store.areas.length"
-              class="mt-4 grid h-0 grow gap-3 overflow-y-scroll pr-1"
-              :class="store.viewMode === 'grid' ? 'lg:grid-cols-2 xl:grid-cols-3' : 'grid-cols-1'"
+              class="mt-4 grid min-h-0 min-w-0 auto-rows-max content-start items-start gap-3 md:flex-1 md:overflow-y-auto md:overscroll-contain md:pr-2"
+              :class="store.viewMode === 'grid' ? 'fishing-map-area-grid' : 'grid-cols-1'"
             >
               <FishingMapAreaCard
                 v-for="(area, index) in store.pagedAreas"
@@ -124,3 +124,15 @@ async function refresh() {
   </Modal>
   <FishingMapSpeciesPopup />
 </template>
+
+<style scoped>
+.fishing-map-area-grid {
+  grid-template-columns: repeat(auto-fill, minmax(min(100%, 20rem), 1fr));
+}
+
+@media (min-width: 48rem) {
+  .fishing-map-modal :deep(.shared-modal__content) {
+    overflow: hidden;
+  }
+}
+</style>

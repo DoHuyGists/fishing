@@ -5,18 +5,18 @@ const store = useFishingMapStore();
 </script>
 
 <template>
-  <aside class="w-fit shrink-0 rounded-xl border border-border-default bg-surface p-3">
+  <aside class="flex min-h-0 min-w-0 shrink-0 flex-col rounded-xl border border-border-default bg-surface p-3 md:w-64 lg:w-72">
     <div class="mb-3 text-lg font-bold">{{ tr("FishingMapModal.countries") }}</div>
     <input
       v-model="store.countrySearch"
       type="search"
-      class="mb-2 w-full rounded-lg border border-border-default bg-white px-3 py-2 text-sm"
+      class="mb-2 w-full shrink-0 rounded-lg border border-border-default bg-white px-3 py-2 text-sm"
       :aria-label="tr('FishingMapModal.countrySearch')"
       :placeholder="tr('FishingMapModal.countrySearch')"
     />
     <select
       v-model="store.countryFilter"
-      class="mb-3 w-full rounded-lg border border-border-default bg-white px-3 py-2 text-sm"
+      class="mb-3 w-full shrink-0 rounded-lg border border-border-default bg-white px-3 py-2 text-sm"
       :aria-label="tr('FishingMapModal.countryFilter')"
     >
       <option value="all">{{ tr("FishingMapModal.allCountries") }}</option>
@@ -25,7 +25,7 @@ const store = useFishingMapStore();
     </select>
     <nav
       :aria-label="tr('FishingMapModal.countries')"
-      class="grid max-h-52 gap-2 overflow-y-auto md:max-h-[calc(100dvh-18rem)]"
+      class="grid min-h-0 max-h-52 content-start gap-2 overflow-y-auto overscroll-contain md:max-h-none md:flex-1 md:pr-1"
     >
       <button
         v-for="country in store.countries"

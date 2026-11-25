@@ -8,19 +8,19 @@ defineProps<{ area: FishingMapArea }>();
   <div class="mt-3 space-y-3 text-sm">
     <div v-if="area.survivalMode" class="rounded-lg border border-danger/40 bg-surface p-2 text-xs text-danger">{{ tr('FishingSurvival.rules') }}</div>
     <div class="grid grid-cols-2 gap-2">
-      <div class="rounded-lg border border-border-default bg-surface p-2">
+      <div class="min-w-0 rounded-lg border border-border-default bg-surface p-2">
         <div class="text-xs text-content">{{ tr('FishingMapModal.region') }}</div>
         <div class="mt-1 break-words font-semibold">{{ area.zone?.name || tr('FishingMapModal.unknown') }}</div>
         <div v-if="area.zone" class="text-xs text-content">{{ area.zone.code }}</div>
       </div>
-      <div class="rounded-lg border border-border-default bg-surface p-2">
+      <div class="min-w-0 rounded-lg border border-border-default bg-surface p-2">
         <div class="text-xs text-content">{{ tr('FishingMapModal.maxDepth') }}</div>
         <div class="mt-1 font-semibold">{{ area.maxDepth == null ? tr('FishingMapModal.unknown') : `${area.maxDepth.toLocaleString(getFormattingLocale())} m` }}</div>
       </div>
     </div>
     <div class="flex flex-wrap justify-between gap-2 text-xs">
       <span>{{ tr('FishingMapModal.depthTool') }}: {{ tr(area.allowDepthTool ? 'FishingMapModal.yes' : 'FishingMapModal.no') }}</span>
-      <span v-if="area.timezone">{{ tr('FishingMapModal.timezone') }}: {{ area.timezone }}</span>
+      <span v-if="area.timezone" class="min-w-0 wrap-anywhere">{{ tr('FishingMapModal.timezone') }}: {{ area.timezone }}</span>
     </div>
     <div>
       <div class="mb-2 font-semibold">{{ tr('FishingMapModal.possibleWeathers') }}</div>

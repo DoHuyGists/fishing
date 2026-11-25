@@ -9,12 +9,12 @@ defineProps<{ area: FishingMapArea; viewMode: "list" | "grid" }>();
 
 <template>
   <article
-    class="player-popup-in rounded-xl border border-border-default bg-white overflow-hidden"
+    class="player-popup-in min-w-0 rounded-xl border border-border-default bg-white"
     :class="viewMode === 'list' ? 'sm:flex' : ''"
   >
     <div
-      class="flex shrink-0 items-center justify-center overflow-hidden bg-surface"
-      :class="viewMode === 'list' ? 'h-36 sm:h-auto sm:w-1/3' : 'h-40'"
+      class="flex shrink-0 items-center justify-center overflow-hidden rounded-t-xl bg-surface"
+      :class="viewMode === 'list' ? 'aspect-video sm:w-1/3 sm:max-w-72 sm:self-start sm:rounded-tr-none sm:rounded-bl-xl' : 'aspect-video'"
     >
       <img
         v-if="area.scenePath"

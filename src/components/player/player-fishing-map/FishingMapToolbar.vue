@@ -5,7 +5,7 @@ const store = useFishingMapStore();
 </script>
 
 <template>
-  <div class="flex flex-wrap gap-2">
+  <div class="flex shrink-0 flex-wrap gap-2">
     <input
       v-model="store.search"
       type="search"
