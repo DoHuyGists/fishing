@@ -39,6 +39,10 @@ const {
 const caughtStore = useCaughtStore();
 const LISTED_PRICE = 500;
 const emit = defineEmits(["close"]);
+const sellingUsage = computed(() => {
+  if (marketStore.sellingCount === null || !profile.profile || profile.marketSellSlots <= 0) return null;
+  return Math.min(100, Math.max(0, marketStore.sellingCount / profile.marketSellSlots * 100));
+});
 const balanceFee = computed(() => {
   if (!itemToBuy.value) return 0;
   const price = Number(itemToBuy.value.price);
@@ -59,6 +63,7 @@ const marketTabs = computed(() => [
   },
   {
     key: "my",
+    badge: marketStore.sellingCount ?? undefined,
     get label() {
       return tr("MarketWindow.ca_cua_toi_dang_ban");
     },
@@ -178,54 +183,65 @@ onUnmounted(() => {
 
 <template>
   <Modal
+    class="market-window"
     :title="tr('MarketWindow.cho_ca')"
     :show-count-data="activeMarketTab !== 'history'"
     :on-refresh="() => marketStore.loadVisible()"
   >
-    <div v-if="marketStore.error" role="alert" class="mb-3 rounded bg-surface p-3 text-danger">
-      {{ marketStore.error }}
-    </div>
-    <div class="mb-3 rounded-xl border border-border-default bg-surface p-3">
-      <CapacityUsage :label="tr('Capacity.market')" :used="marketStore.sellingCount" :capacity="profile.profile ? profile.marketSellSlots : null" />
-    </div>
-    <Tab v-model="activeMarketTab" :tabs="marketTabs" :aria-label="tr('MarketWindow.cho_ca')" lazy>
-      <template #all>
-        <MarketListingsTab v-model:view-mode="viewMode" @buy="confirmBuy" />
-      </template>
-      <template #my>
-        <MyMarketListingsTab
-          :view-mode="viewMode"
-          :is-cancelling-listing="isCancellingListing"
-          @cancel-listing="handleCancelListing"
-        />
-      </template>
-      <template #history>
-        <MarketHistoryTab />
-      </template>
-    </Tab>
-    <nav
-      v-if="activeMarketTab !== 'history'"
-      :aria-label="tr('MarketWindow.cho_ca')"
-      class="mt-3 flex items-center justify-between gap-3 text-xs"
-    >
-      <button
-        type="button"
-        :disabled="marketStore.isLoadingMarket || marketStore.listingPage <= 1"
-        class="rounded-lg border border-border-default px-3 py-1.5 disabled:opacity-40"
-        @click="marketStore.listingPage--"
+    <div class="mx-auto w-full max-w-[1600px] px-1 py-3 sm:px-4 lg:px-6">
+      <div v-if="marketStore.error" role="alert" class="mb-4 rounded-xl border border-danger/30 bg-white p-4 text-sm text-danger">
+        {{ marketStore.error }}
+      </div>
+      <div class="mb-5 flex flex-wrap items-center justify-between gap-4 rounded-2xl border border-border bg-white px-4 py-4 sm:px-5">
+        <div class="flex items-center gap-3">
+          <span aria-hidden="true" class="flex size-11 shrink-0 items-center justify-center rounded-xl bg-primary text-accent">
+            <svg class="size-6" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><path d="M3 10h18M4 10v10h16V10M3 10l2-6h14l2 6M9 20v-6h6v6" stroke-linecap="round" stroke-linejoin="round" /></svg>
+          </span>
+          <CapacityUsage :label="tr('Capacity.market')" :used="marketStore.sellingCount" :capacity="profile.profile ? profile.marketSellSlots : null" />
+        </div>
+        <div v-if="sellingUsage !== null" class="h-2 w-full overflow-hidden rounded-full bg-primary sm:w-44" aria-hidden="true">
+          <div class="h-full rounded-full bg-accent transition-[width] duration-300 motion-reduce:transition-none" :style="{ width: `${sellingUsage}%` }"></div>
+        </div>
+      </div>
+      <Tab v-model="activeMarketTab" class="market-tabs" :tabs="marketTabs" :aria-label="tr('MarketWindow.cho_ca')" lazy>
+        <template #all>
+          <MarketListingsTab v-model:view-mode="viewMode" @buy="confirmBuy" />
+        </template>
+        <template #my>
+          <MyMarketListingsTab
+            :view-mode="viewMode"
+            :is-cancelling-listing="isCancellingListing"
+            @cancel-listing="handleCancelListing"
+          />
+        </template>
+        <template #history>
+          <MarketHistoryTab />
+        </template>
+      </Tab>
+      <nav
+        v-if="activeMarketTab !== 'history'"
+        :aria-label="tr('MarketWindow.cho_ca')"
+        class="flex items-center justify-between gap-3 rounded-2xl border border-border bg-white p-3 text-sm"
       >
-        {{ tr("Fishfarm.truoc") }}
-      </button>
-      <span>{{ tr("CaughtModal.trang") }} {{ marketStore.listingPage }}</span>
-      <button
-        type="button"
-        :disabled="marketStore.isLoadingMarket || !marketStore.listingHasNext"
-        class="rounded-lg border border-border-default px-3 py-1.5 disabled:opacity-40"
-        @click="marketStore.listingPage++"
-      >
-        {{ tr("Fishfarm.sau") }}
-      </button>
-    </nav>
+        <button
+          type="button"
+          :disabled="marketStore.isLoadingMarket || marketStore.listingPage <= 1"
+          class="min-h-11 rounded-xl border border-border px-4 font-medium transition-colors hover:bg-surface disabled:cursor-not-allowed disabled:opacity-40"
+          @click="marketStore.listingPage--"
+        >
+          {{ tr("Fishfarm.truoc") }}
+        </button>
+        <span>{{ tr("CaughtModal.trang") }} {{ marketStore.listingPage }}</span>
+        <button
+          type="button"
+          :disabled="marketStore.isLoadingMarket || !marketStore.listingHasNext"
+          class="min-h-11 rounded-xl border border-border px-4 font-medium transition-colors hover:bg-surface disabled:cursor-not-allowed disabled:opacity-40"
+          @click="marketStore.listingPage++"
+        >
+          {{ tr("Fishfarm.sau") }}
+        </button>
+      </nav>
+    </div>
   </Modal>
   <PaymentConfirmation
     v-if="itemToBuy"
@@ -255,3 +271,8 @@ onUnmounted(() => {
     </div>
   </PaymentConfirmation>
 </template>
+
+<style scoped>
+.market-tabs { height: auto; }
+.market-tabs :deep([role="tabpanel"]) { height: auto; }
+</style>

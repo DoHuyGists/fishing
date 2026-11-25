@@ -4,6 +4,7 @@ import { t as tr } from "../../../i18n";
 
 import { computed, onMounted, ref } from "vue";
 import Modal from "../../shared/Modal.vue";
+import Tab from "../../shared/Tab.vue";
 import ShopItemCard from "./ShopItemCard.vue";
 import ShopPurchaseForm from "./ShopPurchaseForm.vue";
 import { useInventoryStore } from "../../../stores/player-inventory-store.ts";
@@ -36,6 +37,14 @@ const classifications = computed(() =>
     ),
   ].sort((a, b) => a.localeCompare(b, "vi")),
 );
+const shopTabs = computed(() => [
+  { key: "ALL", label: tr("ShopModal.moi_nhom_vat_pham") },
+  ...classifications.value.map((key) => ({
+    key,
+    label: key === "fishing" ? tr("InventoryModal.fishingTab")
+      : key === "body" ? tr("InventoryModal.healthTab") : key,
+  })),
+]);
 const categories = computed(() =>
   [
     ...new Set(
@@ -134,102 +143,102 @@ async function buyItem() {
 <template>
   <Modal :title="tr('ShopModal.cua_hang_vat_pham')" :on-refresh="() => inventoryStore.loadShopItems(true)">
     <div class="grid min-h-full gap-4 lg:grid-cols-[minmax(0,1fr)_18rem] text-content">
-      <section>
-        <div
-          class="sticky top-0 z-10 mb-4 grid gap-2 rounded-xl border border-border-default bg-surface p-3 sm:grid-cols-2 xl:grid-cols-4"
-        >
-          <input
-            v-model="search"
-            type="search"
-            :placeholder="tr('ShopModal.tim_vat_pham')"
-            class="rounded-lg border border-border-default bg-white px-3 py-2 text-sm outline-none focus:ring-2 focus:ring-accent/30"
-          />
-          <select
-            v-model="selectedClassification"
-            class="rounded-lg border border-border-default bg-white px-3 py-2 text-sm"
-          >
-            <option value="ALL">{{ tr("ShopModal.moi_nhom_vat_pham") }}</option>
-            <option v-for="value in classifications" :key="value" :value="value">{{ value }}</option>
-          </select>
-          <select v-model="selectedCategory" class="rounded-lg border border-border-default bg-white px-3 py-2 text-sm">
-            <option value="ALL">{{ tr("ShopModal.moi_loai_vat_pham") }}</option>
-            <option v-for="value in categories" :key="value" :value="value">{{ value }}</option>
-          </select>
-          <select v-model="sort" class="rounded-lg border border-border-default bg-white px-3 py-2 text-sm">
-            <option value="name">{{ tr("ShopModal.ten_a_z") }}</option>
-            <option value="price-asc">{{ tr("ShopModal.gia_thap_den_cao") }}</option>
-            <option value="price-desc">{{ tr("ShopModal.gia_cao_den_thap") }}</option>
-          </select>
-          <div
-            class="flex items-center justify-end gap-1 border-t border-border-default/70 pt-2 sm:col-span-2 xl:col-span-4"
-            role="group"
-            :aria-label="tr('CaughtModal.che_do_hien_thi')"
-          >
-            <button
-              type="button"
-              class="rounded-md px-3 py-1.5 text-xs font-bold transition"
-              :class="viewMode === 'list' ? 'bg-content text-white' : 'text-content hover:bg-white'"
-              :aria-pressed="viewMode === 'list'"
-              @click="viewMode = 'list'"
-            >
-              {{ tr("CaughtModal.danh_sach") }}
-            </button>
-            <button
-              type="button"
-              class="rounded-md px-3 py-1.5 text-xs font-bold transition"
-              :class="viewMode === 'grid' ? 'bg-content text-white' : 'text-content hover:bg-white'"
-              :aria-pressed="viewMode === 'grid'"
-              @click="viewMode = 'grid'"
-            >
-              {{ tr("CaughtModal.luoi") }}
-            </button>
-            <button
-              type="button"
-              class="rounded-md px-3 py-1.5 text-xs font-bold transition"
-              :class="viewMode === 'group' ? 'bg-content text-white' : 'text-content hover:bg-white'"
-              :aria-pressed="viewMode === 'group'"
-              @click="viewMode = 'group'"
-            >
-              {{ tr("ShopModal.nhom") }}
-            </button>
-          </div>
-        </div>
-        <div v-if="inventoryStore.shopLoading" class="py-16 text-center text-sm text-content/60">
-          {{ tr("ShopModal.dang_tai_vat_pham") }}
-        </div>
-        <div
-          v-else-if="!filteredItems.length"
-          class="rounded-xl border border-dashed border-border-default py-16 text-center text-sm text-content/60"
-        >
-          {{ tr("ShopModal.khong_tim_thay_vat_pham_phu_hop") }}
-        </div>
-        <div v-else class="space-y-5">
-          <section v-for="group in displayGroups" :key="group.category || 'all-items'">
-            <div
-              v-if="viewMode === 'group'"
-              class="mb-2 mt-0 flex items-center gap-2 border-b border-border-default pb-2 text-sm font-extrabold uppercase tracking-wide text-content"
-            >
-              {{ group.category }}
-              <span class="rounded-full bg-surface px-2 py-0.5 text-[10px]">{{ group.items.length }}</span>
+      <section class="min-w-0">
+        <Tab v-model="selectedClassification" :tabs="shopTabs" :aria-label="tr('ShopModal.moi_nhom_vat_pham')">
+          <template v-for="tab in shopTabs" :key="tab.key" #[tab.key]>
+            <div v-if="selectedClassification === tab.key" class="pt-4">
+              <div
+                class="sticky top-0 z-10 mb-4 grid gap-2 rounded-xl border border-border-default bg-surface p-3 sm:grid-cols-2 xl:grid-cols-3"
+              >
+                <input
+                  v-model="search"
+                  type="search"
+                  :placeholder="tr('ShopModal.tim_vat_pham')"
+                  class="rounded-lg border border-border-default bg-white px-3 py-2 text-sm outline-none focus:ring-2 focus:ring-accent/30"
+                />
+                <select v-model="selectedCategory" class="rounded-lg border border-border-default bg-white px-3 py-2 text-sm">
+                  <option value="ALL">{{ tr("ShopModal.moi_loai_vat_pham") }}</option>
+                  <option v-for="value in categories" :key="value" :value="value">{{ value }}</option>
+                </select>
+                <select v-model="sort" class="rounded-lg border border-border-default bg-white px-3 py-2 text-sm">
+                  <option value="name">{{ tr("ShopModal.ten_a_z") }}</option>
+                  <option value="price-asc">{{ tr("ShopModal.gia_thap_den_cao") }}</option>
+                  <option value="price-desc">{{ tr("ShopModal.gia_cao_den_thap") }}</option>
+                </select>
+                <div
+                  class="flex items-center justify-end gap-1 border-t border-border-default/70 pt-2 sm:col-span-2 xl:col-span-3"
+                  role="group"
+                  :aria-label="tr('CaughtModal.che_do_hien_thi')"
+                >
+                  <button
+                    type="button"
+                    class="rounded-md px-3 py-1.5 text-xs font-bold transition"
+                    :class="viewMode === 'list' ? 'bg-content text-white' : 'text-content hover:bg-white'"
+                    :aria-pressed="viewMode === 'list'"
+                    @click="viewMode = 'list'"
+                  >
+                    {{ tr("CaughtModal.danh_sach") }}
+                  </button>
+                  <button
+                    type="button"
+                    class="rounded-md px-3 py-1.5 text-xs font-bold transition"
+                    :class="viewMode === 'grid' ? 'bg-content text-white' : 'text-content hover:bg-white'"
+                    :aria-pressed="viewMode === 'grid'"
+                    @click="viewMode = 'grid'"
+                  >
+                    {{ tr("CaughtModal.luoi") }}
+                  </button>
+                  <button
+                    type="button"
+                    class="rounded-md px-3 py-1.5 text-xs font-bold transition"
+                    :class="viewMode === 'group' ? 'bg-content text-white' : 'text-content hover:bg-white'"
+                    :aria-pressed="viewMode === 'group'"
+                    @click="viewMode = 'group'"
+                  >
+                    {{ tr("ShopModal.nhom") }}
+                  </button>
+                </div>
+              </div>
+              <div v-if="inventoryStore.shopLoading" class="py-16 text-center text-sm text-content/60">
+                {{ tr("ShopModal.dang_tai_vat_pham") }}
+              </div>
+              <div
+                v-else-if="!filteredItems.length"
+                class="rounded-xl border border-dashed border-border-default py-16 text-center text-sm text-content/60"
+              >
+                {{ tr("ShopModal.khong_tim_thay_vat_pham_phu_hop") }}
+              </div>
+              <div v-else class="space-y-5">
+                <section v-for="group in displayGroups" :key="group.category || 'all-items'">
+                  <div
+                    v-if="viewMode === 'group'"
+                    class="mb-2 mt-0 flex items-center gap-2 border-b border-border-default pb-2 text-sm font-extrabold uppercase tracking-wide text-content"
+                  >
+                    {{ group.category }}
+                    <span class="rounded-full bg-surface px-2 py-0.5 text-[10px]">{{ group.items.length }}</span>
+                  </div>
+                  <div
+                    :class="
+                      viewMode === 'list' ? 'flex flex-col gap-3' : 'grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-3'
+                    "
+                  >
+                    <ShopItemCard
+                      v-for="(item, index) in group.items"
+                      :key="item.id"
+                      :style="{ '--delay': `${index * 45}ms` }"
+                      :item="item"
+                      :layout="viewMode === 'list' ? 'list' : 'grid'"
+                      :selected="selectedItemId === item.id"
+                      :owned-quantity="authStore.userId ? (inventoryStore.ownedQuantitiesByItemId.get(item.id) ?? 0) : 0"
+                      @select="selectItem"
+                      @preview="previewImage = $event"
+                    />
+                  </div>
+                </section>
+              </div>
             </div>
-            <div
-              :class="
-                viewMode === 'list' ? 'flex flex-col gap-3' : 'grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-3'
-              "
-            >
-              <ShopItemCard
-                v-for="(item, index) in group.items"
-                :key="item.id"
-                :style="{ '--delay': `${index * 45}ms` }"
-                :item="item"
-                :selected="selectedItemId === item.id"
-                :owned-quantity="authStore.userId ? (inventoryStore.ownedQuantitiesByItemId.get(item.id) ?? 0) : 0"
-                @select="selectItem"
-                @preview="previewImage = $event"
-              />
-            </div>
-          </section>
-        </div>
+          </template>
+        </Tab>
       </section>
       <ShopPurchaseForm
         v-model:quantity="quantity"

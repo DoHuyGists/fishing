@@ -15,13 +15,6 @@ watch(() => storage.classification, () => { storage.category = ""; }, { flush: "
         <input v-model="storage.search" type="search" :placeholder="tr('InventoryItems.tim_theo_ten_hoac_loai_vat_pham')" class="min-h-10 rounded-lg border border-border-default bg-white px-3 text-sm" />
       </label>
       <label class="flex flex-col gap-1 text-xs">
-        <span>{{ tr('Storage.classification') }}</span>
-        <select v-model="storage.classification" class="min-h-10 rounded-lg border border-border-default bg-white px-2 text-sm">
-          <option value="">{{ tr('Storage.all') }}</option>
-          <option v-for="value in storage.classifications" :key="value" :value="value">{{ storage.classificationLabel(value) }}</option>
-        </select>
-      </label>
-      <label class="flex flex-col gap-1 text-xs">
         <span>{{ tr('Storage.category') }}</span>
         <select v-model="storage.category" class="min-h-10 rounded-lg border border-border-default bg-white px-2 text-sm">
           <option value="">{{ tr('Storage.all') }}</option>
