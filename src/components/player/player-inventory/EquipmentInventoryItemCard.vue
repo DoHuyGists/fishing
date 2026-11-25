@@ -1,12 +1,13 @@
 <script setup lang="ts">
 import type { UserInventory } from "../../../types/model/userInventory";
 import { computed } from "vue";
-import { getFormattingLocale, t as tr } from "../../../i18n";
+import { t as tr } from "../../../i18n";
 import { useInformationModal } from "../../../composables/useInformationModal";
 
 import type { ItemData } from "../../../stores/player-equipment-store";
 import { useEquipmentInventoryTableContext } from "./useEquipmentInventoryTable";
 import { healthEquipment } from "../../../data/healthEquipment";
+import { equipmentItemStats } from "../../../data/equipmentItemStats";
 
 const props = defineProps<{ item: UserInventory; list?: boolean }>();
 const { open } = useInformationModal();
@@ -33,36 +34,7 @@ const description = computed(() => {
 });
 const classification = computed(() => (typeof data.value.classification === "string" ? data.value.classification : ""));
 const icon = computed(() => (typeof data.value.icon === "string" ? data.value.icon : ""));
-const details = computed(() => {
-  const rows: { label: string; value: string }[] = [];
-  const addNumber = (key: string, label: string, style: "decimal" | "percent" = "decimal", unit = "") => {
-    const value = data.value[key];
-    if (typeof value !== "number" || !Number.isFinite(value)) return;
-    rows.push({
-      label,
-      value: `${value.toLocaleString(getFormattingLocale(), { style, maximumFractionDigits: 2 })}${unit}`,
-    });
-  };
-
-  addNumber("quantity", tr("ShopModal.so_luong"));
-  addNumber("max_weight", tr("InventoryItemCard.tai_trong_toi_da"), "decimal", " kg");
-  addNumber("pull_strength", tr("InventoryItemCard.suc_keo"));
-  addNumber("durability", tr("InventoryItemCard.do_ben"));
-  addNumber("catch_rate", tr("InventoryItemCard.bonus_moc_ca"), "percent");
-  addNumber("luck_bonus", tr("InventoryItemCard.may_man"));
-  if (activeTab.value === "health" || classification.value === "body") {
-    for (const [id, bonus] of Object.entries(healthItem.value.bonuses)) {
-      rows.push({ label: tr(`Health.${id}`), value: `+${bonus?.toLocaleString(getFormattingLocale())}` });
-    }
-  }
-
-  const fishTypes = data.value.fish_type;
-  if (Array.isArray(fishTypes)) {
-    const value = fishTypes.filter((type): type is string => typeof type === "string" && type.trim() !== "").join(", ");
-    if (value) rows.push({ label: tr("InventoryItemCard.nhom_ca"), value });
-  }
-  return rows;
-});
+const details = computed(() => equipmentItemStats(data.value));
 
 function showDetails() {
   open({

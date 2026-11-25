@@ -10,6 +10,8 @@ import { useHealthStore } from "../../../stores/player-health-store.ts";
 import { useFishingStore } from "../../../stores/player-fishing-store.ts";
 import type { FishingTool } from "../../../types/model/fishing";
 import Tab, { type TabItem } from "../../shared/Tab.vue";
+import EquipmentPickerItemCard from "./EquipmentPickerItemCard.vue";
+import { useInformationModal } from "../../../composables/useInformationModal";
 
 const props = defineProps<{ open: boolean }>();
 const emit = defineEmits<{ (e: "close"): void }>();
@@ -17,6 +19,7 @@ const emit = defineEmits<{ (e: "close"): void }>();
 const store = useFishingStore();
 const equipmentStore = useEquipmentStore();
 const healthStore = useHealthStore();
+const information = useInformationModal();
 
 const activeTab = ref<string>(store.selectedTool ?? equipmentCategories[0].id);
 const search = ref("");
@@ -49,6 +52,7 @@ const filteredOptions = computed(() => {
     : healthStore.activeItems
         .filter((item) => item.slot === bodySlot.value)
         .map((item) => ({
+          ...item.inventory.data,
           id: item.inventory.id,
           name: item.name,
           image: item.image,
@@ -63,14 +67,6 @@ const filteredOptions = computed(() => {
   return options.filter((o) => o.name.toLowerCase().includes(term) || o.detail.toLowerCase().includes(term));
 });
 
-function isImageIcon(icon: string) {
-  return icon.startsWith("/") || icon.startsWith("http");
-}
-
-function imageSource(variant: EquipmentVariant) {
-  return variant.image || (isImageIcon(variant.icon) ? variant.icon : null);
-}
-
 async function pick(variant: EquipmentVariant) {
   const tool = activeTab.value;
   if (!isFishingTool(tool)) return;
@@ -81,11 +77,8 @@ async function pick(variant: EquipmentVariant) {
   }
 }
 
-function isSelected(variant: EquipmentVariant) {
-  return variant.is_used === true;
-}
-
 function onKeydown(event: KeyboardEvent) {
+  if (information.content.value) return;
   if (props.open && event.key === "Escape") emit("close");
 }
 
@@ -178,48 +171,15 @@ onBeforeUnmount(() => window.removeEventListener("keydown", onKeydown));
                         : tr("EquipmentPickerModal.khong_tim_thay_ket_qua")
                     }}
                   </div>
-                  <div v-for="variant in filteredOptions" :key="variant.id">
-                    <button
-                      type="button"
-                      :disabled="!!bodySlot"
-                      class="relative flex min-h-[150px] w-full items-center gap-3 overflow-hidden rounded-xl border border-border-default bg-white p-3 text-left transition hover:bg-surface"
-                      :class="{
-                        'border-2 border-accent bg-surface shadow-[0_0_0_2px_var(--color-surface)]': isSelected(variant),
-                      }"
-                      :aria-pressed="isSelected(variant)"
-                      @click="pick(variant)"
-                    >
-                      <span class="grid h-32 w-20 flex-none place-items-center overflow-hidden text-3xl">
-                        <img
-                          v-if="imageSource(variant)"
-                          :src="imageSource(variant)!"
-                          :alt="variant.name"
-                          class="h-[128px] w-[80px] max-h-full max-w-full rounded-md object-contain"
-                        />
-                        <template v-else>{{ variant.icon }}</template>
-                      </span>
-                      <span class="flex min-w-0 flex-1 flex-col leading-tight">
-                        <span
-                          v-if="isSelected(variant)"
-                          class="mb-1 flex items-center gap-1 text-[10px] font-extrabold uppercase tracking-wide text-content"
-                        >
-                          <span class="grid h-4 w-4 place-items-center rounded-full bg-accent text-white">✓</span>
-                          {{ tr("EquipmentPickerModal.dang_dung") }}
-                        </span>
-                        <strong class="text-xs font-bold">{{ variant.name }}</strong>
-                        <small class="text-[10px] text-content">{{ variant.detail }}</small>
-                        <small v-if="activeTab === 'bait'" class="mt-1 text-[10px] font-semibold text-content">
-                          {{ tr("EquipmentPickerModal.so_luong") }} {{ variant.quantity ?? 0 }}
-                        </small>
-                      </span>
-                      <span
-                        v-if="isSelected(variant)"
-                        class="absolute right-2 top-2 rounded-full bg-accent px-2 py-1 text-[9px] font-extrabold text-white"
-                      >
-                        {{ tr("EquipmentPickerModal.da_chon") }}
-                      </span>
-                    </button>
-                  </div>
+                  <EquipmentPickerItemCard
+                    v-for="variant in filteredOptions"
+                    :key="variant.id"
+                    :variant="variant"
+                    :category="tab.label"
+                    :read-only="!!bodySlot"
+                    :bait="activeTab === 'bait'"
+                    @pick="pick"
+                  />
                 </div>
               </div>
             </template>
