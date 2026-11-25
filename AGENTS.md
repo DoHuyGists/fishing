@@ -14,6 +14,13 @@
 - Choose the right animation from animation.css if the component not have yet.
 - Always run a build check after changing code.
 
+## Supabase
+- Use only the Supabase project defined in VITE_SUPABASE_URL.
+- Verify the project_ref before using Supabase MCP.
+- Never access other Supabase projects.
+- Never modify the database without explicit approval.
+
+Use Supabase MCP to verify actual database schemas, RPCs, and RLS policies before implementing database-related features. Never modify the remote database without explicit user approval. Follow the existing supabaseRepository architecture.
 
 
 ## ⚠️ CRITICAL: File Encoding & Text Integrity Rules (Mojibake Prevention)
