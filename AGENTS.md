@@ -2,8 +2,8 @@
 - State & logic: Use Pinia stores for state management, dynamic data, and data-processing actions.
 - Database: Use `supabaseRepository` for Supabase queries and Realtime subscriptions. Keep database access out of components and stores unless existing architecture explicitly requires otherwise.
 - Follow existing architecture, conventions, and patterns. Implement intended behavior, not merely minimum literal requirements.
-- Reuse `src/components/shared/*`. Create components only if no suitable component exists or existing components cover less than 30% of essential requirements.
-- Preferred UI colors: theme.css, animation.css
+- Reuse component: `src/components/shared/*`.
+- Preferred UI colors: `theme.css`, `animation.css`
 - Avoid duplication, unrelated changes, and oversimplification. Preserve existing behavior and validate changes when practical.
 - No using <ul>, <ol>, <li>, <p>, <h1>, <h2>, <h3>, ...
 - Notice that this project is using vue-i18n so except for the content in /components/admin/*, we need to support multiple languages following the current configuration.
