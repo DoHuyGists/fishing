@@ -2,12 +2,14 @@
 import { t as tr } from "../../../i18n";
 
 import { useFishingStore } from "../../../stores/player-fishing-store.ts";
-import { ref, watch } from "vue";
+import { defineAsyncComponent, ref, watch } from "vue";
 import EquipmentPickerModal from "./EquipmentPickerModal.vue";
 import AdjusDepth from "./AdjusDepth.vue";
 
+const DailyMissionModal = defineAsyncComponent(() => import("../player-mission/DailyMissionModal.vue"));
 const store = useFishingStore();
 const pickerOpen = ref(false);
+const dailyMissionsOpen = ref(false);
 
 function openPicker() {
   if (!store.canAdjustDepth) return;
@@ -95,6 +97,17 @@ watch(
         </span>
       </button>
       <AdjusDepth />
+      <button
+        type="button"
+        class="slide-fade-in from-top player-content-in flex items-center gap-2 rounded-lg border border-border-default bg-surface min-h-11 [@media(pointer:fine)]:min-h-7 px-3 py-[3px] text-[11px] font-bold text-content transition hover:border-accent hover:bg-surface"
+        aria-haspopup="dialog"
+        :aria-expanded="dailyMissionsOpen"
+        @click="dailyMissionsOpen = true"
+      >
+        <span aria-hidden="true" class="text-base">📋</span>
+        {{ tr("DailyMission.nhiem_vu_hang_ngay") }}
+      </button>
+      <DailyMissionModal v-if="dailyMissionsOpen" @close="dailyMissionsOpen = false" />
       <button
         type="button"
         class="slide-fade-in from-top player-content-in relative flex items-center gap-2 rounded-lg border border-border-default bg-surface min-h-11 [@media(pointer:fine)]:min-h-7 px-3 py-[3px] text-[11px] font-bold text-content transition hover:border-accent hover:bg-surface"
