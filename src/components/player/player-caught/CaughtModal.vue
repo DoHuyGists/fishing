@@ -59,7 +59,8 @@ async function handleSell(priceNum: number) {
         return tr("AttendanceModal.thanh_cong");
       },
     });
-  } catch (err: any) {
+  } catch (err: unknown) {
+    sellError.value = err instanceof Error ? err.message : tr("CaughtModal.loi_khi_dang_ban_ca");
     toast.error(tr("CaughtModal.loi_khi_dang_ban_ca"), {
       get title() {
         return tr("CaughtModal.khong_thanh_cong");

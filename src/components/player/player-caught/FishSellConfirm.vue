@@ -4,10 +4,12 @@ import { t as tr } from "../../../i18n";
 import { computed, ref, watch } from "vue";
 import PaymentConfirmation from "../../shared/PaymentConfirmation.vue";
 import { useCurrencyStore } from "../../../stores/player-currency-store.ts";
+import { useUserProfileStore } from "../../../stores/player-user-profile-store";
 
 const props = defineProps<{ fish: any; isLoading?: boolean; error?: string }>();
 const emit = defineEmits<{ cancel: []; confirm: [price: number] }>();
 const currencyStore = useCurrencyStore();
+const userProfileStore = useUserProfileStore();
 const price = ref<number | "">("");
 const listedPrice = 500;
 const balanceFee = computed(() => {
@@ -52,6 +54,9 @@ function confirm() {
     <div class="text-sm text-content/70">
       {{ tr("CaughtModal.dang_ban") }} <strong>{{ fish.species?.name }}</strong>
       {{ tr("FishSellConfirm.len_thi_truong") }}
+    </div>
+    <div v-if="userProfileStore.profile" class="text-sm text-content/70">
+      {{ tr("FishSellConfirm.sell_slot_limit", { count: userProfileStore.marketSellSlots }) }}
     </div>
     <input
       v-model.number="price"

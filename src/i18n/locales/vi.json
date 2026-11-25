@@ -678,6 +678,8 @@
     "xac_nhan_tha": "Xác nhận thả"
   },
   "FishSellConfirm": {
+    "sell_slot_limit": "Số cá được bày bán cùng lúc: tối đa {count} con.",
+    "slot_limit_reached": "Bạn đã hết chỗ bày bán cá. Hãy hủy một tin bán hoặc chờ cá được mua để đăng thêm.",
     "dang_ban_ca": "Đăng bán cá",
     "len_thi_truong": "lên thị trường.",
     "nhap_gia_ban": "Nhập giá bán...",

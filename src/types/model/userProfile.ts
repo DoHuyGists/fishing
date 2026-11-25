@@ -7,6 +7,7 @@ export interface UserProfile {
   equipment_capacity: number;
   fishing_net_capacity: number;
   species_storage_capacity: number;
+  market_sell_slot: number | null;
   pond_slot: number;
   is_admin: boolean;
   created_at: string;

@@ -674,6 +674,8 @@
     "xac_nhan_tha": "Confirm release"
   },
   "FishSellConfirm": {
+    "sell_slot_limit": "You can list up to {count} fish at a time.",
+    "slot_limit_reached": "All your fish sale slots are full. Cancel a listing or wait for a fish to sell before listing another.",
     "dang_ban_ca": "List fish for sale",
     "len_thi_truong": "on the market.",
     "nhap_gia_ban": "Enter sale price...",

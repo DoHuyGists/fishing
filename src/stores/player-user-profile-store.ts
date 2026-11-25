@@ -23,6 +23,7 @@ export const useUserProfileStore = defineStore("userProfile", {
     equipmentCapacity: (state) => Math.max(0, state.profile?.equipment_capacity ?? 0),
     fishingNetCapacity: (state) => Math.max(0, Math.floor(state.profile?.fishing_net_capacity ?? 0)),
     speciesStorageCapacity: (state) => state.profile?.species_storage_capacity ?? 0,
+    marketSellSlots: (state) => Math.max(0, Math.floor(state.profile?.market_sell_slot ?? 0)),
   },
   actions: {
     async updateIdentity(displayName: string, avatarUrl: string | null, file?: File) {

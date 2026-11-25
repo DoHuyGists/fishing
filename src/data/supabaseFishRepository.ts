@@ -2,6 +2,7 @@ import type { FishDepthPreviewResponse, AreaSpeciesDiaryResponse } from "../type
 import type { CaughtRow, FishingInventoryRow } from "../types/table/fish";
 import type { NearbyCatchRow } from "../types/table/nearbyCatch";
 import supabase from "../database/connection";
+import { t as tr } from "../i18n";
 
 class SupabaseFishRepository {
   // Preserve the existing RLS-visible scope; area-session aggregation is IC-12.
@@ -160,9 +161,13 @@ class SupabaseFishRepository {
       p_price: price,
     });
 
-    if (error) throw new Error(error.message);
-
-    return data;
+    const message = error?.message ?? (data?.success === false
+      ? data.message || tr("CaughtModal.loi_khi_dang_ban_ca") : null);
+    if (message) {
+      throw new Error(message.includes("MARKET_SELL_SLOT_LIMIT")
+        ? tr("FishSellConfirm.slot_limit_reached")
+        : message);
+    }
   }
 }
 
