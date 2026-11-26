@@ -15,9 +15,9 @@ async function save(payload: Record<string, unknown>, key: string | null) {
   try {
     await store.save(payload, key);
     const name = store.items.find((item) => item.feature_key === key)?.name ?? key;
-    const enabled = store.flags.find((flag) => flag.feature_key === key)?.enabled;
+    const flag = store.flags.find((flag) => flag.feature_key === key);
     toast.success(
-      `${name}: ${enabled ? "Đang bật — người chơi có thể sử dụng." : "Đang tắt — tính năng đang khóa với người chơi."}`,
+      `${name}: ${flag?.is_visible === false ? "Đã ẩn và khóa với người chơi." : flag?.enabled ? "Đang bật — người chơi có thể sử dụng." : "Đang tắt — tính năng đang khóa với người chơi."}`,
       { title: "Đã cập nhật tính năng" },
     );
   } catch (error) {
@@ -37,11 +37,14 @@ const columns: CrudColumn[] = [
     format: (row) =>
       row.enabled === undefined
         ? "Thiếu cấu hình DB"
-        : row.enabled
-          ? "Đang bật · Có thể sử dụng"
-          : "Đang tắt · Đang khóa",
+        : row.is_visible === false
+          ? "Đang ẩn · Đang khóa"
+          : row.enabled
+            ? "Đang bật · Có thể sử dụng"
+            : "Đang tắt · Đang khóa",
   },
   { key: "message_vi", label: "Thông báo (VI)" },
+  { key: "is_visible", label: "Hiển thị", format: (row) => row.is_visible === false ? "Ẩn" : "Hiện" },
   { key: "message_en", label: "Thông báo (EN)" },
   {
     key: "updated_at",
@@ -61,6 +64,16 @@ const fields: CrudField[] = [
     options: [
       { value: "true", label: "Đang bật — người chơi có thể sử dụng" },
       { value: "false", label: "Đang tắt — khóa tính năng với người chơi" },
+    ],
+  },
+  {
+    key: "is_visible",
+    label: "Hiển thị trên giao diện",
+    type: "select",
+    required: true,
+    options: [
+      { value: "true", label: "Hiện — sử dụng trạng thái bật/tắt ở trên" },
+      { value: "false", label: "Ẩn — khóa và không hiển thị với người chơi" },
     ],
   },
   { key: "message_vi", label: "Thông báo tiếng Việt (để trống dùng mặc định)", type: "text" },
@@ -89,9 +102,9 @@ const fields: CrudField[] = [
       <span
         class="inline-flex items-center gap-1.5 whitespace-nowrap rounded-full border px-2.5 py-1 text-xs font-bold"
         :class="
-          item.enabled === true
+          item.enabled === true && item.is_visible !== false
             ? 'border-accent bg-surface text-content'
-            : item.enabled === false
+            : item.enabled === false || item.is_visible === false
               ? 'border-danger bg-surface text-danger'
               : 'border-gold bg-surface text-gold'
         "
@@ -99,7 +112,7 @@ const fields: CrudField[] = [
         <span
           aria-hidden="true"
           class="size-2 rounded-full"
-          :class="item.enabled === true ? 'bg-accent' : item.enabled === false ? 'bg-danger' : 'bg-gold'"
+          :class="item.enabled === true && item.is_visible !== false ? 'bg-accent' : item.enabled === false || item.is_visible === false ? 'bg-danger' : 'bg-gold'"
         ></span>
         {{ value }}
       </span>

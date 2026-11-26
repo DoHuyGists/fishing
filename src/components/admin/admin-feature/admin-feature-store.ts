@@ -36,12 +36,15 @@ export const useAdminFeatureStore = defineStore("AdminFeatureAvailability", {
       if (!current) throw new Error("Không tìm thấy cấu hình tính năng. Hãy chạy migration và tải lại danh sách.");
       if (![true, false, "true", "false"].includes(payload.enabled as boolean | string))
         throw new Error("Hãy chọn trạng thái tính năng");
+      if (![true, false, "true", "false"].includes(payload.is_visible as boolean | string))
+        throw new Error("Hãy chọn trạng thái hiển thị tính năng");
       this.saving = true;
       try {
         const updated = await repository.update(
           current.feature_key,
           {
             enabled: payload.enabled === true || payload.enabled === "true",
+            is_visible: payload.is_visible === true || payload.is_visible === "true",
             message_vi: String(payload.message_vi ?? ""),
             message_en: String(payload.message_en ?? ""),
           },

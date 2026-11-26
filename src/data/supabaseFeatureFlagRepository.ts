@@ -1,6 +1,6 @@
 import type { FeatureFlagRow, FeatureFlagUpdate } from "../types/table/featureFlag";
 import supabase from "../database/connection";
-const columns = "feature_key,enabled,message_vi,message_en,updated_at,updated_by";
+const columns = "feature_key,enabled,is_visible,message_vi,message_en,updated_at,updated_by";
 
 class SupabaseFeatureFlagRepository {
   async fetchAll(): Promise<FeatureFlagRow[]> {
@@ -12,7 +12,7 @@ class SupabaseFeatureFlagRepository {
 
   async update(key: string, payload: FeatureFlagUpdate, expectedUpdatedAt: string): Promise<FeatureFlagRow | null> {
     const { data, error } = await supabase.from("feature_flags")
-      .update({ enabled: payload.enabled, message_vi: payload.message_vi.trim(), message_en: payload.message_en.trim() })
+      .update({ enabled: payload.enabled, is_visible: payload.is_visible, message_vi: payload.message_vi.trim(), message_en: payload.message_en.trim() })
       .eq("feature_key", key).eq("updated_at", expectedUpdatedAt).select(columns).maybeSingle();
     if (error) throw new Error(error.message);
     return data;

@@ -7,6 +7,7 @@ export const FEATURE_CATALOG = catalog;
 export function modalFeatures(modal: string): string[] {
   if (modal === "game-settings") return ["account"];
   if (modal === "storage") return ["inventory"];
+  if (modal === "fishing-map") return ["world-map"];
   if (modal === "prepare") return ["world-map", "enter-area"];
   return catalog.some(feature => feature.key === modal) ? [modal] : [];
 }

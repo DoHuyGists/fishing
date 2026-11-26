@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import type { LobbyAction } from "../../../types/model/worldMap";
+import { computed } from "vue";
 import { t as tr } from "../../../i18n";
 
 import { useConfigStore } from "../../../stores/player-config-store.ts";
@@ -275,6 +276,11 @@ const supportActions: LobbyAction[] = [
     requiresUnlock: true,
   },
 ];
+const visibleUtilityActions = computed(() => utilityActions.filter(action => features.isModalVisible(action.modal)));
+const visibleSupportActions = computed(() => supportActions.filter(action => features.isModalVisible(action.modal)));
+const visibleActionGroups = computed(() => actionGroups
+  .map(group => ({ ...group, actions: group.actions.filter(action => features.isModalVisible(action.modal)) }))
+  .filter(group => group.actions.length));
 </script>
 
 <template>
@@ -295,7 +301,7 @@ const supportActions: LobbyAction[] = [
       </div>
       <div class="grid grid-cols-2 gap-1.5">
         <button
-          v-for="(action, actionIndex) in utilityActions"
+          v-for="(action, actionIndex) in visibleUtilityActions"
           :id="action.tourId"
           :key="action.modal"
           type="button"
@@ -327,7 +333,7 @@ const supportActions: LobbyAction[] = [
       class="lobby-menu__body [scrollbar-width:thin] [scrollbar-color:var(--color-ocean-cyan)_transparent] scroll-py-2 min-h-0 flex-1 space-y-3 overflow-x-hidden overflow-y-auto overscroll-contain px-2.5 py-2 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-accent"
     >
       <section
-        v-for="(group, groupIndex) in actionGroups"
+        v-for="(group, groupIndex) in visibleActionGroups"
         :key="group.key"
         :aria-labelledby="`lobby-group-${group.key}`"
       >
@@ -381,7 +387,7 @@ const supportActions: LobbyAction[] = [
 
     <div class="lobby-menu__footer grid shrink-0 grid-cols-2 gap-1 border-t border-border-default bg-surface px-2 py-1">
       <button
-        v-for="(action, actionIndex) in supportActions"
+        v-for="(action, actionIndex) in visibleSupportActions"
         :key="action.modal"
         type="button"
         :disabled="features.canOpen(action.modal) && action.requiresUnlock && !configStore.isUnlocked(action.modal)"

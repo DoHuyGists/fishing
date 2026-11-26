@@ -210,6 +210,7 @@ function zoomTo(k: number) {
               :preview-scene="dayPhaseStore.previewScene"
               :is-entering="isEntering"
               :enter-area-available="features.isAvailable('enter-area')"
+              :enter-area-visible="features.isVisible('enter-area')"
               @close="worldStore.targetArea({})"
               @enter="features.isAvailable('enter-area') ? openPrepare(area) : features.showDetails('enter-area')"
             />
@@ -230,7 +231,7 @@ function zoomTo(k: number) {
       </div>
     </div>
   </div>
-  <div v-else class="rounded-xl border border-border-default bg-surface p-4 text-sm text-content" role="status">
+  <div v-else-if="features.isVisible('world-map')" class="rounded-xl border border-border-default bg-surface p-4 text-sm text-content" role="status">
     <div class="font-semibold">
       {{ tr("FishingAnchor.ban_do") }} ·
       <button

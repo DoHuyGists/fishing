@@ -13,6 +13,9 @@ Migration dừng và rollback nếu phát hiện `pgrst.db_pre_request` khác đ
 
 ## Hoạt động
 
+- Chạy migration `migrations/20261126_feature_flag_visibility.sql` trước khi phát hành client có `is_visible`. Cột boolean `NOT NULL DEFAULT true` giữ nguyên hành vi các flag hiện có. `is_visible = false` luôn khóa tính năng (dù `enabled = true`) và ẩn các nút tương ứng, kể cả nút dùng chung flag (`storage`, `game-settings`, `fishing-map`), nút vào bãi và thông báo bảo trì bản đồ. `is_visible = true` tiếp tục dùng `enabled` để quyết định bật hoặc bảo trì. Khi hiện lại, giá trị `enabled` trước đó được giữ nguyên.
+- Admin chỉnh `is_visible` tại **Hiển thị trên giao diện**. Quyền cập nhật vẫn theo RLS admin; trigger cập nhật thời gian/người sửa khi đổi hiển thị. Hook Data API và helper dùng cho Storage/RPC đều kiểm tra cả hai cột. Migration chưa được áp dụng lên DB từ xa trong thay đổi mã nguồn này. Edge Function PayPal triển khai ngoài repo cũng cần kiểm tra `is_visible` cùng `enabled` trước thanh toán.
+
 - `src/data/featureCatalog.json` khai báo khóa, bản dịch nhãn và endpoint thuộc mỗi tính năng. Danh sách tương ứng được nhúng trong migration.
 - Repository sở hữu truy vấn và subscription Supabase. Pinia store tải snapshot, nhận Realtime, tải lại khi reconnect/focus/online và mỗi 30 giây. Snapshot đến muộn từ phiên đăng nhập cũ bị bỏ qua. Sự kiện đến trong lúc tải sẽ yêu cầu tải lại sau đó.
 - `featureRequestGate.ts` kiểm tra request của Supabase trước khi gửi. Request bị khóa nhận lỗi dạng PostgREST ngay trên client. Snapshot quá 30 giây được tải lại trước request. Nếu mất mạng sau khi đã tải, giữ trạng thái gần nhất; server vẫn kiểm tra từng request.

@@ -26,7 +26,14 @@ export const useFeatureAvailabilityStore = defineStore("FeatureAvailability", {
     isAvailable:
       (state) =>
       (key: string): boolean =>
-        state.ready && state.flags[key]?.enabled === true,
+        state.ready && state.flags[key]?.enabled === true && state.flags[key]?.is_visible !== false,
+    isVisible:
+      (state) =>
+      (key: string): boolean =>
+        state.flags[key]?.is_visible !== false,
+    isModalVisible(): (modal: string) => boolean {
+      return (modal) => modalFeatures(modal).every((key) => this.isVisible(key));
+    },
     canOpen(): (modal: string) => boolean {
       return (modal) => modalFeatures(modal).every((key) => this.isAvailable(key));
     },

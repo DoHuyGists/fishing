@@ -9,6 +9,7 @@ defineProps<{
   previewScene: string;
   isEntering: boolean;
   enterAreaAvailable: boolean;
+  enterAreaVisible: boolean;
 }>();
 
 const emit = defineEmits<{
@@ -38,6 +39,7 @@ const emit = defineEmits<{
       <FishingFatigue v-if="!area.survivalMode" variant="compact" :area-id="area.id" />
     </div>
     <button
+      v-if="enterAreaVisible"
       type="button"
       class="w-full rounded-lg bg-accent px-2 py-1.5 font-bold text-white hover:bg-accent disabled:opacity-70"
       :disabled="isEntering"
