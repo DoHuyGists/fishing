@@ -23,7 +23,6 @@ const modalNames = [
   "team",
   "post-production",
   "shop",
-  "prepare",
   "badge",
   "work-bench",
   "leaderboard",
@@ -43,6 +42,7 @@ type ModalName = (typeof modalNames)[number] | null;
 function restoreModal(): ModalName {
   try {
     const saved = localStorage.getItem(STORAGE_KEY);
+    if (saved === "prepare") localStorage.removeItem(STORAGE_KEY);
     return modalNames.find((name) => name === saved) ?? null;
   } catch {
     // Modal controls remain available when browser storage is disabled.

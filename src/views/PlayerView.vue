@@ -18,7 +18,6 @@ import Shells from "../components/player/player-currency/Shells.vue";
 import Tickets from "../components/player/player-currency/Tickets.vue";
 import SkillPoints from "../components/player/player-currency/SkillPoints.vue";
 import TeamMembersSticky from "../components/player/player-team/TeamMembersSticky.vue";
-import PrepareModal from "../components/player/player-prepare/PrepareModal.vue";
 import FeatureTable from "../components/player/player-world-map/FeatureTable.vue";
 import GuideTour from "../components/shared/GuideTour.vue";
 import { useOnboardingStore } from "../stores/player-onboarding-store.ts";
@@ -276,7 +275,6 @@ onUnmounted(() => {
           <AttendanceModal v-if="modalStore.isOpening('attendance')" />
           <DonationModal v-if="configStore.isUnlocked('donation') && modalStore.isOpening('donation')" />
           <PostProduction v-if="configStore.isUnlocked('post-production') && modalStore.isOpening('post-production')" />
-          <PrepareModal v-if="modalStore.isOpening('prepare')" />
         </div>
       </Transition>
     </Teleport>

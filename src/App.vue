@@ -32,9 +32,7 @@ watch(
 watch(
   () => router.currentRoute.value.name,
   (name) => {
-    if (name === "fishing") {
-      if (modals.isOpening("prepare")) modals.close();
-    } else if (fishingTransition.visible) {
+    if (name !== "fishing" && fishingTransition.visible) {
       // A completed redirect away from fishing must not leave the screen covered.
       fishingTransition.hide();
     }

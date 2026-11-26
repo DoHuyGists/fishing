@@ -1790,6 +1790,8 @@
     "luu_lai": "Save"
   },
   "PrepareModal": {
+    "title": "Fishing preparation",
+    "areaNotFound": "This fishing area does not exist or is currently unavailable. Choose another area on the map.",
     "khong_the_tai_trang_bi": "Unable to load equipment",
     "khong_the_doi_set_trang_bi": "Unable to change equipment set",
     "chua_chon_set_trang_bi_nao": "No equipment set selected.",

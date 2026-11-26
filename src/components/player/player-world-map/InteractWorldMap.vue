@@ -13,7 +13,7 @@ import { useDayPhaseClock } from "../../../composables/useDayPhaseClock";
 import { useToast } from "../../../composables/useToast.ts";
 import FishingAnchor from "./FishingAnchor.vue";
 import FishingFatigue from "../player-fishing/FishingFatigue.vue";
-import { useModalStore } from "../../../stores/player-modal-store.ts";
+import { useRouter } from "vue-router";
 import { useCountryStore } from "../../../stores/player-country-store.ts";
 import { useFeatureAvailabilityStore } from "../../../stores/player-feature-availability-store.ts";
 
@@ -29,7 +29,7 @@ const features = useFeatureAvailabilityStore();
 const userInAreaStore = useUserInAreaStore();
 const dayPhaseStore = useDayPhaseClock();
 const fishingAreaStore = useFishingAreaStore();
-const modalStore = useModalStore();
+const router = useRouter();
 const zoomInfo = ref({ lon: 0, lat: 0, k: 1 });
 const picked = ref<string>("");
 const mapRef = ref<InstanceType<typeof WorldMap> | null>(null);
@@ -39,7 +39,6 @@ const worldStore = useWorldStore();
 const isMapVisible = computed(() => !props.collapsible || worldStore.isMapVisible);
 useGameCatalogRefresh(["countries", "areas"], () => isMapVisible.value && features.isAvailable("world-map"));
 const selectedArea = computed(() => (worldStore.selectedArea?.id ? worldStore.selectedArea : null));
-const pendingArea = ref<any | null>(null);
 const isEntering = ref(false);
 
 watch(isMapVisible, async (visible) => {
@@ -72,7 +71,6 @@ watch(
   async (enabled) => {
     if (enabled) void fishingAreaStore.fetchArea();
     if (!enabled) {
-      pendingArea.value = null;
       worldStore.isAnchorMode = false;
     } else {
       await nextTick();
@@ -125,7 +123,8 @@ watch(
   { immediate: true },
 );
 
-function openPrepare(area: any) {
+async function openPrepare(area: any) {
+  if (isEntering.value || !area?.id) return;
   const blocked = ["world-map", "enter-area"].find((key) => !features.isAvailable(key));
   if (blocked) {
     features.notify(blocked);
@@ -140,8 +139,12 @@ function openPrepare(area: any) {
     });
     return;
   }
-  pendingArea.value = area;
-  modalStore.open("prepare");
+  isEntering.value = true;
+  try {
+    await router.push({ name: "prepare", params: { areaId: area.id } });
+  } finally {
+    isEntering.value = false;
+  }
 }
 
 function onZoom(s: { center: [number, number] | null; k: number }) {
@@ -223,7 +226,6 @@ function zoomTo(k: number) {
                 type="button"
                 class="w-full rounded-lg bg-accent px-2 py-1.5 font-bold text-white hover:bg-accent disabled:opacity-70"
                 :disabled="isEntering"
-                aria-haspopup="dialog"
                 :class="{ 'underline underline-offset-2': !features.isAvailable('enter-area') }"
                 @click="features.isAvailable('enter-area') ? openPrepare(area) : features.showDetails('enter-area')"
               >

@@ -1794,6 +1794,8 @@
     "luu_lai": "Lưu lại"
   },
   "PrepareModal": {
+    "title": "Chuẩn bị câu cá",
+    "areaNotFound": "Bãi câu không tồn tại hoặc hiện không mở cửa. Hãy chọn lại bãi câu từ bản đồ.",
     "khong_the_tai_trang_bi": "Không thể tải trang bị",
     "khong_the_doi_set_trang_bi": "Không thể đổi set trang bị",
     "chua_chon_set_trang_bi_nao": "Chưa chọn set trang bị nào.",

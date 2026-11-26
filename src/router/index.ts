@@ -52,6 +52,12 @@ const router = createRouter({
               meta: { requiresAuth: true },
             },
             {
+              path: "/prepare/:areaId?",
+              name: "prepare",
+              component: () => import("../views/PrepareView.vue"),
+              meta: { requiresAuth: true },
+            },
+            {
               path: "/fishing",
               name: "fishing",
               component: () => import("../views/FishingView.vue"),

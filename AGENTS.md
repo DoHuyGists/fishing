@@ -1,29 +1,32 @@
-- Stack: Supabase, Vue 3 Composition API (`<script setup>`), TypeScript, Tailwind CSS.
-- State & logic: Use Pinia stores for state management, dynamic data, and data-processing actions.
-- Database: Use `supabaseRepository` for Supabase queries and Realtime subscriptions. Keep database access out of components and stores unless existing architecture explicitly requires otherwise.
-- Follow existing architecture, conventions, and patterns. Implement intended behavior, not merely minimum literal requirements.
-- Reuse component: `src/components/shared/*`.
-- Preferred UI colors: `theme.css`, `animation.css`
-- Avoid duplication, unrelated changes, and oversimplification. Preserve existing behavior and validate changes when practical.
-- No using <ul>, <ol>, <li>, <p>, <h1>, <h2>, <h3>, ...
-- Notice that this project is using vue-i18n so except for the content in /components/admin/*, we need to support multiple languages following the current configuration.
-- Do not use sub sentence under main title
-- Prioritize breaking down large components into smaller ones for better structure and recognition.
-- Try to limit using basic state management variables if it can be done better when using Pinia store or composables
-- Type references in the 'types' folder, take a look before intending to make a new type.
-- Choose the right animation from animation.css if the component not have yet.
-- Always run a build check after changing code.
+## Development Rules
+
+- Stack: Supabase, Vue 3 Composition API (`<script setup lang="ts">`), TypeScript, Tailwind CSS.
+- Follow existing architecture, conventions, and patterns. Implement intended behavior without oversimplification, duplication, or unrelated changes.
+- Use Pinia for shared state and data-processing actions, composables for reusable logic, and local state for component-specific needs.
+- Use `supabaseRepository` for database queries and Realtime subscriptions. Keep direct database access out of components and stores unless required by existing architecture.
+- Reuse components from `src/components/shared/` and split large components by responsibility.
+- Reuse existing type definitions in `types/` before creating new ones.
+- Follow `theme.css` and reuse appropriate animations from `animation.css`.
+- Avoid native HTML list, paragraph, and heading elements (`ul`, `ol`, `li`, `p`, `h1`–`h6`).
+- Do not add subtitles beneath main titles.
+- Follow existing vue-i18n configuration except within `src/components/admin/`.
+- Preserve existing behavior and always run a build check after code changes.
+
+## Project Memory
+
+- Read relevant `docs/` and use `docs/codebase-map.md` to locate modules before implementation.
+- Verify documentation against current source code.
+- Update affected documentation when architecture, database schemas, or business rules change.
 
 ## Supabase
-- Use only the Supabase project defined in VITE_SUPABASE_URL.
-- Verify the project_ref before using Supabase MCP.
-- Never access other Supabase projects.
-- Never modify the database without explicit approval.
 
-Use Supabase MCP to verify actual database schemas, RPCs, and RLS policies before implementing database-related features. Never modify the remote database without explicit user approval. Follow the existing supabaseRepository architecture.
+- Use Supabase MCP only for tasks involving database tables or RPCs.
+- Verify the project_ref against `VITE_SUPABASE_URL` before accessing Supabase. Never access other projects.
+- Verify relevant schemas, RPC definitions, and RLS policies before implementing affected features.
+- Never modify the remote database without explicit user approval.
 
 
-## ⚠️ CRITICAL: File Encoding & Text Integrity Rules (Mojibake Prevention)
+## CRITICAL: File Encoding & Text Integrity Rules (Mojibake Prevention)
 
 To prevent UTF-8 encoding corruption (mojibake like `BÃ£i cÃ¢u`, `Ä‘`, `ðŸ`), you MUST strictly follow these rules when handling text files (especially `.vue`, `.ts`, `.js`, `.json`, `.md`):
 
