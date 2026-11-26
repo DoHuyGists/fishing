@@ -420,7 +420,7 @@ onMounted(() => {
             </div>
 
             <div class="col-span-4">
-              <img :src="factionStore.activeFaction?.leader_1_image" alt="" draggable="false" />
+              
             </div>
           </div>
         </section>
