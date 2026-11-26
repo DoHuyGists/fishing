@@ -6,6 +6,7 @@ const STORAGE_KEY = "fishing.modalOpening";
 const modalNames = [
   "story",
   "account",
+  "game-settings",
   "market",
   "diary",
   "gacha",

@@ -1,5 +1,15 @@
 # Refactor theo module
 
+## Cài đặt tại sảnh
+
+`FeatureTable.vue` mở `GameSettingModal.vue` qua modal `game-settings` trong
+`PlayerView.vue`. Modal dùng `player-user-setting-store.ts` và
+`supabaseUserSettingRepository` để đọc `user_setting` theo ID tài khoản đang
+đăng nhập, lưu `is_fishing_background_sound_turn_on` khi bật/tắt. Nếu chưa có
+bản ghi, giá trị mặc định là `true`, cùng quy ước với màn hình câu cá.
+Modal dùng trạng thái tải/lưu, lỗi và retry của store hiện có; quyền bảo trì
+dùng nhóm `account` vì nhóm này quản lý thao tác ghi `user_setting`.
+
 Góc thông tin trong `FishingView.vue` dùng `FishingStatusPanel.vue`: mặc định
 gom chế độ câu, giờ, thời tiết và mệt mỏi hoặc đủ năm chỉ số sinh tồn trong
 một thẻ gọn. Nút mở rộng giữ trạng thái cục bộ, hiện thông tin ngày/đêm và

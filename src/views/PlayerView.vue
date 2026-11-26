@@ -67,6 +67,7 @@ const FishingMapModal = defineAsyncComponent(
 );
 const GuideModal = defineAsyncComponent(() => import("../components/player/player-guide/GuideModal.vue"));
 const RuleModal = defineAsyncComponent(() => import("../components/player/player-rule/RuleModal.vue"));
+const GameSettingModal = defineAsyncComponent(() => import("../components/player/player-game-settings/GameSettingModal.vue"));
 const TutorialModal = defineAsyncComponent(() => import("../components/player/player-tutorial/TutorialModal.vue"));
 const StoryModal = defineAsyncComponent(() => import("../components/story/StoryModal.vue"));
 
@@ -242,6 +243,7 @@ onUnmounted(() => {
       <Transition name="player-window" :css="!modalStore.restoredEntrance" :duration="{ enter: 220, leave: 220 }">
         <div v-if="modalStore.isModalOpening && !modalStore.restorationPending">
           <AccountInfoModal v-if="modalStore.isOpening('account')" />
+          <GameSettingModal v-if="modalStore.isOpening('game-settings')" />
           <GuideModal v-if="modalStore.isOpening('guide')" />
           <RuleModal v-if="modalStore.isOpening('rule')" />
           <TutorialModal v-if="modalStore.isOpening('tutorial')" />

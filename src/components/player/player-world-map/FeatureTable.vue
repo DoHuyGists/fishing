@@ -25,6 +25,13 @@ const utilityActions: LobbyAction[] = [
     tourId: "first-play-account",
   },
   {
+    modal: "game-settings",
+    get label() {
+      return tr("FishingView.cai_dat");
+    },
+    icon: "🔧",
+  },
+  {
     modal: "guide",
     get label() {
       return tr("FeatureTable.huong_dan");
