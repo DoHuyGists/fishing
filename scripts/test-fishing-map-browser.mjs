@@ -14,7 +14,7 @@ assert.ok(executablePath, 'Set RESPONSIVE_BROWSER to an installed Chromium brows
 const fixture = `
 import { createApp } from 'vue';
 import { createPinia } from 'pinia';
-import FishingMapModal from '/src/components/player/player-fishing-map/FishingMapModal.vue';
+import FishingMapModal from '/src/components/player/player-fishing-maps/FishingMapModal.vue';
 import { useAuthStore } from '/src/stores/auth.ts';
 import { useCountryStore } from '/src/stores/player-country-store.ts';
 import { useFishingMapStore } from '/src/stores/player-fishing-map-store.ts';

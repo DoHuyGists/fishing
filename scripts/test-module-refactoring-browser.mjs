@@ -39,8 +39,8 @@ const server = await createServer({ configFile: false, envDir: false, appType: '
         import { supabaseEventScheduleRepository } from '/src/data/supabaseEventScheduleRepository.ts';
         import FriendModal from '/src/components/player/player-friend/FriendModal.vue';
         import TeamEditorForm from '/src/components/player/player-team/TeamEditorForm.vue';
-        import TheBook from '/src/components/player/player-diary/TheBook.vue';
-        import EventModal from '/src/components/player/player-event/EventModal.vue';
+        import TheBook from '/src/components/player/player-fish-collecion/TheBook.vue';
+        import EventModal from '/src/components/player/player-events/EventModal.vue';
         import LakeMap from '/src/components/admin/admin-species-in-area/Map.vue';
         import '/src/styles/index.css';
         const pinia = createPinia(), auth = useAuthStore(pinia);

@@ -13,7 +13,7 @@ assert.ok(executablePath, 'Set RESPONSIVE_BROWSER to an installed Chromium brows
 const fixture = `
 import { createApp } from 'vue';
 import { createPinia } from 'pinia';
-import DispatchModal from '/src/components/player/player-dispatch/DispatchModal.vue';
+import DispatchModal from '/src/components/player/player-dispatch-npc/DispatchModal.vue';
 import { useDispatchStore } from '/src/stores/player-dispatch-store';
 import { i18n } from '/src/i18n';
 import '/src/styles/index.css';

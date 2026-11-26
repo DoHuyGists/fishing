@@ -17,7 +17,7 @@ import { createApp, h } from 'vue';
 import { createPinia } from 'pinia';
 import Modal from '/src/components/shared/Modal.vue';
 import Confirm from '/src/components/shared/TwoOptionsModal.vue';
-import Badge from '/src/components/player/player-badge/AchievementDetail.vue';
+import Badge from '/src/components/player/player-achievement/AchievementDetail.vue';
 import MyMarket from '/src/components/player/player-market/MyMarketListingsTab.vue';
 import Market from '/src/components/player/player-market/MarketListingsTab.vue';
 import DepthForm from '/src/components/admin/admin-depth-scope/DepthScopeForm.vue';

@@ -20,10 +20,10 @@ import PrepareBodyEquipmentSets from "../components/player/player-prepare/Prepar
 import WeatherSection from "../components/player/player-fishing/WeatherSection.vue";
 import FishingSurvival from "../components/player/player-fishing/FishingSurvival.vue";
 import FishingFatigue from "../components/player/player-fishing/FishingFatigue.vue";
-import FishingEquipmentOverview from "../components/player/player-inventory/fishing-equipment/FishingEquipmentOverview.vue";
-import HealthOverview from "../components/player/player-inventory/body-equipment/HealthOverview.vue";
+import FishingEquipmentOverview from "../components/player/player-equipment/fishing-equipment/FishingEquipmentOverview.vue";
+import HealthOverview from "../components/player/player-equipment/body-equipment/HealthOverview.vue";
 
-const EquipmentModal = defineAsyncComponent(() => import("../components/player/player-inventory/EquipmentModal.vue"));
+const EquipmentModal = defineAsyncComponent(() => import("../components/player/player-equipment/EquipmentModal.vue"));
 const route = useRoute();
 const router = useRouter();
 const prepare = usePrepareStore();

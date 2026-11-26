@@ -3,7 +3,7 @@ import AdminModal from "../AdminModal.vue";
 import Pagination from "../../shared/Pagination.vue";
 import { usePagedListFilters } from "../../../composables/usePagedListFilters.ts";
 import { onMounted } from "vue";
-import EventThumbnail from "../../player/player-event/EventThumbnail.vue";
+import EventThumbnail from "../../player/player-events/EventThumbnail.vue";
 import EventScheduleForm from "./EventScheduleForm.vue";
 import { useAdminEventScheduleStore } from "./admin-event-schedule-store.ts";
 

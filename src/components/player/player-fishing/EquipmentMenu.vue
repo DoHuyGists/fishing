@@ -6,7 +6,7 @@ import { defineAsyncComponent, ref, watch } from "vue";
 import EquipmentPickerModal from "./EquipmentPickerModal.vue";
 import AdjusDepth from "./AdjusDepth.vue";
 
-const DailyMissionModal = defineAsyncComponent(() => import("../player-mission/DailyMissionModal.vue"));
+const DailyMissionModal = defineAsyncComponent(() => import("../player-missions/DailyMissionModal.vue"));
 const store = useFishingStore();
 const pickerOpen = ref(false);
 const dailyMissionsOpen = ref(false);

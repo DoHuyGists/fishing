@@ -30,24 +30,26 @@ const InteractWorldMap2 = defineAsyncComponent(
 const AccountInfoModal = defineAsyncComponent(() => import("../components/player/player-account/AccountInfoModal.vue"));
 const MarketModal = defineAsyncComponent(() => import("../components/player/player-market/MarketModal.vue"));
 const ShopModal = defineAsyncComponent(() => import("../components/player/player-shop/ShopModal.vue"));
-const CatchDiaryModal = defineAsyncComponent(() => import("../components/player/player-diary/CatchDiaryModal.vue"));
-const SpinWheelModal = defineAsyncComponent(() => import("../components/player/player-spin-wheel/SpinWheelModal.vue"));
-const StorageModal = defineAsyncComponent(() => import("../components/player/player-storage/StorageModal.vue"));
-const EquipmentModal = defineAsyncComponent(() => import("../components/player/player-inventory/EquipmentModal.vue"));
+const CatchDiaryModal = defineAsyncComponent(
+  () => import("../components/player/player-fish-collecion/CatchDiaryModal.vue"),
+);
+const SpinWheelModal = defineAsyncComponent(() => import("../components/player/player-gacha/SpinWheelModal.vue"));
+const StorageModal = defineAsyncComponent(() => import("../components/player/player-item-storage/StorageModal.vue"));
+const EquipmentModal = defineAsyncComponent(() => import("../components/player/player-equipment/EquipmentModal.vue"));
 const Feedbackmodal = defineAsyncComponent(() => import("../components/player/player-feedback/Feedbackmodal.vue"));
-const MissionModal = defineAsyncComponent(() => import("../components/player/player-mission/MissionModal.vue"));
-const EventModal = defineAsyncComponent(() => import("../components/player/player-event/EventModal.vue"));
+const MissionModal = defineAsyncComponent(() => import("../components/player/player-missions/MissionModal.vue"));
+const EventModal = defineAsyncComponent(() => import("../components/player/player-events/EventModal.vue"));
 const RedeemCode = defineAsyncComponent(() => import("../components/player/player-redeem-code/RedeemCodeModal.vue"));
 const NotificationModal = defineAsyncComponent(
   () => import("../components/player/player-notification/NotificationModal.vue"),
 );
-const CaughtModal = defineAsyncComponent(() => import("../components/player/player-caught/CaughtModal.vue"));
+const CaughtModal = defineAsyncComponent(() => import("../components/player/player-fish-storage/CaughtModal.vue"));
 const FactionSelectModal = defineAsyncComponent(
-  () => import("../components/player/player-faction/FactionSelectModal.vue"),
+  () => import("../components/player/player-factions/FactionSelectModal.vue"),
 );
-const Achievement = defineAsyncComponent(() => import("../components/player/player-badge/Achievement.vue"));
+const Achievement = defineAsyncComponent(() => import("../components/player/player-achievement/Achievement.vue"));
 const FriendModal = defineAsyncComponent(() => import("../components/player/player-friend/FriendModal.vue"));
-const WorkBenchModal = defineAsyncComponent(() => import("../components/player/player-work-bench/WorkBenchModal.vue"));
+const WorkBenchModal = defineAsyncComponent(() => import("../components/player/player-crafting-items/WorkBenchModal.vue"));
 const LeaderboardModal = defineAsyncComponent(
   () => import("../components/player/player-leaderboard/LeaderboardModal.vue"),
 );
@@ -57,17 +59,19 @@ const AttendanceModal = defineAsyncComponent(
   () => import("../components/player/player-attendance/AttendanceModal.vue"),
 );
 const DonationModal = defineAsyncComponent(() => import("../components/player/player-donation/DonationModal.vue"));
-const SkillModal = defineAsyncComponent(() => import("../components/player/player-skill/SkillModal.vue"));
+const SkillModal = defineAsyncComponent(() => import("../components/player/player-skills/SkillModal.vue"));
 const AquacultureModal = defineAsyncComponent(
-  () => import("../components/player/player-aquaculture/AquacultureModal.vue"),
+  () => import("../components/player/player-fish-farm/AquacultureModal.vue"),
 );
-const DispatchModal = defineAsyncComponent(() => import("../components/player/player-dispatch/DispatchModal.vue"));
+const DispatchModal = defineAsyncComponent(() => import("../components/player/player-dispatch-npc/DispatchModal.vue"));
 const FishingMapModal = defineAsyncComponent(
-  () => import("../components/player/player-fishing-map/FishingMapModal.vue"),
+  () => import("../components/player/player-fishing-maps/FishingMapModal.vue"),
 );
-const GuideModal = defineAsyncComponent(() => import("../components/player/player-guide/GuideModal.vue"));
-const RuleModal = defineAsyncComponent(() => import("../components/player/player-rule/RuleModal.vue"));
-const GameSettingModal = defineAsyncComponent(() => import("../components/player/player-game-settings/GameSettingModal.vue"));
+const GuideModal = defineAsyncComponent(() => import("../components/player/player-guides/GuideModal.vue"));
+const RuleModal = defineAsyncComponent(() => import("../components/player/player-rules/RuleModal.vue"));
+const GameSettingModal = defineAsyncComponent(
+  () => import("../components/player/player-game-settings/GameSettingModal.vue"),
+);
 const TutorialModal = defineAsyncComponent(() => import("../components/player/player-tutorial/TutorialModal.vue"));
 const StoryModal = defineAsyncComponent(() => import("../components/story/StoryModal.vue"));
 
@@ -157,7 +161,10 @@ watch(
   { immediate: true },
 );
 
-watch(() => indicators.enabledFeatures.join(","), () => indicators.requestRefresh());
+watch(
+  () => indicators.enabledFeatures.join(","),
+  () => indicators.requestRefresh(),
+);
 
 watch(
   () => [authStore.user?.id, features.isAvailable("notifications")] as const,
@@ -196,7 +203,10 @@ onUnmounted(() => {
 </script>
 
 <template>
-  <div :style="{backgroundImage: 'url(/lobby_bg.png)', backgroundRepeat: 'no-repeat', backgroundSize: 'cover'}" class="w-screen min-h-screen p-3 relative flex flex-col gap-2 overflow-hidden bg-[var(--color-ocean-deep)] text-content">
+  <div
+    :style="{ backgroundImage: 'url(/lobby_bg.png)', backgroundRepeat: 'no-repeat', backgroundSize: 'cover' }"
+    class="w-screen min-h-screen p-3 relative flex flex-col gap-2 overflow-hidden bg-[var(--color-ocean-deep)] text-content"
+  >
     <TeamMembersSticky
       v-if="features.isAvailable('team') && configStore.showTeam && teamStore.myTeamMembers.length"
       class="slide-fade-in from-right"
