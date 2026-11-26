@@ -18,9 +18,7 @@ import { useAuthStore } from "../stores/auth";
 import { useEquipmentStore } from "../stores/player-equipment-store.ts";
 import { useUserSettingStore } from "../stores/player-user-setting-store.ts";
 import { useFishingBackgroundSoundStore } from "../stores/player-fishing-background-sound-store.ts";
-import DayPhaseClock from "../components/player/player-fishing/DayPhaseClock.vue";
-import FishingFatigue from "../components/player/player-fishing/FishingFatigue.vue";
-import FishingSurvival from '../components/player/player-fishing/FishingSurvival.vue';
+import FishingStatusPanel from "../components/player/player-fishing/FishingStatusPanel.vue";
 import SurvivalDeathDialog from '../components/player/player-fishing/SurvivalDeathDialog.vue';
 import { useDayPhaseClock } from "../composables/useDayPhaseClock";
 import { useAreaWeather } from "../composables/useAreaWeather";
@@ -207,29 +205,13 @@ onBeforeUnmount(() => {
   </section>
   <main v-else-if="sessionReady" class="w-full h-screen overflow-hidden touch-none overscroll-none bg-[var(--color-ocean-deep)] text-[var(--color-ocean-pearl)]">
     <SurvivalDeathDialog />
-    <div class="fixed top-3 left-3 z-20 text-white flex justify-between items-start">
-      <div class="flex flex-col gap-2">
-        <DayPhaseClock />
-        <FishingSurvival v-if="fishingStore.currentArea.survivalMode" class="w-[min(21rem,calc(100vw-1.5rem))]" />
-        <FishingFatigue
-          v-else
-          variant="compact"
-          class="max-w-60"
-          :area-id="userInAreaStore.userInArea?.area_id ?? null"
-          presence
-        />
-        <div class="h-fit w-fit">
-          <button
-            type="button"
-            class="rounded-xl border border-danger bg-danger px-3 py-2 text-sm font-semibold text-white shadow-sm transition-colors hover:bg-content hover:border-content focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-danger disabled:cursor-not-allowed disabled:opacity-50 cursor-pointer"
-            :disabled="fishingStore.isLeavingArea"
-            @click="showExitConfirmation = true"
-          >
-            {{ fishingStore.isLeavingArea ? tr("FishingView.dang_quay_lai") : tr("FishingView.ket_thuc_chuyen_cau") }}
-          </button>
-        </div>
-      </div>
-    </div>
+    <FishingStatusPanel
+      class="fixed top-3 left-3 z-20"
+      :area="fishingStore.currentArea"
+      :area-id="userInAreaStore.userInArea?.area_id ?? null"
+      :leaving="fishingStore.isLeavingArea"
+      @exit="showExitConfirmation = true"
+    />
     <button
       type="button"
       class="fixed right-3 top-3 z-20 rounded-xl border border-[var(--color-ocean-gold)]/60 bg-[var(--color-ocean-deep)]/90 px-3 py-2 text-xs font-bold text-[var(--color-ocean-pearl)] backdrop-blur-md transition hover:border-[var(--color-ocean-cyan)] hover:bg-[var(--color-ocean-panel)]"

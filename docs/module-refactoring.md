@@ -1,5 +1,12 @@
 # Refactor theo module
 
+Góc thông tin trong `FishingView.vue` dùng `FishingStatusPanel.vue`: mặc định
+gom chế độ câu, giờ, thời tiết và mệt mỏi hoặc đủ năm chỉ số sinh tồn trong
+một thẻ gọn. Nút mở rộng giữ trạng thái cục bộ, hiện thông tin ngày/đêm và
+chi tiết mệt mỏi/sinh tồn; các component chỉ đổi cách trình bày, vẫn giữ
+việc cập nhật presence khi thu gọn. Nút kết thúc phát sự kiện về view để
+mở xác nhận như trước. Các màn hình chuẩn bị và popup giữ giao diện cũ.
+
 Mỗi đợt chọn một module, xác định hợp đồng hiện tại, chuyển trách nhiệm về đúng lớp, chạy hồi quy và cập nhật tài liệu liên quan. Tách các thay đổi luật chơi, schema hoặc quyền thành công việc riêng có nghiệm thu cụ thể. IC-18/IC-19 vẫn mở đến khi các phần còn lại được xử lý.
 
 ## Đổi mã thưởng — đã refactor ngày 19/11/2026

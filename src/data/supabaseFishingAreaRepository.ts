@@ -154,7 +154,7 @@ class SupabaseFishingAreaRepository {
     if (error) throw new RepositoryError(error);
   }
   async fetchAreas(signal?: AbortSignal): Promise<any[]> {
-    const data = await readCatalogPages((from, to) => supabase.from("fishing_areas").select("id, country_id, title, location, scene_path, survival_mode").eq("is_available", true).order("id").abortSignal(signal ?? new AbortController().signal).range(from, to));
+    const data = await readCatalogPages((from, to) => supabase.from("fishing_areas").select("id, country_id, title, location, scene_path, allow_depth_tool, survival_mode").eq("is_available", true).order("id").abortSignal(signal ?? new AbortController().signal).range(from, to));
 
     if (!data) return [];
 
@@ -164,6 +164,7 @@ class SupabaseFishingAreaRepository {
       countryId: x.country_id,
       location: x.location,
       scenePath: x.scene_path,
+      allowDepthTool: x.allow_depth_tool === true,
       survivalMode: x.survival_mode === true,
     }));
   }

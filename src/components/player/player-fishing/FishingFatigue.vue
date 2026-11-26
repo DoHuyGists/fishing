@@ -8,6 +8,7 @@ const props = withDefaults(defineProps<{
   areaId: string | null;
   presence?: boolean;
   variant?: 'default' | 'compact';
+  embedded?: boolean;
 }>(), { presence: false, variant: 'default' });
 const store = useFishingFatigueStore();
 const auth = useAuthStore();
@@ -41,7 +42,8 @@ onBeforeUnmount(() => clearInterval(timer));
 <template>
   <section
     v-if="areaId"
-    class="slide-fade-in from-left player-content-in w-full rounded-lg border border-border-default bg-surface p-2 text-xs text-content"
+    class="w-full text-xs text-content"
+    :class="embedded ? '' : 'slide-fade-in from-left player-content-in rounded-lg border border-border-default bg-surface p-2'"
     :aria-label="tr('FishingFatigue.label')"
     :aria-busy="!!store.loading[key]"
     :title="variant === 'compact' ? description : undefined"

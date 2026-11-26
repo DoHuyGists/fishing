@@ -13,6 +13,7 @@ import { useDayPhaseClock } from "../../../composables/useDayPhaseClock";
 import { useToast } from "../../../composables/useToast.ts";
 import FishingAnchor from "./FishingAnchor.vue";
 import FishingFatigue from "../player-fishing/FishingFatigue.vue";
+import FishingModeBadge from "../../shared/FishingModeBadge.vue";
 import { useRouter } from "vue-router";
 import { useCountryStore } from "../../../stores/player-country-store.ts";
 import { useFeatureAvailabilityStore } from "../../../stores/player-feature-availability-store.ts";
@@ -220,8 +221,8 @@ function zoomTo(k: number) {
                   draggable="false"
                 />
               </div>
-              <div v-if="area.survivalMode" class="font-semibold text-danger">{{ tr('FishingSurvival.title') }}</div>
-              <FishingFatigue v-else variant="compact" :area-id="area.id" />
+              <FishingModeBadge :area="area" />
+              <FishingFatigue v-if="!area.survivalMode" variant="compact" :area-id="area.id" />
               <button
                 type="button"
                 class="w-full rounded-lg bg-accent px-2 py-1.5 font-bold text-white hover:bg-accent disabled:opacity-70"

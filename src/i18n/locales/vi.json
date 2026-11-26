@@ -2432,6 +2432,8 @@
     "cai_dat": "Cài đặt",
     "thu_gon": "Thu gọn",
     "trang_thai_cau_ca": "Trạng thái câu cá",
+    "xem_thong_tin_chuyen_cau": "Xem thông tin chuyến câu",
+    "thu_gon_thong_tin": "Thu gọn thông tin chuyến câu",
     "ket_thuc_chuyen_cau_2": "Kết thúc chuyến câu?",
     "gio_ca_hien_co": "Giỏ cá hiện có",
     "con_ca_ban_co_chac_chan_muon_quay_lai_ban_do_khong": "con cá. Bạn có chắc chắn muốn quay lại bản đồ không?",
@@ -2485,6 +2487,12 @@
     "nhap_lai_mat_khau": "Nhập lại mật khẩu",
     "dang_tao_tai_khoan": "Đang tạo tài khoản...",
     "da_co_tai_khoan": "Đã có tài khoản?"
+  },
+  "FishingMode": {
+    "label": "Chế độ câu: {mode}",
+    "random": "Ngẫu nhiên",
+    "depth": "Độ sâu",
+    "survival": "Sinh tồn"
   },
   "FishingSurvival": {
     "title": "Câu sinh tồn",

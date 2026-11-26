@@ -30,6 +30,12 @@ export const supabaseGameCatalogRepository = {
       const { data, error, status } = await supabase.rpc('get_game_catalog_snapshot', { p_domain: domain, p_ids: ids }).abortSignal(signal);
       if (error) throw new RepositoryError({ ...error, status });
       if (!data || typeof data.revision !== 'string' || !/^[1-9]\d*$/.test(data.revision) || !Object.hasOwn(data, 'data')) throw new RepositoryError({ message: 'Invalid catalog snapshot', code: 'CATALOG_SCHEMA_MISMATCH' });
+      // Older catalog RPCs omit mode flags. Read the complete area DTO through
+      // the repository until the deployed RPC includes those fields.
+      if (domain === 'areas' && Array.isArray(data.data) && data.data.some((area: Record<string, unknown> | null) =>
+        area && (typeof area.allowDepthTool !== 'boolean' || typeof area.survivalMode !== 'boolean'))) {
+        return { ...data, data: await supabaseFishingAreaRepository.fetchAreas(signal) as GameCatalogData[K] };
+      }
       return data;
     }
     const loaders = {

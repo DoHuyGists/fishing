@@ -22,7 +22,8 @@ const rows = (value: unknown, check: (row: Record<string, unknown>) => boolean) 
 export function validateCatalog<K extends CatalogDomain>(domain: K, data: unknown): data is GameCatalogData[K] {
   switch (domain) {
     case 'countries': return rows(data, row => text(row, ['id', 'name', 'code']) && (row.location == null || object(row.location) && number(row.location, ['k', 'lon', 'lat'])));
-    case 'areas': return rows(data, row => text(row, ['id', 'countryId']) && (row.title == null || typeof row.title === 'string'));
+    case 'areas': return rows(data, row => text(row, ['id', 'countryId']) && (row.title == null || typeof row.title === 'string')
+      && typeof row.allowDepthTool === 'boolean' && typeof row.survivalMode === 'boolean');
     case 'species': return rows(data, row => text(row, ['id', 'name']) && (row.location == null || typeof row.location === 'string'));
     case 'guides': return rows(data, row => text(row, ['id', 'title', 'content']) && number(row, ['sort_order']));
     case 'items': case 'shop': return rows(data, row => text(row, ['id', 'name']) && number(row, ['price']) && (row.quantity == null || number(row, ['quantity'])));

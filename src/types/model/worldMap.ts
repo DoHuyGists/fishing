@@ -1,4 +1,5 @@
 import type { useModalStore } from "../../stores/player-modal-store";
+import type { FishingAreaRow } from "../table/fishingArea";
 
 export type LobbyAction = {
   modal: NonNullable<Parameters<ReturnType<typeof useModalStore>["open"]>[0]>;
@@ -31,7 +32,7 @@ export interface ZoomState {
   fromUser: boolean;
 }
 
-export interface AreaPoint {
+export interface AreaPoint extends Pick<FishingAreaRow, "allowDepthTool" | "survivalMode"> {
   id: string;
   title?: string | null;
   location?: { lon?: number; lat?: number } | null;

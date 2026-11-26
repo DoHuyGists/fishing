@@ -51,3 +51,10 @@ tile fails. Requests are cleaned up when the component unmounts.
 
 Tiles allow loading only visible regions; they cannot add detail beyond the source image's resolution.
 Use a higher-resolution source and export again to improve deep zoom detail.
+
+FishingAnchor, the WorldMap entry popup, and FishingView share
+`FishingModeBadge` to identify each area's mode: Survival when `survivalMode`
+is true, otherwise Depth when `allowDepthTool` is true, otherwise Random.
+The area repository includes both flags. Catalog snapshots from older RPCs
+that omit either flag are completed through the area repository, and cached
+area DTOs without both boolean flags are rejected and reloaded.

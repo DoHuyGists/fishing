@@ -23,6 +23,47 @@ test('Pinia catalogs preserve feature gates, login isolation and transaction ret
       revision = '1'; repository.versions = async () => Object.fromEntries(Object.keys(catalogPolicies).map(domain => [domain, revision]));
       return { auth, catalog: useGameCatalogStore() };
     };
+    await t.test('area modes load from older catalog RPCs and incomplete cached DTOs are rejected', async () => {
+      init();
+      const { setFeatureRequestGuard } = await server.ssrLoadModule('/src/database/featureRequestGate.ts');
+      setFeatureRequestGuard(async () => null);
+      const { validateCatalog } = await server.ssrLoadModule('/src/data/gameCachePolicies.ts');
+      const transport = globalThis.fetch;
+      const rawAreas = [
+        { id: 'random', allow_depth_tool: false, survival_mode: false },
+        { id: 'depth', allow_depth_tool: true, survival_mode: false },
+        { id: 'survival', allow_depth_tool: true, survival_mode: true },
+      ].map(area => ({ ...area, country_id: 'country', title: area.id, location: null, scene_path: null }));
+      let complete = false, areaReads = 0;
+      const oldAreas = rawAreas.map(area => ({ id: area.id, countryId: area.country_id, title: area.title }));
+      const fullAreas = rawAreas.map((area, index) => ({ ...oldAreas[index], allowDepthTool: area.allow_depth_tool, survivalMode: area.survival_mode }));
+      globalThis.fetch = async input => {
+        const url = new URL(input instanceof Request ? input.url : String(input));
+        assert.equal(url.hostname, 'example.supabase.co');
+        if (url.pathname.endsWith('/rpc/get_game_catalog_snapshot')) {
+          return Response.json({ revision: '7', data: complete ? fullAreas : oldAreas });
+        }
+        assert.equal(url.pathname, '/rest/v1/fishing_areas');
+        assert.ok(url.searchParams.get('select').includes('allow_depth_tool'));
+        assert.ok(url.searchParams.get('select').includes('survival_mode'));
+        assert.equal(url.searchParams.get('is_available'), 'eq.true');
+        areaReads++;
+        return Response.json(Number(url.searchParams.get('offset') ?? 0) === 0 ? rawAreas : []);
+      };
+      try {
+        const result = await repository.snapshot('areas', [], new AbortController().signal);
+        assert.equal(result.revision, '7');
+        assert.deepEqual(result.data.map(({ id, allowDepthTool, survivalMode }) => ({ id, allowDepthTool, survivalMode })),
+          fullAreas.map(({ id, allowDepthTool, survivalMode }) => ({ id, allowDepthTool, survivalMode })));
+        assert.equal(validateCatalog('areas', result.data), true);
+        assert.equal(validateCatalog('areas', oldAreas), false);
+        assert.equal(validateCatalog('areas', [{ ...fullAreas[0], survivalMode: undefined }]), false);
+        complete = true;
+        const previousReads = areaReads;
+        assert.deepEqual((await repository.snapshot('areas', [], new AbortController().signal)).data, fullAreas);
+        assert.equal(areaReads, previousReads, 'Complete RPC snapshots do not need a second query');
+      } finally { globalThis.fetch = transport; }
+    });
     await t.test('ten store callers share one catalog fetch and return independent DTOs', async () => {
       const { catalog } = init(); let calls = 0;
       repository.snapshot = async () => { calls++; return { data: [{ id: 'x', name: 'Country', code: 'VN', location: null }], revision }; };

@@ -5,8 +5,9 @@ import { computed, ref } from "vue";
 import { useWeatherStore } from "../../../stores/player-weather-store";
 import { utcToLocalMs } from "../../../utils/time";
 
-withDefaults(defineProps<{ inline?: boolean }>(), {
+withDefaults(defineProps<{ inline?: boolean; compact?: boolean }>(), {
   inline: false,
+  compact: false,
 });
 
 const weatherStore = useWeatherStore();
@@ -92,11 +93,15 @@ const hasWeather = computed(() => !!weather.value);
   <button
     v-if="!inline"
     type="button"
-    class="inline-flex w-fit items-center gap-1.5 rounded-full border border-accent/30 bg-surface px-2.5 py-1 text-xs font-semibold text-content hover:bg-surface"
+    class="inline-flex w-fit shrink-0 items-center rounded-full border border-accent/30 bg-surface font-semibold text-content hover:bg-surface focus-visible:outline-2 focus-visible:outline-accent"
+    :class="compact ? 'min-h-7 gap-1 px-1.5 py-0.5 text-[11px]' : 'gap-1.5 px-2.5 py-1 text-xs'"
+    :aria-label="`${tr('WeatherSection.thoi_tiet')}: ${hasWeather ? weather?.name : tr('WeatherSection.chua_co_thong_tin_thoi_tiet')}${hasWeather && weatherStore.zone?.weather_expires_at ? ` · ${countdown}` : ''}`"
+    :title="hasWeather ? weather?.name : tr('WeatherSection.thoi_tiet')"
+    aria-haspopup="dialog"
     @click.stop="open = true"
   >
     <span class="text-sm leading-none">{{ hasWeather ? weatherIcon : "🌤️" }}</span>
-    <span>{{ hasWeather ? weather?.name : tr('WeatherSection.thoi_tiet') }}</span>
+    <span :class="{ 'sr-only': compact }">{{ hasWeather ? weather?.name : tr('WeatherSection.thoi_tiet') }}</span>
     <span v-if="hasWeather && weatherStore.zone?.weather_expires_at" class="tabular-nums text-content">{{
       countdown
     }}</span>

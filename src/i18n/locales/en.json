@@ -2428,6 +2428,8 @@
     "cai_dat": "Settings",
     "thu_gon": "Collapse",
     "trang_thai_cau_ca": "Fishing status",
+    "xem_thong_tin_chuyen_cau": "Show fishing trip details",
+    "thu_gon_thong_tin": "Collapse fishing trip details",
     "ket_thuc_chuyen_cau_2": "Finish this fishing trip?",
     "gio_ca_hien_co": "Your fish bag contains",
     "con_ca_ban_co_chac_chan_muon_quay_lai_ban_do_khong": "fish. Are you sure you want to return to the map?",
@@ -2481,6 +2483,12 @@
     "nhap_lai_mat_khau": "Re-enter password",
     "dang_tao_tai_khoan": "Creating account...",
     "da_co_tai_khoan": "Already have an account?"
+  },
+  "FishingMode": {
+    "label": "Fishing mode: {mode}",
+    "random": "Random",
+    "depth": "Depth",
+    "survival": "Survival"
   },
   "FishingSurvival": {
     "title": "Survival fishing",

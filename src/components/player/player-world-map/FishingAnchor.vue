@@ -5,6 +5,7 @@ import { onMounted } from "vue";
 import { useCountryStore } from "../../../stores/player-country-store";
 import { useFishingAreaStore } from "../../../stores/player-fishing-area-store";
 import { useWorldStore } from "../../../stores/player-world-map-store";
+import FishingModeBadge from "../../shared/FishingModeBadge.vue";
 
 withDefaults(defineProps<{ collapsible?: boolean; mapVisible?: boolean }>(), {
   collapsible: false,
@@ -97,9 +98,12 @@ onMounted(() => {
                   @click="worldStore.handleMoveToArea(area)"
                 >
                   <span aria-hidden="true" class="mt-1 h-2 w-2 shrink-0 rounded-full bg-danger"></span>
-                  <span class="min-w-0 wrap-break-word">{{
-                    area.title || tr("FishingAnchor.bai_cau_chua_dat_ten")
-                  }}</span>
+                  <span class="flex min-w-0 flex-1 flex-wrap items-center gap-1.5">
+                    <span class="min-w-0 wrap-break-word">{{
+                      area.title || tr("FishingAnchor.bai_cau_chua_dat_ten")
+                    }}</span>
+                    <FishingModeBadge :area="area" />
+                  </span>
                 </button>
               </div>
             </div>
