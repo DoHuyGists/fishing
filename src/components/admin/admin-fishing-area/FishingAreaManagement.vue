@@ -2,7 +2,8 @@
 import AdminModal from "../AdminModal.vue";
 import Pagination from "../../shared/Pagination.vue";
 import { usePagedListFilters } from "../../../composables/usePagedListFilters";
-import { computed, ref, watch } from "vue";
+import { computed, nextTick, ref, watch } from "vue";
+import type { FishingAreaRow } from "../../../types/table/fishingArea";
 import { mapData } from "../../../data/map.ts";
 import InteractWorldMap2 from "../../player/player-world-map/InteractWorldMap.vue";
 import { useAdminFishingAreaStore } from "./admin-fishing-area-store.ts";
@@ -42,6 +43,30 @@ usePagedListFilters(
 
 const deletingId = ref<string | null>(null);
 const confirmDeleteId = ref<string | null>(null);
+const imagePreview = ref<{ src: string; title: string } | null>(null);
+const failedImageUrls = ref(new Set<string>());
+const previewCloseButton = ref<HTMLButtonElement | null>(null);
+let previewTrigger: HTMLButtonElement | null = null;
+
+function sceneImageUrl(area: FishingAreaRow) {
+  const path = area.scenePath?.trim().replace(/\\/g, "/").replace(/\/+$/, "");
+  return path ? `${path}/day.png` : "";
+}
+
+async function openImagePreview(area: FishingAreaRow, event: MouseEvent) {
+  const src = sceneImageUrl(area);
+  if (!src) return;
+  previewTrigger = event.currentTarget as HTMLButtonElement;
+  imagePreview.value = { src, title: area.title || "(Chưa đặt tên)" };
+  await nextTick();
+  previewCloseButton.value?.focus();
+}
+
+function closeImagePreview() {
+  imagePreview.value = null;
+  previewTrigger?.focus();
+  previewTrigger = null;
+}
 
 const countryOptions = computed(() =>
   Object.entries(mapData)
@@ -216,6 +241,7 @@ watch(
           <table class="w-full text-xs text-left border-collapse">
             <thead class="bg-surface text-content uppercase text-[10px] tracking-wide">
               <tr>
+                <th class="px-4 py-2.5">Ảnh</th>
                 <th class="px-4 py-2.5">Tên</th>
                 <th class="px-4 py-2.5">Quốc gia</th>
                 <th class="px-4 py-2.5">Đường dẫn cảnh</th>
@@ -230,6 +256,27 @@ watch(
             </thead>
             <tbody>
               <tr v-for="area in filteredAreas" :key="area.id" class="border-t border-border hover:bg-surface/40">
+                <td class="px-4 py-2.5">
+                  <button
+                    v-if="sceneImageUrl(area) && !failedImageUrls.has(sceneImageUrl(area))"
+                    type="button"
+                    :aria-label="`Xem ảnh ${area.title || '(Chưa đặt tên)'}`"
+                    title="Xem ảnh"
+                    class="block w-24 overflow-hidden rounded-lg border border-border-default bg-surface cursor-pointer hover:border-accent focus-visible:outline-2 focus-visible:outline-accent"
+                    @click="openImagePreview(area, $event)"
+                  >
+                    <img
+                      :src="sceneImageUrl(area)"
+                      :alt="area.title || 'Ảnh bãi câu'"
+                      loading="lazy"
+                      class="aspect-video w-full object-cover"
+                      @error="failedImageUrls.add(sceneImageUrl(area))"
+                    />
+                  </button>
+                  <span v-else class="text-content-muted whitespace-nowrap">
+                    {{ sceneImageUrl(area) ? "Không tải được ảnh" : "Chưa có ảnh" }}
+                  </span>
+                </td>
                 <td class="px-4 py-2.5 font-semibold text-content">{{ area.title || "(Chưa đặt tên)" }}</td>
                 <td class="px-4 py-2.5 text-content">{{ countryName(area.countryId) }}</td>
                 <td class="px-4 py-2.5 text-content truncate max-w-45" :title="area.scenePath || ''">
@@ -327,5 +374,34 @@ watch(
       :loading="adminFishingAreaStore.adminLoading"
       @change="adminFishingAreaStore.fetchAllAreasAdmin($event)"
     />
+  </AdminModal>
+
+  <AdminModal
+    v-if="imagePreview"
+    :title="`Ảnh bãi câu: ${imagePreview.title}`"
+    :z-index="60"
+    @close="closeImagePreview"
+    @keydown.esc.stop="closeImagePreview"
+  >
+    <div class="flex min-h-0 flex-1 flex-col items-center justify-center gap-4 p-4">
+      <div v-if="failedImageUrls.has(imagePreview.src)" role="alert" class="text-sm text-danger">
+        Không tải được ảnh bãi câu.
+      </div>
+      <img
+        v-else
+        :src="imagePreview.src"
+        :alt="imagePreview.title"
+        class="min-h-0 max-h-full max-w-full flex-1 object-contain"
+        @error="failedImageUrls.add(imagePreview.src)"
+      />
+      <button
+        ref="previewCloseButton"
+        type="button"
+        class="shrink-0 rounded-lg border border-border-default bg-surface px-4 py-2 text-xs font-bold text-content hover:bg-surface-muted cursor-pointer focus-visible:outline-2 focus-visible:outline-accent"
+        @click="closeImagePreview"
+      >
+        Đóng ảnh
+      </button>
+    </div>
   </AdminModal>
 </template>

@@ -90,8 +90,12 @@ function buildPayload(): SpeciesPayload | null {
     formError.value = "Điểm kinh nghiệm phải là số nguyên không âm";
     return null;
   }
-  if ([strength, alertness].some((value) => value !== null && (!Number.isFinite(value) || value < 0))) {
-    formError.value = "Sức mạnh và độ cảnh giác phải là số không âm hợp lệ";
+  if (strength !== null && (!Number.isFinite(strength) || strength <= 0)) {
+    formError.value = "Sức mạnh kéo phải là số hợp lệ lớn hơn 0";
+    return null;
+  }
+  if (alertness !== null && (!Number.isFinite(alertness) || alertness < 0 || alertness > 1)) {
+    formError.value = "Độ cảnh giác phải nằm trong khoảng 0 đến 1";
     return null;
   }
   if (burstMultiplier !== null && (!Number.isFinite(burstMultiplier) || burstMultiplier < 1 || burstMultiplier > 10)) {
@@ -262,8 +266,8 @@ async function handleSave() {
             <input v-model.number="form.strength" type="number" min="0" step="any" class="rounded-md border border-border-default px-3 py-2 text-sm font-normal text-content focus:border-accent focus:outline-none" />
           </label>
           <label class="flex flex-col gap-1.5 text-xs font-bold text-content">
-            Độ cảnh giác
-            <input v-model.number="form.alertness" type="number" min="0" step="any" class="rounded-md border border-border-default px-3 py-2 text-sm font-normal text-content focus:border-accent focus:outline-none" />
+            Độ cảnh giác (0–1)
+            <input v-model.number="form.alertness" type="number" min="0" max="1" step="any" class="rounded-md border border-border-default px-3 py-2 text-sm font-normal text-content focus:border-accent focus:outline-none" />
           </label>
           <label class="flex flex-col gap-1.5 text-xs font-bold text-content">
             Hệ số bùng nổ (1–10)

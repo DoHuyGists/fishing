@@ -235,7 +235,9 @@ export function useEquipmentInventoryTable(initialTab: EquipmentInventoryTab = "
 
   const filteredSets = computed(() => {
     const query = setSearch.value.trim().toLowerCase();
-    const all = inventoryStore.equipmentSets.map((set, index) => ({ set, index }));
+    const all = inventoryStore.equipmentSets
+      .map((set, index) => ({ set, index }))
+      .sort((a, b) => Number(b.set.isUsed) - Number(a.set.isUsed));
     if (!query) return all;
     return all.filter(
       ({ set, index }) =>
