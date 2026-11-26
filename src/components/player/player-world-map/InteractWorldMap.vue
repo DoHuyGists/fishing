@@ -12,8 +12,7 @@ import { useAuthStore } from "../../../stores/auth.ts";
 import { useDayPhaseClock } from "../../../composables/useDayPhaseClock";
 import { useToast } from "../../../composables/useToast.ts";
 import FishingAnchor from "./FishingAnchor.vue";
-import FishingFatigue from "../player-fishing/FishingFatigue.vue";
-import FishingModeBadge from "../../shared/FishingModeBadge.vue";
+import FishingAreaPopup from "./FishingAreaPopup.vue";
 import { useRouter } from "vue-router";
 import { useCountryStore } from "../../../stores/player-country-store.ts";
 import { useFeatureAvailabilityStore } from "../../../stores/player-feature-availability-store.ts";
@@ -206,39 +205,14 @@ function zoomTo(k: number) {
           @select-area="onSelectArea"
         >
           <template #popup="{ area }">
-            <div class="player-popup-in flex flex-col gap-1.5 rounded-lg bg-white p-2 text-xs text-content shadow-lg">
-              <div class="flex items-center justify-between gap-2 font-bold">
-                <span class="whitespace-nowrap">{{ area.title }}</span>
-                <button type="button" class="text-base leading-none text-content" @click="worldStore.targetArea({})">
-                  ×
-                </button>
-              </div>
-              <div class="overflow-hidden rounded-md">
-                <img
-                  v-if="dayPhaseStore.previewScene"
-                  :src="dayPhaseStore.previewScene"
-                  class="w-full hover:scale-110 duration-200"
-                  draggable="false"
-                />
-              </div>
-              <FishingModeBadge :area="area" />
-              <FishingFatigue v-if="!area.survivalMode" variant="compact" :area-id="area.id" />
-              <button
-                type="button"
-                class="w-full rounded-lg bg-accent px-2 py-1.5 font-bold text-white hover:bg-accent disabled:opacity-70"
-                :disabled="isEntering"
-                :class="{ 'underline underline-offset-2': !features.isAvailable('enter-area') }"
-                @click="features.isAvailable('enter-area') ? openPrepare(area) : features.showDetails('enter-area')"
-              >
-                {{
-                  !features.isAvailable("enter-area")
-                    ? tr("FeatureAvailability.maintenanceBadge")
-                    : isEntering
-                      ? tr("InteractWorldMap.dang_vao")
-                      : tr("InteractWorldMap.di_den_bai_cau")
-                }}
-              </button>
-            </div>
+            <FishingAreaPopup
+              :area="area"
+              :preview-scene="dayPhaseStore.previewScene"
+              :is-entering="isEntering"
+              :enter-area-available="features.isAvailable('enter-area')"
+              @close="worldStore.targetArea({})"
+              @enter="features.isAvailable('enter-area') ? openPrepare(area) : features.showDetails('enter-area')"
+            />
           </template>
         </WorldMap>
       </div>

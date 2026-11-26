@@ -548,7 +548,7 @@ defineExpose({ setView, resetView });
   bottom: 0;
   transform: translate(-50%, -16px);
   width: 200px;
-  overflow-y: auto;
+  overflow-y: hidden;
   overscroll-behavior: contain;
 }
 .world-map-tip__dot,

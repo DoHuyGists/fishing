@@ -5,6 +5,7 @@ import type { FishingAreaRow } from "../../types/table/fishingArea";
 
 const props = defineProps<{
   area: Pick<FishingAreaRow, "allowDepthTool" | "survivalMode">;
+  compacted?: boolean;
 }>();
 
 const mode = computed(() => {
@@ -26,6 +27,6 @@ const mode = computed(() => {
     :title="tr('FishingMode.label', { mode: tr(mode.key) })"
   >
     <span aria-hidden="true">{{ mode.icon }}</span>
-    <span>{{ tr(mode.key) }}</span>
+    <span v-if="!compacted">{{ tr(mode.key) }}</span>
   </span>
 </template>

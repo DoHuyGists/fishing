@@ -52,7 +52,12 @@ tile fails. Requests are cleaned up when the component unmounts.
 Tiles allow loading only visible regions; they cannot add detail beyond the source image's resolution.
 Use a higher-resolution source and export again to improve deep zoom detail.
 
-FishingAnchor, the WorldMap entry popup, and FishingView share
+`InteractWorldMap.vue` renders the entry popup through `FishingAreaPopup.vue`,
+passing the area, preview scene, entry loading state, and feature availability.
+The popup emits close and enter events; selection, navigation, and entry checks
+remain in `InteractWorldMap.vue`.
+
+FishingAnchor, FishingAreaPopup, and FishingView share
 `FishingModeBadge` to identify each area's mode: Survival when `survivalMode`
 is true, otherwise Depth when `allowDepthTool` is true, otherwise Random.
 The area repository includes both flags. Catalog snapshots from older RPCs
