@@ -55,7 +55,7 @@ try {
   await page.waitForLoadState('networkidle');
   assert(requests.includes('/world-map-tiles/manifest.json'));
   assert(requests.some(url => /^\/world-map-tiles\/1\/\d+\/\d+\.jpg$/.test(url)));
-  assert(!requests.includes('/HYP_HR_SR_OB_DR.jpg'));
+  assert(!requests.includes('/world_map.jpg'));
 
   // A deep zoom must load only the visible part of the highest-resolution level.
   await page.evaluate(() => mapTest.map.value.setView({ lon: 105, lat: 15, k: 30 }));
@@ -92,7 +92,7 @@ try {
   // Missing manifest and missing individual tiles both recover via the original image.
   for (const failedUrl of ['**/world-map-tiles/manifest.json', '**/world-map-tiles/*/*/*.jpg']) {
     const failurePage = await browser.newPage();
-    const recovered = failurePage.waitForResponse(response => response.url().endsWith('/HYP_HR_SR_OB_DR.jpg') && response.ok());
+    const recovered = failurePage.waitForResponse(response => response.url().endsWith('/world_map.jpg') && response.ok());
     await failurePage.route(failedUrl, route => route.fulfill({ status: 404, body: '' }));
     await failurePage.goto(`${origin}/__map`);
     await recovered;

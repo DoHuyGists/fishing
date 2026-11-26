@@ -4,7 +4,7 @@ import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 
 const root = fileURLToPath(new URL('../', import.meta.url));
-const source = path.resolve(root, process.argv[2] ?? 'public/HYP_HR_SR_OB_DR.jpg');
+const source = path.resolve(root, process.argv[2] ?? 'public/world_map.jpg');
 const output = path.resolve(root, process.argv[3] ?? 'public/world-map-tiles');
 
 if (process.platform !== 'win32') {
