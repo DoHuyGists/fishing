@@ -7,6 +7,7 @@ export const useAdminFishingAreaStore = defineStore("AdminFishingArea", {
   state: () => ({
     target: null as FishingAreaRow | null,
     adminAreas: [] as FishingAreaRow[],
+    viewMode: 'list' as 'list' | 'grid' | 'group',
     page: 1, pageSize: 10, total: 0, search: '', countryFilter: 'ALL', availabilityFilter: 'ALL', requestId: 0,
     countryIds: [] as string[],
 
@@ -24,12 +25,24 @@ export const useAdminFishingAreaStore = defineStore("AdminFishingArea", {
   actions: {
     async fetchAllAreasAdmin(page?: number) {
       page ??= this.page;
+      const grouped = this.viewMode === 'group';
+      if (grouped) page = 1;
       const request = ++this.requestId;
       this.adminLoading = true;
       this.adminError = "";
       try {
         const result = await supabaseFishingAreaRepository.fetchAdminPage(page, this.search, this.countryFilter, this.availabilityFilter);
         if (request !== this.requestId) return;
+        if (grouped) {
+          const items = [...result.items];
+          const search = this.search, country = this.countryFilter, availability = this.availabilityFilter;
+          for (let nextPage = 2; nextPage <= Math.ceil(result.total / this.pageSize); nextPage++) {
+            const next = await supabaseFishingAreaRepository.fetchAdminPage(nextPage, search, country, availability);
+            if (request !== this.requestId) return;
+            items.push(...next.items);
+          }
+          result.items = items;
+        }
         this.adminAreas = result.items; this.page = page; this.total = result.total; this.countryIds = result.facets.country_id ?? [];
         if (!result.items.length && page > 1) await this.fetchAllAreasAdmin(Math.max(1, Math.ceil(result.total / this.pageSize)));
       } catch (err) {

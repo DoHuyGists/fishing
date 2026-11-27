@@ -1,5 +1,10 @@
 # Refactor theo module
 
+## Hiển thị bãi câu admin
+
+`FishingAreaManagement.vue` có danh sách, lưới và nhóm theo quốc gia; thẻ dùng chung là `FishingAreaCard.vue`.
+Danh sách/lưới phân trang như trước. Chế độ nhóm tải đủ các trang qua repository hiện có theo bộ lọc hiện tại rồi gom theo quốc gia, không hiển thị phân trang. Store giữ chế độ hiển thị và bỏ phản hồi cũ khi đổi chế độ/bộ lọc. Kiểm tra chuyển ba chế độ với dữ liệu nhiều trang bằng `node scripts/test-fishing-area-views-browser.mjs`.
+
 ## Cài đặt tại sảnh
 
 `FeatureTable.vue` mở `GameSettingModal.vue` qua modal `game-settings` trong

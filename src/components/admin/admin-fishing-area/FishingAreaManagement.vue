@@ -8,6 +8,7 @@ import { mapData } from "../../../data/map.ts";
 import InteractWorldMap2 from "../../player/player-world-map/InteractWorldMap.vue";
 import { useAdminFishingAreaStore } from "./admin-fishing-area-store.ts";
 import FishingAreaManagementForm from "./FishingAreaManagementForm.vue";
+import FishingAreaCard from "./FishingAreaCard.vue";
 import { useWorldStore } from "../../../stores/player-world-map-store.ts";
 
 const emit = defineEmits(["close"]);
@@ -42,6 +43,32 @@ usePagedListFilters(
 );
 
 const deletingId = ref<string | null>(null);
+const viewMode = computed({
+  get: () => adminFishingAreaStore.viewMode,
+  set: (value) => { adminFishingAreaStore.viewMode = value; },
+});
+watch(viewMode, (mode, previous) => {
+  if (mode === 'group' || previous === 'group') {
+    void adminFishingAreaStore.fetchAllAreasAdmin(1);
+  }
+});
+const viewModes = [
+  { value: "list", label: "Danh sách" },
+  { value: "grid", label: "Lưới" },
+  { value: "group", label: "Theo quốc gia" },
+] as const;
+const areaGroups = computed(() => {
+  if (viewMode.value !== "group") return [{ code: "all", name: "", areas: filteredAreas.value }];
+  const groups = new Map<string, FishingAreaRow[]>();
+  for (const area of filteredAreas.value) {
+    const code = area.countryId?.trim() || "";
+    const areas = groups.get(code) ?? [];
+    areas.push(area);
+    groups.set(code, areas);
+  }
+  return Array.from(groups, ([code, areas]) => ({ code, name: countryName(code), areas }))
+    .sort((a, b) => a.name.localeCompare(b.name, "vi"));
+});
 const confirmDeleteId = ref<string | null>(null);
 const imagePreview = ref<{ src: string; title: string } | null>(null);
 const failedImageUrls = ref(new Set<string>());
@@ -70,7 +97,7 @@ function closeImagePreview() {
 
 const countryOptions = computed(() =>
   Object.entries(mapData)
-    .map(([code, info]) => ({ code, name: (info as any).name }))
+    .map(([code]) => ({ code, name: countryName(code) }))
     .sort((a, b) => a.name.localeCompare(b.name)),
 );
 
@@ -79,8 +106,11 @@ const countryFilterOptions = computed(() => {
   return countryOptions.value.filter((option) => codes.has(option.code));
 });
 
-function countryName(code: string) {
-  return (mapData as any)[code]?.name ?? code;
+function countryName(code: string | null | undefined): string {
+  const normalizedCode = code?.trim();
+  if (!normalizedCode) return "Chưa có quốc gia";
+  const name = mapData[normalizedCode as keyof typeof mapData]?.name;
+  return typeof name === "string" && name.trim() ? name : normalizedCode;
 }
 
 const filteredAreas = computed(() => {
@@ -184,6 +214,20 @@ watch(
 
       <div class="flex-1"></div>
 
+      <div role="group" aria-label="Chế độ hiển thị" class="flex rounded-lg border border-content p-0.5 gap-0.5">
+        <button
+          v-for="mode in viewModes"
+          :key="mode.value"
+          type="button"
+          :aria-pressed="viewMode === mode.value"
+          :class="viewMode === mode.value ? 'bg-content text-white' : 'text-content hover:bg-surface'"
+          class="rounded-md px-2.5 py-1 text-xs font-bold cursor-pointer transition-colors focus-visible:outline-2 focus-visible:outline-accent"
+          @click="viewMode = mode.value"
+        >
+          {{ mode.label }}
+        </button>
+      </div>
+
       <button
         type="button"
         @click="adminFishingAreaStore.fetchAllAreasAdmin()"
@@ -237,7 +281,7 @@ watch(
           <div class="m-0 font-medium">Không tìm thấy bãi câu nào phù hợp.</div>
         </div>
 
-        <div v-else class="bg-white border border-border rounded-xl overflow-x-auto shadow-2xs">
+        <div v-else-if="viewMode === 'list'" class="bg-white border border-border rounded-xl overflow-x-auto shadow-2xs">
           <table class="w-full text-xs text-left border-collapse">
             <thead class="bg-surface text-content uppercase text-[10px] tracking-wide">
               <tr>
@@ -332,6 +376,29 @@ watch(
             </tbody>
           </table>
         </div>
+        <div v-else class="space-y-6">
+          <section v-for="group in areaGroups" :key="group.code" :aria-label="group.name || 'Bãi câu'">
+            <div v-if="viewMode === 'group'" class="mb-3 flex items-center gap-2 text-sm font-bold text-content">
+              <span>{{ group.name || 'Chưa có quốc gia' }}</span>
+              <span class="rounded-full bg-surface border border-border px-2 py-0.5 text-[10px]">{{ group.areas.length }} bãi câu</span>
+            </div>
+            <div class="grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 2xl:grid-cols-5">
+              <FishingAreaCard
+                v-for="area in group.areas"
+                :key="area.id"
+                :area="area"
+                :country-name="countryName(area.countryId)"
+                :image-url="sceneImageUrl(area)"
+                :image-failed="failedImageUrls.has(sceneImageUrl(area))"
+                :deleting="deletingId === area.id"
+                @preview="openImagePreview(area, $event)"
+                @image-error="failedImageUrls.add(sceneImageUrl(area))"
+                @edit="adminFishingAreaStore.openForm(area)"
+                @delete="askDelete(area.id)"
+              />
+            </div>
+          </section>
+        </div>
       </div>
       <div v-else class="grid grid-cols-2 gap-2 p-2 w-full">
         <InteractWorldMap2 :fog-enabled="false" />
@@ -367,7 +434,7 @@ watch(
       </div>
     </div>
     <Pagination
-      v-if="!adminFishingAreaStore.isFormOpen"
+      v-if="!adminFishingAreaStore.isFormOpen && viewMode !== 'group'"
       :page="adminFishingAreaStore.page"
       :page-size="adminFishingAreaStore.pageSize"
       :total="adminFishingAreaStore.total"
