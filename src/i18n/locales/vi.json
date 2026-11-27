@@ -92,6 +92,9 @@
     "expression_happy": "Vui", "expression_angry": "Giận", "expression_shocked": "Bất ngờ", "expression_sad": "Buồn"
   },
   "FishingMapModal": {
+    "unlockCountry": "Mở khóa {country}",
+    "unlockPrice": "Mở khóa · {price} vỏ sò",
+    "unlockError": "Không thể mở khóa quốc gia. Vui lòng kiểm tra số dư và thử lại.",
     "open": "Đang mở", "closed": "Đang đóng", "region": "Khu vực", "unknown": "Chưa có thông tin",
     "maxDepth": "Độ sâu tối đa", "depthTool": "Dụng cụ đo sâu", "yes": "Cho phép", "no": "Không cho phép", "timezone": "Múi giờ",
     "possibleWeathers": "Thời tiết có thể xuất hiện", "noWeathers": "Chưa có thông tin thời tiết cho khu vực này.",

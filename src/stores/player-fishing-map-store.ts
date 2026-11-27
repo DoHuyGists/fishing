@@ -6,6 +6,10 @@ import type { FishingMapArea, FishingMapAreaDetails, FishingMapSpecies } from ".
 import { supabaseFishingAreaRepository } from "../data/supabaseFishingAreaRepository";
 import { supabaseSpeciesInAreaRepository } from "../data/supabaseSpeciesInAreaRepository";
 import { getFormattingLocale, t as tr } from "../i18n";
+import { supabaseCountryRepository } from "../data/supabaseCountryRepository";
+import { useCurrencyStore } from "./player-currency-store";
+
+export const COUNTRY_UNLOCK_COST = 300;
 
 const normalize = (value: string) =>
   value
@@ -33,6 +37,9 @@ export const useFishingMapStore = defineStore("fishingMap", {
     speciesError: "",
     request: 0,
     page: 1,
+    countryIdsWithAreas: [] as string[],
+    unlockingCountryId: "",
+    unlockError: "",
   }),
   getters: {
     unlockedIds(): Set<string> {
@@ -100,6 +107,34 @@ export const useFishingMapStore = defineStore("fishingMap", {
     },
   },
   actions: {
+    canUnlock(countryId: string): boolean {
+      return Boolean(useAuthStore().user && !this.loading && !this.error &&
+        !useCountryStore().isLoadingUnlocked && !useCountryStore().unlockedError &&
+        !this.unlockedIds.has(countryId) && this.countryIdsWithAreas.includes(countryId));
+    },
+    async unlockCountry(countryId: string): Promise<boolean> {
+      if (this.unlockingCountryId || !this.canUnlock(countryId)) return false;
+      const auth = useAuthStore(), generation = auth.sessionGeneration;
+      this.unlockingCountryId = countryId;
+      this.unlockError = "";
+      const current = () => auth.sessionGeneration === generation;
+      try {
+        await supabaseCountryRepository.purchaseUnlock(countryId);
+        if (!current()) return false;
+        await Promise.all([
+          useCountryStore().fetchMyUnlockedCountries(auth.user?.id ?? null, true),
+          useCurrencyStore().fetchCurrency(true),
+        ]);
+        if (!current()) return false;
+        this.selectCountry(countryId);
+        return true;
+      } catch {
+        if (current()) this.unlockError = tr("FishingMapModal.unlockError");
+        return false;
+      } finally {
+        if (current()) this.unlockingCountryId = "";
+      }
+    },
     selectCountry(id: string) {
       if (!this.unlockedIds.has(id)) return;
       this.selectedCountryId = id;
@@ -112,11 +147,18 @@ export const useFishingMapStore = defineStore("fishingMap", {
         generation = auth.sessionGeneration;
       this.loading = true;
       this.error = "";
+      this.countryIdsWithAreas = [];
       const countries = useCountryStore();
-      await Promise.all([
-        countries.fetchCountries(force),
-        countries.fetchMyUnlockedCountries(auth.user?.id ?? null, force),
-      ]);
+      try {
+        const [, , countryIds] = await Promise.all([
+          countries.fetchCountries(force),
+          countries.fetchMyUnlockedCountries(auth.user?.id ?? null, force),
+          supabaseCountryRepository.fetchCountryIdsWithAreas(),
+        ]);
+        if (auth.sessionGeneration === generation) this.countryIdsWithAreas = countryIds;
+      } catch {
+        if (auth.sessionGeneration === generation) this.error = tr("FishingMapModal.loadError");
+      }
       if (auth.sessionGeneration !== generation) return;
       this.loading = false;
       if (!countries.loaded || countries.unlockedError) this.error = tr("FishingMapModal.loadError");

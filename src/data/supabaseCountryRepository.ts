@@ -4,6 +4,19 @@ import supabase from "../database/connection";
 import type { Country } from "../stores/player-country-store";
 
 class SupabaseCountryRepository {
+  async purchaseUnlock(countryId: string): Promise<void> {
+    const { error } = await supabase.rpc("purchase_country_unlock", { p_country_id: countryId });
+    if (error) throw new RepositoryError(error);
+  }
+
+  async fetchCountryIdsWithAreas(): Promise<string[]> {
+    const rows = await readCatalogPages<{ id: string }>((from, to) =>
+      supabase.from("countries").select("id, fishing_areas!inner(id)")
+        .limit(1, { referencedTable: "fishing_areas" }).order("id").range(from, to),
+    );
+    return rows.map((row) => row.id);
+  }
+
   async fetchMyUnlockedCountries(playerId: string): Promise<Country[]> {
     const { data, error } = await supabase
       .from("player_unlocked_countries")

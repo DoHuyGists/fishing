@@ -386,6 +386,7 @@
     "key": "world-map",
     "labelKey": "FishingAnchor.ban_do",
     "rpcs": [
+      "purchase_country_unlock",
       "user_enter_area",
       "consume_turn"
     ],

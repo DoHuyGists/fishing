@@ -92,6 +92,9 @@
     "expression_happy": "Happy", "expression_angry": "Angry", "expression_shocked": "Shocked", "expression_sad": "Sad"
   },
   "FishingMapModal": {
+    "unlockCountry": "Unlock {country}",
+    "unlockPrice": "Unlock · {price} shells",
+    "unlockError": "Unable to unlock this country. Please check your balance and try again.",
     "open": "Open", "closed": "Closed", "region": "Region", "unknown": "Not available",
     "maxDepth": "Maximum depth", "depthTool": "Depth tool", "yes": "Allowed", "no": "Not allowed", "timezone": "Time zone",
     "possibleWeathers": "Possible weather", "noWeathers": "No weather information for this region yet.",

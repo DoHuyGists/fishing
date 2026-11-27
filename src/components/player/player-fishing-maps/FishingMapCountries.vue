@@ -1,7 +1,29 @@
 <script setup lang="ts">
 import { t as tr } from "../../../i18n";
-import { useFishingMapStore } from "../../../stores/player-fishing-map-store";
+import { ref, watch } from "vue";
+import { COUNTRY_UNLOCK_COST, useFishingMapStore } from "../../../stores/player-fishing-map-store";
+import { useAuthStore } from "../../../stores/auth";
+import { useCurrencyStore } from "../../../stores/player-currency-store";
+import type { Country } from "../../../stores/player-country-store";
+import PaymentConfirmation from "../../shared/PaymentConfirmation.vue";
 const store = useFishingMapStore();
+const auth = useAuthStore();
+const currency = useCurrencyStore();
+const purchaseCountry = ref<Country | null>(null);
+watch(() => auth.sessionGeneration, () => { purchaseCountry.value = null; });
+
+function openUnlock(country: Country) {
+  if (!store.canUnlock(country.id) || store.unlockingCountryId) return;
+  store.unlockError = "";
+  purchaseCountry.value = country;
+  void currency.fetchCurrency(true);
+}
+
+async function confirmUnlock() {
+  const country = purchaseCountry.value;
+  if (!country || currency.loading || currency.error || currency.shells < COUNTRY_UNLOCK_COST) return;
+  if (await store.unlockCountry(country.id)) purchaseCountry.value = null;
+}
 </script>
 
 <template>
@@ -27,11 +49,14 @@ const store = useFishingMapStore();
       :aria-label="tr('FishingMapModal.countries')"
       class="grid min-h-0 max-h-52 content-start gap-2 overflow-y-auto overscroll-contain md:max-h-none md:flex-1 md:pr-1"
     >
-      <button
+      <div
         v-for="country in store.countries"
         :key="country.id"
+        class="rounded-lg border border-border-default"
+      >
+      <button
         type="button"
-        class="flex w-full items-center gap-2 rounded-lg border border-border-default px-3 py-3 text-left text-sm disabled:cursor-not-allowed disabled:opacity-50 focus-visible:outline-2 focus-visible:outline-content"
+        class="flex w-full items-center gap-2 rounded-lg px-3 py-3 text-left text-sm disabled:cursor-not-allowed disabled:opacity-50 focus-visible:outline-2 focus-visible:outline-content"
         :class="
           store.selectedCountryId === country.id && store.canView
             ? 'bg-surface font-bold'
@@ -46,9 +71,32 @@ const store = useFishingMapStore();
           tr(store.unlockedIds.has(country.id) ? "FishingMapModal.unlocked" : "FishingMapModal.locked")
         }}</span>
       </button>
+      <button
+        v-if="store.canUnlock(country.id)"
+        type="button"
+        class="ocean-primary-action mx-3 mb-3 rounded-lg bg-content px-3 py-2 text-sm font-bold text-white hover:bg-accent disabled:cursor-not-allowed disabled:opacity-50"
+        :disabled="Boolean(store.unlockingCountryId)"
+        :aria-label="tr('FishingMapModal.unlockCountry', { country: country.name })"
+        @click="openUnlock(country)"
+      >
+        {{ tr("FishingMapModal.unlockPrice", { price: COUNTRY_UNLOCK_COST }) }}
+      </button>
+      </div>
       <div v-if="!store.loading && !store.countries.length" role="status" class="py-4 text-center text-sm">
         {{ tr("FishingMapModal.noCountries") }}
       </div>
     </nav>
   </aside>
+  <PaymentConfirmation
+    v-if="purchaseCountry"
+    :title="tr('FishingMapModal.unlockCountry', { country: purchaseCountry.name })"
+    currency="shells"
+    :balance="currency.shells"
+    :total="COUNTRY_UNLOCK_COST"
+    :busy="Boolean(store.unlockingCountryId)"
+    :disabled="currency.loading || Boolean(currency.error) || !store.canUnlock(purchaseCountry.id)"
+    :error="store.unlockError || currency.error"
+    @cancel="purchaseCountry = null"
+    @confirm="confirmUnlock"
+  />
 </template>
