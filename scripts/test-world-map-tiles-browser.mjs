@@ -28,10 +28,10 @@ const server = await createServer({
       return `
         import { createApp, h, ref } from 'vue';
         import WorldMap from '/src/components/player/player-world-map/WorldMap.vue';
-        const map = ref(), visible = ref(true);
-        window.mapTest = { map, visible, picks: [], zooms: [] };
+        const map = ref(), visible = ref(true), tileMode = ref('player');
+        window.mapTest = { map, visible, tileMode, picks: [], zooms: [] };
         createApp({ render: () => visible.value ? h(WorldMap, {
-          ref: map, pickEnabled: true,
+          ref: map, pickEnabled: true, tileMode: tileMode.value,
           onPick: point => window.mapTest.picks.push(point),
           onZoom: state => window.mapTest.zooms.push(state),
         }) : null }).mount('#app');
@@ -46,6 +46,32 @@ try {
   const origin = `http://127.0.0.1:${address.port}`;
   browser = await chromium.launch({ executablePath, headless: true });
   const page = await browser.newPage({ deviceScaleFactor: 1 });
+  await page.addInitScript(() => {
+    window.tilePaints = [];
+    window.tileLabels = [];
+    window.tileFrames = [];
+    window.whiteFrames = [];
+    const strokeRect = CanvasRenderingContext2D.prototype.strokeRect;
+    CanvasRenderingContext2D.prototype.strokeRect = function (...args) {
+      if (this.strokeStyle === '#ffffff') {
+        window.whiteFrames.push({ alpha: this.globalAlpha, time: performance.now(), x: args[0] });
+      }
+      return strokeRect.apply(this, args);
+    };
+    const drawImage = CanvasRenderingContext2D.prototype.drawImage;
+    CanvasRenderingContext2D.prototype.drawImage = function (...args) {
+      window.tilePaints.push(this.globalAlpha);
+      if (args[0] instanceof HTMLImageElement) {
+        window.tileFrames.push({ src: args[0].src, alpha: this.globalAlpha, time: performance.now() });
+      }
+      return drawImage.apply(this, args);
+    };
+    const fillText = CanvasRenderingContext2D.prototype.fillText;
+    CanvasRenderingContext2D.prototype.fillText = function (...args) {
+      window.tileLabels.push(args[0]);
+      return fillText.apply(this, args);
+    };
+  });
   const requests = [];
   const errors = [];
   page.on('request', request => requests.push(new URL(request.url()).pathname));
@@ -56,12 +82,27 @@ try {
   assert(requests.includes('/world-map-tiles/manifest.json'));
   assert(requests.some(url => /^\/world-map-tiles\/1\/\d+\/\d+\.jpg$/.test(url)));
   assert(!requests.includes('/world_map.jpg'));
+  assert(await page.evaluate(() => whiteFrames.some(frame => frame.alpha > 0 && frame.alpha < 1)));
+  assert(await page.evaluate(() => tilePaints.every(alpha => alpha === 1)));
+  assert.equal(await page.evaluate(() => tileLabels.length), 0);
+  await page.waitForFunction(() => new Set(whiteFrames.map(frame => frame.x)).size >= 2);
+  const columnStarts = await page.evaluate(() => {
+    const starts = new Map();
+    for (const frame of whiteFrames) if (!starts.has(frame.x)) starts.set(frame.x, frame.time);
+    return [...starts].sort((a, b) => a[0] - b[0]);
+  });
+  assert(columnStarts.at(-1)[1] - columnStarts[0][1] >= 150);
+  for (let i = 1; i < columnStarts.length; i++) assert(columnStarts[i][1] >= columnStarts[i - 1][1]);
 
   // A deep zoom must load only the visible part of the highest-resolution level.
-  await page.evaluate(() => mapTest.map.value.setView({ lon: 105, lat: 15, k: 30 }));
+  await page.evaluate(() => {
+    whiteFrames.length = 0;
+    mapTest.map.value.setView({ lon: 105, lat: 15, k: 30 });
+  });
   await page.waitForLoadState('networkidle');
-  const highTiles = requests.filter(url => /^\/world-map-tiles\/3\//.test(url));
-  assert(highTiles.length > 0 && highTiles.length < 128);
+  await page.waitForFunction(() => whiteFrames.some(frame => frame.alpha === 0));
+  const highTiles = requests.filter(url => /^\/world-map-tiles\/4\//.test(url));
+  assert(highTiles.length > 0 && highTiles.length < 512);
   const lastZoom = await page.evaluate(() => mapTest.zooms.at(-1));
   assert.equal(lastZoom.k, 30);
   assert(Math.abs(lastZoom.center[0] - 105) < 0.001);
@@ -81,10 +122,39 @@ try {
   });
   assert(pixels > 20);
 
+  // Re-entering a cached target level still fades, for long enough to perceive.
+  await page.evaluate(() => mapTest.map.value.setView({ lon: 105, lat: 15, k: 1 }));
+  await page.waitForLoadState('networkidle');
+  const cachedRequests = requests.length;
+  await page.evaluate(() => {
+    tileFrames.length = 0;
+    whiteFrames.length = 0;
+    mapTest.map.value.setView({ lon: 105, lat: 15, k: 30 });
+  });
+  await page.waitForFunction(() => whiteFrames.some(frame => frame.alpha === 0));
+  const fadeFrames = await page.evaluate(() => whiteFrames);
+  const firstFrame = fadeFrames[0];
+  const finishedFrame = fadeFrames.find(frame => frame.alpha === 0);
+  assert(firstFrame.alpha > 0.95);
+  assert(finishedFrame.time - firstFrame.time >= 300);
+  assert(fadeFrames.some(frame => frame.alpha > 0.2 && frame.alpha < 0.8));
+  assert.equal(requests.length, cachedRequests);
+
+  await page.evaluate(() => {
+    mapTest.tileMode.value = 'admin';
+    tilePaints.length = 0;
+    whiteFrames.length = 0;
+  });
+  await page.evaluate(() => mapTest.map.value.setView({ lon: 105, lat: 15, k: 29 }));
+  await page.waitForFunction(() => tileLabels.some(label => label.includes('drawn=')));
+  assert(await page.evaluate(() => tileLabels.some(label => /^4\/\d+\/\d+ target$/.test(label))));
+  assert(await page.evaluate(() => tilePaints.every(alpha => alpha === 1)));
+  assert.equal(await page.evaluate(() => whiteFrames.length), 0);
+
   const beforePan = new Set(requests);
   await page.evaluate(() => mapTest.map.value.setView({ lon: -100, lat: 40, k: 30 }));
   await page.waitForLoadState('networkidle');
-  assert(requests.some(url => url.startsWith('/world-map-tiles/3/') && !beforePan.has(url)));
+  assert(requests.some(url => url.startsWith('/world-map-tiles/4/') && !beforePan.has(url)));
   await page.evaluate(() => mapTest.visible.value = false);
   await page.waitForFunction(() => !document.querySelector('canvas'));
   assert.deepEqual(errors, []);

@@ -401,7 +401,7 @@ watch(
         </div>
       </div>
       <div v-else class="grid grid-cols-2 gap-2 p-2 w-full">
-        <InteractWorldMap2 :fog-enabled="false" />
+        <InteractWorldMap2 :fog-enabled="false" tile-mode="admin" />
         <!-- Form panel -->
         <FishingAreaManagementForm />
       </div>

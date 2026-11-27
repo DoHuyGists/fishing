@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import type { ViewTarget, ZoomState, PickPoint, AreaPoint } from "../../../types/model/worldMap";
+import type { ViewTarget, ZoomState, PickPoint, AreaPoint, WorldMapTileMode } from "../../../types/model/worldMap";
 import { computed, onBeforeUnmount, onMounted, ref, watch } from "vue";
 import * as d3 from "d3";
 import * as topojson from "topojson-client";
@@ -25,6 +25,7 @@ const props = withDefaults(
     selectedAreaId?: string | null;
     pickEnabled?: boolean; // bật/tắt chọn vị trí bằng click
     unlockedCountryIds?: string[] | null; // null = xem toàn bộ bản đồ
+    tileMode?: WorldMapTileMode;
   }>(),
   {
     seaColor: "#4fc3ff",
@@ -35,6 +36,7 @@ const props = withDefaults(
     selectedAreaId: null,
     pickEnabled: false,
     unlockedCountryIds: null,
+    tileMode: 'none',
   },
 );
 
@@ -165,7 +167,7 @@ const zoomBehavior = d3
   });
 
 let projection: d3.GeoProjection | null = null;
-const reliefTiles = useWorldMapTiles(draw);
+const reliefTiles = useWorldMapTiles(draw, () => props.tileMode);
 
 function updateCloudLayer() {
   if (!cloudLayerDirty || props.unlockedCountryIds === null) return;
@@ -323,6 +325,7 @@ function draw() {
   }
 
   ctx.restore();
+  reliefTiles.drawDebug(ctx);
   updateTip();
 }
 
@@ -431,7 +434,7 @@ watch(() => props.unlockedCountryIds, () => {
 }, { deep: true });
 
 // Đổi màu qua props thì vẽ lại
-watch(() => [props.seaColor, props.landColor, props.borderColor], draw);
+watch(() => [props.seaColor, props.landColor, props.borderColor, props.tileMode], draw);
 
 defineExpose({ setView, resetView });
 </script>

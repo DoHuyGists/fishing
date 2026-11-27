@@ -47,6 +47,8 @@ export interface WorldMapTileLevel {
   rows: number;
 }
 
+export type WorldMapTileMode = 'none' | 'player' | 'admin';
+
 export interface WorldMapTileManifest {
   projection: 'equirectangular';
   tileSize: number;

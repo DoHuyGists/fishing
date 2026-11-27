@@ -1,6 +1,6 @@
 <script lang="ts" setup>
 import { useGameCatalogRefresh } from "../../../composables/useGameCatalogRefresh";
-import type { PickPoint } from "../../../types/model/worldMap";
+import type { PickPoint, WorldMapTileMode } from "../../../types/model/worldMap";
 import { t as tr } from "../../../i18n";
 
 import { computed, nextTick, onMounted, ref, watch } from "vue";
@@ -17,9 +17,10 @@ import { useRouter } from "vue-router";
 import { useCountryStore } from "../../../stores/player-country-store.ts";
 import { useFeatureAvailabilityStore } from "../../../stores/player-feature-availability-store.ts";
 
-const props = withDefaults(defineProps<{ fogEnabled?: boolean; collapsible?: boolean }>(), {
+const props = withDefaults(defineProps<{ fogEnabled?: boolean; collapsible?: boolean; tileMode?: WorldMapTileMode }>(), {
   fogEnabled: true,
   collapsible: false,
+  tileMode: 'player',
 });
 
 const toast = useToast();
@@ -194,6 +195,7 @@ function zoomTo(k: number) {
         class="w-full h-fit overflow-hidden grid place-items-center border border-content rounded-xl"
       >
         <WorldMap
+          :tile-mode="tileMode"
           ref="mapRef"
           :areas="fishingAreaStore.visibleMapAreas"
           :selected-area-id="selectedArea?.id ?? null"

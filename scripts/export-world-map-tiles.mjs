@@ -1,11 +1,19 @@
 import { spawnSync } from 'node:child_process';
-import { mkdir, writeFile } from 'node:fs/promises';
+import { mkdir, readFile, writeFile } from 'node:fs/promises';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 
 const root = fileURLToPath(new URL('../', import.meta.url));
 const source = path.resolve(root, process.argv[2] ?? 'public/world_map.jpg');
 const output = path.resolve(root, process.argv[3] ?? 'public/world-map-tiles');
+const selectedZoom = process.argv[4] === undefined ? null : Number(process.argv[4]);
+if (selectedZoom !== null && (!Number.isInteger(selectedZoom) || selectedZoom < 0 || selectedZoom > 6)) {
+  throw new Error('Expected an integer zoom level between 0 and 6.');
+}
+const existing = selectedZoom === null ? null : JSON.parse(await readFile(path.join(output, 'manifest.json'), 'utf8'));
+if (existing && (existing.projection !== 'equirectangular' || existing.tileSize !== 256 || existing.template !== '{z}/{x}/{y}.jpg')) {
+  throw new Error('Existing tile manifest is incompatible.');
+}
 
 if (process.platform !== 'win32') {
   throw new Error('This exporter requires Windows PowerShell and System.Drawing.');
@@ -22,6 +30,11 @@ try {
     throw 'Expected a 2:1 equirectangular image at least 512 x 256 pixels.'
   }
   $maxZoom = [int][Math]::Ceiling([Math]::Log($source.Height / 256, 2))
+  $startZoom = 0
+  if ($env:WORLD_MAP_TILE_ZOOM -ne '') {
+    $startZoom = [int]$env:WORLD_MAP_TILE_ZOOM
+    $maxZoom = $startZoom
+  }
   $encoder = [System.Drawing.Imaging.ImageCodecInfo]::GetImageEncoders() |
     Where-Object { $_.MimeType -eq 'image/jpeg' }
   $parameters = New-Object System.Drawing.Imaging.EncoderParameters(1)
@@ -29,9 +42,11 @@ try {
     [System.Drawing.Imaging.Encoder]::Quality, [long]92)
   $levels = @()
   try {
-    for ($z = 0; $z -le $maxZoom; $z++) {
+    for ($z = $startZoom; $z -le $maxZoom; $z++) {
       # The last level preserves every source pixel, including non-power-of-two images.
       $height = [int][Math]::Min(256 * [Math]::Pow(2, $z), $source.Height)
+      # Explicit levels may upscale the original relief before cutting tiles.
+      if ($env:WORLD_MAP_TILE_ZOOM -ne '') { $height = [int](256 * [Math]::Pow(2, $z)) }
       $width = 2 * $height
       $columns = [int][Math]::Ceiling($width / 256)
       $rows = [int][Math]::Ceiling($height / 256)
@@ -77,7 +92,7 @@ try {
   } | ConvertTo-Json -Depth 5 -Compress
 } finally { $source.Dispose() }
 `], {
-  env: { ...process.env, WORLD_MAP_TILE_SOURCE: source, WORLD_MAP_TILE_OUTPUT: output },
+  env: { ...process.env, WORLD_MAP_TILE_SOURCE: source, WORLD_MAP_TILE_OUTPUT: output, WORLD_MAP_TILE_ZOOM: selectedZoom === null ? '' : String(selectedZoom) },
   encoding: 'utf8',
   windowsHide: true,
 });
@@ -86,6 +101,11 @@ if (result.error) throw result.error;
 if (result.status !== 0) throw new Error(result.stderr || 'Tile export failed.');
 
 const manifest = JSON.parse(result.stdout.trim());
+if (existing) {
+  manifest.levels = [...existing.levels.filter(level => level.zoom !== selectedZoom), ...manifest.levels].sort((a, b) => a.width - b.width);
+  manifest.minZoom = Math.min(...manifest.levels.map(level => level.zoom));
+  manifest.maxZoom = Math.max(...manifest.levels.map(level => level.zoom));
+}
 await mkdir(output, { recursive: true });
 await writeFile(path.join(output, 'manifest.json'), `${JSON.stringify(manifest, null, 2)}\n`, 'utf8');
 const count = manifest.levels.reduce((total, level) => total + level.columns * level.rows, 0);
