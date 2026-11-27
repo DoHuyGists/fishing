@@ -93,7 +93,7 @@
   },
   "FishingMapModal": {
     "unlockCountry": "Unlock {country}",
-    "unlockPrice": "Unlock · {price} shells",
+    "unlock": "Unlock",
     "unlockError": "Unable to unlock this country. Please check your balance and try again.",
     "open": "Open", "closed": "Closed", "region": "Region", "unknown": "Not available",
     "maxDepth": "Maximum depth", "depthTool": "Depth tool", "yes": "Allowed", "no": "Not allowed", "timezone": "Time zone",
@@ -126,7 +126,7 @@
     "noAreas": "No matching fishing areas.",
     "speciesCount": "{count} species",
     "noSpecies": "No species information yet.",
-    "title": "Lake map",
+    "title": "Fishing areas",
     "shoreName": "Shallow shore waters",
     "shoreNote": "Abundant vegetation",
     "weedName": "Swirling currents",

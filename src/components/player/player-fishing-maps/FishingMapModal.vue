@@ -23,12 +23,12 @@ watch(
     store.$reset();
     store.request = request;
     void store.load();
-    stopRefresh = countries.watchUnlockedCountries(auth.user?.id ?? null);
+    stopRefresh = countries.watchUnlockedCountries(auth.user?.id ?? null, 60_000, false);
   },
   { immediate: true },
 );
 watch(
-  () => [store.selectedCountryId, store.canView],
+  [() => store.selectedCountryId, () => store.canView],
   () => {
     void store.loadSpecies();
   },
@@ -96,17 +96,18 @@ async function refresh() {
           <template v-else>
             <div
               v-if="store.areas.length"
-              class="mt-4 grid min-h-0 min-w-0 auto-rows-max content-start items-start gap-3 md:flex-1 md:overflow-y-auto md:overscroll-contain md:pr-2"
-              :class="store.viewMode === 'grid' ? 'fishing-map-area-grid' : 'grid-cols-1'"
+              class="fishing-map-areas mt-4 min-h-0 min-w-0 md:flex-1 md:overflow-y-auto md:overscroll-contain md:pr-2"
             >
-              <FishingMapAreaCard
-                v-for="(area, index) in store.pagedAreas"
-                :key="area.id"
-                class="slide-fade-in from-bottom player-content-in"
-                :style="{ '--delay': `${index * 45}ms` }"
-                :area="area"
-                :view-mode="store.viewMode"
-              />
+              <div :class="store.viewMode === 'grid' ? 'fishing-map-area-grid' : 'grid auto-rows-max items-start gap-3'">
+                <FishingMapAreaCard
+                  v-for="(area, index) in store.pagedAreas"
+                  :key="area.id"
+                  class="slide-fade-in from-bottom player-content-in"
+                  :style="{ '--delay': `${index * 45}ms` }"
+                  :area="area"
+                  :view-mode="store.viewMode"
+                />
+              </div>
             </div>
             <div v-else role="status" class="py-10 text-center">{{ tr("FishingMapModal.noAreas") }}</div>
             <Pagination
@@ -127,7 +128,13 @@ async function refresh() {
 
 <style scoped>
 .fishing-map-area-grid {
-  grid-template-columns: repeat(auto-fill, minmax(min(100%, 20rem), 1fr));
+  columns: 20rem;
+  column-gap: 0.75rem;
+}
+
+.fishing-map-area-grid > :deep(article) {
+  break-inside: avoid;
+  margin-bottom: 0.75rem;
 }
 
 @media (min-width: 48rem) {

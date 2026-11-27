@@ -58,7 +58,11 @@ export const useFishingMapStore = defineStore("fishingMap", {
             normalize(`${country.name} ${country.code}`).includes(query) &&
             (this.countryFilter === "all" || this.unlockedIds.has(country.id) === (this.countryFilter === "unlocked")),
         )
-        .sort((a, b) => Number(this.unlockedIds.has(b.id)) - Number(this.unlockedIds.has(a.id)));
+        .sort(
+          (a, b) =>
+            Number(this.unlockedIds.has(b.id)) - Number(this.unlockedIds.has(a.id)) ||
+            Number(this.countryIdsWithAreas.includes(b.id)) - Number(this.countryIdsWithAreas.includes(a.id)),
+        );
     },
     selectedCountry(): Country | undefined {
       return useCountryStore().countries.find((country) => country.id === this.selectedCountryId);
@@ -109,7 +113,7 @@ export const useFishingMapStore = defineStore("fishingMap", {
   actions: {
     canUnlock(countryId: string): boolean {
       return Boolean(useAuthStore().user && !this.loading && !this.error &&
-        !useCountryStore().isLoadingUnlocked && !useCountryStore().unlockedError &&
+        useCountryStore().unlockedPlayerId === useAuthStore().user?.id && !useCountryStore().unlockedError &&
         !this.unlockedIds.has(countryId) && this.countryIdsWithAreas.includes(countryId));
     },
     async unlockCountry(countryId: string): Promise<boolean> {

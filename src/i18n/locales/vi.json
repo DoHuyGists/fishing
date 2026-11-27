@@ -93,7 +93,7 @@
   },
   "FishingMapModal": {
     "unlockCountry": "Mở khóa {country}",
-    "unlockPrice": "Mở khóa · {price} vỏ sò",
+    "unlock": "Mở khóa",
     "unlockError": "Không thể mở khóa quốc gia. Vui lòng kiểm tra số dư và thử lại.",
     "open": "Đang mở", "closed": "Đang đóng", "region": "Khu vực", "unknown": "Chưa có thông tin",
     "maxDepth": "Độ sâu tối đa", "depthTool": "Dụng cụ đo sâu", "yes": "Cho phép", "no": "Không cho phép", "timezone": "Múi giờ",
@@ -126,7 +126,7 @@
     "noAreas": "Không có bãi câu phù hợp.",
     "speciesCount": "{count} loài cá",
     "noSpecies": "Chưa có thông tin loài cá.",
-    "title": "Bản đồ hồ",
+    "title": "Khu vực câu",
     "shoreName": "Vùng nước nông ven bờ",
     "shoreNote": "Nhiều rong rêu",
     "weedName": "Vùng nước xoáy dòng chảy",

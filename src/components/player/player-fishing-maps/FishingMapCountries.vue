@@ -6,6 +6,7 @@ import { useAuthStore } from "../../../stores/auth";
 import { useCurrencyStore } from "../../../stores/player-currency-store";
 import type { Country } from "../../../stores/player-country-store";
 import PaymentConfirmation from "../../shared/PaymentConfirmation.vue";
+import Shells from "../player-currency/Shells.vue";
 const store = useFishingMapStore();
 const auth = useAuthStore();
 const currency = useCurrencyStore();
@@ -74,12 +75,13 @@ async function confirmUnlock() {
       <button
         v-if="store.canUnlock(country.id)"
         type="button"
-        class="ocean-primary-action mx-3 mb-3 rounded-lg bg-content px-3 py-2 text-sm font-bold text-white hover:bg-accent disabled:cursor-not-allowed disabled:opacity-50"
+        class="ocean-primary-action mx-3 mb-3 inline-flex items-center gap-2 rounded-lg bg-content px-3 py-2 text-sm font-bold text-white hover:bg-accent disabled:cursor-not-allowed disabled:opacity-50"
         :disabled="Boolean(store.unlockingCountryId)"
         :aria-label="tr('FishingMapModal.unlockCountry', { country: country.name })"
         @click="openUnlock(country)"
       >
-        {{ tr("FishingMapModal.unlockPrice", { price: COUNTRY_UNLOCK_COST }) }}
+        <span>{{ tr("FishingMapModal.unlock") }}</span>
+        <Shells :amount="COUNTRY_UNLOCK_COST" :interactive="false" class="pointer-events-none text-content" />
       </button>
       </div>
       <div v-if="!store.loading && !store.countries.length" role="status" class="py-4 text-center text-sm">

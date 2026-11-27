@@ -1,5 +1,9 @@
 # Mở khóa quốc gia trên bản đồ bãi câu
 
+Danh sách ưu tiên quốc gia đã mở khóa, tiếp đến quốc gia chưa mở khóa có bãi câu, cuối cùng là quốc gia chưa mở khóa không có bãi câu. Trong mỗi nhóm giữ thứ tự hiện có; tìm kiếm và bộ lọc trạng thái vẫn áp dụng như trước.
+
+Modal tải danh sách khi mở và kiểm tra nền mỗi 60 giây khi đang hiển thị. Vòng kiểm tra không tải ngay lần nữa sau lượt tải ban đầu. Trong lúc kiểm tra nền cùng tài khoản, giữ nút mở khóa theo snapshot hiện có để tránh nhấp nháy; lỗi tải hoặc đổi tài khoản vẫn chặn mở khóa. Chỉ thay đổi quốc gia được chọn hoặc quyền xem mới kích hoạt tải lại bãi câu.
+
 `FishingMapCountries.vue` trong `FishingMapModal.vue` hiển thị nút mở khóa cho quốc gia chưa mở khóa có ít nhất một dòng `fishing_areas`, kể cả bãi đang đóng. Repository dùng inner join, phân trang theo quốc gia và chỉ lấy một bãi mẫu cho mỗi quốc gia để kiểm tra điều kiện.
 
 Giá cố định là **300 vỏ sò**. Hộp `PaymentConfirmation` tải lại ví, hiển thị chi phí/số dư và chặn xác nhận khi thiếu tiền hoặc đang xử lý. Action trong `player-fishing-map-store.ts` gọi repository, tải lại quốc gia đã mở khóa và ví sau thành công, rồi chọn quốc gia vừa mua. Kết quả từ phiên đăng nhập cũ bị bỏ qua.

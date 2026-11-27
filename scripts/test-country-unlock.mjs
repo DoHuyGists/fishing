@@ -23,6 +23,13 @@ test('country purchase store checks eligibility, prevents duplicate requests and
     countries.countries = [{ id: 'a', name: 'A' }, { id: 'empty', name: 'Empty' }];
     countries.unlockedPlayerId = 'player';
     store.countryIdsWithAreas = ['a'];
+    countries.isLoadingUnlocked = true;
+    assert.equal(store.canUnlock('a'), true, 'background refresh preserves the unlock button');
+    assert.deepEqual(store.countries.map(country => country.id), ['a', 'empty']);
+    countries.unlockedPlayerId = 'previous-player';
+    assert.equal(store.canUnlock('a'), false, 'a different account cannot use the previous snapshot');
+    countries.unlockedPlayerId = 'player';
+    countries.isLoadingUnlocked = false;
     assert.equal(store.canUnlock('empty'), false);
     assert.equal(await store.unlockCountry('empty'), false);
     let resolvePurchase, calls = 0, refreshes = 0;
