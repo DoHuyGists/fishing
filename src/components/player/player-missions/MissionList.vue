@@ -25,41 +25,43 @@ const emit = defineEmits<{
 
 <template>
   <section class="min-h-0 flex flex-col">
-    <div class="px-5 py-3 sm:px-6 border-b border-accent/10 flex items-center justify-between">
+    <div class="shrink-0 px-5 py-3 sm:px-6 border-b border-accent/10 flex items-center justify-between">
       <div class="m-0 text-sm font-bold">{{ tr("MissionList.nhiem_vu") }}</div>
       <span class="text-xs text-content/60">{{ missions.length }} {{ tr("MissionList.nhiem_vu_2") }}</span>
     </div>
-    <div class="flex-1 overflow-y-auto p-4 sm:p-5 space-y-4">
-      <div v-if="!missions.length" class="py-8 text-center text-sm text-content/55">
-        {{ tr("MissionList.hien_khong_co_nhiem_vu") }}
-      </div>
-      <button
-        v-for="mission in missions"
-        :key="mission.id"
-        type="button"
-        class="slide-fade-in from-top player-content-in w-full p-3 rounded-lg border text-left transition-colors"
-        :class="
-          selectedMissionId === mission.id ? 'border-accent bg-surface' : 'border-accent/10 bg-white/55 hover:bg-white'
-        "
-        @click="emit('select', mission.id)"
-      >
-        <span class="flex items-center justify-between gap-3">
-          <strong class="text-sm">{{ mission.start }} - {{ mission.end }}</strong>
-          <span class="flex items-center gap-2"
-            ><span class="text-sm">{{ tr("Achievement.phan_thuong") }}</span
-            ><Cash :amount="mission.cash"
-          /></span>
-        </span>
-        <span class="mt-1 block text-xs text-content/65"
-          >{{ mission.content.length }} {{ tr("MissionList.ca_can_nop") }}</span
+    <div class="min-h-0 flex flex-1 flex-col gap-4 overflow-hidden p-4 sm:p-5">
+      <div class="min-h-0 flex-1 overflow-y-scroll space-y-4">
+        <div v-if="!missions.length" class="py-8 text-center text-sm text-content/55">
+          {{ tr("MissionList.hien_khong_co_nhiem_vu") }}
+        </div>
+        <button
+          v-for="mission in missions"
+          :key="mission.id"
+          type="button"
+          class="slide-fade-in from-top player-content-in w-full p-3 rounded-lg border text-left transition-colors"
+          :class="
+            selectedMissionId === mission.id ? 'border-accent bg-surface' : 'border-accent/10 bg-white/55 hover:bg-white'
+          "
+          @click="emit('select', mission.id)"
         >
-      </button>
+          <span class="flex items-center justify-between gap-3">
+            <strong class="text-sm">{{ mission.start }} - {{ mission.end }}</strong>
+            <span class="flex items-center gap-2"
+              ><span class="text-sm">{{ tr("Achievement.phan_thuong") }}</span
+              ><Cash :amount="mission.cash"
+            /></span>
+          </span>
+          <span class="mt-1 block text-xs text-content/65"
+            >{{ mission.content.length }} {{ tr("MissionList.ca_can_nop") }}</span
+          >
+        </button>
+      </div>
 
-      <div v-if="selectedMission" class="pt-1">
-        <div class="m-0 mb-2 text-xs font-extrabold uppercase tracking-wide text-content/65">
+      <div v-if="selectedMission" class="min-h-0 flex flex-1 flex-col pt-1">
+        <div class="shrink-0 m-0 mb-2 text-xs font-extrabold uppercase tracking-wide text-content/65">
           {{ tr("MissionList.ca_can_co") }}
         </div>
-        <div class="space-y-2 slide-fade-in from-left">
+        <div class="min-h-0 flex-1 overflow-y-scroll space-y-2 slide-fade-in from-bottom">
           <div
             v-for="(fish, index) in selectedMission.content"
             :key="`${fish.id}-${index}`"
@@ -82,7 +84,7 @@ const emit = defineEmits<{
         </div>
       </div>
     </div>
-    <footer class="px-4 py-3 sm:px-5 border-t border-accent/10 bg-white/40">
+    <footer class="shrink-0 px-4 py-3 sm:px-5 border-t border-accent/10 bg-white/40">
       <div v-if="statusMessage" class="m-0 mb-2 text-xs" :class="statusIsError ? 'text-danger' : 'text-content'">
         {{ statusMessage }}
       </div>
