@@ -1,5 +1,7 @@
 # Mở khóa quốc gia trên bản đồ bãi câu
 
+Thanh danh sách `FishingAnchor.vue` hiển thị tất cả quốc gia đã mở khóa của người chơi hiện tại, kể cả quốc gia chưa có bãi câu. Khi mở nhóm trống sau khi tải thành công, hiển thị “Chưa có địa điểm câu”. Tìm theo tên quốc gia giữ cả nhóm trống; tìm theo tên bãi câu chỉ giữ nhóm có bãi khớp. Mỗi bãi hiển thị trên một hàng với biểu tượng chế độ có chú thích; tên dài được rút gọn và có chú thích đầy đủ.
+
 Danh sách ưu tiên quốc gia đã mở khóa, tiếp đến quốc gia chưa mở khóa có bãi câu, cuối cùng là quốc gia chưa mở khóa không có bãi câu. Trong mỗi nhóm giữ thứ tự hiện có; tìm kiếm và bộ lọc trạng thái vẫn áp dụng như trước.
 
 Modal tải danh sách khi mở và kiểm tra nền mỗi 60 giây khi đang hiển thị. Vòng kiểm tra không tải ngay lần nữa sau lượt tải ban đầu. Trong lúc kiểm tra nền cùng tài khoản, giữ nút mở khóa theo snapshot hiện có để tránh nhấp nháy; lỗi tải hoặc đổi tài khoản vẫn chặn mở khóa. Chỉ thay đổi quốc gia được chọn hoặc quyền xem mới kích hoạt tải lại bãi câu.

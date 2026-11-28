@@ -1769,6 +1769,7 @@
     "bai_cau_chua_dat_ten": "Bãi câu chưa đặt tên",
     "dang_tai_bai_cau": "Đang tải bãi câu...",
     "chua_co_bai_cau": "Chưa có bãi câu",
+    "chua_co_dia_diem_cau": "Chưa có địa điểm câu",
     "khong_tim_thay_quoc_gia_hoac_bai_cau_phu_hop": "Không tìm thấy quốc gia hoặc bãi câu phù hợp."
   },
   "InteractWorldMap": {

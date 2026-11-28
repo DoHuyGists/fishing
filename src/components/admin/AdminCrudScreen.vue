@@ -30,7 +30,7 @@ const props = withDefaults(defineProps<{
   title: string;
   icon: string;
   columns: CrudColumn[];
-  fields: CrudField[];
+  fields?: CrudField[];
   items: any[];
   loading: boolean;
   error: string;
@@ -40,9 +40,9 @@ const props = withDefaults(defineProps<{
   search?: string;
   allowCreate?: boolean;
   allowDelete?: boolean;
-  save: (payload: Record<string, unknown>, id: string | null) => Promise<unknown>;
+  save?: (payload: Record<string, unknown>, id: string | null) => Promise<unknown>;
   remove: (id: string) => Promise<unknown>;
-}>(), { allowCreate: true, allowDelete: true });
+}>(), { allowCreate: true, allowDelete: true, fields: () => [] });
 const emit = defineEmits<{ (e: "close"): void; (e: "refresh"): void; (e: 'page', page: number, search: string): void }>();
 
 const search = ref(props.search ?? "");
@@ -58,6 +58,7 @@ watch(search, () => {
 onUnmounted(() => clearTimeout(searchTimer));
 const isOpen = ref(false);
 const editingId = ref<string | null>(null);
+const editingItem = ref<any>(null);
 const form = reactive<Record<string, any>>({});
 const formError = ref("");
 const saving = ref(false);
@@ -97,8 +98,10 @@ function isReadonly(field: CrudField) {
 }
 
 function openForm(item?: any) {
+  if (saving.value) return;
   formError.value = "";
   editingId.value = item?.id ?? null;
+  editingItem.value = item ?? null;
   for (const key of Object.keys(form)) delete form[key];
   for (const f of props.fields) {
     const raw = item ? item[f.key] : f.defaultValue;
@@ -109,6 +112,14 @@ function openForm(item?: any) {
     else form[f.key] = typeof raw === "boolean" ? String(raw) : raw ?? "";
   }
   isOpen.value = true;
+}
+
+function closeForm() {
+  if (!saving.value) isOpen.value = false;
+}
+
+function setSaving(value: boolean) {
+  saving.value = value;
 }
 
 function buildPayload(): Record<string, unknown> {
@@ -141,6 +152,7 @@ async function submit() {
   formError.value = "";
   saving.value = true;
   try {
+    if (!props.save) throw new Error("Chưa cấu hình thao tác lưu dữ liệu");
     await props.save(buildPayload(), editingId.value);
     isOpen.value = false;
   } catch (err) {
@@ -214,6 +226,7 @@ async function confirmDelete() {
     </div>
 
     <div v-if="isOpen" class="fixed inset-0 z-60 bg-content/40 grid place-items-center p-4">
+      <slot name="form" :item="editingItem" :close="closeForm" :set-saving="setSaving">
       <form class="bg-white rounded-xl w-full max-w-lg max-h-[90vh] flex flex-col shadow-xl" @submit.prevent="submit">
         <div class="px-5 py-3 border-b border-border font-extrabold text-sm">{{ editingId ? "Cập nhật" : "Thêm mới" }} - {{ title }}</div>
         <fieldset :disabled="saving" class="m-0 min-w-0 border-0 p-5 overflow-auto flex flex-col gap-3">
@@ -238,6 +251,7 @@ async function confirmDelete() {
           <button type="submit" :disabled="saving" class="px-3 py-1.5 rounded-lg bg-content-strong text-white text-xs font-bold cursor-pointer disabled:opacity-50">{{ saving ? "Đang lưu..." : "Lưu" }}</button>
         </div>
       </form>
+      </slot>
     </div>
     <Pagination v-if="page !== undefined" :page="page" :page-size="pageSize ?? 10" :total="total ?? 0" :loading="loading" @change="emit('page', $event, search)" />
   </AdminModal>

@@ -1765,6 +1765,7 @@
     "bai_cau_chua_dat_ten": "Unnamed fishing area",
     "dang_tai_bai_cau": "Loading fishing areas...",
     "chua_co_bai_cau": "No fishing areas yet",
+    "chua_co_dia_diem_cau": "No fishing locations yet",
     "khong_tim_thay_quoc_gia_hoac_bai_cau_phu_hop": "No matching countries or fishing areas."
   },
   "InteractWorldMap": {

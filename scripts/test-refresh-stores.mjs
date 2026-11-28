@@ -57,6 +57,18 @@ test('snapshot stores preserve the selected page and login under reordered respo
       countries.unlockedCountries = [countries.countries[0]];
       assert.deepEqual(areas.areasByCountry.map(group => group.id), ['open']);
       assert.deepEqual(areas.filteredAreasByCountry[0].areas.map(area => area.id), ['open-area']);
+      countries.unlockedCountries.push({ id: 'empty', name: 'Đảo trống' });
+      assert.deepEqual(areas.areasByCountry.map(group => group.id), ['empty', 'open']);
+      assert.deepEqual(areas.areasByCountry[0].areas, []);
+      areas.searchQuery = 'dao trong';
+      assert.deepEqual(areas.filteredAreasByCountry.map(group => group.id), ['empty']);
+      areas.searchQuery = 'lake';
+      assert.deepEqual(areas.filteredAreasByCountry.map(group => group.id), ['open']);
+      const savedAreas = areas.fishingAreas;
+      areas.fishingAreas = [];
+      areas.searchQuery = '';
+      assert.deepEqual(areas.filteredAreasByCountry.map(group => group.id), ['empty', 'open']);
+      areas.fishingAreas = savedAreas;
       areas.searchQuery = 'Locked';
       assert.deepEqual(areas.filteredAreasByCountry, []);
       areas.searchQuery = 'Open lake';

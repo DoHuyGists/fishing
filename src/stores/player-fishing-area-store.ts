@@ -45,7 +45,7 @@ export const useFishingAreaStore = defineStore("fishing_areas", {
                 normalizeSearch(area.title || tr("FishingAnchor.bai_cau_chua_dat_ten")).includes(query),
               ),
         }))
-        .filter((group) => group.areas.length > 0);
+        .filter((group) => normalizeSearch(group.name).includes(query) || group.areas.length > 0);
     },
 
     visibleMapAreas(state): FishingArea[] {
@@ -59,22 +59,16 @@ export const useFishingAreaStore = defineStore("fishing_areas", {
       const playerId = useAuthStore().user?.id;
       if (!playerId || countryStore.unlockedPlayerId !== playerId || countryStore.unlockedError) return [];
 
-      const countries = new Map(countryStore.unlockedCountries.map((country) => [country.id, country.name]));
-      const groups = new Map<string, FishingAreaCountryGroup>();
+      const groups = new Map<string, FishingAreaCountryGroup>(
+        countryStore.unlockedCountries.map((country) => [country.id, {
+          id: country.id,
+          name: country.name || tr("fishingArea.chua_xac_dinh_quoc_gia"),
+          areas: [],
+        }]),
+      );
 
       for (const area of state.fishingAreas) {
-        if (!countries.has(area.countryId)) continue;
-        const countryId = area.countryId;
-        let group = groups.get(countryId);
-        if (!group) {
-          group = {
-            id: countryId,
-            name: countries.get(countryId) ?? tr("fishingArea.chua_xac_dinh_quoc_gia"),
-            areas: [],
-          };
-          groups.set(countryId, group);
-        }
-        group.areas.push(area);
+        groups.get(area.countryId)?.areas.push(area);
       }
 
       return [...groups.values()]

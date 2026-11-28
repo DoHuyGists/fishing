@@ -26,8 +26,9 @@ function createRepository<Row extends { id: string }, Payload>(
       return mapRow(data);
     },
     async update(id, payload) {
-      const { data, error } = await supabase.from(table).update(toDb(payload)).eq("id", id).select("*").single();
+      const { data, error } = await supabase.from(table).update(toDb(payload)).eq("id", id).select("*").maybeSingle();
       if (error) throw new Error(error.message);
+      if (!data) throw new Error("Không thể cập nhật: bản ghi không còn tồn tại hoặc bạn không có quyền cập nhật. Vui lòng kiểm tra quyền RLS của bảng.");
       return mapRow(data);
     },
     async remove(id) {

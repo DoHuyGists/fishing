@@ -56,8 +56,20 @@ const server = await createServer({
         };
         supabaseWeatherRepository.fetchAll = async () => [{ id: 'weather', code: 'sun', name: 'Sun' }];
         supabaseModifierRepository.fetchAll = async () => [{ id: 'modifier', code: 'strength', name: 'Strength' }];
-        supabaseWeatherRepository.fetchPage = supabaseWeatherModifierRepository.fetchPage = async () => ({ items: [], total: 0 });
-        supabaseWeatherRepository.create = async payload => { weatherWrites++; return { id: 'weather', ...payload }; };
+        let weatherRows = [], rejectWeatherUpdate = true;
+        supabaseWeatherRepository.fetchPage = async () => ({ items: structuredClone(weatherRows), total: weatherRows.length });
+        supabaseWeatherModifierRepository.fetchPage = async () => ({ items: [], total: 0 });
+        supabaseWeatherRepository.create = async payload => {
+          weatherWrites++;
+          const row = { id: 'weather', ...payload, createdAt: '2026-11-28T00:00:00Z' };
+          weatherRows = [row];
+          return row;
+        };
+        supabaseWeatherRepository.update = async (id, payload) => {
+          if (rejectWeatherUpdate) { rejectWeatherUpdate = false; throw new Error('Weather update denied by RLS'); }
+          weatherRows = [{ ...weatherRows[0], id, ...payload }];
+          return weatherRows[0];
+        };
         supabaseWeatherModifierRepository.create = async payload => { modifierWrites++; return { id: 'weather-modifier', ...payload }; };
         const router = createRouter({ history: createMemoryHistory(), routes: [
           { path: '/', redirect: '/admin' },
@@ -175,6 +187,20 @@ try {
   await weatherDialog.getByRole('button', { name: 'Lưu', exact: true }).click();
   await page.waitForFunction(() => adminTest.weatherWrites === 1);
   await weatherDialog.locator('form').waitFor({ state: 'detached' });
+  await weatherDialog.getByRole('button', { name: 'Sửa', exact: true }).click();
+  assert.equal(await weatherDialog.getByLabel(/^Tên/).inputValue(), 'Sun');
+  await weatherDialog.getByLabel(/^Tên/).fill('Updated sun');
+  await weatherDialog.getByRole('button', { name: 'Huỷ', exact: true }).click();
+  await weatherDialog.getByRole('cell', { name: 'Sun', exact: true }).waitFor();
+  await weatherDialog.getByRole('button', { name: 'Sửa', exact: true }).click();
+  assert.equal(await weatherDialog.getByLabel(/^Tên/).inputValue(), 'Sun', 'Cancelled drafts must not mutate saved rows');
+  await weatherDialog.getByLabel(/^Tên/).fill('Updated sun');
+  await weatherDialog.getByRole('button', { name: 'Lưu', exact: true }).click();
+  await weatherDialog.getByRole('alert').getByText('Weather update denied by RLS').waitFor();
+  assert.equal(await weatherDialog.getByLabel(/^Tên/).inputValue(), 'Updated sun', 'Failed updates must preserve the draft');
+  await weatherDialog.getByRole('button', { name: 'Lưu', exact: true }).click();
+  await weatherDialog.locator('form').waitFor({ state: 'detached' });
+  await weatherDialog.getByRole('cell', { name: 'Updated sun', exact: true }).waitFor();
   await weatherDialog.getByRole('button', { name: 'Đóng', exact: true }).click();
 
   await page.locator('aside').getByRole('button', { name: 'Chỉ số theo thời tiết', exact: true }).click();

@@ -342,14 +342,27 @@ watch(
                 </td>
                 <td class="px-4 py-2.5">
                   <span
-                    class="px-2 py-0.5 rounded-full text-[10px] font-bold border"
+                    class="inline-flex items-center gap-1.5 whitespace-nowrap rounded-full border px-2.5 py-1 text-xs font-semibold"
                     :class="
                       area.isAvailable
-                        ? 'bg-surface text-content border-accent'
-                        : 'bg-surface text-content border-content'
+                        ? 'bg-accent text-white border-accent'
+                        : 'bg-gold/20 text-content border-gold'
                     "
                   >
-                    {{ area.isAvailable ? "Hoạt động" : "Chưa bật" }}
+                    <svg
+                      class="h-3.5 w-3.5 shrink-0"
+                      aria-hidden="true"
+                      fill="none"
+                      stroke="currentColor"
+                      stroke-width="2"
+                      stroke-linecap="round"
+                      stroke-linejoin="round"
+                      viewBox="0 0 24 24"
+                    >
+                      <path v-if="area.isAvailable" d="m5 12 4 4L19 6" />
+                      <path v-else d="M9 5v14M15 5v14" />
+                    </svg>
+                    {{ area.isAvailable ? "Đang hoạt động" : "Chưa kích hoạt" }}
                   </span>
                 </td>
                 <td class="px-4 py-2.5 text-content whitespace-nowrap">{{ formatDate(area.createdAt) }}</td>
